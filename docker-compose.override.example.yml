@@ -1,0 +1,7 @@
+# Copy to docker-compose.override.yml (gitignored) and fill in the secrets.
+# docker compose merges it automatically on top of docker-compose.yml.
+# Alternatively, set the same variables in .env.
+services:
+  gateway:
+    environment:
+      - MONGODB_URI=mongodb://USER:PASSWORD@HOST:27017/DATABASE?authSource=admin

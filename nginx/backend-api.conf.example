@@ -1,0 +1,38 @@
+# 3Speak Editor Backend API — nginx reverse proxy
+#
+# Usage:
+#   1. Copy to /etc/nginx/sites-available/YOUR_DOMAIN
+#   2. Replace YOUR_DOMAIN with your actual domain
+#   3. Replace 3103 with your backend port (3102, 3103, 3104, etc.)
+#   4. symlink: ln -s /etc/nginx/sites-available/YOUR_DOMAIN /etc/nginx/sites-enabled/
+#   5. Run: sudo certbot --nginx -d YOUR_DOMAIN
+#   6. Reload: sudo nginx -t && sudo systemctl reload nginx
+
+server {
+    server_name YOUR_DOMAIN;
+
+    client_max_body_size 2g;
+
+    location / {
+        proxy_pass http://127.0.0.1:3103;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_read_timeout 120s;
+        proxy_send_timeout 120s;
+    }
+
+    # SSL — managed by Certbot (added automatically after running certbot)
+    # listen 443 ssl;
+    # ssl_certificate /etc/letsencrypt/live/YOUR_DOMAIN/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/YOUR_DOMAIN/privkey.pem;
+    # include /etc/letsencrypt/options-ssl-nginx.conf;
+    # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    listen 80;
+}

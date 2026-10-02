@@ -1,0 +1,1027 @@
+import { spawn, execFile } from 'child_process'
+import path from 'path'
+import fs from 'fs/promises'
+
+/**
+ * Build and execute FFmpeg commands to render the timeline.
+ */
+export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath, jobDir, onProgress, signal }) {
+  const outputWidth = timeline.outputWidth || 854
+  const outputHeight = timeline.outputHeight || 480
+  const fps = timeline.fps || 30
+
+  // Scale factor: clip properties (fontSize, positionX/Y) are in preview-pixel coords
+  // Convert to output resolution
+  const previewWidth = timeline.previewWidth || outputWidth
+  const scaleFactor = outputWidth / previewWidth
+  console.log(`[ffmpeg] Preview width: ${previewWidth}px, Output: ${outputWidth}px, Scale factor: ${scaleFactor.toFixed(2)}`)
+
+  // Scoped runner that passes the abort signal to every FFmpeg call
+  const run = (args) => runFFmpeg(args, signal)
+
+  const videoTracks = timeline.tracks.filter(t => t.type === 'video')
+  const audioTracks = timeline.tracks.filter(t => t.type === 'audio')
+
+  // Calculate total timeline duration
+  let totalDuration = 0
+  for (const track of timeline.tracks) {
+    for (const clip of track.clips) {
+      const clipEnd = (clip.timelinePosition || 0) + (clip.endTime - clip.startTime)
+      totalDuration = Math.max(totalDuration, clipEnd)
+    }
+  }
+
+  if (totalDuration === 0) {
+    throw new Error('Timeline has no duration')
+  }
+
+  // Collect all clips with track info
+  const allClips = []
+  for (const track of [...videoTracks, ...audioTracks]) {
+    for (const clip of track.clips) {
+      allClips.push({ ...clip, trackType: track.type, trackId: track.id })
+    }
+  }
+
+  // STEP 1: Process each clip (trim, scale)
+  onProgress(0, 'Processing individual clips...')
+
+  const processedClips = new Map()
+
+  for (let i = 0; i < allClips.length; i++) {
+    const clip = allClips[i]
+    const inputFile = downloadedFiles.get(clip.id)
+
+    // Text and color clips don't need downloaded files
+    if (!inputFile && clip.type !== 'text' && clip.type !== 'color') continue
+
+    // Detect image type from file extension if not set correctly
+    if (inputFile && (!clip.type || clip.type === 'video')) {
+      const inputExt = path.extname(inputFile).toLowerCase()
+      if (['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.svg'].includes(inputExt)) {
+        clip.type = 'image'
+        console.log(`[DEBUG] Corrected clip type to 'image' based on file extension: ${inputExt}`)
+      }
+    }
+
+    onProgress((i / allClips.length) * 0.4, `Processing clip ${i + 1}/${allClips.length}: ${clip.name || 'clip'}`)
+
+    // Use .mov for images and text to preserve transparency, .mp4 for others (including color)
+    const ext = (clip.type === 'image' || clip.type === 'text') ? '.mov' : '.mp4'
+    const processedPath = path.join(jobDir, `processed_${clip.id}${ext}`)
+    await processClip(clip, inputFile, processedPath, outputWidth, outputHeight, fps, signal, scaleFactor)
+    processedClips.set(clip.id, processedPath)
+  }
+
+  // STEP 2: Composite all video clips onto a single canvas
+  // Uses overlay with setpts for timing — gaps are naturally transparent
+  // because clips are only present during their timeline range.
+  onProgress(0.4, 'Compositing video...')
+
+  // Collect clips in layer order: bottom track first (last videoTrack = bottom in UI),
+  // then upper tracks overlaid on top.
+  const overlayClips = []
+  for (const track of [...videoTracks].reverse()) {
+    const sorted = [...track.clips].sort((a, b) => (a.timelinePosition || 0) - (b.timelinePosition || 0))
+    for (const clip of sorted) {
+      if (processedClips.has(clip.id)) {
+        overlayClips.push({ clip, file: processedClips.get(clip.id) })
+      }
+    }
+  }
+
+  if (overlayClips.length === 0) {
+    throw new Error('No video content to render')
+  }
+
+  let videoOutputPath
+
+  // Always composite onto the canvas to ensure correct output dimensions (e.g. 9:16)
+  {
+    videoOutputPath = path.join(jobDir, 'composited_video.mp4')
+
+    const compArgs = []
+    // Input 0: black canvas for the full timeline duration
+    compArgs.push('-f', 'lavfi', '-i', `color=c=black:s=${outputWidth}x${outputHeight}:d=${totalDuration}:r=${fps}`)
+
+    // Add each processed clip as an input
+    for (const oc of overlayClips) {
+      compArgs.push('-i', oc.file)
+    }
+
+    // Build the filter graph:
+    // 1. Delay each clip to its timeline position using setpts
+    // 2. Chain overlay filters: base → overlay clip0 → overlay clip1 → ...
+    const filterParts = []
+
+    for (let i = 0; i < overlayClips.length; i++) {
+      const oc = overlayClips[i]
+      const pos = oc.clip.timelinePosition || 0
+
+      if (pos > 0.01) {
+        filterParts.push(`[${i + 1}:v]setpts=PTS+${pos.toFixed(3)}/TB[v${i}]`)
+      }
+    }
+
+    let prev = '0:v'
+    for (let i = 0; i < overlayClips.length; i++) {
+      const oc = overlayClips[i]
+      const out = i === overlayClips.length - 1 ? '[outv]' : `[tmp${i}]`
+      const clipLabel = (oc.clip.timelinePosition || 0) > 0.01 ? `[v${i}]` : `[${i + 1}:v]`
+
+      // Text/image/color clips have position baked into their canvas → overlay at 0:0
+      // Video clips need position applied here
+      const isFullCanvas = oc.clip.type === 'text' || oc.clip.type === 'image' || oc.clip.type === 'color'
+      const overlayPos = isFullCanvas ? '0:0' : getOverlayPosition(oc.clip, outputWidth, outputHeight, scaleFactor)
+
+      filterParts.push(`[${prev}]${clipLabel}overlay=${overlayPos}:eof_action=pass:format=auto${out}`)
+      prev = `tmp${i}`
+    }
+
+    compArgs.push('-filter_complex', filterParts.join(';'))
+    compArgs.push('-map', '[outv]')
+    compArgs.push('-c:v', 'libx264', '-crf', '23', '-preset', 'fast', '-pix_fmt', 'yuv420p')
+    compArgs.push('-t', totalDuration.toFixed(3))
+    compArgs.push('-an')
+    compArgs.push('-y', videoOutputPath)
+
+    console.log('[DEBUG] Composite filter:', filterParts.join(';'))
+    await run(compArgs)
+  }
+
+  // STEP 4: Mix audio
+  onProgress(0.75, 'Mixing audio...')
+
+  const audioSources = []
+
+  // Audio from video clips (with timeline offset) — only actual video clips have audio
+  for (const track of videoTracks) {
+    for (const clip of track.clips) {
+      if (clip.type === 'video' && clip.audioEnabled !== false && processedClips.has(clip.id)) {
+        audioSources.push({
+          file: processedClips.get(clip.id),
+          volume: (clip.volume || 100) / 100,
+          offset: clip.timelinePosition || 0
+        })
+      }
+    }
+  }
+
+  // Audio-only tracks (with timeline offset)
+  for (const track of audioTracks) {
+    for (const clip of track.clips) {
+      if (processedClips.has(clip.id)) {
+        audioSources.push({
+          file: processedClips.get(clip.id),
+          volume: (clip.volume || 100) / 100,
+          offset: clip.timelinePosition || 0
+        })
+      }
+    }
+  }
+
+  // STEP 5: Final encode
+  onProgress(0.85, 'Encoding final output...')
+
+  if (audioSources.length > 0) {
+    await combineVideoAudio(videoOutputPath, audioSources, outputPath, fps, signal)
+  } else {
+    await run([
+      '-i', videoOutputPath,
+      '-c:v', 'libx264', '-crf', '23', '-preset', 'fast',
+      '-an', '-r', fps.toString(),
+      '-y', outputPath
+    ])
+  }
+
+  onProgress(1.0, 'Complete')
+}
+
+/**
+ * Process a single clip: trim, scale, normalize, apply transforms.
+ */
+async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scaleFactor = 1) {
+  const duration = clip.endTime - clip.startTime
+
+  // Handle text clips
+  if (clip.type === 'text') {
+    console.log('[DEBUG] Text clip properties:', JSON.stringify({
+      text: clip.text,
+      fontSize: clip.fontSize,
+      fontColor: clip.fontColor,
+      fontFamily: clip.fontFamily,
+      positionX: clip.positionX,
+      positionY: clip.positionY,
+      boxEnabled: clip.boxEnabled,
+      boxColor: clip.boxColor,
+      boxBorderW: clip.boxBorderW
+    }, null, 2))
+
+    const baseFontSize = clip.fontSize || 48
+    const fontColor = clip.fontColor || 'white'
+
+    // scaleFactor converts preview-pixel values to output-pixel values
+    // zoom is the CSS scale() value (percentage / 100)
+    const zoom = (clip.zoom && clip.zoom !== 100) ? clip.zoom / 100 : 1.0
+    // Font size: scale from preview coords to output coords, then apply zoom
+    const fontSize = Math.round(baseFontSize * scaleFactor * zoom)
+
+    // Map font families to font files
+    // Google Fonts (variable fonts use the same file for regular and bold)
+    const G = '/usr/share/fonts/google'
+    const fontFileMap = {
+      // Sans Serif
+      'Roboto': `${G}/Roboto[wdth,wght].ttf`,
+      'Open Sans': `${G}/OpenSans[wdth,wght].ttf`,
+      'Lato': `${G}/Lato-Regular.ttf`,
+      'Montserrat': `${G}/Montserrat[wght].ttf`,
+      'Poppins': `${G}/Poppins-Regular.ttf`,
+      'Nunito': `${G}/Nunito[wght].ttf`,
+      'Raleway': `${G}/Raleway[wght].ttf`,
+      'Inter': `${G}/Inter[opsz,wght].ttf`,
+      // Serif
+      'Playfair Display': `${G}/PlayfairDisplay[wght].ttf`,
+      'Merriweather': `${G}/Merriweather[opsz,wdth,wght].ttf`,
+      'Lora': `${G}/Lora[wght].ttf`,
+      // Display
+      'Oswald': `${G}/Oswald[wght].ttf`,
+      'Bebas Neue': `${G}/BebasNeue-Regular.ttf`,
+      'Anton': `${G}/Anton-Regular.ttf`,
+      'Archivo Black': `${G}/ArchivoBlack-Regular.ttf`,
+      'Righteous': `${G}/Righteous-Regular.ttf`,
+      'Titan One': `${G}/TitanOne-Regular.ttf`,
+      'Fredoka': `${G}/Fredoka[wdth,wght].ttf`,
+      'Lobster': `${G}/Lobster-Regular.ttf`,
+      // Handwriting
+      'Dancing Script': `${G}/DancingScript[wght].ttf`,
+      'Pacifico': `${G}/Pacifico-Regular.ttf`,
+      'Caveat': `${G}/Caveat[wght].ttf`,
+      'Permanent Marker': `${G}/PermanentMarker-Regular.ttf`,
+      'Bangers': `${G}/Bangers-Regular.ttf`,
+      // Monospace
+      'Roboto Mono': `${G}/RobotoMono[wght].ttf`,
+      'Press Start 2P': `${G}/PressStart2P-Regular.ttf`,
+      // Legacy fallbacks
+      'Arial': `${G}/Roboto[wdth,wght].ttf`,
+      'Helvetica': `${G}/Roboto[wdth,wght].ttf`,
+      'Sans': `${G}/Roboto[wdth,wght].ttf`,
+      'Times New Roman': `${G}/Merriweather[opsz,wdth,wght].ttf`,
+      'Georgia': `${G}/Merriweather[opsz,wdth,wght].ttf`,
+      'Courier New': `${G}/RobotoMono[wght].ttf`,
+      'Impact': `${G}/Oswald[wght].ttf`,
+      'Verdana': `${G}/OpenSans[wdth,wght].ttf`
+    }
+    const fontFileBoldMap = {
+      // Sans Serif
+      'Roboto': `${G}/Roboto[wdth,wght].ttf`,
+      'Open Sans': `${G}/OpenSans[wdth,wght].ttf`,
+      'Lato': `${G}/Lato-Bold.ttf`,
+      'Montserrat': `${G}/Montserrat[wght].ttf`,
+      'Poppins': `${G}/Poppins-Bold.ttf`,
+      'Nunito': `${G}/Nunito[wght].ttf`,
+      'Raleway': `${G}/Raleway[wght].ttf`,
+      'Inter': `${G}/Inter[opsz,wght].ttf`,
+      // Serif
+      'Playfair Display': `${G}/PlayfairDisplay[wght].ttf`,
+      'Merriweather': `${G}/Merriweather[opsz,wdth,wght].ttf`,
+      'Lora': `${G}/Lora[wght].ttf`,
+      // Display
+      'Oswald': `${G}/Oswald[wght].ttf`,
+      'Bebas Neue': `${G}/BebasNeue-Regular.ttf`,
+      'Anton': `${G}/Anton-Regular.ttf`,
+      'Archivo Black': `${G}/ArchivoBlack-Regular.ttf`,
+      'Righteous': `${G}/Righteous-Regular.ttf`,
+      'Titan One': `${G}/TitanOne-Regular.ttf`,
+      'Fredoka': `${G}/Fredoka[wdth,wght].ttf`,
+      'Lobster': `${G}/Lobster-Regular.ttf`,
+      // Handwriting
+      'Dancing Script': `${G}/DancingScript[wght].ttf`,
+      'Pacifico': `${G}/Pacifico-Regular.ttf`,
+      'Caveat': `${G}/Caveat[wght].ttf`,
+      'Permanent Marker': `${G}/PermanentMarker-Regular.ttf`,
+      'Bangers': `${G}/Bangers-Regular.ttf`,
+      // Monospace
+      'Roboto Mono': `${G}/RobotoMono[wght].ttf`,
+      'Press Start 2P': `${G}/PressStart2P-Regular.ttf`,
+      // Legacy fallbacks
+      'Arial': `${G}/Roboto[wdth,wght].ttf`,
+      'Helvetica': `${G}/Roboto[wdth,wght].ttf`,
+      'Sans': `${G}/Roboto[wdth,wght].ttf`,
+      'Times New Roman': `${G}/Merriweather[opsz,wdth,wght].ttf`,
+      'Georgia': `${G}/Merriweather[opsz,wdth,wght].ttf`,
+      'Courier New': `${G}/RobotoMono[wght].ttf`,
+      'Impact': `${G}/Oswald[wght].ttf`,
+      'Verdana': `${G}/OpenSans[wdth,wght].ttf`
+    }
+    const isBold = clip.fontWeight === 'bold'
+    const fontFile = (isBold ? fontFileBoldMap[clip.fontFamily] : fontFileMap[clip.fontFamily])
+      || fontFileMap[clip.fontFamily]
+      || `${G}/Roboto[wdth,wght].ttf`
+
+    // Padding matches preview's CSS padding: 20px, scaled to output resolution
+    const padding = Math.round(20 * scaleFactor)
+
+    // Word-wrap text to fit within canvas (matching CSS word-break: break-word)
+    // Estimate average character width as ~0.6 × fontSize for proportional fonts
+    const isMonospace = ['Courier New', 'Courier', 'Monospace', 'Roboto Mono', 'Press Start 2P'].includes(clip.fontFamily)
+    const charWidthRatio = isMonospace ? 0.6 : 0.55
+    const avgCharWidth = fontSize * charWidthRatio
+    const maxTextWidth = w - padding * 2  // canvas width minus padding on both sides
+    const maxCharsPerLine = Math.max(1, Math.floor(maxTextWidth / avgCharWidth))
+
+    const rawText = clip.text || 'Text'
+    let wrappedLines
+    if (Array.isArray(clip.wrappedLines) && clip.wrappedLines.length > 0) {
+      // Use pre-wrapped lines from the frontend (measured from actual DOM layout)
+      wrappedLines = clip.wrappedLines
+      console.log('[DEBUG] Text wrap (from frontend):', JSON.stringify({ input: rawText, lines: wrappedLines }))
+    } else {
+      // Fallback: estimate word wrap based on character width
+      wrappedLines = []
+      for (const paragraph of rawText.split('\n')) {
+        if (paragraph === '') {
+          wrappedLines.push('')
+          continue
+        }
+        const words = paragraph.split(/(\s+)/)
+        let currentLine = ''
+        for (const word of words) {
+          if ((currentLine + word).length > maxCharsPerLine && currentLine.trim().length > 0) {
+            wrappedLines.push(currentLine.trimEnd())
+            currentLine = word.trimStart()
+          } else {
+            currentLine += word
+          }
+        }
+        if (currentLine.length > 0) wrappedLines.push(currentLine)
+      }
+      console.log('[DEBUG] Text wrap (estimated):', JSON.stringify({ input: rawText, maxCharsPerLine, lines: wrappedLines }))
+    }
+
+    // Position: match the preview's CSS layout
+    const scaledPosX = Math.round((clip.positionX || 0) * scaleFactor)
+    const scaledPosY = Math.round((clip.positionY || 0) * scaleFactor)
+    const textAlign = clip.textAlign || 'top'
+    const textHAlign = clip.textHAlign || 'center'
+
+    // Line height and vertical positioning (matching CSS line-height: 1.2)
+    const lineHeight = Math.round(fontSize * 1.2)
+    const totalTextHeight = wrappedLines.length * lineHeight
+
+    // Vertical start Y depends on textAlign (matching CSS alignItems)
+    let baseY
+    if (textAlign === 'center') {
+      baseY = Math.round((h - totalTextHeight) / 2) + scaledPosY
+    } else if (textAlign === 'bottom') {
+      baseY = h - padding - totalTextHeight + scaledPosY
+    } else {
+      // top (default)
+      baseY = padding + scaledPosY
+    }
+
+    // Text background box: compute box dimensions first so text can be centered within it
+    const textBoxEnabled = clip.textBoxEnabled === true
+    let boxInputArgs = []
+    let boxOverlayPrefix = ''
+    let boxPadding = 0, boxBorderWidth = 0, boxX = 0, boxY = 0, boxW = 0, boxH = 0, estTextWidth = 0
+
+    if (textBoxEnabled) {
+      boxPadding = Math.round((clip.textBoxPadding ?? 12) * scaleFactor)
+      const boxRadius = Math.round((clip.textBoxRadius ?? 8) * scaleFactor)
+      boxBorderWidth = Math.round((clip.textBoxBorderWidth ?? 0) * scaleFactor)
+      const boxColor = clip.textBoxColor || '#000000'
+      const boxOpacity = (clip.textBoxOpacity ?? 80) / 100
+      const boxBorderColor = clip.textBoxBorderColor || '#ffffff'
+
+      // Use measured text width from frontend if available, otherwise estimate
+      if (clip.measuredMaxLineWidth && clip.measuredPreviewWidth) {
+        estTextWidth = Math.round(clip.measuredMaxLineWidth * scaleFactor)
+      } else {
+        const maxLineLen = Math.max(...wrappedLines.map(l => l.length))
+        const estCharWidth = fontSize * (isMonospace ? 0.6 : 0.55)
+        estTextWidth = Math.round(maxLineLen * estCharWidth)
+      }
+      boxW = estTextWidth + boxPadding * 2 + boxBorderWidth * 2
+      boxH = totalTextHeight + boxPadding * 2 + boxBorderWidth * 2
+
+      // Box position: centered on canvas (adjusted for alignment)
+      if (textHAlign === 'left') {
+        boxX = padding + scaledPosX - boxPadding - boxBorderWidth
+      } else if (textHAlign === 'right') {
+        boxX = w - padding + scaledPosX - estTextWidth - boxPadding - boxBorderWidth
+      } else {
+        boxX = Math.round((w - boxW) / 2) + scaledPosX
+      }
+      boxY = baseY - boxPadding - boxBorderWidth
+
+      // Generate SVG with rounded rectangle
+      const svgPath = outputPath.replace(/\.[^.]+$/, '_box.svg')
+      const halfBorder = boxBorderWidth / 2
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${boxW}" height="${boxH}">
+  <rect x="${halfBorder}" y="${halfBorder}" width="${boxW - boxBorderWidth}" height="${boxH - boxBorderWidth}"
+    rx="${boxRadius}" ry="${boxRadius}"
+    fill="${boxColor}" fill-opacity="${boxOpacity}"
+    ${boxBorderWidth > 0 ? `stroke="${boxBorderColor}" stroke-width="${boxBorderWidth}"` : 'stroke="none"'} />
+</svg>`
+      await fs.writeFile(svgPath, svg, 'utf-8')
+
+      // Convert SVG to PNG using rsvg-convert
+      const boxPngPath = svgPath.replace('.svg', '.png')
+      await new Promise((resolve, reject) => {
+        execFile('rsvg-convert', ['-o', boxPngPath, svgPath], (err) => {
+          if (err) reject(new Error(`rsvg-convert failed: ${err.message}`))
+          else resolve()
+        })
+      })
+
+      boxInputArgs = ['-i', boxPngPath]
+      // Overlay box PNG onto transparent canvas (format=auto doesn't preserve alpha, must keep rgba)
+      // colorchannelmixer=aa=0 zeros the alpha (color source has no alpha channel, rgba conversion defaults to opaque)
+      boxOverlayPrefix = `[0:v]format=rgba,colorchannelmixer=aa=0[base];[1:v]format=rgba[box];[base][box]overlay=${Math.max(0, boxX)}:${Math.max(0, boxY)}[withbox];[withbox]`
+
+      console.log(`[DEBUG] Text box: x=${boxX}, y=${boxY}, w=${boxW}, h=${boxH}, padding=${boxPadding}, radius=${boxRadius}, border=${boxBorderWidth}, estTextWidth=${estTextWidth}`)
+    }
+
+    // Horizontal x expression per line — text_w is evaluated per drawtext instance
+    // Both text and box are centered on the canvas, so they share the same center point
+    let xExpr
+    if (textHAlign === 'left') {
+      xExpr = `${padding}+${scaledPosX}`
+    } else if (textHAlign === 'right') {
+      xExpr = `w-text_w-${padding}+${scaledPosX}`
+    } else {
+      xExpr = `(w-text_w)/2+${scaledPosX}`
+    }
+
+    // Shadow matches preview's textShadow: 2px 2px 4px rgba(0,0,0,0.8)
+    const shadowX = Math.round(2 * scaleFactor * zoom)
+    const shadowY = Math.round(2 * scaleFactor * zoom)
+
+    // Escape fontFile path for FFmpeg
+    const escapedFontFile = fontFile.replace(/:/g, '\\:')
+
+    // Build per-line drawtext filters
+    const drawTextFilters = []
+    for (let i = 0; i < wrappedLines.length; i++) {
+      const lineFilePath = outputPath.replace(/\.[^.]+$/, `_line${i}.txt`)
+      await fs.writeFile(lineFilePath, wrappedLines[i] || ' ', 'utf-8')
+      const escapedLineFile = lineFilePath.replace(/:/g, '\\:')
+      const textYOffset = textBoxEnabled ? Math.round(boxPadding / 2) : 0
+      const lineY = baseY + i * lineHeight + textYOffset
+
+      drawTextFilters.push(
+        `drawtext=textfile='${escapedLineFile}':fontfile='${escapedFontFile}':fontsize=${fontSize}:fontcolor=${fontColor}:x=${xExpr}:y=${lineY}:shadowcolor=black@0.8:shadowx=${shadowX}:shadowy=${shadowY}`
+      )
+    }
+    const filterChain = drawTextFilters.join(',')
+
+    console.log(`[DEBUG] Text scaleFactor=${scaleFactor.toFixed(2)}, zoom=${zoom}, fontSize=${fontSize}, hAlign=${textHAlign}, vAlign=${textAlign}, lines=${wrappedLines.length}, textBox=${textBoxEnabled}`)
+    console.log('[DEBUG] Output path:', outputPath)
+
+    // Use QuickTime Animation codec to preserve transparency
+    const filterComplex = textBoxEnabled
+      ? `${boxOverlayPrefix}${filterChain}[outv]`
+      : `[0:v]format=rgba,colorchannelmixer=aa=0,${filterChain}[outv]`
+    return runFFmpeg([
+      '-f', 'lavfi',
+      '-i', `color=c=black@0:s=${w}x${h}:d=${duration}`,
+      ...boxInputArgs,
+      '-filter_complex', filterComplex,
+      '-map', '[outv]',
+      '-c:v', 'qtrle',
+      '-pix_fmt', 'argb',
+      '-r', fps.toString(),
+      '-y', outputPath
+    ], signal)
+  }
+
+  // Handle color clips (solid color or gradient backgrounds)
+  if (clip.type === 'color') {
+    const bgColor = (clip.backgroundColor || '#000000').replace('#', '0x')
+
+    if (clip.gradientEnabled) {
+      const endColor = (clip.gradientEndColor || '#ffffff').replace('#', '0x')
+      const angle = clip.gradientAngle ?? 180
+
+      // CSS gradient angle convention: 0°=bottom-to-top, 90°=left-to-right, 180°=top-to-bottom
+      // Direction vector in screen coords (Y down): (sin(θ), -cos(θ))
+      const rad = (angle * Math.PI) / 180
+      const dx = Math.sin(rad)
+      const dy = -Math.cos(rad)
+
+      // Projection range across the canvas
+      const minProj = Math.min(0, w * dx) + Math.min(0, h * dy)
+      const maxProj = Math.max(0, w * dx) + Math.max(0, h * dy)
+      const range = maxProj - minProj || 1 // avoid division by zero
+
+      // t = (X*dx + Y*dy - minProj) / range, clamped to [0,1]
+      // Blend: A*(1-t) + B*t
+      const blendExpr = `A*(1-clip((X*${dx.toFixed(6)}+Y*${dy.toFixed(6)}-${minProj.toFixed(6)})/${range.toFixed(6)},0,1))+B*clip((X*${dx.toFixed(6)}+Y*${dy.toFixed(6)}-${minProj.toFixed(6)})/${range.toFixed(6)},0,1)`
+
+      console.log(`[DEBUG] Gradient: angle=${angle}, dx=${dx.toFixed(4)}, dy=${dy.toFixed(4)}, minProj=${minProj.toFixed(2)}, maxProj=${maxProj.toFixed(2)}, range=${range.toFixed(2)}`)
+
+      return runFFmpeg([
+        '-f', 'lavfi', '-i', `color=c=${bgColor}:s=${w}x${h}:d=${duration}:r=${fps}`,
+        '-f', 'lavfi', '-i', `color=c=${endColor}:s=${w}x${h}:d=${duration}:r=${fps}`,
+        '-filter_complex', `[0:v]format=gbrp[a];[1:v]format=gbrp[b];[a][b]blend=all_expr='${blendExpr}'[outv]`,
+        '-map', '[outv]',
+        '-c:v', 'libx264', '-crf', '23', '-preset', 'fast', '-pix_fmt', 'yuv420p',
+        '-r', fps.toString(),
+        '-t', duration.toString(),
+        '-y', outputPath
+      ], signal)
+    }
+
+    // Solid color — simple color source
+    return runFFmpeg([
+      '-f', 'lavfi', '-i', `color=c=${bgColor}:s=${w}x${h}:d=${duration}:r=${fps}`,
+      '-c:v', 'libx264', '-crf', '23', '-preset', 'fast', '-pix_fmt', 'yuv420p',
+      '-r', fps.toString(),
+      '-y', outputPath
+    ], signal)
+  }
+
+  if (clip.type === 'image') {
+    let filterChain = buildTransformFilter(clip, w, h)
+    let overlayPos = getOverlayPosition(clip, w, h, scaleFactor)
+
+    // Use QuickTime Animation codec to preserve transparency
+    return runFFmpeg([
+      '-loop', '1',
+      '-i', inputFile,
+      '-t', duration.toString(),
+      '-filter_complex', `color=c=black@0.0:s=${w}x${h}:d=${duration}[bg];[0:v]${filterChain}[scaled];[bg][scaled]overlay=${overlayPos}[outv]`,
+      '-map', '[outv]',
+      '-c:v', 'qtrle',
+      '-pix_fmt', 'argb',
+      '-r', fps.toString(),
+      '-y', outputPath
+    ], signal)
+  }
+
+  if (clip.trackType === 'audio' || clip.type === 'audio') {
+    // Probe whether the input actually has an audio stream
+    const hasAudio = await new Promise((resolve) => {
+      const probe = spawn('ffprobe', [
+        '-v', 'error', '-select_streams', 'a',
+        '-show_entries', 'stream=index', '-of', 'csv=p=0',
+        inputFile
+      ])
+      let out = ''
+      probe.stdout.on('data', d => { out += d.toString() })
+      probe.on('close', () => resolve(out.trim().length > 0))
+    })
+
+    if (!hasAudio) {
+      // No audio stream — generate silence so the pipeline doesn't break
+      console.log(`[DEBUG] Audio clip ${clip.id} has no audio stream, generating silence`)
+      return runFFmpeg([
+        '-f', 'lavfi', '-i', `anullsrc=r=44100:cl=stereo`,
+        '-t', duration.toString(),
+        '-c:a', 'aac', '-ar', '44100',
+        '-y', outputPath
+      ], signal)
+    }
+
+    const args = []
+    if (clip.startTime > 0) args.push('-ss', clip.startTime.toString())
+    args.push('-i', inputFile, '-t', duration.toString())
+    args.push('-vn', '-c:a', 'aac', '-ar', '44100', '-y', outputPath)
+    return runFFmpeg(args, signal)
+  }
+
+  // Video clip — scale/crop only, composited onto canvas later
+  let filterChain = buildTransformFilter(clip, w, h, fps)
+
+  const args = []
+  if (clip.startTime > 0) args.push('-ss', clip.startTime.toString())
+  args.push('-i', inputFile, '-t', duration.toString())
+  args.push(
+    '-vf', filterChain,
+    '-c:v', 'libx264', '-crf', '23', '-preset', 'fast', '-pix_fmt', 'yuv420p',
+    '-an',
+    '-y', outputPath
+  )
+  console.log(`[DEBUG] Video clip ffmpeg args: ffmpeg ${args.join(' ')}`)
+  console.log(`[DEBUG] clip.type=${clip.type}, clip.id=${clip.id}, input=${inputFile}`)
+  return runFFmpeg(args, signal)
+}
+
+/**
+ * Build FFmpeg filter chain for zoom/crop/position transforms
+ */
+function buildTransformFilter(clip, w, h, fps = null) {
+  const filters = []
+
+  // Layout box (remix modes): cover-fit into a box given as canvas fractions.
+  // zoom/crop/position are ignored for these clips, matching the preview.
+  const box = getLayoutBox(clip, w, h)
+  if (box) {
+    // Zoom scales the cover fit up; the crop then keeps a box-sized window
+    filters.push(`scale=${Math.round(box.w * box.zoom)}:${Math.round(box.h * box.zoom)}:force_original_aspect_ratio=increase`)
+    // Pan picks which part of the overflow stays visible (0.5 = centered)
+    filters.push(`crop=${box.w}:${box.h}:(iw-ow)*${box.panX}:(ih-oh)*${box.panY}`)
+    if (fps) filters.push(`fps=${fps}`)
+    return filters.join(',')
+  }
+
+  // Apply crop — percentage-based (cropX/cropY/cropWidth/cropHeight are 0-100%)
+  const cropX = clip.cropX || 0
+  const cropY = clip.cropY || 0
+  const cropW = clip.cropWidth || 100
+  const cropH = clip.cropHeight || 100
+
+  if (cropX !== 0 || cropY !== 0 || cropW !== 100 || cropH !== 100) {
+    // Use FFmpeg expressions: iw/ih = input width/height
+    filters.push(`crop=iw*${cropW / 100}:ih*${cropH / 100}:iw*${cropX / 100}:ih*${cropY / 100}`)
+  }
+
+  // Legacy pixel-based crop (if provided directly)
+  if (clip.crop) {
+    const { x = 0, y = 0, width, height } = clip.crop
+    if (width && height) {
+      filters.push(`crop=${width}:${height}:${x}:${y}`)
+    }
+  }
+
+  // Determine target dimensions
+  let scaleW = w
+  let scaleH = h
+
+  // Use clip's width/height if specified
+  if (clip.width && clip.height) {
+    scaleW = clip.width
+    scaleH = clip.height
+  } else if (clip.width) {
+    scaleW = clip.width
+    scaleH = -1 // maintain aspect ratio
+  } else if (clip.height) {
+    scaleW = -1 // maintain aspect ratio
+    scaleH = clip.height
+  }
+
+  // Apply zoom/scale with safety limits
+  if (clip.zoom && clip.zoom !== 1 && clip.zoom !== 100) {
+    // Convert percentage to decimal if needed (100 -> 1.0, 200 -> 2.0)
+    let zoomValue = clip.zoom
+    if (zoomValue > 10) {
+      zoomValue = zoomValue / 100
+    }
+
+    // Clamp zoom to reasonable range: 0.1 (10%) to 5.0 (500%)
+    const safeZoom = Math.max(0.1, Math.min(5.0, zoomValue))
+    if (scaleW > 0) scaleW = Math.round(scaleW * safeZoom)
+    if (scaleH > 0) scaleH = Math.round(scaleH * safeZoom)
+  }
+
+  // Enforce maximum dimensions (4K limit)
+  const MAX_DIMENSION = 3840
+  if (scaleW > MAX_DIMENSION) scaleW = MAX_DIMENSION
+  if (scaleH > MAX_DIMENSION) scaleH = MAX_DIMENSION
+
+  // Scale to target size
+  if (scaleW > 0 && scaleH > 0) {
+    filters.push(`scale=${scaleW}:${scaleH}:force_original_aspect_ratio=decrease`)
+  } else if (scaleW > 0) {
+    filters.push(`scale=${scaleW}:-1`)
+  } else if (scaleH > 0) {
+    filters.push(`scale=-1:${scaleH}`)
+  } else {
+    // Fit to canvas
+    filters.push(`scale=${w}:${h}:force_original_aspect_ratio=decrease`)
+  }
+
+  // Ensure even dimensions (libx264 requires width & height divisible by 2)
+  // Use scale (trunc) instead of pad to avoid adding visible border pixels on PNGs
+  filters.push('scale=trunc(iw/2)*2:trunc(ih/2)*2')
+
+  // Add fps for video clips
+  if (fps) {
+    filters.push(`fps=${fps}`)
+  }
+
+  return filters.join(',')
+}
+
+/**
+ * Resolve a clip's layout box (fractions of the canvas) to even output pixels.
+ * Returns null when the clip has no valid layout.
+ */
+function getLayoutBox(clip, w, h) {
+  const l = clip.layout
+  if (!l || ![l.x, l.y, l.w, l.h].every(v => typeof v === 'number' && isFinite(v))) return null
+  if (l.w <= 0 || l.h <= 0) return null
+  const even = (v) => Math.max(2, Math.round(v / 2) * 2)
+  const bw = Math.min(even(l.w * w), w)
+  const bh = Math.min(even(l.h * h), h)
+  const bx = Math.max(0, Math.min(w - bw, Math.round(l.x * w)))
+  const by = Math.max(0, Math.min(h - bh, Math.round(l.y * h)))
+  const pan = (v) => (typeof v === 'number' && isFinite(v) ? Math.min(1, Math.max(0, v)) : 0.5)
+  const zoom = typeof l.zoom === 'number' && isFinite(l.zoom) ? Math.min(4, Math.max(1, l.zoom)) : 1
+  return { x: bx, y: by, w: bw, h: bh, panX: pan(l.panX), panY: pan(l.panY), zoom }
+}
+
+/**
+ * Get overlay position for clip positioning
+ */
+function getOverlayPosition(clip, w, h, scaleFactor = 1) {
+  const box = getLayoutBox(clip, w, h)
+  if (box) return `${box.x}:${box.y}`
+
+  // Use positionX/positionY as pixel offset from center
+  // Values are in preview-pixel coords → scale to output, then apply zoom
+  const offsetX = clip.positionX || (clip.position && clip.position.x) || 0
+  const offsetY = clip.positionY || (clip.position && clip.position.y) || 0
+
+  // Apply scaleFactor (preview→output) and zoom (CSS scale behavior)
+  let zoomValue = 1
+  if (clip.zoom && clip.zoom !== 1 && clip.zoom !== 100) {
+    zoomValue = clip.zoom > 10 ? clip.zoom / 100 : clip.zoom
+  }
+  const scaledX = Math.round(offsetX * scaleFactor * zoomValue)
+  const scaledY = Math.round(offsetY * scaleFactor * zoomValue)
+
+  if (scaledX !== 0 || scaledY !== 0) {
+    const xExpr = scaledX !== 0 ? `(W-w)/2+${scaledX}` : '(W-w)/2'
+    const yExpr = scaledY !== 0 ? `(H-h)/2+${scaledY}` : '(H-h)/2'
+    return `${xExpr}:${yExpr}`
+  }
+  // Default: center the clip
+  return '(W-w)/2:(H-h)/2'
+}
+
+/**
+ * Prepend black frames before a clip for timeline offset.
+ */
+async function prependBlack(inputFile, outputPath, durationSec, w, h, fps) {
+  // Determine if input is transparent (MOV with qtrle) or opaque (MP4)
+  const isTransparent = inputFile.endsWith('.mov')
+  const blackPath = path.join(path.dirname(outputPath), `black_${Date.now()}${isTransparent ? '.mov' : '.mp4'}`)
+
+  if (isTransparent) {
+    // Use transparent black for clips that support alpha
+    await runFFmpeg([
+      '-f', 'lavfi', '-i', `color=c=black:s=${w}x${h}:d=${durationSec}:r=${fps}`,
+      '-filter_complex', '[0:v]format=rgba,colorchannelmixer=aa=0[outv]',
+      '-map', '[outv]',
+      '-t', durationSec.toString(),
+      '-c:v', 'qtrle',
+      '-pix_fmt', 'argb',
+      '-y', blackPath
+    ])
+  } else {
+    // Use opaque black for regular video clips
+    await runFFmpeg([
+      '-f', 'lavfi', '-i', `color=c=black:s=${w}x${h}:d=${durationSec}:r=${fps}`,
+      '-f', 'lavfi', '-i', `anullsrc=r=44100:cl=stereo`,
+      '-t', durationSec.toString(),
+      '-c:v', 'libx264', '-crf', '23', '-pix_fmt', 'yuv420p',
+      '-c:a', 'aac', '-shortest',
+      '-y', blackPath
+    ])
+  }
+
+  const listPath = path.join(path.dirname(outputPath), `concat_${Date.now()}.txt`)
+  await fs.writeFile(listPath, `file '${blackPath}'\nfile '${inputFile}'\n`)
+
+  await runFFmpeg(['-f', 'concat', '-safe', '0', '-i', listPath, '-c', 'copy', '-y', outputPath])
+
+  await fs.unlink(blackPath).catch(() => {})
+  await fs.unlink(listPath).catch(() => {})
+}
+
+/**
+ * Concatenate clips on a track with black gap-fill.
+ */
+async function concatenateWithGaps(sortedClips, processedClips, outputPath, jobDir, w, h, fps, trackId) {
+  const segments = []
+  let currentTime = 0
+
+  // Determine if any clip on this track is transparent (text/image)
+  const hasTransparentClips = sortedClips.some(clip => {
+    const processedFile = processedClips.get(clip.id)
+    return processedFile && processedFile.endsWith('.mov')
+  })
+
+  console.log(`[DEBUG] concatenateWithGaps for track ${trackId}: hasTransparentClips=${hasTransparentClips}`)
+  sortedClips.forEach(clip => {
+    const processedFile = processedClips.get(clip.id)
+    console.log(`[DEBUG]   Clip ${clip.id}: processedFile=${processedFile}`)
+  })
+
+  for (const clip of sortedClips) {
+    const clipStart = clip.timelinePosition || 0
+    const clipDuration = clip.endTime - clip.startTime
+    const processedFile = processedClips.get(clip.id)
+    if (!processedFile) continue
+
+    const gap = clipStart - currentTime
+    if (gap > 0.05) {
+      const ext = hasTransparentClips ? '.mov' : '.mp4'
+      const blackPath = path.join(jobDir, `gap_${trackId}_${currentTime}${ext}`)
+
+      if (hasTransparentClips) {
+        // Use transparent black for tracks with text/image clips
+        await runFFmpeg([
+          '-f', 'lavfi', '-i', `color=c=black:s=${w}x${h}:d=${gap}:r=${fps}`,
+          '-filter_complex', '[0:v]format=rgba,colorchannelmixer=aa=0[outv]',
+          '-map', '[outv]',
+          '-t', gap.toString(),
+          '-c:v', 'qtrle',
+          '-pix_fmt', 'argb',
+          '-y', blackPath
+        ])
+      } else {
+        // Use opaque black for regular video tracks
+        await runFFmpeg([
+          '-f', 'lavfi', '-i', `color=c=black:s=${w}x${h}:d=${gap}:r=${fps}`,
+          '-f', 'lavfi', '-i', `anullsrc=r=44100:cl=stereo`,
+          '-t', gap.toString(),
+          '-c:v', 'libx264', '-crf', '23', '-pix_fmt', 'yuv420p',
+          '-c:a', 'aac', '-shortest',
+          '-y', blackPath
+        ])
+      }
+      segments.push(blackPath)
+    }
+
+    segments.push(processedFile)
+    currentTime = clipStart + clipDuration
+  }
+
+  if (segments.length === 1) {
+    await fs.copyFile(segments[0], outputPath)
+    return
+  }
+
+  const listPath = path.join(jobDir, `concat_${trackId}.txt`)
+  await fs.writeFile(listPath, segments.map(f => `file '${f}'`).join('\n'))
+
+  await runFFmpeg(['-f', 'concat', '-safe', '0', '-i', listPath, '-c', 'copy', '-y', outputPath])
+}
+
+/**
+ * Overlay multiple video track files.
+ */
+async function overlayTracks(trackFiles, outputPath) {
+  console.log('[DEBUG] Overlaying tracks:')
+  trackFiles.forEach((tf, i) => {
+    const isTransparent = tf.file.endsWith('.mov')
+    console.log(`[DEBUG]   Track ${i}: ${tf.file} (${isTransparent ? 'TRANSPARENT .mov' : 'OPAQUE .mp4'})`)
+  })
+
+  const args = []
+  for (const tf of trackFiles) args.push('-i', tf.file)
+
+  if (trackFiles.length === 2) {
+    args.push(
+      '-filter_complex', '[0:v][1:v]overlay=0:0:eof_action=pass:format=auto[outv]',
+      '-map', '[outv]',
+      '-c:v', 'libx264', '-crf', '23', '-preset', 'fast', '-pix_fmt', 'yuv420p', '-an',
+      '-y', outputPath
+    )
+  } else {
+    const parts = []
+    let prev = '0:v'
+    for (let i = 1; i < trackFiles.length; i++) {
+      const out = i === trackFiles.length - 1 ? '[outv]' : `[tmp${i}]`
+      parts.push(`[${prev}][${i}:v]overlay=0:0:eof_action=pass:format=auto${out}`)
+      prev = `tmp${i}`
+    }
+    args.push(
+      '-filter_complex', parts.join(';'),
+      '-map', '[outv]',
+      '-c:v', 'libx264', '-crf', '23', '-preset', 'fast', '-pix_fmt', 'yuv420p', '-an',
+      '-y', outputPath
+    )
+  }
+
+  console.log('[DEBUG] Overlay filter:', args[args.indexOf('-filter_complex') + 1])
+  await runFFmpeg(args)
+}
+
+/**
+ * Combine video with audio sources.
+ * Handles composited video (no audio track) + separate audio sources with timeline offsets.
+ */
+async function combineVideoAudio(videoPath, audioSources, outputPath, fps, signal) {
+  // Check if all audio comes from the video file itself (single-clip shortcut)
+  const allFromVideo = audioSources.every(a => a.file === videoPath)
+
+  if (allFromVideo && audioSources.length > 0) {
+    try {
+      await runFFmpeg(['-i', videoPath, '-c:v', 'copy', '-c:a', 'aac', '-y', outputPath], signal)
+      return
+    } catch (err) {
+      if (err.message === 'Job aborted') throw err
+      console.warn('[ffmpeg] Copy with audio failed, video may not have audio:', err.message)
+      await runFFmpeg(['-i', videoPath, '-c:v', 'copy', '-an', '-y', outputPath], signal)
+      return
+    }
+  }
+
+  // Composited video (no audio) + separate audio sources with timeline offsets
+  const args = ['-i', videoPath]
+
+  // Add each audio source as a separate input
+  for (const src of audioSources) {
+    args.push('-i', src.file)
+  }
+
+  // Build audio filter graph using adelay for timeline positioning
+  const filterParts = []
+  const mixInputs = []
+
+  for (let i = 0; i < audioSources.length; i++) {
+    const src = audioSources[i]
+    const offset = src.offset || 0
+    const vol = src.volume
+    const delayMs = Math.round(offset * 1000)
+
+    const filters = []
+    if (delayMs > 0) {
+      filters.push(`adelay=${delayMs}|${delayMs}`)
+    }
+    if (vol !== 1) {
+      filters.push(`volume=${vol.toFixed(2)}`)
+    }
+
+    if (filters.length > 0) {
+      filterParts.push(`[${i + 1}:a]${filters.join(',')}[a${i}]`)
+      mixInputs.push(`[a${i}]`)
+    } else {
+      mixInputs.push(`[${i + 1}:a]`)
+    }
+  }
+
+  if (mixInputs.length === 1) {
+    // Single audio source
+    if (filterParts.length > 0) {
+      filterParts[filterParts.length - 1] = filterParts[filterParts.length - 1].replace(/\[a\d+\]$/, '[aout]')
+      args.push(
+        '-filter_complex', filterParts.join(';'),
+        '-map', '0:v', '-map', '[aout]'
+      )
+    } else {
+      args.push('-map', '0:v', '-map', '1:a')
+    }
+  } else {
+    // Multiple audio sources — mix them together
+    filterParts.push(`${mixInputs.join('')}amix=inputs=${mixInputs.length}:duration=longest:dropout_transition=2[aout]`)
+    args.push(
+      '-filter_complex', filterParts.join(';'),
+      '-map', '0:v', '-map', '[aout]'
+    )
+  }
+
+  args.push('-c:v', 'copy', '-c:a', 'aac', '-y', outputPath)
+
+  try {
+    await runFFmpeg(args, signal)
+  } catch (err) {
+    if (err.message === 'Job aborted') throw err
+    console.warn('[ffmpeg] Audio mix failed, falling back to video-only:', err.message)
+    await runFFmpeg(['-i', videoPath, '-c:v', 'copy', '-an', '-y', outputPath], signal)
+  }
+}
+
+/**
+ * Run ffmpeg and return a promise.
+ * Accepts an optional AbortSignal to kill the process early.
+ */
+function runFFmpeg(args, signal) {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      return reject(new Error('Job aborted'))
+    }
+
+    console.log(`[ffmpeg] ffmpeg ${args.join(' ')}`)
+
+    const proc = spawn('ffmpeg', args, { stdio: ['ignore', 'pipe', 'pipe'] })
+    let stderr = ''
+    proc.stderr.on('data', (d) => { stderr += d.toString() })
+
+    const onAbort = () => {
+      proc.kill('SIGTERM')
+      reject(new Error('Job aborted'))
+    }
+    signal?.addEventListener('abort', onAbort, { once: true })
+
+    proc.on('close', (code) => {
+      signal?.removeEventListener('abort', onAbort)
+      if (code === 0) resolve()
+      else reject(new Error(`FFmpeg exit ${code}: ${stderr.slice(-1000)}`))
+    })
+
+    proc.on('error', (err) => {
+      signal?.removeEventListener('abort', onAbort)
+      reject(new Error(`Failed to spawn ffmpeg: ${err.message}`))
+    })
+
+    // 30 min timeout
+    setTimeout(() => {
+      proc.kill('SIGTERM')
+      reject(new Error('FFmpeg timed out after 30 minutes'))
+    }, 30 * 60 * 1000)
+  })
+}

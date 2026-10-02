@@ -1,0 +1,7 @@
+claude/
+node_modules/
+logs/
+.env
+nginx/deveditor.okinoko.io.conf
+# Local secrets (MONGODB_URI etc.), see docker-compose.override.example.yml
+docker-compose.override.yml

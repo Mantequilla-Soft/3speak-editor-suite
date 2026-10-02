@@ -1,0 +1,56 @@
+services:
+  frontend:
+    profiles:
+      - frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: 3speak-deveditor-frontend
+    restart: unless-stopped
+    ports:
+      - "8091:80"
+    volumes:
+      - rendered_output:/usr/share/nginx/rendered
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: 3speak-deveditor-backend
+    restart: unless-stopped
+    ports:
+      - "3104:3102"
+    volumes:
+      - rendered_output:/app/rendered
+    environment:
+      - NODE_ENV=production
+      - PORT=3102
+      - RENDERED_DIR=/app/rendered
+      - WORK_DIR=/app/work
+      - MAX_CONCURRENT_JOBS=${MAX_CONCURRENT_JOBS:-2}
+      - HLS_TARGET_RESOLUTION=480
+
+  gateway:
+    profiles:
+      - gateway
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    container_name: 3speak-deveditor-gateway
+    restart: unless-stopped
+    ports:
+      - "3201:3200"
+    environment:
+      - NODE_ENV=production
+      - PORT=3200
+      - MONGODB_URI=${MONGODB_URI}
+      - MAX_JOBS_PER_BACKEND=${MAX_JOBS_PER_BACKEND:-2}
+      - HEALTH_CHECK_INTERVAL=${HEALTH_CHECK_INTERVAL:-15000}
+      - ADMIN_USER=${GATEWAY_ADMIN_USER:-admin}
+      - ADMIN_PASSWORD=${GATEWAY_ADMIN_PASSWORD}
+
+volumes:
+  rendered_output:
+    driver: local

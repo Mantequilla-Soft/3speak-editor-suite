@@ -1,0 +1,108 @@
+.tour-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  pointer-events: none;
+}
+
+.tour-spotlight {
+  position: fixed;
+  border-radius: 8px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 5000;
+}
+
+.tour-tooltip {
+  position: fixed;
+  z-index: 5001;
+  pointer-events: auto;
+  background: var(--bg-elevated, #2a2a2a);
+  border: 1px solid var(--border-color, #444);
+  border-radius: 12px;
+  padding: 16px;
+  color: var(--text-primary, #fff);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: tour-fade-in 0.25s ease;
+}
+
+@keyframes tour-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tour-tooltip-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--accent-primary, #ff5252);
+}
+
+.tour-tooltip-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary, #ccc);
+  margin-bottom: 14px;
+}
+
+.tour-tooltip-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tour-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.tour-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted, #666);
+  transition: background 0.2s;
+}
+
+.tour-dot.active {
+  background: var(--accent-primary, #ff5252);
+  width: 16px;
+  border-radius: 3px;
+}
+
+.tour-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.tour-skip-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted, #888);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.tour-skip-btn:hover {
+  color: var(--text-primary, #fff);
+  background: var(--bg-tertiary, #333);
+}
+
+.tour-next-btn {
+  background: transparent;
+  color: var(--accent-primary, #ff5252);
+  border: 1px solid var(--accent-primary, #ff5252);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 16px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.tour-next-btn:hover {
+  background: var(--accent-light, rgba(255, 82, 82, 0.15));
+}
