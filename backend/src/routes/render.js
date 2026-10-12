@@ -154,6 +154,19 @@ async function processJob(jobId, jobDir) {
 
       const localPath = await downloadMedia(clip.url, clip.id, jobDir)
       downloadedFiles.set(clip.id, localPath)
+
+      // Static-background key: the clean plate image travels as its own file
+      // (plus its noise map, which tells the mask how much each spot flickers)
+      const isStatic = clip.chromaKey?.color === 'static'
+      for (const [field, suffix] of [['plateUrl', 'plate'], ['noiseUrl', 'noise']]) {
+        const u = isStatic ? clip.chromaKey[field] : null
+        if (!u || typeof u !== 'string' || /^(blob|data):/.test(u)) continue
+        try {
+          downloadedFiles.set(`${clip.id}__${suffix}`, await downloadMedia(u, `${clip.id}__${suffix}`, jobDir))
+        } catch (err) {
+          console.warn(`[render] ${suffix} image for ${clip.id} could not be downloaded: ${err.message}`)
+        }
+      }
     }
 
     job.phase = 'Processing video...'
