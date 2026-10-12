@@ -1,0 +1,690 @@
+/* Teleprompter overlay for the camera recorder. Ported from the 3Speak frontend's
+   EmbedCameraRecord.scss (the cr-* rules), as plain CSS with a tp- prefix.
+   Everything sits in one fixed, click-through layer above the editor (and above
+   the phone record stage at z-index 2000); only the widgets take pointer events.
+   Nothing here is ever recorded: the recorder records the raw camera stream. */
+
+.tp-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 2600;
+  pointer-events: none;
+  color: #fff;
+  font-family: inherit;
+}
+
+.tp-layer > * {
+  pointer-events: auto;
+}
+
+/* ---- draggable + resizable script box ---- */
+.tp-box {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* Corner grip instead of a header bar: no UI strip above the text, so the
+   script can sit flush under the selfie lens and stay inconspicuous. */
+.tp-box .tp-grip {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  cursor: grab;
+  touch-action: none; /* only the grip disables touch scrolling */
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(0, 0, 0, 0.22);
+  border-bottom-left-radius: 10px;
+  user-select: none;
+}
+
+.tp-box .tp-grip:active {
+  cursor: grabbing;
+  color: #fff;
+}
+
+.tp-box .tp-scroll {
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Tight vertical padding so a two-line "Front cam" strip is mostly text.
+     Keep in sync with SCROLL_PAD_Y (8 + 16) and LINE_HEIGHT in the component. */
+  padding: 8px 14px 16px;
+  line-height: 1.7;
+  font-weight: 600;
+  text-align: left;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  overflow-wrap: anywhere;
+}
+
+/* "Mirror text": flips only the script (for a beam-splitter teleprompter
+   mirror), independent of the camera preview's own selfie mirroring. */
+.tp-box .tp-text--mirror {
+  transform: scaleX(-1);
+}
+
+.tp-box .tp-word {
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.tp-box .tp-word--read {
+  opacity: 0.35;
+}
+
+.tp-box .tp-word--current {
+  opacity: 1;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tp-box .tp-resize {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 28px;
+  height: 28px;
+  cursor: nwse-resize;
+  touch-action: none;
+  background:
+    linear-gradient(135deg, transparent 50%, rgba(255, 255, 255, 0.55) 50%, rgba(255, 255, 255, 0.55) 62%, transparent 62%, transparent 74%, rgba(255, 255, 255, 0.55) 74%, rgba(255, 255, 255, 0.55) 86%, transparent 86%);
+}
+
+/* ---- status strip under the box: heard line / warnings + matched pill ---- */
+.tp-status {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.62);
+  font-size: 0.78rem;
+  text-align: center;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.tp-status .tp-status-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tp-status--warn {
+  color: #ffd27a;
+  background: rgba(60, 40, 0, 0.78);
+}
+
+.tp-status .tp-pill {
+  flex-shrink: 0;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+.tp-status .tp-pill--on {
+  opacity: 1;
+  color: #7cfc9b;
+}
+
+/* ---- "Text style" gear button ---- */
+.tp-gear {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Selected = accent outline, never a red fill */
+.tp-gear.is-on {
+  background: rgba(0, 0, 0, 0.6);
+  border-color: var(--accent-primary, #e53935);
+  color: var(--accent-primary, #e53935);
+}
+
+/* ---- floating, collapsible, draggable menu ---- */
+.tp-menu {
+  position: absolute;
+  width: max-content;
+  max-width: min(82vw, 320px);
+  background: rgba(20, 20, 20, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  overflow: hidden;
+}
+
+.tp-menu .tp-menu-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  background: rgba(255, 255, 255, 0.1);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  font-size: 0.75rem;
+}
+
+.tp-menu .tp-menu-head:active {
+  cursor: grabbing;
+}
+
+.tp-menu .tp-menu-title {
+  flex: 1;
+  font-weight: 600;
+}
+
+.tp-menu .tp-menu-collapse {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.tp-menu .tp-menu-body {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tp-menu .tp-menu-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tp-menu .tp-menu-btn.is-on {
+  color: #7cfc9b;
+}
+
+/* ---- movable, compact settings popup ---- */
+.tp-settings-pop {
+  position: absolute;
+  z-index: 2;
+  width: 260px;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 24px);
+  display: flex;
+  flex-direction: column;
+  background: #161616;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.tp-settings-pop .tp-pop-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.08);
+  cursor: grab;
+  touch-action: none; /* header only, so body sliders still respond to touch */
+  user-select: none;
+  font-size: 0.78rem;
+  flex-shrink: 0;
+}
+
+.tp-settings-pop .tp-pop-header:active {
+  cursor: grabbing;
+}
+
+.tp-settings-pop .tp-pop-title {
+  flex: 1;
+  font-weight: 600;
+}
+
+.tp-settings-pop .tp-pop-close {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.tp-settings-pop .tp-pop-body {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 0.78rem;
+  overflow-y: auto;
+}
+
+/* One-tap layout presets for the script overlay. */
+.tp-presets {
+  display: flex;
+  gap: 6px;
+}
+
+.tp-presets button {
+  flex: 1;
+  padding: 7px 4px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.15;
+  cursor: pointer;
+}
+
+.tp-presets button:active {
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--accent-primary, #e53935);
+  border-color: var(--accent-primary, #e53935);
+}
+
+.tp-set-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tp-set-row > span:first-child {
+  min-width: 62px;
+  opacity: 0.8;
+}
+
+.tp-set-row input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--accent-primary, #e53935);
+}
+
+.tp-set-val {
+  width: 40px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+.tp-set-val--wide {
+  width: 60px;
+}
+
+.tp-set-colors {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tp-set-color {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tp-set-color input[type="color"] {
+  width: 30px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  background: none;
+  cursor: pointer;
+}
+
+.tp-set-opacity {
+  flex: 1 1 100%;
+}
+
+.tp-set-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.tp-set-check input {
+  accent-color: var(--accent-primary, #e53935);
+}
+
+.tp-set-note {
+  font-size: 0.72rem;
+  opacity: 0.7;
+  line-height: 1.35;
+}
+
+.tp-lang-select {
+  flex: 1;
+  min-width: 0;
+  background: #0d0d0d;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 7px;
+  padding: 5px 7px;
+  font-size: 0.78rem;
+}
+
+.tp-lang-select option {
+  color: #000;
+}
+
+/* Voice / Timed segmented switch */
+.tp-seg {
+  flex: 1;
+  display: inline-flex;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tp-seg button {
+  flex: 1;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border: none;
+  padding: 6px 8px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tp-seg button.is-on {
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 0 0 1px var(--accent-primary, #e53935);
+  color: var(--accent-primary, #e53935);
+}
+
+.tp-seg button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---- shared buttons ---- */
+.tp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+.tp-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Accent = outline (text + border), never a red background */
+.tp-btn--accent {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--accent-primary, #e53935);
+  color: var(--accent-primary, #e53935);
+}
+
+.tp-btn--accent:not(:disabled):hover {
+  filter: brightness(1.1);
+}
+
+.tp-btn--ghost {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+/* ---- fullscreen script editor ---- */
+.tp-script-phase {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+}
+
+.tp-script-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(env(safe-area-inset-top) + 8px) 12px 8px;
+}
+
+.tp-script-head .tp-title {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.tp-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.tp-script-full {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+  resize: none;
+  border: none;
+  background: #0b0b0b;
+  color: #fff;
+  padding: 14px 16px;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  font-family: inherit;
+  outline: none;
+}
+
+.tp-script-full::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.tp-script-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  background: #111;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tp-script-mode {
+  font-size: 0.8rem;
+  opacity: 0.75;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tp-script-controls {
+  flex-shrink: 0;
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px calc(env(safe-area-inset-bottom) + 14px);
+  background: #0b0b0b;
+}
+
+.tp-script-controls .tp-btn--accent {
+  flex: 1;
+}
+
+/* ---- "Teleprompter" button in the recorder's controls (InlineRecorder) ---- */
+.pip-tp-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.6rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pip-tp-btn:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  color: #fff;
+}
+
+.pip-tp-btn.active {
+  border-color: var(--accent-primary, #e53935);
+  color: var(--accent-primary, #e53935);
+}
+
+/* The small desktop PiP is narrow: icon only (the title says what it does) */
+.inline-recorder-pip.pip-small .pip-tp-btn {
+  width: 28px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.inline-recorder-pip.pip-small .pip-tp-label {
+  display: none;
+}
+
+/* Phone record stage: big enough to hit next to the big record button */
+.remix-stage .inline-recorder-pip .pip-tp-btn {
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 22px;
+  background: rgba(0, 0, 0, 0.55);
+  font-size: 0.75rem;
+}
+
+.remix-stage .inline-recorder-pip .pip-tp-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* "Voice following only works in Chromium browsers" (non-Chromium only). Meant
+   to be noticed: shown at the top of the script editor and in the settings. */
+.tp-speech-notice {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 8px 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 196, 0, 0.6);
+  border-radius: 10px;
+  background: rgba(255, 196, 0, 0.12);
+  color: #fff;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.tp-speech-notice svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #ffc400;
+}
+.tp-speech-notice strong {
+  display: block;
+  margin-bottom: 2px;
+}
+.tp-speech-notice span {
+  opacity: 0.85;
+}
+
+/* Round outline buttons (the menu's scroll-speed control). */
+.tp-sb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+.tp-sb-btn:hover:not(:disabled) { border-color: #fff; background: rgba(255, 255, 255, 0.08); }
+.tp-sb-btn:disabled { opacity: 0.35; cursor: default; }
+.tp-sb-speed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 64px;
+  line-height: 1.1;
+}
+.tp-sb-speed strong { font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.tp-sb-speed small { font-size: 0.68rem; opacity: 0.75; }
+
+/* Scroll speed inside the Teleprompter menu (timed scrolling). */
+.tp-menu-speed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+.tp-menu-speed-label {
+  align-self: flex-start;
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+.tp-menu-speed-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.tp-sb-btn.tp-sb-btn--sm {
+  width: 34px;
+  height: 34px;
+}
