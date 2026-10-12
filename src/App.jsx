@@ -19,6 +19,7 @@ import OnboardingTour from './components/OnboardingTour'
 import RemixModePicker from './components/RemixModePicker'
 import MusicLibrary from './components/MusicLibrary'
 import { REMIX_LAYOUTS, hasLayout, clampLayout } from './utils/remixLayout'
+import { MAX_TIMELINE_SECONDS, MAX_TIMELINE_ADJ } from './utils/limits'
 import logo3speak from './assets/3speak.png'
 
 function App() {
@@ -431,9 +432,11 @@ function App() {
       // Use pre-uploaded URL if InlineRecorder already uploaded it
       const preUploadedUrl = file._serverUrl || null
       const url = preUploadedUrl || URL.createObjectURL(file)
-      await addToLibraryAndTimeline(url, file.name, type, { file, serverUrl: preUploadedUrl })
+      const added = await addToLibraryAndTimeline(url, file.name, type, { file, serverUrl: preUploadedUrl })
+      // Green screen take from the camera recorder
+      if (added?.clipId && type === 'video' && file._chromaKey) updateClip(added.clipId, { chromaKey: file._chromaKey })
     }
-  }, [addToLibraryAndTimeline])
+  }, [addToLibraryAndTimeline, updateClip])
 
   // Handle drop from library to timeline
   const handleTimelineDrop = useCallback((e, trackId, insertIndex, dropTime) => {
@@ -526,9 +529,9 @@ function App() {
     const sourceEnd = (source.timelinePosition || 0) + sourceLen
 
     if (mode === 'stitchBefore' || mode === 'stitchAfter') {
-      const remaining = 60 - sourceEnd
+      const remaining = MAX_TIMELINE_SECONDS - sourceEnd
       if (remaining < 1) {
-        alert('The original already fills the 1-minute limit. Trim it on the timeline, then record your stitch with the camera button.')
+        alert(`The original already fills the ${MAX_TIMELINE_ADJ} limit. Trim it on the timeline, then record your stitch with the camera button.`)
         return
       }
       const before = mode === 'stitchBefore'
@@ -564,7 +567,32 @@ function App() {
     })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleRecordedInline = useCallback(async (files) => {
+  // Plain "record" entry points: with no video on the timeline there is nothing
+  // to record over, so the camera opens full size; otherwise as the small PiP
+  // over the preview, as before. (Remix sessions set their own size.)
+  const openRecorder = useCallback(() => {
+    const hasVideo = tracks.some(t => t.type === 'video' && t.clips.length > 0)
+    setRecorderSize(hasVideo ? 'small' : 'big')
+    setInlineRecordingOpen(true)
+  }, [tracks])
+
+  const handleRecordedInline = useCallback(async (files, { startPosition = 0 } = {}) => {
+    // Green screen take: layered on a new top track where recording started, so
+    // it is keyed over what plays underneath (appended like any take otherwise)
+    const keyedTake = files.find(f => f._chromaKey && f.type.startsWith('video'))
+    if (!remixSession && keyedTake) {
+      const under = tracks.some(t => t.type === 'video' && t.clips.some(c =>
+        startPosition >= (c.timelinePosition || 0) && startPosition < (c.timelinePosition || 0) + (c.endTime - c.startTime)))
+      if (under) {
+        const clipId = await addRemixRecording(keyedTake, keyedTake._serverUrl || null, { placement: 'layer', timelinePosition: startPosition })
+        if (clipId) {
+          updateClip(clipId, { chromaKey: keyedTake._chromaKey })
+          selectClip(clipId)
+          setPlayheadPosition(startPosition)
+        }
+        return
+      }
+    }
     if (!remixSession) return handleRecordedFiles(files)
     const file = files.find(f => f.type.startsWith('video'))
     if (!file) return
@@ -581,6 +609,7 @@ function App() {
     const sourceLayout = session.mode !== 'stitch' ? (session.layouts?.source || REMIX_LAYOUTS[session.mode].source) : null
     if (sourceLayout) updateClip(session.sourceClipId, { layout: sourceLayout })
     const clipId = await addRemixRecording(file, file._serverUrl || null, options)
+    if (clipId && file._chromaKey) updateClip(clipId, { chromaKey: file._chromaKey })
     if (clipId) selectClip(clipId)
     // Land on the seam for a clip after the original; at the start otherwise
     setPlayheadPosition(session.mode === 'stitch' && !session.before
@@ -826,7 +855,7 @@ function App() {
             onOpenClipSettings={(clipId) => setCompactPropertiesClipId(clipId)}
             onRecordAudio={() => setRecordingAudioOpen(true)}
             onOpenMusic={() => setMusicOpen(true)}
-            onRecordVideo={() => setInlineRecordingOpen(true)}
+            onRecordVideo={openRecorder}
             onReverseClip={handleReverseClip}
             onUpdateTrack={updateTrack}
             isDesktop={isDesktop}
@@ -859,6 +888,7 @@ function App() {
                 clip={compactPropertiesClip}
                 onUpdateClip={(updates) => updateClip(compactPropertiesClip.id, updates)}
                 onSplit={() => splitClip(compactPropertiesClip.id)}
+                playheadPosition={playheadPosition}
               />
             </div>
           )}
@@ -1112,7 +1142,7 @@ function App() {
               <FolderPlus size={16} />
               <span>Add Media</span>
             </button>
-            <button className="add-media-btn" onClick={() => setInlineRecordingOpen(true)} title="Record video from camera">
+            <button className="add-media-btn" onClick={openRecorder} title="Record video from camera">
               <Video size={16} />
               <span>Record</span>
             </button>
@@ -1153,7 +1183,7 @@ function App() {
               onAddFilesToTrack={addFilesToTrack}
               onRecordAudio={() => setRecordingAudioOpen(true)}
               onOpenMusic={() => setMusicOpen(true)}
-              onRecordVideo={() => setInlineRecordingOpen(true)}
+              onRecordVideo={openRecorder}
               onReverseClip={handleReverseClip}
               onUpdateTrack={updateTrack}
               isDesktop={isDesktop}
@@ -1206,6 +1236,7 @@ function App() {
                     clip={selectedClip}
                     onUpdateClip={(updates) => selectedClipId && updateClip(selectedClipId, updates)}
                     onSplit={(time) => selectedClipId && splitClip(selectedClipId, time)}
+                    playheadPosition={playheadPosition}
                   />
                 </div>
               )}

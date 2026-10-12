@@ -1,7 +1,11 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { X, Circle, Square, RotateCcw, Check, Maximize2, Minimize2 } from 'lucide-react'
+import { X, Circle, Square, RotateCcw, Check, Maximize2, Minimize2, ScrollText } from 'lucide-react'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { layoutPan, layoutZoom } from '../utils/remixLayout'
+import { defaultChromaKey, normalizeChromaKey, captureSteadyPlate, canvasToBlobUrl, KEY_RANGES } from '../utils/chromaKey'
+import { lockCamera, unlockCamera, applyCameraLock, describeCameraLock } from '../utils/cameraLock'
+import ChromaKeyCanvas from './ChromaKeyCanvas'
+import Teleprompter from './Teleprompter/Teleprompter'
 
 // guide (remix modes, optional): { title, hint, maxDuration, sync }
 //   sync: true  -> only "record + play" (reaction), false -> only plain record (stitch)
@@ -37,6 +41,81 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
 
   const isSmall = pipSize === 'small'
   const isStage = pipSize === 'stage'
+
+  // Green screen: the take is recorded RAW (no keying baked in); the clip it
+  // becomes gets the key, and the camera view shows the keyed picture meanwhile.
+  // 'static' compares against a frame of the empty background (the plate).
+  const [greenScreen, setGreenScreen] = useState(null) // null | 'green' | 'blue' | 'static'
+  const [plateUrl, setPlateUrl] = useState(null)
+  const [noiseUrl, setNoiseUrl] = useState(null) // how much each spot of the plate flickers
+  // Camera lock while a plate is in use: { result, applied, track }
+  const [cameraLock, setCameraLock] = useState(null)
+  const cameraLockRef = useRef(null)
+  cameraLockRef.current = cameraLock
+  const [plateCount, setPlateCount] = useState(null) // countdown before the plate is taken (0 = capturing)
+  const [keyFailed, setKeyFailed] = useState(false)
+  // Threshold (similarity) and Despill (spill) as set here; reset per mode
+  const [keyTune, setKeyTune] = useState(null)
+  const plateTimerRef = useRef(null)
+  const chromaKey = greenScreen ? { ...defaultChromaKey(greenScreen, plateUrl, noiseUrl), ...keyTune } : null
+  const keyConfig = chromaKey && !keyFailed ? normalizeChromaKey(chromaKey) : null
+  const liveKeyed = !!keyConfig && phase !== 'done' && phase !== 'uploading'
+
+  const videoTrack = () => streamRef.current?.getVideoTracks?.()[0] || null
+  const releaseCameraLock = () => {
+    const lock = cameraLockRef.current
+    if (lock?.track && lock.track.readyState === 'live') unlockCamera(lock.track)
+    setCameraLock(null)
+  }
+
+  // Plate: 3 seconds to step out of the picture, then the camera re-adjusts to
+  // the empty room and settles, focus / exposure / white balance get locked
+  // where the camera allows it, and a few raw frames are averaged (plus their
+  // noise map, which tells the key how much each spot flickers by itself)
+  const capturePlate = () => {
+    if (plateTimerRef.current || plateCount != null) return
+    let n = 3
+    setPlateCount(n)
+    plateTimerRef.current = setInterval(async () => {
+      n -= 1
+      if (n > 0) return setPlateCount(n)
+      clearInterval(plateTimerRef.current)
+      plateTimerRef.current = null
+      setPlateCount(0)
+      try {
+        const track = videoTrack()
+        if (cameraLockRef.current?.track) await unlockCamera(cameraLockRef.current.track)
+        let lock = null
+        const shot = liveVideoRef.current && await captureSteadyPlate(liveVideoRef.current, {
+          beforeCapture: async () => { lock = { ...(await lockCamera(track)), track } }
+        })
+        if (shot) {
+          setPlateUrl(await canvasToBlobUrl(shot.plate))
+          setNoiseUrl(shot.noise ? await canvasToBlobUrl(shot.noise) : null)
+        }
+        setCameraLock(lock)
+      } catch (err) {
+        console.warn('[InlineRecorder] background frame:', err)
+      } finally {
+        setPlateCount(null)
+      }
+    }, 1000)
+  }
+  useEffect(() => () => { if (plateTimerRef.current) clearInterval(plateTimerRef.current) }, [])
+  // A restarted camera (retake) gets the same locked values again
+  useEffect(() => {
+    const lock = cameraLockRef.current
+    const track = videoTrack()
+    if (phase !== 'previewing' || !lock || !track || lock.track === track) return
+    applyCameraLock(track, lock.applied)
+    setCameraLock({ ...lock, track })
+  }, [phase]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Teleprompter: a script overlay over the camera view (DOM only, never part of
+  // the recorded stream). With a script on, every take gets the 3-2-1 countdown
+  // and the script starts scrolling when it ends.
+  const tpRef = useRef(null)
+  const [tpActive, setTpActive] = useState(false)
 
   // Start camera on mount
   useEffect(() => {
@@ -162,6 +241,13 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
   const startWithCountdown = useCallback((start) => {
     setPhase('countdown')
     setCountdown(3)
+    // The teleprompter uses the countdown to hand the mic to speech recognition
+    // or fetch its STT token; recording waits for that (capped) so the audio
+    // track is in place when MediaRecorder starts.
+    const tpReady = Promise.race([
+      Promise.resolve(tpRef.current?.prepare?.()).catch(() => {}),
+      new Promise(r => setTimeout(r, 4500))
+    ])
     let n = 3
     countdownRef.current = setInterval(() => {
       n -= 1
@@ -171,7 +257,7 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
       }
       clearInterval(countdownRef.current)
       countdownRef.current = null
-      start()
+      tpReady.then(() => { if (streamRef.current) start() })
     }, 1000)
   }, [])
 
@@ -311,9 +397,12 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
       await new Promise(r => setTimeout(r, 1000 - elapsed))
     }
 
+    // Green screen: the placed clip is keyed (static needs its background frame)
+    if (chromaKey && (greenScreen !== 'static' || plateUrl)) file._chromaKey = chromaKey
+
     onRecorded([file])
     onClose()
-  }, [recordedBlob, onRecorded, onClose])
+  }, [recordedBlob, onRecorded, onClose, chromaKey, greenScreen, plateUrl]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClose = useCallback(() => {
     stopEverything()
@@ -402,6 +491,10 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
     ? (e) => onBoxPointerDown(e, { mirror: phase !== 'done' && phase !== 'uploading' })
     : undefined
 
+  const tpRecState = phase === 'countdown' ? 'countdown'
+    : phase === 'recording' ? 'recording'
+    : (phase === 'done' || phase === 'uploading') ? 'done' : 'idle'
+
   const pipClassName = `inline-recorder-pip pip-${isSmall ? 'small' : isStage ? 'stage' : 'big'}`
   const pipStyle = isSmall ? { right: position.right, bottom: position.bottom } : {}
 
@@ -431,7 +524,10 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
 
       <div
         className="pip-video-area"
-        style={isStage ? boxStyle : undefined}
+        style={liveKeyed
+          // Keyed: the stage shows the timeline underneath, the PiP a checkerboard
+          ? { ...(isStage ? boxStyle : null), background: isStage ? 'transparent' : 'repeating-conic-gradient(#555 0% 25%, #888 0% 50%) 50% / 16px 16px' }
+          : (isStage ? boxStyle : undefined)}
         onMouseDown={handleBoxPointerDown}
         onTouchStart={handleBoxPointerDown}
         onContextMenu={isStage ? (e) => e.preventDefault() : undefined}
@@ -445,8 +541,19 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
               autoPlay
               muted
               playsInline
-              style={{ ...stageMediaStyle(true), transform: 'scaleX(-1)', display: phase !== 'done' && phase !== 'uploading' ? 'block' : 'none' }}
+              style={{ ...stageMediaStyle(true), transform: 'scaleX(-1)', display: phase !== 'done' && phase !== 'uploading' ? 'block' : 'none', opacity: liveKeyed ? 0 : undefined }}
             />
+            {liveKeyed && (
+              <ChromaKeyCanvas
+                getSource={() => liveVideoRef.current}
+                keyConfig={keyConfig}
+                onFail={() => setKeyFailed(true)}
+                style={{
+                  position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover',
+                  ...stageMediaStyle(true), transform: 'scaleX(-1)', pointerEvents: 'none'
+                }}
+              />
+            )}
             <video
               ref={playbackVideoRef}
               // On the stage the preview's own play button + scrubber drive the take
@@ -480,6 +587,13 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
         {phase === 'countdown' && (
           <div className="pip-countdown">{countdown}</div>
         )}
+
+        {plateCount != null && (
+          <div className="pip-countdown pip-plate-countdown">
+            {plateCount > 0 && <span>{plateCount}</span>}
+            <small>{plateCount > 0 ? 'Step out of the picture' : 'Shooting the background, stay out...'}</small>
+          </div>
+        )}
       </div>
 
       {guide?.hint && (phase === 'previewing' || phase === 'starting') && (
@@ -507,14 +621,87 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
         </div>
       )}
 
+      {(phase === 'previewing' || phase === 'starting') && !error && (
+        <div className="pip-greenscreen">
+          <div className="pip-greenscreen-modes" role="group" aria-label="Green screen">
+            <span className="pip-greenscreen-label">Green screen</span>
+            {[[null, 'Off'], ['green', 'Green'], ['blue', 'Blue'], ['static', 'Static']].map(([mode, label]) => (
+              <button
+                key={label}
+                className={greenScreen === mode ? 'active' : ''}
+                onClick={() => {
+                  if (mode !== 'static') releaseCameraLock()
+                  setGreenScreen(mode); setKeyTune(null); setKeyFailed(false)
+                }}
+                title={mode === 'static' ? 'Static background (experimental): removes whatever matches a shot of the empty background' : undefined}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {chromaKey && (() => {
+            const kc = normalizeChromaKey(chromaKey)
+            const range = (greenScreen === 'static' ? KEY_RANGES.static : KEY_RANGES.chroma).similarity
+            const pct = (v) => Math.round(v * 100)
+            return (
+              <div className="pip-greenscreen-sliders">
+                <label title={greenScreen === 'static' ? 'Tolerance: higher ignores more change in the background (noise, light, focus) but can start to remove parts of you' : 'Higher removes more of the screen colour'}>
+                  <span>Threshold</span>
+                  <input
+                    type="range"
+                    min={pct(range[0])}
+                    max={pct(range[1])}
+                    value={pct(kc.similarity)}
+                    onChange={(e) => setKeyTune(t => ({ ...t, similarity: parseInt(e.target.value) / 100 }))}
+                  />
+                </label>
+                <label title={greenScreen === 'static' ? 'Removes the wall colour from the edges' : `Removes the ${greenScreen} tint from the edges`}>
+                  <span>Despill</span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={pct(kc.spill)}
+                    onChange={(e) => setKeyTune(t => ({ ...t, spill: parseInt(e.target.value) / 100 }))}
+                  />
+                </label>
+              </div>
+            )
+          })()}
+          {greenScreen === 'static' && (
+            <div className="pip-greenscreen-plate">
+              <button onClick={capturePlate} disabled={plateCount != null}>
+                {plateUrl ? 'Retake empty background' : 'Shoot empty background'}
+              </button>
+              <small>
+                {plateUrl
+                  ? (describeCameraLock(cameraLock?.result) || 'Experimental. Keep the camera and the light exactly as they are.')
+                  : 'Experimental. Fix the camera in place, press the button and step out of the picture.'}
+              </small>
+            </div>
+          )}
+          {keyFailed && <small>Live keying is not available here. The clip still gets the green screen setting.</small>}
+        </div>
+      )}
+
       <div className="pip-controls">
+        {phase === 'previewing' && (
+          <button
+            className={`pip-tp-btn${tpActive ? ' active' : ''}`}
+            onClick={() => tpRef.current?.openEditor()}
+            title={tpActive ? 'Edit teleprompter text' : 'Add teleprompter text'}
+          >
+            <ScrollText size={12} />
+            <span className="pip-tp-label">Teleprompter</span>
+          </button>
+        )}
         {phase === 'previewing' && !guide && (
           <>
-            <button className="pip-record-btn" onClick={startRecording} title="Record only">
+            <button className="pip-record-btn" onClick={tpActive ? () => startWithCountdown(startRecording) : startRecording} title="Record only">
               <Circle size={14} />
             </button>
             {onSyncRecord && (
-              <button className="pip-sync-btn" onClick={handleSyncRecord} title="Record + Play video">
+              <button className="pip-sync-btn" onClick={tpActive ? () => startWithCountdown(handleSyncRecord) : handleSyncRecord} title="Record + Play video">
                 <Circle size={10} />
                 <span className="sync-label">+ Play</span>
               </button>
@@ -550,6 +737,8 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
           </>
         )}
       </div>
+
+      <Teleprompter ref={tpRef} recState={tpRecState} streamRef={streamRef} onActiveChange={setTpActive} />
     </div>
   )
 }
