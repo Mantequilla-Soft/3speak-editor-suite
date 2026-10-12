@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useMemo, useCallback } from 'react'
+import { useRef, useEffect, useState, useMemo, useCallback, Fragment } from 'react'
 import { Play, Pause, SkipBack, Minus, Plus, Maximize, Minimize2, Repeat } from 'lucide-react'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 
@@ -14,6 +14,8 @@ const UI_UPDATE_INTERVAL = 50 // ~20fps for React state updates during playback
 import InlineRecorder from './InlineRecorder'
 import usePhoneLayout from '../hooks/usePhoneLayout'
 import { REMIX_LAYOUTS, hasLayout, clampLayout, layoutPan, layoutZoom, LAYOUT_ZOOM_MIN, LAYOUT_ZOOM_MAX } from '../utils/remixLayout'
+import { getClipChromaKey } from '../utils/chromaKey'
+import ChromaKeyCanvas from './ChromaKeyCanvas'
 
 // In stitch mode the preview sits in its own column with its own controls;
 // otherwise this renders the preview as-is.
@@ -57,6 +59,15 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   const playbackPosRef = useRef(playheadPosition)
   const lastUiUpdateRef = useRef(0)
   const activeTopClipIdRef = useRef(null)
+
+  // Green screen: keyed clips draw through a canvas over their (hidden) video.
+  // Clips whose keying failed (no WebGL / 2D, cross-origin video) show unkeyed.
+  const [keyFailedIds, setKeyFailedIds] = useState(() => new Set())
+  const markKeyFailed = useCallback((id) => {
+    setKeyFailedIds(prev => (prev.has(id) ? prev : new Set(prev).add(id)))
+  }, [])
+  // Timeline position a camera take started at (a keyed take is layered there)
+  const recordStartRef = useRef(null)
 
   // Set video source, using HLS.js for .m3u8 URLs
   const setVideoSource = useCallback((videoEl, clipId, url) => {
@@ -580,8 +591,15 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   } : null
 
   const handleSyncRecord = () => {
+    recordStartRef.current = recorderGuide?.sync ? (recorderGuide.timelineStart || 0) : playbackPosRef.current
     if (recorderGuide?.sync) playFrom(recorderGuide.timelineStart || 0)
     else if (!isPlaying) handlePlayPause()
+  }
+  // Tell App where the take started (record-only takes: the playhead stays put)
+  const handleRecordedInline = (files) => {
+    const startPosition = recordStartRef.current ?? playbackPosRef.current
+    recordStartRef.current = null
+    return onRecordedInline?.(files, { startPosition })
   }
   const handleRecordingStopped = () => {
     if (recorderGuide && isPlayingRef.current) handlePlayPause()
@@ -914,6 +932,9 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   })() : null
 
   const ownPlayer = !!(inlineRecording && recSize === 'big' && recorderGuide && !recorderGuide.sync)
+  // Nothing on the timeline: the big recorder gets the whole area, there is no
+  // preview to show beside it (same test as App's openRecorder).
+  const hasAnyVideo = (tracks || []).some(t => t.type === 'video' && t.clips.length > 0)
 
   const scrubber = (
     <div className="global-preview-scrubber" ref={scrubberRef} onClick={handleSeek} onTouchStart={handleScrubberTouchStart}>
@@ -967,7 +988,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         </div>
       )}
 
-      <div className={`global-preview-video-wrap${inlineRecording && recSize === 'big' ? ' with-big-recorder' : ''}${isVerticalVideo ? ' vertical-layout' : ''}`}>
+      <div className={`global-preview-video-wrap${inlineRecording && recSize === 'big' ? ' with-big-recorder' : ''}${inlineRecording && recSize === 'big' && !hasAnyVideo ? ' no-preview' : ''}${isVerticalVideo ? ' vertical-layout' : ''}`}>
         <PreviewColumn own={ownPlayer} controls={ownControls}>
         <div className="global-preview-video">
           {videoClips.length > 0 ? (
@@ -1139,7 +1160,21 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                         draggable={false}
                       />
                     )
-                  } else if (box) {
+                  }
+
+                  // Green screen: the video keeps playing invisibly underneath a
+                  // canvas that draws its keyed picture with the very same CSS
+                  const chromaKey = keyFailedIds.has(clip.id) ? null : getClipChromaKey(clip)
+                  const keyCanvas = (style) => chromaKey ? (
+                    <ChromaKeyCanvas
+                      getSource={() => videoRefs.current[clip.id]}
+                      keyConfig={chromaKey}
+                      style={style}
+                      onFail={() => markKeyFailed(clip.id)}
+                    />
+                  ) : null
+
+                  if (box) {
                     return (
                       <div
                         key={clip.id}
@@ -1154,10 +1189,27 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                           ref={el => bindVideoEl(el, clip)}
                           crossOrigin="anonymous"
                           playsInline
-                          style={boxMediaStyle}
+                          style={chromaKey ? { ...boxMediaStyle, opacity: 0 } : boxMediaStyle}
                         />
+                        {keyCanvas(boxMediaStyle)}
                         {boxOutline}
                       </div>
+                    )
+                  } else if (chromaKey) {
+                    return (
+                      <Fragment key={clip.id}>
+                        <video
+                          preload="auto"
+                          ref={el => bindVideoEl(el, clip)}
+                          crossOrigin="anonymous"
+                          playsInline
+                          style={{ ...layerStyle, opacity: 0, outline: undefined }}
+                          onMouseDown={(e) => handleClipPointerDown(e, clip)}
+                          onTouchStart={(e) => handleClipPointerDown(e, clip)}
+                          onContextMenu={(e) => e.preventDefault()}
+                        />
+                        {keyCanvas({ ...layerStyle, pointerEvents: 'none' })}
+                      </Fragment>
                     )
                   } else {
                     return (
@@ -1180,7 +1232,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
 
               {inlineRecording && recSize === 'stage' && (
                 <InlineRecorder
-                  onRecorded={onRecordedInline}
+                  onRecorded={handleRecordedInline}
                   onClose={onCloseInlineRecorder}
                   onSyncRecord={handleSyncRecord}
                   onRecordingStopped={handleRecordingStopped}
@@ -1217,7 +1269,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
 
           {inlineRecording && recSize === 'small' && (
             <InlineRecorder
-              onRecorded={onRecordedInline}
+              onRecorded={handleRecordedInline}
               onClose={onCloseInlineRecorder}
               onSyncRecord={handleSyncRecord}
               onRecordingStopped={handleRecordingStopped}
@@ -1232,7 +1284,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
 
         {inlineRecording && recSize === 'big' && (
           <InlineRecorder
-            onRecorded={onRecordedInline}
+            onRecorded={handleRecordedInline}
             onClose={onCloseInlineRecorder}
             onSyncRecord={handleSyncRecord}
             onRecordingStopped={handleRecordingStopped}

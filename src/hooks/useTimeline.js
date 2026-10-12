@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useMemo, useEffect } from 'react'
 import { isHlsUrl, getHlsDuration } from '../utils/hlsHelper'
 import { downloadHlsToMp4 } from '../utils/hlsDownloader'
 import { api, getBackendUrl } from '../utils/backendSelector'
+import { MAX_TIMELINE_SECONDS, MAX_TIMELINE_TEXT, MAX_TIMELINE_ADJ } from '../utils/limits'
 
 let clipIdCounter = 0
 let trackIdCounter = 0
@@ -369,7 +370,7 @@ export function useTimeline() {
   }, [setTracksWithHistory])
 
   // Add files to library — uploads to backend for 480p encoding first, then makes available
-  const MAX_DURATION = 60 // 1 minute max
+  const MAX_DURATION = MAX_TIMELINE_SECONDS // 2 minutes max (utils/limits.js)
   const addToLibrary = useCallback(async (files) => {
     for (const file of files) {
       const type = getMediaType(file)
@@ -563,18 +564,18 @@ export function useTimeline() {
         timelinePosition = Math.max(timelinePosition, clipEnd2)
       }
 
-      // Auto-trim to fit within 1-minute limit
+      // Auto-trim to fit within the timeline limit
       let clipDuration = clipEnd - clipStart
       const remaining = Math.max(0, MAX_DURATION - timelinePosition)
       if (remaining <= 0) {
-        setTimeout(() => alert('Timeline is full (1 minute). Remove a clip to make room.'), 0)
+        setTimeout(() => alert(`Timeline is full (${MAX_TIMELINE_TEXT}). Remove a clip to make room.`), 0)
         return prev
       }
       if (timelinePosition + clipDuration > MAX_DURATION) {
         clipEnd = clipStart + remaining
         clipDuration = remaining
         // Songs are expected to run longer than a short; trim them quietly
-        if (!options.quiet) setTimeout(() => alert(`Clip trimmed to ${Math.round(remaining)}s to fit within the 1-minute timeline.`), 0)
+        if (!options.quiet) setTimeout(() => alert(`Clip trimmed to ${Math.round(remaining)}s to fit within the ${MAX_TIMELINE_ADJ} timeline.`), 0)
       }
 
       // Generate a groupId for video+audio pairs
@@ -688,7 +689,7 @@ export function useTimeline() {
       let length = duration
       if (maxDuration != null) length = Math.min(length, maxDuration)
       if (placement === 'before') {
-        // Room left = 1 minute minus what is already on the timeline
+        // Room left = the timeline limit minus what is already on the timeline
         let used = 0
         for (const t of tracksNext) for (const c of t.clips) used = Math.max(used, (c.timelinePosition || 0) + (c.endTime - c.startTime))
         length = Math.min(length, MAX_DURATION - used)
@@ -696,7 +697,7 @@ export function useTimeline() {
         length = Math.min(length, MAX_DURATION - position)
       }
       if (length <= 0.05) {
-        setTimeout(() => alert('Timeline is full (1 minute). Remove a clip to make room.'), 0)
+        setTimeout(() => alert(`Timeline is full (${MAX_TIMELINE_TEXT}). Remove a clip to make room.`), 0)
         return prev
       }
       if (placement === 'before') {
@@ -787,16 +788,16 @@ export function useTimeline() {
         timelinePosition = maxEnd
       }
 
-      // Auto-trim to fit within 1-minute limit
+      // Auto-trim to fit within the timeline limit
       const remaining = Math.max(0, MAX_DURATION - timelinePosition)
       if (remaining <= 0) {
-        setTimeout(() => alert('Timeline is full (1 minute). Remove a clip to make room.'), 0)
+        setTimeout(() => alert(`Timeline is full (${MAX_TIMELINE_TEXT}). Remove a clip to make room.`), 0)
         return prev
       }
       let trimmedDuration = libraryItem.duration
       if (timelinePosition + libraryItem.duration > MAX_DURATION) {
         trimmedDuration = remaining
-        setTimeout(() => alert(`Clip trimmed to ${Math.round(remaining)}s to fit within the 1-minute timeline.`), 0)
+        setTimeout(() => alert(`Clip trimmed to ${Math.round(remaining)}s to fit within the ${MAX_TIMELINE_ADJ} timeline.`), 0)
       }
 
       // Generate a groupId for video+audio pairs
@@ -871,7 +872,7 @@ export function useTimeline() {
 
       const duration = await getMediaDuration(file)
 
-      // Allow files longer than 1 minute — they'll be trimmed when placed on timeline
+      // Allow files longer than the timeline limit — they'll be trimmed when placed on timeline
 
       const url = URL.createObjectURL(file)
       const libraryId = generateLibraryId()
@@ -919,16 +920,16 @@ export function useTimeline() {
           maxEnd = Math.max(maxEnd, clipEnd)
         }
 
-        // Auto-trim to fit within 1-minute limit
+        // Auto-trim to fit within the timeline limit
         const remaining = Math.max(0, MAX_DURATION - maxEnd)
         if (remaining <= 0) {
-          setTimeout(() => alert('Timeline is full (1 minute). Remove a clip to make room.'), 0)
+          setTimeout(() => alert(`Timeline is full (${MAX_TIMELINE_TEXT}). Remove a clip to make room.`), 0)
           return prev
         }
         let trimmedDuration = duration
         if (maxEnd + duration > MAX_DURATION) {
           trimmedDuration = remaining
-          setTimeout(() => alert(`Clip trimmed to ${Math.round(remaining)}s to fit within the 1-minute timeline.`), 0)
+          setTimeout(() => alert(`Clip trimmed to ${Math.round(remaining)}s to fit within the ${MAX_TIMELINE_ADJ} timeline.`), 0)
         }
 
         const groupId = type === 'video' ? generateGroupId() : null

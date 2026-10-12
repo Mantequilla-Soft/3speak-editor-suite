@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useRef, useState } from 'react'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { hasLayout } from '../utils/remixLayout'
+import { getClipChromaKey } from '../utils/chromaKey'
 
 const isIframe = typeof window !== 'undefined' && window.parent !== window
 const GATEWAY_URL = (import.meta.env.VITE_GATEWAY_URL || '').replace(/\/+$/, '')
@@ -14,6 +15,7 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     return !isIframe && typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches
   })
   const pollIntervalRef = useRef(null)
+  const uploadedPlatesRef = useRef(new Map()) // local clean-plate URL -> server URL
   const activeJobRef = useRef(null) // { jobId, backendEndpoint }
   const remixSourceRef = useRef(null) // { parentAuthor, parentPermlink } when remixing a short
   // Set when a whole video arrives for remixing (no clip range): { clipId, duration }
@@ -216,6 +218,31 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
       urlOverrides.set(clip.id, serverUrl)
     }
 
+    // Green screen "static background" clips: their clean plate and its noise
+    // map (local PNGs) go up once, the backend keys against them
+    const plateUrls = new Map() // clip id -> { plateUrl, noiseUrl } on the server
+    const toServer = async (localUrl, name, clip) => {
+      if (!localUrl || !/^(blob|data):/.test(localUrl)) return localUrl || null
+      let url = uploadedPlatesRef.current.get(localUrl)
+      if (!url) {
+        onProgress(`Uploading background frame for ${clip.name || 'clip'}...`)
+        const blob = await (await fetch(localUrl)).blob()
+        url = await uploadFile(blob, name)
+        uploadedPlatesRef.current.set(localUrl, url)
+      }
+      return url
+    }
+    for (const track of tracks) {
+      for (const clip of track.clips) {
+        const key = getClipChromaKey(clip)
+        if (key?.mode !== 'static' || !key.plateUrl) continue
+        plateUrls.set(clip.id, {
+          plateUrl: await toServer(key.plateUrl, 'background-plate.png', clip),
+          noiseUrl: await toServer(key.noiseUrl, 'background-noise.png', clip)
+        })
+      }
+    }
+
     // Build the timeline payload with overridden URLs
     // Prefer serverUrl (already on backend, e.g. /rendered/clip-xxx.mp4) over originalUrl (HLS)
     const mediaUrls = []
@@ -248,6 +275,14 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
           volume: clip.volume || 100
         }
         if (hasLayout(clip)) baseClip.layout = clip.layout
+
+        // Green screen: keyed out in the render, over the tracks below
+        const key = getClipChromaKey(clip)
+        if (key) {
+          baseClip.chromaKey = key.mode === 'static'
+            ? { color: 'static', similarity: key.similarity, blend: key.blend, spill: key.spill, plateUrl: plateUrls.get(clip.id)?.plateUrl || null, noiseUrl: plateUrls.get(clip.id)?.noiseUrl || null }
+            : { color: key.mode, similarity: key.similarity, blend: key.blend, spill: key.spill }
+        }
 
         // Add color-specific properties for color clips
         if (clip.type === 'color') {

@@ -1,6 +1,8 @@
 import { spawn, execFile } from 'child_process'
 import path from 'path'
 import fs from 'fs/promises'
+import { createWriteStream } from 'fs'
+import { createStaticMasker, staticMaskSize } from '../utils/staticKeyMask.js'
 
 /**
  * Build and execute FFmpeg commands to render the timeline.
@@ -47,6 +49,7 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
   onProgress(0, 'Processing individual clips...')
 
   const processedClips = new Map()
+  const processedPlates = new Map() // clip id -> clean plate PNG (static-background key)
 
   for (let i = 0; i < allClips.length; i++) {
     const clip = allClips[i]
@@ -71,6 +74,26 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
     const processedPath = path.join(jobDir, `processed_${clip.id}${ext}`)
     await processClip(clip, inputFile, processedPath, outputWidth, outputHeight, fps, signal, scaleFactor)
     processedClips.set(clip.id, processedPath)
+
+    // Static-background key: bring the clean plate into the processed clip's geometry
+    const ck = clip.trackType === 'video' ? getChromaKey(clip) : null
+    if (ck?.mode === 'static') {
+      const plateFile = downloadedFiles.get(`${clip.id}__plate`)
+      if (plateFile) {
+        const platePath = path.join(jobDir, `processed_${clip.id}_plate.png`)
+        const size = await processPlate(clip, plateFile, processedPath, platePath, outputWidth, outputHeight, signal)
+        // Foreground mask with holes filled, per frame, by the shared mask module
+        const t0 = Date.now()
+        const mask = size
+          ? await computeStaticMaskFile(clip, inputFile, plateFile, downloadedFiles.get(`${clip.id}__noise`) || null,
+            path.join(jobDir, `mask_${clip.id}.gray`), fps, ck, signal)
+          : null
+        if (mask) console.log(`[ffmpeg] Static key mask for ${clip.id}: ${mask.frames} frames at ${mask.w}x${mask.h} in ${Date.now() - t0} ms`)
+        processedPlates.set(clip.id, { plate: platePath, size, mask })
+      } else {
+        console.warn(`[ffmpeg] Clip ${clip.id}: static background key without a plate, rendering unkeyed`)
+      }
+    }
   }
 
   // STEP 2: Composite all video clips onto a single canvas
@@ -109,17 +132,56 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
       compArgs.push('-i', oc.file)
     }
 
+    // Clean plates (and foreground masks) of static-background keyed clips go after the clips
+    const plateInputs = new Map() // overlay index -> { plate, mask } input indexes
+    let nextInput = overlayClips.length + 1
+    overlayClips.forEach((oc, i) => {
+      const p = processedPlates.get(oc.clip.id)
+      if (!p) return
+      const entry = { plate: nextInput++, mask: null, maskInfo: p.mask, size: p.size }
+      compArgs.push('-i', p.plate)
+      if (p.mask) {
+        entry.mask = nextInput++
+        compArgs.push('-f', 'rawvideo', '-pix_fmt', 'gray', '-video_size', `${p.mask.w}x${p.mask.h}`, '-framerate', String(fps), '-i', p.mask.path)
+      }
+      plateInputs.set(i, entry)
+    })
+
     // Build the filter graph:
-    // 1. Delay each clip to its timeline position using setpts
-    // 2. Chain overlay filters: base → overlay clip0 → overlay clip1 → ...
+    // 1. Key green / blue screen (or a static background) out of keyed clips
+    // 2. Delay each clip to its timeline position using setpts
+    // 3. Chain overlay filters: base → overlay clip0 → overlay clip1 → ...
+    //    Keyed clips carry alpha, so overlay lets the lower layers show through.
     const filterParts = []
+    const clipLabels = []
 
     for (let i = 0; i < overlayClips.length; i++) {
       const oc = overlayClips[i]
       const pos = oc.clip.timelinePosition || 0
+      const delay = pos > 0.01 ? `setpts=PTS+${pos.toFixed(3)}/TB` : null
+      const key = oc.clip.type === 'video' ? getChromaKey(oc.clip) : null
 
-      if (pos > 0.01) {
-        filterParts.push(`[${i + 1}:v]setpts=PTS+${pos.toFixed(3)}/TB[v${i}]`)
+      if (key && key.mode === 'static' && plateInputs.has(i)) {
+        const pi = plateInputs.get(i)
+        filterParts.push(...buildStaticKeyFilter({
+          clipLabel: `${i + 1}:v`,
+          plateLabel: `${pi.plate}:v`,
+          maskLabel: pi.mask != null ? `${pi.mask}:v` : null,
+          // The mask covers the whole source frame: frame it exactly like the clip
+          maskTransform: pi.mask != null
+            ? `${withScaleFlags(buildTransformFilter(oc.clip, outputWidth, outputHeight), 'bilinear')},scale=${pi.size.width}:${pi.size.height}:flags=bilinear,setsar=1`
+            : null,
+          key, i, delay, outLabel: `v${i}`
+        }))
+        clipLabels.push(`[v${i}]`)
+      } else if (key && key.mode !== 'static') {
+        filterParts.push(...buildChromaKeyFilter(`${i + 1}:v`, key, i, delay, `v${i}`))
+        clipLabels.push(`[v${i}]`)
+      } else if (delay) {
+        filterParts.push(`[${i + 1}:v]${delay}[v${i}]`)
+        clipLabels.push(`[v${i}]`)
+      } else {
+        clipLabels.push(`[${i + 1}:v]`)
       }
     }
 
@@ -127,7 +189,7 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
     for (let i = 0; i < overlayClips.length; i++) {
       const oc = overlayClips[i]
       const out = i === overlayClips.length - 1 ? '[outv]' : `[tmp${i}]`
-      const clipLabel = (oc.clip.timelinePosition || 0) > 0.01 ? `[v${i}]` : `[${i + 1}:v]`
+      const clipLabel = clipLabels[i]
 
       // Text/image/color clips have position baked into their canvas → overlay at 0:0
       // Video clips need position applied here
@@ -596,9 +658,12 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
   const args = []
   if (clip.startTime > 0) args.push('-ss', clip.startTime.toString())
   args.push('-i', inputFile, '-t', duration.toString())
+  // Keyed clips are keyed in the composite step: keep this intermediate cleaner
+  // so a second round of compression does not chew up the key edges
+  const crf = getChromaKey(clip) ? '16' : '23'
   args.push(
     '-vf', filterChain,
-    '-c:v', 'libx264', '-crf', '23', '-preset', 'fast', '-pix_fmt', 'yuv420p',
+    '-c:v', 'libx264', '-crf', crf, '-preset', 'fast', '-pix_fmt', 'yuv420p',
     '-an',
     '-y', outputPath
   )
@@ -719,6 +784,297 @@ function getLayoutBox(clip, w, h) {
   const pan = (v) => (typeof v === 'number' && isFinite(v) ? Math.min(1, Math.max(0, v)) : 0.5)
   const zoom = typeof l.zoom === 'number' && isFinite(l.zoom) ? Math.min(4, Math.max(1, l.zoom)) : 1
   return { x: bx, y: by, w: bw, h: bh, panX: pan(l.panX), panY: pan(l.panY), zoom }
+}
+
+/**
+ * Green screen / static background keying.
+ *
+ * Mirrors src/utils/chromaKey.js in the frontend (modes, defaults, ranges and
+ * the exact math), whose WebGL shader computes the same alpha so the preview
+ * matches the render. Keep both files in step.
+ *
+ * clip.chromaKey: { color: 'green'|'blue'|'static', similarity, blend, spill,
+ *                   plateUrl (static only) }
+ *
+ * Green / blue ("color excess" key, per pixel, channels 0-1):
+ *   C = screen channel (G or B), M = max of the other two
+ *   e = (C - M) / max(C, 0.3)          how much greener (bluer) than anything neutral
+ *   alpha = clamp(((1 - similarity) - e) / blend, 0, 1)
+ *   C' = C - spill * max(C - M, 0)     despill: pull the screen cast off the edges
+ * Neutrals, skin, yellow and cyan all have e <= 0, so they stay solid; a dim or
+ * unevenly lit screen keeps a similar e because of the division by C.
+ *
+ * Static background: see buildStaticKeyFilter (mask module shared with the preview).
+ */
+const KEY_DEFAULTS = {
+  chroma: { similarity: 0.75, blend: 0.15, spill: 0.8 },
+  static: { similarity: 0.05, blend: 0.12, spill: 0.6 }
+}
+const KEY_RANGES = {
+  chroma: { similarity: [0.3, 0.97], blend: [0.001, 0.5] },
+  static: { similarity: [0.01, 0.3], blend: [0, 0.5] }
+}
+
+function getChromaKey(clip) {
+  const ck = clip?.chromaKey
+  if (!ck || typeof ck !== 'object' || ck.enabled === false) return null
+  const mode = ck.color === 'blue' ? 'blue' : ck.color === 'static' ? 'static' : 'green'
+  const kind = mode === 'static' ? 'static' : 'chroma'
+  const d = KEY_DEFAULTS[kind]
+  const r = KEY_RANGES[kind]
+  const num = (v, def, [lo, hi]) => (typeof v === 'number' && isFinite(v) ? Math.min(hi, Math.max(lo, v)) : def)
+  return {
+    mode,
+    similarity: num(ck.similarity, d.similarity, r.similarity),
+    blend: num(ck.blend, d.blend, r.blend),
+    spill: num(ck.spill, d.spill, [0, 1])
+  }
+}
+
+/**
+ * Green / blue screen key as filtergraph parts: [inLabel] -> [outLabel] (gbrap,
+ * despilled, alpha = key). Uses only cheap native filters: the planes are
+ * split, M = max(other two) via blend=lighten, and lut2 (a 256x256 table)
+ * computes alpha and the despilled screen channel from (C, M).
+ */
+function buildChromaKeyFilter(inLabel, key, i, delay, outLabel) {
+  const T = (1 - key.similarity).toFixed(4)
+  const B = Math.max(0.001, key.blend).toFixed(4)
+  const S = key.spill.toFixed(4)
+  const blue = key.mode === 'blue'
+  const n = (s) => `[k${i}${s}]`
+  // extractplanes emits its pads in fixed r, g, b order whatever the order asked
+  // for, so name them by channel: c = screen channel, o1 / o2 = the other two
+  const pads = blue ? [n('o1'), n('o2'), n('c')] : [n('o1'), n('c'), n('o2')]
+  const alphaExpr = `255*clip((${T}-(x-y)/max(x,76.5))/${B},0,1)`
+  const spillExpr = `x-${S}*max(x-y,0)`
+  // mergeplanes takes the gbrap planes in order G, B, R, A
+  const merged = blue ? [n('o2b'), n('cd'), n('o1b')] : [n('cd'), n('o2b'), n('o1b')]
+  return [
+    `[${inLabel}]format=gbrp,extractplanes=r+g+b${pads.join('')}`,
+    `${n('c')}split${n('ca')}${n('cb')}`,
+    `${n('o1')}split${n('o1a')}${n('o1b')}`,
+    `${n('o2')}split${n('o2a')}${n('o2b')}`,
+    `${n('o1a')}${n('o2a')}blend=all_mode=lighten,split${n('m1')}${n('m2')}`,
+    `${n('ca')}${n('m1')}lut2=c0='${alphaExpr}'${n('a')}`,
+    `${n('cb')}${n('m2')}lut2=c0='${spillExpr}'${n('cd')}`,
+    `${merged.join('')}${n('a')}mergeplanes=map0s=0:map0p=0:map1s=1:map1p=0:map2s=2:map2p=0:map3s=3:map3p=0:format=gbrap` +
+      `${delay ? `,${delay}` : ''}[${outLabel}]`
+  ]
+}
+
+// backgroundkey compares stored YUV; the preview re-derives BT.601 limited YUV
+// from decoded RGB, so normalize the clip and the plate to that first
+const KEY_NORMALIZE = 'scale=out_color_matrix=bt601:out_range=tv'
+
+/**
+ * Static-background (difference) key against a clean plate P, mirroring the
+ * preview shader (src/utils/chromaKey.js):
+ *   pa    = backgroundkey alpha at full resolution. backgroundkey takes its
+ *           reference from the first frame it sees, so the plate goes in front
+ *           of the clip and is dropped again; threshold=1 stops it from ever
+ *           adopting a later frame as the background.
+ *   m     = foreground mask with holes filled (computeStaticMaskFile), framed
+ *           like the clip and upscaled bilinearly
+ *   alpha = clamp(pa + 2m - 1)                   lut2 on (pa, m)
+ *   color = clamp((C - (1 - alpha) * spill * P) / alpha)   unmix the wall from the edge
+ * Without a mask (it could not be computed) it falls back to plain backgroundkey.
+ */
+function buildStaticKeyFilter({ clipLabel, plateLabel, maskLabel, maskTransform, key, i, delay, outLabel }) {
+  const prep = `${KEY_NORMALIZE},format=yuva420p,setsar=1`
+  const n = (s) => `[s${i}${s}]`
+  const bk = `backgroundkey=threshold=1:similarity=${key.similarity.toFixed(4)}:blend=${key.blend.toFixed(4)},` +
+    'trim=start_frame=1,setpts=PTS-STARTPTS'
+  const end = `${delay ? `,${delay}` : ''}[${outLabel}]`
+  if (!maskLabel) {
+    return [
+      `[${plateLabel}]${prep}${n('kpl')}`,
+      `[${clipLabel}]${prep}${n('kcl')}`,
+      `${n('kpl')}${n('kcl')}concat=n=2:v=1:a=0,${bk}${end}`
+    ]
+  }
+  const S = key.spill
+  const parts = [
+    `[${plateLabel}]split${n('pa')}${n('pb')}`,
+    `${n('pa')}${prep}${n('kpl')}`,
+    `[${clipLabel}]${prep}${n('kcl')}`,
+    `${n('kpl')}${n('kcl')}concat=n=2:v=1:a=0,${bk},split${n('k1')}${n('k2')}`,
+    `${n('k1')}alphaextract${n('pa8')}`,
+    `[${maskLabel}]${maskTransform},format=gray${n('m')}`,
+    `${n('pa8')}${n('m')}lut2=c0='clip(x+2*y-255,0,255)'${S > 0 ? `,split${n('a1')}${n('a2')}` : n('a1')}`
+  ]
+  if (S <= 0) {
+    parts.push(`${n('pb')}nullsink`, `${n('k2')}${n('a1')}alphamerge${end}`)
+    return parts
+  }
+  const all = (e) => `c0='${e}':c1='${e}':c2='${e}'`
+  parts.push(
+    // alpha as an RGB image (three copies of the plane)
+    `${n('a2')}split=3${n('ar')}${n('ag')}${n('ab')}`,
+    `${n('ag')}${n('ab')}${n('ar')}mergeplanes=map0s=0:map0p=0:map1s=1:map1p=0:map2s=2:map2p=0:format=gbrp,split${n('a3')}${n('a4')}`,
+    `${n('pb')}format=gbrp${n('pg')}`,
+    // (1 - alpha) * spill * P   (the stream first: the plate is a single frame)
+    `${n('a3')}${n('pg')}lut2=${all(`y*(255-x)*${S.toFixed(4)}/255`)}${n('pp')}`,
+    `${n('k2')}format=gbrp${n('cg')}`,
+    `${n('cg')}${n('pp')}lut2=${all('max(x-y,0)')}${n('dd')}`,
+    `${n('dd')}${n('a4')}lut2=${all('clip(x*255/max(y,1),0,255)')}${n('fg')}`,
+    `${n('fg')}${n('a1')}alphamerge${end}`
+  )
+  return parts
+}
+
+/** Add flags to every scale filter of a filter chain (e.g. bilinear for masks). */
+function withScaleFlags(chain, flags) {
+  return chain.split(',').map(f => (f.startsWith('scale=') ? `${f}:flags=${flags}` : f)).join(',')
+}
+
+/** Width x height as decoded (rotation applied, like the browser shows it). */
+function probeDisplaySize(file) {
+  return new Promise((resolve) => {
+    const probe = spawn('ffprobe', [
+      '-v', 'error', '-select_streams', 'v:0',
+      '-show_entries', 'stream=width,height:stream_side_data=rotation', '-of', 'json', file
+    ])
+    let out = ''
+    probe.stdout.on('data', d => { out += d.toString() })
+    probe.on('close', () => {
+      try {
+        const st = JSON.parse(out).streams?.[0]
+        if (!st?.width || !st?.height) return resolve(null)
+        const rot = Math.abs(Number(st.side_data_list?.find(d => d.rotation != null)?.rotation || 0)) % 180
+        resolve(rot === 90 ? { width: st.height, height: st.width } : { width: st.width, height: st.height })
+      } catch {
+        resolve(null)
+      }
+    })
+    probe.on('error', () => resolve(null))
+  })
+}
+
+/** Run ffmpeg and collect stdout (small outputs only). */
+function ffmpegToBuffer(args, signal) {
+  return new Promise((resolve, reject) => {
+    const proc = spawn('ffmpeg', ['-v', 'error', ...args], { stdio: ['ignore', 'pipe', 'pipe'] })
+    const chunks = []
+    let stderr = ''
+    proc.stdout.on('data', c => chunks.push(c))
+    proc.stderr.on('data', d => { stderr += d.toString() })
+    const onAbort = () => proc.kill('SIGTERM')
+    signal?.addEventListener('abort', onAbort, { once: true })
+    proc.on('close', (code) => {
+      signal?.removeEventListener('abort', onAbort)
+      if (signal?.aborted) return reject(new Error('Job aborted'))
+      if (code === 0) resolve(Buffer.concat(chunks))
+      else reject(new Error(`FFmpeg exit ${code}: ${stderr.slice(-500)}`))
+    })
+    proc.on('error', err => reject(err))
+  })
+}
+
+/**
+ * Static-background key, foreground mask pass: ffmpeg decodes the clip's range
+ * of the SOURCE (whole frame, like the preview) scaled down to staticMaskSize,
+ * the shared (stateful) mask module runs on every frame in order with its media
+ * time, and the masks are written as a raw gray stream (w x h bytes per frame
+ * at `fps`) for the composite step. noiseFile: the plate's noise map image
+ * (optional; the preview made it while shooting the plate).
+ * Returns { path, w, h, frames } or null.
+ */
+async function computeStaticMaskFile(clip, inputFile, plateFile, noiseFile, outPath, fps, key, signal) {
+  const src = await probeDisplaySize(inputFile)
+  if (!src) return null
+  const [w, h] = staticMaskSize(src.width, src.height)
+  const scale = `scale=${w}:${h}:flags=area,format=rgb24`
+  const frameBytes = w * h * 3
+  const plate = await ffmpegToBuffer(['-i', plateFile, '-vf', scale, '-frames:v', '1', '-f', 'rawvideo', 'pipe:1'], signal)
+  if (plate.length < frameBytes) return null
+  // Noise map: one byte per cell, stored in the red channel; nearest-neighbour
+  // if its size differs (the browser does the same)
+  let noise = null
+  if (noiseFile) {
+    try {
+      const rgb = await ffmpegToBuffer(['-i', noiseFile, '-vf', `scale=${w}:${h}:flags=neighbor,format=rgb24`, '-frames:v', '1', '-f', 'rawvideo', 'pipe:1'], signal)
+      if (rgb.length >= frameBytes) {
+        noise = new Uint8Array(w * h)
+        for (let i = 0; i < w * h; i++) noise[i] = rgb[i * 3]
+      }
+    } catch (err) {
+      if (err.message === 'Job aborted') throw err
+      console.warn(`[ffmpeg] Noise map unusable, using the default noise: ${err.message}`)
+    }
+  }
+  const masker = createStaticMasker()
+
+  const args = ['-v', 'error']
+  if (clip.startTime > 0) args.push('-ss', clip.startTime.toString())
+  args.push('-i', inputFile, '-t', (clip.endTime - clip.startTime).toString(), '-an',
+    '-vf', `fps=${fps},${scale}`, '-f', 'rawvideo', 'pipe:1')
+
+  const out = createWriteStream(outPath)
+  const frame = Buffer.allocUnsafe(frameBytes)
+  const mask = new Uint8Array(w * h)
+  let fill = 0
+  let frames = 0
+  await new Promise((resolve, reject) => {
+    const proc = spawn('ffmpeg', args, { stdio: ['ignore', 'pipe', 'pipe'] })
+    let stderr = ''
+    proc.stderr.on('data', d => { stderr += d.toString() })
+    proc.stdout.on('data', (chunk) => {
+      let off = 0
+      while (off < chunk.length) {
+        const take = Math.min(frameBytes - fill, chunk.length - off)
+        chunk.copy(frame, fill, off, off + take)
+        fill += take
+        off += take
+        if (fill === frameBytes) {
+          masker.compute({ frame, plate, noise, w, h, channels: 3, similarity: key.similarity, time: frames / fps }, mask)
+          out.write(Buffer.from(mask))
+          frames++
+          fill = 0
+        }
+      }
+    })
+    const onAbort = () => proc.kill('SIGTERM')
+    signal?.addEventListener('abort', onAbort, { once: true })
+    proc.on('close', (code) => {
+      signal?.removeEventListener('abort', onAbort)
+      if (signal?.aborted) return reject(new Error('Job aborted'))
+      if (code !== 0) return reject(new Error(`Mask pass failed (exit ${code}): ${stderr.slice(-500)}`))
+      out.end(resolve)
+    })
+    proc.on('error', reject)
+  }).catch((err) => {
+    out.destroy()
+    throw err
+  })
+  return frames > 0 ? { path: outPath, w, h, frames } : null
+}
+
+function probeVideoSize(file) {
+  return new Promise((resolve) => {
+    const probe = spawn('ffprobe', [
+      '-v', 'error', '-select_streams', 'v:0',
+      '-show_entries', 'stream=width,height', '-of', 'csv=p=0:s=x',
+      file
+    ])
+    let out = ''
+    probe.stdout.on('data', d => { out += d.toString() })
+    probe.on('close', () => {
+      const m = out.trim().match(/^(\d+)x(\d+)/)
+      resolve(m ? { width: parseInt(m[1], 10), height: parseInt(m[2], 10) } : null)
+    })
+    probe.on('error', () => resolve(null))
+  })
+}
+
+/** Scale / crop the clean plate exactly like its clip, to the processed clip's size. */
+async function processPlate(clip, plateFile, processedClipPath, outPath, w, h, signal) {
+  const size = await probeVideoSize(processedClipPath)
+  const filters = [buildTransformFilter(clip, w, h)]
+  if (size) filters.push(`scale=${size.width}:${size.height}`)
+  filters.push('setsar=1')
+  await runFFmpeg(['-i', plateFile, '-vf', filters.join(','), '-frames:v', '1', '-y', outPath], signal)
+  return size
 }
 
 /**

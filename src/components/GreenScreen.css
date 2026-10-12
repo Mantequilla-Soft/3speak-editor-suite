@@ -1,0 +1,159 @@
+/* Green screen: clip properties + camera recorder controls */
+
+.chroma-mode-buttons {
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.chroma-mode-buttons .text-align-btn {
+  font-size: 0.7rem;
+  padding: 4px 8px;
+}
+
+.chroma-plate-thumb {
+  display: block;
+  max-width: 100%;
+  max-height: 90px;
+  margin-top: 4px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  object-fit: contain;
+}
+
+.layout-free-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Recorder */
+.pip-greenscreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px 0;
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.75);
+  text-align: center;
+}
+
+.pip-greenscreen-modes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.pip-greenscreen-label {
+  font-weight: 600;
+  margin-right: 2px;
+}
+
+.pip-greenscreen button {
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 11px;
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.6rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pip-greenscreen button:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  color: #fff;
+}
+
+.pip-greenscreen button.active {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.pip-greenscreen button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.pip-greenscreen-plate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.pip-greenscreen small {
+  line-height: 1.3;
+  opacity: 0.85;
+}
+
+/* The narrow desktop PiP: no label, smaller chips */
+.inline-recorder-pip.pip-small .pip-greenscreen-label {
+  display: none;
+}
+
+.inline-recorder-pip.pip-small .pip-greenscreen button {
+  padding: 0 5px;
+}
+
+.pip-plate-countdown {
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pip-plate-countdown small {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Phone record stage: above the big record button */
+.pip-stage .pip-greenscreen {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 100px;
+  z-index: 2;
+  padding: 6px 8px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.55);
+  font-size: 0.7rem;
+}
+
+.pip-stage .pip-greenscreen button {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 14px;
+  font-size: 0.7rem;
+}
+
+/* Recorder: Threshold + Despill, one compact row (wraps in the narrow PiP) */
+.pip-greenscreen-sliders {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px 10px;
+  width: 100%;
+}
+
+.pip-greenscreen-sliders label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1 1 110px;
+  min-width: 0;
+  max-width: 200px;
+}
+
+.pip-greenscreen-sliders span {
+  flex: none;
+}
+
+.pip-greenscreen-sliders input[type="range"] {
+  flex: 1;
+  min-width: 40px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--accent-primary);
+}

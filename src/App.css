@@ -4797,3 +4797,27 @@ body {
   line-height: 1.35;
   color: var(--text-secondary);
 }
+
+/* Empty timeline + big recorder: hide the empty preview beside the camera (kept
+   mounted, only hidden, so timeline audio elements keep working). */
+.global-preview-video-wrap.with-big-recorder.no-preview > .global-preview-video {
+  display: none;
+}
+
+/* ...and the camera keeps its shape at a height that fits the editor instead of
+   stretching to the full width (a 3:4 box that wide is taller than the modal). */
+.global-preview-video-wrap.with-big-recorder.no-preview {
+  align-items: center;
+  justify-content: center;
+}
+.global-preview-video-wrap.with-big-recorder.no-preview > .inline-recorder-pip.pip-big {
+  flex: 0 0 auto;
+  width: fit-content;
+  max-width: 100%;
+}
+.global-preview-video-wrap.with-big-recorder.no-preview .inline-recorder-pip.pip-big .pip-video-area {
+  height: clamp(240px, 52vh, 600px);
+  width: auto;
+  max-width: 100%;
+  margin: 0 auto;
+}

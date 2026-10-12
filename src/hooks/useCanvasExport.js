@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react'
 import { hasLayout, coverSourceRect, layoutPan, layoutZoom } from '../utils/remixLayout'
+import { getClipChromaKey, createKeyer } from '../utils/chromaKey'
 
 const EXPORT_WIDTH = 1280
 const EXPORT_HEIGHT = 720
@@ -83,9 +84,47 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
     })
   }
 
+  // Green screen clips: one keyer each (same shader as the preview)
+  const createKeyers = async (mediaElements) => {
+    const keyers = new Map()
+    for (const [id, media] of mediaElements) {
+      const key = media.type === 'video' ? getClipChromaKey(media.clip) : null
+      if (!key) continue
+      const keyer = createKeyer(document.createElement('canvas'), { preserveDrawingBuffer: true, maxSide: 4096 })
+      if (!keyer) continue
+      if (key.mode === 'static' && key.plateUrl) {
+        const load = (url) => new Promise((resolve) => {
+          if (!url) return resolve(null)
+          const img = new Image()
+          img.crossOrigin = 'anonymous'
+          img.onload = () => resolve(img)
+          img.onerror = () => resolve(null)
+          img.src = url
+        })
+        const plate = await load(key.plateUrl)
+        if (plate) keyer.setPlate(plate)
+        keyer.setNoise?.(await load(key.noiseUrl))
+      }
+      keyers.set(id, { keyer, key })
+    }
+    return keyers
+  }
+
+  // The keyed picture of a clip's current frame (a canvas the size of the
+  // video, or scaled down by the 2D fallback), or null to draw it as is
+  const keyedFrame = (keyers, clip, video) => {
+    const k = keyers?.get(clip.id)
+    if (!k) return null
+    try {
+      return k.keyer.draw(video, k.key) ? k.keyer.canvas : null
+    } catch {
+      return null
+    }
+  }
+
   // Draw a single frame to the canvas
   // scaleFactor converts preview-pixel values to output-pixel values
-  const drawFrame = (ctx, clips, mediaElements, currentTime, scaleFactor = 1) => {
+  const drawFrame = (ctx, clips, mediaElements, currentTime, scaleFactor = 1, keyers = null) => {
     // Clear canvas with black background
     ctx.fillStyle = '#000000'
     ctx.fillRect(0, 0, EXPORT_WIDTH, EXPORT_HEIGHT)
@@ -113,7 +152,14 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
           const { sx, sy, sw, sh } = coverSourceRect(srcW, srcH, bw, bh, panX, panY, layoutZoom(clip.layout))
           ctx.save()
           if ((clip.opacity ?? 100) < 100) ctx.globalAlpha = clip.opacity / 100
-          ctx.drawImage(el, sx, sy, sw, sh, bx, by, bw, bh)
+          const keyed = media.type === 'video' ? keyedFrame(keyers, clip, el) : null
+          if (keyed) {
+            const kx = keyed.width / srcW
+            const ky = keyed.height / srcH
+            ctx.drawImage(keyed, sx * kx, sy * ky, sw * kx, sh * ky, bx, by, bw, bh)
+          } else {
+            ctx.drawImage(el, sx, sy, sw, sh, bx, by, bw, bh)
+          }
           ctx.restore()
         }
         continue
@@ -179,7 +225,7 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
           drawY = 0
         }
 
-        ctx.drawImage(video, drawX, drawY, drawWidth, drawHeight)
+        ctx.drawImage(keyedFrame(keyers, clip, video) || video, drawX, drawY, drawWidth, drawHeight)
 
       } else if (media.type === 'image') {
         const img = media.element
@@ -307,6 +353,7 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
     const scaleFactor = EXPORT_WIDTH / previewWidth
     console.log(`[CanvasExport] Preview width: ${previewWidth}px, Output: ${EXPORT_WIDTH}px, Scale factor: ${scaleFactor.toFixed(2)}`)
 
+    let keyers = null
     try {
       // Calculate total duration
       const videoTracks = (tracks || []).filter(t => t.type === 'video')
@@ -333,6 +380,7 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
 
       // Load all media
       const mediaElements = await loadMedia(tracks)
+      keyers = await createKeyers(mediaElements)
 
       // Create canvas
       const canvas = document.createElement('canvas')
@@ -407,7 +455,7 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
         }
 
         // Draw frame
-        drawFrame(ctx, clips, mediaElements, currentTime, scaleFactor)
+        drawFrame(ctx, clips, mediaElements, currentTime, scaleFactor, keyers)
 
         // Update progress
         setExportProgress((frame + 1) / frameCount * 0.7) // 70% for rendering
@@ -533,6 +581,7 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
       console.error('Canvas export failed:', error)
       throw error
     } finally {
+      keyers?.forEach(k => k.keyer.dispose())
       setExporting(false)
       setExportProgress(0)
       setExportPhase('')

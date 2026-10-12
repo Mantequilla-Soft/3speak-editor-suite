@@ -1,6 +1,163 @@
 import { useState, useRef, useCallback } from 'react'
 import { Volume2, ZoomIn, Move, Crop, Type, GripVertical, RotateCcw, Droplets, AlignLeft, AlignCenter, AlignRight, Palette, Minus, Plus } from 'lucide-react'
 import { hasLayout, scaleLayout, layoutZoom, LAYOUT_ZOOM_MIN, LAYOUT_ZOOM_MAX } from '../utils/remixLayout'
+import { normalizeChromaKey, defaultChromaKey, KEY_RANGES, grabVideoFrame, canvasToBlobUrl } from '../utils/chromaKey'
+import './GreenScreen.css'
+
+// Green screen (chroma key) on a video clip: keyed pixels turn transparent, so
+// the clips on the tracks below show through. See utils/chromaKey.js.
+function GreenScreenControls({ clip, onUpdateClip, playheadPosition }) {
+  const [grabbing, setGrabbing] = useState(false)
+  const [grabError, setGrabError] = useState(null)
+  const key = normalizeChromaKey(clip.chromaKey)
+  const isStatic = key?.mode === 'static'
+  const ranges = isStatic ? KEY_RANGES.static : KEY_RANGES.chroma
+
+  const setKey = (patch) => onUpdateClip({ chromaKey: { ...clip.chromaKey, ...patch } })
+  const setMode = (mode) => {
+    if (!key || mode === key.mode) return
+    // Green <-> blue keep the sliders; static uses its own scale
+    if (mode !== 'static' && !isStatic) setKey({ color: mode })
+    else onUpdateClip({ chromaKey: defaultChromaKey(mode, mode === 'static' ? clip.chromaKey?.plateUrl : null, mode === 'static' ? clip.chromaKey?.noiseUrl : null) })
+  }
+
+  // The clean plate: the frame at the playhead (or the clip's first frame)
+  const grabPlate = async () => {
+    setGrabbing(true)
+    setGrabError(null)
+    try {
+      const start = clip.timelinePosition || 0
+      const len = clip.endTime - clip.startTime
+      const inClip = typeof playheadPosition === 'number' && playheadPosition >= start && playheadPosition < start + len
+      const time = inClip ? clip.startTime + (playheadPosition - start) : clip.startTime
+      // 12 frames: averaged into the plate, and their spread as the noise map
+      const { plate, noise } = await grabVideoFrame(clip.url, time, 1280, 12, true)
+      const plateUrl = await canvasToBlobUrl(plate)
+      const noiseUrl = noise ? await canvasToBlobUrl(noise) : undefined
+      onUpdateClip({ chromaKey: { ...clip.chromaKey, color: 'static', plateUrl, noiseUrl } })
+    } catch (err) {
+      console.warn('[ClipProperties] background frame:', err)
+      setGrabError('Could not grab that frame. Try again, or pick another moment.')
+    } finally {
+      setGrabbing(false)
+    }
+  }
+
+  const pct = (v) => Math.round(v * 100)
+  return (
+    <div className="prop-group">
+      <div className="prop-group-label">Green screen</div>
+      <div className="property-group">
+        <label>
+          Remove background
+          <label className="toggle-switch" style={{ marginLeft: 'auto' }}>
+            <input
+              type="checkbox"
+              checked={!!key}
+              onChange={(e) => onUpdateClip({ chromaKey: e.target.checked ? defaultChromaKey('green') : undefined })}
+            />
+            <span className="toggle-slider" />
+          </label>
+        </label>
+        {key && (
+          <>
+            <div className="text-align-buttons chroma-mode-buttons">
+              {[['green', 'Green'], ['blue', 'Blue'], ['static', 'Static (experimental)']].map(([mode, label]) => (
+                <button
+                  key={mode}
+                  className={`text-align-btn ${key.mode === mode ? 'active' : ''}`}
+                  onClick={() => setMode(mode)}
+                  title={mode === 'static' ? 'Static background (experimental): removes whatever matches a frame of the empty background' : `${label} screen`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <small className="layout-hint">
+              {isStatic
+                ? 'Removes everything that looks like a few frames of the empty background. Small changes (noise, light, focus) are ignored and parts of you that match the wall are kept inside your outline. Needs a camera that does not move; shadows you cast stay visible. If parts of the room keep showing, raise Threshold.'
+                : `Removes the ${key.mode} backdrop so the clips on the tracks below show through.`}
+            </small>
+          </>
+        )}
+      </div>
+
+      {key && isStatic && (
+        <div className="property-group">
+          <label>Empty background frame</label>
+          {key.plateUrl ? (
+            <img className="chroma-plate-thumb" src={key.plateUrl} alt="Empty background" />
+          ) : (
+            <small className="layout-hint">Move the playhead to a moment that shows only the background, without you in it. Half a second of it is used.</small>
+          )}
+          <button className="layout-free-btn" onClick={grabPlate} disabled={grabbing}>
+            {grabbing ? 'Grabbing frame...' : key.plateUrl ? 'Use the frame at the playhead instead' : 'Use the frame at the playhead'}
+          </button>
+          {grabError && <small className="layout-hint">{grabError}</small>}
+        </div>
+      )}
+
+      {key && (
+        <>
+          <div className="property-group">
+            <label title={isStatic ? 'Tolerance: higher ignores more change in the background (noise, light, focus) but can start to remove parts of you' : 'Higher removes more of the screen colour'}>
+              Threshold
+              <button className="prop-reset-btn" onClick={() => setKey({ similarity: defaultChromaKey(key.mode).similarity })} title="Reset threshold">
+                <RotateCcw size={10} />
+              </button>
+            </label>
+            <div className="property-slider">
+              <input
+                type="range"
+                min={pct(ranges.similarity[0])}
+                max={pct(ranges.similarity[1])}
+                value={pct(key.similarity)}
+                onChange={(e) => setKey({ similarity: parseInt(e.target.value) / 100 })}
+              />
+              <span>{pct(key.similarity)}%</span>
+            </div>
+          </div>
+          <div className="property-group">
+            <label>
+              Edge softness
+              <button className="prop-reset-btn" onClick={() => setKey({ blend: defaultChromaKey(key.mode).blend })} title="Reset softness">
+                <RotateCcw size={10} />
+              </button>
+            </label>
+            <div className="property-slider">
+              <input
+                type="range"
+                min={0}
+                max={pct(ranges.blend[1])}
+                value={pct(key.blend)}
+                onChange={(e) => setKey({ blend: parseInt(e.target.value) / 100 })}
+              />
+              <span>{pct(key.blend)}%</span>
+            </div>
+          </div>
+          <div className="property-group">
+            <label title={isStatic ? 'Removes the wall colour from the edges' : `Removes the ${key.mode} tint from the edges`}>
+              Despill
+              <button className="prop-reset-btn" onClick={() => setKey({ spill: defaultChromaKey(key.mode).spill })} title="Reset despill">
+                <RotateCcw size={10} />
+              </button>
+            </label>
+            <div className="property-slider">
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={pct(key.spill)}
+                onChange={(e) => setKey({ spill: parseInt(e.target.value) / 100 })}
+              />
+              <span>{pct(key.spill)}%</span>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
 
 // Draggable number input - drag left/right to change value
 // On mobile: long press (0.5s) on the label to start dragging
@@ -202,7 +359,7 @@ function PositionDragHandle({ positionX, positionY, onChange }) {
   )
 }
 
-function ClipProperties({ clip, onUpdateClip, onSplit }) {
+function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition }) {
   if (!clip) {
     return (
       <div className="clip-properties empty">
@@ -727,6 +884,11 @@ function ClipProperties({ clip, onUpdateClip, onSplit }) {
               </div>
             )}
           </div>
+        )}
+
+        {/* Green screen (video clips: camera takes, imports, library clips) */}
+        {clip.type === 'video' && (
+          <GreenScreenControls clip={clip} onUpdateClip={onUpdateClip} playheadPosition={playheadPosition} />
         )}
 
         {/* GROUP 3: Timing */}
