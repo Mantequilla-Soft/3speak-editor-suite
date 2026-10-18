@@ -65,7 +65,13 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
 
       switch (data.type) {
         case 'load-media': {
-          const { url, name, mediaType, clipStart, clipEnd, parentAuthor, parentPermlink } = data
+          const { name, mediaType, clipStart, clipEnd, parentAuthor, parentPermlink } = data
+          // A file the creator picked on the parent page (the shorts uploader's
+          // "Edit this video"): posted as a File, because the parent's blob: URL
+          // is not readable from this origin. Treated like a recording made here,
+          // with its own blob URL and the File kept for the render upload.
+          const file = data.file instanceof Blob ? data.file : null
+          const url = file ? URL.createObjectURL(file) : data.url
           if (url && mediaType) {
             // Track remix source so rendered output posts as a comment under the original short
             if (parentAuthor && parentPermlink) {
@@ -80,8 +86,10 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
             if (clipEnd != null || urlRange.clipEnd != null) {
               range.clipEnd = clipEnd != null ? clipEnd : urlRange.clipEnd
             }
-            const added = await addToLibraryAndTimeline(url, name || 'Imported Media', mediaType, range)
-            if (added && mediaType === 'video' && range.clipStart == null && range.clipEnd == null) {
+            const added = await addToLibraryAndTimeline(url, name || file?.name || 'Imported Media', mediaType, file ? { ...range, file } : range)
+            // The remix picker (stitch / reaction / free edit) is for someone else's
+            // video. The creator's own file just goes on the timeline.
+            if (added && !file && mediaType === 'video' && range.clipStart == null && range.clipEnd == null) {
               setRemixPrompt(added)
             }
             // Clear URL params after first use so they don't apply to subsequent clips
@@ -129,7 +137,9 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
   // Notify parent that editor is ready
   useEffect(() => {
     if (!isIframe) return
-    sendToParent('editor-ready')
+    // `canLoadFile`: load-media takes a `file`. A parent with a local file checks
+    // this, since an older editor would ignore the file and open empty.
+    sendToParent('editor-ready', { canLoadFile: true })
   }, [sendToParent])
 
   // Abort an active render job
