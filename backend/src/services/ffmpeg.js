@@ -268,16 +268,20 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
 
   const audioSources = []
 
-  // Audio from video clips (with timeline offset) — only actual video clips have audio
+  // Audio from video clips with their own sound on (usually it comes from the
+  // linked clip on the audio track instead). The processed video clip has no
+  // audio (-an), so cut this clip's sound from its source like an audio clip.
   for (const track of videoTracks) {
     for (const clip of track.clips) {
-      if (clip.type === 'video' && clip.audioEnabled !== false && processedClips.has(clip.id)) {
-        audioSources.push({
-          file: processedClips.get(clip.id),
-          volume: (clip.volume || 100) / 100,
-          offset: clip.timelinePosition || 0
-        })
-      }
+      const inputFile = downloadedFiles.get(clip.id)
+      if (clip.type !== 'video' || clip.audioEnabled === false || !inputFile || !processedClips.has(clip.id)) continue
+      const audioPath = path.join(jobDir, `video_audio_${clip.id}.mp4`)
+      await processClip({ ...clip, type: 'audio', trackType: 'audio' }, inputFile, audioPath, outputWidth, outputHeight, fps, signal, scaleFactor)
+      audioSources.push({
+        file: audioPath,
+        volume: (clip.volume || 100) / 100,
+        offset: clip.timelinePosition || 0
+      })
     }
   }
 
@@ -757,19 +761,7 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
   }
 
   if (clip.trackType === 'audio' || clip.type === 'audio') {
-    // Probe whether the input actually has an audio stream
-    const hasAudio = await new Promise((resolve) => {
-      const probe = spawn('ffprobe', [
-        '-v', 'error', '-select_streams', 'a',
-        '-show_entries', 'stream=index', '-of', 'csv=p=0',
-        inputFile
-      ])
-      let out = ''
-      probe.stdout.on('data', d => { out += d.toString() })
-      probe.on('close', () => resolve(out.trim().length > 0))
-    })
-
-    if (!hasAudio) {
+    if (!(await hasAudioStream(inputFile))) {
       // No audio stream — generate silence so the pipeline doesn't break
       console.log(`[DEBUG] Audio clip ${clip.id} has no audio stream, generating silence`)
       return runFFmpeg([
@@ -1423,11 +1415,38 @@ async function overlayTracks(trackFiles, outputPath) {
   await runFFmpeg(args)
 }
 
+// Whether a media file has an audio stream
+function hasAudioStream(file) {
+  return new Promise((resolve) => {
+    const probe = spawn('ffprobe', [
+      '-v', 'error', '-select_streams', 'a',
+      '-show_entries', 'stream=index', '-of', 'csv=p=0',
+      file
+    ])
+    let out = ''
+    probe.stdout.on('data', d => { out += d.toString() })
+    probe.on('close', () => resolve(out.trim().length > 0))
+    probe.on('error', () => resolve(false))
+  })
+}
+
 /**
  * Combine video with audio sources.
  * Handles composited video (no audio track) + separate audio sources with timeline offsets.
  */
-async function combineVideoAudio(videoPath, audioSources, outputPath, fps, signal) {
+async function combineVideoAudio(videoPath, allSources, outputPath, fps, signal) {
+  // A source without an audio stream would fail the whole mix (and the render
+  // would come out silent), so leave those out
+  const audioSources = []
+  for (const src of allSources) {
+    if (await hasAudioStream(src.file)) audioSources.push(src)
+    else console.warn(`[ffmpeg] No audio stream in ${path.basename(src.file)}, left out of the mix`)
+  }
+  if (audioSources.length === 0) {
+    await runFFmpeg(['-i', videoPath, '-c:v', 'copy', '-an', '-y', outputPath], signal)
+    return
+  }
+
   // Check if all audio comes from the video file itself (single-clip shortcut)
   const allFromVideo = audioSources.every(a => a.file === videoPath)
 
