@@ -374,4 +374,116 @@ function runFFmpegReverse(inputUrl, outputPath, seekTime, duration, onProgress) 
   })
 }
 
+/**
+ * POST /api/clip/denoise  { url, strength: 'light' | 'medium' | 'strong' }
+ * Background-noise reduction for an uploaded clip's audio (ffmpeg afftdn, an
+ * FFT noise gate that follows the noise floor, plus a gentle high-pass). `url`
+ * is one of our own /api/upload/files/<name> URLs, so nothing is uploaded
+ * again. Writes <name>_dn-<strength>.m4a next to the uploads (cached: the same
+ * file and strength is only processed once) and answers its URL. Timing is
+ * unchanged, so the cleaned audio stays in sync with the picture.
+ */
+const DENOISE = {
+  light: 'highpass=f=60,afftdn=nr=8:nf=-35:tn=1',
+  medium: 'highpass=f=70,afftdn=nr=14:nf=-30:tn=1',
+  strong: 'highpass=f=80,afftdn=nr=24:nf=-25:tn=1'
+}
+const UPLOAD_ROOT = process.env.UPLOAD_DIR || UPLOADS_DIR
+
+// One of our /api/upload/files/<name> URLs -> { base, input } on disk (the
+// 480p copy once it exists: the GET route serves that, the original is gone)
+async function resolveUpload(url) {
+  const match = String(url || '').match(/\/api\/upload\/files\/([A-Za-z0-9_.-]+?)(?:\?.*)?$/)
+  if (!match) return null
+  const name = path.basename(match[1])
+  const base = path.basename(name, path.extname(name)).replace(/_dn-(light|medium|strong)$/, '')
+  for (const c of [path.join(UPLOAD_ROOT, `${base}_480p.mp4`), path.join(UPLOAD_ROOT, name)]) {
+    try { await fs.access(c); return { name, base, input: c } } catch {}
+  }
+  return { name, base, input: null }
+}
+
+router.post('/denoise', async (req, res) => {
+  const strength = req.body?.strength
+  const found = DENOISE[strength] ? await resolveUpload(req.body?.url) : null
+  if (!found) return res.status(400).json({ error: 'Need one of our upload URLs and a strength' })
+  const { name, base, input } = found
+  if (!input) return res.status(404).json({ error: 'File not found' })
+
+  const outName = `${base}_dn-${strength}.m4a`
+  const outPath = path.join(UPLOAD_ROOT, outName)
+  const url = `/api/upload/files/${outName}`
+  try {
+    await fs.access(outPath)
+    const now = new Date()
+    await fs.utimes(outPath, now, now).catch(() => {})
+    return res.json({ url, cached: true })
+  } catch {}
+
+  const partPath = path.join(UPLOAD_ROOT, `${base}_dn-${strength}.part.m4a`)
+  const args = ['-i', input, '-vn', '-af', DENOISE[strength], '-c:a', 'aac', '-b:a', '160k', '-y', partPath]
+  const ok = await new Promise((resolve) => {
+    const proc = spawn('ffmpeg', args, { stdio: ['ignore', 'ignore', 'pipe'] })
+    let tail = ''
+    proc.stderr.on('data', d => { tail = (tail + d).slice(-400) })
+    proc.on('close', code => {
+      if (code !== 0) console.warn(`[denoise] ffmpeg exit ${code}: ${tail.split('\n').filter(Boolean).pop()}`)
+      resolve(code === 0)
+    })
+    proc.on('error', () => resolve(false))
+  })
+  if (!ok) {
+    await fs.unlink(partPath).catch(() => {})
+    return res.status(500).json({ error: 'Noise reduction failed' })
+  }
+  await fs.rename(partPath, outPath)
+  console.log(`[denoise] ${name} (${strength}) -> ${outName}`)
+  res.json({ url })
+})
+
+/**
+ * POST /api/clip/scenes  { url }
+ * Scene-change scores of an uploaded video (ffmpeg scdet on a 160px wide copy
+ * of every frame): { scores: [[seconds, score], ...] } for frames scoring 1+
+ * (hard cuts score ~20-40, a still shot under 1). The editor picks the cuts
+ * with its own threshold, so this runs once per file (cached next to it).
+ */
+router.post('/scenes', async (req, res) => {
+  const found = await resolveUpload(req.body?.url)
+  if (!found) return res.status(400).json({ error: 'Need one of our upload URLs' })
+  if (!found.input) return res.status(404).json({ error: 'File not found' })
+  const cachePath = path.join(UPLOAD_ROOT, `${found.base}.scenes.json`)
+  try {
+    return res.json(JSON.parse(await fs.readFile(cachePath, 'utf8')))
+  } catch {}
+
+  const args = ['-hide_banner', '-threads', '2', '-i', found.input, '-an',
+    '-vf', 'scale=160:-2,scdet=threshold=0:sc_pass=0,metadata=print:key=lavfi.scd.score:file=-',
+    '-f', 'null', '-']
+  const scores = []
+  const ok = await new Promise((resolve) => {
+    const proc = spawn('ffmpeg', args, { stdio: ['ignore', 'pipe', 'ignore'] })
+    let buf = ''
+    let time = null
+    proc.stdout.on('data', d => {
+      buf += d
+      const lines = buf.split('\n')
+      buf = lines.pop()
+      for (const line of lines) {
+        const t = line.match(/pts_time:([\d.]+)/)
+        if (t) { time = parseFloat(t[1]); continue }
+        const sc = line.match(/lavfi\.scd\.score=([\d.]+)/)
+        if (sc && time != null && parseFloat(sc[1]) >= 1) scores.push([Number(time.toFixed(3)), Number(parseFloat(sc[1]).toFixed(2))])
+      }
+    })
+    proc.on('close', code => resolve(code === 0))
+    proc.on('error', () => resolve(false))
+  })
+  if (!ok) return res.status(500).json({ error: 'Scene detection failed' })
+  const result = { scores }
+  await fs.writeFile(cachePath, JSON.stringify(result)).catch(() => {})
+  console.log(`[scenes] ${found.name}: ${scores.filter(s => s[1] >= 10).length} likely cuts`)
+  res.json(result)
+})
+
 export { router as clipRouter }

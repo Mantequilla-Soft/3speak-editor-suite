@@ -1,7 +1,10 @@
-import { useState, useRef, useEffect, useCallback, useMemo, memo } from 'react'
-import { Trash2, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette } from 'lucide-react'
+import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo, memo } from 'react'
+import { Trash2, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker } from 'lucide-react'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 import { getGroupColor } from '../hooks/useTimeline'
+import { MAX_TIMELINE_SECONDS } from '../utils/limits'
+import { timelineBeats } from '../utils/beatDetect'
+import { getPeaks, peaksForRange } from '../utils/peakCache'
 
 function formatTime(seconds) {
   const mins = Math.floor(seconds / 60)
@@ -18,43 +21,6 @@ function seededRandom(seed) {
 function generateFallbackWaveform(clipId, count) {
   const seed = clipId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
   return Array.from({ length: count }, (_, i) => 30 + seededRandom(seed + i) * 50)
-}
-
-// Cache for real waveform data keyed by URL
-const waveformCache = new Map()
-
-// Extract real waveform peaks from an audio/video URL using Web Audio API
-function extractWaveformPeaks(url, numPeaks) {
-  const cacheKey = `${url}_${numPeaks}`
-  if (waveformCache.has(cacheKey)) return Promise.resolve(waveformCache.get(cacheKey))
-
-  return fetch(url)
-    .then(res => res.arrayBuffer())
-    .then(buffer => {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-      return audioCtx.decodeAudioData(buffer).then(audioBuffer => {
-        audioCtx.close()
-        const channelData = audioBuffer.getChannelData(0)
-        const samplesPerPeak = Math.floor(channelData.length / numPeaks)
-        const peaks = []
-
-        for (let i = 0; i < numPeaks; i++) {
-          let max = 0
-          const start = i * samplesPerPeak
-          const end = Math.min(start + samplesPerPeak, channelData.length)
-          for (let j = start; j < end; j++) {
-            const abs = Math.abs(channelData[j])
-            if (abs > max) max = abs
-          }
-          // Scale to 10-90% range for visual display
-          peaks.push(10 + max * 80)
-        }
-
-        waveformCache.set(cacheKey, peaks)
-        return peaks
-      })
-    })
-    .catch(() => null) // Return null on failure, component will use fallback
 }
 
 // ===== Sprite / thumbnail strip extraction =====
@@ -213,18 +179,25 @@ const TimelineClip = memo(function TimelineClip({
 
   // Waveform data: try real audio, fall back to generated
   const barCount = useMemo(() => Math.max(3, Math.floor(clipWidth / 6)), [clipWidth])
-  const [realWaveform, setRealWaveform] = useState(null)
+  // The file's peaks, decoded once and shared by all its clips (utils/peakCache)
+  const [peakEnvelope, setPeakEnvelope] = useState(null)
 
   useEffect(() => {
     if (!isAudio || !clip.url) return
     let cancelled = false
-    extractWaveformPeaks(clip.url, barCount).then(peaks => {
+    getPeaks(clip.url).then(env => {
       if (cancelled) return
-      if (peaks) setRealWaveform(peaks)
+      if (env) setPeakEnvelope(env)
       else setWaveformFailed(true)
     })
     return () => { cancelled = true }
-  }, [isAudio, clip.url, barCount])
+  }, [isAudio, clip.url])
+
+  // This clip's own stretch of the file (trim / zoom only re-read it)
+  const realWaveform = useMemo(
+    () => peaksForRange(peakEnvelope, clip.startTime, clip.endTime, barCount),
+    [peakEnvelope, clip.startTime, clip.endTime, barCount]
+  )
 
   const [waveformFailed, setWaveformFailed] = useState(false)
   const waveformBars = useMemo(() => {
@@ -613,9 +586,13 @@ function Timeline({
   onOpenClipSettings,
   onRecordAudio,
   onOpenMusic,
+  onOpenSfx,
+  onOpenStickers,
   onRecordVideo,
   onReverseClip,
   onUpdateTrack,
+  onAutoCut,
+  onBeatSync,
   isDesktop
 }) {
   const [zoom, setZoom] = useState(33) // pixels per second
@@ -698,6 +675,8 @@ function Timeline({
         points.push(clipStart, clipEnd)
       }
     }
+    // Beats of music clips that show them (Beat sync)
+    points.push(...timelineBeats(tracksToCheck))
     return points
   }, [tracks, snapEnabled])
 
@@ -826,8 +805,16 @@ function Timeline({
         </div>
       )
     }
+    // Beat ticks (Beat sync), skipped when zoomed out too far to tell them apart
+    const beats = timelineBeats(tracks)
+    const spacing = beats.length > 1 ? ((beats[beats.length - 1] - beats[0]) / (beats.length - 1)) * pixelsPerSecond : 0
+    if (spacing >= 4) {
+      for (const b of beats) {
+        marks.push(<div key={`beat-${b}`} className="ruler-beat" style={{ left: `${b * pixelsPerSecond}px` }} />)
+      }
+    }
     return marks
-  }, [zoom, totalDuration, pixelsPerSecond])
+  }, [zoom, totalDuration, pixelsPerSecond, tracks])
 
   const handleZoomIn = () => setZoom(z => Math.min(200, z * 1.5))
   const handleZoomOut = () => setZoom(z => Math.max(10, z / 1.5))
@@ -926,10 +913,28 @@ function Timeline({
     } else {
       const btn = e.currentTarget
       const rect = btn.getBoundingClientRect()
-      setTrackAddPopupPos({ top: rect.top, left: rect.right + 6 })
+      setTrackAddPopupPos({ top: rect.top, left: rect.right + 6, anchorBottom: rect.bottom })
       setTrackAddPopup(trackId)
     }
   }, [trackAddPopup])
+
+  // The popup opens beside the "+" going down; on a low track (or a short
+  // window, e.g. the editor inside 3Speak) that runs off the bottom. Once it
+  // is on screen, move it up to end level with the "+" (and in from the right
+  // edge) when it does not fit. Runs before paint, so it never shows cut off.
+  useLayoutEffect(() => {
+    if (!trackAddPopupPos || trackAddPopupPos.fitted) return
+    const el = trackAddPopupRef.current?.querySelector('.track-add-popup')
+    if (!el) return
+    const margin = 8
+    const h = el.offsetHeight
+    const w = el.offsetWidth
+    let { top, left } = trackAddPopupPos
+    if (top + h > window.innerHeight - margin) top = trackAddPopupPos.anchorBottom - h
+    top = Math.max(margin, Math.min(top, window.innerHeight - h - margin))
+    if (left + w > window.innerWidth - margin) left = Math.max(margin, window.innerWidth - w - margin)
+    setTrackAddPopupPos(p => (p ? { ...p, top, left, fitted: true } : p))
+  }, [trackAddPopupPos])
 
   // Actually click the hidden file input (called from popup)
   const handleTrackFileInputClick = useCallback((trackId) => {
@@ -980,6 +985,16 @@ function Timeline({
                   <Music size={14} /> Music Library
                 </button>
               )}
+              {onOpenSfx && (
+                <button onClick={() => { onOpenSfx(); setShowAddMenu(false) }}>
+                  <AudioLines size={14} /> Sound Effects
+                </button>
+              )}
+              {onOpenStickers && (
+                <button onClick={() => { onOpenStickers(); setShowAddMenu(false) }}>
+                  <Sticker size={14} /> Stickers
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -1012,6 +1027,24 @@ function Timeline({
               >
                 <Scissors size={14} /> <span>Split</span>
               </button>
+              {onAutoCut && (selectedClip?.type === 'video' || selectedClip?.type === 'audio') && (
+                <button
+                  className="action-btn"
+                  onClick={() => onAutoCut(selectedClipId)}
+                  title="Find the pauses and cut there"
+                >
+                  <AudioWaveform size={14} /> <span>Auto cut</span>
+                </button>
+              )}
+              {onBeatSync && selectedClip?.type === 'audio' && (
+                <button
+                  className="action-btn"
+                  onClick={() => onBeatSync(selectedClipId)}
+                  title="Find the beat: snap to it, lay clips on it"
+                >
+                  <Music2 size={14} /> <span>Beats</span>
+                </button>
+              )}
               <button
                 className="action-btn delete-btn"
                 onClick={() => onRemoveClip && onRemoveClip(selectedClipId)}
@@ -1120,6 +1153,11 @@ function Timeline({
                             <Video size={14} /> Record Video
                           </button>
                         )}
+                        {onOpenStickers && (
+                          <button onClick={() => { onOpenStickers(); setTrackAddPopup(null) }}>
+                            <Sticker size={14} /> Stickers
+                          </button>
+                        )}
                       </div>
                     )}
                     <input
@@ -1178,6 +1216,11 @@ function Timeline({
                             <Music size={14} /> Music Library
                           </button>
                         )}
+                        {onOpenSfx && (
+                          <button onClick={() => { onOpenSfx(); setTrackAddPopup(null) }}>
+                            <AudioLines size={14} /> Sound Effects
+                          </button>
+                        )}
                         {onRecordAudio && (
                           <button onClick={() => { onRecordAudio(); setTrackAddPopup(null) }}>
                             <Mic size={14} /> Record Audio
@@ -1210,6 +1253,18 @@ function Timeline({
           >
             {rulerMarks}
           </div>
+
+          {/* Past the render limit: only shown once the timeline runs over it */}
+          {maxClipEnd > MAX_TIMELINE_SECONDS + 0.01 && (
+            <div
+              className="timeline-limit-zone"
+              style={{
+                left: `${MAX_TIMELINE_SECONDS * pixelsPerSecond}px`,
+                width: `${Math.max(0, timelineWidth - MAX_TIMELINE_SECONDS * pixelsPerSecond)}px`
+              }}
+              title="Past the render limit"
+            />
+          )}
 
           {/* Playhead */}
           <div

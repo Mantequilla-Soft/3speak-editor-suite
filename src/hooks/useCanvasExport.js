@@ -1,6 +1,8 @@
 import { useState, useCallback, useRef } from 'react'
 import { hasLayout, coverSourceRect, layoutPan, layoutZoom } from '../utils/remixLayout'
 import { getClipChromaKey, createKeyer } from '../utils/chromaKey'
+import { clipColorFilter } from '../components/ClipColorFilters'
+import { motionAt, pivotPoint } from '../utils/stickerMotion'
 
 const EXPORT_WIDTH = 1280
 const EXPORT_HEIGHT = 720
@@ -152,6 +154,9 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
           const { sx, sy, sw, sh } = coverSourceRect(srcW, srcH, bw, bh, panX, panY, layoutZoom(clip.layout))
           ctx.save()
           if ((clip.opacity ?? 100) < 100) ctx.globalAlpha = clip.opacity / 100
+          // Colour: the same SVG filter the preview uses (after the key, as there)
+          const colorFilter = clipColorFilter(clip)
+          if (colorFilter) ctx.filter = colorFilter
           const keyed = media.type === 'video' ? keyedFrame(keyers, clip, el) : null
           if (keyed) {
             const kx = keyed.width / srcW
@@ -167,6 +172,9 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
 
       // Save context for transforms
       ctx.save()
+      // Colour: the same SVG filter the preview uses (after the key, as there)
+      const colorFilter = clipColorFilter(clip)
+      if (colorFilter) ctx.filter = colorFilter
 
       // Apply transforms
       // Position values are in preview-pixel coords — scale to output resolution
@@ -182,6 +190,23 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
       // which equals: T(cx + z*px, cy + z*py) · S(z) · T(-cx, -cy)
       ctx.translate(centerX + posX * zoom, centerY + posY * zoom)
       ctx.scale(zoom, zoom)
+      // Images: then rotate(r), as the preview's transform ends; the image is
+      // centred, so it turns around its own centre
+      if (media.type === 'image' && clip.rotation) ctx.rotate((clip.rotation * Math.PI) / 180)
+      // Sticker motion (utils/stickerMotion.js), around the image's centre like the preview
+      if (media.type === 'image' && clip.motion) {
+        const mv = motionAt(clip.motion, currentTime - clip.timelineStart, clip.endTime - clip.startTime)
+        // Pivot: a point of the contain-fit image (preview: same, in its px)
+        const img = media.element
+        const k = Math.min(EXPORT_WIDTH / (img.naturalWidth || 1), EXPORT_HEIGHT / (img.naturalHeight || 1))
+        const pv = pivotPoint(clip.motion, 0, 0, (img.naturalWidth || 0) * k, (img.naturalHeight || 0) * k)
+        ctx.translate(mv.dx * EXPORT_HEIGHT, mv.dy * EXPORT_HEIGHT)
+        ctx.translate(pv.x, pv.y)
+        ctx.rotate((mv.rot * Math.PI) / 180)
+        ctx.scale(mv.scale, mv.scale)
+        ctx.translate(-pv.x, -pv.y)
+        ctx.globalAlpha *= mv.opacity
+      }
       ctx.translate(-centerX, -centerY)
 
       // Apply crop using clipping path
@@ -300,6 +325,31 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
           textX = EXPORT_WIDTH - padding
         } else {
           textX = EXPORT_WIDTH / 2
+        }
+
+        // Rotation (and sticker motion) turn the text block around its own
+        // centre, like the preview's box
+        if (clip.rotation || clip.motion) {
+          let blockCx = textX
+          if (hAlign !== 'center') {
+            const widest = Math.max(...lines.map(l => ctx.measureText(l).width))
+            blockCx = hAlign === 'left' ? textX + widest / 2 : textX - widest / 2
+          }
+          const blockCy = startY - lineHeight / 2 + totalHeight / 2
+          ctx.translate(blockCx, blockCy)
+          if (clip.rotation) ctx.rotate((clip.rotation * Math.PI) / 180)
+          if (clip.motion) {
+            const mv = motionAt(clip.motion, currentTime - clip.timelineStart, clip.endTime - clip.startTime)
+            const widest = Math.max(...lines.map(l => ctx.measureText(l).width))
+            const pv = pivotPoint(clip.motion, 0, 0, widest, totalHeight)
+            ctx.translate(mv.dx * EXPORT_HEIGHT, mv.dy * EXPORT_HEIGHT)
+            ctx.translate(pv.x, pv.y)
+            ctx.rotate((mv.rot * Math.PI) / 180)
+            ctx.scale(mv.scale, mv.scale)
+            ctx.translate(-pv.x, -pv.y)
+            ctx.globalAlpha *= mv.opacity
+          }
+          ctx.translate(-blockCx, -blockCy)
         }
 
         lines.forEach((line, i) => {

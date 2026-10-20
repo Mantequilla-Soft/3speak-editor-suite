@@ -3,6 +3,34 @@ import path from 'path'
 import fs from 'fs/promises'
 import { createWriteStream } from 'fs'
 import { createStaticMasker, staticMaskSize } from '../utils/staticKeyMask.js'
+import { ffmpegColorFilter } from '../utils/clipColor.js'
+import crypto from 'crypto'
+import { ffmpegMotionFilter, normalizeMotion, pivotPoint, activeEffects } from '../utils/stickerMotion.js'
+
+// Re-renders reuse what did not change: each clip's processed file is kept
+// under a fingerprint of everything that shapes it (its settings, its source
+// file, output size / fps / scale). Where a clip sits on the timeline is not
+// part of it: that is applied when compositing. Bump CLIP_CACHE_VERSION when
+// processClip's output changes for the same input.
+const CLIP_CACHE_VERSION = 1
+export const RENDER_CACHE_DIR = path.join(process.env.WORK_DIR || '/app/work', 'cache')
+const CLIP_CACHE_DIR = path.join(RENDER_CACHE_DIR, 'clips')
+const NOT_IN_CLIP_RENDER = new Set(['id', 'name', 'timelinePosition', 'trackId', 'libraryId', 'groupId', 'credit', 'sticker'])
+
+function clipCacheKey(clip, inputFile, w, h, fps, scaleFactor) {
+  const shape = {}
+  for (const k of Object.keys(clip).sort()) if (!NOT_IN_CLIP_RENDER.has(k)) shape[k] = clip[k]
+  return crypto.createHash('sha256')
+    .update(JSON.stringify({ v: CLIP_CACHE_VERSION, shape, input: inputFile ? path.basename(inputFile) : null, w, h, fps, scaleFactor }))
+    .digest('hex').slice(0, 40)
+}
+
+async function fileExists(p) {
+  try { await fs.access(p); return true } catch { return false }
+}
+
+// A clip's motion when any effect applies (all hidden = no motion at all)
+const appliedMotion = (clip) => (activeEffects(clip.motion).length ? normalizeMotion(clip.motion) : null)
 
 /**
  * Build and execute FFmpeg commands to render the timeline.
@@ -50,6 +78,7 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
 
   const processedClips = new Map()
   const processedPlates = new Map() // clip id -> clean plate PNG (static-background key)
+  let reusedClips = 0
 
   for (let i = 0; i < allClips.length; i++) {
     const clip = allClips[i]
@@ -71,8 +100,29 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
 
     // Use .mov for images and text to preserve transparency, .mp4 for others (including color)
     const ext = (clip.type === 'image' || clip.type === 'text') ? '.mov' : '.mp4'
-    const processedPath = path.join(jobDir, `processed_${clip.id}${ext}`)
-    await processClip(clip, inputFile, processedPath, outputWidth, outputHeight, fps, signal, scaleFactor)
+    // Unchanged since an earlier render: reuse its processed file
+    const cacheKey = clipCacheKey(clip, inputFile, outputWidth, outputHeight, fps, scaleFactor)
+    const cachedPath = path.join(CLIP_CACHE_DIR, `${cacheKey}${ext}`)
+    let processedPath
+    if (await fileExists(cachedPath)) {
+      const now = new Date()
+      await fs.utimes(cachedPath, now, now).catch(() => {})
+      processedPath = cachedPath
+      reusedClips++
+      console.log(`[ffmpeg] Clip ${clip.id} unchanged, reused`)
+    } else {
+      processedPath = path.join(jobDir, `processed_${clip.id}${ext}`)
+      await processClip(clip, inputFile, processedPath, outputWidth, outputHeight, fps, signal, scaleFactor)
+      // Into the cache (written next to it first, so a half copy is never used)
+      try {
+        await fs.mkdir(CLIP_CACHE_DIR, { recursive: true })
+        const tmp = `${cachedPath}.${process.pid}.${Date.now()}.part`
+        await fs.copyFile(processedPath, tmp)
+        await fs.rename(tmp, cachedPath)
+      } catch (err) {
+        console.warn(`[ffmpeg] Clip cache write failed: ${err.message}`)
+      }
+    }
     processedClips.set(clip.id, processedPath)
 
     // Static-background key: bring the clean plate into the processed clip's geometry
@@ -95,6 +145,8 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
       }
     }
   }
+
+  if (reusedClips) console.log(`[ffmpeg] ${reusedClips}/${allClips.length} clips unchanged since an earlier render, reused`)
 
   // STEP 2: Composite all video clips onto a single canvas
   // Uses overlay with setpts for timing — gaps are naturally transparent
@@ -173,10 +225,10 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
             : null,
           key, i, delay, outLabel: `v${i}`
         }))
-        clipLabels.push(`[v${i}]`)
+        clipLabels.push(keyedColor(oc.clip, i, filterParts))
       } else if (key && key.mode !== 'static') {
         filterParts.push(...buildChromaKeyFilter(`${i + 1}:v`, key, i, delay, `v${i}`))
-        clipLabels.push(`[v${i}]`)
+        clipLabels.push(keyedColor(oc.clip, i, filterParts))
       } else if (delay) {
         filterParts.push(`[${i + 1}:v]${delay}[v${i}]`)
         clipLabels.push(`[v${i}]`)
@@ -540,13 +592,63 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
     console.log(`[DEBUG] Text scaleFactor=${scaleFactor.toFixed(2)}, zoom=${zoom}, fontSize=${fontSize}, hAlign=${textHAlign}, vAlign=${textAlign}, lines=${wrappedLines.length}, textBox=${textBoxEnabled}`)
     console.log('[DEBUG] Output path:', outputPath)
 
+    // Rotation turns the text (and its box) around the centre of the text block,
+    // like the preview, which rotates the box element itself. The layer is the full
+    // frame, and ffmpeg's rotate turns around the FRAME centre: turn it on a
+    // canvas big enough for any angle, then lay it back offset so the block's
+    // centre lands where it was.
+    let rotateTail = '[outv]'
+    const motion = appliedMotion(clip)
+    if (clip.rotation || motion) {
+      const textW = textBoxEnabled
+        ? estTextWidth
+        : (clip.measuredMaxLineWidth
+          ? Math.round(clip.measuredMaxLineWidth * scaleFactor)
+          : Math.round(Math.max(...wrappedLines.map(l => l.length)) * fontSize * (isMonospace ? 0.6 : 0.55)))
+      const cx = textHAlign === 'left'
+        ? padding + scaledPosX + textW / 2
+        : textHAlign === 'right'
+          ? w - padding + scaledPosX - textW / 2
+          : w / 2 + scaledPosX
+      const cy = baseY + totalTextHeight / 2
+      // Motion (stickers): the finished layer moves around its pivot, a point of
+      // the text block (or its box), turned with the block's rotation
+      let pivot = { x: cx, y: cy }
+      if (motion && (motion.pivotX || motion.pivotY)) {
+        const blockW = textBoxEnabled ? boxW : textW
+        const blockH = textBoxEnabled ? boxH : totalTextHeight
+        const p = pivotPoint(motion, 0, 0, blockW, blockH)
+        const o = turnOffset(p.x, p.y, clip.rotation)
+        pivot = { x: cx + o.dx, y: cy + o.dy }
+      }
+      const motionTail = motion
+        ? `;[premotion]${ffmpegMotionFilter(motion, { w, h, fps, cx: pivot.x, cy: pivot.y, zoom, duration })}[outv]`
+        : ''
+      if (!clip.rotation) rotateTail = motion ? `[premotion]${motionTail}` : '[outv]'
+      if (clip.rotation) {
+        const rad = (clip.rotation * Math.PI) / 180
+        const cos = Math.cos(rad)
+        const sin = Math.sin(rad)
+        const D = Math.ceil(Math.hypot(w, h) / 2) * 2
+        // Where the block centre ends up on the D x D canvas (clockwise, y down)
+        const rx = D / 2 + cos * (cx - w / 2) - sin * (cy - h / 2)
+        const ry = D / 2 + sin * (cx - w / 2) + cos * (cy - h / 2)
+        const ox = Math.round(cx - rx)
+        const oy = Math.round(cy - ry)
+        rotateTail = `[txt];[txt]format=rgba,rotate=${rad.toFixed(6)}:c=none:ow=${D}:oh=${D}[rot];` +
+          `color=c=black@0:s=${w}x${h}:d=${duration}${motion ? `:r=${fps}` : ''},format=rgba,colorchannelmixer=aa=0[rbg];` +
+          `[rbg][rot]overlay=${ox}:${oy}${motion ? `[premotion]${motionTail}` : '[outv]'}`
+      }
+    }
+
     // Use QuickTime Animation codec to preserve transparency
     const filterComplex = textBoxEnabled
-      ? `${boxOverlayPrefix}${filterChain}[outv]`
-      : `[0:v]format=rgba,colorchannelmixer=aa=0,${filterChain}[outv]`
+      ? `${boxOverlayPrefix}${filterChain}${rotateTail}`
+      : `[0:v]format=rgba,colorchannelmixer=aa=0,${filterChain}${rotateTail}`
     return runFFmpeg([
       '-f', 'lavfi',
-      '-i', `color=c=black@0:s=${w}x${h}:d=${duration}`,
+      // A moving sticker counts frames: give the layer the timeline's rate
+      '-i', `color=c=black@0:s=${w}x${h}:d=${duration}${appliedMotion(clip) ? `:r=${fps}` : ''}`,
       ...boxInputArgs,
       '-filter_complex', filterComplex,
       '-map', '[outv]',
@@ -604,15 +706,48 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
   }
 
   if (clip.type === 'image') {
-    let filterChain = buildTransformFilter(clip, w, h)
+    let filterChain = withColor(clip, buildTransformFilter(clip, w, h))
+    // Rotation (degrees, clockwise like the preview's CSS rotate): turn the scaled
+    // image inside a box that fits it, transparent around it. The box keeps the
+    // image's centre, so the centred overlay below still lands it where it was.
+    if (clip.rotation && !getLayoutBox(clip, w, h)) {
+      const a = ((clip.rotation * Math.PI) / 180).toFixed(6)
+      filterChain += `,format=rgba,rotate=${a}:c=none:ow=rotw(${a}):oh=roth(${a})`
+    }
     let overlayPos = getOverlayPosition(clip, w, h, scaleFactor)
+
+    // Motion (stickers): the layer moves around the image's centre, which the
+    // centred overlay puts at the frame centre plus the clip's offset
+    const motion = layoutBoxFree(clip, w, h) ? appliedMotion(clip) : null
+    let motionChain = ''
+    if (motion) {
+      const z = clip.zoom && clip.zoom !== 100 ? (clip.zoom > 10 ? clip.zoom / 100 : clip.zoom) : 1
+      const cx = w / 2 + (clip.positionX || 0) * scaleFactor * z
+      const cy = h / 2 + (clip.positionY || 0) * scaleFactor * z
+      // The pivot: the image's own size on the frame (contain-fit like
+      // buildTransformFilter, times the zoom), turned with its rotation
+      let pivot = { x: cx, y: cy }
+      if (motion.pivotX || motion.pivotY) {
+        const size = await probeVideoSize(inputFile)
+        if (size) {
+          const iw = size.width * (clip.cropWidth || 100) / 100
+          const ih = size.height * (clip.cropHeight || 100) / 100
+          const k = Math.min(w / iw, h / ih) * z
+          const p = pivotPoint(motion, 0, 0, iw * k, ih * k)
+          const o = turnOffset(p.x, p.y, clip.rotation)
+          pivot = { x: cx + o.dx, y: cy + o.dy }
+        }
+      }
+      motionChain = `,${ffmpegMotionFilter(motion, { w, h, fps, cx: pivot.x, cy: pivot.y, zoom: z, duration })}`
+    }
 
     // Use QuickTime Animation codec to preserve transparency
     return runFFmpeg([
       '-loop', '1',
+      ...(motion ? ['-framerate', String(fps)] : []),
       '-i', inputFile,
       '-t', duration.toString(),
-      '-filter_complex', `color=c=black@0.0:s=${w}x${h}:d=${duration}[bg];[0:v]${filterChain}[scaled];[bg][scaled]overlay=${overlayPos}[outv]`,
+      '-filter_complex', `color=c=black@0.0:s=${w}x${h}:d=${duration}${motion ? `:r=${fps}` : ''}[bg];[0:v]${filterChain}[scaled];[bg][scaled]overlay=${overlayPos}${motion ? ':format=auto' : ''}${motionChain}[outv]`,
       '-map', '[outv]',
       '-c:v', 'qtrle',
       '-pix_fmt', 'argb',
@@ -652,8 +787,8 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
     return runFFmpeg(args, signal)
   }
 
-  // Video clip — scale/crop only, composited onto canvas later
-  let filterChain = buildTransformFilter(clip, w, h, fps)
+  // Video clip — scale/crop (and colour, unless keyed), composited onto canvas later
+  let filterChain = getChromaKey(clip) ? buildTransformFilter(clip, w, h, fps) : withColor(clip, buildTransformFilter(clip, w, h, fps))
 
   const args = []
   if (clip.startTime > 0) args.push('-ss', clip.startTime.toString())
@@ -670,6 +805,27 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
   console.log(`[DEBUG] Video clip ffmpeg args: ffmpeg ${args.join(' ')}`)
   console.log(`[DEBUG] clip.type=${clip.type}, clip.id=${clip.id}, input=${inputFile}`)
   return runFFmpeg(args, signal)
+}
+
+/**
+ * Colour adjustments (src/utils/clipColor.js) in front of a clip's transform.
+ * Not part of buildTransformFilter: that one also frames a clean plate and a
+ * static-key mask, which must stay untouched.
+ */
+function withColor(clip, filterChain) {
+  const color = ffmpegColorFilter(clip.color)
+  return color ? `${color},${filterChain}` : filterChain
+}
+
+/**
+ * A keyed clip's colour goes on after the key (as in the preview, where the
+ * keyed picture is what gets the filter). Returns the label to overlay.
+ */
+function keyedColor(clip, i, filterParts) {
+  const color = ffmpegColorFilter(clip.color)
+  if (!color) return `[v${i}]`
+  filterParts.push(`[v${i}]${color}[v${i}c]`)
+  return `[v${i}c]`
 }
 
 /**
@@ -767,6 +923,17 @@ function buildTransformFilter(clip, w, h, fps = null) {
 
   return filters.join(',')
 }
+
+// A pivot offset (from the sticker's centre) turned with the clip's own
+// rotation, as the preview's box turns before its motion applies
+function turnOffset(dx, dy, rotationDeg) {
+  if (!rotationDeg) return { dx, dy }
+  const r = (rotationDeg * Math.PI) / 180
+  return { dx: dx * Math.cos(r) - dy * Math.sin(r), dy: dx * Math.sin(r) + dy * Math.cos(r) }
+}
+
+// Motion only for freely placed clips (a remix layout box stays put)
+const layoutBoxFree = (clip, w, h) => !getLayoutBox(clip, w, h)
 
 /**
  * Resolve a clip's layout box (fractions of the canvas) to even output pixels.

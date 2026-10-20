@@ -1,13 +1,40 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
-import { X, Play, Pause, Plus, Search, Music } from 'lucide-react'
+import { X, Play, Pause, Plus, Search, Music, AudioLines } from 'lucide-react'
 
 // Where the song lists come from: comma separated URLs of library.json files
 // ({ moods: [{ id, label }], tracks: [...] }), relative to the editor's origin.
 // Tracks give `file` (relative to their JSON) or `url`. 3Speak uploads come as
 // source '3speak' with the uploader's `account`; they are listed first and
 // their creator gets a beneficiary share on the post.
-const SOURCES = (import.meta.env.VITE_MUSIC_SOURCES || '/music/library.json')
-  .split(',').map(s => s.trim()).filter(Boolean)
+const sourceList = (value) => value.split(',').map(s => s.trim()).filter(Boolean)
+
+// The same sheet lists music or sound effects. Sound effects (Kenney CC0 packs,
+// scripts/sfx/build_library.py) use the same library.json format, with the
+// categories in `moods`; CC0 needs no credit, so none goes into the post.
+const KINDS = {
+  music: {
+    sources: sourceList(import.meta.env.VITE_MUSIC_SOURCES || '/music/library.json'),
+    title: 'Music',
+    Icon: Music,
+    search: 'Search songs',
+    loading: 'Loading songs...',
+    failed: 'The music library could not be loaded.',
+    none: 'No songs match.',
+    note: "The song credit is added to your post automatically. Picking a 3Speak creator's sound gives them 5% of the post rewards.",
+    addTitle: 'Add to video'
+  },
+  sfx: {
+    sources: sourceList(import.meta.env.VITE_SFX_SOURCES || '/sfx/library.json'),
+    title: 'Sound effects',
+    Icon: AudioLines,
+    search: 'Search sounds',
+    loading: 'Loading sounds...',
+    failed: 'The sound effects could not be loaded.',
+    none: 'No sounds match.',
+    note: 'Sounds go in at the playhead. Free to use (CC0, Kenney.nl), no credit needed.',
+    addTitle: 'Add at the playhead'
+  }
+}
 
 function normalizeTrack(t, base) {
   const url = new URL(t.url || t.file, base).href
@@ -18,6 +45,7 @@ function normalizeTrack(t, base) {
     artist: is3speak && t.account ? `@${t.account}` : t.artist,
     mood: t.mood,
     duration: t.duration || 0,
+    bpm: Number(t.bpm) || null,
     // Loudness per slice (0-100), computed when the library is built. Older
     // libraries have none; the timeline then draws flat bars.
     peaks: Array.isArray(t.peaks) && t.peaks.length
@@ -39,10 +67,10 @@ function normalizeTrack(t, base) {
   }
 }
 
-async function loadLibraries() {
+async function loadLibraries(sources) {
   const moods = new Map()
   const tracks = []
-  await Promise.all(SOURCES.map(async (src) => {
+  await Promise.all(sources.map(async (src) => {
     try {
       const base = new URL(src, window.location.origin).href
       // Revalidate every time: /music/ is served with a week of browser cache for
@@ -64,7 +92,9 @@ async function loadLibraries() {
   return { moods: [...moods].map(([id, label]) => ({ id, label })), tracks }
 }
 
-const formatDuration = (secs) => {
+const formatDuration = (secs, short = false) => {
+  // Sound effects are mostly well under a second
+  if (short && secs < 10) return `${secs < 1 ? secs.toFixed(2) : secs.toFixed(1)}s`
   const s = Math.round(secs)
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 }
@@ -149,7 +179,8 @@ function Waveform({ peaks, duration, position, active, onSeek, onScrub, title })
   )
 }
 
-function MusicLibrary({ onPick, onClose }) {
+function MusicLibrary({ onPick, onClose, kind = 'music' }) {
+  const cfg = KINDS[kind] || KINDS.music
   const [data, setData] = useState(null)
   const [error, setError] = useState(false)
   const [mood, setMood] = useState('all')
@@ -176,13 +207,13 @@ function MusicLibrary({ onPick, onClose }) {
 
   useEffect(() => {
     let cancelled = false
-    loadLibraries().then(d => {
+    loadLibraries(cfg.sources).then(d => {
       if (cancelled) return
       if (!d.tracks.length) setError(true)
       setData(d)
     })
     return () => { cancelled = true }
-  }, [])
+  }, [cfg])
 
   // Stop the preview when the sheet closes
   useEffect(() => () => {
@@ -247,8 +278,8 @@ function MusicLibrary({ onPick, onClose }) {
     <div className="remix-picker-overlay" onClick={onClose}>
       <div className="remix-picker music-library" role="dialog" aria-modal="true" aria-labelledby="music-library-title" onClick={e => e.stopPropagation()}>
         <div className="remix-picker-header">
-          <Music size={16} />
-          <h3 id="music-library-title">Music</h3>
+          <cfg.Icon size={16} />
+          <h3 id="music-library-title">{cfg.title}</h3>
           <button className="remix-picker-icon-btn" onClick={onClose} title="Close">
             <X size={16} />
           </button>
@@ -258,7 +289,7 @@ function MusicLibrary({ onPick, onClose }) {
           <Search size={14} />
           <input
             type="search"
-            placeholder="Search songs"
+            placeholder={cfg.search}
             value={query}
             onChange={e => setQuery(e.target.value)}
           />
@@ -275,9 +306,9 @@ function MusicLibrary({ onPick, onClose }) {
         )}
 
         <div className="music-library-list">
-          {!data && <div className="music-library-empty">Loading songs...</div>}
-          {data && error && <div className="music-library-empty">The music library could not be loaded.</div>}
-          {data && !error && visible.length === 0 && <div className="music-library-empty">No songs match.</div>}
+          {!data && <div className="music-library-empty">{cfg.loading}</div>}
+          {data && error && <div className="music-library-empty">{cfg.failed}</div>}
+          {data && !error && visible.length === 0 && <div className="music-library-empty">{cfg.none}</div>}
           {visible.map(t => (
             <div key={t.key} className={`music-library-row${playingKey === t.key ? ' playing' : ''}`}>
               <button className="music-library-play" onClick={() => togglePreview(t)} title={playingKey === t.key ? 'Stop' : 'Listen'}>
@@ -290,8 +321,8 @@ function MusicLibrary({ onPick, onClose }) {
                 </div>
                 <div className="music-library-meta">
                   {t.artist} · {playingKey === t.key
-                    ? `${formatDuration(scrubTime ?? position)} / ${formatDuration(t.duration)}`
-                    : formatDuration(t.duration)}
+                    ? `${formatDuration(scrubTime ?? position, kind === 'sfx')} / ${formatDuration(t.duration, kind === 'sfx')}`
+                    : formatDuration(t.duration, kind === 'sfx')}
                 </div>
                 <Waveform
                   peaks={t.peaks}
@@ -307,7 +338,7 @@ function MusicLibrary({ onPick, onClose }) {
                 className="music-library-add"
                 onClick={() => handleAdd(t)}
                 disabled={!!adding}
-                title="Add to video"
+                title={cfg.addTitle}
               >
                 {adding === t.key ? '...' : <><Plus size={14} /> Add</>}
               </button>
@@ -315,9 +346,7 @@ function MusicLibrary({ onPick, onClose }) {
           ))}
         </div>
 
-        <p className="music-library-note">
-          The song credit is added to your post automatically. Picking a 3Speak creator's sound gives them 5% of the post rewards.
-        </p>
+        <p className="music-library-note">{cfg.note}</p>
         <audio ref={audioRef} onEnded={() => setPlayingKey(null)} preload="none" />
       </div>
     </div>
