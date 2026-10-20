@@ -82,7 +82,7 @@ const hasContent = (tracks) => tracks.some(t => t.clips.length > 0)
 /**
  * Drafts of a signed-in user, kept on the editor backend (/api/projects):
  * autosave from the first edit, a prompt to continue a saved draft, the
- * per-tier limit (free: 1 for 48 h, Pro: 3 for 30 days; each save restarts
+ * per-tier limit (free: 1 for 7 days, Pro: 3 for 30 days; each save restarts
  * the clock) and deleting the draft once the video is sent.
  */
 export function useDrafts({ session, hasMedia, tracks, library, loadProjectState, onUnauthorized }) {
@@ -254,10 +254,10 @@ export function formatUntil(ms) {
   return new Date(ms).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 }
 
-// "48 hours" / "30 days"
+// "7 days" / "30 days" (whole days from 2 days up, else hours)
 export function formatKeep(ttlHours) {
   if (!ttlHours) return ''
-  return ttlHours >= 48 && ttlHours % 24 === 0 && ttlHours > 48 ? `${ttlHours / 24} days` : `${ttlHours} hours`
+  return ttlHours >= 48 && ttlHours % 24 === 0 ? `${ttlHours / 24} days` : `${ttlHours} hours`
 }
 
 // "2 h ago"

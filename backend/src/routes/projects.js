@@ -10,7 +10,7 @@ import fs from 'fs/promises'
  * (POST /api/editor-token there, after it verified the user's session), signed
  * with EDITOR_TOKEN_SECRET, which only the two servers know:
  *   v1.<base64url {"u":user,"pro":bool,"exp":ms}>.<hex hmac-sha256 of the middle part>
- * Free: 1 project, kept 48 h after its last save. Pro: 3 projects, 30 days each.
+ * Free: 1 project, kept 7 days after its last save. Pro: 3 projects, 30 days each.
  *
  * Stored as UPLOAD_DIR/.projects/<user>/<id>.json. The upload files a project
  * uses are listed in it and kept by the cleanup (index.js) until it expires.
@@ -24,7 +24,7 @@ const PROJECT_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 const MAX_STATE_BYTES = 5 * 1024 * 1024
 
 export const TIERS = {
-  free: { maxProjects: 1, ttlMs: 48 * 60 * 60 * 1000 },
+  free: { maxProjects: 1, ttlMs: 7 * 24 * 60 * 60 * 1000 },
   pro: { maxProjects: 3, ttlMs: 30 * 24 * 60 * 60 * 1000 }
 }
 
@@ -99,7 +99,7 @@ router.get('/:id', async (req, res) => {
 
 /**
  * PUT /api/projects/:id  { name, state, replace? }
- * Saves (autosave too). Every save restarts the 48 h / 30 day clock. A new
+ * Saves (autosave too). Every save restarts the 7 day / 30 day clock. A new
  * project over the limit is refused with 409 { error: 'limit', projects }
  * unless `replace` names the project it may take the place of.
  */

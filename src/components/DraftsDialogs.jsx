@@ -85,7 +85,7 @@ export function CloseDialog({ drafts, signedOut, canSignIn, signInState, onSignI
   const [name, setName] = useState(drafts.name || '')
   const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
-  const ttl = drafts.limits?.ttlHours || 48
+  const ttl = drafts.limits?.ttlHours || 7 * 24
   const until = Date.now() + ttl * 3600 * 1000
 
   const saveAndClose = async () => {
@@ -199,7 +199,7 @@ function ProUpsell({ user }) {
       <Crown size={18} />
       <div>
         <strong>More with 3Speak Pro</strong>
-        <span>Keep up to 3 projects for 30 days each, instead of 1 for 48 hours.</span>
+        <span>Keep up to 3 projects for 30 days each, instead of 1 for 7 days.</span>
       </div>
       <a href={`${siteOrigin()}/wallet/${user || ''}`} target="_blank" rel="noopener noreferrer">
         Get Pro <ExternalLink size={12} />
