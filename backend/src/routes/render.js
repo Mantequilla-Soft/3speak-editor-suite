@@ -3,7 +3,8 @@ import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
 import fs from 'fs/promises'
 import { downloadMedia } from '../utils/download.js'
-import { buildAndRunFFmpeg } from '../services/ffmpeg.js'
+import { buildAndRunFFmpeg, RENDER_CACHE_DIR } from '../services/ffmpeg.js'
+import crypto from 'crypto'
 
 const router = Router()
 const RENDERED_DIR = process.env.RENDERED_DIR || '/app/rendered'
@@ -15,6 +16,39 @@ const jobs = new Map()
 // AbortControllers for active jobs
 const abortControllers = new Map()
 let activeJobs = 0
+
+// Re-renders reuse what did not change (all kept for the usual cleanup age,
+// refreshed when used):
+// - downloads, by URL: a source is fetched once, not per render
+// - the whole output, by the timeline: an unchanged edit returns the last render
+// (unchanged clips inside a changed edit: see the clip cache in ffmpeg.js)
+const DOWNLOAD_CACHE_DIR = path.join(RENDER_CACHE_DIR, 'downloads')
+const sha = (v) => crypto.createHash('sha256').update(v).digest('hex').slice(0, 40)
+
+async function touch(p) {
+  const now = new Date()
+  await fs.utimes(p, now, now).catch(() => {})
+}
+
+async function cachedDownload(url, jobDir) {
+  const key = sha(url)
+  await fs.mkdir(DOWNLOAD_CACHE_DIR, { recursive: true })
+  const hit = (await fs.readdir(DOWNLOAD_CACHE_DIR)).find(f => f.startsWith(key) && !f.endsWith('.part'))
+  if (hit) {
+    const p = path.join(DOWNLOAD_CACHE_DIR, hit)
+    await touch(p)
+    return p
+  }
+  // Download into the job's folder under the key, then move it in whole
+  const file = await downloadMedia(url, key, jobDir)
+  const cached = path.join(DOWNLOAD_CACHE_DIR, path.basename(file))
+  try {
+    await fs.rename(file, cached)
+    return cached
+  } catch {
+    return file // another device or a race: use the job's own copy
+  }
+}
 
 /**
  * POST /api/render
@@ -135,6 +169,22 @@ async function processJob(jobId, jobDir) {
 
     const { timeline } = job
 
+    // Nothing changed since an earlier render of this exact timeline
+    const renderKey = sha(JSON.stringify(timeline))
+    const cachedOutput = `cache-${renderKey}.mp4`
+    try {
+      await fs.access(path.join(RENDERED_DIR, cachedOutput))
+      await touch(path.join(RENDERED_DIR, cachedOutput))
+      console.log(`[render] Job ${jobId}: timeline unchanged, reusing ${cachedOutput}`)
+      job.phase = 'Complete (nothing changed)'
+      job.progress = 1.0
+      job.status = 'completed'
+      job.outputUrl = `/rendered/${cachedOutput}`
+      job.reused = true
+      await fs.rm(jobDir, { recursive: true, force: true })
+      return
+    } catch {}
+
     // Collect all clips with URLs
     const allClips = []
     for (const track of timeline.tracks) {
@@ -152,7 +202,7 @@ async function processJob(jobId, jobDir) {
       job.phase = `Downloading ${clip.name || 'media'} (${i + 1}/${allClips.length})...`
       job.progress = 0.05 + (i / allClips.length) * 0.25
 
-      const localPath = await downloadMedia(clip.url, clip.id, jobDir)
+      const localPath = await cachedDownload(clip.url, jobDir)
       downloadedFiles.set(clip.id, localPath)
 
       // Static-background key: the clean plate image travels as its own file
@@ -162,7 +212,7 @@ async function processJob(jobId, jobDir) {
         const u = isStatic ? clip.chromaKey[field] : null
         if (!u || typeof u !== 'string' || /^(blob|data):/.test(u)) continue
         try {
-          downloadedFiles.set(`${clip.id}__${suffix}`, await downloadMedia(u, `${clip.id}__${suffix}`, jobDir))
+          downloadedFiles.set(`${clip.id}__${suffix}`, await cachedDownload(u, jobDir))
         } catch (err) {
           console.warn(`[render] ${suffix} image for ${clip.id} could not be downloaded: ${err.message}`)
         }
@@ -187,6 +237,11 @@ async function processJob(jobId, jobDir) {
         if (phase) job.phase = phase
       }
     })
+
+    // Keep it under the timeline's fingerprint too, for an unchanged re-render
+    await fs.copyFile(outputPath, path.join(RENDERED_DIR, `${cachedOutput}.part`))
+      .then(() => fs.rename(path.join(RENDERED_DIR, `${cachedOutput}.part`), path.join(RENDERED_DIR, cachedOutput)))
+      .catch(err => console.warn(`[render] Render cache write failed: ${err.message}`))
 
     job.phase = 'Complete'
     job.progress = 1.0

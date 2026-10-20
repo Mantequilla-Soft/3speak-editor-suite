@@ -2,6 +2,8 @@ import { useEffect, useCallback, useRef, useState } from 'react'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { hasLayout } from '../utils/remixLayout'
 import { getClipChromaKey } from '../utils/chromaKey'
+import { normalizeColor } from '../utils/clipColor'
+import { normalizeMotion } from '../utils/stickerMotion'
 
 const isIframe = typeof window !== 'undefined' && window.parent !== window
 const GATEWAY_URL = (import.meta.env.VITE_GATEWAY_URL || '').replace(/\/+$/, '')
@@ -45,6 +47,13 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     }
   })
   const clipRangeRef = useRef(urlClipRange.current())
+
+  // Drafts: the parent (3Speak) sends who the user is as a signed token
+  // ({ token, user, pro, maxProjects, ttlHours } or null + reason), and asks
+  // before closing so the editor can offer to save (closeRequest counts up).
+  const [draftSession, setDraftSession] = useState(undefined) // undefined = not told yet
+  const [draftContext, setDraftContext] = useState({ hasMedia: false, reason: null })
+  const [closeRequest, setCloseRequest] = useState(0)
 
   const sendToParent = useCallback((type, payload = {}) => {
     if (!isIframe) return
@@ -120,6 +129,17 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
           break
         }
 
+        case 'drafts-session': {
+          setDraftSession(data.session && typeof data.session.token === 'string' ? data.session : null)
+          setDraftContext({ hasMedia: !!data.hasMedia, reason: data.reason || null })
+          break
+        }
+
+        case 'request-close': {
+          setCloseRequest(n => n + 1)
+          break
+        }
+
         case 'get-state': {
           sendToParent('state-response', {
             timeline: { tracks, library, playheadPosition }
@@ -139,7 +159,9 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     if (!isIframe) return
     // `canLoadFile`: load-media takes a `file`. A parent with a local file checks
     // this, since an older editor would ignore the file and open empty.
-    sendToParent('editor-ready', { canLoadFile: true })
+    // `canSaveDrafts`: the parent may send a drafts session and must ask
+    // (request-close) before closing; an older editor gets the plain confirm.
+    sendToParent('editor-ready', { canLoadFile: true, canSaveDrafts: true })
   }, [sendToParent])
 
   // Abort an active render job
@@ -281,10 +303,19 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
           cropHeight: clip.cropHeight || 100,
           positionX: clip.positionX || 0,
           positionY: clip.positionY || 0,
+          rotation: clip.rotation || 0,
           audioEnabled: clip.audioEnabled !== false,
           volume: clip.volume || 100
         }
         if (hasLayout(clip)) baseClip.layout = clip.layout
+
+        // Colour adjustments (utils/clipColor.js), same maths as the preview
+        const color = (clip.type === 'video' || clip.type === 'image') ? normalizeColor(clip.color) : null
+        if (color) baseClip.color = color
+
+        // Sticker motion (utils/stickerMotion.js), image and text clips
+        const motion = (clip.type === 'image' || clip.type === 'text') ? normalizeMotion(clip.motion) : null
+        if (motion) baseClip.motion = motion
 
         // Green screen: keyed out in the render, over the tracks below
         const key = getClipChromaKey(clip)
@@ -326,8 +357,11 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
           if (previewEl) {
             const previewWidth = previewEl.clientWidth
             const padding = 20 // matches preview CSS padding
+            // Inside a box the text also has to fit within the box's own padding and
+            // border, exactly as it wraps in the preview
+            const boxInset = baseClip.textBoxEnabled ? baseClip.textBoxPadding + baseClip.textBoxBorderWidth : 0
             const measurer = document.createElement('div')
-            measurer.style.cssText = `position:absolute;left:-9999px;top:-9999px;width:${previewWidth - padding * 2}px;font-size:${baseClip.fontSize}px;font-family:'${baseClip.fontFamily}',sans-serif;font-weight:${baseClip.fontWeight};word-break:break-word;white-space:pre-wrap;line-height:1.2`
+            measurer.style.cssText = `position:absolute;left:-9999px;top:-9999px;width:${previewWidth - padding * 2 - boxInset * 2}px;font-size:${baseClip.fontSize}px;font-family:'${baseClip.fontFamily}',sans-serif;font-weight:${baseClip.fontWeight};word-break:break-word;white-space:pre-wrap;line-height:1.2`
             measurer.textContent = baseClip.text
             document.body.appendChild(measurer)
             // Use Range API to extract visual lines
@@ -499,6 +533,18 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     sendToParent('editor-closed')
   }, [sendToParent])
 
+  // Answer to request-close: close the studio, or stay
+  const answerClose = useCallback((close) => {
+    sendToParent('close-decision', { close: !!close })
+  }, [sendToParent])
+
+  // Ask the parent to sign the user in for drafts (one signature for wallet
+  // logins); 'signing-in' until its drafts-session answer arrives
+  const requestDraftSignIn = useCallback(() => {
+    setDraftContext(c => ({ ...c, reason: 'signing-in' }))
+    sendToParent('drafts-sign-in')
+  }, [sendToParent])
+
   return {
     isIframe,
     compactMode,
@@ -511,6 +557,11 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     clearRenderStatus,
     remixSource: remixSourceRef.current,
     remixPrompt,
-    clearRemixPrompt
+    clearRemixPrompt,
+    draftSession,
+    draftContext,
+    closeRequest,
+    answerClose,
+    requestDraftSignIn
   }
 }

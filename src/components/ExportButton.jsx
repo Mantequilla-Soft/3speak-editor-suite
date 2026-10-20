@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Download, Settings, X, Send, ExternalLink } from 'lucide-react'
+import { MAX_TIMELINE_TEXT, formatLength } from '../utils/limits'
 
 // Quality presets mapped to CRF values (lower CRF = higher quality, larger file)
 const QUALITY_PRESETS = [
@@ -23,7 +24,10 @@ function ExportButton({
   isIframe,
   onRenderRequest,
   renderStatus,
-  onClearRenderStatus
+  onClearRenderStatus,
+  timelineEnd = 0,
+  overLengthLimit = false,
+  pendingUpload = null
 }) {
   const [error, setError] = useState(null)
   const [quality, setQuality] = useState(23) // Default to medium quality (CRF 23)
@@ -32,9 +36,9 @@ function ExportButton({
 
   const isBackendRendering = renderStatus && (renderStatus.status === 'submitting' || renderStatus.status === 'processing')
 
-  const canExport = isIframe
+  const canExport = !overLengthLimit && !pendingUpload && (isIframe
     ? clips.length > 0 && !exporting && !isBackendRendering
-    : ffmpegLoaded && clips.length > 0 && !exporting
+    : ffmpegLoaded && clips.length > 0 && !exporting)
 
   const handleExport = async () => {
     setError(null)
@@ -99,6 +103,21 @@ function ExportButton({
           </button>
         )}
       </div>
+
+      {pendingUpload && (
+        <div className="export-upload-status" role="status">
+          <div className="export-upload-bar"><div style={{ width: `${Math.round(pendingUpload.progress * 100)}%` }} /></div>
+          <p>
+            Uploading {pendingUpload.name} ({Math.round(pendingUpload.progress * 100)}%). Keep editing; {isIframe ? 'Render' : 'Export'} unlocks when it is done.
+          </p>
+        </div>
+      )}
+
+      {overLengthLimit && (
+        <p className="export-length-hint">
+          Timeline is {formatLength(timelineEnd)}. Trim it to {MAX_TIMELINE_TEXT} or less to {isIframe ? 'render' : 'export'}.
+        </p>
+      )}
 
       {showSettings && !exporting && !isIframe && (
         <div className="export-settings">

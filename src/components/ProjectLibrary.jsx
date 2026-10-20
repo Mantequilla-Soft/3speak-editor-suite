@@ -8,7 +8,9 @@ function formatDuration(seconds) {
 }
 
 function LibraryItem({ item, isSelected, downloadStatus, onSelect, onRemove, onAddToTimeline }) {
-  const isEncoding = item.uploading && !item.serverUrl
+  // Items can go on the timeline while they upload: the preview plays the
+  // local file and the upload finishes in the background
+  const isEncoding = false
 
   const handleDragStart = (e) => {
     if (isEncoding) { e.preventDefault(); return }
@@ -65,11 +67,19 @@ function LibraryItem({ item, isSelected, downloadStatus, onSelect, onRemove, onA
             <span className="hls-dl-badge done" title="Downloaded locally">local</span>
           )}
           {item.uploading && !item.serverUrl && (
-            <span className="hls-dl-badge" title="Uploading to server...">
-              <Upload size={9} /> encoding
+            <span className="hls-dl-badge" title="Uploading in the background. Render waits until it is done.">
+              <Upload size={9} /> {Math.round((item.uploadProgress || 0) * 100)}%
             </span>
           )}
-          {item.serverUrl && (
+          {item.converting && (
+            <span className="hls-dl-badge" title="This browser cannot show this video's format. The preview switches to a 480p copy once it is ready.">
+              <Upload size={9} /> converting
+            </span>
+          )}
+          {item.convertFailed && (
+            <span className="hls-dl-badge" title="Could not make a playable copy. The preview may stay black, rendering still works.">no preview</span>
+          )}
+          {item.serverUrl && !item.converting && !item.convertFailed && (
             <span className="hls-dl-badge done" title="Encoded to 480p on server">480p</span>
           )}
         </span>

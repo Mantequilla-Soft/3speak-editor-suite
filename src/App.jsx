@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useMemo, useState } from 'react'
-import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info } from 'lucide-react'
+import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music } from 'lucide-react'
 import { useFFmpeg } from './hooks/useFFmpeg'
 import { useCanvasExport } from './hooks/useCanvasExport'
 import { useTimeline } from './hooks/useTimeline'
@@ -19,7 +19,16 @@ import OnboardingTour from './components/OnboardingTour'
 import RemixModePicker from './components/RemixModePicker'
 import MusicLibrary from './components/MusicLibrary'
 import { REMIX_LAYOUTS, hasLayout, clampLayout } from './utils/remixLayout'
-import { MAX_TIMELINE_SECONDS, MAX_TIMELINE_ADJ } from './utils/limits'
+import { MAX_TIMELINE_SECONDS, MAX_TIMELINE_ADJ, MAX_TIMELINE_TEXT, getTimelineEnd } from './utils/limits'
+import LengthLimitNotice from './components/LengthLimitNotice'
+import TooLargeNotice from './components/TooLargeNotice'
+import SilenceCutModal from './components/SilenceCutModal'
+import BeatSyncModal from './components/BeatSyncModal'
+import StickerPicker from './components/StickerPicker'
+import EncodingNotice from './components/EncodingNotice'
+import ClipColorFilters from './components/ClipColorFilters'
+import { DraftsPrompt, DraftLimitPicker, CloseDialog, DraftStatus } from './components/DraftsDialogs'
+import { useDrafts } from './hooks/useDrafts'
 import logo3speak from './assets/3speak.png'
 
 function App() {
@@ -39,6 +48,10 @@ function App() {
     addToLibrary,
     addToLibraryAndTimeline,
     addMusicClip,
+    addSfxClip,
+    addStickerClip,
+    fitClipsToBeats,
+    loadProjectState,
     addRemixRecording,
     removeFromLibrary,
     selectLibraryItem,
@@ -59,6 +72,7 @@ function App() {
     duplicateClip,
     splitClip,
     splitClipAtPlayhead,
+    applySilenceCut,
     removeGapAtPlayhead,
     isPlayheadOnGap,
     groupClips,
@@ -78,8 +92,47 @@ function App() {
     undo,
     redo,
     canUndo,
-    canRedo
+    canRedo,
+    lengthNotice,
+    dismissLengthNotice,
+    rejectedFiles,
+    dismissRejectedFiles
   } = useTimeline()
+
+  // Auto cut popup: the clip it was opened for
+  const [autoCutClipId, setAutoCutClipId] = useState(null)
+  const autoCutClip = useMemo(
+    () => (autoCutClipId ? tracks.flatMap(t => t.clips).find(c => c.id === autoCutClipId) || null : null),
+    [autoCutClipId, tracks]
+  )
+  // Prefer the creator's own file; HLS streams cannot be decoded in one go
+  const autoCutSource = autoCutClip
+    ? (fileStoreRef.current.get(autoCutClip.id) || autoCutClip.file || (isHlsUrl(autoCutClip.url) ? null : autoCutClip.url))
+    : null
+  const autoCutUnavailable = autoCutClip && !autoCutSource
+    ? 'This clip is still streaming from 3Speak. Try again once its download has finished.'
+    : null
+  const autoCutOpenRef = useRef(false)
+  const handleAutoCutApply = useCallback((parts, options) => {
+    applySilenceCut(autoCutClipId, parts, options)
+    setAutoCutClipId(null)
+  }, [applySilenceCut, autoCutClipId])
+
+  // Beat sync popup (audio clips): same way of reading the clip's audio as Auto cut
+  const [beatClipId, setBeatClipId] = useState(null)
+  const beatClip = useMemo(
+    () => (beatClipId ? tracks.flatMap(t => t.clips).find(c => c.id === beatClipId) || null : null),
+    [beatClipId, tracks]
+  )
+  const beatSource = beatClip
+    ? (fileStoreRef.current.get(beatClip.id) || beatClip.file || (isHlsUrl(beatClip.url) ? null : beatClip.url))
+    : null
+  // App shortcuts are off while the Auto cut or Beat sync popup is open
+  autoCutOpenRef.current = !!autoCutClip || !!beatClip
+
+  // The timeline may run long while editing; rendering waits until it fits
+  const timelineEnd = useMemo(() => getTimelineEnd(tracks), [tracks])
+  const overLengthLimit = timelineEnd > MAX_TIMELINE_SECONDS + 0.01
 
   // Locked to 9:16 for shorts
   const activeAspectRatio = '9:16'
@@ -97,6 +150,11 @@ function App() {
     theme,
     requestRender,
     requestClose,
+    draftSession,
+    draftContext,
+    closeRequest,
+    answerClose,
+    requestDraftSignIn,
     sendToParent,
     renderStatus,
     clearRenderStatus,
@@ -287,6 +345,11 @@ function App() {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // The Auto cut popup is open over the timeline
+      if (autoCutOpenRef.current) {
+        if (e.key === 'Escape') { setAutoCutClipId(null); setBeatClipId(null) }
+        return
+      }
       // Ignore if typing in an input
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
         return
@@ -460,6 +523,8 @@ function App() {
   const [recordingOpen, setRecordingOpen] = useState(false)
   const [recordingAudioOpen, setRecordingAudioOpen] = useState(false)
   const [musicOpen, setMusicOpen] = useState(false)
+  const [sfxOpen, setSfxOpen] = useState(false)
+  const [stickersOpen, setStickersOpen] = useState(false)
   const [inlineRecordingOpen, setInlineRecordingOpen] = useState(false)
   const [recorderSize, setRecorderSize] = useState('small') // 'small' | 'big'
 
@@ -619,9 +684,21 @@ function App() {
 
   // Music library: the song lands on its own track and is selected
   const handlePickMusic = useCallback(async (track) => {
-    const clipId = await addMusicClip(track.url, `${track.title} - ${track.artist}`, track.credit)
+    const clipId = await addMusicClip(track.url, `${track.title} - ${track.artist}`, track.credit, track.bpm)
     if (clipId) selectClip(clipId)
   }, [addMusicClip, selectClip])
+
+  // Stickers go in at the playhead (on a "Stickers" track above the footage)
+  const handlePickSticker = useCallback((sticker) => {
+    const clipId = addStickerClip(sticker, playheadPosition)
+    if (clipId) selectClip(clipId)
+  }, [addStickerClip, selectClip, playheadPosition])
+
+  // Sound effects go in at the playhead
+  const handlePickSfx = useCallback(async (track) => {
+    const clipId = await addSfxClip(track.url, track.title, playheadPosition)
+    if (clipId) selectClip(clipId)
+  }, [addSfxClip, selectClip, playheadPosition])
 
   // Credits of the library songs still on the timeline, once each, sent with
   // the video so 3speak.tv can credit them (and pay 3Speak sound creators)
@@ -653,12 +730,61 @@ function App() {
     return { name: item?.name || 'Media', progress: info.progress }
   }, [hlsDownloads, library])
 
-  // Active file upload for overlay
+  // Footage this browser cannot show while its playable copy is made; the
+  // popup can be hidden per video (the library badge still shows the status)
+  const [hiddenEncodingIds, setHiddenEncodingIds] = useState(() => new Set())
+  const encodingItems = useMemo(
+    () => library.filter(item => item.needsConversion && (item.uploading || item.converting) && !hiddenEncodingIds.has(item.id)),
+    [library, hiddenEncodingIds]
+  )
+  const hideEncodingNotice = useCallback(() => {
+    setHiddenEncodingIds(prev => new Set([...prev, ...encodingItems.map(i => i.id)]))
+  }, [encodingItems])
+
+  // Empty timeline: quiet "Add video / image / audio" tiles in the preview.
+  // Files go straight onto the first matching track (same path as a track's +).
+  const emptyVideoInputRef = useRef(null)
+  const emptyImageInputRef = useRef(null)
+  const emptyAudioInputRef = useRef(null)
+  const addFilesFromEmpty = useCallback((e, type) => {
+    const files = Array.from(e.target.files || [])
+    e.target.value = ''
+    if (!files.length) return
+    const track = tracks.find(t => t.type === (type === 'audio' ? 'audio' : 'video'))
+    if (track) addFilesToTrack(files, track.id)
+    else addToLibrary(files)
+  }, [tracks, addFilesToTrack, addToLibrary])
+  const emptyTimelineActions = (
+    <div className="empty-timeline-actions">
+      <button type="button" onClick={() => emptyVideoInputRef.current?.click()}>
+        <Film size={22} /> <span>Add video</span>
+      </button>
+      <button type="button" onClick={() => emptyImageInputRef.current?.click()}>
+        <ImageIcon size={22} /> <span>Add image</span>
+      </button>
+      <button type="button" onClick={() => emptyAudioInputRef.current?.click()}>
+        <Music size={22} /> <span>Add audio</span>
+      </button>
+      <input ref={emptyVideoInputRef} type="file" accept="video/*" multiple hidden onChange={(e) => addFilesFromEmpty(e, 'video')} />
+      <input ref={emptyImageInputRef} type="file" accept="image/*" multiple hidden onChange={(e) => addFilesFromEmpty(e, 'image')} />
+      <input ref={emptyAudioInputRef} type="file" accept="audio/*" multiple hidden onChange={(e) => addFilesFromEmpty(e, 'audio')} />
+    </div>
+  )
+
+  // Uploads still running in the background; Render waits for them
   const activeUpload = useMemo(() => {
     const uploading = library.filter(item => item.uploading)
     if (uploading.length === 0) return null
-    const item = uploading[0]
-    return { name: item.name || 'Media', progress: item.uploadProgress || 0, count: uploading.length }
+    // Uploads run in parallel: overall progress, weighted by file size
+    let total = 0
+    let done = 0
+    for (const item of uploading) {
+      const size = item.file?.size || 1
+      total += size
+      done += size * (item.uploadProgress || 0)
+    }
+    const name = uploading.length > 1 ? `${uploading.length} files` : (uploading[0].name || 'Media')
+    return { name, progress: total ? done / total : 0, count: uploading.length }
   }, [library])
 
   // Ref for add-media file input
@@ -674,11 +800,40 @@ function App() {
     e.target.value = ''
   }, [addToLibrary])
 
+  // Drafts (saved projects of signed-in users, see hooks/useDrafts.js)
+  const drafts = useDrafts({
+    session: draftSession,
+    hasMedia: draftContext.hasMedia,
+    tracks,
+    library,
+    loadProjectState,
+    onUnauthorized: requestDraftSignIn
+  })
+  const canDraftSignIn = isIframe && !draftSession && ['sign-in-needed', 'sign-in-failed', 'signing-in'].includes(draftContext.reason)
+  const [limitOpen, setLimitOpen] = useState(false)
+  useEffect(() => {
+    if (drafts.status === 'limit' && drafts.limitProjects.length) setLimitOpen(true)
+  }, [drafts.status, drafts.limitProjects])
+
+  // Closing: from our own X ('self') or the site's (it sends request-close: 'parent')
+  const [closeDialog, setCloseDialog] = useState(null)
+  const closeAfterSaveRef = useRef(false)
+  const timelineEmpty = !tracks.some(t => t.clips.length)
+  const finishClose = useCallback((close, from) => {
+    setCloseDialog(null)
+    closeAfterSaveRef.current = false
+    if (from === 'parent') answerClose(close)
+    else if (close) requestClose()
+  }, [answerClose, requestClose])
   const handleCloseEditor = useCallback(() => {
-    if (window.confirm('Are you sure you want to close the editor? Unsaved changes will be lost.')) {
-      requestClose()
-    }
-  }, [requestClose])
+    if (timelineEmpty) requestClose()
+    else setCloseDialog('self')
+  }, [timelineEmpty, requestClose])
+  useEffect(() => {
+    if (!closeRequest) return
+    if (timelineEmpty) answerClose(true)
+    else setCloseDialog('parent')
+  }, [closeRequest]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const isBackendRendering = renderStatus && (renderStatus.status === 'submitting' || renderStatus.status === 'processing')
 
@@ -697,9 +852,43 @@ function App() {
     ? tracks.flatMap(t => t.clips).find(c => c.id === compactPropertiesClipId) || null
     : null
 
+  // The audio-track clip a video's sound plays from (same group, type audio)
+  const linkedAudioOf = (clip) => (clip?.type === 'video' && clip.groupId
+    ? tracks.flatMap(t => t.clips).find(c => c.groupId === clip.groupId && c.type === 'audio') || null
+    : null)
+
+  // Clip settings in the compact layout: on phones the clip opened with
+  // "Options" (a panel over the timeline); on desktop a sidebar that follows
+  // the selected clip
+  const sideClip = compactPropertiesClip || (isDesktop ? selectedClip : null)
+  const compactPropertiesPanel = sideClip ? (
+          <div className="compact-properties-panel">
+            <div className="compact-properties-header">
+              <span className="compact-properties-title">{sideClip.name}</span>
+              <button
+                className="compact-btn compact-properties-close"
+                onClick={() => { setCompactPropertiesClipId(null); if (isDesktop) selectClip(null) }}
+                title="Close properties"
+              >
+                <X size={14} />
+              </button>
+            </div>
+            <ClipProperties
+              clip={sideClip}
+              linkedAudio={linkedAudioOf(sideClip)}
+              onUpdateLinkedAudio={(u) => { const a = linkedAudioOf(sideClip); if (a) updateClip(a.id, u) }}
+              onUpdateClip={(updates) => updateClip(sideClip.id, updates)}
+              onSplit={() => splitClip(sideClip.id)}
+              playheadPosition={playheadPosition}
+              tabbed={!isDesktop}
+            />
+          </div>
+  ) : null
+
   if (compactMode) {
     return (
-      <div className="app compact">
+      <div className={`app compact${isDesktop ? ' desktop' : ''}`}>
+        <ClipColorFilters tracks={tracks} />
         {/* Backend health warning */}
         {backendStatus === 'error' && (
           <div className="backend-warning">
@@ -720,6 +909,7 @@ function App() {
               )}
             </span>
           </div>
+          <DraftStatus drafts={drafts} canSignIn={canDraftSignIn} signInState={draftContext.reason} onSignIn={requestDraftSignIn} onOpenLimit={() => drafts.save()} />
           <button className="branding-close-btn" onClick={handleCloseEditor} title="Close editor">
             <X size={16} />
           </button>
@@ -749,10 +939,11 @@ function App() {
             <button
               className={renderStatus?.status === 'completed' ? 'compact-download-btn' : 'compact-render-btn'}
               onClick={() => { clearRenderStatus(); requestRender() }}
-              disabled={videoClips.length === 0 || (exporting || canvasExporting) || isBackendRendering}
+              disabled={videoClips.length === 0 || (exporting || canvasExporting) || isBackendRendering || overLengthLimit || !!activeUpload}
+              title={overLengthLimit ? `Trim the timeline to ${MAX_TIMELINE_TEXT} or less to render` : undefined}
             >
               <Clapperboard size={14} />
-              <span>{isBackendRendering ? 'Rendering...' : renderStatus?.status === 'completed' ? 'Re-render' : 'Render'}</span>
+              <span>{isBackendRendering ? 'Rendering...' : activeUpload ? `Uploading ${Math.round(activeUpload.progress * 100)}%` : renderStatus?.status === 'completed' ? 'Re-render' : 'Render'}</span>
             </button>
             {renderStatus?.status === 'completed' && renderStatus.outputUrl && (
               <>
@@ -806,7 +997,10 @@ function App() {
         )}
 
         {/* Global Preview */}
+        <div className={`compact-workspace${isDesktop ? ' desktop' : ''}`}>
+        <div className="compact-main">
         <GlobalPreview
+          emptyActions={emptyTimelineActions}
           tracks={tracks}
           playheadPosition={playheadPosition}
           onSetPlayhead={setPlayheadPosition}
@@ -855,9 +1049,13 @@ function App() {
             onOpenClipSettings={(clipId) => setCompactPropertiesClipId(clipId)}
             onRecordAudio={() => setRecordingAudioOpen(true)}
             onOpenMusic={() => setMusicOpen(true)}
+            onOpenSfx={() => setSfxOpen(true)}
+            onOpenStickers={() => setStickersOpen(true)}
             onRecordVideo={openRecorder}
             onReverseClip={handleReverseClip}
             onUpdateTrack={updateTrack}
+            onAutoCut={setAutoCutClipId}
+            onBeatSync={setBeatClipId}
             isDesktop={isDesktop}
           />
 
@@ -871,27 +1069,18 @@ function App() {
             </div>
           )}
 
-          {/* Compact properties panel */}
-          {compactPropertiesClip && (
-            <div className="compact-properties-panel">
-              <div className="compact-properties-header">
-                <span className="compact-properties-title">{compactPropertiesClip.name}</span>
-                <button
-                  className="compact-btn compact-properties-close"
-                  onClick={() => setCompactPropertiesClipId(null)}
-                  title="Close properties"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-              <ClipProperties
-                clip={compactPropertiesClip}
-                onUpdateClip={(updates) => updateClip(compactPropertiesClip.id, updates)}
-                onSplit={() => splitClip(compactPropertiesClip.id)}
-                playheadPosition={playheadPosition}
-              />
-            </div>
-          )}
+          {/* Compact properties panel (phones: over the timeline; desktop: the sidebar) */}
+          {!isDesktop && compactPropertiesPanel}
+        </div>
+        </div>
+        {/* Desktop: the selected clip's settings beside preview and timeline */}
+        {isDesktop && (
+          <aside className="compact-side">
+            {sideClip ? compactPropertiesPanel : (
+              <p className="compact-side-empty">Select a clip on the timeline to see its settings.</p>
+            )}
+          </aside>
+        )}
         </div>
 
         {/* Onboarding Tour */}
@@ -904,8 +1093,62 @@ function App() {
 
         {/* Remix mode picker (whole video arriving from the remix button) */}
         {remixPrompt && !showTour && <RemixModePicker onChoose={handleRemixChoice} />}
+        {rejectedFiles.length > 0 && <TooLargeNotice files={rejectedFiles} onClose={dismissRejectedFiles} />}
+        {lengthNotice && !remixPrompt && !showTour && <LengthLimitNotice length={lengthNotice.length} onClose={dismissLengthNotice} />}
+        {drafts.prompt && drafts.drafts?.length > 0 && (
+          <DraftsPrompt drafts={drafts.drafts} limits={drafts.limits} onLoad={drafts.loadDraft} onStartNew={drafts.startNew} />
+        )}
+        {limitOpen && drafts.limitProjects.length > 0 && (
+          <DraftLimitPicker
+            projects={drafts.limitProjects}
+            limits={drafts.limits}
+            onReplace={async (id) => {
+              const r = await drafts.resolveLimit(id)
+              setLimitOpen(false)
+              if (r.ok && closeAfterSaveRef.current) finishClose(true, closeDialog)
+            }}
+            onSkip={() => { drafts.resolveLimit(null); setLimitOpen(false) }}
+          />
+        )}
+        {closeDialog && !limitOpen && (
+          <CloseDialog
+            uploading={library.filter(i => i.uploading).map(i => ({ name: i.name, size: i.file?.size || 0, progress: i.uploadProgress || 0 }))}
+            drafts={{ ...drafts, save: async (o) => { closeAfterSaveRef.current = true; return drafts.save(o) } }}
+            signedOut={draftContext.reason === 'logged-out'}
+            canSignIn={canDraftSignIn}
+    signInState={draftContext.reason}
+            onSignIn={requestDraftSignIn}
+            onClose={() => finishClose(true, closeDialog)}
+            onCancel={() => finishClose(false, closeDialog)}
+          />
+        )}
+        {beatClip && (
+          <BeatSyncModal
+            key={beatClip.id}
+            clip={beatClip}
+            source={beatSource}
+            unavailable={beatClip && !beatSource ? 'This clip is still streaming from 3Speak. Try again once its download has finished.' : null}
+            onSetBeats={(fields) => updateClip(beatClip.id, fields)}
+            onFitClips={fitClipsToBeats}
+            onClose={() => setBeatClipId(null)}
+          />
+        )}
+        {autoCutClip && (
+          <SilenceCutModal
+            key={autoCutClip.id}
+            clip={autoCutClip}
+            source={autoCutSource}
+            unavailable={autoCutUnavailable}
+            onApply={handleAutoCutApply}
+            onClose={() => setAutoCutClipId(null)}
+          />
+        )}
 
         {musicOpen && <MusicLibrary onPick={handlePickMusic} onClose={() => setMusicOpen(false)} />}
+
+        {sfxOpen && <MusicLibrary kind="sfx" onPick={handlePickSfx} onClose={() => setSfxOpen(false)} />}
+
+        {stickersOpen && <StickerPicker onPick={handlePickSticker} onClose={() => setStickersOpen(false)} />}
 
         {/* Record Video Modal */}
         {recordingOpen && (
@@ -943,22 +1186,8 @@ function App() {
         )}
 
         {/* Upload Progress Overlay */}
-        {activeUpload && (
-          <div className="hls-download-overlay">
-            <div className="hls-download-modal">
-              <Upload size={32} className="hls-download-icon" />
-              <h3>Uploading Media</h3>
-              <p className="hls-download-name">{activeUpload.name}{activeUpload.count > 1 ? ` (+${activeUpload.count - 1} more)` : ''}</p>
-              <div className="hls-download-progress-bar">
-                <div
-                  className="hls-download-progress-fill"
-                  style={{ width: `${Math.round(activeUpload.progress * 100)}%` }}
-                />
-              </div>
-              <p className="hls-download-percent">{Math.round(activeUpload.progress * 100)}%</p>
-              <p className="hls-download-hint">Please wait while the file is being uploaded and prepared...</p>
-            </div>
-          </div>
+        {encodingItems.length > 0 && (
+          <EncodingNotice items={encodingItems} onClose={hideEncodingNotice} />
         )}
 
         {/* Video Preview before Send */}
@@ -988,6 +1217,8 @@ function App() {
                   className="video-preview-send"
                   onClick={() => {
                     setShowPreview(false)
+                    // Sent: the draft has done its job ("Download" keeps it)
+                    drafts.deleteCurrent()
                     sendToParent('post-to-3speak', {
                       outputUrl: renderStatus.outputUrl,
                       ...(remixSource && { remixSource }),
@@ -1008,6 +1239,7 @@ function App() {
 
   return (
     <div className="app">
+      <ClipColorFilters tracks={tracks} />
       {/* Backend health warning */}
       {backendStatus === 'error' && (
         <div className="backend-warning">
@@ -1025,6 +1257,7 @@ function App() {
             <Info size={14} />
           </span>
         </div>
+        <DraftStatus drafts={drafts} canSignIn={canDraftSignIn} signInState={draftContext.reason} onSignIn={requestDraftSignIn} onOpenLimit={() => drafts.save()} />
         <button className="branding-close-btn" onClick={handleCloseEditor} title="Close editor">
           <X size={18} />
         </button>
@@ -1090,6 +1323,9 @@ function App() {
             onRenderRequest={requestRender}
             renderStatus={renderStatus}
             onClearRenderStatus={clearRenderStatus}
+            timelineEnd={timelineEnd}
+            overLengthLimit={overLengthLimit}
+            pendingUpload={activeUpload}
           />
         </div>
 
@@ -1097,6 +1333,7 @@ function App() {
           {/* Global Preview - only in center for horizontal */}
           {!isVerticalVideo && (
             <GlobalPreview
+              emptyActions={emptyTimelineActions}
               tracks={tracks}
               playheadPosition={playheadPosition}
               onSetPlayhead={setPlayheadPosition}
@@ -1183,9 +1420,13 @@ function App() {
               onAddFilesToTrack={addFilesToTrack}
               onRecordAudio={() => setRecordingAudioOpen(true)}
               onOpenMusic={() => setMusicOpen(true)}
+              onOpenSfx={() => setSfxOpen(true)}
+              onOpenStickers={() => setStickersOpen(true)}
               onRecordVideo={openRecorder}
               onReverseClip={handleReverseClip}
               onUpdateTrack={updateTrack}
+              onAutoCut={setAutoCutClipId}
+              onBeatSync={setBeatClipId}
               isDesktop={isDesktop}
             />
           </div>
@@ -1205,6 +1446,7 @@ function App() {
         <div className="right-panel">
           {isVerticalVideo ? (
             <GlobalPreview
+              emptyActions={emptyTimelineActions}
               tracks={tracks}
               playheadPosition={playheadPosition}
               onSetPlayhead={setPlayheadPosition}
@@ -1234,6 +1476,8 @@ function App() {
                 <div className="collapsible-body">
                   <ClipProperties
                     clip={selectedClip}
+                    linkedAudio={linkedAudioOf(selectedClip)}
+                    onUpdateLinkedAudio={(u) => { const a = linkedAudioOf(selectedClip); if (a) updateClip(a.id, u) }}
                     onUpdateClip={(updates) => selectedClipId && updateClip(selectedClipId, updates)}
                     onSplit={(time) => selectedClipId && splitClip(selectedClipId, time)}
                     playheadPosition={playheadPosition}
@@ -1247,8 +1491,62 @@ function App() {
 
       {/* Remix mode picker (whole video arriving from the remix button) */}
       {remixPrompt && <RemixModePicker onChoose={handleRemixChoice} />}
+      {rejectedFiles.length > 0 && <TooLargeNotice files={rejectedFiles} onClose={dismissRejectedFiles} />}
+      {lengthNotice && !remixPrompt && <LengthLimitNotice length={lengthNotice.length} onClose={dismissLengthNotice} />}
+      {drafts.prompt && drafts.drafts?.length > 0 && (
+        <DraftsPrompt drafts={drafts.drafts} limits={drafts.limits} onLoad={drafts.loadDraft} onStartNew={drafts.startNew} />
+      )}
+      {limitOpen && drafts.limitProjects.length > 0 && (
+        <DraftLimitPicker
+          projects={drafts.limitProjects}
+          limits={drafts.limits}
+          onReplace={async (id) => {
+            const r = await drafts.resolveLimit(id)
+            setLimitOpen(false)
+            if (r.ok && closeAfterSaveRef.current) finishClose(true, closeDialog)
+          }}
+          onSkip={() => { drafts.resolveLimit(null); setLimitOpen(false) }}
+        />
+      )}
+      {closeDialog && !limitOpen && (
+        <CloseDialog
+          uploading={library.filter(i => i.uploading).map(i => ({ name: i.name, size: i.file?.size || 0, progress: i.uploadProgress || 0 }))}
+          drafts={{ ...drafts, save: async (o) => { closeAfterSaveRef.current = true; return drafts.save(o) } }}
+          signedOut={draftContext.reason === 'logged-out'}
+          canSignIn={canDraftSignIn}
+    signInState={draftContext.reason}
+          onSignIn={requestDraftSignIn}
+          onClose={() => finishClose(true, closeDialog)}
+          onCancel={() => finishClose(false, closeDialog)}
+        />
+      )}
+      {beatClip && (
+        <BeatSyncModal
+          key={beatClip.id}
+          clip={beatClip}
+          source={beatSource}
+          unavailable={beatClip && !beatSource ? 'This clip is still streaming from 3Speak. Try again once its download has finished.' : null}
+          onSetBeats={(fields) => updateClip(beatClip.id, fields)}
+          onFitClips={fitClipsToBeats}
+          onClose={() => setBeatClipId(null)}
+        />
+      )}
+      {autoCutClip && (
+        <SilenceCutModal
+          key={autoCutClip.id}
+          clip={autoCutClip}
+          source={autoCutSource}
+          unavailable={autoCutUnavailable}
+          onApply={handleAutoCutApply}
+          onClose={() => setAutoCutClipId(null)}
+        />
+      )}
 
       {musicOpen && <MusicLibrary onPick={handlePickMusic} onClose={() => setMusicOpen(false)} />}
+
+      {sfxOpen && <MusicLibrary kind="sfx" onPick={handlePickSfx} onClose={() => setSfxOpen(false)} />}
+
+      {stickersOpen && <StickerPicker onPick={handlePickSticker} onClose={() => setStickersOpen(false)} />}
 
       {/* Record Video Modal */}
       {recordingOpen && (
@@ -1286,22 +1584,8 @@ function App() {
       )}
 
       {/* Upload Progress Overlay */}
-      {activeUpload && (
-        <div className="hls-download-overlay">
-          <div className="hls-download-modal">
-            <Upload size={32} className="hls-download-icon" />
-            <h3>Uploading Media</h3>
-            <p className="hls-download-name">{activeUpload.name}{activeUpload.count > 1 ? ` (+${activeUpload.count - 1} more)` : ''}</p>
-            <div className="hls-download-progress-bar">
-              <div
-                className="hls-download-progress-fill"
-                style={{ width: `${Math.round(activeUpload.progress * 100)}%` }}
-              />
-            </div>
-            <p className="hls-download-percent">{Math.round(activeUpload.progress * 100)}%</p>
-            <p className="hls-download-hint">Please wait while the file is being uploaded and prepared...</p>
-          </div>
-        </div>
+      {encodingItems.length > 0 && (
+        <EncodingNotice items={encodingItems} onClose={hideEncodingNotice} />
       )}
 
     </div>

@@ -2,7 +2,111 @@ import { useState, useCallback, useRef, useMemo, useEffect } from 'react'
 import { isHlsUrl, getHlsDuration } from '../utils/hlsHelper'
 import { downloadHlsToMp4 } from '../utils/hlsDownloader'
 import { api, getBackendUrl } from '../utils/backendSelector'
-import { MAX_TIMELINE_SECONDS, MAX_TIMELINE_TEXT, MAX_TIMELINE_ADJ } from '../utils/limits'
+import { MAX_TIMELINE_SECONDS, MAX_IMPORT_BYTES, getTimelineEnd } from '../utils/limits'
+import { createSHA256 } from 'hash-wasm'
+
+// Upload requests (whole small files or chunks of big ones) in flight at once,
+// shared by every upload; the rest wait for a free slot. Kept under the
+// browser's 6 connections per host (the API is HTTP/1.1).
+const MAX_PARALLEL_REQUESTS = 4
+let activeRequests = 0
+const requestQueue = []
+function withUploadSlot(task) {
+  return new Promise((resolve, reject) => {
+    const run = () => {
+      activeRequests++
+      task().then(resolve, reject).finally(() => {
+        activeRequests--
+        const next = requestQueue.shift()
+        if (next) next()
+      })
+    }
+    if (activeRequests < MAX_PARALLEL_REQUESTS) run()
+    else requestQueue.push(run)
+  })
+}
+
+// Files above this go up in chunks (size set by the backend), several at once
+const CHUNKED_FROM_BYTES = 8 * 1024 * 1024
+const CHUNK_ATTEMPTS = 4
+
+// One XHR (for upload progress). Resolves the JSON answer; rejects with .status set.
+function sendXhr(method, url, body, onProgress) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open(method, url)
+    if (body instanceof Blob && !(body instanceof File)) xhr.setRequestHeader('Content-Type', 'application/octet-stream')
+    if (onProgress) {
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) onProgress(e.loaded / e.total)
+      })
+    }
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try { resolve(JSON.parse(xhr.responseText)) } catch { reject(new Error('Invalid response from server')) }
+      } else {
+        const err = new Error(`Upload failed: ${xhr.status}`)
+        err.status = xhr.status
+        reject(err)
+      }
+    }
+    xhr.onerror = () => reject(new Error('Upload network error'))
+    xhr.send(body)
+  })
+}
+
+async function postJson(url, body) {
+  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+  if (!res.ok) throw new Error(`Upload failed: ${res.status}`)
+  return res.json()
+}
+
+// SHA-256 of a file, read in pieces so a big file never sits in memory whole
+// (crypto.subtle cannot hash in pieces). About a second per few hundred MB.
+async function hashFile(file) {
+  const hasher = await createSHA256()
+  const piece = 8 * 1024 * 1024
+  for (let offset = 0; offset < file.size; offset += piece) {
+    hasher.update(new Uint8Array(await file.slice(offset, offset + piece).arrayBuffer()))
+  }
+  return hasher.digest('hex')
+}
+
+// Send a big file as chunks in parallel (retrying each a few times), then
+// have the backend join them. Resolves what POST /api/upload would answer.
+async function uploadInChunks(file, name, onProgress, hash) {
+  const { uploadId, chunkSize, chunks } = await postJson(api('/api/upload/chunked/init'), { name, size: file.size, hash })
+  const sent = new Array(chunks).fill(0)
+  const report = () => onProgress?.(sent.reduce((a, b) => a + b, 0) / file.size)
+  let failed = false
+
+  const sendChunk = async (index) => {
+    const blob = file.slice(index * chunkSize, Math.min(file.size, (index + 1) * chunkSize))
+    for (let attempt = 1; ; attempt++) {
+      if (failed) return
+      try {
+        await withUploadSlot(() => (failed
+          ? Promise.resolve()
+          : sendXhr('PUT', api(`/api/upload/chunked/${uploadId}/${index}`), blob, (f) => { sent[index] = f * blob.size; report() })))
+        sent[index] = blob.size
+        report()
+        return
+      } catch (err) {
+        sent[index] = 0
+        report()
+        // 4xx means the chunk itself is wrong; retrying will not help
+        if (attempt >= CHUNK_ATTEMPTS || (err.status >= 400 && err.status < 500)) {
+          failed = true
+          throw err
+        }
+        await new Promise(r => setTimeout(r, 1000 * 2 ** (attempt - 1)))
+      }
+    }
+  }
+
+  await Promise.all(Array.from({ length: chunks }, (_, i) => sendChunk(i)))
+  return postJson(api(`/api/upload/chunked/${uploadId}/complete`), {})
+}
 
 let clipIdCounter = 0
 let trackIdCounter = 0
@@ -39,27 +143,35 @@ function getGroupColor(groupId) {
 
 const MAX_HISTORY = 20
 
-function getMediaDuration(file) {
+// Duration, and whether this browser can show the picture: HEVC (iPhone) or
+// 10-bit video loads in some browsers with sound but no image (or not at all).
+function probeMedia(file) {
+  const type = getMediaType(file)
+  if (type === 'image') return Promise.resolve({ duration: 5, durationKnown: true, playable: true })
   return new Promise((resolve) => {
-    const isVideo = file.type.startsWith('video/')
-    const isAudio = file.type.startsWith('audio/')
-    const isImage = file.type.startsWith('image/')
-
-    if (isImage) {
-      resolve(5) // Default 5 seconds for images
-      return
+    const el = document.createElement(type === 'video' ? 'video' : 'audio')
+    el.preload = 'auto'
+    el.muted = true
+    const src = URL.createObjectURL(file)
+    let duration = null
+    let settled = false
+    const finish = (playable) => {
+      if (settled) return
+      settled = true
+      clearTimeout(timer)
+      el.removeAttribute('src')
+      el.load()
+      URL.revokeObjectURL(src)
+      resolve({ duration: duration ?? 10, durationKnown: duration != null, playable })
     }
-
-    const element = document.createElement(isVideo ? 'video' : 'audio')
-    element.preload = 'metadata'
-    element.onloadedmetadata = () => {
-      URL.revokeObjectURL(element.src)
-      resolve(element.duration)
+    const timer = setTimeout(() => finish(type !== 'video' && duration != null), 8000)
+    el.onloadedmetadata = () => {
+      duration = el.duration
+      if (type !== 'video') finish(true)
     }
-    element.onerror = () => {
-      resolve(10)
-    }
-    element.src = URL.createObjectURL(file)
+    el.onloadeddata = () => finish(el.videoWidth > 0)
+    el.onerror = () => finish(false)
+    el.src = src
   })
 }
 
@@ -165,7 +277,8 @@ function getMediaMetadataFromURL(url, mediaType) {
 // Video tracks are prepended (newest first), audio tracks are appended (oldest first),
 // so we use mirror indexing: videoTracks[i] pairs with audioTracks[last - i].
 function findPairedAudioTrack(tracks, videoTrackId) {
-  const videoTracks = tracks.filter(t => t.type === 'video')
+  // Sticker tracks carry no sound: they never pair with an audio track
+  const videoTracks = tracks.filter(t => t.type === 'video' && !t.stickers)
   // Music tracks (music library) never pair with a video track
   const audioTracks = tracks.filter(t => t.type === 'audio' && !t.music)
   const videoIndex = videoTracks.findIndex(t => t.id === videoTrackId)
@@ -205,7 +318,7 @@ function createLinkedAudioClip(videoClip, groupId) {
 
 // Ensure there's a paired audio track for every video track
 function ensurePairedAudioTracks(tracks) {
-  const videoTracks = tracks.filter(t => t.type === 'video')
+  const videoTracks = tracks.filter(t => t.type === 'video' && !t.stickers)
   const audioTracks = tracks.filter(t => t.type === 'audio' && !t.music)
 
   if (audioTracks.length >= videoTracks.length) return tracks
@@ -236,6 +349,27 @@ export function useTimeline() {
   ])
   const [selectedClipId, setSelectedClipId] = useState(null)
   const [selectedLibraryId, setSelectedLibraryId] = useState(null)
+
+  // Set when an import lands on the timeline; the effect below then tells the
+  // creator once if the timeline now runs past the render limit.
+  const lengthCheckRef = useRef(false)
+  // Files refused at import (over MAX_IMPORT_BYTES), for the notice
+  const [rejectedFiles, setRejectedFiles] = useState([])
+  const dismissRejectedFiles = useCallback(() => setRejectedFiles([]), [])
+  const keepImportable = useCallback((files) => {
+    const list = Array.from(files)
+    const tooBig = list.filter(f => f.size > MAX_IMPORT_BYTES)
+    if (tooBig.length) setRejectedFiles(prev => [...prev, ...tooBig.map(f => ({ name: f.name, size: f.size }))])
+    return list.filter(f => f.size <= MAX_IMPORT_BYTES)
+  }, [])
+  const [lengthNotice, setLengthNotice] = useState(null) // { length } in seconds
+  const dismissLengthNotice = useCallback(() => setLengthNotice(null), [])
+  useEffect(() => {
+    if (!lengthCheckRef.current) return
+    lengthCheckRef.current = false
+    const length = getTimelineEnd(tracks)
+    if (length > MAX_TIMELINE_SECONDS + 0.01) setLengthNotice({ length })
+  }, [tracks])
   const [playheadPosition, setPlayheadPosition] = useState(0)
 
   // File store: keeps File references separate from serialized track history
@@ -313,36 +447,98 @@ export function useTimeline() {
   // Upload a file to the backend, returns server URL (e.g. /api/upload/files/abc.mp4)
   // When using a remote backend, makes the returned URL absolute
   // onProgress(0..1) is called during upload
-  const uploadFileToServer = useCallback((file, name, onProgress) => {
-    return new Promise((resolve, reject) => {
+  // Upload a file for the backend (480p encode, rendering). The file is hashed
+  // first: if the backend already has it, nothing is sent at all (and an HEVC
+  // file's converted copy comes along). Otherwise small files go in one
+  // request, big ones in parallel chunks. Resolves
+  // { url (absolute), filename, duration, browserSafe, encodes, reused?, encodeState? }.
+  const uploadFileToServer = useCallback(async (file, name, onProgress) => {
+    let data = null
+    let hash = null
+    try {
+      hash = await hashFile(file)
+      const res = await fetch(api(`/api/upload/by-hash/${hash}`), { cache: 'no-store' })
+      if (res.ok) {
+        data = await res.json()
+        console.log(`[upload] ${file.name} already on the server, upload skipped (${data.encodeState})`)
+        onProgress?.(1)
+      }
+    } catch (err) {
+      console.warn(`[upload] Hash check skipped for ${file.name}: ${err.message}`)
+    }
+    if (!data && file.size > CHUNKED_FROM_BYTES) {
+      data = await uploadInChunks(file, name || file.name, onProgress, hash)
+    } else if (!data) {
       const formData = new FormData()
       formData.append('file', file, name || file.name)
-      const xhr = new XMLHttpRequest()
-      xhr.open('POST', api('/api/upload'))
-      if (onProgress) {
-        xhr.upload.addEventListener('progress', (e) => {
-          if (e.lengthComputable) onProgress(e.loaded / e.total)
-        })
-      }
-      xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          try {
-            const data = JSON.parse(xhr.responseText)
-            const backendUrl = getBackendUrl()
-            if (backendUrl && data.url && data.url.startsWith('/')) {
-              resolve(`${backendUrl}${data.url}`)
-            } else {
-              resolve(data.url)
-            }
-          } catch { reject(new Error('Invalid response from server')) }
-        } else {
-          reject(new Error(`Upload failed: ${xhr.status}`))
-        }
-      }
-      xhr.onerror = () => reject(new Error('Upload network error'))
-      xhr.send(formData)
-    })
+      const query = hash ? `?hash=${hash}` : ''
+      data = await withUploadSlot(() => sendXhr('POST', api(`/api/upload${query}`), formData, onProgress))
+    }
+    const backendUrl = getBackendUrl()
+    const url = backendUrl && data.url && data.url.startsWith('/') ? `${backendUrl}${data.url}` : data.url
+    return { ...data, url }
   }, [])
+
+  // Show the backend's 480p H.264 copy instead of a local file this browser
+  // cannot decode (HEVC, 10-bit). The undo history is patched too, so undo
+  // never brings the black preview back. Not an undo step itself.
+  const switchToPlayableCopy = useCallback((libraryId, url) => {
+    const patch = (list) => list.map(t => ({
+      ...t,
+      clips: t.clips.map(c => (c.libraryId === libraryId ? { ...c, url, serverUrl: url } : c))
+    }))
+    historyRef.current = historyRef.current.map(patch)
+    setTracks(prev => patch(prev))
+    setLibrary(prev => prev.map(i => (i.id === libraryId ? { ...i, url, serverUrl: url, converting: false } : i)))
+  }, [])
+
+  // After an upload: take the backend's duration when the browser could not
+  // read it, and for footage the browser cannot show, wait for the 480p copy
+  // and switch the preview to it.
+  const afterUpload = useCallback(async (libraryId, probe, info) => {
+    if (!probe.durationKnown && info.duration) {
+      const fix = (list) => list.map(t => ({
+        ...t,
+        clips: t.clips.map(c => (c.libraryId === libraryId && c.startTime === 0 && c.endTime === probe.duration
+          ? { ...c, duration: info.duration, endTime: info.duration }
+          : c))
+      }))
+      historyRef.current = historyRef.current.map(fix)
+      setTracks(prev => fix(prev))
+      setLibrary(prev => prev.map(i => (i.id === libraryId ? { ...i, duration: info.duration } : i)))
+    }
+    if (probe.playable || !info.encodes) return
+
+    // Uploaded before and already converted: use that copy right away
+    if (info.encodeState === 'done') {
+      switchToPlayableCopy(libraryId, `${info.url}?v=480p`)
+      return
+    }
+
+    setLibrary(prev => prev.map(i => (i.id === libraryId ? { ...i, converting: true } : i)))
+    const deadline = Date.now() + Math.max(10 * 60, (info.duration || 0) * 4) * 1000
+    while (Date.now() < deadline) {
+      await new Promise(r => setTimeout(r, 2000))
+      let state = 'unknown'
+      try {
+        const res = await fetch(api(`/api/upload/status/${encodeURIComponent(info.filename)}`), { cache: 'no-store' })
+        const status = await res.json()
+        state = status.state
+        // For the "making it playable" popup
+        setLibrary(prev => prev.map(i => (i.id === libraryId
+          ? { ...i, convertProgress: status.progress ?? null, convertAhead: state === 'queued' ? status.ahead : 0 }
+          : i)))
+      } catch { state = 'retry' }
+      if (state === 'done') {
+        // New URL so no cached copy of the original is reused
+        switchToPlayableCopy(libraryId, `${info.url}?v=480p`)
+        return
+      }
+      if (state === 'failed' || state === 'unknown') break
+    }
+    console.warn(`[upload] No playable 480p copy for ${info.filename}`)
+    setLibrary(prev => prev.map(i => (i.id === libraryId ? { ...i, converting: false, convertFailed: true } : i)))
+  }, [switchToPlayableCopy])
 
   // Update a library item's serverUrl and all timeline clips that reference it.
   // Does NOT change clip.url (keeps the local blob URL for preview).
@@ -351,32 +547,30 @@ export function useTimeline() {
     setLibrary(prev => prev.map(item =>
       item.id === libraryId ? { ...item, serverUrl } : item
     ))
-    // Set serverUrl on all clips that reference this library item (preview keeps blob URL)
-    setTracksWithHistory(prev => {
-      let matchCount = 0
-      const updated = prev.map(track => ({
-        ...track,
-        clips: track.clips.map(clip => {
-          if (clip.libraryId === libraryId) {
-            matchCount++
-            return { ...clip, serverUrl }
-          }
-          return clip
-        })
-      }))
-      console.log(`[applyServerUrl] Matched ${matchCount} clips for serverUrl`)
-      return updated
-    })
-  }, [setTracksWithHistory])
+    // Set serverUrl on all clips that reference this library item (preview keeps
+    // blob URL). Uploads finish in the background while the creator edits, so
+    // this is not an undo step: the history snapshots get it too, and undo
+    // never takes a finished upload away.
+    const patch = (list) => list.map(track => ({
+      ...track,
+      clips: track.clips.map(clip => (clip.libraryId === libraryId && !clip.serverUrl ? { ...clip, serverUrl } : clip))
+    }))
+    historyRef.current = historyRef.current.map(patch)
+    setTracks(prev => patch(prev))
+  }, [])
 
   // Add files to library — uploads to backend for 480p encoding first, then makes available
-  const MAX_DURATION = MAX_TIMELINE_SECONDS // 2 minutes max (utils/limits.js)
+  // A song on an empty timeline defaults to the render limit (utils/limits.js)
+  const MAX_DURATION = MAX_TIMELINE_SECONDS
   const addToLibrary = useCallback(async (files) => {
-    for (const file of files) {
+    // Every file shows up in the library right away (durations read in
+    // parallel); the uploads then share the parallel upload slots
+    const media = keepImportable(files).filter(f => getMediaType(f))
+    const probes = await Promise.all(media.map(f => probeMedia(f)))
+    media.forEach(async (file, index) => {
       const type = getMediaType(file)
-      if (!type) continue
-
-      const duration = await getMediaDuration(file)
+      const probe = probes[index]
+      const duration = probe.duration
 
       const blobUrl = URL.createObjectURL(file)
       const itemId = generateLibraryId()
@@ -389,7 +583,9 @@ export function useTimeline() {
         name: file.name,
         duration,
         type,
-        uploading: true
+        uploading: true,
+        // This browser cannot show it: it has to be uploaded and converted first
+        needsConversion: type === 'video' && !probe.playable
       }
       setLibrary(prev => [...prev, newItem])
 
@@ -397,16 +593,20 @@ export function useTimeline() {
       if (type === 'video' || type === 'audio') {
         try {
           console.log(`[addToLibrary] Starting upload for ${file.name} (itemId=${itemId})`)
-          const serverUrl = await uploadFileToServer(file, file.name, (p) => {
+          const info = await uploadFileToServer(file, file.name, (p) => {
             setLibrary(prev => prev.map(i =>
               i.id === itemId ? { ...i, uploadProgress: p } : i
             ))
           })
+          const serverUrl = info.url
           console.log(`[addToLibrary] Upload complete: ${file.name} -> ${serverUrl}`)
           // Store server URL but keep blob URL for preview
           setLibrary(prev => prev.map(i =>
             i.id === itemId ? { ...i, serverUrl, uploading: false, uploadProgress: 1 } : i
           ))
+          // Clips already placed from the library while it uploaded
+          applyServerUrl(itemId, serverUrl)
+          afterUpload(itemId, probe, info)
         } catch (err) {
           console.warn(`[upload] Upload failed for ${file.name}:`, err.message)
           setLibrary(prev => prev.map(i =>
@@ -419,8 +619,8 @@ export function useTimeline() {
           i.id === itemId ? { ...i, uploading: false } : i
         ))
       }
-    }
-  }, [uploadFileToServer])
+    })
+  }, [uploadFileToServer, afterUpload, applyServerUrl, keepImportable])
 
   // Remove from library
   const removeFromLibrary = useCallback((itemId) => {
@@ -457,7 +657,7 @@ export function useTimeline() {
   // Music library: the song goes on its own "Music" track (never paired with a
   // video track), from 0:00, cut to the length of the video content, at half
   // volume so voices stay on top. `credit` rides along into the post.
-  const addMusicClip = useCallback(async (url, name, credit) => {
+  const addMusicClip = useCallback(async (url, name, credit, bpm = null) => {
     const meta = await getMediaMetadataFromURL(url, 'audio')
     const duration = meta.duration
     if (!duration) return null
@@ -473,7 +673,7 @@ export function useTimeline() {
           contentEnd = Math.max(contentEnd, (c.timelinePosition || 0) + (c.endTime - c.startTime))
         }
       }
-      const length = Math.min(duration, contentEnd > 0 ? contentEnd : MAX_DURATION, MAX_DURATION)
+      const length = Math.min(duration, contentEnd > 0 ? contentEnd : MAX_DURATION)
       const clip = {
         id: clipId,
         file: null,
@@ -496,6 +696,8 @@ export function useTimeline() {
         positionX: 0,
         positionY: 0,
         volume: 50,
+        // The library's tempo, a hint for Beat sync
+        ...(bpm ? { bpm } : {}),
         ...(credit ? { credit } : {})
       }
       // Reuse an empty music track, else add one below the others
@@ -515,10 +717,143 @@ export function useTimeline() {
     return clipId
   }, [setTracksWithHistory])
 
+  /**
+   * Open a saved project (useDrafts): its tracks and library replace the
+   * current ones, with a fresh undo history (undo must not go back to the
+   * empty editor the project was opened into).
+   */
+  const loadProjectState = useCallback((state) => {
+    const nextTracks = Array.isArray(state?.tracks) && state.tracks.length
+      ? state.tracks
+      : [{ id: generateTrackId(), type: 'video', name: 'Video 1', clips: [] }, { id: generateTrackId(), type: 'audio', name: 'Audio 1', clips: [] }]
+    historyRef.current = [JSON.parse(JSON.stringify(nextTracks))]
+    historyIndexRef.current = 0
+    setTracks(nextTracks)
+    setLibrary(Array.isArray(state?.library) ? state.library : [])
+    setSelectedClipId(null)
+  }, [])
+
+  /**
+   * Beat sync: lay the clips of the first video track (in order) on the beat,
+   * each `every` beats long, starting on the first beat. `beats` are timeline
+   * seconds; past the last one the grid goes on at the same tempo. A video
+   * shorter than its slot keeps its length and the next clip starts on the
+   * following beat. Linked audio moves and trims with its video. One undo step.
+   */
+  const fitClipsToBeats = useCallback((beats, every = 1) => {
+    if (!beats || beats.length < 2) return
+    const period = (beats[beats.length - 1] - beats[0]) / (beats.length - 1)
+    const beatAt = (i) => (i < beats.length ? beats[i] : beats[beats.length - 1] + (i - beats.length + 1) * period)
+    setTracksWithHistory(prev => {
+      const track = prev.find(t => t.type === 'video' && t.clips.length)
+      if (!track) return prev
+      const ordered = [...track.clips].sort((a, b) => (a.timelinePosition || 0) - (b.timelinePosition || 0))
+      const changes = new Map() // clip id -> { timelinePosition, endTime }
+      let beat = 0
+      for (const clip of ordered) {
+        const start = beatAt(beat)
+        const slot = beatAt(beat + every) - start
+        const isMedia = clip.type === 'video' || clip.type === 'audio'
+        const available = isMedia ? Math.max(0.1, (clip.duration || clip.endTime) - clip.startTime) : Infinity
+        let length = Math.min(slot, available)
+        // Shorter than its slot: next clip on the beat after this one ends
+        let used = every
+        if (length < slot) {
+          used = 1
+          while (beatAt(beat + used) - start < length - 0.01) used++
+        }
+        changes.set(clip.id, { timelinePosition: start, endTime: clip.startTime + length, groupId: clip.groupId })
+        beat += used
+      }
+      return prev.map(t => ({
+        ...t,
+        clips: t.clips.map(c => {
+          const own = changes.get(c.id)
+          if (own) return { ...c, timelinePosition: own.timelinePosition, endTime: own.endTime }
+          // Linked audio of a moved video: same place, same length
+          const twin = c.groupId ? [...changes.entries()].find(([, v]) => v.groupId === c.groupId) : null
+          if (twin) {
+            const v = ordered.find(o => o.id === twin[0])
+            return { ...c, timelinePosition: twin[1].timelinePosition, endTime: c.startTime + (twin[1].endTime - v.startTime) }
+          }
+          return c
+        })
+      }))
+    })
+  }, [setTracksWithHistory])
+
+  /**
+   * A sticker at `position` (the playhead) on a "Stickers" video track above
+   * the footage: the first one with room there, else a new one on top.
+   * `sticker` is either { kind: 'image', url, name, zoom } (emoji, badge,
+   * shape, logo: an image clip) or { kind: 'text', name, text, props } (a
+   * pre-styled text box: an ordinary, editable text clip). Returns the clip id.
+   */
+  const addStickerClip = useCallback((sticker, position, length = 3) => {
+    const clipId = generateClipId()
+    const start = Math.max(0, position || 0)
+    const end = start + length
+    const base = {
+      id: clipId, startTime: 0, endTime: length, duration: length, timelinePosition: start,
+      audioEnabled: false, zoom: 100, positionX: 0, positionY: 0, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100,
+      sticker: true
+    }
+    const clip = sticker.kind === 'text'
+      ? { ...base, type: 'text', name: sticker.name, text: sticker.text, textAlign: 'center', backgroundColor: 'transparent', ...sticker.props }
+      : { ...base, type: 'image', name: sticker.name, url: sticker.url, serverUrl: null, file: null, zoom: sticker.zoom || 40 }
+    setTracksWithHistory(prev => {
+      const fits = (t) => t.clips.every(c => {
+        const cs = c.timelinePosition || 0
+        return cs + (c.endTime - c.startTime) <= start + 0.001 || cs >= end - 0.001
+      })
+      const free = prev.find(t => t.type === 'video' && t.stickers && fits(t))
+      if (free) return prev.map(t => (t.id === free.id ? { ...t, clips: [...t.clips, clip] } : t))
+      const count = prev.filter(t => t.type === 'video' && t.stickers).length
+      // Track 0 draws on top: stickers go above everything
+      return [{ id: generateTrackId(), type: 'video', name: count ? `Stickers ${count + 1}` : 'Stickers', stickers: true, clips: [clip] }, ...prev]
+    })
+    return clipId
+  }, [setTracksWithHistory])
+
+  /**
+   * A sound effect at `position` (the playhead), full length, on an "SFX"
+   * audio track: the first one with room there, else a new one.
+   */
+  const addSfxClip = useCallback(async (url, name, position) => {
+    const meta = await getMediaMetadataFromURL(url, 'audio')
+    const duration = meta.duration
+    if (!duration) return null
+    const libraryId = generateLibraryId()
+    setLibrary(prev => [...prev, { id: libraryId, file: null, url, name, duration, type: 'audio' }])
+    const clipId = generateClipId()
+    const start = Math.max(0, position || 0)
+    const end = start + duration
+
+    setTracksWithHistory(prev => {
+      const clip = {
+        id: clipId, file: null, url, serverUrl: null, name, duration,
+        startTime: 0, endTime: duration, timelinePosition: start,
+        audioEnabled: true, type: 'audio', libraryId, groupId: null,
+        zoom: 100, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100, positionX: 0, positionY: 0,
+        volume: 100
+      }
+      const fits = (t) => t.clips.every(c => {
+        const cs = c.timelinePosition || 0
+        return cs + (c.endTime - c.startTime) <= start + 0.001 || cs >= end - 0.001
+      })
+      const free = prev.find(t => t.type === 'audio' && t.sfx && fits(t))
+      if (free) return prev.map(t => (t.id === free.id ? { ...t, clips: [...t.clips, clip] } : t))
+      const count = prev.filter(t => t.type === 'audio' && t.sfx).length
+      return [...prev, { id: generateTrackId(), type: 'audio', name: count ? `SFX ${count + 1}` : 'SFX', sfx: true, clips: [clip] }]
+    })
+    return clipId
+  }, [setTracksWithHistory])
+
   // Add media from URL to library AND place on timeline
   // options: { clipStart?: number, clipEnd?: number } — optional trim range
   const addToLibraryAndTimeline = useCallback(async (url, name, mediaType, options = {}) => {
     if (!mediaType || !['video', 'audio', 'image'].includes(mediaType)) return
+    if (options.file && !keepImportable([options.file]).length) return
 
     const meta = await getMediaMetadataFromURL(url, mediaType)
     const duration = meta.duration
@@ -553,6 +888,7 @@ export function useTimeline() {
     const targetTrackType = mediaType === 'audio' ? 'audio' : 'video'
     const newClipId = generateClipId()
 
+    lengthCheckRef.current = true
     setTracksWithHistory(prev => {
       const targetTrack = prev.find(t => t.type === targetTrackType)
       if (!targetTrack) return prev
@@ -562,20 +898,6 @@ export function useTimeline() {
       for (const clip of targetTrack.clips) {
         const clipEnd2 = (clip.timelinePosition || 0) + (clip.endTime - clip.startTime)
         timelinePosition = Math.max(timelinePosition, clipEnd2)
-      }
-
-      // Auto-trim to fit within the timeline limit
-      let clipDuration = clipEnd - clipStart
-      const remaining = Math.max(0, MAX_DURATION - timelinePosition)
-      if (remaining <= 0) {
-        setTimeout(() => alert(`Timeline is full (${MAX_TIMELINE_TEXT}). Remove a clip to make room.`), 0)
-        return prev
-      }
-      if (timelinePosition + clipDuration > MAX_DURATION) {
-        clipEnd = clipStart + remaining
-        clipDuration = remaining
-        // Songs are expected to run longer than a short; trim them quietly
-        if (!options.quiet) setTimeout(() => alert(`Clip trimmed to ${Math.round(remaining)}s to fit within the ${MAX_TIMELINE_ADJ} timeline.`), 0)
       }
 
       // Generate a groupId for video+audio pairs
@@ -640,9 +962,28 @@ export function useTimeline() {
 
       return updatedTracks
     })
+
+    // The creator's own file (from the 3Speak uploader): if this browser cannot
+    // show it, upload it now so its 480p copy can stand in for the preview
+    if (options.file && mediaType === 'video') {
+      probeMedia(options.file).then(probe => {
+        if (probe.playable) return
+        const patchItem = (fields) => setLibrary(prev => prev.map(i => (i.id === libraryId ? { ...i, ...fields } : i)))
+        patchItem({ needsConversion: true, uploading: true, uploadProgress: 0 })
+        return uploadFileToServer(options.file, item.name, (p) => patchItem({ uploadProgress: p })).then(info => {
+          patchItem({ uploading: false, uploadProgress: 1 })
+          applyServerUrl(libraryId, info.url)
+          afterUpload(libraryId, { ...probe, duration }, info)
+        }, err => {
+          patchItem({ uploading: false, uploadError: err.message })
+          throw err
+        })
+      }).catch(err => console.warn(`[load-media] Upload for preview failed: ${err.message}`))
+    }
+
     // The updater may run later, so callers look the clip up in `tracks` by id
     return { clipId: newClipId }
-  }, [setTracksWithHistory])
+  }, [setTracksWithHistory, uploadFileToServer, applyServerUrl, afterUpload, keepImportable])
 
   /**
    * Place a finished recording for a remix mode.
@@ -665,6 +1006,7 @@ export function useTimeline() {
     const videoClipId = generateClipId()
     const groupId = generateGroupId()
 
+    lengthCheckRef.current = true
     setTracksWithHistory(prev => {
       let tracksNext = prev
       let videoTrack
@@ -688,18 +1030,7 @@ export function useTimeline() {
 
       let length = duration
       if (maxDuration != null) length = Math.min(length, maxDuration)
-      if (placement === 'before') {
-        // Room left = the timeline limit minus what is already on the timeline
-        let used = 0
-        for (const t of tracksNext) for (const c of t.clips) used = Math.max(used, (c.timelinePosition || 0) + (c.endTime - c.startTime))
-        length = Math.min(length, MAX_DURATION - used)
-      } else {
-        length = Math.min(length, MAX_DURATION - position)
-      }
-      if (length <= 0.05) {
-        setTimeout(() => alert(`Timeline is full (${MAX_TIMELINE_TEXT}). Remove a clip to make room.`), 0)
-        return prev
-      }
+      if (length <= 0.05) return prev
       if (placement === 'before') {
         // Make room at the start: shift every existing clip right
         tracksNext = tracksNext.map(t => ({
@@ -757,6 +1088,7 @@ export function useTimeline() {
     // Images go on video tracks, audio on audio tracks
     const targetTrackType = libraryItem.type === 'audio' ? 'audio' : 'video'
 
+    lengthCheckRef.current = true
     setTracksWithHistory(prev => {
       let targetTrack = trackId
         ? prev.find(t => t.id === trackId)
@@ -788,18 +1120,6 @@ export function useTimeline() {
         timelinePosition = maxEnd
       }
 
-      // Auto-trim to fit within the timeline limit
-      const remaining = Math.max(0, MAX_DURATION - timelinePosition)
-      if (remaining <= 0) {
-        setTimeout(() => alert(`Timeline is full (${MAX_TIMELINE_TEXT}). Remove a clip to make room.`), 0)
-        return prev
-      }
-      let trimmedDuration = libraryItem.duration
-      if (timelinePosition + libraryItem.duration > MAX_DURATION) {
-        trimmedDuration = remaining
-        setTimeout(() => alert(`Clip trimmed to ${Math.round(remaining)}s to fit within the ${MAX_TIMELINE_ADJ} timeline.`), 0)
-      }
-
       // Generate a groupId for video+audio pairs
       const groupId = libraryItem.type === 'video' ? generateGroupId() : null
 
@@ -811,7 +1131,7 @@ export function useTimeline() {
         name: libraryItem.name,
         duration: libraryItem.duration,
         startTime: 0,
-        endTime: trimmedDuration,
+        endTime: libraryItem.duration,
         timelinePosition,
         audioEnabled: libraryItem.type === 'video' ? false : true,
         type: libraryItem.type,
@@ -866,11 +1186,12 @@ export function useTimeline() {
 
   // Add files directly to a specific track (for compact mode "+" buttons)
   const addFilesToTrack = useCallback(async (files, trackId) => {
-    for (const file of files) {
+    for (const file of keepImportable(files)) {
       const type = getMediaType(file)
       if (!type) continue
 
-      const duration = await getMediaDuration(file)
+      const probe = await probeMedia(file)
+      const duration = probe.duration
 
       // Allow files longer than the timeline limit — they'll be trimmed when placed on timeline
 
@@ -878,7 +1199,11 @@ export function useTimeline() {
       const libraryId = generateLibraryId()
 
       // Add to library with uploading state
-      const item = { id: libraryId, file, url, name: file.name, duration, type, uploading: type === 'video' || type === 'audio' }
+      const item = {
+        id: libraryId, file, url, name: file.name, duration, type,
+        uploading: type === 'video' || type === 'audio',
+        needsConversion: type === 'video' && !probe.playable
+      }
       setLibrary(prev => [...prev, item])
 
       // Upload video/audio to backend for 480p encoding
@@ -888,13 +1213,15 @@ export function useTimeline() {
           setLibrary(prev => prev.map(i =>
             i.id === libraryId ? { ...i, uploadProgress: p } : i
           ))
-        }).then(serverUrl => {
+        }).then(info => {
+          const serverUrl = info.url
           console.log(`[addFilesToTrack] Upload complete: ${file.name} -> ${serverUrl}`)
           // Store server URL but keep blob URL for preview
           setLibrary(prev => prev.map(i =>
             i.id === libraryId ? { ...i, serverUrl, uploading: false, uploadProgress: 1 } : i
           ))
           applyServerUrl(libraryId, serverUrl)
+          afterUpload(libraryId, probe, info)
         }).catch(err => {
           console.error(`[addFilesToTrack] Upload FAILED for ${file.name}:`, err.message)
           setLibrary(prev => prev.map(i =>
@@ -906,6 +1233,7 @@ export function useTimeline() {
       // Place on the specified track
       const targetTrackType = type === 'audio' ? 'audio' : 'video'
 
+      lengthCheckRef.current = true
       setTracksWithHistory(prev => {
         const targetTrack = prev.find(t => t.id === trackId)
         if (!targetTrack) return prev
@@ -920,18 +1248,6 @@ export function useTimeline() {
           maxEnd = Math.max(maxEnd, clipEnd)
         }
 
-        // Auto-trim to fit within the timeline limit
-        const remaining = Math.max(0, MAX_DURATION - maxEnd)
-        if (remaining <= 0) {
-          setTimeout(() => alert(`Timeline is full (${MAX_TIMELINE_TEXT}). Remove a clip to make room.`), 0)
-          return prev
-        }
-        let trimmedDuration = duration
-        if (maxEnd + duration > MAX_DURATION) {
-          trimmedDuration = remaining
-          setTimeout(() => alert(`Clip trimmed to ${Math.round(remaining)}s to fit within the ${MAX_TIMELINE_ADJ} timeline.`), 0)
-        }
-
         const groupId = type === 'video' ? generateGroupId() : null
 
         const newClip = {
@@ -941,7 +1257,7 @@ export function useTimeline() {
           name: file.name,
           duration,
           startTime: 0,
-          endTime: trimmedDuration,
+          endTime: duration,
           timelinePosition: maxEnd,
           audioEnabled: type === 'video' ? false : true,
           type,
@@ -985,7 +1301,7 @@ export function useTimeline() {
         return updatedTracks
       })
     }
-  }, [setTracksWithHistory])
+  }, [setTracksWithHistory, uploadFileToServer, applyServerUrl, afterUpload, keepImportable])
 
   // Add a new track (prepend so new tracks appear on top)
   const addTrack = useCallback((type = 'video') => {
@@ -1171,10 +1487,21 @@ export function useTimeline() {
       fileStoreRef.current.delete(id)
     }
 
-    setTracksWithHistory(prev => prev.map(track => ({
-      ...track,
-      clips: track.clips.filter(c => !idsToRemove.has(c.id))
-    })))
+    setTracksWithHistory(prev => prev.map(track => {
+      const removed = track.clips.filter(c => idsToRemove.has(c.id))
+      if (!removed.length) return track
+      const kept = track.clips.filter(c => !idsToRemove.has(c.id))
+      // Deleting the first clip of a track ripples: the rest of the track moves
+      // left so the next clip starts where the deleted one did (a gap at the
+      // start is never wanted). Gaps further along stay as they are.
+      const pos = (c) => c.timelinePosition || 0
+      const first = track.clips.reduce((a, c) => (pos(c) < pos(a) ? c : a), track.clips[0])
+      if (!idsToRemove.has(first.id) || !kept.length) return { ...track, clips: kept }
+      // The next clip takes the deleted one's start; the rest keep their spacing
+      const shift = Math.min(...kept.map(pos)) - pos(first)
+      if (shift <= 0) return { ...track, clips: kept }
+      return { ...track, clips: kept.map(c => ({ ...c, timelinePosition: Math.max(0, pos(c) - shift) })) }
+    }))
 
     setSelectedClipId(prev => idsToRemove.has(prev) ? null : prev)
   }, [setTracksWithHistory, tracks])
@@ -1486,6 +1813,71 @@ export function useTimeline() {
     })
   }, [setTracksWithHistory])
 
+  /**
+   * Auto cut: replace a clip (and its linked audio/video twin) with numbered
+   * parts. `parts` are {start, end} in source media seconds, in order.
+   * closeGaps false: each part stays where it was (split at the pauses).
+   * closeGaps true: parts are packed back to back and everything after the
+   * original clip moves left by what was cut out (pauses removed).
+   * One undo step.
+   */
+  const applySilenceCut = useCallback((clipId, parts, { closeGaps = false } = {}) => {
+    if (!parts?.length) return
+    setTracksWithHistory(prev => {
+      let target = null
+      for (const t of prev) {
+        target = t.clips.find(c => c.id === clipId)
+        if (target) break
+      }
+      if (!target) return prev
+
+      const pos = target.timelinePosition || 0
+      const originalLength = target.endTime - target.startTime
+      const originalEnd = pos + originalLength
+      // The linked twin covers exactly the same media and time span
+      const same = (c) => c.id === target.id || (
+        target.groupId && c.groupId === target.groupId &&
+        Math.abs((c.timelinePosition || 0) - pos) < 0.001 &&
+        Math.abs(c.startTime - target.startTime) < 0.001 &&
+        Math.abs(c.endTime - target.endTime) < 0.001
+      )
+      const keptLength = parts.reduce((sum, p) => sum + (p.end - p.start), 0)
+      const removed = closeGaps ? Math.max(0, originalLength - keptLength) : 0
+      const groupIds = parts.map(() => (target.groupId ? generateGroupId() : null))
+
+      return prev.map(track => {
+        if (!track.clips.some(same) && !removed) return track
+        const clips = []
+        for (const c of track.clips) {
+          if (same(c)) {
+            const file = fileStoreRef.current.get(c.id)
+            const baseName = (c.name || '').replace(/^Part \d+ · /, '')
+            let packed = pos
+            parts.forEach((p, i) => {
+              const part = {
+                ...c,
+                id: i === 0 ? c.id : generateClipId(),
+                name: `Part ${i + 1} · ${baseName}`,
+                startTime: p.start,
+                endTime: p.end,
+                timelinePosition: closeGaps ? packed : pos + (p.start - target.startTime),
+                groupId: groupIds[i]
+              }
+              packed += p.end - p.start
+              if (file && i > 0) fileStoreRef.current.set(part.id, file)
+              clips.push(part)
+            })
+          } else if (removed && (c.timelinePosition || 0) >= originalEnd - 0.001) {
+            clips.push({ ...c, timelinePosition: (c.timelinePosition || 0) - removed })
+          } else {
+            clips.push(c)
+          }
+        }
+        return { ...track, clips }
+      })
+    })
+  }, [setTracksWithHistory])
+
   // Legacy split clip (relative time)
   const splitClip = useCallback((clipId, splitTime) => {
     setTracksWithHistory(prev => prev.map(track => {
@@ -1779,6 +2171,11 @@ export function useTimeline() {
     groupClips,
     ungroupClips,
     getTotalDuration,
+    applySilenceCut,
+    addSfxClip,
+    addStickerClip,
+    fitClipsToBeats,
+    loadProjectState,
     findClip,
     fileStoreRef,
 
@@ -1791,6 +2188,14 @@ export function useTimeline() {
     undo,
     redo,
     canUndo,
-    canRedo
+    canRedo,
+
+    // Over-the-limit notice after an import
+    lengthNotice,
+    dismissLengthNotice,
+
+    // Files refused at import (too big)
+    rejectedFiles,
+    dismissRejectedFiles
   }
 }

@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useMemo, useCallback, Fragment } from 'react'
+import { useRef, useEffect, useLayoutEffect, useState, useMemo, useCallback, Fragment } from 'react'
 import { Play, Pause, SkipBack, Minus, Plus, Maximize, Minimize2, Repeat } from 'lucide-react'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 
@@ -10,8 +10,53 @@ function formatTime(seconds) {
 
 const SIZES = ['small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge', 'huge', 'massive', 'giant', 'max', 'fullscreen']
 const UI_UPDATE_INTERVAL = 50 // ~20fps for React state updates during playback
+// Clips starting within this many seconds are mounted (hidden) and seeked to
+// their first frame ahead of time, so a cut plays without a flash
+const PRELOAD_AHEAD = 1.5
+// ...and start playing (hidden / silent) this long before their cut, from the
+// matching earlier point of the file, so at the cut they are already running
+const PREROLL = 0.4
+
+// Start a hidden/silent element early so it reaches the clip's first frame
+// exactly at the cut. `target()` is where it should be right now. Play start-up
+// takes a few frames, so once it is really playing it is corrected once.
+function prerollElement(el, target) {
+  if (Math.abs(el.currentTime - target()) > 0.04) el.currentTime = target()
+  el.dataset.preroll = '1'
+  el.addEventListener('playing', () => {
+    if (Math.abs(el.currentTime - target()) > 0.03) el.currentTime = target()
+  }, { once: true })
+  el.play().catch(() => {})
+}
+
+// A freshly loaded <video> first paints the file's frame 0, and only then
+// seeks to where the clip starts. Keep it invisible until it sits at its frame.
+// Sticker motion pivots, as offsets from the element's centre (motionStyle):
+// text boxes in % of the box itself, images in px of the contain-fit image
+function textPivot(motion) {
+  const p = pivotPoint(motion, 0, 0, 100, 100)
+  return { x: p.x, y: p.y, unit: '%' }
+}
+function imagePivot(motion, nw, nh, frameW, frameH) {
+  if (!nw || !nh || !frameW || !frameH) return null
+  const k = Math.min(frameW / nw, frameH / nh)
+  const p = pivotPoint(motion, 0, 0, nw * k, nh * k)
+  return { x: p.x, y: p.y, unit: 'px' }
+}
+
+function hideUntilPositioned(el) {
+  el.classList.add('preview-video-pending')
+  const reveal = () => {
+    el.classList.remove('preview-video-pending')
+    el.removeEventListener('seeked', reveal)
+  }
+  el.addEventListener('seeked', reveal)
+  setTimeout(reveal, 1500) // never stay hidden if no seek happens
+}
 
 import InlineRecorder from './InlineRecorder'
+import { clipColorFilter } from './ClipColorFilters'
+import { motionStyle, normalizeMotion, pivotPoint } from '../utils/stickerMotion'
 import usePhoneLayout from '../hooks/usePhoneLayout'
 import { REMIX_LAYOUTS, hasLayout, clampLayout, layoutPan, layoutZoom, LAYOUT_ZOOM_MIN, LAYOUT_ZOOM_MAX } from '../utils/remixLayout'
 import { getClipChromaKey } from '../utils/chromaKey'
@@ -43,8 +88,59 @@ const STAGE_LAYOUTS = [
 const ASPECT_RATIOS = ['auto', '16:9', '9:16', '4:3', '1:1']
 const RATIO_LABELS = { 'auto': 'Auto', '16:9': '16:9', '9:16': '9:16', '4:3': '4:3', '1:1': '1:1' }
 
-function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVideo, activeAspectRatio, aspectRatioOverride, onSetAspectRatio, selectedClipId, onUpdateClip, onSelectClip, compact, inlineRecording, onRecordedInline, onCloseInlineRecorder, recorderSize, onSetRecorderSize, recorderGuide, onChangeRemixMode, onChangeStageLayout, controlRef }) {
+/**
+ * A text clip's text (and its box), shrunk to the widest line.
+ *
+ * A wrapped box takes the whole available width, so a two-line text box stretched
+ * almost edge to edge here while the render hugs the text: the backend sizes the
+ * box from the measured widest line (see useIframeApi). Measure the lines the
+ * browser actually laid out and give the box exactly that width, plus its padding
+ * and border, which is how the backend sizes it too.
+ */
+function FitTextBox({ measureKey, children, ...rest }) {
+  const ref = useRef(null)
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return undefined
+    const fit = () => {
+      // Measure unrotated and at the natural wrap
+      const transform = el.style.transform
+      el.style.transform = 'none'
+      el.style.width = ''
+      const range = document.createRange()
+      range.selectNodeContents(el)
+      // Line boxes come back in screen pixels: undo the layer's zoom above
+      const scale = el.offsetWidth ? el.getBoundingClientRect().width / el.offsetWidth : 1
+      let widest = 0
+      for (const r of range.getClientRects()) widest = Math.max(widest, r.width / (scale || 1))
+      if (widest > 0) {
+        const cs = getComputedStyle(el)
+        const edges = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight)
+          + parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth)
+        // +1px so sub-pixel rounding can never push the last word onto a new line
+        el.style.width = `${Math.ceil(widest + edges) + 1}px`
+      }
+      el.style.transform = transform
+    }
+    fit()
+    const ro = typeof ResizeObserver !== 'undefined' && el.parentElement ? new ResizeObserver(fit) : null
+    ro?.observe(el.parentElement)
+    let live = true
+    document.fonts?.ready.then(() => { if (live) fit() })
+    return () => { live = false; ro?.disconnect() }
+  }, [measureKey])
+  return <span ref={ref} {...rest}>{children}</span>
+}
+
+function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVideo, activeAspectRatio, aspectRatioOverride, onSetAspectRatio, selectedClipId, onUpdateClip, onSelectClip, compact, inlineRecording, onRecordedInline, onCloseInlineRecorder, recorderSize, onSetRecorderSize, recorderGuide, onChangeRemixMode, onChangeStageLayout, controlRef, emptyActions }) {
   const videoRefs = useRef({}) // Map of clip ID to video element
+  // Sticker motion: the layer container (= the frame) and the moving clips,
+  // which the playback loop moves every frame (React renders only ~20/s)
+  const layerContainerRef = useRef(null)
+  const motionClipsRef = useRef({}) // clip id -> { motion, start, duration, kind, opacity }
+  // Natural sizes of image clips (for an off-centre pivot), learned on load
+  const imageSizeRef = useRef({})
+  const [, setImageSizeTick] = useState(0)
   const hlsRefs = useRef({}) // Map of clip ID to HLS instance
   const animationRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -98,6 +194,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
     if (boundVideoElsRef.current[clip.id] === el) return // same element, re-render
     boundVideoElsRef.current[clip.id] = el
     if (!loadedUrlsRef.current[clip.id]) return // first load: the effects handle it
+    hideUntilPositioned(el)
     setVideoSource(el, clip.id, clip.url)
     loadedUrlsRef.current[clip.id] = clip.url
     el.addEventListener('loadeddata', () => {
@@ -140,6 +237,13 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         timelineEnd: (clip.timelinePosition || 0) + (clip.endTime - clip.startTime)
       }))
   }, [tracks])
+
+  // Audio elements exist only around the playhead (playing, or starting within
+  // PRELOAD_AHEAD); a long timeline or many Auto cut parts no longer keep one
+  // buffered element per clip
+  const mountedAudioClips = useMemo(() => audioClips.filter(clip =>
+    clip.timelineEnd > playheadPosition - 0.25 && clip.timelineStart <= playheadPosition + PRELOAD_AHEAD
+  ), [audioClips, playheadPosition])
 
   const currentAudioClips = useMemo(() => {
     return audioClips.filter(clip =>
@@ -185,9 +289,67 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   const topClip = currentClips[0] || null
   const reversedClips = useMemo(() => [...currentClips].reverse(), [currentClips])
 
+  // Video clips about to start (see PRELOAD_AHEAD): rendered hidden after the
+  // visible layers and parked at their first frame
+  const upcomingClips = useMemo(() => {
+    const visibleIds = new Set(currentClips.map(c => c.id))
+    return videoClips.filter(c => c.type === 'video' && c.url && !visibleIds.has(c.id) &&
+      c.timelineStart > playheadPosition && c.timelineStart - playheadPosition <= PRELOAD_AHEAD)
+  }, [videoClips, currentClips, playheadPosition])
+
+  // At a cut the clip that just ended stays on screen underneath, paused on its
+  // last frame, until the next clip has actually painted a frame. Otherwise the
+  // empty background shows for a moment while the new video gets its first
+  // frame onto the screen. Worked out during render (not in an effect), so the
+  // ending clip's element is never unmounted in between.
+  const holdRef = useRef({ prev: [], held: [], incoming: [] })
+  const [holdTick, setHoldTick] = useState(0)
+  const heldClips = useMemo(() => {
+    const h = holdRef.current
+    const nowIds = new Set(currentClips.map(c => c.id))
+    if (h.prev !== currentClips) {
+      const prevIds = new Set(h.prev.map(c => c.id))
+      const incoming = currentClips.filter(c => c.type === 'video' && !prevIds.has(c.id))
+      const outgoing = h.prev.filter(c => c.type === 'video' && !nowIds.has(c.id))
+      // Hold only across a cut into another video (a gap or the end stays empty)
+      if (incoming.length && outgoing.length) {
+        h.held = [...h.held.filter(c => !outgoing.some(o => o.id === c.id)), ...outgoing]
+        h.incoming = incoming
+      }
+      h.prev = currentClips
+    }
+    h.held = h.held.filter(c => !nowIds.has(c.id))
+    return h.held
+  }, [currentClips, holdTick])
+
+  // Release the held clip once every new clip has painted (600 ms at most)
+  useEffect(() => {
+    const h = holdRef.current
+    const incoming = h.incoming
+    if (!incoming.length) return
+    h.incoming = []
+    const heldIds = heldClips.map(c => c.id)
+    let released = false
+    const release = () => {
+      if (released) return
+      released = true
+      h.held = h.held.filter(c => !heldIds.includes(c.id))
+      setHoldTick(t => t + 1)
+    }
+    setTimeout(release, 600)
+    let waiting = incoming.length
+    const painted = () => { if (--waiting <= 0) release() }
+    incoming.forEach(clip => {
+      const el = videoRefs.current[clip.id]
+      if (!el) return painted()
+      if (el.requestVideoFrameCallback) el.requestVideoFrameCallback(() => painted())
+      else el.addEventListener('timeupdate', painted, { once: true })
+    })
+  }, [heldClips])
+
   // Clean up resources when clips leave the viewport
   useEffect(() => {
-    const renderedIds = new Set(currentClips.filter(c => c.type !== 'image').map(c => c.id))
+    const renderedIds = new Set([...heldClips, ...currentClips, ...upcomingClips].filter(c => c.type !== 'image').map(c => c.id))
     for (const id of Object.keys(loadedUrlsRef.current)) {
       if (!renderedIds.has(id)) {
         delete loadedUrlsRef.current[id]
@@ -199,7 +361,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         delete hlsRefs.current[id]
       }
     }
-  }, [currentClips])
+  }, [currentClips, upcomingClips, heldClips])
 
   // Calculate the media time within a clip
   const getMediaTime = useCallback((clip, position) => {
@@ -212,7 +374,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
 
   // Stable ref to latest values — RAF loop reads these without triggering re-renders
   const latestRef = useRef({})
-  latestRef.current = { findClipsAtPosition, getMediaTime, totalDuration, onSetPlayhead, setVideoSource, audioClips }
+  latestRef.current = { findClipsAtPosition, getMediaTime, totalDuration, onSetPlayhead, setVideoSource, audioClips, videoClips }
   loopRef.current = loop
 
   // Jump while playing: move the clock and every playing element to `pos`.
@@ -267,6 +429,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
 
       // Always ensure source is loaded
       if (loadedUrlsRef.current[clip.id] !== clip.url) {
+        hideUntilPositioned(videoEl)
         setVideoSource(videoEl, clip.id, clip.url)
         loadedUrlsRef.current[clip.id] = clip.url
 
@@ -289,6 +452,24 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       }
     })
   }, [playheadPosition, currentClips, getMediaTime, setVideoSource])
+
+  // Park upcoming clips at their first frame, paused and hidden
+  useEffect(() => {
+    upcomingClips.forEach(clip => {
+      const el = videoRefs.current[clip.id]
+      if (!el) return
+      if (loadedUrlsRef.current[clip.id] !== clip.url) {
+        setVideoSource(el, clip.id, clip.url)
+        loadedUrlsRef.current[clip.id] = clip.url
+        el.addEventListener('loadedmetadata', () => {
+          if (el.paused) el.currentTime = Math.max(0, clip.startTime - PREROLL)
+        }, { once: true })
+      } else if (el.paused && el.readyState >= 1 && Math.abs(el.currentTime - Math.max(0, clip.startTime - PREROLL)) > 0.05) {
+        // Parked where the pre-roll starts, so starting it needs no seek
+        el.currentTime = Math.max(0, clip.startTime - PREROLL)
+      }
+    })
+  }, [upcomingClips, setVideoSource])
 
   // Sync muted/volume state imperatively after every render.
   // Video clips are all muted — audio comes from the audio track clips.
@@ -347,6 +528,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       const videoEl = videoRefs.current[clip.id]
       if (!videoEl) return
       if (loadedUrlsRef.current[clip.id] !== clip.url) {
+        hideUntilPositioned(videoEl)
         latestRef.current.setVideoSource(videoEl, clip.id, clip.url)
         loadedUrlsRef.current[clip.id] = clip.url
       }
@@ -417,12 +599,51 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         onSetPlayhead(newPosition)
       }
 
+      // Sticker motion: move the moving layers to this exact moment
+      const frameH = layerContainerRef.current?.clientHeight || 0
+      layerContainerRef.current?.querySelectorAll('[data-motion-id]').forEach(el => {
+        const mc = motionClipsRef.current[el.dataset.motionId]
+        if (!mc) return
+        const frameW = layerContainerRef.current?.clientWidth || 0
+        const pv = mc.kind === 'text'
+          ? textPivot(mc.motion)
+          : imagePivot(mc.motion, el.naturalWidth, el.naturalHeight, frameW, frameH)
+        const st = motionStyle(mc.motion, newPosition - mc.start, mc.duration, frameH, pv)
+        el.style.transform = `${el.dataset.motionBase || ''} ${st.transform}`.trim()
+        el.style.opacity = String(mc.opacity * st.opacity)
+      })
+
+      // Pre-roll clips about to start (see PREROLL): hidden video / silent audio
+      const { videoClips: allVideoClips, audioClips: preAudioClips } = latestRef.current
+      for (const clip of allVideoClips) {
+        if (clip.type !== 'video') continue
+        const lead = clip.timelineStart - newPosition
+        // A clip starting at the very beginning of its file has nothing to pre-roll from
+        if (lead <= 0 || lead > PREROLL || clip.startTime - lead < 0) continue
+        const el = videoRefs.current[clip.id]
+        if (!el || !el.paused || el.readyState < 2 || loadedUrlsRef.current[clip.id] !== clip.url) continue
+        el.muted = true
+        prerollElement(el, () => clip.startTime - (clip.timelineStart - playbackPosRef.current))
+      }
+      for (const clip of preAudioClips) {
+        const lead = clip.timelineStart - newPosition
+        if (lead <= 0 || lead > PREROLL || clip.startTime - lead < 0) continue
+        const el = audioRefs.current[clip.id]
+        if (!el || !el.paused || el.readyState < 2) continue
+        el.volume = 0 // silent until its clip starts (the loop sets its volume then)
+        prerollElement(el, () => clip.startTime - (clip.timelineStart - playbackPosRef.current))
+      }
+
       // Check for clip transitions
       const clipsAtPos = findClipsAtPosition(newPosition)
       const newTopClip = clipsAtPos[0]
       const newTopId = newTopClip?.id || null
 
       if (newTopId !== activeTopClipIdRef.current) {
+        // Show the new clip on the very next frame instead of the next
+        // throttled UI update (else the old one stands frozen up to 50ms)
+        lastUiUpdateRef.current = currentTime
+        onSetPlayhead(newPosition)
         // Top clip changed — pause old top if it's no longer visible at all
         if (activeTopClipIdRef.current) {
           const stillVisible = clipsAtPos.some(c => c.id === activeTopClipIdRef.current)
@@ -448,7 +669,16 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
           videoEl.play().catch(() => {})
         }
 
+        // Pre-rolled: already playing; correct only a clear drift
+        if (videoEl.dataset.preroll && !videoEl.paused) {
+          delete videoEl.dataset.preroll
+          const target = getMediaTime(clip, newPosition)
+          if (Math.abs(videoEl.currentTime - target) > 0.12) videoEl.currentTime = target
+          return
+        }
+
         if (loadedUrlsRef.current[clip.id] !== clip.url) {
+          hideUntilPositioned(videoEl)
           latestRef.current.setVideoSource(videoEl, clip.id, clip.url)
           loadedUrlsRef.current[clip.id] = clip.url
           videoEl.addEventListener('loadeddata', function onReady() {
@@ -619,8 +849,18 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
     onSetPlayhead(clamped)
   }, [totalDuration, onSetPlayhead])
 
-  const handleSeek = (e) => {
+  // Mouse: press anywhere on the scrubber (its padding included) and drag
+  const handleScrubberMouseDown = (e) => {
+    if (e.button !== 0) return
+    e.preventDefault()
     seekFromX(e.clientX)
+    const move = (ev) => seekFromX(ev.clientX)
+    const up = () => {
+      document.removeEventListener('mousemove', move)
+      document.removeEventListener('mouseup', up)
+    }
+    document.addEventListener('mousemove', move)
+    document.addEventListener('mouseup', up)
   }
 
   // Touch drag for scrubber
@@ -688,6 +928,11 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
     }
     if (posX !== 0 || posY !== 0) {
       transforms.push(`translate(${posX}px, ${posY}px)`)
+    }
+    // Last, so an image turns around its own centre (the layer is the full canvas
+    // with the image contain-fit in the middle). Text turns its box instead, below.
+    if (clip.type === 'image' && clip.rotation) {
+      transforms.push(`rotate(${clip.rotation}deg)`)
     }
 
     const opacity = clip.opacity ?? 100
@@ -936,17 +1181,22 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   // preview to show beside it (same test as App's openRecorder).
   const hasAnyVideo = (tracks || []).some(t => t.type === 'video' && t.clips.length > 0)
 
+  // The rail is inset from the edges; the padding around it still takes the
+  // pointer, and seekFromX measures against the rail (clamped), so pressing
+  // left of it lands exactly on 0:00 and right of it on the end.
   const scrubber = (
-    <div className="global-preview-scrubber" ref={scrubberRef} onClick={handleSeek} onTouchStart={handleScrubberTouchStart}>
-      <div className="scrubber-track" />
-      <div
-        className="scrubber-progress"
-        style={{ width: `${totalDuration > 0 ? (playheadPosition / totalDuration) * 100 : 0}%` }}
-      />
-      <div
-        className="scrubber-thumb"
-        style={{ left: `${totalDuration > 0 ? (playheadPosition / totalDuration) * 100 : 0}%` }}
-      />
+    <div className="global-preview-scrubber" onMouseDown={handleScrubberMouseDown} onTouchStart={handleScrubberTouchStart}>
+      <div className="scrubber-rail" ref={scrubberRef}>
+        <div className="scrubber-track" />
+        <div
+          className="scrubber-progress"
+          style={{ width: `${totalDuration > 0 ? (playheadPosition / totalDuration) * 100 : 0}%` }}
+        />
+        <div
+          className="scrubber-thumb"
+          style={{ left: `${totalDuration > 0 ? (playheadPosition / totalDuration) * 100 : 0}%` }}
+        />
+      </div>
     </div>
   )
 
@@ -992,15 +1242,38 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         <PreviewColumn own={ownPlayer} controls={ownControls}>
         <div className="global-preview-video">
           {videoClips.length > 0 ? (
-            <div className="preview-layer-container">
+            <div className="preview-layer-container" ref={layerContainerRef}>
               {currentClips.length > 0 ? (
-                reversedClips.map((clip, reverseIndex) => {
+                [...heldClips, ...reversedClips, ...upcomingClips].map((clip) => {
+                  // One list for held (just ended, underneath), visible and
+                  // upcoming (hidden, preloaded) clips: a clip moving between
+                  // those roles keeps its already loaded element
+                  const reverseIndex = reversedClips.findIndex(c => c.id === clip.id)
+                  const held = reverseIndex === -1 && heldClips.some(c => c.id === clip.id)
+                  const preloading = reverseIndex === -1 && !held
                   const layerIndex = currentClips.length - 1 - reverseIndex
-                  const isTopClip = layerIndex === 0
-                  const zIndex = currentClips.length - reverseIndex
+                  const isTopClip = reverseIndex !== -1 && layerIndex === 0
+                  const zIndex = reverseIndex === -1 ? 0 : currentClips.length - reverseIndex
 
                   const isSelected = clip.id === selectedClipId
                   const canDrag = isSelected && onUpdateClip
+                  // Sticker motion (image / text clips) at the playhead; during
+                  // playback the loop above updates it every frame
+                  const motion = (clip.type === 'image' || clip.type === 'text') ? normalizeMotion(clip.motion) : null
+                  const clipLength = clip.endTime - clip.startTime
+                  // Opacity the element has without motion (images: the clip's own)
+                  const baseOpacity = clip.type === 'image' ? (clip.opacity ?? 100) / 100 : 1
+                  if (motion) motionClipsRef.current[clip.id] = { motion, start: clip.timelineStart, duration: clipLength, kind: clip.type, opacity: baseOpacity }
+                  const frameH = layerContainerRef.current?.clientHeight || 0
+                  const frameW = layerContainerRef.current?.clientWidth || 0
+                  const natural = imageSizeRef.current[clip.url]
+                  const pivotNow = motion
+                    ? (clip.type === 'text' ? textPivot(motion) : imagePivot(motion, natural?.w, natural?.h, frameW, frameH))
+                    : null
+                  const motionNowStyle = motion ? motionStyle(motion, playheadPosition - clip.timelineStart, clipLength, frameH, pivotNow) : null
+                  const motionNow = motionNowStyle ? motionNowStyle.transform : ''
+                  // The pivot, marked on the selected moving sticker while paused
+                  const showPivot = !!motion && isSelected && !isPlaying
 
                   const stageSource = !!(stageLayout?.source && clip.id === recorderGuide.sourceClipId)
                   const box = stageSource
@@ -1029,13 +1302,25 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                     outline: (stage ? panningClipId === gestureClip.id : isSelected && onUpdateClip)
                       ? `2px ${panningClipId === gestureClip.id ? 'dashed' : 'solid'} var(--accent-primary)`
                       : undefined,
-                    outlineOffset: '-2px'
+                    outlineOffset: '-2px',
+                    // Colour adjustments: SVG filter from ClipColorFilters (same maths as the render)
+                    ...(clipColorFilter(clip) ? { filter: clipColorFilter(clip) } : {}),
+                    ...(preloading ? { visibility: 'hidden', pointerEvents: 'none' } : {}),
+                    ...(held ? { pointerEvents: 'none', outline: undefined } : {})
                   }
 
                   // Layout clips: the positioned layer is a clipping box, and the media
                   // inside is zoomed (cover fit x zoom) and panned. Same math as the
                   // backend's scale + crop: visible offset = pan * (zoomed cover - box).
                   let boxMediaStyle = null
+                  // Images move as a whole layer (they sit centred in it)
+                  const imageMotionProps = motion && clip.type === 'image' && !box ? (() => {
+                    const base = layerStyle.transform || ''
+                    layerStyle.transform = `${base} ${motionNow}`.trim()
+                    layerStyle.opacity = baseOpacity * motionNowStyle.opacity
+                    return { 'data-motion-id': clip.id, 'data-motion-base': base }
+                  })() : {}
+
                   if (box) {
                     const { panX, panY } = layoutPan(box)
                     const z = layoutZoom(box)
@@ -1084,6 +1369,9 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                       padding: '20px',
                       boxSizing: 'border-box',
                       textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                      // The render (and the line measurement it gets) use 1.2;
+                      // inherited "normal" is ~1.5 for some fonts
+                      lineHeight: 1.2,
                       whiteSpace: 'pre-wrap',
                       wordBreak: 'break-word'
                     }
@@ -1111,13 +1399,24 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                         // clips underneath stay clickable
                         style={{ ...textStyle, pointerEvents: 'none' }}
                       >
-                        <span
-                          style={{ ...boxStyle, pointerEvents: 'auto' }}
+                        <FitTextBox
+                          measureKey={[clip.text, clip.fontSize, clip.fontFamily, clip.fontWeight, boxEnabled,
+                            clip.textBoxPadding, clip.textBoxBorderWidth, clip.textHAlign].join('|')}
+                          style={{
+                            ...boxStyle,
+                            pointerEvents: 'auto',
+                            // Text turns (and moves) its own box, around the box's centre
+                            ...((clip.rotation || motion) ? { transform: `${clip.rotation ? `rotate(${clip.rotation}deg)` : ''} ${motionNow}`.trim() } : {}),
+                            ...(motionNowStyle ? { opacity: motionNowStyle.opacity } : {}),
+                            ...(showPivot ? { '--pivot-x': `${50 + motion.pivotX * 50}%`, '--pivot-y': `${50 + motion.pivotY * 50}%` } : {})
+                          }}
+                          className={showPivot ? 'motion-pivot-box' : undefined}
+                          {...(motion ? { 'data-motion-id': clip.id, 'data-motion-base': clip.rotation ? `rotate(${clip.rotation}deg)` : '' } : {})}
                           onMouseDown={(e) => handleClipPointerDown(e, clip)}
                           onTouchStart={(e) => handleClipPointerDown(e, clip)}
                         >
                           {clip.text || 'Text'}
-                        </span>
+                        </FitTextBox>
                       </div>
                     )
                   } else if (clip.type === 'color') {
@@ -1147,18 +1446,45 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                       </div>
                     )
                   } else if (clip.type === 'image') {
+                    // The pivot of a selected moving image, marked on the frame: the
+                      // layer's transform is scale(zoom) translate(position) rotate(rotation)
+                      let pivotDot = null
+                      if (showPivot && pivotNow) {
+                        const z = (clip.zoom || 100) / 100
+                        const r = ((clip.rotation || 0) * Math.PI) / 180
+                        const ox = pivotNow.x * Math.cos(r) - pivotNow.y * Math.sin(r)
+                        const oy = pivotNow.x * Math.sin(r) + pivotNow.y * Math.cos(r)
+                        pivotDot = (
+                          <span
+                            key={`${clip.id}-pivot`}
+                            className="motion-pivot-dot"
+                            style={{ left: `calc(50% + ${z * ((clip.positionX || 0) + ox)}px)`, top: `calc(50% + ${z * ((clip.positionY || 0) + oy)}px)` }}
+                          />
+                        )
+                      }
                     return (
+                      <Fragment key={clip.id}>
                       <img
                         key={clip.id}
                         src={clip.url}
                         alt={clip.name}
                         crossOrigin="anonymous"
                         style={layerStyle}
+                        {...imageMotionProps}
+                        onLoad={(e) => {
+                          const img = e.currentTarget
+                          if (!imageSizeRef.current[clip.url]) {
+                            imageSizeRef.current[clip.url] = { w: img.naturalWidth, h: img.naturalHeight }
+                            if (motion && (motion.pivotX || motion.pivotY)) setImageSizeTick(n => n + 1)
+                          }
+                        }}
                         onMouseDown={(e) => handleClipPointerDown(e, clip)}
                         onTouchStart={(e) => handleClipPointerDown(e, clip)}
                         onContextMenu={(e) => e.preventDefault()}
                         draggable={false}
                       />
+                      {pivotDot}
+                      </Fragment>
                     )
                   }
 
@@ -1253,16 +1579,18 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
               )}
             </div>
           ) : (
-            <div className="no-video">No clips on timeline</div>
+            (emptyActions && !(tracks || []).some(t => t.clips.length))
+              ? emptyActions
+              : <div className="no-video">No clips on timeline</div>
           )}
 
-          {/* Hidden audio elements for audio track playback */}
-          {audioClips.map(clip => (
-            <video
+          {/* Audio track playback: <audio> (a video file's picture is never
+              decoded for it), mounted only for clips playing now or about to */}
+          {mountedAudioClips.map(clip => (
+            <audio
               key={`audio-${clip.id}`}
               ref={el => { audioRefs.current[clip.id] = el }}
               preload="auto"
-              style={{ display: 'none' }}
               src={clip.url}
             />
           ))}

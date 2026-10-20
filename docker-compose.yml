@@ -24,6 +24,8 @@ services:
       - "3104:3102"
     volumes:
       - rendered_output:/app/rendered
+      # Uploads (and their hash index) survive rebuilds and redeploys
+      - uploads:/app/uploads
     environment:
       - NODE_ENV=production
       - PORT=3102
@@ -31,6 +33,9 @@ services:
       - WORK_DIR=/app/work
       - MAX_CONCURRENT_JOBS=${MAX_CONCURRENT_JOBS:-2}
       - HLS_TARGET_RESOLUTION=480
+      - CLEANUP_MAX_AGE_HOURS=${CLEANUP_MAX_AGE_HOURS:-12}
+      # Shared with the 3Speak site, which mints the editor tokens for drafts
+      - EDITOR_TOKEN_SECRET=${EDITOR_TOKEN_SECRET}
 
   gateway:
     profiles:
@@ -53,4 +58,6 @@ services:
 
 volumes:
   rendered_output:
+    driver: local
+  uploads:
     driver: local
