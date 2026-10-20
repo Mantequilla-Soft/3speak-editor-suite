@@ -10,6 +10,14 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      if (window.self === window.top) {
+        document.getElementById('root').innerHTML =
+          '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#888;text-align:center;padding:20px;">' +
+          '<div><h2 style="color:#ccc;">3Speak Editor</h2><p>This editor can only be used from within 3speak.tv</p></div></div>';
+        document.body.style.background = '#0f1117';
+      }
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
