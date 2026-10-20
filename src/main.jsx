@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './App.css'
 
+// Only allow usage inside an iframe (embedded by 3speak.tv)
+if (window.self === window.top) throw new Error('iframe-only')
+
 // Prevent browser-level pinch-to-zoom on mobile (iOS Safari ignores viewport meta)
 document.addEventListener('gesturestart', (e) => e.preventDefault())
 document.addEventListener('gesturechange', (e) => e.preventDefault())

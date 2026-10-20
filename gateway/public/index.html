@@ -112,7 +112,7 @@
 
     async function loadBackends() {
       try {
-        const res = await fetch('/api/backends');
+        const res = await fetch('api/backends');
         const backends = await res.json();
         const tbody = document.getElementById('backends-tbody');
 
@@ -168,7 +168,7 @@
       if (!apiEndpoint) return;
 
       try {
-        const res = await fetch('/api/backends', {
+        const res = await fetch('api/backends', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ apiEndpoint })
@@ -194,7 +194,7 @@
 
     async function toggleActive(id, isActive) {
       try {
-        await fetch(`/api/backends/${id}`, {
+        await fetch(`api/backends/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ isActive })
@@ -210,7 +210,7 @@
       if (!newEndpoint || newEndpoint === current) return;
 
       try {
-        const res = await fetch(`/api/backends/${id}`, {
+        const res = await fetch(`api/backends/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ apiEndpoint: newEndpoint.replace(/\/+$/, '') })
@@ -233,7 +233,7 @@
       if (!confirm('Delete this backend?')) return;
 
       try {
-        await fetch(`/api/backends/${id}`, { method: 'DELETE' });
+        await fetch(`api/backends/${id}`, { method: 'DELETE' });
         showToast('success', 'Backend removed');
         loadBackends();
       } catch (err) {
