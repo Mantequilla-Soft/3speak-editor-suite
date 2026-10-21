@@ -201,6 +201,7 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
   const [sttStatus, setSttStatus] = useState('') // '', 'connecting', 'connected', 'error:<msg>', 'closed'
   // STT server (via the parent page): null = none / not known yet.
   const [stt, setStt] = useState(null) // { url, models }
+  const [sttChecked, setSttChecked] = useState(false) // the parent has answered (or timed out)
   const sttTokenRef = useRef({ token: '', at: 0 })
   const sttRef = useRef(null)
   const sttAskedRef = useRef(false)
@@ -215,11 +216,13 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
 
   // ---- which scroll source ----------------------------------------------------
   const webOk = useMemo(() => webSpeechUsable(), [])
-  // Speech-to-text ("Follow voice") is only supported in Chromium browsers for
-  // now (owner's call, 2026-10-12). Keyed on the browser, not on whether an STT
-  // server answered, so the notice is the same for everyone on that browser.
   const chromium = useMemo(() => isChromium(), [])
-  const speechNotice = !chromium && (
+  // The STT server works in any browser (it taps the recording's own audio
+  // track; owner's call 2026-10-21). Only the browser's Web Speech is
+  // Chromium-only, so the notice shows outside Chromium when no server answered.
+  // It waits for the parent's answer so it does not flash up and vanish.
+  const voiceVia = stt?.url ? 'stt' : (webOk ? 'web' : null)
+  const speechNotice = !chromium && sttChecked && !voiceVia && (
     <div className="tp-speech-notice" role="note">
       <Info size={18} aria-hidden="true" />
       <div>
@@ -230,17 +233,10 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
   )
   // The frontend prefers the STT server whenever one is configured: it taps the
   // recording's own audio track, so it cannot fight the recorder for the mic.
-  // Outside Chromium nothing follows the voice, STT server included (see the
-  // notice below): the product only supports it on Chromium for now.
-  const voiceVia = !isChromium() ? null : (stt?.url ? 'stt' : (webOk ? 'web' : null))
-  // 'auto' picks voice only on Chromium (where the frontend's teleprompter is
-  // tested); elsewhere it starts in timed mode. Outside Chromium "Follow voice"
-  // can still be chosen by hand when an STT server is configured.
+  // 'auto' picks voice whenever a source exists, else timed.
   const effectiveMode = settings.mode === 'timed'
     ? 'timed'
-    : settings.mode === 'voice'
-      ? (voiceVia ? 'voice' : 'timed')
-      : (webOk && voiceVia ? 'voice' : 'timed')
+    : (voiceVia ? 'voice' : 'timed')
   const voiceForcedButMissing = settings.mode === 'voice' && !voiceVia
 
   // Ask the parent once (lazily, the first time the teleprompter is used) whether
@@ -253,6 +249,7 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
       sttTokenRef.current = { token: cfg.token, at: Date.now() }
       setStt({ url: cfg.url, models: cfg.models })
     }
+    setSttChecked(true)
   }, [])
 
   // Tokens are short-lived (5 min on the frontend server): reuse one for 2 min.
@@ -784,7 +781,7 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
     statusText = notice
   }
   const showPill = isRecording || recState === 'paused' || testing
-  // Timed scrolling (always the case outside Chromium) gets a prominent control
+  // Timed scrolling (outside Chromium without an STT server) gets a prominent control
   // bar under the box instead of the status strip: speed and, during a take,
   // back / pause / forward. The strip's text moves into the bar.
   // Timed scrolling shows no strip (owner's call): only warnings get through.

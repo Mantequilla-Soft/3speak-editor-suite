@@ -43,18 +43,39 @@ export function createSttStream({ track, url, lang, token, onTranscript, onStatu
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext
       if (!AudioCtx || !track) { status('error', 'audio unavailable'); return }
-      ctx = new AudioCtx()
-      // Editor addition: this runs after the countdown, outside a click, so the
-      // context can start 'suspended' under autoplay rules; ask it to run.
-      // Raced with a timer: without user activation Safari can leave the promise
-      // pending forever.
-      try {
-        await Promise.race([ctx.resume(), new Promise((r) => setTimeout(r, 500))])
-      } catch { /* stays suspended; status shows no transcript */ }
-      await ctx.audioWorklet.addModule(getWorkletUrl())
+      const openCtx = async (opts) => {
+        const c = opts ? new AudioCtx(opts) : new AudioCtx()
+        // Editor addition: this runs after the countdown, outside a click, so the
+        // context can start 'suspended' under autoplay rules; ask it to run.
+        // Raced with a timer: without user activation Safari can leave the promise
+        // pending forever.
+        try {
+          await Promise.race([c.resume(), new Promise((r) => setTimeout(r, 500))])
+        } catch { /* stays suspended; status shows no transcript */ }
+        await c.audioWorklet.addModule(getWorkletUrl())
+        return c
+      }
+      ctx = await openCtx()
       if (closed) { try { ctx.close() } catch { /* ignore */ } return }
 
-      source = ctx.createMediaStreamSource(new MediaStream([track]))
+      // Editor addition: Firefox refuses to connect a mic to a context running at
+      // another sample rate (NotSupportedError). Reopen the context at the mic's
+      // rate (or the usual ones when the track does not report it); the worklet
+      // downsamples from whatever rate it gets.
+      const mic = new MediaStream([track])
+      try {
+        source = ctx.createMediaStreamSource(mic)
+      } catch (err) {
+        const rates = [track.getSettings?.().sampleRate, 48000, 44100]
+          .filter((r, i, all) => r && r !== ctx.sampleRate && all.indexOf(r) === i)
+        for (const sampleRate of rates) {
+          try { ctx.close() } catch { /* ignore */ }
+          ctx = await openCtx({ sampleRate })
+          if (closed) { try { ctx.close() } catch { /* ignore */ } return }
+          try { source = ctx.createMediaStreamSource(mic); break } catch { /* next rate */ }
+        }
+        if (!source) throw err
+      }
       worklet = new AudioWorkletNode(ctx, 'stt-downsampler', { processorOptions: { targetRate: 16000 } })
 
       const wsUrl = new URL(url)
