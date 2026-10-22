@@ -5,3 +5,6 @@ logs/
 nginx/deveditor.okinoko.io.conf
 # Local secrets (MONGODB_URI etc.), see docker-compose.override.example.yml
 docker-compose.override.yml
+
+# Build output: the frontend image builds its own (frontend/Dockerfile)
+dist/

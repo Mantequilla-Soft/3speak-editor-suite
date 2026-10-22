@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import express from 'express'
 import cors from 'cors'
 import path from 'path'
@@ -16,9 +17,14 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || ''
 app.use(cors())
 app.use(express.json())
 
-// Basic auth middleware for admin routes
+// Basic auth middleware for admin routes. Fails CLOSED: without ADMIN_PASSWORD the admin API and page are
+// switched off (they used to be open to anyone).
+const sameSecret = (a, b) => {
+  const x = Buffer.from(String(a)), y = Buffer.from(String(b))
+  return x.length === y.length && crypto.timingSafeEqual(x, y)
+}
 function requireAuth(req, res, next) {
-  if (!ADMIN_PASSWORD) return next()
+  if (!ADMIN_PASSWORD) return res.status(503).send('Gateway admin is disabled: set ADMIN_PASSWORD to use it')
 
   const header = req.headers.authorization
   if (!header || !header.startsWith('Basic ')) {
@@ -27,9 +33,10 @@ function requireAuth(req, res, next) {
   }
 
   const credentials = Buffer.from(header.slice(6), 'base64').toString()
-  const [user, pass] = credentials.split(':')
+  const sep = credentials.indexOf(':')
+  const user = credentials.slice(0, sep), pass = credentials.slice(sep + 1) // a password may contain ':'
 
-  if (user === ADMIN_USER && pass === ADMIN_PASSWORD) {
+  if (sameSecret(user, ADMIN_USER) && sameSecret(pass, ADMIN_PASSWORD)) {
     return next()
   }
 
