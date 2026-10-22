@@ -198,4 +198,4 @@ router.get('/:id', (req, res) => {
 // forget finished jobs after an hour (the files themselves follow the rendered-files cleanup)
 setInterval(() => { const cut = Date.now() - 3600e3; for (const [k, j] of jobs) if (j.createdAt < cut && j.status !== 'processing') jobs.delete(k) }, 600e3).unref()
 
-export { router as sceneRenderRouter }
+export { router as sceneRenderRouter, privateAddress }
