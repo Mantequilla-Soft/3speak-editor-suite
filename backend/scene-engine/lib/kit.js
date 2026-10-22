@@ -49,8 +49,10 @@
     if (/^[a-z][a-z0-9+.-]*:/i.test(u) || u.startsWith('//')) return ''; // any other scheme
     return u; // relative path (projects' assets/...)
   }
-  // URL for CSS url('...') inside a style="" attribute
-  const src = spec => esc(url(spec).replace(/[\\'"()\s]/g, c => encodeURIComponent(c)));
+  // URL for CSS url('...') inside a style="" attribute. Percent-encode by hand: encodeURIComponent leaves ' ( )
+  // alone, and a quote or bracket would end the url() and let the rest of the string be CSS.
+  const cssUrl = u => u.replace(/[\\'"()\s<>]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0'));
+  const src = spec => esc(cssUrl(url(spec)));
   const num = (v, a, b, d) => { const n = +v; return Number.isFinite(n) ? Math.min(b, Math.max(a, n)) : d; };
   // <img> for a user image. Placement: scale 0.2..5 (1 = the scene's own fit), x/y -1..1 = where the picture sits in
   // its frame (object-position, -1 = left/top edge). Composes with the scenes' own transform animations (base.css).
@@ -84,7 +86,7 @@
     const st = document.createElement('style');
     st.id = 'kit-font-faces';
     st.textContent = list.filter(f => f && f.family && url(f.url)).map(f =>
-      `@font-face { font-family: '${String(f.family).replace(/['\\<>]/g, '')}'; src: url('${url(f.url).replace(/[\\'"()\s]/g, c => encodeURIComponent(c))}');` +
+      `@font-face { font-family: '${String(f.family).replace(/['\\<>]/g, '')}'; src: url('${cssUrl(url(f.url))}');` +
       ` font-weight: ${num(f.weight, 100, 900, 400) | 0}; font-style: ${f.style === 'italic' ? 'italic' : 'normal'}; font-display: block; }`).join('\n');
     document.head.appendChild(st);
   }
@@ -248,5 +250,5 @@
     document.write(`<script src="${f}"><\/script>`);
   }
 
-  window.Kit = { ICONS, icon, run, mount, unmount, normalize, loadContent, esc, url, src, img, accents: () => [window.REEL.brand.colors.accent, window.REEL.brand.colors.accent2, window.REEL.brand.colors.accent3] };
+  window.Kit = { ICONS, icon, run, mount, unmount, normalize, loadContent, esc, url, src, cssUrl, img, accents: () => [window.REEL.brand.colors.accent, window.REEL.brand.colors.accent2, window.REEL.brand.colors.accent3] };
 })();
