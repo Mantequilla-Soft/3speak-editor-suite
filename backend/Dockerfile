@@ -2,6 +2,10 @@ FROM node:18-alpine
 
 RUN apk add --no-cache ffmpeg curl fontconfig ttf-dejavu ttf-liberation font-opensans font-freefont git rsvg-convert
 
+# Ad Wizard scene render: headless Chromium (driven by playwright-core) + emoji/CJK-capable fonts
+RUN apk add --no-cache chromium nss harfbuzz ca-certificates font-noto font-noto-emoji
+ENV CHROMIUM_PATH=/usr/bin/chromium-browser
+
 # Install Google Fonts used by the editor frontend
 RUN mkdir -p /usr/share/fonts/google && \
     cd /tmp && \
@@ -26,6 +30,7 @@ COPY backend/package.json backend/package-lock.json* ./
 RUN npm ci --only=production 2>/dev/null || npm install --only=production
 
 COPY backend/src/ src/
+COPY backend/scene-engine/ scene-engine/
 
 RUN mkdir -p /app/rendered /app/work /app/uploads && chmod 777 /app/rendered /app/work /app/uploads
 

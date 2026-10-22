@@ -1,0 +1,247 @@
+/* Template-only scene types (logo statement product wall endcard from promo-16x9; hook stat phone points wall endcard
+   from promo-9x16), scoped by orientation and scene so they can share a page with every lib scene.
+   GENERATED from the two templates' style.css by the original port (2026-10-22), then edited by hand for the
+   orientation each type did not have. Loaded by host/index.html (and anything else that loads lib/scenes-template.js). */
+
+/* ===== landscape ===== */
+.landscape .scene-logo .logoWrap { position: absolute; left: 50%; top: 46%; width: 420px; height: 420px; transform: translate(-50%, -50%); }
+.landscape .scene-logo .rings { position: absolute; inset: 0; overflow: visible; }
+.landscape .scene-logo .mark { position: absolute; left: 50%; top: 50%; width: 220px; transform: translate(-50%, -50%); }
+.landscape .scene-logo .wordmark { position: absolute; left: 0; right: 0; top: 74%; text-align: center; font-weight: 800; font-size: 46px; letter-spacing: .55em; padding-left: .55em; }
+.landscape .scene-logo .wordmark span { display: inline-block; opacity: 0; }
+.landscape .scene-statement .copy { position: absolute; left: 150px; top: 300px; }
+.landscape .scene-statement h1 { font-weight: 900; font-size: 128px; line-height: 1.02; letter-spacing: -.035em; }
+.landscape .scene-statement .label { margin-bottom: 40px; }
+.landscape .scene-wall .wallPersp { position: absolute; inset: 0; perspective: 1700px; perspective-origin: 50% 40%; }
+.landscape .scene-wall .wall { position: absolute; left: 50%; top: 50%; width: 2400px; height: 928px; margin: -464px 0 0 -1200px;
+        display: grid; grid-template-columns: repeat(6, 380px); grid-auto-rows: 214px; gap: 24px; transform-style: preserve-3d; }
+.landscape .scene-wall .card { position: relative; border-radius: 16px; overflow: hidden; background: #1a1c27; box-shadow: 0 30px 60px rgba(0,0,0,.55); }
+.landscape .scene-wall .card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.landscape .scene-wall .card .ph { width: 100%; height: 100%; display: grid; place-items: center; }
+.landscape .scene-wall .card .ph span { font-weight: 900; font-size: 72px; color: rgba(255,255,255,.35); }
+.landscape .scene-wall .card.hot { outline: 4px solid var(--a1); outline-offset: -4px; }
+.landscape .scene-wall .card .play { position: absolute; left: 16px; bottom: 14px; width: 54px; height: 54px; border-radius: 50%; background: rgba(10,11,18,.7); border: 2px solid var(--a1); display: grid; place-items: center; }
+.landscape .scene-wall .shade { position: absolute; inset: 0; background:
+  linear-gradient(90deg, color-mix(in srgb, var(--bg) 96%, transparent) 0%, color-mix(in srgb, var(--bg) 82%, transparent) 34%, transparent 62%),
+  linear-gradient(0deg, color-mix(in srgb, var(--bg) 90%, transparent), transparent 40%); }
+.landscape .scene-wall .copy { position: absolute; left: 150px; top: 330px; }
+.landscape .scene-wall h1 { font-weight: 900; font-size: 136px; line-height: 1.0; letter-spacing: -.035em; }
+.landscape .scene-wall .label { margin-bottom: 36px; }
+.landscape .scene-wall .topics { margin-top: 40px; display: flex; gap: 14px; }
+.landscape .scene-wall .topic { font-weight: 600; font-size: 26px; padding: 10px 22px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,.22); color: #dfe2ec; background: rgba(255,255,255,.04); opacity: 0; }
+.landscape .scene-product .browserPersp { position: absolute; inset: 0; perspective: 2000px; }
+.landscape .scene-product .browser { position: absolute; left: 820px; top: 150px; width: 1240px; border-radius: 18px; overflow: hidden; background: #15161f;
+           box-shadow: 0 60px 120px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08); transform-origin: 0% 50%; }
+.landscape .scene-product .browser .bar { height: 50px; display: flex; align-items: center; gap: 10px; padding: 0 20px; background: #1d1f2b; }
+.landscape .scene-product .browser .dot { width: 13px; height: 13px; border-radius: 50%; background: #3a3d4f; }
+.landscape .scene-product .browser .url { margin-left: 18px; flex: 0 0 420px; height: 30px; border-radius: 8px; background: #0f1018; color: #b9bdcc; font-size: 17px; display: flex; align-items: center; padding: 0 14px; font-weight: 500; }
+.landscape .scene-product .browser > img { display: block; width: 100%; }
+.landscape .scene-product .mock { height: 775px; padding: 24px; display: flex; flex-direction: column; gap: 24px; background: #12131b; }
+.landscape .scene-product .mnav { height: 44px; border-radius: 10px; background: #1d1f2b; }
+.landscape .scene-product .mgrid { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.landscape .scene-product .mcard { display: flex; flex-direction: column; gap: 10px; }
+.landscape .scene-product .mcard i { flex: 1; border-radius: 10px; }
+.landscape .scene-product .mcard b { height: 14px; border-radius: 6px; background: #2a2c3a; }
+.landscape .scene-product .mcard b.s { width: 60%; }
+.landscape .scene-product .chip { position: absolute; display: flex; align-items: center; gap: 16px; padding: 18px 28px 18px 18px; border-radius: 20px; opacity: 0;
+        background: rgba(20,22,33,.92); border: 1px solid rgba(255,255,255,.12); box-shadow: 0 24px 50px rgba(0,0,0,.55); font-weight: 700; font-size: 30px; white-space: nowrap; }
+.landscape .scene-product .chip .ic { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; }
+.landscape .scene-product .chip small { display: block; font-size: 19px; font-weight: 500; color: var(--mute); margin-top: 2px; }
+.landscape .scene-product .copy { position: absolute; left: 150px; top: 300px; width: 640px; }
+.landscape .scene-product h1 { font-weight: 900; font-size: 104px; line-height: 1.02; letter-spacing: -.035em; }
+.landscape .scene-product h1.sub { font-size: 64px; margin-top: 26px; letter-spacing: -.02em; font-weight: 800; }
+.landscape .scene-product .label { margin-bottom: 36px; }
+.landscape .scene-endcard .center { position: absolute; left: 0; right: 0; top: 230px; text-align: center; }
+.landscape .scene-endcard .mark { width: 170px; display: inline-grid; }
+.landscape .scene-endcard .monogram { font-size: 110px; }
+.landscape .scene-endcard .brand { font-weight: 900; font-size: 120px; letter-spacing: -.035em; margin-top: 10px; }
+.landscape .scene-endcard .tag { font-weight: 600; font-size: 46px; margin-top: 18px; color: #dfe2ec; }
+.landscape .scene-endcard .cta { display: inline-flex; align-items: center; gap: 18px; margin-top: 56px; padding: 22px 46px; border-radius: 999px;
+                      border: 3px solid var(--a1); color: var(--a1); background: transparent; font-weight: 800; font-size: 44px; }
+.landscape .scene-endcard .foot { position: absolute; left: 0; right: 0; bottom: 70px; text-align: center; }
+
+/* ===== portrait ===== */
+.portrait .scene-hook .copy { position: absolute; left: 80px; right: 60px; top: 520px; }
+.portrait .scene-hook .label { margin-bottom: 40px; }
+.portrait .scene-hook h1 { font-weight: 900; font-size: var(--hs, 158px); line-height: .98; letter-spacing: -.04em; }
+.portrait .scene-hook .sub { margin-top: 44px; font-weight: 600; font-size: 52px; line-height: 1.2; color: #dfe2ec; max-width: 900px; }
+.portrait .scene-hook .marq { position: absolute; left: -100px; top: 1400px; display: flex; flex-direction: column; gap: 26px; opacity: 0; transform-origin: 640px 50%; }
+.portrait .scene-hook .marq .row { display: flex; gap: 26px; width: max-content; }
+.portrait .scene-hook .marq .tile { position: relative; width: 400px; height: 225px; border-radius: 20px; overflow: hidden; flex: none; background: #1a1c27; box-shadow: 0 24px 50px rgba(0,0,0,.5); }
+.portrait .scene-hook .marq .tile img, .portrait .scene-hook .marq .tile .ph { width: 100%; height: 100%; object-fit: cover; display: block; }
+.portrait .scene-hook .marq .badge { position: absolute; left: 14px; top: 14px; padding: 6px 16px; border-radius: 10px; font-weight: 800; font-size: 26px;
+               color: #111; background: #ffd23f; letter-spacing: .02em; }
+.portrait .scene-stat .center { position: absolute; left: 60px; right: 60px; top: 330px; text-align: center; }
+.portrait .scene-stat .ringWrap { position: relative; width: 700px; height: 700px; margin: 50px auto 0; }
+.portrait .scene-stat .ringWrap svg { position: absolute; inset: 0; overflow: visible; }
+.portrait .scene-stat .ringWrap .track { fill: none; stroke: rgba(255,255,255,.08); stroke-width: 26; }
+.portrait .scene-stat .ringWrap .arc { fill: none; stroke-width: 26; stroke-linecap: round; }
+.portrait .scene-stat .ringWrap .num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 250px; letter-spacing: -.05em; }
+.portrait .scene-stat .ringWrap .suf, .portrait .scene-stat .ringWrap .pre { font-size: .56em; color: var(--a1); }
+.portrait .scene-stat h2 { font-weight: 800; font-size: 64px; line-height: 1.1; letter-spacing: -.02em; margin-top: 70px; }
+.portrait .scene-wall .wallPersp { position: absolute; inset: 0; perspective: 1800px; perspective-origin: 50% 35%; }
+.portrait .scene-wall .wall { position: absolute; left: 50%; top: 42%; width: 1666px; height: 1707px; margin: -853px 0 0 -833px;
+        display: grid; grid-template-columns: repeat(4, 400px); grid-auto-rows: 225px; gap: 22px; transform-style: preserve-3d; }
+.portrait .scene-wall .card { position: relative; border-radius: 18px; overflow: hidden; background: #1a1c27; box-shadow: 0 30px 60px rgba(0,0,0,.55); }
+.portrait .scene-wall .card img, .portrait .scene-wall .card .ph { width: 100%; height: 100%; object-fit: cover; display: block; }
+.portrait .scene-wall .card.hot { outline: 5px solid var(--a1); outline-offset: -5px; }
+.portrait .scene-wall .card .play { position: absolute; left: 16px; bottom: 14px; width: 62px; height: 62px; border-radius: 50%; background: rgba(10,11,18,.7); border: 2px solid var(--a1); display: grid; place-items: center; }
+.portrait .scene-wall .shade { position: absolute; inset: 0; background:
+  linear-gradient(0deg, color-mix(in srgb, var(--bg) 97%, transparent) 0%, color-mix(in srgb, var(--bg) 88%, transparent) 30%, transparent 58%),
+  linear-gradient(180deg, color-mix(in srgb, var(--bg) 70%, transparent) 0%, transparent 16%); }
+.portrait .scene-wall .copy { position: absolute; left: 80px; right: 60px; top: 1060px; }
+.portrait .scene-wall .label { margin-bottom: 30px; }
+.portrait .scene-wall h1 { font-weight: 900; font-size: 140px; line-height: 1; letter-spacing: -.04em; }
+.portrait .scene-wall .topics { margin-top: 40px; display: flex; flex-wrap: wrap; gap: 16px; }
+.portrait .scene-wall .topic { font-weight: 700; font-size: 36px; padding: 12px 28px; border-radius: 999px; border: 2px solid rgba(255,255,255,.22); color: #dfe2ec; background: rgba(255,255,255,.05); opacity: 0; }
+.portrait .scene-phone .copy { position: absolute; left: 80px; right: 60px; top: 240px; }
+.portrait .scene-phone .label { margin-bottom: 28px; }
+.portrait .scene-phone h1 { font-weight: 900; font-size: 116px; line-height: 1; letter-spacing: -.035em; }
+.portrait .scene-phone .phonePersp { position: absolute; inset: 0; perspective: 2200px; }
+.portrait .scene-phone .phone { position: absolute; left: 250px; top: 640px; width: 580px; padding: 16px; border-radius: 76px; background: #07080c;
+         box-shadow: 0 0 0 3px #2a2d3a, 0 80px 140px rgba(0,0,0,.65); transform-origin: 50% 30%; }
+.portrait .scene-phone .phone .screen { border-radius: 62px; overflow: hidden; background: #111; }
+.portrait .scene-phone .phone .screen img { display: block; width: 100%; }
+.portrait .scene-phone .phone .notch { position: absolute; left: 50%; top: 34px; width: 150px; height: 40px; margin-left: -75px; border-radius: 20px; background: #000; }
+.portrait .scene-phone .mock { height: 1180px; padding: 90px 24px 24px; display: flex; flex-direction: column; gap: 22px; background: #12131b; }
+.portrait .scene-phone .mnav { height: 56px; border-radius: 14px; background: #1d1f2b; }
+.portrait .scene-phone .mcard { display: flex; flex-direction: column; gap: 10px; }
+.portrait .scene-phone .mcard .ph { height: 190px; border-radius: 14px; }
+.portrait .scene-phone .mcard b { height: 18px; border-radius: 8px; background: #2a2c3a; }
+.portrait .scene-phone .mcard b.s { width: 55%; }
+.portrait .scene-phone .chip { position: absolute; display: flex; align-items: center; gap: 22px; padding: 22px 36px 22px 22px; border-radius: 28px; opacity: 0; z-index: 3;
+        background: rgba(20,22,33,.94); border: 1.5px solid rgba(255,255,255,.14); box-shadow: 0 30px 60px rgba(0,0,0,.6); font-weight: 800; font-size: 44px; white-space: nowrap; }
+.portrait .scene-phone .chip .ic { width: 76px; height: 76px; border-radius: 20px; display: grid; place-items: center; flex: none; }
+.portrait .scene-phone .chip small { display: block; font-size: 28px; font-weight: 500; color: var(--mute); margin-top: 2px; }
+.portrait .scene-points .copy { position: absolute; left: 80px; right: 60px; top: 300px; }
+.portrait .scene-points .label { margin-bottom: 30px; }
+.portrait .scene-points h1 { font-weight: 900; font-size: 128px; line-height: 1; letter-spacing: -.04em; }
+.portrait .scene-points .pts { position: absolute; left: 80px; right: 60px; top: 800px; display: flex; flex-direction: column; gap: 56px; }
+.portrait .scene-points .pt { display: flex; align-items: center; gap: 36px; opacity: 0; }
+.portrait .scene-points .pt .ic { width: 132px; height: 132px; border-radius: 34px; border: 2px solid; display: grid; place-items: center; flex: none; }
+.portrait .scene-points .pt b { display: block; font-weight: 800; font-size: 56px; letter-spacing: -.02em; line-height: 1.08; }
+.portrait .scene-points .pt small { display: block; font-weight: 500; font-size: 36px; color: var(--mute); margin-top: 8px; line-height: 1.25; }
+.portrait .scene-endcard .center { position: absolute; left: 60px; right: 60px; top: 470px; text-align: center; }
+.portrait .scene-endcard .mark { width: 230px; display: inline-grid; font-size: 150px; }
+.portrait .scene-endcard .brand { font-weight: 900; font-size: 168px; letter-spacing: -.04em; margin-top: 20px; }
+.portrait .scene-endcard .tag { font-weight: 700; font-size: 68px; line-height: 1.12; margin: 26px auto 0; max-width: 900px; color: #e6e8f0; letter-spacing: -.02em; }
+.portrait .scene-endcard .cta { display: inline-flex; align-items: center; gap: 22px; margin-top: 80px; padding: 30px 60px; border-radius: 999px;
+                      border: 4px solid var(--a1); color: var(--a1); background: transparent; font-weight: 800; font-size: 60px; }
+.portrait .scene-endcard .foot { position: absolute; left: 60px; right: 60px; bottom: 400px; text-align: center; line-height: 1.6; }
+
+/* ===== the orientation each type did not have ===== */
+/* (base rules copied from the other orientation, then hand-tuned overrides) */
+.portrait .scene-logo .logoWrap { position: absolute; left: 50%; top: 46%; width: 420px; height: 420px; transform: translate(-50%, -50%); }
+.portrait .scene-logo .rings { position: absolute; inset: 0; overflow: visible; }
+.portrait .scene-logo .mark { position: absolute; left: 50%; top: 50%; width: 220px; transform: translate(-50%, -50%); }
+.portrait .scene-logo .wordmark { position: absolute; left: 0; right: 0; top: 74%; text-align: center; font-weight: 800; font-size: 46px; letter-spacing: .55em; padding-left: .55em; }
+.portrait .scene-logo .wordmark span { display: inline-block; opacity: 0; }
+.portrait .scene-statement .copy { position: absolute; left: 150px; top: 300px; }
+.portrait .scene-statement h1 { font-weight: 900; font-size: 128px; line-height: 1.02; letter-spacing: -.035em; }
+.portrait .scene-statement .label { margin-bottom: 40px; }
+.portrait .scene-product .browserPersp { position: absolute; inset: 0; perspective: 2000px; }
+.portrait .scene-product .browser { position: absolute; left: 820px; top: 150px; width: 1240px; border-radius: 18px; overflow: hidden; background: #15161f; box-shadow: 0 60px 120px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08); transform-origin: 0% 50%; }
+.portrait .scene-product .browser .bar { height: 50px; display: flex; align-items: center; gap: 10px; padding: 0 20px; background: #1d1f2b; }
+.portrait .scene-product .browser .dot { width: 13px; height: 13px; border-radius: 50%; background: #3a3d4f; }
+.portrait .scene-product .browser .url { margin-left: 18px; flex: 0 0 420px; height: 30px; border-radius: 8px; background: #0f1018; color: #b9bdcc; font-size: 17px; display: flex; align-items: center; padding: 0 14px; font-weight: 500; }
+.portrait .scene-product .browser > img { display: block; width: 100%; }
+.portrait .scene-product .mock { height: 775px; padding: 24px; display: flex; flex-direction: column; gap: 24px; background: #12131b; }
+.portrait .scene-product .mnav { height: 44px; border-radius: 10px; background: #1d1f2b; }
+.portrait .scene-product .mgrid { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.portrait .scene-product .mcard { display: flex; flex-direction: column; gap: 10px; }
+.portrait .scene-product .mcard i { flex: 1; border-radius: 10px; }
+.portrait .scene-product .mcard b { height: 14px; border-radius: 6px; background: #2a2c3a; }
+.portrait .scene-product .mcard b.s { width: 60%; }
+.portrait .scene-product .chip { position: absolute; display: flex; align-items: center; gap: 16px; padding: 18px 28px 18px 18px; border-radius: 20px; opacity: 0; background: rgba(20,22,33,.92); border: 1px solid rgba(255,255,255,.12); box-shadow: 0 24px 50px rgba(0,0,0,.55); font-weight: 700; font-size: 30px; white-space: nowrap; }
+.portrait .scene-product .chip .ic { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; }
+.portrait .scene-product .chip small { display: block; font-size: 19px; font-weight: 500; color: var(--mute); margin-top: 2px; }
+.portrait .scene-product .copy { position: absolute; left: 150px; top: 300px; width: 640px; }
+.portrait .scene-product h1 { font-weight: 900; font-size: 104px; line-height: 1.02; letter-spacing: -.035em; }
+.portrait .scene-product h1.sub { font-size: 64px; margin-top: 26px; letter-spacing: -.02em; font-weight: 800; }
+.portrait .scene-product .label { margin-bottom: 36px; }
+.landscape .scene-hook .copy { position: absolute; left: 80px; right: 60px; top: 520px; }
+.landscape .scene-hook .label { margin-bottom: 40px; }
+.landscape .scene-hook h1 { font-weight: 900; font-size: var(--hs, 158px); line-height: .98; letter-spacing: -.04em; }
+.landscape .scene-hook .sub { margin-top: 44px; font-weight: 600; font-size: 52px; line-height: 1.2; color: #dfe2ec; max-width: 900px; }
+.landscape .scene-hook .marq { position: absolute; left: -100px; top: 1400px; display: flex; flex-direction: column; gap: 26px; opacity: 0; transform-origin: 640px 50%; }
+.landscape .scene-hook .marq .row { display: flex; gap: 26px; width: max-content; }
+.landscape .scene-hook .marq .tile { position: relative; width: 400px; height: 225px; border-radius: 20px; overflow: hidden; flex: none; background: #1a1c27; box-shadow: 0 24px 50px rgba(0,0,0,.5); }
+.landscape .scene-hook .marq .tile img, .landscape .scene-hook .marq .tile .ph { width: 100%; height: 100%; object-fit: cover; display: block; }
+.landscape .scene-hook .marq .badge { position: absolute; left: 14px; top: 14px; padding: 6px 16px; border-radius: 10px; font-weight: 800; font-size: 26px; color: #111; background: #ffd23f; letter-spacing: .02em; }
+.landscape .scene-stat .center { position: absolute; left: 60px; right: 60px; top: 330px; text-align: center; }
+.landscape .scene-stat .ringWrap { position: relative; width: 700px; height: 700px; margin: 50px auto 0; }
+.landscape .scene-stat .ringWrap svg { position: absolute; inset: 0; overflow: visible; }
+.landscape .scene-stat .ringWrap .track { fill: none; stroke: rgba(255,255,255,.08); stroke-width: 26; }
+.landscape .scene-stat .ringWrap .arc { fill: none; stroke-width: 26; stroke-linecap: round; }
+.landscape .scene-stat .ringWrap .num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 250px; letter-spacing: -.05em; }
+.landscape .scene-stat .ringWrap .suf, .landscape .scene-stat .ringWrap .pre { font-size: .56em; color: var(--a1); }
+.landscape .scene-stat h2 { font-weight: 800; font-size: 64px; line-height: 1.1; letter-spacing: -.02em; margin-top: 70px; }
+.landscape .scene-phone .copy { position: absolute; left: 80px; right: 60px; top: 240px; }
+.landscape .scene-phone .label { margin-bottom: 28px; }
+.landscape .scene-phone h1 { font-weight: 900; font-size: 116px; line-height: 1; letter-spacing: -.035em; }
+.landscape .scene-phone .phonePersp { position: absolute; inset: 0; perspective: 2200px; }
+.landscape .scene-phone .phone { position: absolute; left: 250px; top: 640px; width: 580px; padding: 16px; border-radius: 76px; background: #07080c; box-shadow: 0 0 0 3px #2a2d3a, 0 80px 140px rgba(0,0,0,.65); transform-origin: 50% 30%; }
+.landscape .scene-phone .phone .screen { border-radius: 62px; overflow: hidden; background: #111; }
+.landscape .scene-phone .phone .screen img { display: block; width: 100%; }
+.landscape .scene-phone .phone .notch { position: absolute; left: 50%; top: 34px; width: 150px; height: 40px; margin-left: -75px; border-radius: 20px; background: #000; }
+.landscape .scene-phone .mock { height: 1180px; padding: 90px 24px 24px; display: flex; flex-direction: column; gap: 22px; background: #12131b; }
+.landscape .scene-phone .mnav { height: 56px; border-radius: 14px; background: #1d1f2b; }
+.landscape .scene-phone .mcard { display: flex; flex-direction: column; gap: 10px; }
+.landscape .scene-phone .mcard .ph { height: 190px; border-radius: 14px; }
+.landscape .scene-phone .mcard b { height: 18px; border-radius: 8px; background: #2a2c3a; }
+.landscape .scene-phone .mcard b.s { width: 55%; }
+.landscape .scene-phone .chip { position: absolute; display: flex; align-items: center; gap: 22px; padding: 22px 36px 22px 22px; border-radius: 28px; opacity: 0; z-index: 3; background: rgba(20,22,33,.94); border: 1.5px solid rgba(255,255,255,.14); box-shadow: 0 30px 60px rgba(0,0,0,.6); font-weight: 800; font-size: 44px; white-space: nowrap; }
+.landscape .scene-phone .chip .ic { width: 76px; height: 76px; border-radius: 20px; display: grid; place-items: center; flex: none; }
+.landscape .scene-phone .chip small { display: block; font-size: 28px; font-weight: 500; color: var(--mute); margin-top: 2px; }
+.landscape .scene-points .copy { position: absolute; left: 80px; right: 60px; top: 300px; }
+.landscape .scene-points .label { margin-bottom: 30px; }
+.landscape .scene-points h1 { font-weight: 900; font-size: 128px; line-height: 1; letter-spacing: -.04em; }
+.landscape .scene-points .pts { position: absolute; left: 80px; right: 60px; top: 800px; display: flex; flex-direction: column; gap: 56px; }
+.landscape .scene-points .pt { display: flex; align-items: center; gap: 36px; opacity: 0; }
+.landscape .scene-points .pt .ic { width: 132px; height: 132px; border-radius: 34px; border: 2px solid; display: grid; place-items: center; flex: none; }
+.landscape .scene-points .pt b { display: block; font-weight: 800; font-size: 56px; letter-spacing: -.02em; line-height: 1.08; }
+.landscape .scene-points .pt small { display: block; font-weight: 500; font-size: 36px; color: var(--mute); margin-top: 8px; line-height: 1.25; }
+/* portrait overrides (hand-tuned: these types were landscape-only) */
+.portrait .scene-logo .logoWrap { top: 42%; }
+.portrait .scene-logo .wordmark { top: 60%; font-size: 52px; letter-spacing: .4em; padding-left: .4em; }
+.portrait .scene-statement .copy { left: 80px; right: 60px; top: 520px; }
+.portrait .scene-statement h1 { font-size: 124px; line-height: 1; letter-spacing: -.04em; }
+.portrait .scene-product .copy { left: 80px; right: 60px; top: 240px; width: auto; }
+.portrait .scene-product h1 { font-size: 104px; line-height: 1; letter-spacing: -.04em; }
+.portrait .scene-product h1.sub { font-size: 54px; margin-top: 22px; }
+.portrait .scene-product .browserPersp { perspective: 2400px; }
+.portrait .scene-product .browser { left: 70px; top: 760px; width: 940px; transform-origin: 50% 0%; }
+.portrait .scene-product .browser .url { flex: 0 1 460px; font-size: 22px; height: 36px; }
+.portrait .scene-product .mock { height: 620px; }
+.portrait .scene-product .mgrid { grid-template-columns: repeat(2, 1fr); }
+.portrait .scene-product .chip { gap: 20px; padding: 20px 32px 20px 20px; border-radius: 26px; font-size: 40px; z-index: 3; }
+.portrait .scene-product .chip .ic { width: 72px; height: 72px; border-radius: 18px; flex: none; }
+.portrait .scene-product .chip small { font-size: 26px; }
+/* landscape overrides (hand-tuned: these types were portrait-only) */
+.landscape .scene-hook .copy { left: 150px; right: 150px; top: 170px; }
+.landscape .scene-hook h1 { font-size: var(--hs, 150px); }
+.landscape .scene-hook .sub { font-size: 44px; max-width: 1300px; margin-top: 36px; }
+.landscape .scene-hook .marq { top: 850px; left: -60px; gap: 20px; }
+.landscape .scene-hook .marq .row { gap: 20px; }
+.landscape .scene-hook .marq .tile { width: 300px; height: 169px; }
+.landscape .scene-stat .center { left: 150px; right: 150px; top: 90px; }
+.landscape .scene-stat .ringWrap { width: 600px; height: 600px; margin-top: 30px; }
+.landscape .scene-stat .ringWrap .num { font-size: 200px; }
+.landscape .scene-stat h2 { font-size: 52px; margin-top: 36px; }
+.landscape .scene-phone .copy { left: 150px; right: auto; width: 680px; top: 330px; }
+.landscape .scene-phone h1 { font-size: 104px; }
+.landscape .scene-phone .phone { left: 820px; top: 110px; width: 380px; padding: 12px; border-radius: 58px; }
+.landscape .scene-phone .phone .screen { border-radius: 48px; }
+.landscape .scene-phone .phone .notch { top: 26px; width: 110px; height: 30px; margin-left: -55px; }
+.landscape .scene-phone .mock { height: 860px; padding: 70px 18px 18px; gap: 16px; }
+.landscape .scene-phone .mcard .ph { height: 130px; }
+.landscape .scene-phone .chip { font-size: 36px; gap: 18px; padding: 18px 30px 18px 18px; border-radius: 24px; }
+.landscape .scene-phone .chip .ic { width: 64px; height: 64px; border-radius: 16px; }
+.landscape .scene-phone .chip small { font-size: 24px; }
+.landscape .scene-points .copy { left: 150px; right: auto; width: 760px; top: 300px; }
+.landscape .scene-points h1 { font-size: 112px; }
+.landscape .scene-points .pts { left: 980px; right: 120px; top: 230px; gap: 44px; }
+.landscape .scene-points .pt { gap: 30px; }
+.landscape .scene-points .pt .ic { width: 110px; height: 110px; border-radius: 28px; }
+.landscape .scene-points .pt b { font-size: 46px; }
+.landscape .scene-points .pt small { font-size: 30px; }

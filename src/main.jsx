@@ -1,8 +1,13 @@
-import React from 'react'
+import React, { Suspense, lazy } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './App.css'
 import './utils/editorAuth' // listens for the 3Speak sign-in from the first message on
+
+// Two entry modes. Default: the Shorts editor (App). ?mode=ads: the Ad Wizard, its own shell and its own
+// code chunk (src/adwizard), so the editor does not load or change because of it.
+const AdWizard = lazy(() => import('./adwizard/AdWizard.jsx'))
+const MODE = new URLSearchParams(window.location.search).get('mode')
 
 // Only allow usage inside an iframe (embedded by 3speak.tv)
 if (window.self === window.top) throw new Error('iframe-only')
@@ -24,6 +29,8 @@ document.addEventListener('touchmove', (e) => {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    {MODE === 'ads'
+      ? <Suspense fallback={null}><AdWizard /></Suspense>
+      : <App />}
   </React.StrictMode>,
 )

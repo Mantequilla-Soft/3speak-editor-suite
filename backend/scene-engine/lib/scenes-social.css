@@ -1,0 +1,52 @@
+/* lib/scenes-social.js styles. Both orientations: body.portrait / body.landscape. */
+
+/* compose */
+.cp { position: absolute; border-radius: 36px; padding: 38px 42px 40px; background: rgba(22,26,38,.96);
+      border: 1.5px solid rgba(255,255,255,.12); box-shadow: 0 40px 90px rgba(0,0,0,.45); opacity: 0; }
+.portrait .cp { left: 60px; right: 60px; top: 650px; }
+.landscape .cp { left: 860px; top: 150px; width: 900px; }
+.landscape .scene-compose .xhead { width: 620px; top: 330px; }
+.cp-top { display: flex; align-items: center; gap: 18px; }
+.cp-av { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; display: grid; place-items: center; overflow: hidden;
+         background: color-mix(in srgb, var(--a1) 20%, #10131c); font-weight: 800; font-size: 34px; }
+.cp-av img { width: 70%; }
+.cp-handle { font-weight: 600; font-size: 32px; } .cp-time { font-style: normal; color: var(--mute); font-size: 26px; margin-left: auto; }
+.cp-text { margin-top: 26px; font-weight: 500; line-height: 1.22; min-height: 2.44em; }
+.portrait .cp-text { font-size: 54px; } .landscape .cp-text { font-size: 46px; }
+.cp-caret { display: inline-block; width: 4px; height: 1em; margin-left: 3px; vertical-align: -.12em; background: var(--a1); }
+.cp-img { margin-top: 0; max-height: 0; border-radius: 24px; overflow: hidden; opacity: 0; transform-origin: 20% 0; }
+.portrait .cp-img { height: 380px; } .landscape .cp-img { height: 300px; }
+.cp-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cp-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 30px; }
+.cp-tools { display: flex; gap: 12px; flex-wrap: wrap; }
+.cp-tool { padding: 10px 20px; border-radius: 999px; border: 1.5px solid rgba(255,255,255,.18); color: var(--mute);
+           font-weight: 600; font-size: 26px; opacity: 0; }
+.cp-btn { padding: 14px 40px; border-radius: 999px; background: var(--a1); color: #fff; font-weight: 700; font-size: 32px; opacity: 0; }
+.cp-reacts { position: absolute; left: 42px; bottom: 44px; display: flex; gap: 46px; opacity: 0; }
+.cp-react { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 36px; }
+.cp-ripple { position: absolute; width: 120px; height: 120px; border-radius: 50%; background: var(--a1); opacity: 0; pointer-events: none; }
+.cp-heart { position: absolute; left: 58px; bottom: 96px; opacity: 0; }
+.cp-heart.h1 { left: 110px; } .cp-heart.h2 { left: 84px; }
+
+/* profile */
+.pf { position: absolute; inset: 0; }
+.pf-av { position: absolute; opacity: 0; }
+.portrait .pf-av { left: calc(50% - 300px); top: 250px; width: 600px; height: 600px; }
+.landscape .pf-av { left: 220px; top: 230px; width: 560px; height: 560px; }
+.pf-av .pf-img { position: absolute; inset: 44px; width: calc(100% - 88px); height: calc(100% - 88px); border-radius: 50%; object-fit: cover; }
+.pf-av .monogram.pf-img { display: grid; place-items: center; background: #1b1f2c; font-size: 160px; font-weight: 800; }
+.pf-ring { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pf-copy { position: absolute; }
+.portrait .pf-copy { left: 70px; right: 70px; top: 930px; text-align: center; }
+.landscape .pf-copy { left: 880px; top: 310px; width: 900px; }
+.pf-copy .label { margin-bottom: 22px; opacity: 0; }
+.pf-name { font-weight: 900; letter-spacing: -.035em; line-height: 1; }
+.portrait .pf-name { font-size: 150px; } .landscape .pf-name { font-size: 130px; }
+.pf-handle { color: var(--a1); font-weight: 600; margin-top: 14px; opacity: 0; }
+.portrait .pf-handle { font-size: 52px; } .landscape .pf-handle { font-size: 46px; }
+.pf-role { font-weight: 600; margin-top: 26px; line-height: 1.2; }
+.portrait .pf-role { font-size: 50px; } .landscape .pf-role { font-size: 44px; }
+.pf-chips { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
+.portrait .pf-chips { justify-content: center; }
+.pf-chip { padding: 12px 26px; border-radius: 999px; border: 1.5px solid color-mix(in srgb, var(--a1) 50%, transparent);
+           background: color-mix(in srgb, var(--a1) 12%, transparent); font-weight: 600; font-size: 30px; opacity: 0; }

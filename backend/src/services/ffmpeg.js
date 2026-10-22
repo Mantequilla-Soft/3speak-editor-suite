@@ -782,6 +782,12 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
     const args = []
     if (clip.startTime > 0) args.push('-ss', clip.startTime.toString())
     args.push('-i', inputFile, '-t', duration.toString())
+    // optional fades (Ad Wizard music); absent on editor clips, so their render is unchanged
+    const fi = Math.max(0, +clip.fadeIn || 0), fo = Math.max(0, +clip.fadeOut || 0)
+    const fades = []
+    if (fi > 0) fades.push(`afade=t=in:st=0:d=${Math.min(fi, duration).toFixed(3)}`)
+    if (fo > 0) fades.push(`afade=t=out:st=${Math.max(0, duration - fo).toFixed(3)}:d=${Math.min(fo, duration).toFixed(3)}`)
+    if (fades.length) args.push('-af', fades.join(','))
     args.push('-vn', '-c:a', 'aac', '-ar', '44100', '-y', outputPath)
     return runFFmpeg(args, signal)
   }
