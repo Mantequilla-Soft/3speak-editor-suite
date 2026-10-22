@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { Play, Pause, SkipBack, Plus, Copy, Trash2, ChevronUp, ChevronDown, Upload, Music, AudioLines, Download, X, Check, Loader2, Search, FolderOpen, Cloud, CloudOff, FilePlus2 } from 'lucide-react'
 import { selectBackend, api } from '../utils/backendSelector'
+import logo3speak from '../assets/3speak.png'
 import MusicLibrary from '../components/MusicLibrary'
 import ScenePreview from './ScenePreview'
 import AdTimeline from './AdTimeline'
@@ -243,7 +244,11 @@ export default function AdWizard() {
   return (
     <div className="aw" data-format={state.format}>
       <header className="aw-top">
-        <b className="aw-title">Ad Wizard</b>
+        {/* same branding as the Shorts editor (App.css .branding-*) */}
+        <div className="branding-left aw-brand">
+          <img src={logo3speak} alt="3Speak" className="branding-logo" />
+          <span className="branding-text">Ad Wizard <span className="branding-badge">beta</span></span>
+        </div>
         <input className="aw-name" value={state.name || ''} placeholder="Untitled ad" maxLength={80} onChange={e => dispatch({ type: 'set', patch: { name: e.target.value } })} />
         <DraftStatus drafts={drafts} saveState={saveState} onOpen={() => setDraftsOpen(true)} />
         <span className="aw-len">{duration ? `${duration.toFixed(1)} s` : ''}{FOR_BOOKING ? ` / max ${MAX_AD_SECONDS} s` : ''}</span>

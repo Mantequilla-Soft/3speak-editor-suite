@@ -4,7 +4,7 @@
 .spin { animation: aw-spin 1s linear infinite; } @keyframes aw-spin { to { transform: rotate(360deg); } }
 
 .aw-top { display: flex; align-items: center; gap: 14px; padding: 8px 16px; border-bottom: 1px solid var(--border-color); background: var(--bg-secondary); flex: none; }
-.aw-title { font-size: 16px; white-space: nowrap; }
+.aw-brand { flex: none; white-space: nowrap; }
 .aw-name { flex: 0 1 280px; min-width: 120px; padding: 5px 9px !important; font-weight: 600; }
 .aw-draft-status { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); flex: 1; min-width: 0; }
 .aw-draft-status small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
