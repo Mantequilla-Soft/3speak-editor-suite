@@ -6,6 +6,7 @@ import { spawn } from 'child_process'
 import crypto from 'crypto'
 import { createReadStream } from 'fs'
 import { v4 as uuidv4 } from 'uuid'
+import { requireSignIn } from '../auth.js'
 
 const router = Router()
 const UPLOAD_DIR = process.env.UPLOAD_DIR || '/app/uploads'
@@ -260,7 +261,7 @@ async function finishUpload(res, { filename, originalName, size, wait, hash = nu
  * 480p encoding happens in the background — the GET endpoint will serve
  * the encoded version once it's ready.
  */
-router.post('/', upload.single('file'), async (req, res) => {
+router.post('/', requireSignIn, upload.single('file'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' })
   }
@@ -297,7 +298,7 @@ async function readChunkMeta(uploadId) {
  * POST /api/upload/chunked/init  { name, size }
  * Starts a chunked upload. Returns { uploadId, chunkSize, chunks }.
  */
-router.post('/chunked/init', async (req, res) => {
+router.post('/chunked/init', requireSignIn, async (req, res) => {
   const size = Number(req.body?.size)
   const name = String(req.body?.name || 'upload')
   if (!Number.isFinite(size) || size <= 0 || size > MAX_UPLOAD_BYTES) {
@@ -316,7 +317,7 @@ router.post('/chunked/init', async (req, res) => {
  * PUT /api/upload/chunked/:uploadId/:index  (raw bytes)
  * Stores one chunk. Chunks may arrive in any order and be retried.
  */
-router.put('/chunked/:uploadId/:index',
+router.put('/chunked/:uploadId/:index', requireSignIn,
   express.raw({ type: () => true, limit: CHUNK_SIZE + 1024 }),
   async (req, res) => {
     const meta = await readChunkMeta(req.params.uploadId)
@@ -340,7 +341,7 @@ router.put('/chunked/:uploadId/:index',
  * POST /api/upload/chunked/:uploadId/complete
  * Joins the chunks into the uploaded file, then answers like POST /api/upload.
  */
-router.post('/chunked/:uploadId/complete', async (req, res) => {
+router.post('/chunked/:uploadId/complete', requireSignIn, async (req, res) => {
   const meta = await readChunkMeta(req.params.uploadId)
   if (!meta) return res.status(404).json({ error: 'Unknown upload' })
   const dir = path.join(CHUNK_DIR, req.params.uploadId)

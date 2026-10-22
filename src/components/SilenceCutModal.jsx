@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { X, Wand2, Play, Pause } from 'lucide-react'
 import { loadLoudness, planCuts, planSceneCuts, suggestThreshold } from '../utils/silenceDetect'
 import { api } from '../utils/backendSelector'
+import { authFetch } from '../utils/editorAuth'
 import { formatLength } from '../utils/limits'
 
 const SETTINGS_KEY = 'autocut-settings'
@@ -84,7 +85,7 @@ function SilenceCutModal({ clip, source, unavailable, onApply, onClose }) {
     if (!uploaded) { setSceneError('Scene changes can be found once this clip has finished uploading.'); return }
     const controller = new AbortController()
     setSceneError(null)
-    fetch(api('/api/clip/scenes'), {
+    authFetch(api('/api/clip/scenes'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url: clip.serverUrl }),

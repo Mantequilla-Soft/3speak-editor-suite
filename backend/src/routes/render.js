@@ -5,6 +5,7 @@ import fs from 'fs/promises'
 import { downloadMedia } from '../utils/download.js'
 import { buildAndRunFFmpeg, RENDER_CACHE_DIR } from '../services/ffmpeg.js'
 import crypto from 'crypto'
+import { requireSignIn } from '../auth.js'
 
 const router = Router()
 const RENDERED_DIR = process.env.RENDERED_DIR || '/app/rendered'
@@ -54,7 +55,7 @@ async function cachedDownload(url, jobDir) {
  * POST /api/render
  * Body: { timeline: { tracks, outputWidth, outputHeight, fps }, mediaUrls }
  */
-router.post('/', async (req, res) => {
+router.post('/', requireSignIn, async (req, res) => {
   try {
     const { timeline } = req.body
 
@@ -121,7 +122,7 @@ router.get('/:jobId', (req, res) => {
 /**
  * POST /api/render/:jobId/abort
  */
-router.post('/:jobId/abort', (req, res) => {
+router.post('/:jobId/abort', requireSignIn, (req, res) => {
   const job = jobs.get(req.params.jobId)
   if (!job) {
     return res.status(404).json({ error: 'Job not found' })

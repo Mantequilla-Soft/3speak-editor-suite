@@ -7,6 +7,7 @@ import { EFFECTS, EFFECT_DEFAULTS, normalizeMotion } from '../utils/stickerMotio
 import { Eye, EyeOff } from 'lucide-react'
 import { autoColor } from '../utils/autoColor'
 import { api, getBackendUrl } from '../utils/backendSelector'
+import { authFetch } from '../utils/editorAuth'
 import './GreenScreen.css'
 
 // Green screen (chroma key) on a video clip: keyed pixels turn transparent, so
@@ -232,7 +233,7 @@ function NoiseControls({ clip, onUpdateClip }) {
     }
     setBusy(level)
     try {
-      const res = await fetch(api('/api/clip/denoise'), {
+      const res = await authFetch(api('/api/clip/denoise'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: source, strength: level })

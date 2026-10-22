@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './App.css'
+import './utils/editorAuth' // listens for the 3Speak sign-in from the first message on
 
 // Two entry modes. Default: the Shorts editor (App). ?mode=ads: the Ad Wizard, its own shell and its own
 // code chunk (src/adwizard), so the editor does not load or change because of it.
