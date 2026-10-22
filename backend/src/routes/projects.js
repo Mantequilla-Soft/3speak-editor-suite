@@ -28,7 +28,7 @@ export const TIERS = {
   pro: { maxProjects: 3, ttlMs: 30 * 24 * 60 * 60 * 1000 }
 }
 
-function verifyEditorToken(header) {
+export function verifyEditorToken(header) {
   if (!SECRET) return null
   const token = String(header || '').replace(/^Bearer\s+/i, '')
   const parts = token.split('.')

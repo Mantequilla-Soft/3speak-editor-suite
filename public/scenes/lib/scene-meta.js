@@ -208,6 +208,24 @@
     points: { role: ['middle'], dur: [3, 3.6], desc: 'Headline and up to 4 icon rows', fields: [...head(1, 2), F('points', 'list', { min: 1, max: 4, of: titleSub() })] },
   };
 
+  // Visual style, for filtering a picker: text = typography carries the scene; components = a UI piece or
+  // widget (calendar, map, poll, chat...); images = the user's pictures or screenshots carry it.
+  const STYLES = { text: 'Text', components: 'Components', images: 'Pictures' };
+  const STYLE = {
+    words: 'text', compare: 'text', steps: 'text', cards: 'text', quote: 'text', greetings: 'text', heroPoster: 'text',
+    marquee: 'text', endPoster: 'text', endMarquee: 'text', kinetic: 'text', cube: 'text', statement: 'text', hook: 'text',
+    points: 'text', logo: 'text', endcard: 'text', endWave: 'text', heroWave: 'components',
+    notify: 'components', chat: 'components', stats: 'components', offer: 'components', receipt: 'components', timeline: 'components',
+    stopwatch: 'components', ticket: 'components', flow: 'components', countdown: 'components', poll: 'components', badge: 'components',
+    checklist: 'components', search: 'components', calendar: 'components', map: 'components', growth: 'components', compose: 'components',
+    stat: 'components', podium: 'components', embedDemo: 'components',
+    spotlight: 'images', heroSplit: 'images', heroSlides: 'images', heroCollage: 'images', carousel: 'images', bento: 'images', wipe: 'images',
+    endPhoto: 'images', endSplit: 'images', endMosaic: 'images', walkthrough: 'images', lockscreen: 'images', deck: 'images', sleeve: 'images',
+    adSpot: 'images', tabs: 'images', frontends: 'images', phoneStack: 'images', spotlightGrid: 'images', split3: 'images', magnifier: 'images',
+    zoomReveal: 'images', videoRow: 'images', profile: 'images', wall: 'images', product: 'images', phone: 'images',
+  };
+  for (const t of Object.keys(TYPES)) TYPES[t].style = STYLE[t] || 'text';
+
   const SIZES = { landscape: [1920, 1080], portrait: [1080, 1920], square: [1080, 1080] };
 
   // ---------- sanitising ----------
@@ -334,9 +352,9 @@
   }
 
   function catalogue() {
-    return Object.entries(TYPES).map(([type, m]) => ({ type, role: m.role, desc: m.desc, minDuration: m.dur[0], duration: m.dur[1], fields: m.fields,
+    return Object.entries(TYPES).map(([type, m]) => ({ type, role: m.role, style: m.style, desc: m.desc, minDuration: m.dur[0], duration: m.dur[1], fields: m.fields,
       orient: m.orient || ['landscape', 'portrait'] }));
   }
 
-  return { TYPES, ICONS, SIZES, sanitize, validate, create, catalogue, SAMPLES };
+  return { TYPES, ICONS, SIZES, STYLES, sanitize, validate, create, catalogue, SAMPLES };
 });

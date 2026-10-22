@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Plus, Trash2, ChevronUp, ChevronDown, Upload, X, RotateCcw } from 'lucide-react'
+import { Plus, Trash2, ChevronUp, ChevronDown, Upload, X, RotateCcw, ClipboardPaste } from 'lucide-react'
 import { uploadFile, absUrl } from './engine'
 
 // Forms generated from the scene engine's schema (lib/scene-meta.js): one field editor per field kind.
@@ -148,21 +148,57 @@ function ObjectList({ f, value, onChange, icons }) {
 
 const swap = (arr, a, b) => { const c = [...arr]; [c[a], c[b]] = [c[b], c[a]]; return c }
 
-// A picture: upload or URL, then zoom + drag to place it inside its frame (engine: { url, scale, x, y })
+// A picture: upload, paste (Ctrl/Cmd+V while the field is focused, or the Paste button) or a link, then zoom +
+// drag to place it inside its frame (engine: { url, scale, x, y })
+const clipboardImage = items => {
+  for (const it of items || []) {
+    if (it.kind === 'file' && /^image\//.test(it.type)) return it.getAsFile()
+  }
+  return null
+}
+const isLink = t => /^https:\/\/\S+$/i.test((t || '').trim())
+
 export function ImageField({ value, onChange, adjust = true, accept = 'image/*' }) {
   const [busy, setBusy] = useState(null)
   const [err, setErr] = useState(null)
+  const [flash, setFlash] = useState(false)
   const fileRef = useRef(null)
   const padRef = useRef(null)
   const url = imgUrl(value)
   const o = value && typeof value === 'object' ? value : { url }
   const set = patch => onChange({ ...o, ...patch })
+  const setUrl = u => onChange(adjust ? { url: u } : u)
 
   const pick = async file => {
     if (!file) return
+    if (!/^image\//.test(file.type)) { setErr('That is not a picture.'); return }
     setErr(null); setBusy(0)
-    try { onChange(adjust ? { url: await uploadFile(file, p => setBusy(p)) } : await uploadFile(file, p => setBusy(p))) }
+    try { setUrl(await uploadFile(file, p => setBusy(p))) }
     catch (e) { setErr(e.message) } finally { setBusy(null) }
+  }
+  // Ctrl/Cmd+V anywhere inside the field (it is focusable)
+  const onPaste = e => {
+    const file = clipboardImage(e.clipboardData?.items)
+    if (file) { e.preventDefault(); setFlash(true); setTimeout(() => setFlash(false), 400); pick(new File([file], file.name || `pasted.${(file.type.split('/')[1] || 'png')}`, { type: file.type })); return }
+    const text = e.clipboardData?.getData('text/plain')
+    if (isLink(text) && e.target.tagName !== 'INPUT') { e.preventDefault(); setUrl(text.trim()) }
+  }
+  // the Paste button: Async Clipboard API (the page that embeds us must allow clipboard-read)
+  const pasteButton = async () => {
+    setErr(null)
+    try {
+      if (navigator.clipboard?.read) {
+        for (const item of await navigator.clipboard.read()) {
+          const type = item.types.find(t => /^image\//.test(t))
+          if (type) { const blob = await item.getType(type); return pick(new File([blob], `pasted.${type.split('/')[1]}`, { type })) }
+        }
+      }
+      const text = await navigator.clipboard?.readText?.()
+      if (isLink(text)) return setUrl(text.trim())
+      setErr('No picture on the clipboard. Copy one, or press Ctrl+V / Cmd+V here.')
+    } catch {
+      setErr('The browser did not allow reading the clipboard. Click here and press Ctrl+V / Cmd+V.')
+    }
   }
   const drag = e => {
     const r = padRef.current.getBoundingClientRect()
@@ -175,7 +211,8 @@ export function ImageField({ value, onChange, adjust = true, accept = 'image/*' 
     window.addEventListener('pointermove', move); window.addEventListener('pointerup', up)
   }
 
-  return <div className="aw-img">
+  return <div className={`aw-img${flash ? ' pasted' : ''}`} tabIndex={0} onPaste={onPaste}
+    onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); pick(e.dataTransfer.files[0]) }}>
     {url ? (
       <div className="aw-img-main">
         <div className="aw-img-pad" ref={padRef} onPointerDown={adjust ? drag : undefined} title={adjust ? 'Drag to choose which part of the picture shows' : ''}>
@@ -189,15 +226,19 @@ export function ImageField({ value, onChange, adjust = true, accept = 'image/*' 
           <div className="aw-row">
             {adjust && <button type="button" className="aw-icon-btn" onClick={() => onChange({ url })} title="Reset placement"><RotateCcw size={14} /></button>}
             <button type="button" className="aw-btn-small" onClick={() => fileRef.current?.click()}><Upload size={14} /> Replace</button>
+            <button type="button" className="aw-icon-btn" onClick={pasteButton} title="Paste from the clipboard"><ClipboardPaste size={14} /></button>
             <button type="button" className="aw-icon-btn" onClick={() => onChange(undefined)} title="Remove"><Trash2 size={14} /></button>
           </div>
         </div>
       </div>
     ) : (
       <div className="aw-img-empty">
-        <button type="button" className="aw-btn-small" onClick={() => fileRef.current?.click()} disabled={busy != null}>
-          <Upload size={14} /> {busy != null ? `Uploading ${Math.round(busy * 100)}%` : 'Upload picture'}</button>
-        <input type="url" placeholder="or paste an https:// link" onBlur={e => e.target.value && onChange(adjust ? { url: e.target.value.trim() } : e.target.value.trim())} />
+        <div className="aw-row">
+          <button type="button" className="aw-btn-small" onClick={() => fileRef.current?.click()} disabled={busy != null}>
+            <Upload size={14} /> {busy != null ? `Uploading ${Math.round(busy * 100)}%` : 'Upload'}</button>
+          <button type="button" className="aw-btn-small" onClick={pasteButton} disabled={busy != null}><ClipboardPaste size={14} /> Paste</button>
+        </div>
+        <input type="url" placeholder="or paste an https:// link, or a picture (Ctrl+V)" onBlur={e => isLink(e.target.value) && setUrl(e.target.value.trim())} />
       </div>
     )}
     {err && <small className="aw-warn">{err}</small>}
