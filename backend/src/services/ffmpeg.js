@@ -7,6 +7,10 @@ import { ffmpegColorFilter } from '../utils/clipColor.js'
 import crypto from 'crypto'
 import { ffmpegMotionFilter, normalizeMotion, pivotPoint, activeEffects } from '../utils/stickerMotion.js'
 
+// clip volume 0..100 -> gain. 0 means silent: `volume || 100` used to turn it into full volume.
+const clipVolume = clip => (Number.isFinite(+clip.volume) ? Math.max(0, +clip.volume) : 100) / 100
+
+
 // Re-renders reuse what did not change: each clip's processed file is kept
 // under a fingerprint of everything that shapes it (its settings, its source
 // file, output size / fps / scale). Where a clip sits on the timeline is not
@@ -49,7 +53,8 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
   // Scoped runner that passes the abort signal to every FFmpeg call
   const run = (args) => runFFmpeg(args, signal)
 
-  const videoTracks = timeline.tracks.filter(t => t.type === 'video')
+  // hidden video tracks are not drawn (and their clips' own sound is not mixed), as in the preview
+  const videoTracks = timeline.tracks.filter(t => t.type === 'video' && t.visible !== false)
   const audioTracks = timeline.tracks.filter(t => t.type === 'audio')
 
   // Calculate total timeline duration
@@ -279,7 +284,7 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
       await processClip({ ...clip, type: 'audio', trackType: 'audio' }, inputFile, audioPath, outputWidth, outputHeight, fps, signal, scaleFactor)
       audioSources.push({
         file: audioPath,
-        volume: (clip.volume || 100) / 100,
+        volume: clipVolume(clip),
         offset: clip.timelinePosition || 0
       })
     }
@@ -287,11 +292,13 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
 
   // Audio-only tracks (with timeline offset)
   for (const track of audioTracks) {
+    if (track.muted === true) continue // a muted track is silent in the preview, so it is silent here
     for (const clip of track.clips) {
+      if (clip.audioEnabled === false) continue
       if (processedClips.has(clip.id)) {
         audioSources.push({
           file: processedClips.get(clip.id),
-          volume: (clip.volume || 100) / 100,
+          volume: clipVolume(clip),
           offset: clip.timelinePosition || 0
         })
       }
@@ -1509,7 +1516,10 @@ async function combineVideoAudio(videoPath, allSources, outputPath, fps, signal)
     }
   } else {
     // Multiple audio sources — mix them together
-    filterParts.push(`${mixInputs.join('')}amix=inputs=${mixInputs.length}:duration=longest:dropout_transition=2[aout]`)
+    // normalize=0: each source keeps the volume it was given (amix's default divides every input by the number
+    // of inputs, so music under a few sound effects came out far quieter than in the preview); a limiter
+    // catches the peaks when several loud sources overlap.
+    filterParts.push(`${mixInputs.join('')}amix=inputs=${mixInputs.length}:duration=longest:dropout_transition=0:normalize=0,alimiter=limit=0.95:level=false[aout]`)
     args.push(
       '-filter_complex', filterParts.join(';'),
       '-map', '0:v', '-map', '[aout]'

@@ -281,11 +281,15 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     // Build the timeline payload with overridden URLs
     // Prefer serverUrl (already on backend, e.g. /rendered/clip-xxx.mp4) over originalUrl (HLS)
     const mediaUrls = []
-    const trackData = tracks.map(track => ({
+    // Render what the preview plays: hidden video tracks are not drawn, muted audio tracks and audio clips
+    // with their sound off are silent (the backend applies the same rules for other callers).
+    const trackData = tracks.filter(track => !(track.type === 'video' && track.visible === false) && !(track.type === 'audio' && track.muted === true)).map(track => ({
       id: track.id,
       type: track.type,
       name: track.name,
-      clips: track.clips.map(clip => {
+      muted: track.muted === true,
+      visible: track.visible !== false,
+      clips: track.clips.filter(clip => !(track.type === 'audio' && clip.audioEnabled === false)).map(clip => {
         const url = urlOverrides.get(clip.id) || clip.serverUrl || clip.originalUrl || clip.url
         if (url) {
           mediaUrls.push({ id: clip.id, url, type: clip.type })
@@ -308,7 +312,7 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
           positionY: clip.positionY || 0,
           rotation: clip.rotation || 0,
           audioEnabled: clip.audioEnabled !== false,
-          volume: clip.volume || 100
+          volume: Number.isFinite(+clip.volume) ? +clip.volume : 100 // 0 is a real setting (silent), not "unset"
         }
         if (hasLayout(clip)) baseClip.layout = clip.layout
 

@@ -319,7 +319,7 @@ function createLinkedAudioClip(videoClip, groupId) {
     cropHeight: 100,
     positionX: 0,
     positionY: 0,
-    volume: videoClip.volume || 100
+    volume: videoClip.volume ?? 100
   }
 }
 
