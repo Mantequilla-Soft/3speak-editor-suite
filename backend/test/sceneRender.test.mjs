@@ -1,5 +1,10 @@
 import { test, before, after } from 'node:test'
 import assert from 'node:assert/strict'
+import crypto from 'node:crypto'
+
+process.env.EDITOR_TOKEN_SECRET = 'test-secret'
+const mid = Buffer.from(JSON.stringify({ u: 'alice', exp: Date.now() + 600000 })).toString('base64url')
+const TOKEN = `v1.${mid}.${crypto.createHmac('sha256', 'test-secret').update(mid).digest('hex')}`
 
 const express = (await import('express')).default
 const { sceneRenderRouter, privateAddress } = await import('../src/routes/sceneRender.js')
@@ -22,7 +27,11 @@ before(async () => {
 })
 after(() => server.close())
 
-const post = async body => { const r = await fetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); return [r.status, await r.json()] }
+const post = async (body, auth = TOKEN) => { const r = await fetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(auth ? { Authorization: `Bearer ${auth}` } : {}) }, body: JSON.stringify(body) }); return [r.status, await r.json()] }
+
+test('a scene render needs a 3Speak sign-in', async () => {
+  assert.equal((await post({ doc: { scenes: [{ type: 'hook', lines: ['x'] }] } }, null))[0], 401)
+})
 
 test('a render needs a doc with at least one known, complete scene (checked before any browser starts)', async () => {
   assert.equal((await post({}))[0], 400)

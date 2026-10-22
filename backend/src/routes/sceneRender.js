@@ -18,6 +18,7 @@ import crypto from 'crypto'
 import dns from 'dns/promises'
 import net from 'net'
 import { fileURLToPath } from 'url'
+import { requireSignIn } from '../auth.js'
 
 const router = Router()
 const PORT = process.env.PORT || 3100
@@ -160,7 +161,7 @@ async function renderJob(job) {
   }
 }
 
-router.post('/', async (req, res) => {
+router.post('/', requireSignIn, async (req, res) => {
   try {
     const raw = req.body?.doc
     if (!raw || typeof raw !== 'object') return res.status(400).json({ error: 'doc required' })

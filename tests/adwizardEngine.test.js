@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest'
 
 let E
 beforeAll(async () => {
-  globalThis.window = { location: { origin: 'https://editor.example', search: '' } }
+  globalThis.window = { location: { origin: 'https://editor.example', search: '' }, addEventListener() {} }
   E = await import('../src/adwizard/engine.js')
 })
 

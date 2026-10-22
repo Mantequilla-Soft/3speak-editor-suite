@@ -2,6 +2,7 @@
 // docs/engine.md). The engine's schema (SceneMeta) and starter content (SceneSamples) are plain browser
 // scripts; loadEngine() puts them on window once.
 import { api, getBackendUrl } from '../utils/backendSelector'
+import { authHeaders, dropToken } from '../utils/editorAuth'
 
 export const SCENES_BASE = '/scenes'
 export const HOST_URL = `${SCENES_BASE}/host/index.html`
@@ -155,17 +156,20 @@ export function autoSfx(cues, sfx) {
 }
 
 // ---- backend calls ----
-export async function uploadFile(file, onProgress) {
+export async function uploadFile(file, onProgress, retried = false) {
   const form = new FormData()
   form.append('file', file)
+  const auth = await authHeaders() // uploads need the 3Speak sign-in (utils/editorAuth)
   const res = await new Promise((resolve, reject) => {
     const x = new XMLHttpRequest()
     x.open('POST', api('/api/upload'))
+    x.setRequestHeader('Authorization', auth.Authorization)
     x.upload.onprogress = e => e.lengthComputable && onProgress?.(e.loaded / e.total)
-    x.onload = () => (x.status < 300 ? resolve(JSON.parse(x.responseText)) : reject(new Error(`upload failed (${x.status})`)))
+    x.onload = () => (x.status < 300 ? resolve(JSON.parse(x.responseText)) : reject(Object.assign(new Error(`upload failed (${x.status})`), { status: x.status })))
     x.onerror = () => reject(new Error('upload failed'))
     x.send(form)
-  })
+  }).catch(e => { if (e.status === 401 && !retried) { dropToken(); return null } throw e })
+  if (res === null) return uploadFile(file, onProgress, true)
   return res.url || `/api/upload/files/${res.filename}`
 }
 

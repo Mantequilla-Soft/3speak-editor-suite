@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { Play, Pause, SkipBack, Plus, Copy, Trash2, ChevronUp, ChevronDown, Upload, Music, AudioLines, Download, X, Check, Loader2, Search, FolderOpen, Cloud, CloudOff, FilePlus2 } from 'lucide-react'
 import { selectBackend, api } from '../utils/backendSelector'
+import { authFetch } from '../utils/editorAuth'
 import logo3speak from '../assets/3speak.png'
 import MusicLibrary from '../components/MusicLibrary'
 import ScenePreview from './ScenePreview'
@@ -541,7 +542,7 @@ function RenderPanel({ state, doc, meta, info, issues, tooLong, music, sfxAll, a
     setUsed(false)
     try {
       setJob({ phase: 'Drawing the scenes…', progress: 0 })
-      const r = await fetch(api('/api/scene-render'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ doc: meta.sanitize(doc) }) })
+      const r = await authFetch(api('/api/scene-render'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ doc: meta.sanitize(doc) }) })
       if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `scene render: ${r.status}`)
       const { jobId } = await r.json()
       const scene = await pollJob(api(`/api/scene-render/${jobId}`), d => setJob(j => ({ ...j, progress: (d.progress || 0) * 0.7 })), { signal: ctl.signal })
@@ -564,7 +565,7 @@ function RenderPanel({ state, doc, meta, info, issues, tooLong, music, sfxAll, a
           fadeIn: music.fadeIn || 0, fadeOut: music.fadeOut || 0, audioEnabled: true }] }] : []),
         ...(sfxClips.length ? [{ id: 's', type: 'audio', name: 'SFX', clips: sfxClips }] : []),
       ]
-      const res = await fetch(api('/api/render'), { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      const res = await authFetch(api('/api/render'), { method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ timeline: { tracks, outputWidth: doc.width, outputHeight: doc.height, previewWidth: doc.width, previewHeight: doc.height, fps: 30 } }) })
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `render: ${res.status}`)
       const { jobId: rid } = await res.json()
