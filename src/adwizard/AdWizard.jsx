@@ -154,6 +154,7 @@ export default function AdWizard() {
     if (LOCKED_FORMAT) s.format = LOCKED_FORMAT
     lastSaved.current = JSON.stringify(s)
     dispatch({ type: 'load', state: s }); setSelected(0); setDraftsOpen(false); setStep('scenes')
+    pendingSeek.current = 0
   }
   const newAd = () => { dispatch({ type: 'load', state: freshState() }); lastSaved.current = null; setSelected(0); setStep('format'); setDraftsOpen(false) }
 
@@ -191,11 +192,19 @@ export default function AdWizard() {
     return () => window.removeEventListener('keydown', k)
   }, [playing, play, stop])
 
-  const selectScene = i => {
-    setSelected(i); setFocus('scene')
+  // show a scene where its content has arrived (at its very start most scenes are still empty)
+  const pendingSeek = useRef(0)
+  const showScene = useCallback(i => {
     const s = info?.scenes?.[i]
-    if (s && !playing) seek(s.start + Math.min(1.2, (s.end - s.start) * 0.6))
-  }
+    if (s && !playRef.current) seek(s.start + Math.min(1.2, (s.end - s.start) * 0.6))
+  }, [info, seek])
+  const selectScene = i => { setSelected(i); setFocus('scene'); showScene(i) }
+  // after the preview reloads (a scene added, the first load), jump into the scene being worked on
+  useEffect(() => {
+    if (pendingSeek.current == null || !info?.scenes?.length) return
+    const i = pendingSeek.current; pendingSeek.current = null
+    showScene(Math.min(i, info.scenes.length - 1))
+  }, [info]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // move an auto sound = take it over as a manual clip
   const moveSfx = (s, at) => {
@@ -227,6 +236,7 @@ export default function AdWizard() {
     const at = state.scenes.length ? Math.min(selected + 1, state.scenes.length) : 0
     dispatch({ type: 'addScene', at, scene: { ...meta.create(type, state.format), id: newId() } })
     setSelected(at); setFocus('scene'); setPicker(false); setStep('scenes')
+    pendingSeek.current = at
   }
   const stepIdx = STEPS.findIndex(s => s.key === step)
 

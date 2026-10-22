@@ -24,7 +24,7 @@
   const sub = F('sub', 'para', { opt: true, maxLen: 140, label: 'Sub line' });
   const line = F('line', 'text', { opt: true, maxLen: 90, label: 'Closing line' });
   const head = (min, max) => [label, lines(min, max)];
-  const closer = [F('tagline', 'text', { opt: true, maxLen: 80, label: 'Tagline', hint: 'string, or two lines' }),
+  const closer = [F('tagline', 'text', { opt: true, maxLen: 80, label: 'Tagline' }),
     F('cta', 'text', { opt: true, maxLen: 40, label: 'Call to action', hint: 'e.g. your URL' }), F('footer', 'text', { opt: true, maxLen: 80, label: 'Footer' })];
   const titleSub = (iconToo = true, imageToo = false) => [
     ...(imageToo ? [F('image', 'image', { opt: true })] : []),
