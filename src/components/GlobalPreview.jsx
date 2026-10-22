@@ -8,6 +8,9 @@ function formatTime(seconds) {
   return `${mins}:${secs.toString().padStart(2, '0')}`
 }
 
+// clip volume 0..100 -> element volume. 0 is silent: `volume || 100` used to play it at full volume.
+const clipVol = clip => Math.min(1, Math.max(0, (Number.isFinite(+clip.volume) ? +clip.volume : 100) / 100))
+
 const SIZES = ['small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge', 'huge', 'massive', 'giant', 'max', 'fullscreen']
 const UI_UPDATE_INTERVAL = 50 // ~20fps for React state updates during playback
 // Clips starting within this many seconds are mounted (hidden) and seeked to
@@ -487,7 +490,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       const audioEl = audioRefs.current[clip.id]
       if (audioEl) {
         audioEl.muted = false
-        audioEl.volume = (clip.volume || 100) / 100
+        audioEl.volume = clipVol(clip)
       }
     })
   }, [currentClips, currentAudioClips, isPlaying])
@@ -560,7 +563,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       const audioEl = audioRefs.current[clip.id]
       if (audioEl) {
         audioEl.muted = false
-        audioEl.volume = (clip.volume || 100) / 100
+        audioEl.volume = clipVol(clip)
         const mediaTime = latestRef.current.getMediaTime(clip, playbackPosRef.current)
         audioEl.currentTime = mediaTime
         audioEl.play().catch(() => {})
@@ -704,7 +707,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         if (!audioEl) return
         const inRange = newPosition >= clip.timelineStart && newPosition < clip.timelineEnd
         if (inRange) {
-          audioEl.volume = (clip.volume || 100) / 100
+          audioEl.volume = clipVol(clip)
           if (audioEl.paused) {
             audioEl.currentTime = gmt(clip, newPosition)
             audioEl.play().catch(() => {})
@@ -760,7 +763,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         const audioEl = audioRefs.current[clip.id]
         if (audioEl) {
           audioEl.muted = false
-          audioEl.volume = (clip.volume || 100) / 100
+          audioEl.volume = clipVol(clip)
           const mt = getMediaTime(clip, playbackPosRef.current)
           audioEl.currentTime = mt
           audioEl.play().catch(() => {})
