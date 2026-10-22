@@ -1,4 +1,5 @@
 import { api, getBackendUrl } from './backendSelector'
+import { authFetch } from './editorAuth'
 
 /**
  * Request the backend to reverse a clip segment.
@@ -24,7 +25,7 @@ export async function reverseClipOnBackend(url, startTime, endTime, onProgress =
     formData.append('url', url)
   }
 
-  const res = await fetch(api('/api/clip/reverse'), {
+  const res = await authFetch(api('/api/clip/reverse'), {
     method: 'POST',
     body: formData
   })

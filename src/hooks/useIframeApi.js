@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useRef, useState } from 'react'
 import { api, getBackendUrl } from '../utils/backendSelector'
+import { authFetch, currentToken } from '../utils/editorAuth'
 import { hasLayout } from '../utils/remixLayout'
 import { getClipChromaKey } from '../utils/chromaKey'
 import { normalizeColor } from '../utils/clipColor'
@@ -176,7 +177,9 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
       abortUrl = api(`/api/render/${job.jobId}/abort`)
     }
 
-    fetch(abortUrl, { method: 'POST', keepalive: true }).catch(() => {})
+    // no sign-in prompt for an abort (it may run while the page closes): use the token we have
+    const tok = currentToken()
+    fetch(abortUrl, { method: 'POST', keepalive: true, headers: tok ? { Authorization: `Bearer ${tok}` } : {} }).catch(() => {})
 
     activeJobRef.current = null
     if (pollIntervalRef.current) {
@@ -204,7 +207,7 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     const formData = new FormData()
     formData.append('file', file, name || file.name)
 
-    const res = await fetch(api('/api/upload'), {
+    const res = await authFetch(api('/api/upload'), {
       method: 'POST',
       body: formData
     })
@@ -499,7 +502,7 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
       setRenderStatus({ status: 'submitting', progress: 0, phase: 'Submitting render job...' })
 
       const renderUrl = GATEWAY_URL ? `${GATEWAY_URL}/api/render` : api('/api/render')
-      const res = await fetch(renderUrl, {
+      const res = await authFetch(renderUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

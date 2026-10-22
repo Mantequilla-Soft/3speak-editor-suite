@@ -1,10 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api, getBackendUrl } from '../utils/backendSelector'
+import { authFetch } from '../utils/editorAuth'
 
 const AUTOSAVE_DELAY = 2500
 const LOCAL = /^(blob|data):/
 
-const newId = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now().toString(16)}-0000-4000-8000-${Math.random().toString(16).slice(2, 14).padEnd(12, '0')}`)
+// A UUID v4 (the backend only accepts that shape). randomUUID is missing outside secure contexts; the old
+// fallback started with an 11-digit time stamp, which the backend refused, so drafts never saved there.
+const newId = () => {
+  if (crypto.randomUUID) return crypto.randomUUID()
+  const b = crypto.getRandomValues(new Uint8Array(16))
+  b[6] = (b[6] & 0x0f) | 0x40; b[8] = (b[8] & 0x3f) | 0x80
+  const h = [...b].map(x => x.toString(16).padStart(2, '0')).join('')
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`
+}
 
 // Fields that only make sense in this browser session
 const SESSION_FIELDS = ['file', 'uploading', 'uploadProgress', 'uploadError', 'converting', 'convertProgress', 'convertAhead', 'convertFailed']
@@ -35,7 +44,7 @@ async function uploadLocalImage(localUrl, name) {
   const blob = await (await fetch(localUrl)).blob()
   const form = new FormData()
   form.append('file', blob, name)
-  const res = await fetch(api('/api/upload'), { method: 'POST', body: form })
+  const res = await authFetch(api('/api/upload'), { method: 'POST', body: form })
   if (!res.ok) throw new Error(`upload ${res.status}`)
   const { url } = await res.json()
   const backend = getBackendUrl()
