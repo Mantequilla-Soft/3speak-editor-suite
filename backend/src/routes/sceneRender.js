@@ -114,7 +114,10 @@ async function localise(doc) {
 async function renderJob(job) {
   const { chromium } = await import('playwright-core')
   const out = path.join(RENDERED_DIR, `scene-${job.id}.mp4`)
-  const browser = await chromium.launch({ executablePath: chromiumPath(), args: ['--no-sandbox', '--font-render-hinting=none', '--disable-dev-shm-usage'] })
+  // headless: false + --headless=new: current Chromium builds (Alpine's) no longer have the old headless mode
+  // that this playwright-core version would ask for
+  const browser = await chromium.launch({ executablePath: chromiumPath(), headless: false,
+    args: ['--headless=new', '--no-sandbox', '--font-render-hinting=none', '--disable-dev-shm-usage', '--hide-scrollbars', '--mute-audio'] })
   const kill = setTimeout(() => { job.error = 'timed out'; browser.close().catch(() => {}) }, JOB_TIMEOUT_MS)
   try {
     const page = await browser.newPage({ viewport: { width: job.doc.width, height: job.doc.height }, deviceScaleFactor: 1 })
