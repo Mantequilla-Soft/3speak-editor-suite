@@ -7,6 +7,7 @@ import path from 'node:path'
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'signin-'))
 process.env.UPLOAD_DIR = dir
+process.env.UPLOADS_DIR = dir // clip.js reads this spelling
 process.env.WORK_DIR = dir
 process.env.RENDERED_DIR = dir
 process.env.EDITOR_TOKEN_SECRET = 'test-secret'
