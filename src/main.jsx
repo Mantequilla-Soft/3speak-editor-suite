@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './App.css'
+import './utils/editorAuth' // listens for the 3Speak sign-in from the first message on
 
 // Only allow usage inside an iframe (embedded by 3speak.tv)
 if (window.self === window.top) throw new Error('iframe-only')

@@ -5,6 +5,7 @@ import fs from 'fs/promises'
 import { spawn } from 'child_process'
 import { selectVariantUrl } from '../utils/m3u8Parser.js'
 import multer from 'multer'
+import { requireSignIn } from '../auth.js'
 
 const router = Router()
 const RENDERED_DIR = process.env.RENDERED_DIR || '/app/rendered'
@@ -18,7 +19,7 @@ const jobs = new Map()
  * POST /api/clip/prepare
  * Body: { url, clipStart, clipEnd }
  */
-router.post('/prepare', async (req, res) => {
+router.post('/prepare', requireSignIn, async (req, res) => {
   try {
     const { url, clipStart, clipEnd } = req.body
 
@@ -201,7 +202,7 @@ function runFFmpegClip(inputUrl, outputPath, seekTime, duration, onProgress) {
  *   - multipart form with 'url' field (for remote URLs)
  * Plus 'startTime' and 'endTime' fields.
  */
-router.post('/reverse', upload.single('file'), async (req, res) => {
+router.post('/reverse', requireSignIn, upload.single('file'), async (req, res) => {
   try {
     const startTime = parseFloat(req.body.startTime)
     const endTime = parseFloat(req.body.endTime)
@@ -403,7 +404,7 @@ async function resolveUpload(url) {
   return { name, base, input: null }
 }
 
-router.post('/denoise', async (req, res) => {
+router.post('/denoise', requireSignIn, async (req, res) => {
   const strength = req.body?.strength
   const found = DENOISE[strength] ? await resolveUpload(req.body?.url) : null
   if (!found) return res.status(400).json({ error: 'Need one of our upload URLs and a strength' })
@@ -448,7 +449,7 @@ router.post('/denoise', async (req, res) => {
  * (hard cuts score ~20-40, a still shot under 1). The editor picks the cuts
  * with its own threshold, so this runs once per file (cached next to it).
  */
-router.post('/scenes', async (req, res) => {
+router.post('/scenes', requireSignIn, async (req, res) => {
   const found = await resolveUpload(req.body?.url)
   if (!found) return res.status(400).json({ error: 'Need one of our upload URLs' })
   if (!found.input) return res.status(404).json({ error: 'File not found' })

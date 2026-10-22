@@ -35,7 +35,8 @@ export async function proxyRenderRequest(req, res) {
   try {
     const proxyRes = await fetch(`${backend.apiEndpoint}/api/render`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      // the 3Speak sign-in travels on: the backend checks it (backend/src/auth.js)
+      headers: { 'Content-Type': 'application/json', ...(req.get('Authorization') ? { Authorization: req.get('Authorization') } : {}) },
       body: JSON.stringify(req.body)
     })
 
@@ -79,7 +80,7 @@ export async function proxyAbortRequest(req, res) {
   }
 
   try {
-    const proxyRes = await fetch(`${backendEndpoint}/api/render/${jobId}/abort`, { method: 'POST' })
+    const proxyRes = await fetch(`${backendEndpoint}/api/render/${jobId}/abort`, { method: 'POST', headers: req.get('Authorization') ? { Authorization: req.get('Authorization') } : {} })
     const data = await proxyRes.json()
     return res.status(proxyRes.status).json(data)
   } catch (err) {

@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
 import { X, Circle, Square, RotateCcw, Check, Maximize2, Minimize2, ScrollText } from 'lucide-react'
 import { api, getBackendUrl } from '../utils/backendSelector'
+import { authHeaders } from '../utils/editorAuth'
 import { layoutPan, layoutZoom } from '../utils/remixLayout'
 import { defaultChromaKey, normalizeChromaKey, captureSteadyPlate, canvasToBlobUrl, KEY_RANGES } from '../utils/chromaKey'
 import { lockCamera, unlockCamera, applyCameraLock, describeCameraLock } from '../utils/cameraLock'
@@ -352,12 +353,14 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
       const formData = new FormData()
       formData.append('file', file, file.name)
 
-      // Use XMLHttpRequest for upload progress tracking
+      // Use XMLHttpRequest for upload progress tracking (signed in: utils/editorAuth)
+      const auth = await authHeaders()
       const result = await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest()
         // wait=1: the backend answers once the 480p file is ready, so the URL
         // serves the same file to the picture and the sound from the start
         xhr.open('POST', `${api('/api/upload')}?wait=1`)
+        xhr.setRequestHeader('Authorization', auth.Authorization)
 
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) {

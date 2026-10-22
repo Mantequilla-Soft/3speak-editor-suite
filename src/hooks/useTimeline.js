@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useMemo, useEffect } from 'react'
 import { isHlsUrl, getHlsDuration } from '../utils/hlsHelper'
 import { downloadHlsToMp4 } from '../utils/hlsDownloader'
 import { api, getBackendUrl } from '../utils/backendSelector'
+import { authHeaders, authFetch, dropToken } from '../utils/editorAuth'
 import { MAX_TIMELINE_SECONDS, MAX_IMPORT_BYTES, getTimelineEnd } from '../utils/limits'
 import { createSHA256 } from 'hash-wasm'
 
@@ -30,11 +31,14 @@ function withUploadSlot(task) {
 const CHUNKED_FROM_BYTES = 8 * 1024 * 1024
 const CHUNK_ATTEMPTS = 4
 
-// One XHR (for upload progress). Resolves the JSON answer; rejects with .status set.
-function sendXhr(method, url, body, onProgress) {
+// One XHR (for upload progress), signed in (utils/editorAuth). Resolves the JSON answer; rejects with .status
+// set. A 401 drops the token and tries once more with a fresh one.
+async function sendXhr(method, url, body, onProgress, retried = false) {
+  const auth = await authHeaders()
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest()
     xhr.open(method, url)
+    xhr.setRequestHeader('Authorization', auth.Authorization)
     if (body instanceof Blob && !(body instanceof File)) xhr.setRequestHeader('Content-Type', 'application/octet-stream')
     if (onProgress) {
       xhr.upload.addEventListener('progress', (e) => {
@@ -44,6 +48,9 @@ function sendXhr(method, url, body, onProgress) {
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
         try { resolve(JSON.parse(xhr.responseText)) } catch { reject(new Error('Invalid response from server')) }
+      } else if (xhr.status === 401 && !retried) {
+        dropToken()
+        resolve(sendXhr(method, url, body, onProgress, true))
       } else {
         const err = new Error(`Upload failed: ${xhr.status}`)
         err.status = xhr.status
@@ -56,7 +63,7 @@ function sendXhr(method, url, body, onProgress) {
 }
 
 async function postJson(url, body) {
-  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+  const res = await authFetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
   if (!res.ok) throw new Error(`Upload failed: ${res.status}`)
   return res.json()
 }

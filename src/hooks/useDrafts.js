@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api, getBackendUrl } from '../utils/backendSelector'
+import { authFetch } from '../utils/editorAuth'
 
 const AUTOSAVE_DELAY = 2500
 const LOCAL = /^(blob|data):/
@@ -35,7 +36,7 @@ async function uploadLocalImage(localUrl, name) {
   const blob = await (await fetch(localUrl)).blob()
   const form = new FormData()
   form.append('file', blob, name)
-  const res = await fetch(api('/api/upload'), { method: 'POST', body: form })
+  const res = await authFetch(api('/api/upload'), { method: 'POST', body: form })
   if (!res.ok) throw new Error(`upload ${res.status}`)
   const { url } = await res.json()
   const backend = getBackendUrl()

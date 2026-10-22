@@ -1,4 +1,5 @@
 import { api, getBackendUrl } from './backendSelector'
+import { authFetch } from './editorAuth'
 
 /**
  * Request the backend to prepare an HLS clip (download 480p + trim).
@@ -11,7 +12,7 @@ import { api, getBackendUrl } from './backendSelector'
  * @returns {Promise<string>} - The URL of the prepared MP4 (e.g. /rendered/clip-xxx.mp4)
  */
 export async function prepareClipOnBackend(hlsUrl, clipStart, clipEnd, onProgress = () => {}) {
-  const res = await fetch(api('/api/clip/prepare'), {
+  const res = await authFetch(api('/api/clip/prepare'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ url: hlsUrl, clipStart, clipEnd })
