@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<!--
+  Scene host: plays ANY scene type from a JSON doc, in either orientation, with no hand-written content.js.
+  Doc shape: see docs/engine.md. Three ways in:
+    1. render.mjs --doc doc.json        (injects window.__DOC__ before the page loads)
+    2. postMessage from the parent       { source: 'scene-host', type: 'load', doc } -> replies 'loaded'
+                                         { source: 'scene-host', type: 'seek', t }   -> draws frame t
+    3. ?doc=<same-origin URL of a .json> (handy in a browser tab)
+  Same-origin parents can also call window.reel.seek(t) directly after 'loaded'.
+-->
+<head>
+<meta charset="utf-8">
+<title>Scene host</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="../lib/base.css">
+<link rel="stylesheet" href="../lib/scenes.css">
+<link rel="stylesheet" href="../lib/scenes-more.css">
+<link rel="stylesheet" href="../lib/scenes-social.css">
+<link rel="stylesheet" href="../lib/scenes-extra.css">
+<link rel="stylesheet" href="../lib/scenes-extra2.css">
+<link rel="stylesheet" href="../lib/scenes-extra3.css">
+<link rel="stylesheet" href="../lib/scenes-template.css">
+</head>
+<body>
+<div id="stage">
+  <div class="glow" id="g1"></div><div class="glow" id="g2"></div><div class="glow" id="g3"></div>
+  <!-- scenes are inserted here by Kit.mount -->
+  <div id="bug"></div>
+  <div id="prog"><i></i><i></i><i></i></div>
+</div>
+<script src="../lib/timeline.js"></script>
+<script src="../lib/kit.js"></script>
+<script src="../lib/scenes.js"></script>
+<script src="../lib/scenes-more.js"></script>
+<script src="../lib/scenes-social.js"></script>
+<script src="../lib/scenes-extra.js"></script>
+<script src="../lib/scenes-extra2.js"></script>
+<script src="../lib/scenes-extra3.js"></script>
+<script src="../lib/scenes-template.js"></script>
+<script src="../lib/scene-meta.js"></script>
+<script>
+(function () {
+  const TAG = 'scene-host';
+  let token = 0;
+
+  // Mount a doc and resolve with what a timeline UI needs. A newer load supersedes an older one still loading.
+  async function load(doc) {
+    const my = ++token;
+    if (window.SceneMeta) doc = window.SceneMeta.sanitize(doc);
+    const reel = window.Kit.mount(doc);
+    await reel.ready;
+    if (my !== token) return null;
+    return { duration: reel.duration, width: reel.width, height: reel.height, fps: reel.fps, cues: reel.cues, scenes: reel.scenes };
+  }
+  window.loadDoc = load; // for render.mjs / same-origin callers
+
+  // renderer: doc injected before load
+  if (window.__DOC__) { window.hostReady = load(window.__DOC__); return; }
+
+  // ?doc=<same-origin json>
+  const q = new URLSearchParams(location.search).get('doc');
+  if (q) {
+    const u = new URL(q, location.href);
+    if (u.origin === location.origin) window.hostReady = fetch(u).then(r => r.json()).then(load);
+  }
+
+  // parent window (the Ad Wizard)
+  let parentOrigin = null;
+  window.addEventListener('message', async ev => {
+    if (ev.source !== window.parent || !ev.data || ev.data.source !== TAG) return;
+    parentOrigin = ev.origin === 'null' ? '*' : ev.origin;
+    const reply = msg => window.parent.postMessage({ source: TAG, ...msg }, parentOrigin);
+    const m = ev.data;
+    try {
+      if (m.type === 'load') {
+        const info = await load(m.doc);
+        if (info) reply({ type: 'loaded', id: m.id, ...info });
+      } else if (m.type === 'seek' && window.reel) {
+        window.reel.seek(Math.max(0, Math.min(window.reel.duration, +m.t || 0)));
+        if (m.ack) reply({ type: 'seeked', id: m.id, t: m.t });
+      } else if (m.type === 'meta') {
+        reply({ type: 'meta', id: m.id, meta: window.SceneMeta ? window.SceneMeta.catalogue() : null });
+      }
+    } catch (e) {
+      reply({ type: 'error', id: m.id, message: String(e && e.message || e) });
+    }
+  });
+  if (window.parent !== window) window.parent.postMessage({ source: TAG, type: 'host-ready' }, '*');
+})();
+</script>
+</body>
+</html>

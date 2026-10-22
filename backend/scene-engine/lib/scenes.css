@@ -1,0 +1,156 @@
+/* Styles for lib/scenes.js. body.portrait = 1080x1920, body.landscape = 1920x1080.
+   Uses the template's variables (--a1 --a2 --ink --mute --bg) and its .label / .w rules. */
+
+/* shared headline block */
+.xhead { position: absolute; }
+.xhead .label { margin-bottom: 28px; }
+.xhead h1 { font-weight: 900; line-height: 1; letter-spacing: -.035em; }
+.portrait .xhead { left: 80px; right: 60px; top: 240px; }
+.portrait .xhead h1 { font-size: 116px; }
+.landscape .xhead { left: 150px; top: 170px; width: 1400px; }
+.landscape .xhead h1 { font-size: 100px; }
+
+/* words */
+.scene-words > .label { position: absolute; left: 0; right: 0; text-align: center; }
+.portrait .scene-words > .label { top: 560px; } .landscape .scene-words > .label { top: 300px; }
+.kw-word { position: absolute; left: 0; right: 0; text-align: center; font-weight: 900; letter-spacing: -.045em; line-height: 1.2; opacity: 0; }
+.portrait .kw-word { top: 720px; font-size: 220px; } .landscape .kw-word { top: 360px; font-size: 250px; }
+.kw-line { position: absolute; left: 80px; right: 80px; text-align: center; text-wrap: balance; font-weight: 700; letter-spacing: -.02em; line-height: 1.15; }
+.portrait .kw-line { top: 1080px; font-size: 64px; } .landscape .kw-line { top: 740px; font-size: 60px; }
+
+/* compare */
+.cmp { position: absolute; display: flex; gap: 34px; }
+.portrait .cmp { left: 80px; right: 60px; top: 640px; flex-direction: column; }
+.landscape .cmp { left: 150px; right: 150px; top: 460px; }
+.landscape .cmp-col { flex: 1; }
+.cmp-col { padding: 34px 44px 40px; border-radius: 34px; border: 2px solid rgba(255,255,255,.1); background: rgba(255,255,255,.035); opacity: 0; }
+.cmp-col.new { background: color-mix(in srgb, var(--a2) 7%, transparent); }
+.cmp-title { font-weight: 700; font-size: 30px; letter-spacing: .2em; text-transform: uppercase; color: var(--mute); }
+.cmp-col.new .cmp-title { color: var(--a2); }
+.cmp-item { display: flex; align-items: center; gap: 24px; margin-top: 24px; font-weight: 700; font-size: 44px; letter-spacing: -.015em; line-height: 1.12; opacity: 0; }
+.landscape .cmp-item { font-size: 40px; }
+.cmp-col.old .cmp-item { color: #a3a8ba; }
+.cmp-item .mk { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; flex: none; background: rgba(255,255,255,.06); }
+.cmp-col.new .mk { background: color-mix(in srgb, var(--a2) 16%, transparent); }
+
+/* steps */
+.stp { position: absolute; }
+.portrait .stp { left: 80px; right: 60px; top: 700px; display: flex; flex-direction: column; gap: 70px; }
+.landscape .stp { left: 150px; right: 150px; top: 500px; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 40px; }
+.st { display: flex; align-items: center; gap: 40px; position: relative; z-index: 1; }
+.landscape .st { flex-direction: column; text-align: center; gap: 28px; }
+.st .num { width: 120px; height: 120px; border-radius: 50%; flex: none; display: grid; place-items: center; font-weight: 900; font-size: 56px; opacity: 0;
+           color: var(--a1); border: 4px solid var(--a1); background: color-mix(in srgb, var(--a1) 12%, var(--bg)); }
+.st .txt { opacity: 0; }
+.st b { display: block; font-weight: 800; font-size: 54px; letter-spacing: -.02em; line-height: 1.08; }
+.st small { display: block; font-weight: 500; font-size: 34px; color: var(--mute); margin-top: 8px; line-height: 1.25; }
+.landscape .st b { font-size: 46px; } .landscape .st small { font-size: 30px; }
+.stp-line { position: absolute; background: rgba(255,255,255,.1); z-index: 0; }
+.stp-line > i { position: absolute; inset: 0; background: var(--a1); }
+.portrait .stp-line { left: 58px; width: 4px; top: 60px; bottom: 60px; } .portrait .stp-line > i { transform-origin: 50% 0; }
+.landscape .stp-line { top: 58px; height: 4px; left: calc(100% / (2 * var(--n, 3))); right: calc(100% / (2 * var(--n, 3))); } .landscape .stp-line > i { transform-origin: 0 50%; }
+
+/* notify */
+.nt { position: absolute; display: flex; flex-direction: column; gap: 26px; }
+.portrait .nt { left: 70px; right: 70px; top: 680px; }
+.landscape .nt { left: 920px; right: 130px; top: 230px; gap: 30px; }
+.landscape .scene-notify .xhead { width: 760px; top: 380px; }
+.toast { display: flex; align-items: center; gap: 26px; padding: 26px 32px; border-radius: 40px; opacity: 0;
+         background: rgba(34,36,50,.88); border: 1px solid rgba(255,255,255,.12); box-shadow: 0 24px 60px rgba(0,0,0,.5); }
+.toast .app { width: 84px; height: 84px; border-radius: 22px; display: grid; place-items: center; flex: none; }
+.toast .app.brand { background: #0d0e14; } .toast .app img { width: 56px; } .toast .app .monogram { width: 56px; font-size: 32px; }
+.toast .body { flex: 1; min-width: 0; }
+.toast .top { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; }
+.toast b { font-weight: 800; font-size: 38px; } .toast .top i { font-style: normal; font-size: 26px; color: var(--mute); }
+.toast .msg { display: block; font-size: 32px; color: #d5d8e2; margin-top: 6px; line-height: 1.25; }
+.landscape .toast b { font-size: 38px; } .landscape .toast .msg { font-size: 32px; }
+
+/* spotlight */
+.sp-bg { position: absolute; inset: -80px; background-size: cover; background-position: center; filter: blur(50px) brightness(.42) saturate(1.2); }
+.sp-dim { position: absolute; inset: 0; background: linear-gradient(0deg, color-mix(in srgb, var(--bg) 92%, transparent), transparent 55%); }
+.sp-card { position: absolute; border-radius: 36px; overflow: hidden; box-shadow: 0 50px 120px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.1); opacity: 0; }
+.portrait .sp-card { left: 60px; right: 60px; top: 300px; height: 540px; }
+.landscape .sp-card { left: 840px; top: 170px; width: 960px; height: 540px; }
+.sp-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sp-tag { position: absolute; left: 24px; bottom: 24px; display: flex; align-items: center; gap: 16px; padding: 12px 28px 12px 12px; border-radius: 999px;
+          background: rgba(10,11,18,.8); border: 1px solid rgba(255,255,255,.14); opacity: 0; }
+.sp-tag .dot { width: 54px; height: 54px; border-radius: 50%; border: 2px solid var(--a1); display: grid; place-items: center; }
+.sp-tag b { display: block; font-size: 32px; font-weight: 800; } .sp-tag small { display: block; font-size: 24px; color: var(--mute); }
+.portrait .scene-spotlight .xhead { top: 980px; }
+.landscape .scene-spotlight .xhead { top: 400px; width: 660px; }
+.landscape .scene-spotlight .xhead h1 { font-size: 88px; }
+
+/* quote: use REAL quotes only, with permission */
+.qt { position: absolute; }
+.portrait .qt { left: 80px; right: 70px; top: 420px; } .landscape .qt { left: 200px; right: 200px; top: 200px; }
+.qmark { font-weight: 900; font-size: 300px; line-height: .8; height: 180px; color: var(--a1); opacity: 0; }
+.qt h2 { font-weight: 800; letter-spacing: -.02em; line-height: 1.14; }
+.portrait .qt h2 { font-size: 76px; } .landscape .qt h2 { font-size: 70px; }
+.who { display: flex; align-items: center; gap: 24px; margin-top: 60px; opacity: 0; }
+.who img, .who .monogram { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; font-size: 48px; }
+.who b { display: block; font-size: 40px; font-weight: 800; } .who small { display: block; font-size: 30px; color: var(--mute); }
+
+/* cards */
+.fc3 { position: absolute; display: flex; gap: 40px; }
+.portrait .fc3 { left: 80px; right: 60px; top: 680px; flex-direction: column; }
+.landscape .fc3 { left: 150px; right: 150px; top: 470px; }
+.fc { position: relative; padding: 36px 40px; border-radius: 34px; background: rgba(24,26,38,.96); border: 1.5px solid rgba(255,255,255,.12);
+      box-shadow: 0 30px 70px rgba(0,0,0,.55); opacity: 0; }
+.portrait .fc { display: grid; grid-template-columns: 112px 1fr; column-gap: 32px; align-items: center; }
+.portrait .fc .ic { grid-row: span 2; }
+.landscape .fc { flex: 1; display: flex; flex-direction: column; gap: 18px; }
+.fc .ic { width: 112px; height: 112px; border-radius: 30px; border: 2px solid; display: grid; place-items: center; }
+.fc b { font-weight: 800; font-size: 50px; letter-spacing: -.02em; line-height: 1.08; }
+.fc small { font-weight: 500; font-size: 32px; color: var(--mute); line-height: 1.25; margin-top: 6px; }
+.portrait .fc b { align-self: end; } .portrait .fc small { align-self: start; }
+
+/* greetings */
+.gr { position: absolute; left: 0; right: 0; text-align: center; }
+.portrait .gr { top: 560px; } .landscape .gr { top: 270px; }
+.gr > .label { margin-bottom: 26px; }
+.hello { font-weight: 800; letter-spacing: -.02em; white-space: nowrap; }
+.portrait .hello { height: 240px; font-size: 180px; line-height: 240px; } .landscape .hello { height: 270px; font-size: 210px; line-height: 270px; }
+.gr h2 { font-weight: 800; letter-spacing: -.025em; margin-top: 40px; padding: 0 60px; }
+.portrait .gr h2 { font-size: 66px; } .landscape .gr h2 { font-size: 74px; }
+.strip { position: absolute; text-align: center; font-weight: 600; font-size: 24px; letter-spacing: .3em; color: #5d6278; opacity: 0; }
+.portrait .strip { left: 110px; right: 110px; bottom: 420px; line-height: 1.9; }
+.landscape .strip { left: 0; right: 0; bottom: 120px; white-space: pre; }
+.preload { position: absolute; left: -9999px; top: 0; opacity: 0; font-weight: 800; }
+
+/* portrait: larger type and spacing so content fills the safe area (down to ~y 1560) */
+.portrait .cmp { top: 680px; gap: 44px; }
+.portrait .cmp-col { padding: 42px 48px 50px; }
+.portrait .cmp-title { font-size: 32px; }
+.portrait .cmp-item { font-size: 52px; margin-top: 30px; }
+.portrait .cmp-item .mk { width: 66px; height: 66px; }
+.portrait .stp { top: 720px; gap: 120px; }
+.portrait .st .num { width: 140px; height: 140px; font-size: 64px; }
+.portrait .stp-line { left: 68px; top: 70px; bottom: 70px; }
+.portrait .st b { font-size: 62px; } .portrait .st small { font-size: 38px; }
+.portrait .nt { top: 700px; gap: 34px; }
+.portrait .toast { padding: 34px 38px; border-radius: 46px; }
+.portrait .toast .app { width: 100px; height: 100px; border-radius: 26px; } .portrait .toast .app img { width: 66px; }
+.portrait .toast b { font-size: 44px; } .portrait .toast .top i { font-size: 30px; } .portrait .toast .msg { font-size: 38px; }
+.portrait .fc3 { top: 700px; gap: 50px; }
+.portrait .fc { padding: 46px 48px; grid-template-columns: 130px 1fr; }
+.portrait .fc .ic { width: 130px; height: 130px; }
+.portrait .fc b { font-size: 58px; } .portrait .fc small { font-size: 36px; }
+.sp-card .img { width: 100%; height: 100%; }
+
+/* watermark for spec/demo ads (REEL.watermark); static, above everything */
+#wm { position: absolute; inset: 0; z-index: 50; pointer-events: none; overflow: hidden; }
+#wm .pat { position: absolute; left: -50%; top: -50%; width: 200%; height: 200%; transform: rotate(-24deg); display: flex; flex-direction: column; justify-content: space-around;
+           font-weight: 900; font-size: 46px; letter-spacing: .3em; color: rgba(255,255,255,.07); white-space: nowrap; }
+#wm .big { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-24deg); font-weight: 900; letter-spacing: .08em; white-space: nowrap;
+           color: rgba(255,255,255,.14); text-shadow: 0 0 40px rgba(0,0,0,.25); } /* translucent fill, not an outline */
+.portrait #wm .big { font-size: 250px; } .landscape #wm .big { font-size: 330px; }
+#wm .rib { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 30px; text-align: center; font-weight: 800; font-size: 30px; letter-spacing: .06em;
+           text-transform: uppercase; color: #111; background: #ffd23f; box-shadow: 0 -6px 30px rgba(0,0,0,.35); }
+
+/* brand.logoBg: logos that vanish on a dark background sit on a light tile */
+.logo-tile #bug img { background: var(--logo-bg); padding: 7px; border-radius: 16px; width: 74px; }
+.logo-tile .scene-endcard img.mark, .logo-tile .scene-logo img.mark { background: var(--logo-bg); padding: 30px; border-radius: 28%; } /* % padding resolves against the PARENT width */
+.logo-tile .toast .app.brand { background: var(--logo-bg); }
+/* keep footers clear of the watermark ribbon */
+.landscape.watermarked .scene-endcard .foot { bottom: 120px; }
+.landscape.watermarked .strip { bottom: 130px; }

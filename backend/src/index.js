@@ -6,6 +6,7 @@ import { renderRouter, getRenderStats } from './routes/render.js'
 import { uploadRouter } from './routes/upload.js'
 import { clipRouter } from './routes/clip.js'
 import { projectsRouter, PROJECTS_DIR } from './routes/projects.js'
+import { sceneRenderRouter } from './routes/sceneRender.js'
 import { RENDER_CACHE_DIR } from './services/ffmpeg.js'
 
 const app = express()
@@ -35,6 +36,9 @@ app.use('/api/clip', clipRouter)
 
 // Saved projects (drafts) of signed-in users
 app.use('/api/projects', projectsRouter)
+
+// Ad Wizard: scene-engine docs -> silent scene video (headless Chromium)
+app.use('/api/scene-render', sceneRenderRouter)
 
 // Serve rendered output files (for download)
 app.use('/rendered', express.static(RENDERED_DIR))

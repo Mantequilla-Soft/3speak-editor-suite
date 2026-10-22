@@ -1,0 +1,58 @@
+/* Page base for the scene host (host/index.html): one page for every scene type in either orientation.
+   The templates carry the same rules in their own style.css at a fixed size; here the frame size comes from
+   --w / --h (lib/kit.js sets them from the doc) and the orientation differences hang off body.portrait /
+   body.landscape. Colours and fonts are CSS variables set by kit.js from doc.brand. */
+:root { --bg: #0a0b12; --ink: #f4f5f8; --mute: #9aa0b4; --a1: #ff5a36; --a2: #5ad1c8; --a3: #8a8cff;
+        --g1: rgba(255,90,54,.36); --g2: rgba(60,60,160,.7); --g3: rgba(90,209,200,.18); --font: sans-serif;
+        --w: 1920px; --h: 1080px; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: var(--w); height: var(--h); overflow: hidden; background: var(--bg); }
+body { font-family: var(--font); color: var(--ink); -webkit-font-smoothing: antialiased; }
+em { font-style: normal; }
+.a1 { color: var(--a1); } .a2 { color: var(--a2); }
+#stage { position: absolute; inset: 0; overflow: hidden; background: var(--bg); }
+.glow { position: absolute; border-radius: 50%; filter: blur(40px); }
+.landscape .glow { width: 1400px; height: 1400px; opacity: .55; }
+.portrait .glow { width: 1700px; height: 1700px; opacity: .6; }
+#g1 { background: radial-gradient(circle, var(--g1), transparent 62%); }
+#g2 { background: radial-gradient(circle, var(--g2), transparent 62%); }
+#g3 { background: radial-gradient(circle, var(--g3), transparent 62%); }
+.scene { position: absolute; inset: 0; opacity: 0; visibility: hidden; }
+.label { text-transform: uppercase; color: var(--mute); }
+.landscape .label { font-weight: 600; font-size: 22px; letter-spacing: .32em; }
+.portrait .label { font-weight: 700; font-size: 30px; letter-spacing: .28em; }
+.label em { font-weight: inherit; }
+/* masked word reveal: .w clips, inner span rises */
+.w { display: inline-block; overflow: hidden; vertical-align: bottom; padding: 0 .02em .08em; margin-bottom: -.08em; }
+.w > span { display: inline-block; }
+.monogram { display: grid; place-items: center; aspect-ratio: 1; border-radius: 28%; background: var(--a1); color: var(--bg); font-weight: 900; font-style: normal; }
+.monogram { font-size: 140px; } /* both orientations; scenes size their own where it matters */
+
+/* corner brand mark (doc.bug !== false), hidden from the first scene type with hideBug */
+#bug { position: absolute; display: flex; align-items: center; z-index: 6; opacity: 0; font-weight: 800; letter-spacing: -.01em; }
+.portrait #bug { left: 80px; top: 120px; gap: 16px; font-size: 40px; }
+.portrait #bug img, .portrait #bug .monogram { width: 64px; font-size: 40px; }
+.landscape #bug { left: 72px; top: 56px; gap: 14px; font-size: 30px; }
+.landscape #bug img, .landscape #bug .monogram { width: 48px; font-size: 30px; }
+
+/* progress bar (doc.progress === true only) */
+#prog { position: absolute; left: 0; height: 6px; display: none; width: 0; z-index: 5; }
+.show-prog #prog { display: flex; }
+.landscape #prog { bottom: 0; height: 6px; }
+.portrait #prog { top: 0; height: 8px; }
+#prog i { flex: 1; } #prog i:nth-child(1) { background: var(--a1); } #prog i:nth-child(2) { background: var(--a2); } #prog i:nth-child(3) { background: var(--a3); }
+
+/* headline face: doc.brand.headFont (falls back to the body font). Covers the big display text of every scene type. */
+h1, h2, .hp-w, .ep-tag, .es-tag, .em-tag, .emq-tag, .ew-tag, .kw-word, .mq-row, .mq-line, .emq, .cb-f b, .of-price, .tl-card b,
+.ck-title, .pl-q, .fl-node b, .cd-half span, .cd-flap span, .vr-w, .kn-w, .s3-txt b, .brand, .wordmark, .num, .stat-num {
+  font-family: var(--font-head, var(--font));
+}
+
+/* user image placement: Kit.img() puts --ix/--iy (object-position) and --is (zoom) on every user image.
+   The individual `scale` property composes with the Ken Burns `transform` the scenes animate. */
+img.ui { object-position: var(--ix, 50%) var(--iy, 50%); scale: var(--is, 1); transform-origin: var(--ix, 50%) var(--iy, 50%); }
+
+/* a scene that failed to build (missing content while editing) */
+.kit-broken { position: absolute; inset: 30% 10%; display: grid; place-content: center; gap: 12px; text-align: center; border: 3px dashed var(--a1);
+  border-radius: 24px; font-size: 34px; color: var(--ink); background: color-mix(in srgb, var(--bg) 80%, transparent); }
+.kit-broken span { font-size: 22px; color: var(--mute); }

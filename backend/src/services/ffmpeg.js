@@ -775,6 +775,12 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
     const args = []
     if (clip.startTime > 0) args.push('-ss', clip.startTime.toString())
     args.push('-i', inputFile, '-t', duration.toString())
+    // optional fades (Ad Wizard music); absent on editor clips, so their render is unchanged
+    const fi = Math.max(0, +clip.fadeIn || 0), fo = Math.max(0, +clip.fadeOut || 0)
+    const fades = []
+    if (fi > 0) fades.push(`afade=t=in:st=0:d=${Math.min(fi, duration).toFixed(3)}`)
+    if (fo > 0) fades.push(`afade=t=out:st=${Math.max(0, duration - fo).toFixed(3)}:d=${Math.min(fo, duration).toFixed(3)}`)
+    if (fades.length) args.push('-af', fades.join(','))
     args.push('-vn', '-c:a', 'aac', '-ar', '44100', '-y', outputPath)
     return runFFmpeg(args, signal)
   }
@@ -1509,7 +1515,10 @@ async function combineVideoAudio(videoPath, allSources, outputPath, fps, signal)
     }
   } else {
     // Multiple audio sources — mix them together
-    filterParts.push(`${mixInputs.join('')}amix=inputs=${mixInputs.length}:duration=longest:dropout_transition=2[aout]`)
+    // normalize=0: each source keeps the volume it was given (amix's default divides every input by the number
+    // of inputs, so music under a few sound effects came out far quieter than in the preview); a limiter
+    // catches the peaks when several loud sources overlap.
+    filterParts.push(`${mixInputs.join('')}amix=inputs=${mixInputs.length}:duration=longest:dropout_transition=0:normalize=0,alimiter=limit=0.95:level=false[aout]`)
     args.push(
       '-filter_complex', filterParts.join(';'),
       '-map', '0:v', '-map', '[aout]'
