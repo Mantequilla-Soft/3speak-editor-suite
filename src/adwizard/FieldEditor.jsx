@@ -30,7 +30,7 @@ function Field({ f, value, onChange, icons }) {
     case 'text':
       return <label className="aw-f">{head}
         <input type="text" value={value ?? ''} maxLength={f.maxLen ? f.maxLen * 2 : undefined} onChange={e => onChange(e.target.value)}
-          placeholder={f.opt ? 'optional' : ''} /><Count v={value} max={f.maxLen} /></label>
+          placeholder={f.dflt || (f.opt ? 'optional' : '')} /><Count v={value} max={f.maxLen} /></label>
     case 'para':
       return <label className="aw-f">{head}
         <textarea rows={3} value={value ?? ''} onChange={e => onChange(e.target.value)} placeholder={f.opt ? 'optional' : ''} /><Count v={value} max={f.maxLen} /></label>
@@ -61,7 +61,7 @@ function Field({ f, value, onChange, icons }) {
     case 'icon':
       return <label className="aw-f">{head}
         <select value={value ?? ''} onChange={e => onChange(e.target.value || undefined)}>
-          {f.opt && <option value="">(none)</option>}
+          {f.opt && <option value="">{f.dflt ? `default (${f.dflt})` : '(none)'}</option>}
           {icons.map(o => <option key={o} value={o}>{o}</option>)}
         </select></label>
     case 'color':

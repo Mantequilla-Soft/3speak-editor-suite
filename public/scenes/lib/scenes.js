@@ -157,6 +157,12 @@
         const n = s.words.length, end = grEnd(s, d); // hold = seconds the last word + line stay
         const gp = (1 - Math.pow(1 - prog(t, .05, end), 1.5)) * (n - 1), gi = Math.round(gp);
         const h = $('.hello', el), settle = prog(t, end - .05, end + .25);
+        if (!h.dataset.fs) { // once: shrink the slot's font until the widest word fits the frame (fonts are loaded by then)
+          h.textContent = widest(s.words); h.style.fontSize = ''; let fs = parseFloat(getComputedStyle(h).fontSize);
+          const r = document.createRange(), wide = () => { r.selectNodeContents(h); return r.getBoundingClientRect().width > el.clientWidth - 80; };
+          while (wide() && fs > 30) { fs *= .95; h.style.fontSize = `${fs}px`; }
+          if (document.fonts.status === 'loaded') h.dataset.fs = fs;
+        }
         h.textContent = s.words[gi];
         h.style.opacity = prog(t, 0, .15);
         h.style.color = gi === n - 1 ? C().ink : `color-mix(in srgb, ${C().ink} 78%, ${C().bg})`;
@@ -172,4 +178,6 @@
   function kwSpan(s, d) { return s.line ? d - Math.min(s.hold || 1.1, Math.max(.3, d - .3 * s.words.length)) : d - .4; }
   // greetings: when the cycle ends; a hold too long for the duration is cut so each word gets at least .2 s
   function grEnd(s, d) { return d - Math.min(s.hold || .75, Math.max(.3, d - .05 - .2 * s.words.length)); }
+  // the word that sets the size of a cycling one-line slot (wide scripts count double)
+  function widest(words) { const w = x => [...String(x)].reduce((n, c) => n + (c.charCodeAt(0) > 0x2e80 ? 2 : 1), 0); return words.reduce((a, b) => (w(b) > w(a) ? b : a), ''); }
 })();

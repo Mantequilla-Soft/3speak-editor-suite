@@ -167,7 +167,7 @@
         $$('.cl-d', el).forEach((c, i) => { c.style.opacity = prog(t, .2 + i * .008, .4 + i * .008); });
         on.forEach((c, i) => { const a = .6 + i * (1.4 / Math.max(1, n)), f = E.outBack(prog(t, a, a + .3));
           c.style.background = tint(C().accent, 100 * prog(t, a, a + .15)); c.style.transform = `scale(${t >= a ? lerp(.7, 1, f) : 1})`; });
-        const st = $('.cl-st em', el); if (st) st.textContent = Math.round(n * prog(t, .6, 2.0));
+        const st = $('.cl-st em', el); if (st) st.textContent = Math.round(longestRun(s.active || []) * prog(t, .6, 2.0));
       },
     },
 
@@ -206,7 +206,7 @@
 
     zoomReveal: {
       cues: () => [{ t: .35, kind: 'whoosh', gain: -4 }],
-      build: s => `<div class="zr"><div class="zr-frame">${imgOr(s.image, 2)}</div>${s.tag ? `<span class="zr-tag">${markup(s.tag)}</span>` : ''}</div>
+      build: s => `<div class="zr"><div class="zr-frame">${imgOr(s.image, 2)}</div></div>${s.tag ? `<span class="zr-tag">${markup(s.tag)}</span>` : ''}
         <div class="xhead zr-head">${label(s.label)}${lines(s.lines)}</div>`,
       update(el, t, d, s) {
         const f = s.from || { x: 50, y: 50, zoom: 4 }, k = E.inOutCubic(prog(t, .2, 1.6));
@@ -227,7 +227,11 @@
         const L = portrait() ? KN_P : KN_L, n = Math.min(6, s.words.length);
         $$('.kn-w', el).forEach((w, i) => {
           const [x, y, size, rot, acc] = L[i], st = knStep(s, d), a = .05 + i * st, k = E.outBack(prog(t, a, a + .3)), shake = Math.sin((t - a) * 60) * 8 * (1 - prog(t, a + .25, a + .5)) * (t > a + .2 ? 1 : 0);
-          w.style.left = `${x}%`; w.style.top = `${y}%`; w.style.fontSize = `${size}px`; w.style.color = acc ? C().accent : C().ink;
+          if (!w.dataset.k) { // once fonts are in: shrink a word that would leave the frame at this size
+            w.style.fontSize = `${size}px`; const room = 2 * Math.min(x, 100 - x) / 100 * el.clientWidth - 60, ww = w.offsetWidth;
+            const k = ww > room ? room / ww : 1; if (document.fonts.status === 'loaded') w.dataset.k = k; else w.dataset.kTmp = k;
+          }
+          w.style.left = `${x}%`; w.style.top = `${y}%`; w.style.fontSize = `${size * +(w.dataset.k || w.dataset.kTmp || 1)}px`; w.style.color = acc ? C().accent : C().ink;
           w.style.opacity = prog(t, a, a + .06) * (i < n - 1 ? lerp(1, .5, prog(t, a + .45, a + .9)) : 1);
           w.style.transform = `translate(-50%, -50%) translate(${shake}px, ${-shake / 2}px) rotate(${rot}deg) scale(${lerp(2.4, 1, k)})`;
         });
@@ -236,8 +240,8 @@
     },
   });
   // [x %, y %, font px, rotation deg, accent] per word slot
-  const KN_L = [[30, 28, 190, -6, 0], [70, 36, 150, 5, 1], [38, 60, 230, 3, 0], [76, 70, 130, -8, 0], [22, 82, 120, 6, 1], [60, 15, 110, -3, 0]];
-  const KN_P = [[40, 24, 190, -6, 0], [62, 36, 160, 6, 1], [46, 50, 230, 3, 0], [58, 64, 150, -7, 0], [38, 76, 140, 5, 1], [60, 15, 110, -3, 0]];
+  const KN_L = [[30, 28, 190, -6, 0], [70, 36, 150, 5, 1], [38, 56, 230, 3, 0], [76, 66, 130, -8, 0], [22, 72, 120, 6, 1], [60, 15, 110, -3, 0]]; // all above the line (top 880)
+  const KN_P = [[40, 23, 190, -6, 0], [62, 34, 160, 6, 1], [46, 46, 230, 3, 0], [58, 57, 150, -7, 0], [38, 67, 140, 5, 1], [60, 13, 110, -3, 0]]; // all above the line (top 1430)
   function srAt(s) { return .5 + s.query.length * .045 + .25; }
   // cube words are sized by length: data-fit measures through the cube's 3D transforms and gets it wrong
   function cbFont(w) { const side = portrait() ? 700 : 640, len = Math.max(...String(w).replace(/[*_]/g, '').split('|').map(l => [...l].length)); return Math.min(150, Math.floor(side * .84 / (len * .62))); } // '|' = line break
@@ -245,19 +249,20 @@
   function knStep(s, d) { const n = s.words.length; return Math.max(.15, Math.min(s.step || .32, (d - 1.3) / Math.max(1, n - 1))); }
   function cbAt(i, d, step) { if (step) return i * Math.min(step, (d - 1) / 3); const n = 4, seg = (d - 1.4) / (n - 1); return .5 + i * seg; } // step: a turn lands every `step` s (on the beat)
   function hl(title, q) {
+    title = String(title).replace(/[*_]/g, ''); // accent markup does not apply here (the query match is the accent)
     const i = title.toLowerCase().indexOf(String(q).toLowerCase());
     return i < 0 ? esc(title) : `${esc(title.slice(0, i))}<mark>${esc(title.slice(i, i + q.length))}</mark>${esc(title.slice(i + q.length))}`;
   }
   Object.assign(window.KitScenes, {
     videoRow: {
       cues: s => s.items.map((_, i) => ({ t: .12 + i * (s.step || .3), kind: 'swish', gain: -5 })),
-      build: s => `${s.lines ? head(s, 'vr-head') : (s.label ? `<div class="vr-lab">${label(s.label)}</div>` : '')}<div class="vr">${s.items.slice(0, 3).map((it, i) => `<div class="vr-it">
+      build: s => `${s.lines?.length ? head(s, 'vr-head') : (s.label ? `<div class="vr-lab">${label(s.label)}</div>` : '')}<div class="vr${s.lines?.length ? ' with-head' : ''}">${s.items.slice(0, 3).map((it, i) => `<div class="vr-it">
           <b class="vr-w" style="color:${i === 1 ? C().accent : C().ink}">${markup(it.word)}</b>
           <div class="vr-card">${imgOr(it.image, i)}<span class="vr-play">${icon('play', '#fff', portrait() ? 30 : 26)}</span>${it.duration ? `<span class="vr-dur">${markup(it.duration)}</span>` : ''}</div>
           <div class="vr-meta">${it.handle ? `<span class="vr-h">${markup(it.handle)}</span>` : ''}${it.sub ? `<small>${markup(it.sub)}</small>` : ''}</div></div>`).join('')}</div>
         ${s.line ? `<div class="vr-line" data-split>${markup(s.line)}</div>` : ''}`,
       update(el, t, d, s) {
-        if (s.lines) animHead(el, t); else fadeUp($('.vr-lab .label', el), t, .05, .4, 16);
+        if (s.lines?.length) animHead(el, t); else fadeUp($('.vr-lab .label', el), t, .05, .4, 16);
         const st = s.step || .3;
         $$('.vr-it', el).forEach((it, i) => {
           const a = .05 + i * st, k = E.outBack(prog(t, a, a + .45));
@@ -273,4 +278,7 @@
       },
     },
   });
+  // calendar streak: the longest run of consecutive day numbers
+  function longestRun(days) { const d = [...new Set(days.map(Number))].sort((a, b) => a - b); let best = 0, run = 0;
+    d.forEach((x, i) => { run = i && x === d[i - 1] + 1 ? run + 1 : 1; best = Math.max(best, run); }); return best; }
 })();

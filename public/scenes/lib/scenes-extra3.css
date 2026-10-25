@@ -124,7 +124,7 @@
 
 /* zoomReveal */
 .zr { position: absolute; inset: 0; transform-origin: 94% 50%; }
-.portrait .zr { transform-origin: 50% 94%; }
+.portrait .zr { transform-origin: 50% 94%; } .portrait .zr-tag { bottom: 380px; } /* above the feed's safe line */
 .zr-frame { position: absolute; inset: 0; overflow: hidden; box-shadow: 0 60px 120px rgba(0,0,0,.6); }
 .zr-frame img, .zr-frame .ph { width: 100%; height: 100%; object-fit: cover; display: block; }
 .zr-tag { position: absolute; right: 70px; bottom: 70px; padding: 18px 34px; border-radius: 999px; background: rgba(10,11,18,.85); border: 2px solid rgba(255,255,255,.18); font-weight: 800; font-size: 40px; opacity: 0; }
@@ -134,7 +134,7 @@
 /* kinetic */
 .kn { position: absolute; inset: 0; }
 .kn-w { position: absolute; white-space: nowrap; font-weight: 900; letter-spacing: -.04em; line-height: 1; text-transform: uppercase; opacity: 0; }
-.kn-line { position: absolute; left: 50%; translate: -50% 0; padding: 24px 46px; border-radius: 34px; background: rgba(10,11,18,.92); border: 2px solid rgba(255,255,255,.14); white-space: nowrap;
+.kn-line { position: absolute; left: 50%; translate: -50% 0; padding: 24px 46px; border-radius: 34px; background: rgba(10,11,18,.92); border: 2px solid rgba(255,255,255,.14); width: max-content; max-width: calc(100% - 200px); text-align: center;
            font-weight: 800; font-size: 50px; opacity: 0; box-shadow: 0 40px 90px rgba(0,0,0,.6); }
 .landscape .kn-line { top: 880px; } .portrait .kn-line { top: 1430px; }
 
@@ -155,7 +155,8 @@
 .vr-dur { position: absolute; right: 14px; top: 14px; padding: 4px 12px; border-radius: 8px; background: rgba(0,0,0,.72); color: #fff; font-weight: 700; font-size: 22px; }
 .vr-meta { margin-top: 18px; opacity: 0; } .portrait .vr-meta { margin-top: 12px; }
 .vr-h { display: block; font-weight: 800; font-size: 30px; color: var(--a2); } .vr-meta small { display: block; font-weight: 600; font-size: 30px; color: #dfe2ec; margin-top: 4px; }
-.portrait .vr-meta { display: flex; gap: 18px; align-items: baseline; } .portrait .vr-meta small { margin-top: 0; }
+.portrait .vr-meta { display: flex; gap: 18px; align-items: baseline; white-space: nowrap; } .portrait .vr-meta small { margin-top: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.portrait .vr-h { flex: none; max-width: 60%; overflow: hidden; text-overflow: ellipsis; } /* one meta line: the card height depends on its width only */
 .vr-line { position: absolute; left: 0; right: 0; text-align: center; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
-.landscape .vr-line { top: 880px; font-size: 64px; } .portrait .vr-line { left: 60px; right: 60px; top: 1560px; font-size: 52px; }
+.landscape .vr-line { top: 880px; font-size: 64px; } .portrait .vr-line { left: 60px; right: 60px; top: 1440px; font-size: 52px; }
 .portrait .vr:has(~ .vr-line) { top: 300px; }

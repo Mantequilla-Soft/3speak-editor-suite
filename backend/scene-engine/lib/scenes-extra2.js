@@ -154,10 +154,14 @@
         dim.style.opacity = .82 * on;
         dim.style.webkitMaskImage = dim.style.maskImage = `radial-gradient(circle ${Math.max(1, rad)}px at ${x}px ${y}px, transparent 96%, #000 100%)`;
         const ring = $('.sg-ring', el); ring.style.opacity = on; ring.style.width = ring.style.height = `${rad * 2}px`; ring.style.transform = `translate(${x - rad}px, ${y - rad}px)`;
+        // frame bounds in the box's own coordinates (x, y and the captions live there)
+        const ox = box.offsetLeft, oy = box.offsetTop, W = el.clientWidth, floor = (portrait() ? 1540 : el.clientHeight - 50) - oy;
         $$('.sg-cap', el).forEach((c, i) => {
-          const a = i ? sgAt(i, n, d) : .9, shown = i === cur;
+          const a = i ? sgAt(i, n, d) : .9, shown = i === cur, cw = c.offsetWidth, ch = c.offsetHeight;
+          // inside the frame: clamped sideways, and above the spotlight when below it would leave the (safe) frame
+          const cx = Math.max(cw / 2 + 30 - ox, Math.min(W - ox - cw / 2 - 30, x)), cy = y + rad + 18 + ch > floor ? y - rad - 18 - ch : y + rad + 18;
           c.style.opacity = shown ? prog(t, a - .05, a + .2) : 0;
-          c.style.transform = `translate(${x}px, ${y + rad + 18}px) translateX(-50%) translateY(${shown ? (1 - E.outCubic(prog(t, a - .05, a + .3))) * 14 : 14}px)`;
+          c.style.transform = `translate(${cx}px, ${cy}px) translateX(-50%) translateY(${shown ? (1 - E.outCubic(prog(t, a - .05, a + .3))) * 14 : 14}px)`;
         });
       },
     },
@@ -176,7 +180,7 @@
         const run = E.inOutCubic(prog(t, .5, 2.2)), secs = s.seconds || 60;
         $('.sw-hand', el).style.transform = `translate(-50%, -100%) rotate(${run * 360}deg)`;
         $('.sw-arc', el).style.strokeDasharray = `${run} 1`;
-        const read = $('.sw-read', el); read.textContent = Math.round(run * secs); read.style.opacity = s.result ? 1 - prog(t, 2.2, 2.35) : 1;
+        const read = $('.sw-read', el); read.textContent = clock(Math.round(run * secs)); read.style.opacity = s.result ? 1 - prog(t, 2.2, 2.35) : 1;
         const done = $('.sw-done', el), dk = E.outBack(prog(t, 2.25, 2.7)); done.style.opacity = s.result ? prog(t, 2.25, 2.4) : 0; done.style.transform = `translate(-50%, -50%) scale(${lerp(.5, 1, dk)})`;
         $('.sw-btn', el).style.transform = `translateX(-50%) translateY(${t > 2.15 && t < 2.3 ? 8 : 0}px)`;
         const cap = $('.sw-cap', el); if (cap) words(cap, t, 2.4, .06, .5);
@@ -276,4 +280,7 @@
   function sgAt(i, n, d) { return i === 0 ? .55 : .9 + i * Math.max(.5, Math.min(1.05, (d - 1.5) / Math.max(1, n - 1))); }
   function mgAt(i, n, d) { return i === 0 ? .6 : .8 + i * Math.max(.6, Math.min(1.15, (d - 1.4) / Math.max(1, n - 1))); }
   function flAt(i) { return .35 + i * .42; }
+  // stopwatch readout: seconds under a minute, m:ss (or h:mm:ss) from there
+  function clock(v) { if (v < 60) return String(v); const h = Math.floor(v / 3600), m = Math.floor(v / 60) % 60, sec = String(v % 60).padStart(2, '0');
+    return h ? `${h}:${String(m).padStart(2, '0')}:${sec}` : `${m}:${sec}`; }
 })();

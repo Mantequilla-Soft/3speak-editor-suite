@@ -239,7 +239,7 @@
         const wins = $$('.fe-w', el), n = wins.length, pt = portrait();
         wins.forEach((w, i) => {
           const a = .3 + i * .3, k = E.outQuint(prog(t, a, a + .6));
-          const x = (pt ? 50 : 96) * i, y = (pt ? 120 : 92) * i;
+          const x = (pt ? 50 : 96) * i, y = (pt ? Math.min(120, 280 / Math.max(1, n - 1)) : 92) * i; // portrait: 5 windows still end above 1560
           w.style.opacity = prog(t, a, a + .15);
           w.style.transform = `translate(${x + (1 - k) * 380}px, ${y + (1 - k) * 40}px) rotate(${(1 - k) * 7}deg)`;
           w.style.zIndex = i + 1;

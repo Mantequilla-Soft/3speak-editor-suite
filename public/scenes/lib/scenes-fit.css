@@ -1,0 +1,180 @@
+/* Auto-fit room for user text (Kit fitBoxes, lib/kit.js): a block with --fit-h > 0 whose text runs taller than that,
+   or wider than its own box, has all its fonts scaled down by one factor until it fits. Values are the room between
+   the block's top and the next content under it (measured per scene and orientation, never less than the sample
+   content needs, so the samples look as designed). Loaded by host/index.html, i.e. the scene engine; hand-made
+   projects don't load it and keep their own sizes. */
+@property --fit-h { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@property --fit-zoom { syntax: '<number>'; inherits: false; initial-value: 0; } /* 1 = zoom the children (lists of cards) */
+
+/* scene headlines (.xhead): default room, then per scene */
+.portrait .xhead { --fit-h: 400px; } .landscape .xhead { --fit-h: 600px; }
+
+/* landscape */
+.landscape .scene-compare .xhead { --fit-h: 260px; }
+.landscape .scene-steps .xhead { --fit-h: 297px; }
+.landscape .scene-notify .xhead { --fit-h: 600px; }
+.landscape .scene-spotlight .xhead { --fit-h: 580px; }
+.landscape .scene-cards .xhead { --fit-h: 257px; }
+.landscape .scene-carousel .xhead { --fit-h: 180px; }
+.landscape .scene-bento .xhead { --fit-h: 148px; }
+.landscape .scene-chat .xhead { --fit-h: 600px; }
+.landscape .scene-stats .xhead { --fit-h: 184px; }
+.landscape .scene-wipe .xhead { --fit-h: 600px; }
+.landscape .scene-offer .xhead { --fit-h: 600px; }
+.landscape .scene-walkthrough .xhead { --fit-h: 290px; }
+.landscape .scene-lockscreen .xhead { --fit-h: 270px; }
+.landscape .scene-embedDemo .xhead { --fit-h: 270px; }
+.landscape .scene-deck .xhead { --fit-h: 600px; }
+.landscape .scene-adSpot .xhead { --fit-h: 138px; }
+.landscape .scene-growth .xhead { --fit-h: 660px; }
+.landscape .scene-frontends .xhead { --fit-h: 660px; }
+.landscape .scene-map .xhead { --fit-h: 200px; }
+.landscape .scene-receipt .xhead { --fit-h: 640px; }
+.landscape .scene-timeline .xhead { --fit-h: 285px; }
+.landscape .scene-phoneStack .xhead { --fit-h: 134px; }
+.landscape .scene-spotlightGrid .xhead { --fit-h: 620px; }
+.landscape .scene-stopwatch .xhead { --fit-h: 329px; }
+.landscape .scene-ticket .xhead { --fit-h: 620px; }
+.landscape .scene-magnifier .xhead { --fit-h: 620px; }
+.landscape .scene-flow .xhead { --fit-h: 240px; }
+.landscape .scene-countdown .xhead { --fit-h: 230px; }
+.landscape .scene-poll .xhead { --fit-h: 620px; }
+.landscape .scene-badge .xhead { --fit-h: 620px; }
+.landscape .scene-checklist .xhead { --fit-h: 620px; }
+.landscape .scene-search .xhead { --fit-h: 180px; }
+.landscape .scene-calendar .xhead { --fit-h: 620px; }
+.landscape .scene-podium .xhead { --fit-h: 229px; }
+.landscape .scene-zoomReveal .xhead { --fit-h: 520px; }
+.landscape .scene-compose .xhead { --fit-h: 650px; }
+
+/* portrait */
+.portrait .scene-compare .xhead { --fit-h: 410px; }
+.portrait .scene-steps .xhead { --fit-h: 450px; }
+.portrait .scene-notify .xhead { --fit-h: 430px; }
+.portrait .scene-spotlight .xhead { --fit-h: 550px; }
+.portrait .scene-cards .xhead { --fit-h: 406px; }
+.portrait .scene-carousel .xhead { --fit-h: 380px; }
+.portrait .scene-bento .xhead { --fit-h: 351px; }
+.portrait .scene-chat .xhead { --fit-h: 410px; }
+.portrait .scene-stats .xhead { --fit-h: 374px; }
+.portrait .scene-wipe .xhead { --fit-h: 436px; }
+.portrait .scene-offer .xhead { --fit-h: 363px; }
+.portrait .scene-walkthrough .xhead { --fit-h: 275px; }
+.portrait .scene-lockscreen .xhead { --fit-h: 275px; }
+.portrait .scene-embedDemo .xhead { --fit-h: 330px; }
+.portrait .scene-deck .xhead { --fit-h: 480px; }
+.portrait .scene-adSpot .xhead { --fit-h: 296px; }
+.portrait .scene-growth .xhead { --fit-h: 630px; }
+.portrait .scene-frontends .xhead { --fit-h: 490px; }
+.portrait .scene-map .xhead { --fit-h: 490px; }
+.portrait .scene-receipt .xhead { --fit-h: 350px; }
+.portrait .scene-timeline .xhead { --fit-h: 327px; }
+.portrait .scene-phoneStack .xhead { --fit-h: 370px; }
+.portrait .scene-spotlightGrid .xhead { --fit-h: 350px; }
+.portrait .scene-stopwatch .xhead { --fit-h: 390px; }
+.portrait .scene-ticket .xhead { --fit-h: 590px; }
+.portrait .scene-magnifier .xhead { --fit-h: 450px; }
+.portrait .scene-flow .xhead { --fit-h: 350px; }
+.portrait .scene-countdown .xhead { --fit-h: 430px; }
+.portrait .scene-poll .xhead { --fit-h: 390px; }
+.portrait .scene-badge .xhead { --fit-h: 567px; }
+.portrait .scene-checklist .xhead { --fit-h: 390px; }
+.portrait .scene-search .xhead { --fit-h: 380px; }
+.portrait .scene-calendar .xhead { --fit-h: 370px; }
+.portrait .scene-podium .xhead { --fit-h: 518px; }
+.portrait .scene-zoomReveal .xhead { --fit-h: 296px; }
+.portrait .scene-compose .xhead { --fit-h: 356px; }
+
+/* hero / closer copy blocks (all top-anchored): room down to the next content or the frame's safe bottom, less the
+   distance the block's entrance motion moves it */
+.landscape .hs-copy { --fit-h: 680px; } .portrait .hs-copy { --fit-h: 490px; }
+.landscape .hc-copy { --fit-h: 650px; } .portrait .hc-copy { --fit-h: 450px; }
+.landscape .sv-copy { --fit-h: 690px; } .portrait .sv-copy { --fit-h: 450px; }
+.landscape .tb-copy { --fit-h: 500px; } .portrait .tb-copy { --fit-h: 490px; }
+.landscape .hw { --fit-h: 263px; } .portrait .hw { --fit-h: 490px; }
+.landscape .pf-copy { --fit-h: 670px; } .portrait .pf-copy { --fit-h: 600px; }
+.landscape .scene-statement .copy { --fit-h: 680px; } .portrait .scene-statement .copy { --fit-h: 960px; }
+.landscape .scene-wall .copy { --fit-h: 680px; } .portrait .scene-wall .copy { --fit-h: 470px; } /* over the wall, on its shade */
+.landscape .scene-hook .copy { --fit-h: 441px; } .portrait .scene-hook .copy { --fit-h: 754px; }
+.landscape .scene-product .copy { --fit-h: 680px; } .portrait .scene-product .copy { --fit-h: 440px; } /* the browser tilts up into view */
+.landscape .scene-phone .copy { --fit-h: 650px; } .portrait .scene-phone .copy { --fit-h: 335px; }
+.landscape .scene-points .copy { --fit-h: 680px; } .portrait .scene-points .copy { --fit-h: 470px; }
+.landscape .ep { --fit-h: 605px; } .portrait .ep { --fit-h: 702px; }
+.landscape .es { --fit-h: 515px; } .portrait .es { --fit-h: 580px; }
+.landscape .emq-c { --fit-h: 520px; } .portrait .emq-c { --fit-h: 660px; }
+.landscape .ew { --fit-h: 483px; } .portrait .ew { --fit-h: 695px; }
+.landscape .scene-endcard .center { --fit-h: 724px; } .portrait .scene-endcard .center { --fit-h: 972px; }
+
+/* one-line pieces: kept on one line, shrunk to their box's width (--fit-h only opts them in) */
+.scene-product .chip, .scene-phone .chip { --fit-h: 400px; white-space: nowrap; }
+.ep-foot, .scene-endcard .foot { --fit-h: 200px; white-space: nowrap; }
+.landscape .hp { --fit-h: 860px; } .portrait .hp { --fit-h: 1140px; } /* heroPoster: label + words + sub */
+.landscape .epo { --fit-h: 780px; } .portrait .epo { --fit-h: 1150px; } /* words + CTA, down to the footer */
+
+/* lists of cards/rows: the children zoom (text, paddings, icons) until the list fits down to the safe bottom */
+.scene-compare .cmp, .scene-steps .stp, .scene-notify .nt, .scene-cards .fc3, .scene-chat .chat, .scene-stats .sts,
+.scene-points .pts, .scene-flow .fl { --fit-zoom: 1; }
+.landscape .scene-compare .cmp { --fit-h: 520px; } .portrait .scene-compare .cmp { --fit-h: 850px; }
+.landscape .scene-steps .stp { --fit-h: 480px; } .portrait .scene-steps .stp { --fit-h: 810px; }
+.landscape .scene-notify .nt { --fit-h: 750px; } .portrait .scene-notify .nt { --fit-h: 830px; }
+.landscape .scene-cards .fc3 { --fit-h: 510px; } .portrait .scene-cards .fc3 { --fit-h: 830px; }
+.landscape .scene-chat .chat { --fit-h: 780px; } .portrait .scene-chat .chat { --fit-h: 850px; }
+.landscape .scene-stats .sts { --fit-h: 580px; } .portrait .scene-stats .sts { --fit-h: 870px; }
+.landscape .scene-points .pts { --fit-h: 750px; } .portrait .scene-points .pts { --fit-h: 730px; }
+.landscape .scene-flow .fl { --fit-h: 540px; } .portrait .scene-flow .fl { --fit-h: 910px; }
+
+/* one big word at a time: one line, shrunk to the frame width (greetings sizes its cycling slot itself) */
+.kw-word { --fit-h: 800px; white-space: nowrap; }
+
+/* big counters: one line, shrunk to their column (stats) or to the inside of the ring (stat) */
+.landscape .scene-stats .st1 { min-width: 0; }
+.scene-stats .st1 .v { --fit-h: 600px; white-space: nowrap; }
+.scene-stat .ringWrap .num { --fit-h: 2000px; white-space: nowrap; left: 80px; right: 80px; }
+
+/* bento: tile text fits its tile (rows are 290px; the landscape big tile spans two), values on one line */
+.bt-in { --fit-h: 230px; } .landscape .bt0 .bt-in { --fit-h: 548px; }
+.bt-val { --fit-h: 400px; white-space: nowrap; }
+
+/* offer: the badge's text stays inside its circle */
+.of-badge > span { display: block; max-width: 150px; --fit-h: 130px; }
+
+/* adSpot: the format rows zoom to fit; the banner's title stays on one line */
+.scene-adSpot .as-list { --fit-zoom: 1; } .landscape .scene-adSpot .as-list { --fit-h: 680px; } .portrait .scene-adSpot .as-list { --fit-h: 370px; }
+.as-btxt b { --fit-h: 100px; white-space: nowrap; }
+
+/* embedDemo post, receipt: the children zoom so the post / the printed slip end above the frame's bottom */
+.scene-embedDemo .ed-post, .scene-receipt .rc { --fit-zoom: 1; }
+.landscape .scene-embedDemo .ed-post { --fit-h: 860px; } .portrait .scene-embedDemo .ed-post { --fit-h: 740px; }
+.landscape .scene-receipt .rc { --fit-h: 840px; } .portrait .scene-receipt .rc { --fit-h: 920px; }
+
+/* one-line labels pinned to a point: capped width, shrunk to it */
+.tl-card { --fit-h: 300px; max-width: 360px; } .portrait .tl-card { max-width: 860px; }
+.sg-cap { --fit-h: 200px; } .landscape .sg-cap { max-width: 560px; } .portrait .sg-cap { max-width: 480px; }
+
+/* line pills and captions (they wrap; the room is down to the next thing or the safe line) */
+.landscape .s3-line { --fit-h: 200px; } .portrait .s3-line { --fit-h: 300px; }
+.landscape .kn-line { --fit-h: 150px; } .portrait .kn-line { --fit-h: 120px; }
+.landscape .mq-front { --fit-h: 250px; } .portrait .mq-front { --fit-h: 300px; }
+.landscape .cb-line { --fit-h: 120px; } .portrait .cb-line { --fit-h: 130px; }
+.landscape .sw-cap { --fit-h: 280px; } .portrait .sw-cap { --fit-h: 100px; }
+.portrait .scene-stopwatch .xhead { --fit-h: 350px; }
+.landscape .wt-cap { --fit-h: 200px; } .portrait .wt-cap { --fit-h: 116px; }
+.portrait .s3-txt { --fit-h: 300px; }
+.landscape .zr-tag { --fit-h: 200px; max-width: 900px; } .portrait .zr-tag { --fit-h: 200px; max-width: 800px; }
+.portrait .scene-embedDemo .ed-post { --fit-h: 740px; }
+
+/* countdown: four units are wider than the portrait frame; the row zooms to fit its width */
+.scene-countdown .cd { --fit-zoom: 1; --fit-h: 1000px; }
+
+/* compose: the post card zooms down to the frame's bottom */
+.scene-compose .cp { --fit-zoom: 1; } .landscape .scene-compose .cp { --fit-h: 860px; } .portrait .scene-compose .cp { --fit-h: 900px; }
+
+/* videoRow: the headline sits above the cards' words. Portrait stacks three 16:9 cards: the column narrows until they
+   end above the closing line (top 1440) or the safe line; a headline moves the cards down. */
+.landscape .scene-videoRow .xhead { --fit-h: 160px; } .portrait .scene-videoRow .xhead { --fit-h: 280px; }
+.landscape .vr-w { --fit-h: 300px; white-space: nowrap; }
+.portrait .vr.with-head { top: 580px; }
+.portrait .scene-videoRow .vr { --fit-zoom: 2; --fit-h: 1170px; }
+.portrait .scene-videoRow .vr:has(~ .vr-line) { --fit-h: 1110px; }
+.portrait .scene-videoRow .vr.with-head { --fit-h: 960px; } .portrait .scene-videoRow .vr.with-head:has(~ .vr-line) { --fit-h: 830px; }
+.landscape .vr-line { --fit-h: 110px; } .portrait .vr-line { --fit-h: 110px; }

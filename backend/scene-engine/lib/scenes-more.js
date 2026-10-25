@@ -51,12 +51,12 @@
   // styles: 'fill' | 'acc' | 'soft' (dimmed fill; 'out' is an alias). No outline-only text: it reads badly.
 const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['fill', 'acc']).length];
   const kenBurns = (img, t, d, from = 1.04, to = 1.16) => { if (img) img.style.transform = `scale(${lerp(from, to, prog(t, 0, d))})`; };
-  const countUp = (el, t, a, it) => {
-    const x = E.outExpo(prog(t, a, a + 1.3));
+  const fmtCount = (it, x) => {
     const loc = window.Kit.locale(it.locale || window.REEL.locale); // e.g. 'de-DE' -> 4,85 and 1.200
-    el.textContent = loc ? (it.value * x).toLocaleString(loc, { minimumFractionDigits: it.decimals || 0, maximumFractionDigits: it.decimals || 0 })
-      : (it.decimals ? (it.value * x).toFixed(it.decimals) : Math.round(it.value * x)).toLocaleString('en-US');
+    return loc ? (it.value * x).toLocaleString(loc, { minimumFractionDigits: it.decimals || 0, maximumFractionDigits: it.decimals || 0 })
+      : (it.value * x).toLocaleString('en-US', { minimumFractionDigits: it.decimals || 0, maximumFractionDigits: it.decimals || 0 });
   };
+  const countUp = (el, t, a, it) => { el.textContent = fmtCount(it, E.outExpo(prog(t, a, a + 1.3))); };
 
   Object.assign(window.KitScenes = window.KitScenes || {}, {
     // ---------- openers ----------
@@ -211,7 +211,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
 
     stats: {
       build: s => `${head(s)}<div class="sts">${s.items.map((it, i) => `<div class="st1"><div class="v" style="color:${i === 0 ? C().accent : C().ink}">
-          <span>${window.Kit.esc(it.prefix || '')}</span><span class="n">0</span><span class="suf">${window.Kit.esc(it.suffix || '')}</span></div>
+          <span>${window.Kit.esc(it.prefix || '')}</span><span class="n">${window.Kit.esc(fmtCount(it, 1))}</span><span class="suf">${window.Kit.esc(it.suffix || '')}</span></div>
           <i class="bar"><i style="background:${accents()[i % 3]}"></i></i><small>${markup(it.label)}</small></div>`).join('')}</div>`,
       update(el, t, d, s) {
         animHead(el, t);
@@ -242,7 +242,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
       cues: () => [{ t: 1.45, kind: 'whoosh' }],
       build(s) {
         const panel = (p, kind, i) => `<div class="wp-${kind}">${p.image ? imgOr(p.image, i) : `<div class="wp-txt"><b>${markup(p.title)}</b>${p.text ? `<small>${markup(p.text)}</small>` : ''}</div>`}
-          <span class="wp-tag">${p.image ? markup(p.title) : (kind === 'before' ? 'Before' : 'After')}</span></div>`;
+          <span class="wp-tag">${markup(p.tag || (p.image ? p.title : (kind === 'before' ? 'Before' : 'After')))}</span></div>`;
         return `${head(s)}<div class="wp">${panel(s.after, 'after', 2)}${panel(s.before, 'before', 5)}<i class="wp-line"><span>${icon('arrow', C().bg, 34)}</span></i></div>`;
       },
       update(el, t, d) {
@@ -261,7 +261,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
     offer: {
       cues: () => [{ t: 1.55, kind: 'tick' }],
       build: s => `${head(s)}<div class="of">
-          ${s.badge ? `<div class="of-badge">${markup(s.badge)}</div>` : ''}
+          ${s.badge ? `<div class="of-badge"><span>${markup(s.badge)}</span></div>` : ''}
           ${s.was ? `<div class="of-was"><span>${markup(s.was)}</span><i></i></div>` : ''}
           <div class="of-price" data-fit>${markup(s.price)}</div>${s.unit ? `<div class="of-unit">${markup(s.unit)}</div>` : ''}
           ${s.until ? `<div class="of-until">${icon('clock', C().accent2, 34)}<span>${markup(s.until)}</span></div>` : ''}
@@ -503,7 +503,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
       cues: () => [{ t: 1.0, kind: 'tick' }],
       build: s => `${head(s)}<div class="ls"><div class="wt-phone ls-phone"><div class="wt-screen ls-screen">
           ${s.from ? `${window.Kit.img(s.from, 'ls-app')}` : ''}<div class="ls-lock">
-            <span class="ls-pad">${icon('lock', '#fff', 30)}</span><div class="ls-time">${window.Kit.esc(s.time || '9:41')}</div><div class="ls-date">${markup(s.date || 'Tuesday, 14 October')}</div>
+            <span class="ls-pad">${icon('lock', '#fff', 30)}</span><div class="ls-time">${window.Kit.esc(s.time || '9:41')}</div><div class="ls-date">${markup(s.date || '')}</div>
             <div class="ls-card"><div class="ls-src">${markup(s.source || B().name)}</div>${s.title ? `<div class="ls-title">${markup(s.title)}</div>` : '<div class="ls-title">Playing</div>'}
               <div class="ls-bar"><i></i></div><div class="ls-ctl">${icon('arrow', '#fff', 30).replace('<svg', '<svg style="transform:scaleX(-1)"')}<b>${icon('play', '#111', 30)}</b>${icon('arrow', '#fff', 30)}</div>
               <div class="wv ls-wv">${waveBars(30)}</div></div></div></div><i class="notch"></i></div></div>
