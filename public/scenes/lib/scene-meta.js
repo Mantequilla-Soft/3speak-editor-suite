@@ -235,7 +235,9 @@
   const SIZES = { landscape: [1920, 1080], portrait: [1080, 1920], square: [1080, 1080] };
 
   // ---------- sanitising ----------
-  const str = (v, max = 200) => (v == null ? '' : String(v)).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '').slice(0, max);
+  // capped at max; text is cut at the last space when there is one in the last 40% (no half words on screen)
+  const str = (v, max = 200) => { const s = (v == null ? '' : String(v)).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '');
+    if (s.length <= max) return s; const t = s.slice(0, max), sp = t.lastIndexOf(' '); return sp > max * .6 ? t.slice(0, sp) : t; };
   const clampNum = (v, f, d) => { let n = +v; if (!Number.isFinite(n)) return d; if (f.kind === 'int') n = Math.round(n); if (f.min != null) n = Math.max(f.min, n); if (f.max != null) n = Math.min(f.max, n); return n; };
   const colorOk = c => typeof c === 'string' && c.length < 60 && /^(#[0-9a-f]{3,8}|(rgb|hsl)a?\([\d\s.,%/+-]+\)|transparent|[a-z]{3,20})$/i.test(c.trim());
   function image(v) {

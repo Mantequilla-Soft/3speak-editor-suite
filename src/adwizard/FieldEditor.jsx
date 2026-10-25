@@ -2,7 +2,8 @@ import { useRef, useState } from 'react'
 import { Plus, Trash2, ChevronUp, ChevronDown, Upload, X, RotateCcw, ClipboardPaste } from 'lucide-react'
 import { uploadFile, absUrl } from './engine'
 
-// Forms generated from the scene engine's schema (lib/scene-meta.js): one field editor per field kind.
+// Forms generated from the scene engine's schema (lib/scene-meta.js): one field editor per field kind. Text stops at
+// the field's maxLen: the engine keeps no more, and every layout fits that much (scene engine check-layout).
 const nice = k => (k.charAt(0).toUpperCase() + k.slice(1)).replace(/([a-z])([A-Z])/g, '$1 $2')
 const labelOf = f => f.label || nice(f.k)
 const imgUrl = v => (v && typeof v === 'object' ? v.url : v) || ''
@@ -29,11 +30,11 @@ function Field({ f, value, onChange, icons }) {
   switch (f.kind) {
     case 'text':
       return <label className="aw-f">{head}
-        <input type="text" value={value ?? ''} maxLength={f.maxLen ? f.maxLen * 2 : undefined} onChange={e => onChange(e.target.value)}
+        <input type="text" value={value ?? ''} maxLength={f.maxLen || undefined} onChange={e => onChange(e.target.value)}
           placeholder={f.dflt || (f.opt ? 'optional' : '')} /><Count v={value} max={f.maxLen} /></label>
     case 'para':
       return <label className="aw-f">{head}
-        <textarea rows={3} value={value ?? ''} onChange={e => onChange(e.target.value)} placeholder={f.opt ? 'optional' : ''} /><Count v={value} max={f.maxLen} /></label>
+        <textarea rows={3} value={value ?? ''} maxLength={f.maxLen || undefined} onChange={e => onChange(e.target.value)} placeholder={f.opt ? 'optional' : ''} /><Count v={value} max={f.maxLen} /></label>
     case 'lines': case 'texts':
       return f.options ? <Options f={f} head={head} value={value} onChange={onChange} />
         : <StringList f={f} head={head} value={value} onChange={onChange} />
@@ -98,7 +99,7 @@ function StringList({ f, head, value, onChange }) {
     {f.kind === 'lines' && <small className="aw-tip">Wrap a word in *stars* for the accent colour, _underscores_ for the second accent.</small>}
     {arr.map((x, i) => (
       <div className="aw-row" key={i}>
-        <input type={isInt ? 'number' : 'text'} min={isInt ? o1 : undefined} value={isInt ? x + o1 : x} onChange={e => set(i, isInt ? +e.target.value - o1 : e.target.value)} />
+        <input type={isInt ? 'number' : 'text'} min={isInt ? o1 : undefined} maxLength={!isInt && f.maxLen ? f.maxLen : undefined} value={isInt ? x + o1 : x} onChange={e => set(i, isInt ? +e.target.value - o1 : e.target.value)} />
         <button type="button" className="aw-icon-btn" disabled={i === 0} onClick={() => onChange(swap(arr, i, i - 1))} title="Up"><ChevronUp size={14} /></button>
         <button type="button" className="aw-icon-btn" disabled={arr.length <= (f.min || 0)} onClick={() => onChange(arr.filter((_, k) => k !== i))} title="Remove"><Trash2 size={14} /></button>
       </div>))}
