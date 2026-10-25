@@ -87,7 +87,7 @@
 .qt h2 { font-weight: 800; letter-spacing: -.02em; line-height: 1.14; }
 .portrait .qt h2 { font-size: 76px; } .landscape .qt h2 { font-size: 70px; }
 .who { display: flex; align-items: center; gap: 24px; margin-top: 60px; opacity: 0; }
-.who img, .who .monogram { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; font-size: 48px; }
+.who img, .who .monogram { width: 100px; height: 100px; --ir: 50%; border-radius: var(--ir); object-fit: cover; font-size: 48px; }
 .who b { display: block; font-size: 40px; font-weight: 800; } .who small { display: block; font-size: 30px; color: var(--mute); }
 
 /* cards */

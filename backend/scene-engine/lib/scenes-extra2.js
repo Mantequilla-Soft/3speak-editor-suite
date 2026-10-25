@@ -137,7 +137,7 @@
     },
 
     spotlightGrid: {
-      cues: s => s.picks.map((_, i) => ({ t: sgAt(i, s.picks.length) + .1, kind: 'swish', gain: -6 })),
+      cues: (s, d) => s.picks.map((_, i) => ({ t: sgAt(i, s.picks.length, d) + .1, kind: 'swish', gain: -6 })),
       build: s => `${head(s, 'sg-head')}<div class="sg"><div class="sg-grid">${s.tiles.slice(0, 9).map((tl, i) => `<div class="sg-t">${imgOr(tl.image, i)}${tl.title ? `<span>${markup(tl.title)}</span>` : ''}</div>`).join('')}</div>
         <div class="sg-dim"></div><i class="sg-ring"></i>${s.picks.map(p => `<div class="sg-cap">${markup(p.caption || '')}</div>`).join('')}</div>`,
       update(el, t, d, s) {
@@ -148,16 +148,20 @@
         const centre = i => { const tl = tiles[s.picks[i].index] || tiles[0]; return [tl.offsetLeft + tl.offsetWidth / 2, tl.offsetTop + tl.offsetHeight / 2]; };
         const n = s.picks.length; let x, y, cur = 0;
         [x, y] = centre(0);
-        for (let i = 1; i < n; i++) { const a = sgAt(i, n), m = E.inOutCubic(prog(t, a - .45, a)); const [x1, y1] = centre(i); x = lerp(x, x1, m); y = lerp(y, y1, m); if (t >= a - .2) cur = i; }
+        for (let i = 1; i < n; i++) { const a = sgAt(i, n, d), m = E.inOutCubic(prog(t, a - .45, a)); const [x1, y1] = centre(i); x = lerp(x, x1, m); y = lerp(y, y1, m); if (t >= a - .2) cur = i; }
         const rad = (portrait() ? 190 : 170) * E.outBack(prog(t, .55, 1.0)), on = prog(t, .5, .8);
         const dim = $('.sg-dim', el);
         dim.style.opacity = .82 * on;
         dim.style.webkitMaskImage = dim.style.maskImage = `radial-gradient(circle ${Math.max(1, rad)}px at ${x}px ${y}px, transparent 96%, #000 100%)`;
         const ring = $('.sg-ring', el); ring.style.opacity = on; ring.style.width = ring.style.height = `${rad * 2}px`; ring.style.transform = `translate(${x - rad}px, ${y - rad}px)`;
+        // frame bounds in the box's own coordinates (x, y and the captions live there)
+        const ox = box.offsetLeft, oy = box.offsetTop, W = el.clientWidth, floor = (portrait() ? 1540 : el.clientHeight - 50) - oy;
         $$('.sg-cap', el).forEach((c, i) => {
-          const a = i ? sgAt(i, n) : .9, shown = i === cur;
+          const a = i ? sgAt(i, n, d) : .9, shown = i === cur, cw = c.offsetWidth, ch = c.offsetHeight;
+          // inside the frame: clamped sideways, and above the spotlight when below it would leave the (safe) frame
+          const cx = Math.max(cw / 2 + 30 - ox, Math.min(W - ox - cw / 2 - 30, x)), cy = y + rad + 18 + ch > floor ? y - rad - 18 - ch : y + rad + 18;
           c.style.opacity = shown ? prog(t, a - .05, a + .2) : 0;
-          c.style.transform = `translate(${x}px, ${y + rad + 18}px) translateX(-50%) translateY(${shown ? (1 - E.outCubic(prog(t, a - .05, a + .3))) * 14 : 14}px)`;
+          c.style.transform = `translate(${cx}px, ${cy}px) translateX(-50%) translateY(${shown ? (1 - E.outCubic(prog(t, a - .05, a + .3))) * 14 : 14}px)`;
         });
       },
     },
@@ -176,8 +180,8 @@
         const run = E.inOutCubic(prog(t, .5, 2.2)), secs = s.seconds || 60;
         $('.sw-hand', el).style.transform = `translate(-50%, -100%) rotate(${run * 360}deg)`;
         $('.sw-arc', el).style.strokeDasharray = `${run} 1`;
-        const read = $('.sw-read', el); read.textContent = Math.round(run * secs); read.style.opacity = 1 - prog(t, 2.2, 2.35);
-        const done = $('.sw-done', el), dk = E.outBack(prog(t, 2.25, 2.7)); done.style.opacity = prog(t, 2.25, 2.4); done.style.transform = `translate(-50%, -50%) scale(${lerp(.5, 1, dk)})`;
+        const read = $('.sw-read', el); read.textContent = clock(Math.round(run * secs)); read.style.opacity = s.result ? 1 - prog(t, 2.2, 2.35) : 1;
+        const done = $('.sw-done', el), dk = E.outBack(prog(t, 2.25, 2.7)); done.style.opacity = s.result ? prog(t, 2.25, 2.4) : 0; done.style.transform = `translate(-50%, -50%) scale(${lerp(.5, 1, dk)})`;
         $('.sw-btn', el).style.transform = `translateX(-50%) translateY(${t > 2.15 && t < 2.3 ? 8 : 0}px)`;
         const cap = $('.sw-cap', el); if (cap) words(cap, t, 2.4, .06, .5);
       },
@@ -220,7 +224,7 @@
     },
 
     magnifier: {
-      cues: s => s.stops.map((_, i) => ({ t: mgAt(i, s.stops.length) + .05, kind: 'swish', gain: -7 })),
+      cues: (s, d) => s.stops.map((_, i) => ({ t: mgAt(i, s.stops.length, d) + .05, kind: 'swish', gain: -7 })),
       build: s => `${head(s, 'mg-head')}<div class="mg">${window.Kit.img(s.image, 'mg-img')}<div class="mg-lens"><div class="mg-zoom" style="background-image:url('${window.Kit.src(s.image)}')"></div></div>
         ${s.stops.map(st => `<div class="mg-cap">${markup(st.caption || '')}</div>`).join('')}</div>`,
       update(el, t, d, s) {
@@ -228,7 +232,7 @@
         const box = $('.mg', el), k = E.outQuint(prog(t, .1, .7)); box.style.opacity = prog(t, .1, .3); box.style.transform = `translateY(${(1 - k) * 60}px)`;
         const W = box.clientWidth, H = box.clientHeight, n = s.stops.length, z = s.zoom || 2.4, R = portrait() ? 170 : 150;
         let x = s.stops[0].x, y = s.stops[0].y, cur = 0;
-        for (let i = 1; i < n; i++) { const a = mgAt(i, n), m = E.inOutCubic(prog(t, a - .55, a)); x = lerp(x, s.stops[i].x, m); y = lerp(y, s.stops[i].y, m); if (t >= a - .15) cur = i; }
+        for (let i = 1; i < n; i++) { const a = mgAt(i, n, d), m = E.inOutCubic(prog(t, a - .55, a)); x = lerp(x, s.stops[i].x, m); y = lerp(y, s.stops[i].y, m); if (t >= a - .15) cur = i; }
         const px = x / 100 * W, py = y / 100 * H, lens = $('.mg-lens', el), lk = E.outBack(prog(t, .6, 1.0));
         lens.style.opacity = prog(t, .6, .75);
         lens.style.width = lens.style.height = `${R * 2}px`;
@@ -239,7 +243,7 @@
         zm.style.backgroundSize = `${dw * z}px ${dh * z}px`;
         zm.style.backgroundPosition = `${R + 8 - (px - ox) * z}px ${R + 8 - py * z}px`;
         $$('.mg-cap', el).forEach((c, i) => {
-          const a = i ? mgAt(i, n) : 1.0, on = i === cur;
+          const a = i ? mgAt(i, n, d) : 1.0, on = i === cur;
           c.style.opacity = on ? prog(t, a, a + .2) : 0;
           const right = px < W * .62;
           c.style.transform = `translate(${right ? px + R + 24 : px - R - 24}px, ${py}px) translate(${right ? 0 : -100}%, -50%)`;
@@ -272,7 +276,11 @@
 
   // shared timings
   function tlAt(i, n) { return .45 + i * Math.min(.45, 1.8 / Math.max(1, n - 1)); }
-  function sgAt(i, n) { return i === 0 ? .55 : .9 + i * 1.05; }
-  function mgAt(i, n) { return i === 0 ? .6 : .8 + i * 1.15; }
+  // the gap between picks/stops shrinks when they would not fit: the last one lands >= .6 s before the end
+  function sgAt(i, n, d) { return i === 0 ? .55 : .9 + i * Math.max(.5, Math.min(1.05, (d - 1.5) / Math.max(1, n - 1))); }
+  function mgAt(i, n, d) { return i === 0 ? .6 : .8 + i * Math.max(.6, Math.min(1.15, (d - 1.4) / Math.max(1, n - 1))); }
   function flAt(i) { return .35 + i * .42; }
+  // stopwatch readout: seconds under a minute, m:ss (or h:mm:ss) from there
+  function clock(v) { if (v < 60) return String(v); const h = Math.floor(v / 3600), m = Math.floor(v / 60) % 60, sec = String(v % 60).padStart(2, '0');
+    return h ? `${h}:${String(m).padStart(2, '0')}:${sec}` : `${m}:${sec}`; }
 })();

@@ -51,12 +51,12 @@
   // styles: 'fill' | 'acc' | 'soft' (dimmed fill; 'out' is an alias). No outline-only text: it reads badly.
 const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['fill', 'acc']).length];
   const kenBurns = (img, t, d, from = 1.04, to = 1.16) => { if (img) img.style.transform = `scale(${lerp(from, to, prog(t, 0, d))})`; };
-  const countUp = (el, t, a, it) => {
-    const x = E.outExpo(prog(t, a, a + 1.3));
-    const loc = it.locale || window.REEL.locale; // e.g. 'de-DE' -> 4,85 and 1.200
-    el.textContent = loc ? (it.value * x).toLocaleString(loc, { minimumFractionDigits: it.decimals || 0, maximumFractionDigits: it.decimals || 0 })
-      : (it.decimals ? (it.value * x).toFixed(it.decimals) : Math.round(it.value * x)).toLocaleString('en-US');
+  const fmtCount = (it, x) => {
+    const loc = window.Kit.locale(it.locale || window.REEL.locale); // e.g. 'de-DE' -> 4,85 and 1.200
+    return loc ? (it.value * x).toLocaleString(loc, { minimumFractionDigits: it.decimals || 0, maximumFractionDigits: it.decimals || 0 })
+      : (it.value * x).toLocaleString('en-US', { minimumFractionDigits: it.decimals || 0, maximumFractionDigits: it.decimals || 0 });
   };
+  const countUp = (el, t, a, it) => { el.textContent = fmtCount(it, E.outExpo(prog(t, a, a + 1.3))); };
 
   Object.assign(window.KitScenes = window.KitScenes || {}, {
     // ---------- openers ----------
@@ -126,8 +126,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
 
     heroCollage: {
       build(s) {
-        const imgs = (s.images || []).slice(0, 5);
-        while (imgs.length < 5) imgs.push(null);
+        const own = (s.images || []).slice(0, 5), imgs = Array.from({ length: 5 }, (_, i) => own.length ? own[i % own.length] : null);
         return `<div class="hc">${imgs.map((src, i) => `<div class="pol p${i}">${imgOr(src, i)}</div>`).join('')}</div>
           <div class="hc-copy">${label(s.label)}${lines(s.lines)}${s.sub ? `<p class="hc-sub" data-split>${markup(s.sub)}</p>` : ''}</div>`;
       },
@@ -212,7 +211,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
 
     stats: {
       build: s => `${head(s)}<div class="sts">${s.items.map((it, i) => `<div class="st1"><div class="v" style="color:${i === 0 ? C().accent : C().ink}">
-          <span>${window.Kit.esc(it.prefix || '')}</span><span class="n">0</span><span class="suf">${window.Kit.esc(it.suffix || '')}</span></div>
+          <span>${window.Kit.esc(it.prefix || '')}</span><span class="n">${window.Kit.esc(fmtCount(it, 1))}</span><span class="suf">${window.Kit.esc(it.suffix || '')}</span></div>
           <i class="bar"><i style="background:${accents()[i % 3]}"></i></i><small>${markup(it.label)}</small></div>`).join('')}</div>`,
       update(el, t, d, s) {
         animHead(el, t);
@@ -227,7 +226,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
 
     marquee: {
       build: s => `<div class="mq">${s.rows.map((r, i) => `<div class="mq-row ${i % 2 ? 'out' : ''} ${i === (s.accentRow ?? 1) ? 'acc' : ''}"><span>${Array.from({ length: 6 }, () => markup(r)).join('<em class="sep">&bull;</em>')}</span></div>`).join('')}</div>
-        <div class="mq-front">${label(s.label)}${s.line ? `<div class="mq-line" data-split>${markup(s.line)}</div>` : ''}</div>`,
+        ${s.label || s.line ? `<div class="mq-front">${label(s.label)}${s.line ? `<div class="mq-line" data-split>${markup(s.line)}</div>` : ''}</div>` : ''}`,
       update(el, t) {
         $$('.mq-row', el).forEach((r, i) => {
           const dir = i % 2 ? 1 : -1, x = E.outCubic(prog(t, i * .08, .6 + i * .08));
@@ -235,8 +234,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
           $('span', r).style.transform = `translateX(${(dir > 0 ? -1400 : -200) + dir * t * 160 + dir * (1 - x) * -300}px)`;
         });
         const f = $('.mq-front', el);
-        popIn(f, t, .45, .55, .8);
-        words(f, t, .55, .07, .5);
+        if (f) { popIn(f, t, .45, .55, .8); words(f, t, .55, .07, .5); }
       },
     },
 
@@ -244,7 +242,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
       cues: () => [{ t: 1.45, kind: 'whoosh' }],
       build(s) {
         const panel = (p, kind, i) => `<div class="wp-${kind}">${p.image ? imgOr(p.image, i) : `<div class="wp-txt"><b>${markup(p.title)}</b>${p.text ? `<small>${markup(p.text)}</small>` : ''}</div>`}
-          <span class="wp-tag">${p.image ? markup(p.title) : (kind === 'before' ? 'Before' : 'After')}</span></div>`;
+          <span class="wp-tag">${markup(p.tag || (p.image ? p.title : (kind === 'before' ? 'Before' : 'After')))}</span></div>`;
         return `${head(s)}<div class="wp">${panel(s.after, 'after', 2)}${panel(s.before, 'before', 5)}<i class="wp-line"><span>${icon('arrow', C().bg, 34)}</span></i></div>`;
       },
       update(el, t, d) {
@@ -263,7 +261,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
     offer: {
       cues: () => [{ t: 1.55, kind: 'tick' }],
       build: s => `${head(s)}<div class="of">
-          ${s.badge ? `<div class="of-badge">${markup(s.badge)}</div>` : ''}
+          ${s.badge ? `<div class="of-badge"><span>${markup(s.badge)}</span></div>` : ''}
           ${s.was ? `<div class="of-was"><span>${markup(s.was)}</span><i></i></div>` : ''}
           <div class="of-price" data-fit>${markup(s.price)}</div>${s.unit ? `<div class="of-unit">${markup(s.unit)}</div>` : ''}
           ${s.until ? `<div class="of-until">${icon('clock', C().accent2, 34)}<span>${markup(s.until)}</span></div>` : ''}
@@ -403,7 +401,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
     heroWave: {
       build: s => `<div class="hw">${label(s.label)}${lines(s.lines)}</div>
         <div class="wv-wrap"><span class="wv-play">${icon('play', C().accent, portrait() ? 64 : 52)}</span><div class="wv">${waveBars(portrait() ? 46 : 70)}<b class="wv-head"></b></div></div>
-        ${s.track ? `<div class="wv-track">${s.track.cover ? `${window.Kit.img(s.track.cover)}` : ''}<span><b>${markup(s.track.title)}</b><small>${markup(s.track.artist || '')}</small></span></div>` : ''}
+        ${s.track ? `<div class="wv-track">${s.track.cover ? `<i class="wv-cov">${window.Kit.img(s.track.cover)}</i>` : ''}<span><b>${markup(s.track.title)}</b><small>${markup(s.track.artist || '')}</small></span></div>` : ''}
         ${s.sub ? `<p class="hw-sub" data-split>${markup(s.sub)}</p>` : ''}`,
       update(el, t, d) {
         fadeUp($('.hw .label', el), t, 0, .4, 20);
@@ -505,7 +503,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
       cues: () => [{ t: 1.0, kind: 'tick' }],
       build: s => `${head(s)}<div class="ls"><div class="wt-phone ls-phone"><div class="wt-screen ls-screen">
           ${s.from ? `${window.Kit.img(s.from, 'ls-app')}` : ''}<div class="ls-lock">
-            <span class="ls-pad">${icon('lock', '#fff', 30)}</span><div class="ls-time">${window.Kit.esc(s.time || '9:41')}</div><div class="ls-date">${markup(s.date || 'Tuesday, 14 October')}</div>
+            <span class="ls-pad">${icon('lock', '#fff', 30)}</span><div class="ls-time">${window.Kit.esc(s.time || '9:41')}</div><div class="ls-date">${markup(s.date || '')}</div>
             <div class="ls-card"><div class="ls-src">${markup(s.source || B().name)}</div>${s.title ? `<div class="ls-title">${markup(s.title)}</div>` : '<div class="ls-title">Playing</div>'}
               <div class="ls-bar"><i></i></div><div class="ls-ctl">${icon('arrow', '#fff', 30).replace('<svg', '<svg style="transform:scaleX(-1)"')}<b>${icon('play', '#111', 30)}</b>${icon('arrow', '#fff', 30)}</div>
               <div class="wv ls-wv">${waveBars(30)}</div></div></div></div><i class="notch"></i></div></div>

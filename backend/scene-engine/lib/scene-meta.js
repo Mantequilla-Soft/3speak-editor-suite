@@ -9,7 +9,8 @@
 //   number / int / bool / enum (options) / icon (Kit.ICONS)    color  CSS colour
 //   list      list of objects ({ of: [fields] })                object one object ({ of: [fields] })
 // Common keys: k (field name), kind, label (UI), opt (optional), min/max (items, or value range), maxLen (chars),
-//   hint (UI help), adjust:false (image placement not offered).
+//   hint (UI help), dflt (what the scene draws when an optional field is left empty), adjust:false (image placement not offered), from1 (an index the doc stores from 0; a UI shows
+//   and takes it counting from 1).
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.SceneMeta = factory();
@@ -20,29 +21,32 @@
   // shorthand builders
   const F = (k, kind, extra = {}) => ({ k, kind, ...extra });
   const label = F('label', 'text', { opt: true, maxLen: 48, label: 'Small label' });
-  const lines = (min = 1, max = 3) => F('lines', 'lines', { min, max, maxLen: 44, label: 'Headline lines' });
+  const lines = (min = 1, max = 3) => F('lines', 'lines', { min, max, maxLen: 32, label: 'Headline lines' });
   const sub = F('sub', 'para', { opt: true, maxLen: 140, label: 'Sub line' });
   const line = F('line', 'text', { opt: true, maxLen: 90, label: 'Closing line' });
   const head = (min, max) => [label, lines(min, max)];
   const closer = [F('tagline', 'text', { opt: true, maxLen: 80, label: 'Tagline' }),
     F('cta', 'text', { opt: true, maxLen: 40, label: 'Call to action', hint: 'e.g. your URL' }), F('footer', 'text', { opt: true, maxLen: 80, label: 'Footer' })];
-  const titleSub = (iconToo = true, imageToo = false) => [
+  const titleSub = (iconToo = true, imageToo = false, dflt = 'star') => [
     ...(imageToo ? [F('image', 'image', { opt: true })] : []),
-    ...(iconToo ? [F('icon', 'icon', { opt: true })] : []),
+    ...(iconToo ? [F('icon', 'icon', { opt: true, dflt, ...(imageToo ? { hint: 'shows when there is no picture' } : {}) })] : []),
     F('title', 'text', { maxLen: 48 }), F('sub', 'text', { opt: true, maxLen: 80 })];
+
+  // a small floating chip next to a screenshot (product, phone)
+  const chip = [F('icon', 'icon', { opt: true, dflt: 'star' }), F('title', 'text', { maxLen: 20 }), F('sub', 'text', { opt: true, maxLen: 32 })];
 
   // role: opener | middle | closer. dur: [min readable, default]. orient: both unless noted.
   const TYPES = {
     // ---- lib/scenes.js
     words: { role: ['opener'], dur: [1.8, 2.6], desc: 'One huge word at a time, the last stays, then a line',
-      fields: [label, F('words', 'texts', { min: 1, max: 5, maxLen: 16, label: 'Words' }), line, F('hold', 'number', { opt: true, min: .3, max: 4, label: 'Line hold (s)' })] },
+      fields: [label, F('words', 'texts', { min: 1, max: 5, maxLen: 16, label: 'Words' }), line, F('hold', 'number', { opt: true, min: .3, max: 4, label: 'Line hold (s)', hint: 'seconds the last word and the line stay (needs a closing line)' })] },
     compare: { role: ['middle'], dur: [3, 3.8], desc: '"Elsewhere" panel with crosses, then "here" panel with checks',
       fields: [...head(1, 2), F('left', 'object', { of: [F('title', 'text', { maxLen: 32 }), F('items', 'texts', { min: 2, max: 4, maxLen: 40 })] }),
         F('right', 'object', { of: [F('title', 'text', { maxLen: 32 }), F('items', 'texts', { min: 2, max: 4, maxLen: 40 })] })] },
     steps: { role: ['middle'], dur: [3, 3.6], desc: 'Numbered steps joined by a drawing line',
       fields: [...head(1, 2), F('steps', 'list', { min: 2, max: 4, of: [F('title', 'text', { maxLen: 36 }), F('sub', 'text', { opt: true, maxLen: 60 })] })] },
     notify: { role: ['middle'], dur: [3, 3.6], desc: 'Phone notifications dropping in',
-      fields: [...head(1, 2), F('items', 'list', { min: 2, max: 4, of: [F('icon', 'icon', { opt: true }), F('color', 'color', { opt: true }), F('title', 'text', { maxLen: 32 }),
+      fields: [...head(1, 2), F('items', 'list', { min: 2, max: 4, of: [F('icon', 'icon', { opt: true, hint: 'none = your logo' }), F('color', 'color', { opt: true, label: 'Icon colour' }), F('title', 'text', { maxLen: 32 }),
         F('text', 'text', { maxLen: 80 }), F('time', 'text', { opt: true, maxLen: 12 })] })] },
     spotlight: { role: ['middle'], dur: [2.8, 3.4], desc: 'One picture as a card with slow zoom, name tag',
       fields: [...head(1, 2), F('image', 'image', { opt: true }), F('tag', 'object', { opt: true, of: [F('title', 'text', { maxLen: 40 }), F('sub', 'text', { opt: true, maxLen: 60 })] })] },
@@ -51,12 +55,13 @@
     cards: { role: ['middle'], dur: [3, 3.6], desc: 'Feature cards fanning out of a stack',
       fields: [...head(1, 2), F('cards', 'list', { min: 3, max: 4, of: titleSub() })] },
     greetings: { role: ['opener', 'middle'], dur: [2.4, 3.2], desc: 'Cycles through words (any script), lands on the last',
-      fields: [label, F('words', 'texts', { min: 2, max: 10, maxLen: 18 }), line, F('strip', 'text', { opt: true, maxLen: 60 }), F('hold', 'number', { opt: true, min: .3, max: 4 })] },
+      fields: [label, F('words', 'texts', { min: 2, max: 10, maxLen: 18, label: 'Words' }), line, F('strip', 'text', { opt: true, maxLen: 60 }),
+        F('hold', 'number', { opt: true, min: .3, max: 4, label: 'Last word hold (s)', hint: 'seconds the last word and the line stay' })] },
 
     // ---- lib/scenes-more.js
     heroSplit: { role: ['opener'], dur: [2.6, 3.2], desc: 'Photo on one half, headline on the other',
       fields: [F('image', 'image'), ...head(1, 3), sub] },
-    heroSlides: { role: ['opener'], dur: [3, 3.8], desc: 'Photo carousel on one half, headline on the other',
+    heroSlides: { role: ['opener'], dur: [3, 3.8], minFor: s => 2 + .85 * ((s.slides || []).length - 1), desc: 'Photo carousel on one half, headline on the other',
       fields: [F('slides', 'list', { min: 3, max: 5, of: [F('image', 'image'), F('tag', 'text', { opt: true, maxLen: 30 })] }), ...head(1, 3), sub] },
     heroPoster: { role: ['opener'], dur: [2.2, 2.8], desc: 'Giant stacked words, alternating fill and accent',
       fields: [label, F('words', 'texts', { min: 2, max: 4, maxLen: 14 }), F('styles', 'texts', { opt: true, max: 4, options: ['fill', 'acc', 'soft'], label: 'Word styles' }), sub] },
@@ -66,17 +71,17 @@
       fields: [...head(1, 2), F('items', 'list', { min: 3, max: 4, of: titleSub(true, true) })] },
     bento: { role: ['middle'], dur: [3.2, 3.8], desc: 'Mixed-size tile grid; tile 1 is big and can be a photo',
       fields: [...head(1, 2), F('tiles', 'list', { min: 5, max: 5, of: [F('image', 'image', { opt: true }), F('icon', 'icon', { opt: true }),
-        F('value', 'text', { opt: true, maxLen: 10, label: 'Big value' }), F('title', 'text', { maxLen: 40 }), F('sub', 'text', { opt: true, maxLen: 60 })] })] },
+        F('value', 'text', { opt: true, maxLen: 8, label: 'Big value' }), F('title', 'text', { maxLen: 30 }), F('sub', 'text', { opt: true, maxLen: 40 })] })] },
     chat: { role: ['middle'], dur: [3.2, 3.8], desc: 'Message bubbles with typing dots (no made-up testimonials)',
-      fields: [...head(1, 2), F('messages', 'list', { min: 2, max: 4, of: [F('from', 'enum', { options: ['them', 'me'] }), F('name', 'text', { opt: true, maxLen: 24 }),
-        F('avatar', 'image', { opt: true }), F('text', 'text', { maxLen: 90 })] })] },
+      fields: [...head(1, 2), F('messages', 'list', { min: 2, max: 4, of: [F('from', 'enum', { options: ['them', 'me'] }), F('name', 'text', { opt: true, maxLen: 24, hint: 'only for "them"' }),
+        F('avatar', 'image', { opt: true, hint: 'only for "them"' }), F('text', 'text', { maxLen: 90 })] })] },
     stats: { role: ['middle'], dur: [3, 3.6], desc: '2 to 4 numbers counting up with colour bars (real numbers only)',
-      fields: [...head(1, 2), F('items', 'list', { min: 2, max: 4, of: [F('value', 'number'), F('prefix', 'text', { opt: true, maxLen: 4 }), F('suffix', 'text', { opt: true, maxLen: 6 }),
+      fields: [...head(1, 2), F('items', 'list', { min: 2, max: 4, of: [F('value', 'number'), F('prefix', 'text', { opt: true, maxLen: 2, hint: '$' }), F('suffix', 'text', { opt: true, maxLen: 4, hint: '%, k+, /mo' }),
         F('decimals', 'int', { opt: true, min: 0, max: 3 }), F('label', 'text', { maxLen: 40 }), F('locale', 'text', { opt: true, maxLen: 10, hint: 'de-DE' })] })] },
     marquee: { role: ['opener', 'middle'], dur: [2.4, 3], desc: 'Giant text rows scrolling in opposite directions, a line in front',
-      fields: [label, F('rows', 'texts', { min: 2, max: 4, maxLen: 30 }), line, F('accentRow', 'int', { opt: true, min: 0, max: 3 })] },
+      fields: [label, F('rows', 'texts', { min: 2, max: 4, maxLen: 30 }), line, F('accentRow', 'int', { opt: true, min: 0, max: 3, from1: true, label: 'Accent row' })] },
     wipe: { role: ['middle'], dur: [3, 3.6], desc: 'Before/after card with a sweeping divider',
-      fields: [...head(1, 2), ...['before', 'after'].map(k => F(k, 'object', { of: [F('title', 'text', { maxLen: 32 }), F('text', 'text', { opt: true, maxLen: 80 }), F('image', 'image', { opt: true })] }))] },
+      fields: [...head(1, 2), ...['before', 'after'].map(k => F(k, 'object', { of: [F('tag', 'text', { opt: true, maxLen: 14, label: 'Corner tag', hint: k === 'before' ? 'default: Before (or the title over a picture)' : 'default: After (or the title over a picture)' }), F('title', 'text', { maxLen: 32 }), F('text', 'text', { opt: true, maxLen: 80, hint: 'shows when there is no picture' }), F('image', 'image', { opt: true })] }))] },
     offer: { role: ['middle'], dur: [3, 3.6], desc: 'Price card: old price struck, new price, badge, deadline',
       fields: [...head(1, 2), F('price', 'text', { maxLen: 14 }), F('unit', 'text', { opt: true, maxLen: 20 }), F('was', 'text', { opt: true, maxLen: 14 }),
         F('badge', 'text', { opt: true, maxLen: 14 }), F('until', 'text', { opt: true, maxLen: 30 }), F('note', 'text', { opt: true, maxLen: 70 })] },
@@ -91,19 +96,20 @@
       fields: [...head(1, 3), sub, F('track', 'object', { opt: true, of: [F('title', 'text', { maxLen: 40 }), F('artist', 'text', { opt: true, maxLen: 40 }), F('cover', 'image', { opt: true })] })] },
     endWave: { role: ['closer'], dur: [2.6, 3.2], desc: 'Waveform behind logo, tagline, CTA', fields: [...closer] },
     walkthrough: { role: ['middle'], dur: [3.6, 4.6], desc: 'A finger (portrait) or cursor (landscape) taps through real screens',
-      fields: [...head(1, 2), F('url', 'text', { opt: true, maxLen: 60 }), F('steps', 'list', { min: 2, max: 4, of: [F('image', 'image', { adjust: false }),
+      fields: [...head(1, 2), F('url', 'text', { opt: true, maxLen: 60, hint: 'address bar, landscape only' }), F('steps', 'list', { min: 2, max: 4, of: [F('image', 'image', { adjust: false, hint: 'phone screenshot (portrait) / desktop (landscape)' }),
         F('tap', 'object', { opt: true, hint: '[x%, y%] where the tap lands', of: [] }), F('caption', 'text', { opt: true, maxLen: 50 }),
         F('zoom', 'number', { opt: true, min: 1, max: 3 }), F('origin', 'object', { opt: true, hint: '[x%, y%] zoom centre (default: the tap point)', of: [] })] })] },
     lockscreen: { role: ['middle'], dur: [3.2, 3.8], desc: 'Phone shows the app, locks, a now-playing card keeps going',
-      fields: [...head(1, 2), F('from', 'image', { opt: true, label: 'App screenshot' }), F('time', 'text', { opt: true, maxLen: 6 }), F('date', 'text', { opt: true, maxLen: 30 }),
+      fields: [...head(1, 2), F('from', 'image', { opt: true, label: 'App screenshot' }), F('time', 'text', { opt: true, maxLen: 6, dflt: '9:41' }), F('date', 'text', { opt: true, maxLen: 30 }),
         F('source', 'text', { opt: true, maxLen: 30 }), F('title', 'text', { opt: true, maxLen: 40 }), F('caption', 'text', { opt: true, maxLen: 60 })] },
     embedDemo: { role: ['middle'], dur: [3.6, 4.2], desc: 'Embed code types out, players appear in a blog post',
-      fields: [...head(1, 2), F('code', 'para', { maxLen: 160 }), F('embeds', 'list', { min: 1, max: 3, of: [F('image', 'image', { opt: true }), F('label', 'text', { opt: true, maxLen: 30 })] }),
+      fields: [...head(1, 2), F('code', 'para', { maxLen: 160 }), F('embeds', 'list', { min: 1, max: 3, of: [F('image', 'image', { opt: true, hint: 'a wide player screenshot; taller pictures show as a strip' }), F('label', 'text', { opt: true, maxLen: 30 })] }),
         F('post', 'object', { opt: true, of: [F('title', 'text', { maxLen: 50 })] }), F('site', 'text', { opt: true, maxLen: 40 })] },
 
     // ---- lib/scenes-extra.js
     deck: { role: ['opener', 'middle'], dur: [3.6, 4.2], desc: 'Cards dealt off a stack, flipped into a fan',
-      fields: [...head(1, 2), F('cards', 'list', { min: 3, max: 5, of: titleSub(true, true) })] },
+      fields: [...head(1, 2), F('cards', 'list', { min: 3, max: 4, of: [F('image', 'image', { opt: true }), F('icon', 'icon', { opt: true, dflt: 'star', hint: 'shows when there is no picture' }),
+        F('title', 'text', { maxLen: 16 }), F('sub', 'text', { opt: true, maxLen: 24 })] })] },
     sleeve: { role: ['opener'], dur: [3, 3.6], desc: 'Album cover slides in, a vinyl slides out and spins',
       fields: [F('cover', 'image'), F('title', 'text', { opt: true, maxLen: 40 }), F('artist', 'text', { opt: true, maxLen: 40 }), ...head(1, 2), sub] },
     adSpot: { role: ['middle'], dur: [4, 4.6], desc: 'A video player shows a spot, a ticker and a banner',
@@ -113,37 +119,37 @@
         F('formats', 'list', { min: 3, max: 3, of: titleSub() })] },
     tabs: { role: ['opener', 'middle'], dur: [3.6, 4.4], desc: 'A browser flips through real pages as tabs',
       fields: [...head(1, 2), sub, F('tabs', 'list', { min: 2, max: 4, of: [F('title', 'text', { maxLen: 24 }), F('image', 'image', { adjust: false }), F('url', 'text', { opt: true, maxLen: 50 }),
-        F('chip', 'text', { opt: true, maxLen: 40 }), F('icon', 'image', { opt: true, label: 'Favicon' })] })] },
+        F('chip', 'text', { opt: true, maxLen: 40 }), F('icon', 'image', { opt: true, adjust: false, label: 'Favicon' })] })] },
     growth: { role: ['middle'], dur: [3, 3.6], desc: 'An upward curve with "+1" bubbles and a Join pill (illustration, no numbers)',
-      fields: [...head(1, 2), sub, F('bubbles', 'int', { opt: true, min: 1, max: 8 }), F('join', 'text', { opt: true, maxLen: 16 })] },
+      fields: [...head(1, 2), sub, F('bubbles', 'int', { opt: true, min: 1, max: 6 }), F('join', 'text', { opt: true, maxLen: 16 })] },
     frontends: { role: ['middle'], dur: [3.6, 4.2], desc: 'Browser windows cascade in, each another site with the same banner',
       fields: [...head(1, 2), sub, F('sites', 'list', { min: 3, max: 5, of: [F('url', 'text', { maxLen: 40 }), F('video', 'image', { label: 'Player still' }), F('tag', 'text', { opt: true, maxLen: 20 })] }),
         F('banner', 'image', { opt: true })] },
 
     // ---- lib/scenes-extra2.js
     map: { role: ['middle'], dur: [3.2, 3.8], desc: 'Dotted world map, pins drop at real places, arcs fly',
-      fields: [...head(1, 2), F('pins', 'list', { min: 1, max: 8, of: [F('lon', 'number', { min: -180, max: 180 }), F('lat', 'number', { min: -90, max: 90 }), F('label', 'text', { opt: true, maxLen: 24 })] }),
+      fields: [...head(1, 2), F('pins', 'list', { min: 1, max: 8, of: [F('lon', 'number', { min: -180, max: 180 }), F('lat', 'number', { min: -56, max: 82, hint: 'the map shows 82 N to 56 S' }), F('label', 'text', { opt: true, maxLen: 24 })] }),
         F('caption', 'text', { opt: true, maxLen: 60 })] },
     receipt: { role: ['middle'], dur: [3.2, 3.8], desc: 'A slip prints line by line, a total, a stamp (real values only)',
       fields: [...head(1, 2), F('title', 'text', { opt: true, maxLen: 30 }), F('items', 'list', { min: 2, max: 5, of: [F('name', 'text', { maxLen: 30 }), F('value', 'text', { maxLen: 14 })] }),
         F('total', 'object', { opt: true, of: [F('name', 'text', { maxLen: 20 }), F('value', 'text', { maxLen: 14 })] }), F('stamp', 'text', { opt: true, maxLen: 14 }), F('note', 'text', { opt: true, maxLen: 60 })] },
     timeline: { role: ['middle'], dur: [3.4, 4], desc: 'A line draws itself, milestones pop, "now" pulses',
-      fields: [...head(1, 2), F('items', 'list', { min: 3, max: 5, of: [F('date', 'text', { maxLen: 14 }), F('title', 'text', { maxLen: 36 }), F('icon', 'icon', { opt: true })] }),
-        F('now', 'int', { opt: true, min: 0, max: 4, label: 'Index of "now"' })] },
+      fields: [...head(1, 2), F('items', 'list', { min: 3, max: 5, of: [F('date', 'text', { maxLen: 14 }), F('title', 'text', { maxLen: 24 }), F('icon', 'icon', { opt: true })] }),
+        F('now', 'int', { opt: true, min: 0, max: 4, from1: true, label: '"Now" item', hint: '1 = the first item' })] },
     phoneStack: { role: ['middle'], dur: [3.4, 4], desc: 'Three phones fan in, each scrolls its own tall screenshot',
       fields: [...head(1, 2), F('phones', 'list', { min: 3, max: 3, of: [F('image', 'image', { adjust: false, hint: 'tall mobile screenshot' }), F('caption', 'text', { opt: true, maxLen: 24 })] })] },
     spotlightGrid: { role: ['middle'], dur: [3.6, 4.2], desc: 'Dimmed 3x3 grid, a round spotlight glides from pick to pick',
       fields: [...head(1, 2), F('tiles', 'list', { min: 9, max: 9, of: [F('image', 'image', { opt: true }), F('title', 'text', { opt: true, maxLen: 24 })] }),
-        F('picks', 'list', { min: 1, max: 4, of: [F('index', 'int', { min: 0, max: 8 }), F('caption', 'text', { maxLen: 40 })] })] },
+        F('picks', 'list', { min: 1, max: 4, of: [F('index', 'int', { min: 0, max: 8, from1: true, label: 'Tile', hint: '1-9, left to right, top to bottom' }), F('caption', 'text', { maxLen: 40 })] })] },
     stopwatch: { role: ['middle'], dur: [3, 3.6], desc: 'A dial sweeps while the readout counts, snaps to a result',
       fields: [...head(1, 2), F('seconds', 'number', { min: 1, max: 3600 }), F('result', 'text', { opt: true, maxLen: 30 }), F('caption', 'text', { opt: true, maxLen: 60 })] },
     split3: { role: ['opener', 'middle'], dur: [2.8, 3.4], desc: 'Three full-height panels slide in, a word on each',
       fields: [F('panels', 'list', { min: 3, max: 3, of: [F('image', 'image', { opt: true }), F('word', 'text', { maxLen: 14 }), F('sub', 'text', { opt: true, maxLen: 30 })] }), line] },
     ticket: { role: ['middle'], dur: [3.2, 3.8], desc: 'An event ticket slides in, the stub tears off, a stamp lands',
       fields: [...head(1, 2), F('event', 'text', { maxLen: 40 }), F('date', 'text', { maxLen: 24 }), F('time', 'text', { opt: true, maxLen: 14 }), F('place', 'text', { opt: true, maxLen: 40 }),
-        F('stamp', 'text', { opt: true, maxLen: 14 }), F('code', 'text', { opt: true, maxLen: 20 })] },
+        F('stamp', 'text', { opt: true, maxLen: 14 }), F('code', 'text', { opt: true, maxLen: 10 })] },
     magnifier: { role: ['middle'], dur: [3.4, 4], desc: 'A lens glides over a screenshot and enlarges details',
-      fields: [...head(1, 2), F('image', 'image', { adjust: false }), F('stops', 'list', { min: 1, max: 4, of: [F('x', 'number', { min: 0, max: 100, label: 'x %' }), F('y', 'number', { min: 0, max: 100, label: 'y %' }),
+      fields: [...head(1, 2), F('image', 'image', { adjust: false }), F('stops', 'list', { min: 1, max: 4, hint: 'x / y in % of the screenshot frame', of: [F('x', 'number', { min: 0, max: 100, label: 'x %' }), F('y', 'number', { min: 0, max: 100, label: 'y %' }),
         F('caption', 'text', { opt: true, maxLen: 40 })] }), F('zoom', 'number', { opt: true, min: 1.5, max: 4 })] },
     flow: { role: ['middle'], dur: [3.2, 3.8], desc: 'Nodes joined by drawing lines, dots travel along them',
       fields: [...head(1, 2), F('nodes', 'list', { min: 3, max: 5, of: titleSub() })] },
@@ -153,27 +159,27 @@
       fields: [...head(1, 2), F('units', 'list', { min: 2, max: 4, of: [F('value', 'int', { min: 0, max: 99 }), F('label', 'text', { maxLen: 10 })] }), F('caption', 'text', { opt: true, maxLen: 60 })] },
     poll: { role: ['middle'], dur: [3, 3.6], desc: 'A poll card: bars fill, the winner gets a check (real numbers only)',
       fields: [...head(1, 2), F('question', 'text', { maxLen: 60 }), F('options', 'list', { min: 2, max: 4, of: [F('text', 'text', { maxLen: 30 }), F('pct', 'number', { min: 0, max: 100 })] }),
-        F('winner', 'int', { opt: true, min: 0, max: 3 })] },
+        F('winner', 'int', { opt: true, min: 0, max: 3, from1: true, label: 'Winning option', hint: '1 = the first option' })] },
     badge: { role: ['middle'], dur: [2.8, 3.4], desc: 'A medal drops in on a ribbon, rays turn, confetti',
-      fields: [...head(1, 2), F('icon', 'icon'), F('title', 'text', { maxLen: 24 }), F('sub', 'text', { opt: true, maxLen: 40 })] },
+      fields: [...head(1, 2), F('icon', 'icon', { opt: true, dflt: 'star' }), F('title', 'text', { maxLen: 24 }), F('sub', 'text', { opt: true, maxLen: 40 })] },
     checklist: { role: ['middle'], dur: [3, 3.6], desc: 'Items tick off one by one, a counter and bar fill',
-      fields: [...head(1, 2), F('title', 'text', { opt: true, maxLen: 30 }), F('items', 'texts', { min: 3, max: 6, maxLen: 40 })] },
+      fields: [...head(1, 2), F('title', 'text', { opt: true, maxLen: 30, hint: 'also shows the 0/N counter' }), F('items', 'texts', { min: 3, max: 6, maxLen: 40 })] },
     search: { role: ['middle'], dur: [3.2, 3.8], desc: 'A search box types the query, results drop in',
-      fields: [...head(1, 2), F('query', 'text', { maxLen: 40 }), F('results', 'list', { min: 2, max: 4, of: titleSub() })] },
+      fields: [...head(1, 2), F('query', 'text', { maxLen: 40 }), F('results', 'list', { min: 2, max: 4, of: titleSub(true, false, 'play') })] },
     calendar: { role: ['middle'], dur: [3.2, 3.8], desc: 'A month grid; active days light up, a streak counter runs',
       fields: [...head(1, 2), F('month', 'text', { maxLen: 20 }), F('days', 'int', { min: 28, max: 31 }), F('start', 'int', { min: 0, max: 6, hint: '0 = Monday' }),
-        F('active', 'texts', { min: 0, max: 31, kindOf: 'int', hint: 'day numbers' }), F('streak', 'text', { opt: true, maxLen: 30 })] },
+        F('active', 'texts', { min: 0, max: 31, kindOf: 'int', hint: 'day numbers' }), F('streak', 'text', { opt: true, maxLen: 30, hint: 'shown after the longest run of days in a row, e.g. day streak' })] },
     cube: { role: ['opener', 'middle'], dur: [2.6, 3.2], desc: 'A 3D cube turns face by face, a word on each',
       fields: [label, F('faces', 'list', { min: 4, max: 4, of: [F('word', 'text', { maxLen: 18, hint: '| breaks a line' }), F('image', 'image', { opt: true })] }), line,
         F('step', 'number', { opt: true, min: .3, max: 1.5, label: 'Seconds per turn' })] },
     podium: { role: ['middle'], dur: [3.2, 3.8], desc: 'Three columns rise, avatars land, the winner gets a crown (real people, with permission)',
       fields: [...head(1, 2), F('places', 'list', { min: 3, max: 3, of: [F('name', 'text', { maxLen: 20 }), F('value', 'text', { opt: true, maxLen: 14 }), F('avatar', 'image', { opt: true })] })] },
     zoomReveal: { role: ['opener'], dur: [2.8, 3.4], desc: 'Starts deep inside a detail and pulls back to the whole picture',
-      fields: [F('image', 'image', { adjust: false }), ...head(1, 2), F('from', 'object', { opt: true, of: [F('x', 'number', { min: 0, max: 100 }), F('y', 'number', { min: 0, max: 100 }), F('zoom', 'number', { min: 1, max: 12 })] }),
+      fields: [F('image', 'image'), ...head(1, 2), F('from', 'object', { opt: true, of: [F('x', 'number', { min: 0, max: 100 }), F('y', 'number', { min: 0, max: 100 }), F('zoom', 'number', { min: 1, max: 12 })] }),
         F('tag', 'text', { opt: true, maxLen: 30 })] },
     kinetic: { role: ['opener'], dur: [2, 2.8], desc: 'Words slam in at different sizes and angles, then a line',
       fields: [F('words', 'texts', { min: 3, max: 6, maxLen: 14 }), line, F('step', 'number', { opt: true, min: .2, max: 1, label: 'Seconds between words' })] },
-    videoRow: { role: ['middle'], dur: [3.2, 3.8], desc: 'Three video cards drop in, each shown whole at 16:9',
+    videoRow: { role: ['middle'], dur: [3.2, 3.8], desc: 'Three 16:9 video cards drop in, a word on each',
       fields: [label, F('lines', 'lines', { opt: true, min: 0, max: 2, maxLen: 44 }), F('items', 'list', { min: 3, max: 3, of: [F('image', 'image'), F('word', 'text', { maxLen: 14 }),
         F('sub', 'text', { opt: true, maxLen: 40 }), F('handle', 'text', { opt: true, maxLen: 24 }), F('duration', 'text', { opt: true, maxLen: 8 })] }), line,
         F('step', 'number', { opt: true, min: .2, max: 1 })] },
@@ -191,20 +197,20 @@
     logo: { role: ['opener'], dur: [2.4, 3], desc: 'Logo with three drawn rings, letter-spaced wordmark', fields: [F('wordmark', 'text', { opt: true, maxLen: 20 })] },
     statement: { role: ['opener', 'middle'], dur: [2.4, 3], desc: 'Big multi-line statement', fields: head(1, 4) },
     wall: { role: ['opener', 'middle'], dur: [3, 3.6], desc: 'Tilted wall of pictures panning, headline over a shade',
-      fields: [...head(1, 2), F('images', 'images', { opt: true, max: 28 }), F('highlight', 'texts', { opt: true, max: 4, kindOf: 'int', hint: 'tile numbers to lift' }),
+      fields: [...head(1, 2), F('images', 'images', { opt: true, max: 28 }), F('highlight', 'texts', { opt: true, max: 4, kindOf: 'int', from1: true, hint: 'tile numbers to lift (1 = first)' }),
         F('chips', 'texts', { opt: true, max: 4, maxLen: 20 })] },
     product: { role: ['middle'], dur: [3.4, 4], desc: 'Screenshot in a browser frame with feature chips',
-      fields: [...head(1, 2), sub, F('screenshot', 'image', { opt: true, adjust: false }), F('url', 'text', { opt: true, maxLen: 50 }), F('features', 'list', { opt: true, max: 4, of: titleSub() })] },
+      fields: [...head(1, 2), sub, F('screenshot', 'image', { opt: true, adjust: false }), F('url', 'text', { opt: true, maxLen: 50 }), F('features', 'list', { opt: true, max: 4, of: chip })] },
     endcard: { role: ['closer'], dur: [2.6, 3.2], desc: 'Logo, name, tagline, CTA, footer',
       fields: [F('brand', 'text', { opt: true, maxLen: 30, label: 'Name (defaults to the brand)' }), ...closer] },
     hook: { role: ['opener'], dur: [2.4, 3], desc: 'Opening statement, readable by 0.5 s; optional picture marquee',
-      fields: [...head(1, 4), sub, F('images', 'images', { opt: true, max: 12 }), F('badge', 'text', { opt: true, maxLen: 8 }), F('size', 'int', { opt: true, min: 60, max: 220, label: 'Headline size (px)' })] },
+      fields: [...head(1, 4), sub, F('images', 'images', { opt: true, max: 12 }), F('badge', 'text', { opt: true, maxLen: 8, hint: 'shows on the pictures' }), F('size', 'int', { opt: true, min: 60, max: 220, label: 'Headline size (px)' })] },
     stat: { role: ['middle'], dur: [2.8, 3.4], desc: 'A number counting up in a ring (real numbers only)',
-      fields: [label, F('value', 'number'), F('prefix', 'text', { opt: true, maxLen: 4 }), F('suffix', 'text', { opt: true, maxLen: 6 }), F('max', 'number', { opt: true }),
-        F('ring', 'number', { opt: true, min: 0, max: 1, label: 'Ring fill 0..1' }), F('decimals', 'int', { opt: true, min: 0, max: 3 }), F('caption', 'text', { opt: true, maxLen: 60 }),
-        F('size', 'int', { opt: true, min: 60, max: 320 })] },
+      fields: [label, F('value', 'number'), F('prefix', 'text', { opt: true, maxLen: 2, hint: '$' }), F('suffix', 'text', { opt: true, maxLen: 4, hint: '%, k+, /mo' }), F('max', 'number', { opt: true }),
+        F('ring', 'number', { opt: true, min: 0, max: 1, label: 'Ring fill 0..1', hint: 'overrides max' }), F('decimals', 'int', { opt: true, min: 0, max: 3 }), F('locale', 'text', { opt: true, maxLen: 10, hint: 'de-DE' }),
+        F('caption', 'text', { opt: true, maxLen: 60 }), F('size', 'int', { opt: true, min: 60, max: 320 })] },
     phone: { role: ['middle'], dur: [3.2, 3.8], desc: 'Mobile screenshot in a phone frame with up to 4 chips',
-      fields: [...head(1, 2), F('screenshot', 'image', { opt: true, adjust: false, hint: 'mobile screenshot' }), F('features', 'list', { opt: true, max: 4, of: titleSub() })] },
+      fields: [...head(1, 2), F('screenshot', 'image', { opt: true, adjust: false, hint: 'mobile screenshot' }), F('features', 'list', { opt: true, max: 4, of: chip })] },
     points: { role: ['middle'], dur: [3, 3.6], desc: 'Headline and up to 4 icon rows', fields: [...head(1, 2), F('points', 'list', { min: 1, max: 4, of: titleSub() })] },
   };
 
@@ -229,7 +235,9 @@
   const SIZES = { landscape: [1920, 1080], portrait: [1080, 1920], square: [1080, 1080] };
 
   // ---------- sanitising ----------
-  const str = (v, max = 200) => (v == null ? '' : String(v)).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '').slice(0, max);
+  // capped at max; text is cut at the last space when there is one in the last 40% (no half words on screen)
+  const str = (v, max = 200) => { const s = (v == null ? '' : String(v)).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '');
+    if (s.length <= max) return s; const t = s.slice(0, max), sp = t.lastIndexOf(' '); return sp > max * .6 ? t.slice(0, sp) : t; };
   const clampNum = (v, f, d) => { let n = +v; if (!Number.isFinite(n)) return d; if (f.kind === 'int') n = Math.round(n); if (f.min != null) n = Math.max(f.min, n); if (f.max != null) n = Math.min(f.max, n); return n; };
   const colorOk = c => typeof c === 'string' && c.length < 60 && /^(#[0-9a-f]{3,8}|(rgb|hsl)a?\([\d\s.,%/+-]+\)|transparent|[a-z]{3,20})$/i.test(c.trim());
   function image(v) {
@@ -336,7 +344,8 @@
     (doc.scenes || []).forEach((s, i) => {
       const m = TYPES[s.type];
       if (!m) { out.push({ scene: i, field: 'type', level: 'error', msg: `unknown type ${s.type}` }); return; }
-      if (s.duration < m.dur[0]) out.push({ scene: i, field: 'duration', level: 'warn', msg: `under ${m.dur[0]} s is hard to read` });
+      const least = Math.max(m.dur[0], m.minFor ? +m.minFor(s).toFixed(1) : 0); // some types need more time for more items
+      if (s.duration < least) out.push({ scene: i, field: 'duration', level: 'warn', msg: `under ${least} s is hard to read` });
       check(m.fields, s, i, '');
     });
     return out;

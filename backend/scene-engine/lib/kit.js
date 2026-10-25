@@ -53,17 +53,27 @@
   // alone, and a quote or bracket would end the url() and let the rest of the string be CSS.
   const cssUrl = u => u.replace(/[\\'"()\s<>]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0'));
   const src = spec => esc(cssUrl(url(spec)));
+  // a locale tag the browser accepts, else undefined (toLocaleString throws on a bad tag such as 'de_DE')
+  const locale = l => { if (!l) return undefined; try { (0).toLocaleString(l); return l; } catch { return undefined; } };
   const num = (v, a, b, d) => { const n = +v; return Number.isFinite(n) ? Math.min(b, Math.max(a, n)) : d; };
-  // <img> for a user image. Placement: scale 0.2..5 (1 = the scene's own fit), x/y -1..1 = where the picture sits in
-  // its frame (object-position, -1 = left/top edge). Composes with the scenes' own transform animations (base.css).
+  // <img> for a user image. Placement: scale 1..5 = zoom INTO the picture (1 = the scene's own fit), x/y -1..1 = where
+  // the picture sits in its frame (object-position, -1 = left/top edge) and the point the zoom keeps still.
+  // Zoom crops: the element keeps its box, the scaled picture is clipped back to it, so it never grows out of a frame
+  // that does not clip. A scene that rounds a user image sets the radius as --ir (border-radius: var(--ir)) so the clip
+  // keeps its corners. All inline and only when set: an unplaced picture keeps the scene's own object-position
+  // (screenshots pin to the top). The `scale` property composes with the Ken Burns `transform` the scenes animate.
   function img(spec, cls = '', style = '') {
     // no usable picture: still an <img> (transparent), so scenes that look the element up never crash
     const u = url(spec) || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     const o = spec && typeof spec === 'object' ? spec : {};
+    const px = 50 + num(o.x, -1, 1, 0) * 50, py = 50 + num(o.y, -1, 1, 0) * 50, s = num(o.scale, 1, 5, 1);
+    // the box in the element's own (unscaled) coordinates that lands exactly on its layout box after scale(s) about (px, py)
+    const k = 1 - 1 / s, pc = v => `${(v * k).toFixed(3)}%`;
+    const at = `${px.toFixed(2)}% ${py.toFixed(2)}%`;
     const vars = [
-      o.x != null ? `--ix:${(50 + num(o.x, -1, 1, 0) * 50).toFixed(2)}%` : '',
-      o.y != null ? `--iy:${(50 + num(o.y, -1, 1, 0) * 50).toFixed(2)}%` : '',
-      o.scale != null ? `--is:${num(o.scale, .2, 5, 1)}` : '',
+      o.x != null || o.y != null ? `object-position:${at}` : '',
+      s > 1 ? `scale:${s};transform-origin:${at}` : '',
+      s > 1 ? `clip-path:inset(${pc(py)} ${pc(100 - px)} ${pc(100 - py)} ${pc(px)} round calc(var(--ir, 0px) / ${s}))` : '',
       style,
     ].filter(Boolean).join(';');
     return `<img class="ui${cls ? ' ' + esc(cls) : ''}" src="${esc(u)}" alt=""${vars ? ` style="${esc(vars).replace(/&#39;/g, "'")}"` : ''}>`;
@@ -197,9 +207,48 @@
         el.style.fontSize = '';
         el.style.whiteSpace = 'nowrap';
         // measure the text itself: centred text overflows to BOTH sides and scrollWidth misses the left half
+        // ...against the box as drawn (getBoundingClientRect), so a transform on the element or a parent scales both sides
         const r = document.createRange(), textW = () => { r.selectNodeContents(el); return r.getBoundingClientRect().width; };
+        const boxW = () => { const w = el.getBoundingClientRect().width; return w - 8 * (w / (el.clientWidth || 1)); };
         let fs = parseFloat(getComputedStyle(el).fontSize);
-        while (textW() > el.clientWidth - 8 && fs > 24) { fs *= .96; el.style.fontSize = fs + 'px'; }
+        while (textW() > boxW() && fs > 24) { fs *= .96; el.style.fontSize = fs + 'px'; }
+      });
+    }
+
+    // --fit-h (lib/scenes-fit.css): a text block taller than its --fit-h, or wider than its own box (a long word),
+    // gets every font in it scaled down by one factor until it fits (long user headlines, captions, taglines).
+    // With --fit-zoom: 1 the block's children are zoomed instead (CSS zoom: text, paddings and icons together), for
+    // lists of cards whose fixed paddings would not shrink with the text; the block itself keeps its position.
+    // With --fit-zoom: 2 the block (absolutely placed with left + right) gets narrower around its centre, for a column of
+    // fixed-aspect cards (16:9 stills) that only gets shorter when it gets narrower; text keeps its size.
+    // Measured on layout boxes (offsetHeight, scrollWidth), so the scenes' animated transforms don't matter, with every
+    // scene at its END state (see ready below): counters at their final value, typed text complete.
+    function fitBoxes() {
+      const prop = (el, k) => parseFloat(getComputedStyle(el).getPropertyValue(k)) || 0;
+      $$('section.scene *').filter(el => prop(el, '--fit-h') > 0).forEach(el => {
+        const maxH = prop(el, '--fit-h'), zoom = prop(el, '--fit-zoom') > 0;
+        // width: scrollWidth, and for one-line pieces the text itself against the box (centred text overflows to BOTH
+        // sides, scrollWidth misses the left half; only there, the scenes' rotated cards would read as overflow)
+        const oneLine = getComputedStyle(el).whiteSpace === 'nowrap', r = document.createRange();
+        const wide = () => { if (el.scrollWidth > el.clientWidth + 2) return true; if (!oneLine) return false;
+          r.selectNodeContents(el); const t = r.getBoundingClientRect(), b = el.getBoundingClientRect(); return t.left < b.left - 2 || t.right > b.right + 2; };
+        const fits = () => el.offsetHeight <= maxH + 1 && !wide();
+        if (fits()) return;
+        let set;
+        if (prop(el, '--fit-zoom') >= 2) {
+          const cs = getComputedStyle(el), L = parseFloat(cs.left), R = parseFloat(cs.right), w = el.offsetWidth;
+          set = k => { const cut = (1 - k) * w / 2; el.style.left = `${L + cut}px`; el.style.right = `${R + cut}px`; };
+        } else if (zoom) {
+          const kids = [...el.children];
+          set = k => kids.forEach(e => { e.style.zoom = k.toFixed(4); });
+        } else {
+          // the word-reveal spans splitWords() makes always inherit: leaving them out saves most of the style writes
+          const all = [el, ...el.querySelectorAll('*:not(.w):not(.w *)')], base = all.map(e => parseFloat(getComputedStyle(e).fontSize));
+          set = k => all.forEach((e, i) => { e.style.fontSize = `${(base[i] * k).toFixed(2)}px`; });
+        }
+        let lo = .35, hi = 1; // 7 halvings: within 1% of the largest size that fits
+        for (let i = 0; i < 7; i++) { const k = (lo + hi) / 2; set(k); if (fits()) lo = k; else hi = k; }
+        set(lo);
       });
     }
 
@@ -234,7 +283,9 @@
     const scenes = plan.map(p => ({ type: p.s.type, start: +p.a.toFixed(3), end: +p.b.toFixed(3) }));
     window.reel = {
       seek, duration, fps: R.fps, width: W, height: H, cues, scenes,
-      ready: fontCss.then(() => ready({ families: [...new Set(fams)], text: allText })).then(fitText).then(() => seek(0)),
+      // fitting measures every scene at its END state: counters final, typed text complete, pop-ins at full size
+      ready: fontCss.then(() => ready({ families: [...new Set(fams)], text: allText }))
+        .then(() => { for (const p of plan) p.type.update(p.el, p.s.duration, p.s.duration, p.s); fitText(); fitBoxes(); }).then(() => seek(0)),
     };
     seek(0);
     return window.reel;
@@ -250,5 +301,5 @@
     document.write(`<script src="${f}"><\/script>`);
   }
 
-  window.Kit = { ICONS, icon, run, mount, unmount, normalize, loadContent, esc, url, src, cssUrl, img, accents: () => [window.REEL.brand.colors.accent, window.REEL.brand.colors.accent2, window.REEL.brand.colors.accent3] };
+  window.Kit = { ICONS, icon, run, mount, unmount, normalize, loadContent, esc, url, src, cssUrl, img, locale, accents: () => [window.REEL.brand.colors.accent, window.REEL.brand.colors.accent2, window.REEL.brand.colors.accent3] };
 })();

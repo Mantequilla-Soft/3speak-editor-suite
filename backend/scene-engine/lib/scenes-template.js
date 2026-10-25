@@ -17,6 +17,8 @@
   const label = s => s ? `<div class="label">${markup(s)}</div>` : '';
   const tint = (c, pct) => `color-mix(in srgb, ${c} ${pct}%, transparent)`;
   const ph = i => `<div class="ph" style="background:linear-gradient(135deg, hsl(${(i * 47) % 360} 55% 42%), hsl(${(i * 47 + 60) % 360} 60% 22%))"></div>`;
+  // a chip pinned at x may grow to the frame's right edge (minus a margin); scenes-fit.css shrinks longer text
+  const chipRoom = x => (portrait() ? 1080 : 1920) - x - 50;
   const thumb = (imgs, i) => imgs?.length ? img(imgs[i % imgs.length]) : ph(i);
   const esc = s => window.Kit.esc(s);
   // pick an implementation by orientation (both carry build + update; cues/hideBug/exitPush are read from the pair)
@@ -95,11 +97,11 @@
       const shot = s.screenshot ? img(s.screenshot, 'shot')
         : `<div class="mock"><div class="mnav"></div><div class="mgrid">${Array.from({ length: 8 }, (_, i) => `<div class="mcard"><i style="background:linear-gradient(135deg, hsl(${(i * 47) % 360} 45% 40%), hsl(${(i * 47 + 60) % 360} 50% 20%))"></i><b></b><b class="s"></b></div>`).join('')}</div></div>`;
       const slots = portrait()
-        ? [{ left: 60, top: 1180 }, { left: 520, top: 1330 }, { left: 90, top: 1480 }, { left: 540, top: 1630 }]
+        ? [{ left: 60, top: 1060 }, { left: 520, top: 1190 }, { left: 90, top: 1320 }, { left: 540, top: 1440 }] // all above the 1560 safe line
         : [{ left: 1440, top: 110 }, { left: 1560, top: 470 }, { left: 1180, top: 830 }, { left: 900, top: 60 }];
       const chips = (s.features || []).slice(0, 4).map((f, i) => {
         const c = accents()[i % 3];
-        return `<div class="chip" style="left:${slots[i].left}px; top:${slots[i].top}px">
+        return `<div class="chip" style="left:${slots[i].left}px; top:${slots[i].top}px; max-width:${chipRoom(slots[i].left)}px">
           <span class="ic" style="background:${tint(c, 16)}">${icon(f.icon, c, portrait() ? 40 : 28)}</span>
           <span>${markup(f.title)}<small>${markup(f.sub || '')}</small></span></div>`;
       }).join('');
@@ -179,9 +181,9 @@
       const x = E.outExpo(prog(t, .15, 1.6)), frac = Math.max(0, Math.min(1, s.ring ?? (+s.value || 0) / (s.max || 100)));
       const c = 2 * Math.PI * 300, arc = $('.arc', el);
       arc.setAttribute('stroke-dasharray', `${c * frac * x} ${c}`);
-      const v = (+s.value || 0) * x, loc = s.locale || window.REEL.locale;
+      const v = (+s.value || 0) * x, loc = window.Kit.locale(s.locale || window.REEL.locale);
       $('.val', el).textContent = loc ? v.toLocaleString(loc, { minimumFractionDigits: s.decimals || 0, maximumFractionDigits: s.decimals || 0 })
-        : (s.decimals ? v.toFixed(s.decimals) : Math.round(v)).toLocaleString('en-US');
+        : v.toLocaleString('en-US', { minimumFractionDigits: s.decimals || 0, maximumFractionDigits: s.decimals || 0 });
       popIn($('.num', el), t, .05, .6, .7);
       $('.ringWrap svg', el).style.transform = `rotate(${-90 + t * 8}deg)`;
       words(el, t, .75, .06, .5);
@@ -217,12 +219,12 @@
       const screen = s.screenshot ? img(s.screenshot, 'shot')
         : `<div class="mock"><div class="mnav"></div>${Array.from({ length: 6 }, (_, i) => `<div class="mcard">${ph(i)}<b></b><b class="s"></b></div>`).join('')}</div>`;
       const dflt = portrait()
-        ? [{ left: 40, top: 840 }, { left: 500, top: 1060 }, { left: 60, top: 1290 }, { left: 480, top: 1510 }]
+        ? [{ left: 40, top: 840 }, { left: 500, top: 1040 }, { left: 60, top: 1240 }, { left: 480, top: 1430 }] // all above the 1560 safe line
         : [{ left: 1130, top: 170 }, { left: 1290, top: 420 }, { left: 1150, top: 670 }, { left: 1310, top: 900 }];
       const slots = s.slots || dflt;
       const chips = (s.features || []).slice(0, 4).map((f, i) => {
         const c = accents()[i % 3], sl = slots[i] || dflt[i];
-        return `<div class="chip" style="left:${+sl.left || 0}px; top:${+sl.top || 0}px"><span class="ic" style="background:${tint(c, 16)}">${icon(f.icon, c, 40)}</span>
+        return `<div class="chip" style="left:${+sl.left || 0}px; top:${+sl.top || 0}px; max-width:${chipRoom(+sl.left || 0)}px"><span class="ic" style="background:${tint(c, 16)}">${icon(f.icon, c, 40)}</span>
           <span>${markup(f.title)}${f.sub ? `<small>${markup(f.sub)}</small>` : ''}</span></div>`;
       }).join('');
       return `<div class="phonePersp"><div class="phone"><div class="screen">${screen}</div><i class="notch"></i></div></div>${chips}

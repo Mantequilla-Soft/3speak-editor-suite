@@ -72,7 +72,7 @@
       build: s => `<div class="sv">
           <div class="sv-disc"><div class="sv-grooves"></div><div class="sv-label">${imgOr(s.cover, 1)}<i></i></div><div class="sv-sheen"></div></div>
           <div class="sv-cover">${imgOr(s.cover, 1)}</div></div>
-        ${s.title ? `<div class="sv-track">${icon('play', C().accent, portrait() ? 40 : 34)}<span><b>${markup(s.title)}</b>${s.artist ? `<small>${markup(s.artist)}</small>` : ''}</span></div>` : ''}
+        ${s.title || s.artist ? `<div class="sv-track">${icon('play', C().accent, portrait() ? 40 : 34)}<span><b>${markup(s.title || '')}</b>${s.artist ? `<small>${markup(s.artist)}</small>` : ''}</span></div>` : ''}
         <div class="sv-copy">${label(s.label)}${lines(s.lines)}${s.sub ? `<p class="sv-sub" data-split>${markup(s.sub)}</p>` : ''}</div>`,
       update(el, t, d) {
         const pt = portrait(), size = pt ? 560 : 520;
@@ -106,7 +106,7 @@
                 <div class="as-spot-txt"><b>${markup(s.spot.title)}</b>${s.spot.sub ? `<small>${markup(s.spot.sub)}</small>` : ''}</div>
                 ${s.spot.cta ? `<span class="as-btn">${markup(s.spot.cta)}</span>` : ''}</div>
               <div class="as-ticker"><span class="as-pill">Ad</span><div class="as-tk"><span>${Array.from({ length: 3 }, () => markup(s.ticker || '')).join('<em class="sep">&bull;</em>')}</span></div></div>
-              <div class="as-banner${s.banner.title ? '' : ' img-only'}">${s.banner.image ? `<div class="as-bimg">${imgOr(s.banner.image, 6)}</div>` : ''}${s.banner.title ? `<span class="as-btxt"><b>${markup(s.banner.title)}</b>${s.banner.sub ? `<small>${markup(s.banner.sub)}</small>` : ''}</span>` : ''}<span class="as-pill">Ad</span><span class="as-bx">&times;</span></div>
+              <div class="as-banner${s.banner.title || s.banner.sub ? '' : ' img-only'}">${s.banner.image ? `<div class="as-bimg">${imgOr(s.banner.image, 6)}</div>` : ''}${s.banner.title || s.banner.sub ? `<span class="as-btxt"><b>${markup(s.banner.title || '')}</b>${s.banner.sub ? `<small>${markup(s.banner.sub)}</small>` : ''}</span>` : ''}<span class="as-pill">Ad</span><span class="as-bx">&times;</span></div>
             </div>
             <div class="as-bar"><b>${icon('play', '#fff', 26)}</b><div class="as-track"><i class="as-played"></i><i class="as-mark"></i><i class="as-head"></i></div><span class="as-time">2:41</span></div>
           </div>`;
@@ -239,7 +239,7 @@
         const wins = $$('.fe-w', el), n = wins.length, pt = portrait();
         wins.forEach((w, i) => {
           const a = .3 + i * .3, k = E.outQuint(prog(t, a, a + .6));
-          const x = (pt ? 50 : 96) * i, y = (pt ? 120 : 92) * i;
+          const x = (pt ? 50 : 96) * i, y = (pt ? Math.min(120, 280 / Math.max(1, n - 1)) : 92) * i; // portrait: 5 windows still end above 1560
           w.style.opacity = prog(t, a, a + .15);
           w.style.transform = `translate(${x + (1 - k) * 380}px, ${y + (1 - k) * 40}px) rotate(${(1 - k) * 7}deg)`;
           w.style.zIndex = i + 1;

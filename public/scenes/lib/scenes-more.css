@@ -49,7 +49,7 @@
 .pol { position: absolute; left: 0; top: 0; width: 520px; padding: 18px 18px 64px; background: #f6f3ee; border-radius: 10px;
        box-shadow: 0 30px 70px rgba(0,0,0,.55); opacity: 0; }
 .landscape .pol { width: 480px; }
-.pol img, .pol .ph { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; border-radius: 4px; }
+.pol img, .pol .ph { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; --ir: 4px; border-radius: var(--ir); }
 .hc-copy { position: absolute; }
 .portrait .hc-copy { left: 80px; right: 60px; top: 1080px; } .landscape .hc-copy { left: 150px; top: 330px; width: 700px; }
 .hc-copy .label { margin-bottom: 26px; opacity: 0; }
@@ -264,7 +264,8 @@
 .wv-head { position: absolute; top: -6%; bottom: -6%; width: 4px; border-radius: 2px; background: #fff; box-shadow: 0 0 20px rgba(255,255,255,.7); margin-left: -2px; }
 .wv-track { position: absolute; display: flex; align-items: center; gap: 26px; opacity: 0; }
 .portrait .wv-track { left: 80px; right: 60px; top: 1210px; } .landscape .wv-track { left: 150px; top: 740px; }
-.wv-track img { width: 120px; height: 120px; border-radius: 22px; object-fit: cover; box-shadow: 0 20px 40px rgba(0,0,0,.5); }
+.wv-cov { flex: none; width: 120px; height: 120px; border-radius: 22px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,.5); }
+.wv-cov img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .wv-track b { display: block; font-size: 46px; font-weight: 800; letter-spacing: -.02em; } .wv-track small { display: block; font-size: 32px; color: var(--mute); margin-top: 4px; }
 .landscape .wv-track b { font-size: 40px; } .landscape .wv-track small { font-size: 28px; }
 .hw-sub { position: absolute; font-weight: 600; color: #dfe2ec; line-height: 1.22; }
@@ -311,11 +312,13 @@
 .ed-txt { color: #cfe9ef; white-space: pre-wrap; word-break: break-all; }
 .ed-caret { width: 3px; height: 1.2em; background: var(--a2); margin-left: -18px; }
 .ed-post { position: absolute; border-radius: 34px; background: #f4f2ee; color: #1b1c22; box-shadow: 0 50px 110px rgba(0,0,0,.6); opacity: 0; display: flex; flex-direction: column; gap: 20px; }
+.portrait .ed-emb img { max-height: 170px; }
 .portrait .ed-post { left: 70px; right: 70px; top: 820px; padding: 44px 40px; } .landscape .ed-post { left: 880px; top: 150px; width: 890px; padding: 40px 40px; }
 .ed-title { font-weight: 900; letter-spacing: -.02em; line-height: 1.1; } .portrait .ed-title { font-size: 52px; } .landscape .ed-title { font-size: 44px; }
 .ed-line { display: block; height: 18px; border-radius: 9px; background: #d9d5cd; } .ed-line.s { width: 70%; } .ed-line.m { width: 55%; }
 .ed-emb { position: relative; opacity: 0; }
-.ed-emb img { display: block; width: 100%; border-radius: 999px; box-shadow: 0 14px 30px rgba(0,0,0,.25); }
+.ed-emb img { display: block; width: 100%; max-height: 150px; object-fit: cover; border-radius: 999px; }
+.ed-emb { box-shadow: 0 14px 30px rgba(0,0,0,.25); border-radius: 999px; } /* on the wrapper: a zoom clip would cut it off the <img> */
 .ed-emb span { position: absolute; right: 18px; top: -16px; padding: 6px 14px; border-radius: 999px; background: #1b1c22; color: #fff; font-weight: 800; font-size: 22px; letter-spacing: .08em; text-transform: uppercase; }
 /* review fixes: landscape endSplit footer stays under its copy, not over the photo; bigger landscape stats */
 .landscape .scene-endSplit .ep-foot { left: 150px; right: auto; width: 760px; text-align: left; bottom: 200px; }
@@ -325,7 +328,7 @@
 .ed-mock b { width: 58px; height: 58px; border-radius: 50%; background: var(--a2); display: grid; place-items: center; flex: none; padding-left: 4px; }
 .ed-mock .wv { height: 54px; } .ed-mock .wv i { transform: scaleY(var(--b)); background: #8b8d96; }
 /* gallery3 fixes: portrait endSplit copy higher + footer lower; landscape embed code below a 2-line headline */
-.portrait .es { top: 880px; } .portrait .scene-endSplit .ep-foot { bottom: 300px; }
+.portrait .es { top: 880px; } .portrait .scene-endSplit .ep-foot { bottom: 380px; }
 .landscape .ed-code { top: 470px; }
 
 /* walkthrough v2 (portrait): smaller phone so the step captions sit BELOW it, inside the safe area */
