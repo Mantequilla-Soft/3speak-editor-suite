@@ -53,7 +53,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
   const kenBurns = (img, t, d, from = 1.04, to = 1.16) => { if (img) img.style.transform = `scale(${lerp(from, to, prog(t, 0, d))})`; };
   const countUp = (el, t, a, it) => {
     const x = E.outExpo(prog(t, a, a + 1.3));
-    const loc = it.locale || window.REEL.locale; // e.g. 'de-DE' -> 4,85 and 1.200
+    const loc = window.Kit.locale(it.locale || window.REEL.locale); // e.g. 'de-DE' -> 4,85 and 1.200
     el.textContent = loc ? (it.value * x).toLocaleString(loc, { minimumFractionDigits: it.decimals || 0, maximumFractionDigits: it.decimals || 0 })
       : (it.decimals ? (it.value * x).toFixed(it.decimals) : Math.round(it.value * x)).toLocaleString('en-US');
   };
@@ -126,8 +126,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
 
     heroCollage: {
       build(s) {
-        const imgs = (s.images || []).slice(0, 5);
-        while (imgs.length < 5) imgs.push(null);
+        const own = (s.images || []).slice(0, 5), imgs = Array.from({ length: 5 }, (_, i) => own.length ? own[i % own.length] : null);
         return `<div class="hc">${imgs.map((src, i) => `<div class="pol p${i}">${imgOr(src, i)}</div>`).join('')}</div>
           <div class="hc-copy">${label(s.label)}${lines(s.lines)}${s.sub ? `<p class="hc-sub" data-split>${markup(s.sub)}</p>` : ''}</div>`;
       },
@@ -227,7 +226,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
 
     marquee: {
       build: s => `<div class="mq">${s.rows.map((r, i) => `<div class="mq-row ${i % 2 ? 'out' : ''} ${i === (s.accentRow ?? 1) ? 'acc' : ''}"><span>${Array.from({ length: 6 }, () => markup(r)).join('<em class="sep">&bull;</em>')}</span></div>`).join('')}</div>
-        <div class="mq-front">${label(s.label)}${s.line ? `<div class="mq-line" data-split>${markup(s.line)}</div>` : ''}</div>`,
+        ${s.label || s.line ? `<div class="mq-front">${label(s.label)}${s.line ? `<div class="mq-line" data-split>${markup(s.line)}</div>` : ''}</div>` : ''}`,
       update(el, t) {
         $$('.mq-row', el).forEach((r, i) => {
           const dir = i % 2 ? 1 : -1, x = E.outCubic(prog(t, i * .08, .6 + i * .08));
@@ -235,8 +234,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
           $('span', r).style.transform = `translateX(${(dir > 0 ? -1400 : -200) + dir * t * 160 + dir * (1 - x) * -300}px)`;
         });
         const f = $('.mq-front', el);
-        popIn(f, t, .45, .55, .8);
-        words(f, t, .55, .07, .5);
+        if (f) { popIn(f, t, .45, .55, .8); words(f, t, .55, .07, .5); }
       },
     },
 
@@ -403,7 +401,7 @@ const posterStyles = (s, i) => (s.styles || ['fill', 'acc'])[i % (s.styles || ['
     heroWave: {
       build: s => `<div class="hw">${label(s.label)}${lines(s.lines)}</div>
         <div class="wv-wrap"><span class="wv-play">${icon('play', C().accent, portrait() ? 64 : 52)}</span><div class="wv">${waveBars(portrait() ? 46 : 70)}<b class="wv-head"></b></div></div>
-        ${s.track ? `<div class="wv-track">${s.track.cover ? `${window.Kit.img(s.track.cover)}` : ''}<span><b>${markup(s.track.title)}</b><small>${markup(s.track.artist || '')}</small></span></div>` : ''}
+        ${s.track ? `<div class="wv-track">${s.track.cover ? `<i class="wv-cov">${window.Kit.img(s.track.cover)}</i>` : ''}<span><b>${markup(s.track.title)}</b><small>${markup(s.track.artist || '')}</small></span></div>` : ''}
         ${s.sub ? `<p class="hw-sub" data-split>${markup(s.sub)}</p>` : ''}`,
       update(el, t, d) {
         fadeUp($('.hw .label', el), t, 0, .4, 20);

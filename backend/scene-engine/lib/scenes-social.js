@@ -34,8 +34,8 @@
   Object.assign(window.KitScenes = window.KitScenes || {}, {
     compose: {
       build(s) {
-        const tools = (s.tools || ['Image', 'GIF', 'Video', 'Voice']).map(x => `<span class="cp-tool">${markup(x)}</span>`).join('');
-        const reacts = (s.reactions || [{ icon: 'heart', value: 24 }, { icon: 'arrow', value: 6 }])
+        const tools = (s.tools || []).map(x => `<span class="cp-tool">${markup(x)}</span>`).join('');
+        const reacts = (s.reactions || [])
           .map(r => `<span class="cp-react">${icon(r.icon, C().accent, portrait() ? 40 : 34)}<b data-to="${r.value}">0</b></span>`).join('');
         return `${head(s)}<div class="cp">
             <div class="cp-top">${avatarHtml(s.avatar, 'cp-av')}<span class="cp-handle">${markup(s.handle || '@you')}</span><i class="cp-time">now</i></div>

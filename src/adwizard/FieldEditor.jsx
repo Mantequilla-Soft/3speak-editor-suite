@@ -38,13 +38,16 @@ function Field({ f, value, onChange, icons }) {
       return f.options ? <Options f={f} head={head} value={value} onChange={onChange} />
         : <StringList f={f} head={head} value={value} onChange={onChange} />
     case 'number': case 'int': {
-      const ranged = f.min != null && f.max != null && f.max - f.min <= 400
-      const step = f.kind === 'int' ? 1 : (f.max - f.min) > 20 ? 1 : 0.05
+      // from1: the doc stores an index from 0, the form shows and takes it from 1
+      const o1 = f.from1 ? 1 : 0, min = f.min != null ? f.min + o1 : undefined, max = f.max != null ? f.max + o1 : undefined
+      const ranged = min != null && max != null && max - min <= 400
+      const step = f.kind === 'int' ? 1 : (max - min) > 20 ? 1 : 0.05
+      const shown = value == null ? undefined : value + o1
       return <label className="aw-f">{head}
         <div className="aw-num">
-          {ranged && <input type="range" min={f.min} max={f.max} step={step} value={value ?? f.min} onChange={e => onChange(+e.target.value)} />}
-          <input type="number" min={f.min} max={f.max} step={f.kind === 'int' ? 1 : 'any'} value={value ?? ''} placeholder={f.opt ? 'auto' : ''}
-            onChange={e => onChange(e.target.value === '' ? undefined : +e.target.value)} />
+          {ranged && <input type="range" min={min} max={max} step={step} value={shown ?? min} onChange={e => onChange(+e.target.value - o1)} />}
+          <input type="number" min={min} max={max} step={f.kind === 'int' ? 1 : 'any'} value={shown ?? ''} placeholder={f.opt ? 'auto' : ''}
+            onChange={e => onChange(e.target.value === '' ? undefined : +e.target.value - o1)} />
         </div></label>
     }
     case 'bool':
@@ -89,13 +92,13 @@ function Count({ v, max }) {
 function StringList({ f, head, value, onChange }) {
   const arr = Array.isArray(value) ? value : []
   const max = f.max || 12
-  const isInt = f.kindOf === 'int'
+  const isInt = f.kindOf === 'int', o1 = isInt && f.from1 ? 1 : 0 // from1: stored from 0, shown from 1
   const set = (i, v) => onChange(arr.map((x, k) => (k === i ? v : x)))
   return <div className="aw-f">{head}
     {f.kind === 'lines' && <small className="aw-tip">Wrap a word in *stars* for the accent colour, _underscores_ for the second accent.</small>}
     {arr.map((x, i) => (
       <div className="aw-row" key={i}>
-        <input type={isInt ? 'number' : 'text'} value={x} onChange={e => set(i, isInt ? +e.target.value : e.target.value)} />
+        <input type={isInt ? 'number' : 'text'} min={isInt ? o1 : undefined} value={isInt ? x + o1 : x} onChange={e => set(i, isInt ? +e.target.value - o1 : e.target.value)} />
         <button type="button" className="aw-icon-btn" disabled={i === 0} onClick={() => onChange(swap(arr, i, i - 1))} title="Up"><ChevronUp size={14} /></button>
         <button type="button" className="aw-icon-btn" disabled={arr.length <= (f.min || 0)} onClick={() => onChange(arr.filter((_, k) => k !== i))} title="Remove"><Trash2 size={14} /></button>
       </div>))}
@@ -149,7 +152,7 @@ function ObjectList({ f, value, onChange, icons }) {
 const swap = (arr, a, b) => { const c = [...arr]; [c[a], c[b]] = [c[b], c[a]]; return c }
 
 // A picture: upload, paste (Ctrl/Cmd+V while the field is focused, or the Paste button) or a link, then zoom +
-// drag to place it inside its frame (engine: { url, scale, x, y })
+// drag to place it inside its frame (engine: { url, scale, x, y }; zoom crops, the frame keeps its size)
 const clipboardImage = items => {
   for (const it of items || []) {
     if (it.kind === 'file' && /^image\//.test(it.type)) return it.getAsFile()
@@ -167,6 +170,7 @@ export function ImageField({ value, onChange, adjust = true, accept = 'image/*' 
   const url = imgUrl(value)
   const o = value && typeof value === 'object' ? value : { url }
   const set = patch => onChange({ ...o, ...patch })
+  const zoom = Math.max(1, o.scale ?? 1) // the engine crops: 1 = the scene's own fit, older drafts may hold a zoom-out
   const setUrl = u => onChange(adjust ? { url: u } : u)
 
   const pick = async file => {
@@ -220,9 +224,9 @@ export function ImageField({ value, onChange, adjust = true, accept = 'image/*' 
           {adjust && <i className="aw-img-dot" style={{ left: `${50 + (o.x || 0) * 50}%`, top: `${50 + (o.y || 0) * 50}%` }} />}
         </div>
         <div className="aw-img-tools">
-          {adjust && <label className="aw-f-inline">Zoom
-            <input type="range" min={0.5} max={3} step={0.05} value={o.scale ?? 1} onChange={e => set({ scale: +e.target.value })} />
-            <span>{(o.scale ?? 1).toFixed(2)}x</span></label>}
+          {adjust && <label className="aw-f-inline" title="Zooms into the picture inside its frame; the frame keeps its size">Zoom
+            <input type="range" min={1} max={4} step={0.05} value={zoom} onChange={e => set({ scale: +e.target.value })} />
+            <span>{zoom.toFixed(2)}x</span></label>}
           <div className="aw-row">
             {adjust && <button type="button" className="aw-icon-btn" onClick={() => onChange({ url })} title="Reset placement"><RotateCcw size={14} /></button>}
             <button type="button" className="aw-btn-small" onClick={() => fileRef.current?.click()}><Upload size={14} /> Replace</button>

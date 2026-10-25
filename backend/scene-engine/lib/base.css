@@ -48,9 +48,7 @@ h1, h2, .hp-w, .ep-tag, .es-tag, .em-tag, .emq-tag, .ew-tag, .kw-word, .mq-row, 
   font-family: var(--font-head, var(--font));
 }
 
-/* user image placement: Kit.img() puts --ix/--iy (object-position) and --is (zoom) on every user image.
-   The individual `scale` property composes with the Ken Burns `transform` the scenes animate. */
-img.ui { object-position: var(--ix, 50%) var(--iy, 50%); scale: var(--is, 1); transform-origin: var(--ix, 50%) var(--iy, 50%); }
+/* user image placement (zoom, position) is inline on the <img>, see Kit.img() */
 
 /* a scene that failed to build (missing content while editing) */
 .kit-broken { position: absolute; inset: 30% 10%; display: grid; place-content: center; gap: 12px; text-align: center; border: 3px dashed var(--a1);

@@ -178,7 +178,7 @@
       update(el, t, d, s) {
         fadeUp($('.cb-wrap > .label', el), t, .05, .4, 20);
         const n = Math.min(4, s.faces.length); let rot = 0;
-        for (let i = 1; i < n; i++) { const e = cbAt(i, d, s.step); rot += E.inOutCubic(prog(t, e - Math.min(.5, (s.step || 1) * .75), e)) * 90; }
+        for (let i = 1; i < n; i++) { const e = cbAt(i, d, s.step); rot += E.inOutCubic(prog(t, e - Math.min(.5, (s.step ? Math.min(s.step, (d - 1) / 3) : 1) * .75), e)) * 90; }
         const k = E.outBack(prog(t, .05, .6));
         $('.cb', el).style.transform = `translateZ(calc(var(--cb) / -2)) rotateX(${-8 + Math.sin(t * 1.2) * 3}deg) rotateY(${-rot}deg) scale(${lerp(.7, 1, k)})`;
         $('.cb', el).style.opacity = prog(t, .05, .2);
@@ -221,17 +221,17 @@
     },
 
     kinetic: {
-      cues: s => s.words.map((_, i) => ({ t: .05 + i * (s.step || .32) + .1, kind: 'hit' })), // a punch as each word slams (lands ~.1 s in)
+      cues: (s, d) => s.words.map((_, i) => ({ t: .05 + i * knStep(s, d) + .1, kind: 'hit' })), // a punch as each word slams (lands ~.1 s in)
       build: s => `<div class="kn">${s.words.slice(0, 6).map((w, i) => `<b class="kn-w k${i}">${markup(w)}</b>`).join('')}</div>${s.line ? `<div class="kn-line" data-split>${markup(s.line)}</div>` : ''}`,
       update(el, t, d, s) {
         const L = portrait() ? KN_P : KN_L, n = Math.min(6, s.words.length);
         $$('.kn-w', el).forEach((w, i) => {
-          const [x, y, size, rot, acc] = L[i], st = s.step || .32, a = .05 + i * st, k = E.outBack(prog(t, a, a + .3)), shake = Math.sin((t - a) * 60) * 8 * (1 - prog(t, a + .25, a + .5)) * (t > a + .2 ? 1 : 0);
+          const [x, y, size, rot, acc] = L[i], st = knStep(s, d), a = .05 + i * st, k = E.outBack(prog(t, a, a + .3)), shake = Math.sin((t - a) * 60) * 8 * (1 - prog(t, a + .25, a + .5)) * (t > a + .2 ? 1 : 0);
           w.style.left = `${x}%`; w.style.top = `${y}%`; w.style.fontSize = `${size}px`; w.style.color = acc ? C().accent : C().ink;
           w.style.opacity = prog(t, a, a + .06) * (i < n - 1 ? lerp(1, .5, prog(t, a + .45, a + .9)) : 1);
           w.style.transform = `translate(-50%, -50%) translate(${shake}px, ${-shake / 2}px) rotate(${rot}deg) scale(${lerp(2.4, 1, k)})`;
         });
-        const ln = $('.kn-line', el); if (ln) { const a = .05 + (n - 1) * (s.step || .32) + .35; /* right after the last word lands */ popIn(ln, t, a, .45, .85); words(ln, t, a + .08, .06, .45); }
+        const ln = $('.kn-line', el); if (ln) { const a = .05 + (n - 1) * knStep(s, d) + .35; /* right after the last word lands */ popIn(ln, t, a, .45, .85); words(ln, t, a + .08, .06, .45); }
       },
     },
   });
@@ -241,7 +241,9 @@
   function srAt(s) { return .5 + s.query.length * .045 + .25; }
   // cube words are sized by length: data-fit measures through the cube's 3D transforms and gets it wrong
   function cbFont(w) { const side = portrait() ? 700 : 640, len = Math.max(...String(w).replace(/[*_]/g, '').split('|').map(l => [...l].length)); return Math.min(150, Math.floor(side * .84 / (len * .62))); } // '|' = line break
-  function cbAt(i, d, step) { if (step) return i * step; const n = 4, seg = (d - 1.4) / (n - 1); return .5 + i * seg; } // step: a turn lands every `step` s (on the beat)
+  // kinetic: seconds between words; shortened when the last word + line (~1.3 s) would not fit the duration
+  function knStep(s, d) { const n = s.words.length; return Math.max(.15, Math.min(s.step || .32, (d - 1.3) / Math.max(1, n - 1))); }
+  function cbAt(i, d, step) { if (step) return i * Math.min(step, (d - 1) / 3); const n = 4, seg = (d - 1.4) / (n - 1); return .5 + i * seg; } // step: a turn lands every `step` s (on the beat)
   function hl(title, q) {
     const i = title.toLowerCase().indexOf(String(q).toLowerCase());
     return i < 0 ? esc(title) : `${esc(title.slice(0, i))}<mark>${esc(title.slice(i, i + q.length))}</mark>${esc(title.slice(i + q.length))}`;

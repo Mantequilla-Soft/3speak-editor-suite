@@ -53,17 +53,27 @@
   // alone, and a quote or bracket would end the url() and let the rest of the string be CSS.
   const cssUrl = u => u.replace(/[\\'"()\s<>]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0'));
   const src = spec => esc(cssUrl(url(spec)));
+  // a locale tag the browser accepts, else undefined (toLocaleString throws on a bad tag such as 'de_DE')
+  const locale = l => { if (!l) return undefined; try { (0).toLocaleString(l); return l; } catch { return undefined; } };
   const num = (v, a, b, d) => { const n = +v; return Number.isFinite(n) ? Math.min(b, Math.max(a, n)) : d; };
-  // <img> for a user image. Placement: scale 0.2..5 (1 = the scene's own fit), x/y -1..1 = where the picture sits in
-  // its frame (object-position, -1 = left/top edge). Composes with the scenes' own transform animations (base.css).
+  // <img> for a user image. Placement: scale 1..5 = zoom INTO the picture (1 = the scene's own fit), x/y -1..1 = where
+  // the picture sits in its frame (object-position, -1 = left/top edge) and the point the zoom keeps still.
+  // Zoom crops: the element keeps its box, the scaled picture is clipped back to it, so it never grows out of a frame
+  // that does not clip. A scene that rounds a user image sets the radius as --ir (border-radius: var(--ir)) so the clip
+  // keeps its corners. All inline and only when set: an unplaced picture keeps the scene's own object-position
+  // (screenshots pin to the top). The `scale` property composes with the Ken Burns `transform` the scenes animate.
   function img(spec, cls = '', style = '') {
     // no usable picture: still an <img> (transparent), so scenes that look the element up never crash
     const u = url(spec) || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     const o = spec && typeof spec === 'object' ? spec : {};
+    const px = 50 + num(o.x, -1, 1, 0) * 50, py = 50 + num(o.y, -1, 1, 0) * 50, s = num(o.scale, 1, 5, 1);
+    // the box in the element's own (unscaled) coordinates that lands exactly on its layout box after scale(s) about (px, py)
+    const k = 1 - 1 / s, pc = v => `${(v * k).toFixed(3)}%`;
+    const at = `${px.toFixed(2)}% ${py.toFixed(2)}%`;
     const vars = [
-      o.x != null ? `--ix:${(50 + num(o.x, -1, 1, 0) * 50).toFixed(2)}%` : '',
-      o.y != null ? `--iy:${(50 + num(o.y, -1, 1, 0) * 50).toFixed(2)}%` : '',
-      o.scale != null ? `--is:${num(o.scale, .2, 5, 1)}` : '',
+      o.x != null || o.y != null ? `object-position:${at}` : '',
+      s > 1 ? `scale:${s};transform-origin:${at}` : '',
+      s > 1 ? `clip-path:inset(${pc(py)} ${pc(100 - px)} ${pc(100 - py)} ${pc(px)} round calc(var(--ir, 0px) / ${s}))` : '',
       style,
     ].filter(Boolean).join(';');
     return `<img class="ui${cls ? ' ' + esc(cls) : ''}" src="${esc(u)}" alt=""${vars ? ` style="${esc(vars).replace(/&#39;/g, "'")}"` : ''}>`;
@@ -250,5 +260,5 @@
     document.write(`<script src="${f}"><\/script>`);
   }
 
-  window.Kit = { ICONS, icon, run, mount, unmount, normalize, loadContent, esc, url, src, cssUrl, img, accents: () => [window.REEL.brand.colors.accent, window.REEL.brand.colors.accent2, window.REEL.brand.colors.accent3] };
+  window.Kit = { ICONS, icon, run, mount, unmount, normalize, loadContent, esc, url, src, cssUrl, img, locale, accents: () => [window.REEL.brand.colors.accent, window.REEL.brand.colors.accent2, window.REEL.brand.colors.accent3] };
 })();

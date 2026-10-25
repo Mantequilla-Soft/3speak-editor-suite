@@ -26,13 +26,13 @@
 
   window.KitScenes = {
     words: {
-      cues: (s, d) => { const n = s.words.length, seg = (s.line ? d - (s.hold || 1.1) : d - .4) / n;
+      cues: (s, d) => { const n = s.words.length, seg = kwSpan(s, d) / n;
         return s.words.map((_, i) => ({ t: i * seg + .03, kind: 'click' })); },
       build: s => `${label(s.label)}<div class="kw">${s.words.map(w => `<div class="kw-word">${markup(w)}</div>`).join('')}</div>
         ${s.line ? `<div class="kw-line" data-split>${markup(s.line)}</div>` : ''}`,
       update(el, t, d, s) {
         fadeUp($(':scope > .label', el), t, 0, .4, 20);
-        const n = s.words.length, span = (s.line ? d - (s.hold || 1.1) : d - .4), seg = span / n;
+        const n = s.words.length, span = kwSpan(s, d), seg = span / n;
         $$('.kw-word', el).forEach((w, i) => {
           const a = i * seg, xin = E.outExpo(prog(t, a, a + .3));
           const xout = i === n - 1 ? 0 : prog(t, a + seg - .1, a + seg);
@@ -147,14 +147,14 @@
     },
 
     greetings: {
-      cues: (s, d) => { const n = s.words.length, end = d - (s.hold || .75);
+      cues: (s, d) => { const n = s.words.length, end = grEnd(s, d);
         return Array.from({ length: n - 1 }, (_, i) => { const k = i + 1, p = 1 - Math.pow(1 - (k - .5) / (n - 1), 1 / 1.5);
           return { t: .05 + p * (end - .05), kind: 'type' }; }); },
       build: s => `<div class="gr">${label(s.label)}<div class="hello"></div>${s.line ? `<h2 data-split>${markup(s.line)}</h2>` : ''}</div>
         ${s.strip ? `<div class="strip">${window.Kit.esc(s.strip)}</div>` : ''}<div class="preload">${window.Kit.esc(s.words.join(' '))}</div>`,
       update(el, t, d, s) {
         fadeUp($('.gr > .label', el), t, .05);
-        const n = s.words.length, end = d - (s.hold || .75); // hold = seconds the last word + line stay
+        const n = s.words.length, end = grEnd(s, d); // hold = seconds the last word + line stay
         const gp = (1 - Math.pow(1 - prog(t, .05, end), 1.5)) * (n - 1), gi = Math.round(gp);
         const h = $('.hello', el), settle = prog(t, end - .05, end + .25);
         h.textContent = s.words[gi];
@@ -167,4 +167,9 @@
       },
     },
   };
+  // words: seconds the words get (the line holds for `hold` after them); a hold too long for the duration is cut so
+  // every word still shows for at least .3 s
+  function kwSpan(s, d) { return s.line ? d - Math.min(s.hold || 1.1, Math.max(.3, d - .3 * s.words.length)) : d - .4; }
+  // greetings: when the cycle ends; a hold too long for the duration is cut so each word gets at least .2 s
+  function grEnd(s, d) { return d - Math.min(s.hold || .75, Math.max(.3, d - .05 - .2 * s.words.length)); }
 })();

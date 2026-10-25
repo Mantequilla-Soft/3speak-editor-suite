@@ -179,7 +179,7 @@
       const x = E.outExpo(prog(t, .15, 1.6)), frac = Math.max(0, Math.min(1, s.ring ?? (+s.value || 0) / (s.max || 100)));
       const c = 2 * Math.PI * 300, arc = $('.arc', el);
       arc.setAttribute('stroke-dasharray', `${c * frac * x} ${c}`);
-      const v = (+s.value || 0) * x, loc = s.locale || window.REEL.locale;
+      const v = (+s.value || 0) * x, loc = window.Kit.locale(s.locale || window.REEL.locale);
       $('.val', el).textContent = loc ? v.toLocaleString(loc, { minimumFractionDigits: s.decimals || 0, maximumFractionDigits: s.decimals || 0 })
         : (s.decimals ? v.toFixed(s.decimals) : Math.round(v)).toLocaleString('en-US');
       popIn($('.num', el), t, .05, .6, .7);
