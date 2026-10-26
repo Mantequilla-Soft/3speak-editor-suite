@@ -55,6 +55,8 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
   const [draftSession, setDraftSession] = useState(undefined) // undefined = not told yet
   const [draftContext, setDraftContext] = useState({ hasMedia: false, reason: null })
   const [closeRequest, setCloseRequest] = useState(0)
+  // A remix (someone else's video, posted under it) is never kept as a draft
+  const [remixing, setRemixing] = useState(false)
 
   const sendToParent = useCallback((type, payload = {}) => {
     if (!isIframe) return
@@ -86,6 +88,7 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
             // Track remix source so rendered output posts as a comment under the original short
             if (parentAuthor && parentPermlink) {
               remixSourceRef.current = { parentAuthor, parentPermlink }
+              setRemixing(true)
             }
             // Clip range: message params override URL params
             const range = {}
@@ -565,8 +568,9 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     remixSource: remixSourceRef.current,
     remixPrompt,
     clearRemixPrompt,
-    draftSession,
-    draftContext,
+    // Remixing: no drafts session, so no autosave, draft prompts or sign-in offer
+    draftSession: remixing ? null : draftSession,
+    draftContext: remixing ? { ...draftContext, reason: 'remix' } : draftContext,
     closeRequest,
     answerClose,
     requestDraftSignIn
