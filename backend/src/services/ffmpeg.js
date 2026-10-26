@@ -16,7 +16,7 @@ const clipVolume = clip => (Number.isFinite(+clip.volume) ? Math.max(0, +clip.vo
 // file, output size / fps / scale). Where a clip sits on the timeline is not
 // part of it: that is applied when compositing. Bump CLIP_CACHE_VERSION when
 // processClip's output changes for the same input.
-const CLIP_CACHE_VERSION = 1
+const CLIP_CACHE_VERSION = 2
 export const RENDER_CACHE_DIR = path.join(process.env.WORK_DIR || '/app/work', 'cache')
 const CLIP_CACHE_DIR = path.join(RENDER_CACHE_DIR, 'clips')
 const NOT_IN_CLIP_RENDER = new Set(['id', 'name', 'timelinePosition', 'trackId', 'libraryId', 'groupId', 'credit', 'sticker'])
@@ -83,6 +83,7 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
 
   const processedClips = new Map()
   const processedPlates = new Map() // clip id -> clean plate PNG (static-background key)
+  const cropSources = new Map() // clip id -> display size of a free-cropped video
   let reusedClips = 0
 
   for (let i = 0; i < allClips.length; i++) {
@@ -99,6 +100,13 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
         clip.type = 'image'
         console.log(`[DEBUG] Corrected clip type to 'image' based on file extension: ${inputExt}`)
       }
+    }
+
+    // A free-cropped video goes back where its piece was in the frame: needs the media size
+    if (clip.type === 'video' && clip.trackType === 'video' && freeCrop(clip, outputWidth, outputHeight)) {
+      const src = await probeDisplaySize(inputFile)
+      if (src) cropSources.set(clip.id, src)
+      else console.warn(`[ffmpeg] Clip ${clip.id}: size unknown, its crop is centred`)
     }
 
     onProgress((i / allClips.length) * 0.4, `Processing clip ${i + 1}/${allClips.length}: ${clip.name || 'clip'}`)
@@ -251,7 +259,7 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
       // Text/image/color clips have position baked into their canvas → overlay at 0:0
       // Video clips need position applied here
       const isFullCanvas = oc.clip.type === 'text' || oc.clip.type === 'image' || oc.clip.type === 'color'
-      const overlayPos = isFullCanvas ? '0:0' : getOverlayPosition(oc.clip, outputWidth, outputHeight, scaleFactor)
+      const overlayPos = isFullCanvas ? '0:0' : getOverlayPosition(oc.clip, outputWidth, outputHeight, scaleFactor, cropSources.get(oc.clip.id))
 
       filterParts.push(`[${prev}]${clipLabel}overlay=${overlayPos}:eof_action=pass:format=auto${out}`)
       prev = `tmp${i}`
@@ -725,7 +733,8 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
       const a = ((clip.rotation * Math.PI) / 180).toFixed(6)
       filterChain += `,format=rgba,rotate=${a}:c=none:ow=rotw(${a}):oh=roth(${a})`
     }
-    let overlayPos = getOverlayPosition(clip, w, h, scaleFactor)
+    const src = freeCrop(clip, w, h) ? await probeDisplaySize(inputFile) : null
+    let overlayPos = getOverlayPosition(clip, w, h, scaleFactor, src)
 
     // Motion (stickers): the layer moves around the image's centre, which the
     // centred overlay puts at the frame centre plus the clip's offset
@@ -851,6 +860,29 @@ function buildTransformFilter(clip, w, h, fps = null) {
     return filters.join(',')
   }
 
+  // Free crop, as in the preview (see freeCrop): contain-fit the media in the
+  // canvas, cut the crop rect (canvas pixels; the media starts (W-iw)/2 into the
+  // canvas, letterbox parts of the rect have nothing to cut), then zoom.
+  // getOverlayPosition puts the piece back where it was in the frame.
+  const crop = freeCrop(clip, w, h)
+  if (crop) {
+    const span = (from, size, canvas, iv) => {
+      const off = `(${canvas}-${iv})/2`
+      const start = `max(${Math.round(from * canvas)}-${off}\\,0)`
+      const end = `min(${Math.round((from + size) * canvas)}-${off}\\,${iv})`
+      return { start, len: `max(${end}-${start}\\,2)` }
+    }
+    const sx = span(crop.x, crop.w, w, 'iw')
+    const sy = span(crop.y, crop.h, h, 'ih')
+    const z = clipZoom(clip)
+    filters.push(`scale=${w}:${h}:force_original_aspect_ratio=decrease`)
+    filters.push(`crop=w=${sx.len}:h=${sy.len}:x=${sx.start}:y=${sy.start}`)
+    if (z !== 1) filters.push(`scale=${z}*iw:${z}*ih`)
+    filters.push('scale=trunc(iw/2)*2:trunc(ih/2)*2')
+    if (fps) filters.push(`fps=${fps}`)
+    return filters.join(',')
+  }
+
   // Apply crop — percentage-based (cropX/cropY/cropWidth/cropHeight are 0-100%)
   const cropX = clip.cropX || 0
   const cropY = clip.cropY || 0
@@ -939,6 +971,58 @@ function turnOffset(dx, dy, rotationDeg) {
 
 // Motion only for freely placed clips (a remix layout box stays put)
 const layoutBoxFree = (clip, w, h) => !getLayoutBox(clip, w, h)
+
+// Zoom of a freely placed clip as a factor (100 -> 1), clamped like buildTransformFilter
+function clipZoom(clip) {
+  if (!clip.zoom || clip.zoom === 1 || clip.zoom === 100) return 1
+  return Math.max(0.1, Math.min(5.0, clip.zoom > 10 ? clip.zoom / 100 : clip.zoom))
+}
+
+/**
+ * Crop of a freely placed clip (no layout box) as fractions of the CANVAS, or
+ * null when it is not cropped. The preview cuts the clip's full-canvas layer
+ * (CSS clip-path, media contain-fit in it), so the rect is in canvas fractions
+ * and the piece stays where it was in the frame; zoom and position move the
+ * whole layer afterwards. The legacy pixel `crop` / fixed `width`/`height`
+ * clips keep the old path.
+ */
+function freeCrop(clip, w, h) {
+  if (getLayoutBox(clip, w, h) || clip.crop || clip.width || clip.height) return null
+  const x = (clip.cropX || 0) / 100
+  const y = (clip.cropY || 0) / 100
+  const cw = (clip.cropWidth || 100) / 100
+  const ch = (clip.cropHeight || 100) / 100
+  if (x === 0 && y === 0 && cw === 1 && ch === 1) return null
+  return { x, y, w: cw, h: ch }
+}
+
+/**
+ * Overlay position of a free-cropped clip: the centre of its piece where the
+ * preview has it. The layer turns scale(zoom) translate(position) rotate(rotation)
+ * around the canvas centre (rotation: images only). `src` = the media's display
+ * size; null when the clip is not cropped or the size is unknown.
+ */
+function freeCropOverlay(clip, w, h, scaleFactor, src) {
+  const crop = freeCrop(clip, w, h)
+  if (!crop || !src) return null
+  const k = Math.min(w / src.width, h / src.height)
+  const mw = src.width * k
+  const mh = src.height * k
+  const mx = (w - mw) / 2
+  const my = (h - mh) / 2
+  // Piece centre, relative to the canvas centre
+  const cx = (Math.max(crop.x * w, mx) + Math.min((crop.x + crop.w) * w, mx + mw)) / 2 - w / 2
+  const cy = (Math.max(crop.y * h, my) + Math.min((crop.y + crop.h) * h, my + mh)) / 2 - h / 2
+  const r = clip.type === 'image' && clip.rotation ? (clip.rotation * Math.PI) / 180 : 0
+  const rx = cx * Math.cos(r) - cy * Math.sin(r)
+  const ry = cx * Math.sin(r) + cy * Math.cos(r)
+  const z = clipZoom(clip)
+  const offsetX = clip.positionX || (clip.position && clip.position.x) || 0
+  const offsetY = clip.positionY || (clip.position && clip.position.y) || 0
+  const px = Math.round(w / 2 + z * (offsetX * scaleFactor + rx))
+  const py = Math.round(h / 2 + z * (offsetY * scaleFactor + ry))
+  return `${px}-w/2:${py}-h/2`
+}
 
 /**
  * Resolve a clip's layout box (fractions of the canvas) to even output pixels.
@@ -1252,9 +1336,11 @@ async function processPlate(clip, plateFile, processedClipPath, outPath, w, h, s
 /**
  * Get overlay position for clip positioning
  */
-function getOverlayPosition(clip, w, h, scaleFactor = 1) {
+function getOverlayPosition(clip, w, h, scaleFactor = 1, src = null) {
   const box = getLayoutBox(clip, w, h)
   if (box) return `${box.x}:${box.y}`
+  const cropped = freeCropOverlay(clip, w, h, scaleFactor, src)
+  if (cropped) return cropped
 
   // Use positionX/positionY as pixel offset from center
   // Values are in preview-pixel coords → scale to output, then apply zoom
