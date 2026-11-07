@@ -38,6 +38,11 @@ ff(['-f', 'lavfi', '-i', 'sine=f=300:d=1', '-f', 'lavfi', '-i', 'anullsrc=r=4410
 ff(['-f', 'lavfi', '-i', 'sine=f=800:d=2', '-ar', '44100', path.join(HOST_DIR, 'intro.wav')])
 ff(['-f', 'lavfi', '-i', 'sine=f=600:d=1.5', '-ar', '44100', path.join(HOST_DIR, 'outro.wav')])
 ff(['-f', 'lavfi', '-i', 'anoisesrc=d=5:c=pink:a=0.3', '-ar', '44100', path.join(HOST_DIR, 'bed.wav')])
+// two voices on their own tracks: host talks 0-2 and 6-8, guest 3-5; both quiet 2-3, 5-6, 8-10
+ff(['-f', 'lavfi', '-i', 'sine=f=300:d=2', '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=mono:d=4', '-f', 'lavfi', '-i', 'sine=f=320:d=2', '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=mono:d=2',
+  '-filter_complex', '[0:a][1:a][2:a][3:a]concat=n=4:v=0:a=1,volume=6dB', '-ar', '44100', path.join(HOST_DIR, 'host.wav')])
+ff(['-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=mono:d=3', '-f', 'lavfi', '-i', 'sine=f=500:d=2', '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=mono:d=5',
+  '-filter_complex', '[0:a][1:a][2:a]concat=n=3:v=0:a=1,volume=6dB', '-ar', '44100', path.join(HOST_DIR, 'guest.wav')])
 
 const freePort = () => new Promise((resolve) => { const s = net.createServer().listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => resolve(p)) }) })
 const [BACKEND_PORT, HOST_PORT, EDITOR_PORT] = [await freePort(), await freePort(), await freePort()]
@@ -264,6 +269,56 @@ try {
     assert.ok(overflow <= 1, `page overflows by ${overflow}px`)
     await phone.ctx.close()
   })
+  await step('two voices grouped: silences cut only where both are quiet, the same cut on both tracks, in sync', async () => {
+    // a clean start: no template (it would apply by itself), no drafts (the free limit)
+    fs.rmSync(path.join(DATA, 'uploads', '.templates'), { recursive: true, force: true })
+    fs.rmSync(projectsDir, { recursive: true, force: true })
+    const g = await openEditor({ file: null })
+    const f = g.frame
+    await f.locator('.audio-stage-empty input[type=file]').setInputFiles(path.join(HOST_DIR, 'host.wav'))
+    await until(async () => (await f.locator('.timeline-clip-v2.audio').count()) === 1, 'host on the Voice track')
+    // a second voice track for the guest
+    await f.locator('.add-menu-btn').click()
+    await f.getByRole('button', { name: /Audio Track/ }).click()
+    const guestTrack = f.locator('.track-label.audio').first()
+    assert.equal(await guestTrack.getAttribute('aria-label'), 'Voice 2')
+    await guestTrack.locator('input[type=file]').setInputFiles(path.join(HOST_DIR, 'guest.wav'))
+    await until(async () => (await f.locator('.timeline-clip-v2.audio').count()) === 2, 'guest on its own track')
+    // group them from the clip menu
+    await f.locator('.timeline-clip-v2.audio').first().click()
+    await f.getByTitle('More clip actions').click()
+    await f.getByRole('button', { name: 'Group with other voices' }).click()
+    await f.getByText(/2 voices grouped/).waitFor()
+    // Cut silences on the group
+    await f.getByRole('button', { name: 'Cut silences' }).click()
+    await f.getByRole('dialog', { name: 'Cut silences: 2 voices together' }).waitFor()
+    await until(async () => /cuts/.test(await f.locator('.silence-cut-summary').innerText().catch(() => '')), 'group plan')
+    await f.getByRole('button', { name: 'Cut this group' }).click()
+    await until(async () => (await f.locator('.timeline-clip-v2.audio').count()) >= 4, 'both voices cut')
+    const d = await until(() => drafts().find(p => {
+      const voices = p.state.tracks.filter(t => !t.music)
+      return voices.length === 2 && voices.every(t => t.clips.length >= 2)
+    }), 'draft of the cut group', 45000)
+    const [guestT, hostT] = d.state.tracks.filter(t => !t.music)
+    const span = (t) => t.clips.map(c => [+c.timelinePosition.toFixed(2), +(c.timelinePosition + c.endTime - c.startTime).toFixed(2)])
+    // the same kept stretches on both tracks (each voice keeps its share of every stretch)
+    assert.deepEqual(span(hostT), span(guestT), 'both tracks cut at the same moments')
+    // host speech still lines up with the guest's: the guest's answer starts right where the host's first words end
+    const hostEnd = hostT.clips.at(-1).timelinePosition + hostT.clips.at(-1).endTime - hostT.clips.at(-1).startTime
+    assert.ok(hostEnd > 6.2 && hostEnd < 7.5, `kept 6 s of talk plus the air around each cut, got ${hostEnd.toFixed(2)}`)
+    // where only one person talks nothing was cut: the guest's 2 s answer is whole
+    const guestTalk = guestT.clips.find(c => c.startTime <= 3.05 && c.endTime >= 4.95)
+    assert.ok(guestTalk, 'the guest answer (file 3-5 s) is kept in one piece')
+    const hostPiece = hostT.clips.find(c => Math.abs(c.timelinePosition - guestTalk.timelinePosition) < 0.01)
+    assert.ok(hostPiece && hostPiece.groupId === guestTalk.groupId, 'pieces of one stretch are grouped across the tracks')
+    // and the export has both voices at the same moments
+    await f.getByRole('button', { name: /^Export$/ }).click()
+    await f.getByRole('button', { name: 'Use this audio' }).first().waitFor({ timeout: 90000 })
+    const mp3 = path.join(DATA, 'rendered', fs.readdirSync(path.join(DATA, 'rendered')).filter(x => x.endsWith('.mp3') && !x.startsWith('cache-')).map(x => [x, fs.statSync(path.join(DATA, 'rendered', x)).mtimeMs]).sort((a, b) => b[1] - a[1])[0][0])
+    assert.ok(Math.abs(ffDuration(mp3) - hostEnd) < 0.15, `mp3 ${ffDuration(mp3)} s vs timeline ${hostEnd} s`)
+    await g.ctx.close()
+  })
+
   await step('the shorts video editor is unchanged (no mode, Video 1 + Audio 1, Render, no audio tools)', async () => {
     const v = await openEditor({ file: null, mode: 'video' })
     const ready = await v.page.evaluate(() => window.__messages.find(m => m.type === 'editor-ready'))

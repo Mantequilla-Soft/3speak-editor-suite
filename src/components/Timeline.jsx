@@ -607,7 +607,8 @@ function Timeline({
   onAutoCut,
   onBeatSync,
   isDesktop,
-  audioMode = false
+  audioMode = false,
+  onGroupVoices
 }) {
   const { min: MIN_ZOOM, max: MAX_ZOOM } = zoomRange(audioMode)
   const [zoom, setZoom] = useState(33) // pixels per second
@@ -1122,6 +1123,14 @@ function Timeline({
                     <button onClick={() => { onDuplicate && onDuplicate(selectedClipId); setShowClipActions(false) }}>
                       <Copy size={14} /> Duplicate
                     </button>
+                    {onGroupVoices && selectedClip?.type === 'audio' && !selectedClip.templateRole && (
+                      <button
+                        onClick={() => { onGroupVoices(selectedClipId); setShowClipActions(false) }}
+                        title="Group with what plays at the same time on the other voice tracks: they move, trim and get their silences cut together"
+                      >
+                        <Link size={14} /> Group with other voices
+                      </button>
+                    )}
                     {selectedClipGroupId && (
                       <button onClick={() => { onUngroupClips && onUngroupClips(selectedClipId); setShowClipActions(false) }}>
                         <Unlink size={14} /> Ungroup

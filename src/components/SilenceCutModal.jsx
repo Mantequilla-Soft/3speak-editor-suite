@@ -5,6 +5,8 @@ import { api } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
 import { formatLength } from '../utils/limits'
 import { isAudioMode } from '../utils/editorMode'
+import { groupSpan, combineLoudness } from '../utils/groupSilence'
+import { GroupPlayer } from '../utils/groupPlayer'
 
 // The audio editor keeps its own settings: there "Cut silences" means cutting
 // the pauses out (podcasts), with a little more air around the words
@@ -45,7 +47,7 @@ const seconds = (s) => (s < 10 ? s.toFixed(1) : String(Math.round(s))) + 's'
  * Play / scrub use the clip's own (playable) URL; in "cut pauses out" mode the
  * playback skips what would be cut, so the result can be heard first.
  */
-function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onApply, onApplyAll = null, allCount = 0, onClose }) {
+function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onApply, onApplyAll = null, allCount = 0, group = null, onClose }) {
   const [loudness, setLoudness] = useState(null)
   const [error, setError] = useState(unavailable || null)
   const [settings, setSettings] = useState(loadSettings)
@@ -53,9 +55,18 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
   const wrapRef = useRef(null)
   const [width, setWidth] = useState(0)
 
-  const from = clip.startTime
-  const to = clip.endTime
-  const isVideo = clip.type === 'video'
+  // A group (voices on their own tracks, [{ clip, source, analysisUrl }]): the
+  // popup works in timeline seconds over the whole group; a pause counts only
+  // where everyone is quiet, and the cut goes through every voice
+  const groupMode = Array.isArray(group) && group.length > 1
+  const groupRef = useRef(group)
+  groupRef.current = group
+  const groupKey = groupMode ? group.map(m => `${m.clip.id}:${m.clip.timelinePosition || 0}:${m.clip.startTime}:${m.clip.endTime}`).join('|') : ''
+  const span = useMemo(() => (groupMode ? groupSpan(groupRef.current.map(m => m.clip)) : null), [groupMode, groupKey]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const from = groupMode ? span.from : clip.startTime
+  const to = groupMode ? span.to : clip.endTime
+  const isVideo = !groupMode && clip.type === 'video'
 
   // Playback: position in source media seconds
   const mediaRef = useRef(null)
@@ -63,8 +74,36 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
   const [time, setTime] = useState(from)
   const scrubbingRef = useRef(false)
 
+  // Group: every voice is measured; one that cannot be read stops it (treating
+  // it as silent would cut that person's words)
   useEffect(() => {
-    if (unavailable || !(source || analysisUrl)) return
+    if (!groupMode) return
+    const controller = new AbortController()
+    const members = groupRef.current
+    Promise.all(members.map(m => loadLoudness(m.source || m.analysisUrl, { signal: controller.signal, analysisUrl: m.analysisUrl })))
+      .then(list => { if (!controller.signal.aborted) setLoudness(combineLoudness(members.map((m, i) => ({ clip: m.clip, loudness: list[i] })))) })
+      .catch(() => { if (!controller.signal.aborted) setError('Could not read the audio of every voice in this group. Try again once the uploads have finished.') })
+    return () => controller.abort()
+  }, [groupMode, groupKey])
+
+  // The group plays all its voices together (utils/groupPlayer.js)
+  const memberEls = useRef([])
+  useEffect(() => {
+    if (!groupMode) return
+    const player = new GroupPlayer(groupRef.current.map((m, i) => ({
+      el: memberEls.current[i],
+      position: m.clip.timelinePosition || 0,
+      startTime: m.clip.startTime,
+      endTime: m.clip.endTime,
+      volume: Math.min(1, Math.max(0, (Number.isFinite(+m.clip.volume) ? +m.clip.volume : 100) / 100))
+    })), { onState: setPlaying })
+    player.currentTime = groupSpan(groupRef.current.map(m => m.clip)).from
+    mediaRef.current = player
+    return () => { player.pause(); mediaRef.current = null }
+  }, [groupMode, groupKey])
+
+  useEffect(() => {
+    if (groupMode || unavailable || !(source || analysisUrl)) return
     const controller = new AbortController()
     loadLoudness(source || analysisUrl, { signal: controller.signal, analysisUrl })
       .then(l => { if (!controller.signal.aborted) setLoudness(l) })
@@ -77,7 +116,7 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
           : 'Could not read the audio of this clip.')
       })
     return () => controller.abort()
-  }, [source, analysisUrl, unavailable])
+  }, [source, analysisUrl, unavailable, groupMode])
 
   useEffect(() => { saveSettings(settings) }, [settings])
 
@@ -326,7 +365,7 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
       >
         <div className="remix-picker-header">
           <span className="remix-picker-icon-spacer" />
-          <h3 id="silence-cut-title">{isAudioMode ? 'Cut silences' : 'Auto cut'}</h3>
+          <h3 id="silence-cut-title">{groupMode ? `Cut silences: ${group.length} voices together` : isAudioMode ? 'Cut silences' : 'Auto cut'}</h3>
           <button className="remix-picker-icon-btn" onClick={onClose} title="Close">
             <X size={16} />
           </button>
@@ -384,7 +423,17 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
           </p>
         )}
 
-        {isVideo ? (
+        {groupMode && (
+          <p className="silence-cut-mode-hint silence-cut-group-hint">
+            A pause is only cut where everyone is quiet, and the same cut goes through every voice, so they stay in sync.
+          </p>
+        )}
+
+        {groupMode ? (
+          group.map((m, i) => (
+            <audio key={m.clip.id} ref={el => { memberEls.current[i] = el }} src={m.clip.url} preload="auto" />
+          ))
+        ) : isVideo ? (
           <video
             ref={mediaRef}
             className="silence-cut-video"
@@ -504,7 +553,7 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
             disabled={!canApply}
             onClick={() => onApply(plan.parts, { closeGaps: true })}
           >
-            <Wand2 size={14} /> {allCount > 1 ? 'This clip only' : 'Edit for me'}
+            <Wand2 size={14} /> {groupMode ? 'Cut this group' : allCount > 1 ? 'This clip only' : 'Edit for me'}
           </button>
         </div>
       </div>

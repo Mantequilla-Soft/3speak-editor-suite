@@ -6,6 +6,7 @@ import { authHeaders, authFetch, dropToken } from '../utils/editorAuth'
 import { MAX_TIMELINE_SECONDS, MAX_IMPORT_BYTES, getTimelineEnd } from '../utils/limits'
 import { createSHA256 } from 'hash-wasm'
 import { isAudioMode } from '../utils/editorMode'
+import { applyGroupCut } from '../utils/groupSilence'
 
 // Upload requests (whole small files or chunks of big ones) in flight at once,
 // shared by every upload; the rest wait for a free slot. Kept under the
@@ -1343,8 +1344,9 @@ export function useTimeline() {
 
   // Add a new track (prepend so new tracks appear on top)
   const addTrack = useCallback((type = 'video') => {
-    const trackCount = tracks.filter(t => t.type === type).length + 1
-    const name = type === 'video' ? `Video ${trackCount}` : `Audio ${trackCount}`
+    // The audio editor's tracks are voices (the Music track does not count)
+    const trackCount = tracks.filter(t => t.type === type && !(isAudioMode && t.music)).length + 1
+    const name = type === 'video' ? `Video ${trackCount}` : isAudioMode ? `Voice ${trackCount}` : `Audio ${trackCount}`
 
     const newTrack = {
       id: generateTrackId(),
@@ -1587,11 +1589,15 @@ export function useTimeline() {
             if (hasPositionChange) {
               groupUpdates.timelinePosition = (clip.timelinePosition || 0) + positionDelta
             }
+            // Trims move every member by the same amount: a video and its own
+            // sound have equal in/out points either way, and two voices recorded
+            // on their own (audio editor groups) start at different points of
+            // their files, so copying the values would cut the wrong part
             if ('startTime' in updates) {
-              groupUpdates.startTime = updates.startTime
+              groupUpdates.startTime = Math.max(0, clip.startTime + (updates.startTime - targetClip.startTime))
             }
             if ('endTime' in updates) {
-              groupUpdates.endTime = updates.endTime
+              groupUpdates.endTime = clip.endTime + (updates.endTime - targetClip.endTime)
             }
             return { ...clip, ...groupUpdates }
           }
@@ -1916,6 +1922,23 @@ export function useTimeline() {
     })
   }, [setTracksWithHistory])
 
+  /**
+   * Cut silences on a group of clips that play together (audio editor: two
+   * voices on their own tracks): `keep` = the stretches to keep, in timeline
+   * seconds, the same for every member (utils/groupSilence.js). One undo step.
+   */
+  const applyGroupSilenceCut = useCallback((memberIds, keep, { closeGaps = true } = {}) => {
+    if (!memberIds?.length || !keep?.length) return
+    setTracksWithHistory(prev => {
+      const { tracks: next, copies } = applyGroupCut(prev, memberIds, keep, { closeGaps, newId: generateClipId, newGroupId: generateGroupId })
+      for (const [id, fromId] of copies) {
+        const file = fileStoreRef.current.get(fromId)
+        if (file) fileStoreRef.current.set(id, file)
+      }
+      return next
+    })
+  }, [setTracksWithHistory])
+
   // Legacy split clip (relative time)
   const splitClip = useCallback((clipId, splitTime) => {
     setTracksWithHistory(prev => prev.map(track => {
@@ -2210,6 +2233,7 @@ export function useTimeline() {
     ungroupClips,
     getTotalDuration,
     applySilenceCut,
+    applyGroupSilenceCut,
     // Replace the tracks with fn(tracks) as one undo step (the audio template)
     applyTracks: setTracksWithHistory,
     uploadFileToServer,

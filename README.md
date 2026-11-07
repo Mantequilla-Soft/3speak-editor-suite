@@ -89,6 +89,7 @@ Quality presets: High (CRF 18), Medium (CRF 23), Low (CRF 28).
 The same editor for podcasts, music and voice. 3Speak opens it from its share menu (standalone) and from the audio upload ("Edit audio" on a track).
 - **Tracks:** a Voice track and a Music track. An audio stage shows the whole show with waveforms (click to jump), up to 3 hours. "Fit" zooms out to the whole show.
 - **Cut silences:** finds the pauses and cuts them out, closing the gaps. It works on one clip or on every voice clip with the same settings. Files too big for the browser are measured by the backend (`POST /api/clip/audio-analysis`).
+- **Several voices:** a host and a guest on their own Voice tracks can be grouped ("Group with other voices" in a clip's ⋯ menu). A group moves and trims together, and Cut silences on it cuts only where everyone is quiet, the same stretch from every voice, so they stay in sync. "Cut all voice clips" also cuts groups this way.
 - **Basic edits:** split, trim, move, delete, volume, fades in and out, noise reduction, music library and sound effects, recording.
 - **Export:** an MP3 rendered by the backend (`timeline.output: 'audio'`), levelled to -16 LUFS for podcasts (can be switched off). "Use this audio" posts `{ type: 'post-to-3speak', mediaType: 'audio', outputUrl, fileName, durationSec, musicCredits? }`.
 - **Drafts:** like the video editor's. Each editor only offers its own drafts, and the limit counts both.

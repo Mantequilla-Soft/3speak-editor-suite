@@ -27,6 +27,7 @@ import AudioTemplateDialog from './components/AudioTemplateDialog'
 import { useAudioTemplate } from './hooks/useAudioTemplate'
 import { applyAudioTemplate, removeAudioTemplate, appliedRoles, hasSlots } from './utils/audioTemplate'
 import { loadLoudness, planCuts } from './utils/silenceDetect'
+import { combineLoudness, groupSpan, overlappingVoices } from './utils/groupSilence'
 import { isAudioMode } from './utils/editorMode'
 import { audioFileName } from './utils/audioTemplate'
 import BeatSyncModal from './components/BeatSyncModal'
@@ -87,6 +88,7 @@ function App() {
     splitClip,
     splitClipAtPlayhead,
     applySilenceCut,
+    applyGroupSilenceCut,
     applyTracks,
     uploadFileToServer,
     removeGapAtPlayhead,
@@ -129,11 +131,24 @@ function App() {
     ? 'This clip is still streaming from 3Speak. Try again once its download has finished.'
     : null
   const autoCutOpenRef = useRef(false)
+  // Audio editor: a clip grouped with other voices is cut together with them
+  // (only where everyone is quiet, the same cut through every voice)
+  const autoCutGroup = useMemo(() => {
+    if (!isAudioMode || !autoCutClip?.groupId) return null
+    const members = voiceClipsOf(tracks).filter(c => c.groupId === autoCutClip.groupId)
+    if (members.length < 2) return null
+    return members.map(c => ({
+      clip: c,
+      source: fileStoreRef.current.get(c.id) || c.file || (isHlsUrl(c.url) ? null : c.url),
+      analysisUrl: c.serverUrl || null
+    }))
+  }, [autoCutClip, tracks, fileStoreRef])
   const handleAutoCutApply = useCallback((parts, options) => {
-    applySilenceCut(autoCutClipId, parts, options)
+    if (autoCutGroup) applyGroupSilenceCut(autoCutGroup.map(m => m.clip.id), parts, options)
+    else applySilenceCut(autoCutClipId, parts, options)
     setAutoCutClipId(null)
     refitTemplateRef.current?.()
-  }, [applySilenceCut, autoCutClipId])
+  }, [applySilenceCut, applyGroupSilenceCut, autoCutClipId, autoCutGroup])
   // (refitTemplate is defined further down, with the template)
   const refitTemplateRef = useRef(null)
 
@@ -895,39 +910,64 @@ function App() {
   const [cutProgress, setCutProgress] = useState(null) // { done, total, failed }
   const cutAllSilences = useCallback(async (settings) => {
     setAutoCutClipId(null)
-    const list = voiceClipsOf(tracksRef.current).sort((a, b) => (b.timelinePosition || 0) - (a.timelinePosition || 0))
-    if (!list.length) return { cut: 0, failed: 0 }
+    // Units: a group of voices is cut as one (only where everyone is quiet, in
+    // sync); every other voice clip on its own. Last on the timeline first.
+    const voices = voiceClipsOf(tracksRef.current)
+    const units = []
+    const seenGroups = new Set()
+    for (const c of voices) {
+      const members = c.groupId ? voices.filter(v => v.groupId === c.groupId) : [c]
+      if (members.length > 1) {
+        if (seenGroups.has(c.groupId)) continue
+        seenGroups.add(c.groupId)
+      }
+      units.push({ members, start: groupSpan(members).from })
+    }
+    units.sort((a, b) => b.start - a.start)
+    if (!units.length) return { cut: 0, failed: 0 }
     const loudness = new Map()
-    let cut = 0
-    let failed = 0
-    setCutProgress({ done: 0, total: list.length, failed: 0 })
-    for (let i = 0; i < list.length; i++) {
-      const c = list[i]
+    const loudnessOf = async (c) => {
       const local = fileStoreRef.current.get(c.id) || c.file || null
       const source = local || (isHlsUrl(c.url) ? null : c.url)
       const key = local || c.serverUrl || c.url
+      if (!loudness.has(key)) loudness.set(key, await loadLoudness(source || c.serverUrl, { analysisUrl: c.serverUrl || null }))
+      return loudness.get(key)
+    }
+    let cut = 0
+    let failed = 0
+    setCutProgress({ done: 0, total: units.length, failed: 0 })
+    for (let i = 0; i < units.length; i++) {
+      const { members } = units[i]
       try {
-        let loud = loudness.get(key)
-        if (!loud) {
-          loud = await loadLoudness(source || c.serverUrl, { analysisUrl: c.serverUrl || null })
-          loudness.set(key, loud)
-        }
-        const { parts } = planCuts(loud, { from: c.startTime, to: c.endTime, ...settings, mode: 'remove' })
-        const kept = parts.reduce((sum, p) => sum + (p.end - p.start), 0)
-        if (parts.length && (parts.length > 1 || kept < (c.endTime - c.startTime) - 0.05)) {
-          applySilenceCut(c.id, parts, { closeGaps: true })
-          cut++
+        if (members.length > 1) {
+          const list = []
+          for (const m of members) list.push({ clip: m, loudness: await loudnessOf(m) })
+          const { from, to } = groupSpan(members)
+          const { parts } = planCuts(combineLoudness(list), { from, to, ...settings, mode: 'remove' })
+          const kept = parts.reduce((sum, p) => sum + (p.end - p.start), 0)
+          if (parts.length && (parts.length > 1 || kept < (to - from) - 0.05)) {
+            applyGroupSilenceCut(members.map(m => m.id), parts, { closeGaps: true })
+            cut++
+          }
+        } else {
+          const c = members[0]
+          const { parts } = planCuts(await loudnessOf(c), { from: c.startTime, to: c.endTime, ...settings, mode: 'remove' })
+          const kept = parts.reduce((sum, p) => sum + (p.end - p.start), 0)
+          if (parts.length && (parts.length > 1 || kept < (c.endTime - c.startTime) - 0.05)) {
+            applySilenceCut(c.id, parts, { closeGaps: true })
+            cut++
+          }
         }
       } catch (err) {
-        console.warn(`[cut silences] ${c.name}: ${err.message}`)
+        console.warn(`[cut silences] ${members.map(m => m.name).join(' + ')}: ${err.message}`)
         failed++
       }
-      setCutProgress({ done: i + 1, total: list.length, failed })
+      setCutProgress({ done: i + 1, total: units.length, failed })
     }
     setCutProgress(failed ? { done: list.length, total: list.length, failed, finished: true } : null)
     if (cut) refitTemplate()
     return { cut, failed }
-  }, [applySilenceCut, refitTemplate, fileStoreRef])
+  }, [applySilenceCut, applyGroupSilenceCut, refitTemplate, fileStoreRef])
   refitTemplateRef.current = audioMode ? refitTemplate : null
 
   // A new recording gets the template by itself (when the creator asked for that):
@@ -951,6 +991,19 @@ function App() {
       }
     })()
   }, [audioMode, hasVoice, audioTemplate.template]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // "Group with other voices": the clip and what plays at the same time on the
+  // other voice tracks become one group (they then move, trim and get cut together)
+  const [groupNotice, setGroupNotice] = useState(null)
+  const groupWithVoices = useCallback((clipId) => {
+    const ids = overlappingVoices(tracksRef.current, clipId)
+    if (ids.length < 2) {
+      setGroupNotice('Nothing plays at the same time on another voice track. Put the other voice on its own track first.')
+      return
+    }
+    groupClips(ids)
+    setGroupNotice(`${ids.length} voices grouped: they now move, trim and get their silences cut together.`)
+  }, [groupClips])
 
   const applyTemplateNow = useCallback((tpl) => {
     applyTracks(t => applyAudioTemplate(t, tpl))
@@ -1169,6 +1222,12 @@ function App() {
             )}
           </div>
         )}
+        {groupNotice && (
+          <div className="compact-render-progress audio-template-notice" role="status">
+            <span className="compact-render-progress-text">{groupNotice}</span>
+            <button className="compact-btn" onClick={() => setGroupNotice(null)} title="Dismiss"><X size={12} /></button>
+          </div>
+        )}
         {templateNotice && (
           <div className="compact-render-progress audio-template-notice" role="status">
             <span className="compact-render-progress-text">
@@ -1265,6 +1324,7 @@ function App() {
             onBeatSync={setBeatClipId}
             isDesktop={isDesktop}
             audioMode={audioMode}
+            onGroupVoices={audioMode ? groupWithVoices : undefined}
           />
 
           {/* Reversing overlay */}
@@ -1351,6 +1411,7 @@ function App() {
             onApply={handleAutoCutApply}
             onApplyAll={audioMode ? cutAllSilences : null}
             allCount={audioMode && voiceClips.some(c => c.id === autoCutClip.id) ? voiceClips.length : 0}
+            group={autoCutGroup}
             onClose={() => setAutoCutClipId(null)}
           />
         )}
