@@ -445,6 +445,8 @@ try {
   })
 
   await step('recording a voice: live graph, full length in the preview, Use puts it on the Voice track with its length', async () => {
+    // no template: the take sits at 0 on its own
+    fs.rmSync(templateFile, { force: true })
     const r = await openEditor({ file: null })
     const f = r.frame
     await f.locator('.empty-timeline-actions').getByRole('button', { name: 'Record', exact: true }).click()
@@ -459,19 +461,40 @@ try {
     })
     await until(async () => (await inked()) > 0, 'live voice graph before recording', 10000)
     await f.locator('.record-start-btn').click()
-    await new Promise(res => setTimeout(res, 3000))
+    await new Promise(res => setTimeout(res, 8000))
     await f.locator('.record-stop-btn').click()
     const audio = f.locator('.record-audio-indicator audio:not(.record-audio-loading)')
     await audio.waitFor({ timeout: 15000 })
     const shown = await audio.evaluate(el => el.duration)
-    assert.ok(Number.isFinite(shown) && shown > 2.3 && shown < 4.5, `preview length ${shown}`)
+    assert.ok(Number.isFinite(shown) && shown > 7.3 && shown < 9.5, `preview length ${shown}`)
     assert.ok((await inked()) > 0, 'the take\'s shape is drawn')
     await f.locator('.record-use-btn').click()
-    const d = await until(() => drafts().find(p => clipsOf(p.state).some(c => /^Recording_/.test(c.name || ''))), 'draft with the recording', 45000)
+    const d = await until(() => drafts().find(p => clipsOf(p.state).some(c => /^Recording_/.test(c.name || '') && /\/api\/upload\/files\//.test(c.url))), 'draft with the uploaded recording', 45000)
     const rec = clipsOf(d.state).find(c => /^Recording_/.test(c.name))
     assert.equal(rec.track, clipsOf(d.state).find(c => !c.music && !c.templateRole)?.track, 'on the voice track')
-    assert.ok(Number.isFinite(rec.duration) && rec.duration > 2.3 && rec.duration < 4.5, `clip length ${rec.duration}`)
+    assert.ok(Number.isFinite(rec.duration) && rec.duration > 7.3 && rec.duration < 9.5, `clip length ${rec.duration}`)
     assert.ok(Math.abs((rec.endTime - rec.startTime) - rec.duration) < 0.05, `whole take on the timeline: ${rec.startTime}-${rec.endTime}`)
+
+    // play, pause, back to 0, play again: the take must play from its start
+    const audioState = () => f.evaluate(() => [...document.querySelectorAll('.global-preview audio')].map(a => ({ src: a.src.slice(-40), paused: a.paused, t: +a.currentTime.toFixed(2), d: a.duration, seekable: a.seekable.length ? [a.seekable.start(0), a.seekable.end(0)] : [], ready: a.readyState })))
+    const ruler = f.locator('.timeline-ruler')
+    const toStart = async () => { const b = await ruler.boundingBox(); await r.page.mouse.click(b.x + 1, b.y + b.height / 2) }
+    const playBtn = f.locator('.global-preview button[title="Play"], .global-preview button[title="Pause"]').first()
+    const toggle = async () => { if (await playBtn.count()) await playBtn.click(); else await r.page.keyboard.press(' ') }
+    await toggle()
+    await new Promise(res => setTimeout(res, 3000))
+    const first = await audioState()
+    // the length is in the file now (header fixed after recording): seekable to its end
+    assert.equal(first.length, 1, JSON.stringify(first))
+    assert.ok(Number.isFinite(first[0].d) && first[0].d > 7.3, `timeline audio knows its length: ${JSON.stringify(first)}`)
+    assert.ok(!first[0].paused && first[0].t > 2, `plays: ${JSON.stringify(first)}`)
+    await toggle()
+    await toStart()
+    assert.equal(await f.locator('[aria-label="Position in the show"]').getAttribute('aria-valuenow'), '0')
+    await toggle()
+    await new Promise(res => setTimeout(res, 1000))
+    const again = await audioState()
+    assert.ok(!again[0].paused && again[0].t > 0.5 && again[0].t < 2, `plays again from the start: ${JSON.stringify(again)}`)
     await r.ctx.close()
   })
 

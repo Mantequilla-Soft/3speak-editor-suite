@@ -3022,6 +3022,12 @@ body {
   width: 100%;
 }
 
+.record-busy {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* until the player knows the take's full length */
 .record-audio-loading {
   visibility: hidden;

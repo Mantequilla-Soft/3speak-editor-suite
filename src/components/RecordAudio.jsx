@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { X, Circle, Square, RotateCcw, Check } from 'lucide-react'
+import { X, Circle, Square, RotateCcw, Check, Loader2 } from 'lucide-react'
+import fixWebmDuration from 'fix-webm-duration'
 import { finiteDuration, pickRecorderType, recordingExtension } from '../utils/mediaDuration'
 import { rmsLevel, levelHistory, drawLevels } from '../utils/voiceGraph'
 
@@ -23,7 +24,8 @@ function RecordAudio({ onRecorded, onClose }) {
   const durationRef = useRef(0)
   const phaseRef = useRef('starting')
 
-  const [phase, setPhase] = useState('starting') // starting | ready | recording | done
+  const [phase, setPhase] = useState('starting') // starting | ready | recording | preparing | done
+  const [adding, setAdding] = useState(false)
   const [recordedBlob, setRecordedBlob] = useState(null)
   const [elapsed, setElapsed] = useState(0)
   const [error, setError] = useState(null)
@@ -129,11 +131,19 @@ function RecordAudio({ onRecorded, onClose }) {
       if (e.data.size > 0) chunksRef.current.push(e.data)
     }
 
-    recorder.onstop = () => {
+    recorder.onstop = async () => {
       durationRef.current = (performance.now() - startedAtRef.current) / 1000
       const type = recorder.mimeType || mimeType || 'audio/webm'
-      setRecordedBlob(new Blob(chunksRef.current, { type }))
       setPreviewReady(false)
+      setPhase('preparing')
+      let blob = new Blob(chunksRef.current, { type })
+      // A browser's WebM recording has no length in its header, so players
+      // can't seek in it reliably (back to 0 played nothing). Write it in;
+      // on any trouble the blob comes back unchanged.
+      if (/webm/i.test(type)) {
+        try { blob = await fixWebmDuration(blob, durationRef.current * 1000, { logger: false }) } catch { /* keep it as is */ }
+      }
+      setRecordedBlob(blob)
       setPhase('done')
     }
 
@@ -164,22 +174,32 @@ function RecordAudio({ onRecorded, onClose }) {
     }
   }, [openMic])
 
-  const handleUseClip = useCallback(() => {
-    if (!recordedBlob) return
+  const handleUseClip = useCallback(async () => {
+    if (!recordedBlob || adding) return
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
     const type = recordedBlob.type || 'audio/webm'
     const file = new File([recordedBlob], `Recording_${timestamp}.${recordingExtension(type)}`, { type: type.split(';')[0] })
     // Browser recordings carry no length of their own: the recorder's clock
     // stands in until the file is measured
     file._durationHint = durationRef.current
-    onRecorded([file])
-    onClose()
-  }, [recordedBlob, onRecorded, onClose])
+    // Adding measures and places the take: keep the dialog up with a spinner
+    // until it's on the track
+    setAdding(true)
+    playbackRef.current?.pause?.()
+    try {
+      await onRecorded([file])
+      onClose()
+    } catch {
+      setAdding(false)
+      setError('Could not add the recording. Please try again.')
+    }
+  }, [recordedBlob, adding, onRecorded, onClose])
 
   const handleClose = useCallback(() => {
+    if (adding) return
     stopEverything()
     onClose()
-  }, [stopEverything, onClose])
+  }, [adding, stopEverything, onClose])
 
   // Playback: the file has no duration of its own, so measure it before the
   // player shows (otherwise its bar grows while it plays)
@@ -248,8 +268,14 @@ function RecordAudio({ onRecorded, onClose }) {
               {phase === 'ready' && (
                 <div className="record-loading">Ready to record: speak to check your level</div>
               )}
+              {phase === 'preparing' && (
+                <div className="record-loading record-busy"><Loader2 size={16} className="encoding-notice-spin" /> Preparing your recording...</div>
+              )}
               {phase === 'done' && (
                 <audio ref={playbackRef} controls className={previewReady ? '' : 'record-audio-loading'} />
+              )}
+              {adding && (
+                <div className="record-loading record-busy" role="status"><Loader2 size={16} className="encoding-notice-spin" /> Adding to your tracks...</div>
               )}
             </div>
           )}
@@ -272,13 +298,13 @@ function RecordAudio({ onRecorded, onClose }) {
 
           {phase === 'done' && (
             <>
-              <button className="record-retake-btn" onClick={handleRetake}>
+              <button className="record-retake-btn" onClick={handleRetake} disabled={adding}>
                 <RotateCcw size={14} />
                 <span>Retake</span>
               </button>
-              <button className="record-use-btn" onClick={handleUseClip}>
-                <Check size={14} />
-                <span>Use Recording</span>
+              <button className="record-use-btn" onClick={handleUseClip} disabled={adding}>
+                {adding ? <Loader2 size={14} className="encoding-notice-spin" /> : <Check size={14} />}
+                <span>{adding ? 'Adding...' : 'Use Recording'}</span>
               </button>
             </>
           )}
