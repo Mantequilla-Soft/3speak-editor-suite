@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useMemo, useState } from 'react'
-import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, ArrowDownWideNarrow } from 'lucide-react'
+import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, ArrowDownWideNarrow, HelpCircle } from 'lucide-react'
 import { useFFmpeg } from './hooks/useFFmpeg'
 import { useCanvasExport } from './hooks/useCanvasExport'
 import { useTimeline } from './hooks/useTimeline'
@@ -15,7 +15,7 @@ import ClipProperties from './components/ClipProperties'
 import ExportButton from './components/ExportButton'
 import RecordVideo from './components/RecordVideo'
 import RecordAudio from './components/RecordAudio'
-import OnboardingTour from './components/OnboardingTour'
+import OnboardingTour, { AUDIO_TOUR_STEPS } from './components/OnboardingTour'
 import RemixModePicker from './components/RemixModePicker'
 import MusicLibrary from './components/MusicLibrary'
 import { REMIX_LAYOUTS, hasLayout, clampLayout } from './utils/remixLayout'
@@ -235,9 +235,18 @@ function App() {
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
 
+  // First visit: the shorts editor and the audio editor each show their own
+  // tour once (separate keys, so seeing one doesn't skip the other). Storage
+  // can throw in a sandboxed iframe: then the tour just shows.
+  const tourKey = isAudioMode ? '3speak-audio-tour-done' : '3speak-tour-done'
   const [showTour, setShowTour] = useState(() => {
-    return compactMode && !localStorage.getItem('3speak-tour-done')
+    if (!isAudioMode && !compactMode) return false
+    try { return !localStorage.getItem(tourKey) } catch { return true }
   })
+  const finishTour = () => {
+    try { localStorage.setItem(tourKey, '1') } catch { /* storage blocked */ }
+    setShowTour(false)
+  }
   const [showBackendInfo, setShowBackendInfo] = useState(false)
   const [selectedBackendUrl, setSelectedBackendUrl] = useState('')
 
@@ -1176,6 +1185,11 @@ function App() {
                 <span className="branding-info-popup">Backend: {selectedBackendUrl || 'selecting...'}</span>
               )}
             </span>
+            {audioMode && (
+              <button className="branding-help-btn" onClick={() => setShowTour(true)} title="Show the tour again" aria-label="Show the tour again">
+                <HelpCircle size={15} />
+              </button>
+            )}
           </div>
           <DraftStatus drafts={drafts} canSignIn={canDraftSignIn} signInState={draftContext.reason} onSignIn={requestDraftSignIn} onOpenLimit={() => drafts.save()} />
           <button className="branding-close-btn" onClick={handleCloseEditor} title="Close editor">
@@ -1467,19 +1481,16 @@ function App() {
         )}
         </div>
 
-        {/* Onboarding Tour (the shorts editor's) */}
-        {showTour && !audioMode && (
-          <OnboardingTour onComplete={() => {
-            localStorage.setItem('3speak-tour-done', '1')
-            setShowTour(false)
-          }} />
+        {/* Onboarding Tour (the shorts editor's, or the audio editor's) */}
+        {showTour && (
+          <OnboardingTour steps={audioMode ? AUDIO_TOUR_STEPS : undefined} onComplete={finishTour} />
         )}
 
         {/* Remix mode picker (whole video arriving from the remix button) */}
         {remixPrompt && !showTour && <RemixModePicker onChoose={handleRemixChoice} />}
         {rejectedFiles.length > 0 && <TooLargeNotice files={rejectedFiles} onClose={dismissRejectedFiles} />}
         {lengthNotice && !remixPrompt && !showTour && <LengthLimitNotice length={lengthNotice.length} onClose={dismissLengthNotice} />}
-        {drafts.prompt && drafts.drafts?.length > 0 && (
+        {drafts.prompt && !showTour && drafts.drafts?.length > 0 && (
           <DraftsPrompt drafts={drafts.drafts} limits={drafts.limits} onLoad={drafts.loadDraft} onStartNew={drafts.startNew} />
         )}
         {limitOpen && drafts.limitProjects.length > 0 && (

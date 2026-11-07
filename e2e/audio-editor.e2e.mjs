@@ -113,13 +113,23 @@ const step = async (name, fn) => {
 
 const browser = await chromium.launch({ executablePath: CHROME, args: ['--autoplay-policy=no-user-gesture-required'] })
 const consoleErrors = []
-async function openEditor({ file = 'speech.wav', viewport = { width: 1280, height: 860 }, mode = 'audio' } = {}) {
+// tourSeen: act as a returning user (the first-visit tours are already done),
+// so the tour overlay doesn't sit on top of the controls the steps click.
+async function openEditor({ file = 'speech.wav', viewport = { width: 1280, height: 860 }, mode = 'audio', tourSeen = true } = {}) {
   const ctx = await browser.newContext({ viewport })
   const page = await ctx.newPage()
   page.on('console', m => { if (m.type() === 'error') consoleErrors.push(m.text()) })
   page.on('pageerror', e => consoleErrors.push(`pageerror: ${e.message}`))
   page.on('response', r => { if (r.status() >= 400 && !/favicon/.test(r.url())) consoleErrors.push(`HTTP ${r.status()} ${r.request().method()} ${r.url()}`) })
   await page.addInitScript((s) => { window.__session = s }, session)
+  if (tourSeen) {
+    await page.addInitScript((origin) => {
+      if (location.href.startsWith(origin)) {
+        localStorage.setItem('3speak-audio-tour-done', '1')
+        localStorage.setItem('3speak-tour-done', '1')
+      }
+    }, EDITOR)
+  }
   await page.goto(`${HOST}/index.html?editor=${encodeURIComponent(EDITOR)}${file ? `&file=${file}` : ''}&mode=${mode}`)
   const frame = await until(async () => page.frames().find(f => f.url().startsWith(EDITOR)), 'editor frame')
   await until(() => page.evaluate(() => window.__messages.some(m => m.type === 'editor-ready')), 'editor-ready')
@@ -135,6 +145,31 @@ try {
   })
 
   const { page, frame } = first
+  await step('first visit: the audio tour walks through the tools, is remembered, and the ? button shows it again', async () => {
+    const t = await openEditor({ file: null, tourSeen: false })
+    const tip = t.frame.locator('.tour-tooltip')
+    await tip.waitFor({ timeout: 15000 })
+    assert.match(await tip.locator('.tour-tooltip-title').innerText(), /Welcome to the Audio Editor/)
+    const titles = []
+    for (let i = 0; i < 20; i++) {
+      titles.push(await tip.locator('.tour-tooltip-title').innerText())
+      const next = tip.locator('.tour-next-btn')
+      const last = /Got it/.test(await next.innerText())
+      await next.click()
+      if (last) break
+    }
+    for (const want of ['Cut silences', 'Your template', 'Level and duck', 'Chapters', 'Export']) assert.ok(titles.includes(want), `tour step ${want} in ${titles.join(', ')}`)
+    await until(async () => (await t.frame.locator('.tour-overlay').count()) === 0, 'tour closed')
+    assert.equal(await t.frame.evaluate(() => localStorage.getItem('3speak-audio-tour-done')), '1')
+    // the shorts editor's tour is a separate flag: seeing this one doesn't skip it
+    assert.equal(await t.frame.evaluate(() => localStorage.getItem('3speak-tour-done')), null)
+    await t.frame.locator('.branding-help-btn').click()
+    await tip.waitFor({ timeout: 5000 })
+    await tip.locator('.tour-skip-btn').click()
+    await until(async () => (await t.frame.locator('.tour-overlay').count()) === 0, 'tour skipped')
+    await t.ctx.close()
+  })
+
   await step('audio layout: Audio Editor branding, Voice + Music tracks, no video tools', async () => {
     await frame.getByText('Audio Editor').first().waitFor()
     assert.ok(await frame.getByRole('button', { name: /Cut silences/ }).isVisible())
