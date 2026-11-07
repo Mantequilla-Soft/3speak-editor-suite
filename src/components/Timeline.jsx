@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo, memo } from 'react'
-import { Trash2, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker } from 'lucide-react'
+import { Trash2, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker, Maximize2 } from 'lucide-react'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 import { getGroupColor } from '../hooks/useTimeline'
 import { MAX_TIMELINE_SECONDS } from '../utils/limits'
@@ -7,10 +7,22 @@ import { timelineBeats } from '../utils/beatDetect'
 import { getPeaks, peaksForRange } from '../utils/peakCache'
 
 function formatTime(seconds) {
-  const mins = Math.floor(seconds / 60)
-  const secs = Math.floor(seconds % 60)
-  return `${mins}:${secs.toString().padStart(2, '0')}`
+  const s = Math.floor(seconds)
+  const h = Math.floor(s / 3600)
+  const mins = Math.floor((s % 3600) / 60)
+  const secs = String(s % 60).padStart(2, '0')
+  return h ? `${h}:${String(mins).padStart(2, '0')}:${secs}` : `${Math.floor(s / 60)}:${secs}`
 }
+
+// Waveform bars per clip: a long podcast clip zoomed in would otherwise be
+// tens of thousands of elements; past this the bars just get wider
+const MAX_WAVE_BARS = 3000
+// Ruler steps (seconds); the first that keeps labels this far apart is used
+const RULER_STEPS = [1, 2, 5, 10, 15, 30, 60, 120, 300, 600, 900, 1800, 3600]
+const RULER_MIN_GAP_PX = 56
+export const rulerInterval = (pxPerSecond) => RULER_STEPS.find(s => s * pxPerSecond >= RULER_MIN_GAP_PX) || 7200
+// Zoom range in px per second: the audio editor zooms out to a 3-hour show
+export const zoomRange = (audioMode) => (audioMode ? { min: 0.05, max: 200 } : { min: 10, max: 200 })
 
 // Generate a stable pseudo-random sequence based on a seed (fallback)
 function seededRandom(seed) {
@@ -178,20 +190,21 @@ const TimelineClip = memo(function TimelineClip({
   }, [isVideo, clip.url, clip.duration, clip.startTime, clip.endTime])
 
   // Waveform data: try real audio, fall back to generated
-  const barCount = useMemo(() => Math.max(3, Math.floor(clipWidth / 6)), [clipWidth])
+  const barCount = useMemo(() => Math.min(MAX_WAVE_BARS, Math.max(3, Math.floor(clipWidth / 6))), [clipWidth])
   // The file's peaks, decoded once and shared by all its clips (utils/peakCache)
   const [peakEnvelope, setPeakEnvelope] = useState(null)
 
   useEffect(() => {
     if (!isAudio || !clip.url) return
     let cancelled = false
-    getPeaks(clip.url).then(env => {
+    // the backend measures files this browser cannot decode (once uploaded)
+    getPeaks(clip.url, { analysisUrl: clip.serverUrl || null }).then(env => {
       if (cancelled) return
       if (env) setPeakEnvelope(env)
       else setWaveformFailed(true)
     })
     return () => { cancelled = true }
-  }, [isAudio, clip.url])
+  }, [isAudio, clip.url, clip.serverUrl])
 
   // This clip's own stretch of the file (trim / zoom only re-read it)
   const realWaveform = useMemo(
@@ -455,7 +468,7 @@ const TimelineClip = memo(function TimelineClip({
       >
         {isAudio ? (
           <div className="clip-waveform">
-            <div className="waveform-visual">
+            <div className={`waveform-visual${barCount >= MAX_WAVE_BARS ? ' wave-wide' : ''}`}>
               {waveformBars.map((height, i) => (
                 <div key={i} className="wave-bar" style={{ height: `${height}%` }} />
               ))}
@@ -593,8 +606,10 @@ function Timeline({
   onUpdateTrack,
   onAutoCut,
   onBeatSync,
-  isDesktop
+  isDesktop,
+  audioMode = false
 }) {
+  const { min: MIN_ZOOM, max: MAX_ZOOM } = zoomRange(audioMode)
   const [zoom, setZoom] = useState(33) // pixels per second
   const [isDraggingPlayhead, setIsDraggingPlayhead] = useState(false)
   const [showAddMenu, setShowAddMenu] = useState(false)
@@ -792,7 +807,7 @@ function Timeline({
   // Generate ruler marks - memoized to avoid recreating on every render
   const rulerMarks = useMemo(() => {
     const marks = []
-    const interval = zoom >= 80 ? 1 : zoom >= 40 ? 2 : zoom >= 20 ? 5 : 10
+    const interval = audioMode ? rulerInterval(zoom) : (zoom >= 80 ? 1 : zoom >= 40 ? 2 : zoom >= 20 ? 5 : 10)
     for (let t = 0; t <= totalDuration; t += interval) {
       marks.push(
         <div
@@ -814,10 +829,23 @@ function Timeline({
       }
     }
     return marks
-  }, [zoom, totalDuration, pixelsPerSecond, tracks])
+  }, [zoom, totalDuration, pixelsPerSecond, tracks, audioMode])
 
-  const handleZoomIn = () => setZoom(z => Math.min(200, z * 1.5))
-  const handleZoomOut = () => setZoom(z => Math.max(10, z / 1.5))
+  const handleZoomIn = () => setZoom(z => Math.min(MAX_ZOOM, z * 1.5))
+  const handleZoomOut = () => setZoom(z => Math.max(MIN_ZOOM, z / 1.5))
+
+  // Audio editor: "Fit" shows the whole show; it also fits by itself when the
+  // first recording lands (a 1-hour file at the shorts zoom is 120,000 px wide)
+  const fitToView = useCallback(() => {
+    const width = (timelineContentRef.current?.clientWidth || 600) - 24
+    setZoom(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, width / Math.max(1, maxClipEnd))))
+  }, [maxClipEnd, MIN_ZOOM, MAX_ZOOM])
+  const hadContentRef = useRef(false)
+  useEffect(() => {
+    if (!audioMode) return
+    if (maxClipEnd > 0 && !hadContentRef.current) fitToView()
+    hadContentRef.current = maxClipEnd > 0
+  }, [audioMode, maxClipEnd > 0]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Ctrl+= zoom in, Ctrl+- zoom out
   useEffect(() => {
@@ -856,9 +884,9 @@ function Timeline({
     const dy = e.touches[0].clientY - e.touches[1].clientY
     const distance = Math.hypot(dx, dy)
     const scale = distance / pinchRef.current.initialDistance
-    const newZoom = Math.min(200, Math.max(10, pinchRef.current.initialZoom * scale))
+    const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, pinchRef.current.initialZoom * scale))
     setZoom(newZoom)
-  }, [])
+  }, [MIN_ZOOM, MAX_ZOOM])
 
   const handleTouchEnd = useCallback(() => {
     pinchRef.current.active = false
@@ -974,9 +1002,11 @@ function Timeline({
           </button>
           {showAddMenu && (
             <div className="add-menu-dropdown">
-              <button onClick={() => { onAddTrack && onAddTrack('video'); setShowAddMenu(false) }}>
-                <Film size={14} /> Video Track
-              </button>
+              {!audioMode && (
+                <button onClick={() => { onAddTrack && onAddTrack('video'); setShowAddMenu(false) }}>
+                  <Film size={14} /> Video Track
+                </button>
+              )}
               <button onClick={() => { onAddTrack && onAddTrack('audio'); setShowAddMenu(false) }}>
                 <Music size={14} /> Audio Track
               </button>
@@ -999,15 +1029,35 @@ function Timeline({
           )}
         </div>
         <div className="toolbar-center">
-          <input
-            type="range"
-            className="zoom-slider"
-            min={10}
-            max={200}
-            value={zoom}
-            onChange={(e) => setZoom(Number(e.target.value))}
-            title={`Zoom: ${Math.round(zoom)}px/s`}
-          />
+          {audioMode ? (
+            <>
+              {/* log scale: 0.05 to 200 px/s is too wide a range for a linear slider */}
+              <input
+                type="range"
+                className="zoom-slider"
+                min={Math.log(MIN_ZOOM)}
+                max={Math.log(MAX_ZOOM)}
+                step={0.01}
+                value={Math.log(zoom)}
+                onChange={(e) => setZoom(Math.exp(Number(e.target.value)))}
+                title={`Zoom: ${zoom < 1 ? zoom.toFixed(2) : Math.round(zoom)}px/s`}
+                aria-label="Zoom"
+              />
+              <button className="action-btn zoom-fit-btn" onClick={fitToView} disabled={maxClipEnd <= 0} title="Show the whole timeline">
+                <Maximize2 size={14} /> <span>Fit</span>
+              </button>
+            </>
+          ) : (
+            <input
+              type="range"
+              className="zoom-slider"
+              min={10}
+              max={200}
+              value={zoom}
+              onChange={(e) => setZoom(Number(e.target.value))}
+              title={`Zoom: ${Math.round(zoom)}px/s`}
+            />
+          )}
         </div>
         <div className="toolbar-right">
           <button
@@ -1178,7 +1228,7 @@ function Timeline({
 
           {/* Audio track labels */}
           {audioTracks.map((track, index) => (
-            <div key={track.id} className={`track-label audio${track.muted ? ' track-muted' : ''}`}>
+            <div key={track.id} className={`track-label audio${track.muted ? ' track-muted' : ''}`} title={track.name} aria-label={track.name}>
               <div className="track-label-top">
                 <Music size={16} title={track.name} />
                 {onUpdateTrack && (
@@ -1232,7 +1282,7 @@ function Timeline({
                       ref={el => { trackFileInputRefs.current[track.id] = el }}
                       type="file"
                       multiple
-                      accept="audio/*"
+                      accept={audioMode ? 'audio/*,video/*' : 'audio/*'}
                       style={{ display: 'none' }}
                       onChange={(e) => handleTrackFileChange(e, track.id)}
                     />

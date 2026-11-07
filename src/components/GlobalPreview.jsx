@@ -3,13 +3,12 @@ import { Play, Pause, SkipBack, Minus, Plus, Maximize, Minimize2, Repeat } from 
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 
 function formatTime(seconds) {
-  const mins = Math.floor(seconds / 60)
-  const secs = Math.floor(seconds % 60)
-  return `${mins}:${secs.toString().padStart(2, '0')}`
+  const s = Math.floor(seconds)
+  const h = Math.floor(s / 3600)
+  const mins = Math.floor((s % 3600) / 60)
+  const secs = String(s % 60).padStart(2, '0')
+  return h ? `${h}:${String(mins).padStart(2, '0')}:${secs}` : `${Math.floor(s / 60)}:${secs}`
 }
-
-// clip volume 0..100 -> element volume. 0 is silent: `volume || 100` used to play it at full volume.
-const clipVol = clip => Math.min(1, Math.max(0, (Number.isFinite(+clip.volume) ? +clip.volume : 100) / 100))
 
 const SIZES = ['small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge', 'huge', 'massive', 'giant', 'max', 'fullscreen']
 const UI_UPDATE_INTERVAL = 50 // ~20fps for React state updates during playback
@@ -58,6 +57,8 @@ function hideUntilPositioned(el) {
 }
 
 import InlineRecorder from './InlineRecorder'
+import AudioStage from './AudioStage'
+import { clipGainAt } from '../utils/audioGain'
 import { clipColorFilter } from './ClipColorFilters'
 import { motionStyle, normalizeMotion, pivotPoint } from '../utils/stickerMotion'
 import usePhoneLayout from '../hooks/usePhoneLayout'
@@ -135,7 +136,7 @@ function FitTextBox({ measureKey, children, ...rest }) {
   return <span ref={ref} {...rest}>{children}</span>
 }
 
-function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVideo, activeAspectRatio, aspectRatioOverride, onSetAspectRatio, selectedClipId, onUpdateClip, onSelectClip, compact, inlineRecording, onRecordedInline, onCloseInlineRecorder, recorderSize, onSetRecorderSize, recorderGuide, onChangeRemixMode, onChangeStageLayout, controlRef, emptyActions }) {
+function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVideo, activeAspectRatio, aspectRatioOverride, onSetAspectRatio, selectedClipId, onUpdateClip, onSelectClip, compact, inlineRecording, onRecordedInline, onCloseInlineRecorder, recorderSize, onSetRecorderSize, recorderGuide, onChangeRemixMode, onChangeStageLayout, controlRef, emptyActions, audioMode = false }) {
   const videoRefs = useRef({}) // Map of clip ID to video element
   // Sticker motion: the layer container (= the frame) and the moving clips,
   // which the playback loop moves every frame (React renders only ~20/s)
@@ -490,10 +491,10 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       const audioEl = audioRefs.current[clip.id]
       if (audioEl) {
         audioEl.muted = false
-        audioEl.volume = clipVol(clip)
+        audioEl.volume = clipGainAt(clip, playheadPosition)
       }
     })
-  }, [currentClips, currentAudioClips, isPlaying])
+  }, [currentClips, currentAudioClips, isPlaying]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle playback — ref-driven animation loop
   useEffect(() => {
@@ -563,7 +564,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       const audioEl = audioRefs.current[clip.id]
       if (audioEl) {
         audioEl.muted = false
-        audioEl.volume = clipVol(clip)
+        audioEl.volume = clipGainAt(clip, playbackPosRef.current)
         const mediaTime = latestRef.current.getMediaTime(clip, playbackPosRef.current)
         audioEl.currentTime = mediaTime
         audioEl.play().catch(() => {})
@@ -707,7 +708,8 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         if (!audioEl) return
         const inRange = newPosition >= clip.timelineStart && newPosition < clip.timelineEnd
         if (inRange) {
-          audioEl.volume = clipVol(clip)
+          // volume and fades, every frame (a fade is a ramp, not a step)
+          audioEl.volume = clipGainAt(clip, newPosition)
           if (audioEl.paused) {
             audioEl.currentTime = gmt(clip, newPosition)
             audioEl.play().catch(() => {})
@@ -763,7 +765,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         const audioEl = audioRefs.current[clip.id]
         if (audioEl) {
           audioEl.muted = false
-          audioEl.volume = clipVol(clip)
+          audioEl.volume = clipGainAt(clip, playbackPosRef.current)
           const mt = getMediaTime(clip, playbackPosRef.current)
           audioEl.currentTime = mt
           audioEl.play().catch(() => {})
@@ -1218,7 +1220,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   ) : null
 
   return (
-    <div ref={previewContainerRef} className={`global-preview${stage ? ` remix-stage remix-stage-${recorderGuide.mode}` : ''}${compact ? ` compact-global-preview compact-${compactSize}` : ` size-${size}`}${isVerticalVideo ? ' vertical-video' : ''} aspect-${activeAspectRatio?.replace(':', '-') || '16-9'}`}>
+    <div ref={previewContainerRef} className={`global-preview${audioMode ? ' audio-mode' : ''}${stage ? ` remix-stage remix-stage-${recorderGuide.mode}` : ''}${compact ? ` compact-global-preview compact-${compactSize}` : ` size-${size}`}${isVerticalVideo ? ' vertical-video' : ''} aspect-${activeAspectRatio?.replace(':', '-') || '16-9'}`}>
       {!compact && (
         <div className="global-preview-header">
           <h3>Timeline Preview</h3>
@@ -1244,7 +1246,16 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       <div className={`global-preview-video-wrap${inlineRecording && recSize === 'big' ? ' with-big-recorder' : ''}${inlineRecording && recSize === 'big' && !hasAnyVideo ? ' no-preview' : ''}${isVerticalVideo ? ' vertical-layout' : ''}`}>
         <PreviewColumn own={ownPlayer} controls={ownControls}>
         <div className="global-preview-video">
-          {videoClips.length > 0 ? (
+          {audioMode ? (
+            <AudioStage
+              tracks={tracks}
+              playheadPosition={playheadPosition}
+              totalDuration={totalDuration}
+              onSeek={(pos) => { if (isPlayingRef.current) playFrom(pos); else seekTo(pos) }}
+              nowPlaying={currentAudioClips.filter(c => !c.templateRole).map(c => c.name).join(' + ') || currentAudioClips.map(c => c.name).join(' + ')}
+              emptyActions={emptyActions}
+            />
+          ) : videoClips.length > 0 ? (
             <div className="preview-layer-container" ref={layerContainerRef}>
               {currentClips.length > 0 ? (
                 [...heldClips, ...reversedClips, ...upcomingClips].map((clip) => {
@@ -1653,7 +1664,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         <span className="time-display">
           {formatTime(playheadPosition)} / {formatTime(totalDuration)}
         </span>
-        {compact && (
+        {compact && !audioMode && (
           <div className="compact-size-controls">
             <button
               className={compactSize === 'half' ? 'active' : ''}

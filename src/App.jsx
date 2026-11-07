@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useMemo, useState } from 'react'
-import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music } from 'lucide-react'
+import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2 } from 'lucide-react'
 import { useFFmpeg } from './hooks/useFFmpeg'
 import { useCanvasExport } from './hooks/useCanvasExport'
 import { useTimeline } from './hooks/useTimeline'
@@ -22,7 +22,13 @@ import { REMIX_LAYOUTS, hasLayout, clampLayout } from './utils/remixLayout'
 import { MAX_TIMELINE_SECONDS, MAX_TIMELINE_ADJ, MAX_TIMELINE_TEXT, getTimelineEnd } from './utils/limits'
 import LengthLimitNotice from './components/LengthLimitNotice'
 import TooLargeNotice from './components/TooLargeNotice'
-import SilenceCutModal from './components/SilenceCutModal'
+import SilenceCutModal, { loadSettings as loadAutoCutSettings } from './components/SilenceCutModal'
+import AudioTemplateDialog from './components/AudioTemplateDialog'
+import { useAudioTemplate } from './hooks/useAudioTemplate'
+import { applyAudioTemplate, removeAudioTemplate, appliedRoles, hasSlots } from './utils/audioTemplate'
+import { loadLoudness, planCuts } from './utils/silenceDetect'
+import { isAudioMode } from './utils/editorMode'
+import { audioFileName } from './utils/audioTemplate'
 import BeatSyncModal from './components/BeatSyncModal'
 import StickerPicker from './components/StickerPicker'
 import EncodingNotice from './components/EncodingNotice'
@@ -30,6 +36,14 @@ import ClipColorFilters from './components/ClipColorFilters'
 import { DraftsPrompt, DraftLimitPicker, CloseDialog, DraftStatus } from './components/DraftsDialogs'
 import { useDrafts } from './hooks/useDrafts'
 import logo3speak from './assets/3speak.png'
+
+// Audio editor: the talking = clips on audio tracks that are not music and not template parts
+function voiceClipsOf(list) {
+  return list
+    .filter(t => t.type === 'audio' && !t.music && t.muted !== true)
+    .flatMap(t => t.clips)
+    .filter(c => !c.templateRole && c.audioEnabled !== false)
+}
 
 function App() {
   const { ffmpeg, loaded, loading, progress, exporting, exportProgress, loadFFmpeg, processVideo } = useFFmpeg()
@@ -73,6 +87,8 @@ function App() {
     splitClip,
     splitClipAtPlayhead,
     applySilenceCut,
+    applyTracks,
+    uploadFileToServer,
     removeGapAtPlayhead,
     isPlayheadOnGap,
     groupClips,
@@ -116,7 +132,10 @@ function App() {
   const handleAutoCutApply = useCallback((parts, options) => {
     applySilenceCut(autoCutClipId, parts, options)
     setAutoCutClipId(null)
+    refitTemplateRef.current?.()
   }, [applySilenceCut, autoCutClipId])
+  // (refitTemplate is defined further down, with the template)
+  const refitTemplateRef = useRef(null)
 
   // Beat sync popup (audio clips): same way of reading the clip's audio as Auto cut
   const [beatClipId, setBeatClipId] = useState(null)
@@ -133,6 +152,18 @@ function App() {
   // The timeline may run long while editing; rendering waits until it fits
   const timelineEnd = useMemo(() => getTimelineEnd(tracks), [tracks])
   const overLengthLimit = timelineEnd > MAX_TIMELINE_SECONDS + 0.01
+
+  // The audio editor (?mode=audio): podcasts, music, voice. Same timeline and
+  // tools; an audio stage instead of the picture, MP3 out, a template.
+  const audioMode = isAudioMode
+  // Finishing settings of the audio editor (sent with the render, kept in drafts)
+  const [master, setMaster] = useState({ loudness: true })
+  // Name of the show: the first recording's name (the MP3's title and file name)
+  const audioTitle = useMemo(() => {
+    if (!audioMode) return null
+    const first = tracks.filter(t => t.type === 'audio' && !t.music).flatMap(t => t.clips).find(c => !c.templateRole)
+    return first ? String(first.name || '').replace(/^Part \d+ · /, '').replace(/\.[a-z0-9]{2,4}$/i, '').trim() || null : null
+  }, [audioMode, tracks])
 
   // Locked to 9:16 for shorts
   const activeAspectRatio = '9:16'
@@ -161,7 +192,7 @@ function App() {
     remixSource,
     remixPrompt,
     clearRemixPrompt
-  } = useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay })
+  } = useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay, audioMode, master, title: audioTitle })
 
   // Apply theme to document on mount and changes
   useEffect(() => {
@@ -418,8 +449,8 @@ function App() {
         }
       }
 
-      // T - add text clip
-      if (e.key === 't' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+      // T - add text clip (shorts only)
+      if (!audioMode && e.key === 't' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
         e.preventDefault()
         addTextClip()
       }
@@ -442,7 +473,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [selectedClipId, handleRemoveClip, splitClipAtPlayhead, undo, redo, setPlayheadPosition, ungroupClips, duplicateClip, isPlayheadOnGap, removeGapAtPlayhead, addTextClip])
+  }, [selectedClipId, handleRemoveClip, splitClipAtPlayhead, undo, redo, setPlayheadPosition, ungroupClips, duplicateClip, isPlayheadOnGap, removeGapAtPlayhead, addTextClip, audioMode])
 
   // Prevent external file drops anywhere except the project library
   useEffect(() => {
@@ -771,6 +802,22 @@ function App() {
     </div>
   )
 
+  // Audio editor, empty: add a recording, record one, or start from music
+  const emptyAudioActions = (
+    <div className="empty-timeline-actions">
+      <button type="button" onClick={() => emptyAudioInputRef.current?.click()}>
+        <Upload size={22} /> <span>Add recording</span>
+      </button>
+      <button type="button" onClick={() => setRecordingAudioOpen(true)}>
+        <Mic size={22} /> <span>Record</span>
+      </button>
+      <button type="button" onClick={() => setMusicOpen(true)}>
+        <Music size={22} /> <span>Music</span>
+      </button>
+      <input ref={emptyAudioInputRef} type="file" accept="audio/*,video/*" multiple hidden onChange={(e) => addFilesFromEmpty(e, 'audio')} />
+    </div>
+  )
+
   // Uploads still running in the background; Render waits for them
   const activeUpload = useMemo(() => {
     const uploading = library.filter(item => item.uploading)
@@ -801,15 +848,115 @@ function App() {
   }, [addToLibrary])
 
   // Drafts (saved projects of signed-in users, see hooks/useDrafts.js)
+  // A draft opened (not a new recording): its own template parts and settings stay as saved
+  const draftLoadedRef = useRef(false)
+  const loadSavedProject = useCallback((state) => {
+    draftLoadedRef.current = true
+    loadProjectState(state)
+    if (state?.master) setMaster({ loudness: state.master.loudness !== false })
+  }, [loadProjectState])
   const drafts = useDrafts({
     session: draftSession,
     hasMedia: draftContext.hasMedia,
     tracks,
     library,
-    loadProjectState,
-    onUnauthorized: requestDraftSignIn
+    loadProjectState: loadSavedProject,
+    onUnauthorized: requestDraftSignIn,
+    mode: audioMode ? 'audio' : 'video',
+    master: audioMode ? master : null
   })
   const canDraftSignIn = isIframe && !draftSession && ['sign-in-needed', 'sign-in-failed', 'signing-in'].includes(draftContext.reason)
+
+  // ---- Audio editor: template, Cut silences for every voice clip ----
+  const audioTemplate = useAudioTemplate({ session: draftSession, enabled: audioMode })
+  const [templateOpen, setTemplateOpen] = useState(false)
+  const [templateNotice, setTemplateNotice] = useState(null) // roles just applied, for the notice
+  const tracksRef = useRef(tracks)
+  tracksRef.current = tracks
+
+  // Put the saved template back around the content (after cuts moved the end)
+  const refitTemplate = useCallback(() => {
+    const tpl = audioTemplate.template
+    if (!tpl || !appliedRoles(tracksRef.current).length) return
+    applyTracks(t => applyAudioTemplate(t, tpl))
+  }, [audioTemplate.template, applyTracks])
+
+  const voiceClips = useMemo(() => (audioMode ? voiceClipsOf(tracks) : []), [audioMode, tracks])
+
+  // "Cut silences" opens on the selected voice clip, else the longest one
+  const openCutSilences = useCallback(() => {
+    const sel = voiceClips.find(c => c.id === selectedClipId)
+    const target = sel || [...voiceClips].sort((a, b) => (b.endTime - b.startTime) - (a.endTime - a.startTime))[0]
+    if (target) setAutoCutClipId(target.id)
+  }, [voiceClips, selectedClipId])
+
+  // The same settings for every voice clip: last on the timeline first, so the
+  // clips still to do are not moved by the cuts before them. Each file is read once.
+  const [cutProgress, setCutProgress] = useState(null) // { done, total, failed }
+  const cutAllSilences = useCallback(async (settings) => {
+    setAutoCutClipId(null)
+    const list = voiceClipsOf(tracksRef.current).sort((a, b) => (b.timelinePosition || 0) - (a.timelinePosition || 0))
+    if (!list.length) return { cut: 0, failed: 0 }
+    const loudness = new Map()
+    let cut = 0
+    let failed = 0
+    setCutProgress({ done: 0, total: list.length, failed: 0 })
+    for (let i = 0; i < list.length; i++) {
+      const c = list[i]
+      const local = fileStoreRef.current.get(c.id) || c.file || null
+      const source = local || (isHlsUrl(c.url) ? null : c.url)
+      const key = local || c.serverUrl || c.url
+      try {
+        let loud = loudness.get(key)
+        if (!loud) {
+          loud = await loadLoudness(source || c.serverUrl, { analysisUrl: c.serverUrl || null })
+          loudness.set(key, loud)
+        }
+        const { parts } = planCuts(loud, { from: c.startTime, to: c.endTime, ...settings, mode: 'remove' })
+        const kept = parts.reduce((sum, p) => sum + (p.end - p.start), 0)
+        if (parts.length && (parts.length > 1 || kept < (c.endTime - c.startTime) - 0.05)) {
+          applySilenceCut(c.id, parts, { closeGaps: true })
+          cut++
+        }
+      } catch (err) {
+        console.warn(`[cut silences] ${c.name}: ${err.message}`)
+        failed++
+      }
+      setCutProgress({ done: i + 1, total: list.length, failed })
+    }
+    setCutProgress(failed ? { done: list.length, total: list.length, failed, finished: true } : null)
+    if (cut) refitTemplate()
+    return { cut, failed }
+  }, [applySilenceCut, refitTemplate, fileStoreRef])
+  refitTemplateRef.current = audioMode ? refitTemplate : null
+
+  // A new recording gets the template by itself (when the creator asked for that):
+  // silences cut first, then intro / outro / music bed around what is left.
+  // Not for a draft that was opened, and only once per editor session.
+  const autoTemplateRef = useRef(false)
+  const hasVoice = voiceClips.length > 0
+  useEffect(() => {
+    if (!audioMode || autoTemplateRef.current || !hasVoice) return
+    if (draftLoadedRef.current) { autoTemplateRef.current = true; return }
+    const tpl = audioTemplate.template
+    if (tpl === undefined) return // not known yet (the sign-in may still come)
+    autoTemplateRef.current = true
+    if (!tpl || tpl.autoApply === false || appliedRoles(tracksRef.current).length) return
+    ;(async () => {
+      setMaster({ loudness: tpl.master?.loudness !== false })
+      if (tpl.silence?.enabled) await cutAllSilences({ ...loadAutoCutSettings(), ...tpl.silence })
+      if (hasSlots(tpl)) {
+        applyTracks(t => applyAudioTemplate(t, tpl))
+        setTemplateNotice(Object.keys(tpl.slots || {}))
+      }
+    })()
+  }, [audioMode, hasVoice, audioTemplate.template]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const applyTemplateNow = useCallback((tpl) => {
+    applyTracks(t => applyAudioTemplate(t, tpl))
+    setMaster({ loudness: tpl.master?.loudness !== false })
+    setTemplateNotice(Object.keys(tpl.slots || {}))
+  }, [applyTracks])
   const [limitOpen, setLimitOpen] = useState(false)
   useEffect(() => {
     if (drafts.status === 'limit' && drafts.limitProjects.length) setLimitOpen(true)
@@ -885,7 +1032,8 @@ function App() {
           </div>
   ) : null
 
-  if (compactMode) {
+  // The audio editor only exists in the compact layout
+  if (compactMode || audioMode) {
     return (
       <div className={`app compact${isDesktop ? ' desktop' : ''}`}>
         <ClipColorFilters tracks={tracks} />
@@ -901,7 +1049,7 @@ function App() {
         <header className="app-branding">
           <div className="branding-left">
             <img src={logo3speak} alt="3Speak" className="branding-logo" />
-            <span className="branding-text">Shorts Editor <span className="branding-badge">beta</span></span>
+            <span className="branding-text">{audioMode ? 'Audio Editor' : 'Shorts Editor'} <span className="branding-badge">beta</span></span>
             <span className="branding-info" onClick={() => setShowBackendInfo(prev => !prev)}>
               <Info size={14} />
               {showBackendInfo && (
@@ -939,11 +1087,11 @@ function App() {
             <button
               className={renderStatus?.status === 'completed' ? 'compact-download-btn' : 'compact-render-btn'}
               onClick={() => { clearRenderStatus(); requestRender() }}
-              disabled={videoClips.length === 0 || (exporting || canvasExporting) || isBackendRendering || overLengthLimit || !!activeUpload}
-              title={overLengthLimit ? `Trim the timeline to ${MAX_TIMELINE_TEXT} or less to render` : undefined}
+              disabled={(audioMode ? audioClips.length === 0 : videoClips.length === 0) || (exporting || canvasExporting) || isBackendRendering || overLengthLimit || !!activeUpload || !!cutProgress}
+              title={overLengthLimit ? `Trim the timeline to ${MAX_TIMELINE_TEXT} or less to ${audioMode ? 'export' : 'render'}` : undefined}
             >
-              <Clapperboard size={14} />
-              <span>{isBackendRendering ? 'Rendering...' : activeUpload ? `Uploading ${Math.round(activeUpload.progress * 100)}%` : renderStatus?.status === 'completed' ? 'Re-render' : 'Render'}</span>
+              {audioMode ? <AudioWaveform size={14} /> : <Clapperboard size={14} />}
+              <span>{isBackendRendering ? (audioMode ? 'Exporting...' : 'Rendering...') : activeUpload ? `Uploading ${Math.round(activeUpload.progress * 100)}%` : renderStatus?.status === 'completed' ? (audioMode ? 'Export again' : 'Re-render') : (audioMode ? 'Export' : 'Render')}</span>
             </button>
             {renderStatus?.status === 'completed' && renderStatus.outputUrl && (
               <>
@@ -963,15 +1111,73 @@ function App() {
                     onClick={() => setShowPreview(true)}
                   >
                     <Send size={14} />
-                    <span>Send Video</span>
+                    <span>{audioMode ? 'Use this audio' : 'Send Video'}</span>
                   </button>
                 )}
               </>
             )}
           </div>
           <div className="compact-menu-right">
+            {audioMode && (
+              <>
+                <button
+                  className="compact-btn compact-tool-btn"
+                  onClick={openCutSilences}
+                  disabled={!voiceClips.length || !!cutProgress}
+                  title="Cut the silences out (find the pauses, cut them, close the gaps)"
+                  aria-label="Cut silences"
+                >
+                  <AudioWaveform size={15} /><span>Cut silences</span>
+                </button>
+                <button
+                  className={`compact-btn compact-tool-btn${appliedRoles(tracks).length ? ' active' : ''}`}
+                  onClick={() => setTemplateOpen(true)}
+                  title="Your template: intro, outro and music bed for every recording"
+                  aria-label="Template"
+                >
+                  <LayoutTemplate size={15} /><span>Template</span>
+                </button>
+                <button
+                  className={`compact-btn compact-tool-btn${master.loudness ? ' active' : ''}`}
+                  onClick={() => setMaster(m => ({ ...m, loudness: !m.loudness }))}
+                  aria-pressed={master.loudness}
+                  aria-label="Level loudness"
+                  title={master.loudness ? 'Loudness levelling is on: the export is levelled to -16 LUFS (podcast standard)' : 'Loudness levelling is off: the export keeps your levels'}
+                >
+                  <Gauge size={15} /><span>{master.loudness ? 'Level: on' : 'Level: off'}</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
+
+        {/* Audio editor: Cut silences over every voice clip */}
+        {cutProgress && (
+          <div className="compact-render-progress audio-cut-progress" role="status">
+            {cutProgress.finished ? (
+              <>
+                <span className="compact-render-progress-text">
+                  {cutProgress.failed} clip{cutProgress.failed === 1 ? '' : 's'} could not be read{activeUpload ? ' yet: try again when the upload is done' : ''}. The others were cut.
+                </span>
+                <button className="compact-btn" onClick={() => setCutProgress(null)} title="Dismiss"><X size={12} /></button>
+              </>
+            ) : (
+              <>
+                <Loader2 size={14} className="encoding-notice-spin" />
+                <span className="compact-render-progress-text">Cutting silences: clip {cutProgress.done} of {cutProgress.total}</span>
+              </>
+            )}
+          </div>
+        )}
+        {templateNotice && (
+          <div className="compact-render-progress audio-template-notice" role="status">
+            <span className="compact-render-progress-text">
+              Template applied: {templateNotice.map(r => ({ intro: 'intro', outro: 'outro', bed: 'music bed' }[r])).filter(Boolean).join(', ')}.
+            </span>
+            <button className="compact-btn" onClick={() => { applyTracks(t => removeAudioTemplate(t)); setTemplateNotice(null) }}>Take it off</button>
+            <button className="compact-btn" onClick={() => setTemplateNotice(null)} title="Dismiss"><X size={12} /></button>
+          </div>
+        )}
 
         {/* Render progress bar (shown below menu bar when active) */}
         {isBackendRendering && (
@@ -1000,7 +1206,8 @@ function App() {
         <div className={`compact-workspace${isDesktop ? ' desktop' : ''}`}>
         <div className="compact-main">
         <GlobalPreview
-          emptyActions={emptyTimelineActions}
+          emptyActions={audioMode ? emptyAudioActions : emptyTimelineActions}
+          audioMode={audioMode}
           tracks={tracks}
           playheadPosition={playheadPosition}
           onSetPlayhead={setPlayheadPosition}
@@ -1040,8 +1247,8 @@ function App() {
             onGroupClips={groupClips}
             onUngroupClips={ungroupClips}
             onAddTrack={addTrack}
-            onAddTextClip={addTextClip}
-            onAddColorClip={addColorClip}
+            onAddTextClip={audioMode ? undefined : addTextClip}
+            onAddColorClip={audioMode ? undefined : addColorClip}
             onRemoveTrack={handleRemoveTrack}
             onLibraryDrop={handleTimelineDrop}
             onMoveClipToTrack={moveClipToTrack}
@@ -1050,13 +1257,14 @@ function App() {
             onRecordAudio={() => setRecordingAudioOpen(true)}
             onOpenMusic={() => setMusicOpen(true)}
             onOpenSfx={() => setSfxOpen(true)}
-            onOpenStickers={() => setStickersOpen(true)}
-            onRecordVideo={openRecorder}
-            onReverseClip={handleReverseClip}
+            onOpenStickers={audioMode ? undefined : () => setStickersOpen(true)}
+            onRecordVideo={audioMode ? undefined : openRecorder}
+            onReverseClip={audioMode ? undefined : handleReverseClip}
             onUpdateTrack={updateTrack}
             onAutoCut={setAutoCutClipId}
             onBeatSync={setBeatClipId}
             isDesktop={isDesktop}
+            audioMode={audioMode}
           />
 
           {/* Reversing overlay */}
@@ -1083,8 +1291,8 @@ function App() {
         )}
         </div>
 
-        {/* Onboarding Tour */}
-        {showTour && (
+        {/* Onboarding Tour (the shorts editor's) */}
+        {showTour && !audioMode && (
           <OnboardingTour onComplete={() => {
             localStorage.setItem('3speak-tour-done', '1')
             setShowTour(false)
@@ -1138,9 +1346,30 @@ function App() {
             key={autoCutClip.id}
             clip={autoCutClip}
             source={autoCutSource}
-            unavailable={autoCutUnavailable}
+            analysisUrl={autoCutClip.serverUrl || null}
+            unavailable={autoCutSource || autoCutClip.serverUrl ? null : autoCutUnavailable}
             onApply={handleAutoCutApply}
+            onApplyAll={audioMode ? cutAllSilences : null}
+            allCount={audioMode && voiceClips.some(c => c.id === autoCutClip.id) ? voiceClips.length : 0}
             onClose={() => setAutoCutClipId(null)}
+          />
+        )}
+
+        {templateOpen && (
+          <AudioTemplateDialog
+            template={audioTemplate.template || null}
+            selectedClip={selectedClip}
+            uploadFile={uploadFileToServer}
+            signedIn={audioTemplate.enabled}
+            canSignIn={canDraftSignIn || (isIframe && draftContext.reason === 'unavailable')}
+            onSignIn={requestDraftSignIn}
+            silenceSettings={(() => { const st = loadAutoCutSettings(); return { thresholdDb: st.thresholdDb, minSilence: st.minSilence, keepStartMs: st.keepStartMs, keepEndMs: st.keepEndMs } })()}
+            master={master}
+            saving={audioTemplate.status === 'saving'}
+            onSave={async (tpl) => { const r = await audioTemplate.save(tpl); if (r.ok) setTemplateOpen(false) }}
+            onApply={async (tpl) => { const r = await audioTemplate.save(tpl); if (r.ok) { setTemplateOpen(false); applyTemplateNow(r.template) } }}
+            onRemove={async () => { await audioTemplate.remove(); setTemplateOpen(false) }}
+            onClose={() => setTemplateOpen(false)}
           />
         )}
 
@@ -1195,19 +1424,23 @@ function App() {
           <div className="video-preview-overlay">
             <div className="video-preview-modal">
               <div className="video-preview-header">
-                <h3>Preview your video</h3>
+                <h3>{audioMode ? 'Listen before you use it' : 'Preview your video'}</h3>
                 <button className="video-preview-close" onClick={() => setShowPreview(false)}>
                   <X size={18} />
                 </button>
               </div>
               <div className="video-preview-player">
-                <video
-                  src={renderStatus.outputUrl}
-                  controls
-                  autoPlay
-                  playsInline
-                  style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: 8, background: '#000' }}
-                />
+                {audioMode ? (
+                  <audio src={renderStatus.outputUrl} controls autoPlay className="audio-preview-player" />
+                ) : (
+                  <video
+                    src={renderStatus.outputUrl}
+                    controls
+                    autoPlay
+                    playsInline
+                    style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: 8, background: '#000' }}
+                  />
+                )}
               </div>
               <div className="video-preview-actions">
                 <button className="video-preview-back" onClick={() => setShowPreview(false)}>
@@ -1221,13 +1454,14 @@ function App() {
                     drafts.deleteCurrent()
                     sendToParent('post-to-3speak', {
                       outputUrl: renderStatus.outputUrl,
+                      ...(audioMode && { mediaType: 'audio', fileName: audioFileName(audioTitle), durationSec: Math.round(timelineEnd * 1000) / 1000 }),
                       ...(remixSource && { remixSource }),
                       ...(musicCredits.length > 0 && { musicCredits })
                     })
                   }}
                 >
                   <Send size={14} />
-                  <span>Send Video</span>
+                  <span>{audioMode ? 'Use this audio' : 'Send Video'}</span>
                 </button>
               </div>
             </div>

@@ -5,6 +5,7 @@ import { api, getBackendUrl } from '../utils/backendSelector'
 import { authHeaders, authFetch, dropToken } from '../utils/editorAuth'
 import { MAX_TIMELINE_SECONDS, MAX_IMPORT_BYTES, getTimelineEnd } from '../utils/limits'
 import { createSHA256 } from 'hash-wasm'
+import { isAudioMode } from '../utils/editorMode'
 
 // Upload requests (whole small files or chunks of big ones) in flight at once,
 // shared by every upload; the rest wait for a free slot. Kept under the
@@ -183,7 +184,8 @@ function probeMedia(file) {
 }
 
 function getMediaType(file) {
-  if (file.type.startsWith('video/')) return 'video'
+  // The audio editor takes a video file for its sound (an <audio> element plays it)
+  if (file.type.startsWith('video/')) return isAudioMode ? 'audio' : 'video'
   if (file.type.startsWith('audio/')) return 'audio'
   if (file.type.startsWith('image/')) return 'image'
   return null
@@ -345,15 +347,26 @@ function ensurePairedAudioTracks(tracks) {
 
 export { getGroupColor }
 
+// A new project: video + its audio for shorts; a voice track and a music track
+// for the audio editor (music tracks never pair with video, see addMusicClip)
+export function initialTracks() {
+  return isAudioMode
+    ? [
+        { id: generateTrackId(), type: 'audio', name: 'Voice', clips: [] },
+        { id: generateTrackId(), type: 'audio', name: 'Music', music: true, clips: [] }
+      ]
+    : [
+        { id: generateTrackId(), type: 'video', name: 'Video 1', clips: [] },
+        { id: generateTrackId(), type: 'audio', name: 'Audio 1', clips: [] }
+      ]
+}
+
 export function useTimeline() {
   // Library: array of { id, file, url, name, duration, type }
   const [library, setLibrary] = useState([])
 
   // Tracks: array of { id, type: 'video' | 'audio', clips: [] }
-  const [tracks, setTracks] = useState([
-    { id: generateTrackId(), type: 'video', name: 'Video 1', clips: [] },
-    { id: generateTrackId(), type: 'audio', name: 'Audio 1', clips: [] }
-  ])
+  const [tracks, setTracks] = useState(initialTracks)
   const [selectedClipId, setSelectedClipId] = useState(null)
   const [selectedLibraryId, setSelectedLibraryId] = useState(null)
 
@@ -675,7 +688,8 @@ export function useTimeline() {
     setTracksWithHistory(prev => {
       let contentEnd = 0
       for (const t of prev) {
-        if (t.type !== 'video') continue
+        // Shorts: as long as the video. Audio editor: as long as the talking.
+        if (isAudioMode ? (t.type !== 'audio' || t.music) : t.type !== 'video') continue
         for (const c of t.clips) {
           contentEnd = Math.max(contentEnd, (c.timelinePosition || 0) + (c.endTime - c.startTime))
         }
@@ -732,7 +746,7 @@ export function useTimeline() {
   const loadProjectState = useCallback((state) => {
     const nextTracks = Array.isArray(state?.tracks) && state.tracks.length
       ? state.tracks
-      : [{ id: generateTrackId(), type: 'video', name: 'Video 1', clips: [] }, { id: generateTrackId(), type: 'audio', name: 'Audio 1', clips: [] }]
+      : initialTracks()
     historyRef.current = [JSON.parse(JSON.stringify(nextTracks))]
     historyIndexRef.current = 0
     setTracks(nextTracks)
@@ -897,7 +911,9 @@ export function useTimeline() {
 
     lengthCheckRef.current = true
     setTracksWithHistory(prev => {
-      const targetTrack = prev.find(t => t.type === targetTrackType)
+      // Audio goes on the first track that is not a music track (the voice)
+      const targetTrack = (targetTrackType === 'audio' && prev.find(t => t.type === 'audio' && !t.music)) ||
+        prev.find(t => t.type === targetTrackType)
       if (!targetTrack) return prev
 
       // Place at the end of existing clips on this track
@@ -969,6 +985,21 @@ export function useTimeline() {
 
       return updatedTracks
     })
+
+    // The audio editor's file (from 3Speak): upload it now, in the background, so
+    // drafts, the template, server analysis and the render have it
+    if (options.file && mediaType === 'audio' && !options.serverUrl) {
+      const patchItem = (fields) => setLibrary(prev => prev.map(i => (i.id === libraryId ? { ...i, ...fields } : i)))
+      patchItem({ uploading: true, uploadProgress: 0 })
+      uploadFileToServer(options.file, item.name, (p) => patchItem({ uploadProgress: p })).then(info => {
+        patchItem({ uploading: false, uploadProgress: 1, serverUrl: info.url })
+        applyServerUrl(libraryId, info.url)
+        afterUpload(libraryId, { duration, durationKnown: !!duration, playable: true }, info)
+      }, err => {
+        console.warn(`[load-media] Upload failed: ${err.message}`)
+        patchItem({ uploading: false, uploadError: err.message })
+      })
+    }
 
     // The creator's own file (from the 3Speak uploader): if this browser cannot
     // show it, upload it now so its 480p copy can stand in for the preview
@@ -2179,6 +2210,9 @@ export function useTimeline() {
     ungroupClips,
     getTotalDuration,
     applySilenceCut,
+    // Replace the tracks with fn(tracks) as one undo step (the audio template)
+    applyTracks: setTracksWithHistory,
+    uploadFileToServer,
     addSfxClip,
     addStickerClip,
     fitClipsToBeats,

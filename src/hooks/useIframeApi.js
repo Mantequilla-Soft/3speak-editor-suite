@@ -9,7 +9,7 @@ import { normalizeMotion } from '../utils/stickerMotion'
 const isIframe = typeof window !== 'undefined' && window.parent !== window
 const GATEWAY_URL = (import.meta.env.VITE_GATEWAY_URL || '').replace(/\/+$/, '')
 
-export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay }) {
+export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay, audioMode = false, master = null, title = null }) {
   const parentOriginRef = useRef('*')
   const [renderStatus, setRenderStatus] = useState(null)
   const [theme, setTheme] = useState('dark')
@@ -165,8 +165,10 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     // this, since an older editor would ignore the file and open empty.
     // `canSaveDrafts`: the parent may send a drafts session and must ask
     // (request-close) before closing; an older editor gets the plain confirm.
-    sendToParent('editor-ready', { canLoadFile: true, canSaveDrafts: true })
-  }, [sendToParent])
+    // `mode` / `canEditAudio`: this is the audio editor (opened with ?mode=audio);
+    // it answers "Use this audio" with post-to-3speak { mediaType: 'audio' }.
+    sendToParent('editor-ready', { canLoadFile: true, canSaveDrafts: true, ...(audioMode ? { mode: 'audio', canEditAudio: true } : {}) })
+  }, [sendToParent, audioMode])
 
   // Abort an active render job
   const abortActiveJob = useCallback(() => {
@@ -317,6 +319,11 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
           audioEnabled: clip.audioEnabled !== false,
           volume: Number.isFinite(+clip.volume) ? +clip.volume : 100 // 0 is a real setting (silent), not "unset"
         }
+        // Fades of audio clips (the backend's afade), seconds
+        if (clip.type === 'audio') {
+          if (+clip.fadeIn > 0) baseClip.fadeIn = +clip.fadeIn
+          if (+clip.fadeOut > 0) baseClip.fadeOut = +clip.fadeOut
+        }
         if (hasLayout(clip)) baseClip.layout = clip.layout
 
         // Colour adjustments (utils/clipColor.js), same maths as the preview
@@ -417,6 +424,19 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
       })
     }))
 
+    // The audio editor renders an MP3 of the audio tracks (backend audioRender.js)
+    if (audioMode) {
+      return {
+        timeline: {
+          output: 'audio',
+          tracks: trackData.filter(t => t.type === 'audio'),
+          master: { loudness: master?.loudness !== false },
+          ...(title ? { title: String(title).slice(0, 120) } : {})
+        },
+        mediaUrls
+      }
+    }
+
     // Output dimensions based on aspect ratio
     let outputWidth = 1280
     let outputHeight = 720
@@ -448,7 +468,7 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
       },
       mediaUrls
     }
-  }, [tracks, uploadFile, activeAspectRatio])
+  }, [tracks, uploadFile, activeAspectRatio, audioMode, master, title])
 
   // Poll job status
   const pollJobStatus = useCallback((jobId, backendEndpoint) => {
@@ -467,8 +487,9 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
         const data = await res.json()
 
         if (data.status === 'completed') {
-          // Build full URL from the backend that rendered it
-          const base = backendEndpoint || window.location.origin
+          // Build full URL from the backend that rendered it (no gateway: the
+          // selected backend, not this page's own origin)
+          const base = backendEndpoint || getBackendUrl() || window.location.origin
           const fullUrl = new URL(data.outputUrl, base).href
           setRenderStatus({ ...data, outputUrl: fullUrl })
           clearInterval(pollIntervalRef.current)

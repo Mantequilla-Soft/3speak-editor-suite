@@ -218,6 +218,45 @@ const NOISE_LEVELS = [
  * uploaded file (POST /api/clip/denoise) and the clip switches to the cleaned
  * audio, so preview and render both play it. Off switches back.
  */
+// Fade in / out of an audio clip (seconds): the render's afade, previewed as a
+// volume ramp (utils/audioGain.js). A fade never runs longer than the clip.
+const FADE_MAX = 10
+function FadeControls({ clip, onUpdateClip }) {
+  const length = Math.max(0, clip.endTime - clip.startTime)
+  const max = Math.max(0.1, Math.min(FADE_MAX, length))
+  const value = (key) => Math.min(max, Math.max(0, +clip[key] || 0))
+  const row = (key, label) => (
+    <div className="property-slider fade-slider">
+      <span className="fade-label">{label}</span>
+      <input
+        type="range"
+        min="0"
+        max={max}
+        step="0.1"
+        value={value(key)}
+        onChange={(e) => onUpdateClip({ [key]: Math.round(parseFloat(e.target.value) * 10) / 10 })}
+        aria-label={`${label} (seconds)`}
+      />
+      <span>{value(key).toFixed(1)}s</span>
+    </div>
+  )
+  const any = value('fadeIn') > 0 || value('fadeOut') > 0
+  return (
+    <div className="property-group">
+      <label>
+        Fades
+        {any && (
+          <button className="prop-reset-btn" onClick={() => onUpdateClip({ fadeIn: 0, fadeOut: 0 })} title="No fades">
+            <RotateCcw size={10} />
+          </button>
+        )}
+      </label>
+      {row('fadeIn', 'In')}
+      {row('fadeOut', 'Out')}
+    </div>
+  )
+}
+
 function NoiseControls({ clip, onUpdateClip }) {
   const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
@@ -1033,6 +1072,8 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
               </div>
             )
           })()}
+
+          {isAudio && <FadeControls clip={clip} onUpdateClip={onUpdateClip} />}
 
           {isAudio && <NoiseControls clip={clip} onUpdateClip={onUpdateClip} />}
         </div>

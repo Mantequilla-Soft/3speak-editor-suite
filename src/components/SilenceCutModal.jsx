@@ -4,15 +4,20 @@ import { loadLoudness, planCuts, planSceneCuts, suggestThreshold } from '../util
 import { api } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
 import { formatLength } from '../utils/limits'
+import { isAudioMode } from '../utils/editorMode'
 
-const SETTINGS_KEY = 'autocut-settings'
-const DEFAULTS = { cutAt: 'pauses', mode: 'split', thresholdDb: -40, minSilence: 0.6, minPart: 3, keepStartMs: 150, keepEndMs: 150, sensitivity: 70 }
+// The audio editor keeps its own settings: there "Cut silences" means cutting
+// the pauses out (podcasts), with a little more air around the words
+const SETTINGS_KEY = isAudioMode ? 'autocut-settings-audio' : 'autocut-settings'
+const DEFAULTS = isAudioMode
+  ? { cutAt: 'pauses', mode: 'remove', thresholdDb: -40, minSilence: 0.8, minPart: 3, keepStartMs: 200, keepEndMs: 200, sensitivity: 70 }
+  : { cutAt: 'pauses', mode: 'split', thresholdDb: -40, minSilence: 0.6, minPart: 3, keepStartMs: 150, keepEndMs: 150, sensitivity: 70 }
 const SCENE_MAX = 40 // top of the scene-score graph (hard cuts score ~20-40)
 // Sensitivity 0..100 -> scene score a change needs to count as a cut
 const sceneThreshold = (sensitivity) => 52 - sensitivity / 2
 const DB_MIN = -70 // bottom of the preview graph
 
-function loadSettings() {
+export function loadSettings() {
   try {
     return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') }
   } catch {
@@ -40,7 +45,7 @@ const seconds = (s) => (s < 10 ? s.toFixed(1) : String(Math.round(s))) + 's'
  * Play / scrub use the clip's own (playable) URL; in "cut pauses out" mode the
  * playback skips what would be cut, so the result can be heard first.
  */
-function SilenceCutModal({ clip, source, unavailable, onApply, onClose }) {
+function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onApply, onApplyAll = null, allCount = 0, onClose }) {
   const [loudness, setLoudness] = useState(null)
   const [error, setError] = useState(unavailable || null)
   const [settings, setSettings] = useState(loadSettings)
@@ -59,18 +64,20 @@ function SilenceCutModal({ clip, source, unavailable, onApply, onClose }) {
   const scrubbingRef = useRef(false)
 
   useEffect(() => {
-    if (unavailable || !source) return
+    if (unavailable || !(source || analysisUrl)) return
     const controller = new AbortController()
-    loadLoudness(source, { signal: controller.signal })
+    loadLoudness(source || analysisUrl, { signal: controller.signal, analysisUrl })
       .then(l => { if (!controller.signal.aborted) setLoudness(l) })
       .catch(err => {
         if (controller.signal.aborted) return
         setError(err.message === 'too-large'
-          ? 'This file is too big to analyse in the browser (over 300 MB). Trim it or use a smaller file.'
+          ? (analysisUrl
+            ? 'Could not read the audio of this clip.'
+            : 'This file is too big to analyse in the browser (over 300 MB). It can be analysed once it has finished uploading.')
           : 'Could not read the audio of this clip.')
       })
     return () => controller.abort()
-  }, [source, unavailable])
+  }, [source, analysisUrl, unavailable])
 
   useEffect(() => { saveSettings(settings) }, [settings])
 
@@ -319,7 +326,7 @@ function SilenceCutModal({ clip, source, unavailable, onApply, onClose }) {
       >
         <div className="remix-picker-header">
           <span className="remix-picker-icon-spacer" />
-          <h3 id="silence-cut-title">Auto cut</h3>
+          <h3 id="silence-cut-title">{isAudioMode ? 'Cut silences' : 'Auto cut'}</h3>
           <button className="remix-picker-icon-btn" onClick={onClose} title="Close">
             <X size={16} />
           </button>
@@ -482,12 +489,22 @@ function SilenceCutModal({ clip, source, unavailable, onApply, onClose }) {
 
         <div className="silence-cut-actions">
           <button className="silence-cut-cancel" onClick={onClose}>Cancel</button>
+          {onApplyAll && allCount > 1 && !scenesMode && (
+            <button
+              className="silence-cut-apply silence-cut-apply-all"
+              disabled={!loudness}
+              onClick={() => onApplyAll(settings)}
+              title="The same settings for every clip on the voice tracks (music stays as it is)"
+            >
+              <Wand2 size={14} /> Cut all {allCount} voice clips
+            </button>
+          )}
           <button
             className="silence-cut-apply"
             disabled={!canApply}
             onClick={() => onApply(plan.parts, { closeGaps: true })}
           >
-            <Wand2 size={14} /> Edit for me
+            <Wand2 size={14} /> {allCount > 1 ? 'This clip only' : 'Edit for me'}
           </button>
         </div>
       </div>

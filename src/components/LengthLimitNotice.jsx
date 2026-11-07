@@ -1,5 +1,6 @@
 import { X } from 'lucide-react'
 import { MAX_TIMELINE_SECONDS, MAX_TIMELINE_TEXT, formatLength } from '../utils/limits'
+import { isAudioMode } from '../utils/editorMode'
 
 /**
  * Shown after an import leaves the timeline longer than a short may be.
@@ -23,8 +24,8 @@ function LengthLimitNotice({ length, onClose }) {
           </button>
         </div>
         <p className="length-notice-text">
-          A short can be at most {MAX_TIMELINE_TEXT}. You can keep editing the full footage,
-          but Render stays off until the timeline ends at the marked {formatLength(MAX_TIMELINE_SECONDS)} line.
+          {isAudioMode ? 'An export' : 'A short'} can be at most {MAX_TIMELINE_TEXT}. You can keep editing everything,
+          but {isAudioMode ? 'Export' : 'Render'} stays off until the timeline ends at the marked {formatLength(MAX_TIMELINE_SECONDS)} line.
           Trim, split or delete clips to get there.
         </p>
         <button className="length-notice-ok" onClick={onClose} autoFocus>Got it</button>
