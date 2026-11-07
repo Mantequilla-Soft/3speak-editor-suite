@@ -1,0 +1,34 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>3Speak host (e2e)</title>
+<style>html,body{margin:0;height:100%}iframe{border:0;width:100%;height:100%}</style></head>
+<body>
+<iframe id="ed" allow="cross-origin-isolated; microphone"></iframe>
+<script>
+// Plays the 3Speak side of the audio editor contract (EditorModal):
+// opens ?compact=true&mode=audio, answers editor-ready with a drafts session,
+// loads a File, and records everything the editor posts.
+const params = new URLSearchParams(location.search)
+const EDITOR = params.get('editor')
+const FILE = params.get('file') // e.g. speech.wav, or none
+window.__messages = []
+const ed = document.getElementById('ed')
+ed.src = params.get('mode') === 'video' ? `${EDITOR}/?compact=true` : `${EDITOR}/?compact=true&mode=audio`
+const send = (m) => ed.contentWindow.postMessage(m, new URL(EDITOR).origin)
+window.__send = send
+window.addEventListener('message', async (e) => {
+  if (e.origin !== new URL(EDITOR).origin || e.data?.source !== '3speak-editor') return
+  window.__messages.push(e.data)
+  if (e.data.type === 'editor-ready') {
+    send({ type: 'set-theme', theme: 'dark' })
+    send({ type: 'set-desktop', isDesktop: true })
+    send({ type: 'drafts-session', session: window.__session || null, reason: window.__session ? null : 'logged-out', hasMedia: !!FILE })
+    if (FILE) {
+      const blob = await (await fetch(FILE)).blob()
+      send({ type: 'load-media', file: new File([blob], FILE, { type: 'audio/wav' }), name: FILE, mediaType: 'audio' })
+    }
+  }
+  if (e.data.type === 'drafts-sign-in') send({ type: 'drafts-session', session: window.__session, reason: null, hasMedia: !!FILE })
+  if (e.data.type === 'request-close' || e.data.type === 'editor-closed') window.__closed = true
+})
+</script>
+</body></html>

@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e:audio": "node e2e/audio-editor.e2e.mjs"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.10",

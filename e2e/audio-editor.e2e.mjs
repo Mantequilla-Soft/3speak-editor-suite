@@ -1,0 +1,290 @@
+// End-to-end test of the audio editor (?mode=audio) in a real browser, against
+// a real editor backend, opened the way 3Speak opens it (e2e/host.html plays the
+// 3Speak side of the postMessage contract). It checks what the editor really
+// saves (drafts and template on the backend), renders (an MP3) and posts back.
+//
+// Self-contained: it makes its own test audio (ffmpeg), starts the backend on a
+// free port with throwaway folders and a throwaway token secret, builds the
+// editor against it, serves editor and host page, and cleans everything up.
+//
+//   npm run test:e2e:audio          (needs ffmpeg + ffprobe on PATH, and Chromium:
+//   E2E_CHROME=/path/to/chrome      defaults to Playwright's chromium-1148)
+import { createRequire } from 'node:module'
+import crypto from 'node:crypto'
+import fs from 'node:fs'
+import http from 'node:http'
+import net from 'node:net'
+import os from 'node:os'
+import path from 'node:path'
+import { execFileSync, spawn } from 'node:child_process'
+import assert from 'node:assert/strict'
+
+const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..')
+const require = createRequire(path.join(ROOT, 'backend', 'package.json'))
+const { chromium } = require('playwright-core')
+const CHROME = process.env.E2E_CHROME || path.join(os.homedir(), '.cache/ms-playwright/chromium-1148/chrome-linux/chrome')
+
+const S = fs.mkdtempSync(path.join(os.tmpdir(), 'audio-editor-e2e-'))
+const DATA = path.join(S, 'data')
+const HOST_DIR = path.join(S, 'host')
+for (const d of ['uploads', 'rendered', 'work']) fs.mkdirSync(path.join(DATA, d), { recursive: true })
+fs.mkdirSync(HOST_DIR)
+fs.copyFileSync(path.join(ROOT, 'e2e', 'host.html'), path.join(HOST_DIR, 'index.html'))
+const ff = (args) => execFileSync('ffmpeg', ['-loglevel', 'error', '-y', ...args])
+// speech-like: 1 s tone, 1.5 s silence, 2 s tone, 2 s silence, 1 s tone (7.5 s)
+ff(['-f', 'lavfi', '-i', 'sine=f=300:d=1', '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=mono:d=1.5', '-f', 'lavfi', '-i', 'sine=f=350:d=2',
+  '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=mono:d=2', '-f', 'lavfi', '-i', 'sine=f=400:d=1',
+  '-filter_complex', '[0:a][1:a][2:a][3:a][4:a]concat=n=5:v=0:a=1,volume=6dB', '-ar', '44100', path.join(HOST_DIR, 'speech.wav')])
+ff(['-f', 'lavfi', '-i', 'sine=f=800:d=2', '-ar', '44100', path.join(HOST_DIR, 'intro.wav')])
+ff(['-f', 'lavfi', '-i', 'sine=f=600:d=1.5', '-ar', '44100', path.join(HOST_DIR, 'outro.wav')])
+ff(['-f', 'lavfi', '-i', 'anoisesrc=d=5:c=pink:a=0.3', '-ar', '44100', path.join(HOST_DIR, 'bed.wav')])
+
+const freePort = () => new Promise((resolve) => { const s = net.createServer().listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => resolve(p)) }) })
+const [BACKEND_PORT, HOST_PORT, EDITOR_PORT] = [await freePort(), await freePort(), await freePort()]
+const BACKEND = `http://127.0.0.1:${BACKEND_PORT}`
+const HOST = `http://127.0.0.1:${HOST_PORT}`
+const EDITOR = `http://127.0.0.1:${EDITOR_PORT}`
+const SECRET = crypto.randomBytes(24).toString('hex') // this run only
+const USER = 'e2etester'
+
+const children = []
+const backend = spawn(process.execPath, ['src/index.js'], {
+  cwd: path.join(ROOT, 'backend'),
+  env: { ...process.env, PORT: String(BACKEND_PORT), EDITOR_TOKEN_SECRET: SECRET, UPLOAD_DIR: path.join(DATA, 'uploads'), UPLOADS_DIR: path.join(DATA, 'uploads'), RENDERED_DIR: path.join(DATA, 'rendered'), WORK_DIR: path.join(DATA, 'work') },
+  stdio: ['ignore', 'ignore', 'inherit']
+})
+children.push(backend)
+execFileSync('npx', ['vite', 'build', '--outDir', path.join(S, 'dist'), '--emptyOutDir', '--logLevel', 'error'], {
+  cwd: ROOT, stdio: 'inherit', env: { ...process.env, VITE_BACKEND_URLS: BACKEND, VITE_GATEWAY_URL: '' }
+})
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.wav': 'audio/wav', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.wasm': 'application/wasm' }
+const serve = (dir, port, spa) => new Promise((resolve) => {
+  const server = http.createServer((req, res) => {
+    let file = path.join(dir, decodeURIComponent(new URL(req.url, 'http://x').pathname))
+    if (!file.startsWith(dir)) { res.writeHead(403).end(); return }
+    if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) file = spa ? path.join(dir, 'index.html') : file
+    if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.writeHead(404).end(); return }
+    res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream' })
+    fs.createReadStream(file).pipe(res)
+  }).listen(port, '127.0.0.1', () => resolve(server))
+})
+const servers = [await serve(HOST_DIR, HOST_PORT, false), await serve(path.join(S, 'dist'), EDITOR_PORT, true)]
+
+const mint = () => {
+  const mid = Buffer.from(JSON.stringify({ u: USER, pro: false, exp: Date.now() + 3600e3 })).toString('base64url')
+  return `v1.${mid}.${crypto.createHmac('sha256', SECRET).update(mid).digest('hex')}`
+}
+const session = { token: mint(), user: USER, pro: false, maxProjects: 1, ttlHours: 168 }
+const sleep = (ms) => new Promise(r => setTimeout(r, ms))
+async function until(fn, what, ms = 30000) {
+  const end = Date.now() + ms
+  for (;;) {
+    const v = await fn()
+    if (v) return v
+    if (Date.now() > end) throw new Error(`timed out: ${what}`)
+    await sleep(250)
+  }
+}
+await until(async () => { try { return (await fetch(`${BACKEND}/api/health`)).ok } catch { return false } }, 'backend up', 20000)
+const projectsDir = path.join(DATA, 'uploads', '.projects', USER)
+const drafts = () => (fs.existsSync(projectsDir) ? fs.readdirSync(projectsDir).filter(f => f.endsWith('.json')).map(f => JSON.parse(fs.readFileSync(path.join(projectsDir, f), 'utf8'))) : [])
+const templateFile = path.join(DATA, 'uploads', '.templates', USER, 'audio.json')
+const clipsOf = (state) => state.tracks.flatMap(t => t.clips.map(c => ({ ...c, track: t.name, music: !!t.music })))
+const ffDuration = (file) => +execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', file], { encoding: 'utf8' }).trim()
+
+const results = []
+const step = async (name, fn) => {
+  const t0 = Date.now()
+  try {
+    await fn()
+    results.push(['PASS', name, Date.now() - t0])
+    console.log(`PASS ${name} (${Date.now() - t0} ms)`)
+  } catch (err) {
+    results.push(['FAIL', name, err.message])
+    console.log(`FAIL ${name}: ${err.stack || err.message}`)
+    throw err
+  }
+}
+
+const browser = await chromium.launch({ executablePath: CHROME, args: ['--autoplay-policy=no-user-gesture-required'] })
+const consoleErrors = []
+async function openEditor({ file = 'speech.wav', viewport = { width: 1280, height: 860 }, mode = 'audio' } = {}) {
+  const ctx = await browser.newContext({ viewport })
+  const page = await ctx.newPage()
+  page.on('console', m => { if (m.type() === 'error') consoleErrors.push(m.text()) })
+  page.on('pageerror', e => consoleErrors.push(`pageerror: ${e.message}`))
+  page.on('response', r => { if (r.status() >= 400 && !/favicon/.test(r.url())) consoleErrors.push(`HTTP ${r.status()} ${r.request().method()} ${r.url()}`) })
+  await page.addInitScript((s) => { window.__session = s }, session)
+  await page.goto(`${HOST}/index.html?editor=${encodeURIComponent(EDITOR)}${file ? `&file=${file}` : ''}&mode=${mode}`)
+  const frame = await until(async () => page.frames().find(f => f.url().startsWith(EDITOR)), 'editor frame')
+  await until(() => page.evaluate(() => window.__messages.some(m => m.type === 'editor-ready')), 'editor-ready')
+  return { ctx, page, frame }
+}
+
+try {
+  let first
+  await step('editor-ready announces the audio editor (mode, canEditAudio, canLoadFile, canSaveDrafts)', async () => {
+    first = await openEditor()
+    const ready = await first.page.evaluate(() => window.__messages.find(m => m.type === 'editor-ready'))
+    assert.deepEqual({ mode: ready.mode, canEditAudio: ready.canEditAudio, canLoadFile: ready.canLoadFile, canSaveDrafts: ready.canSaveDrafts }, { mode: 'audio', canEditAudio: true, canLoadFile: true, canSaveDrafts: true })
+  })
+
+  const { page, frame } = first
+  await step('audio layout: Audio Editor branding, Voice + Music tracks, no video tools', async () => {
+    await frame.getByText('Audio Editor').first().waitFor()
+    assert.ok(await frame.getByRole('button', { name: /Cut silences/ }).isVisible())
+    assert.ok(await frame.getByRole('button', { name: /Template/ }).isVisible())
+    assert.equal(await frame.getByRole('button', { name: 'Level loudness' }).getAttribute('aria-pressed'), 'true')
+    assert.match(await frame.getByRole('button', { name: 'Level loudness' }).innerText(), /Level: on/)
+    const labels = await frame.locator('.track-label').evaluateAll(els => els.map(e => e.getAttribute('aria-label')))
+    assert.deepEqual(labels, ['Voice', 'Music'])
+    assert.equal(await frame.locator('.track-label:not(.audio)').count(), 0, 'no video track')
+    await frame.locator('.audio-stage-lane-name').first().waitFor()
+    assert.deepEqual(await frame.locator('.audio-stage-lane-name').allInnerTexts(), ['Voice', 'Music'])
+  })
+
+  await step('the loaded recording lands on the Voice track, uploads, and autosaves as an audio draft', async () => {
+    await until(async () => (await frame.locator('.timeline-clip-v2.audio').count()) === 1, 'one clip on the timeline')
+    await frame.locator('.audio-stage canvas').waitFor()
+    const d = await until(() => drafts().find(p => clipsOf(p.state).some(c => /\/api\/upload\/files\//.test(c.url))), 'draft with uploaded clip', 45000)
+    assert.equal(d.mode, 'audio')
+    assert.equal(d.state.mode, 'audio')
+    assert.deepEqual(d.state.master, { loudness: true })
+    const clips = clipsOf(d.state)
+    assert.equal(clips.length, 1)
+    assert.equal(clips[0].track, 'Voice')
+    assert.ok(Math.abs((clips[0].endTime - clips[0].startTime) - 7.5) < 0.1, `length ${clips[0].endTime - clips[0].startTime}`)
+  })
+
+  await step('Cut silences cuts the pauses out and closes the gaps (7.5 s -> about 4.6 s)', async () => {
+    await frame.getByRole('button', { name: /Cut silences/ }).click()
+    await frame.getByRole('dialog', { name: 'Cut silences' }).waitFor()
+    await until(async () => /cuts/.test(await frame.locator('.silence-cut-summary').innerText().catch(() => '')), 'cut plan summary')
+    await frame.getByRole('button', { name: /Edit for me|This clip only/ }).click()
+    await until(async () => (await frame.locator('.timeline-clip-v2.audio').count()) === 3, 'three speech parts')
+    const d = await until(() => drafts().find(p => clipsOf(p.state).length === 3), 'draft with 3 parts')
+    const clips = clipsOf(d.state).sort((a, b) => a.timelinePosition - b.timelinePosition)
+    const total = clips.reduce((s, c) => s + (c.endTime - c.startTime), 0)
+    assert.ok(total > 4.2 && total < 5.2, `kept ${total.toFixed(2)} s`)
+    // packed back to back
+    for (let i = 1; i < clips.length; i++) {
+      const prevEnd = clips[i - 1].timelinePosition + (clips[i - 1].endTime - clips[i - 1].startTime)
+      assert.ok(Math.abs(clips[i].timelinePosition - prevEnd) < 0.01, 'no gap between parts')
+    }
+  })
+
+  await step('Template: intro, outro and music bed saved for good, applied around the recording', async () => {
+    await frame.getByRole('button', { name: /Template/ }).click()
+    const dialog = frame.getByRole('dialog', { name: 'Your template' })
+    await dialog.waitFor()
+    for (const [role, file] of [['intro', 'intro.wav'], ['outro', 'outro.wav'], ['bed', 'bed.wav']]) {
+      await dialog.locator(`.audio-template-slot[data-role="${role}"] input[type=file]`).setInputFiles(path.join(HOST_DIR, file))
+      await until(async () => !/None/.test(await dialog.locator(`.audio-template-slot[data-role="${role}"] .audio-template-file`).innerText()), `${role} uploaded`)
+    }
+    await dialog.getByLabel('Music bed volume').fill('15')
+    await dialog.getByText('Cut the silences out of every new recording').click()
+    await dialog.getByRole('button', { name: /Save and apply/ }).click()
+    await frame.getByText(/Template applied: intro, outro, music bed/).waitFor()
+    const tpl = JSON.parse(fs.readFileSync(templateFile, 'utf8'))
+    assert.deepEqual(Object.keys(tpl.slots).sort(), ['bed', 'intro', 'outro'])
+    assert.equal(tpl.expiresAt, undefined, 'kept for good')
+    assert.equal(tpl.slots.bed.volume, 15)
+    assert.equal(tpl.silence.enabled, true)
+    assert.equal(tpl.files.length, 3)
+    const d = await until(() => drafts().find(p => clipsOf(p.state).some(c => c.templateRole === 'outro')), 'draft with template parts')
+    const clips = clipsOf(d.state)
+    const intro = clips.find(c => c.templateRole === 'intro')
+    const outro = clips.find(c => c.templateRole === 'outro')
+    const content = clips.filter(c => !c.templateRole).sort((a, b) => a.timelinePosition - b.timelinePosition)
+    const contentEnd = content.at(-1).timelinePosition + (content.at(-1).endTime - content.at(-1).startTime)
+    assert.equal(intro.timelinePosition, 0)
+    assert.ok(Math.abs(content[0].timelinePosition - 2) < 0.02, 'content moved right by the 2 s intro')
+    assert.ok(Math.abs(outro.timelinePosition - contentEnd) < 0.02, 'outro right after the content')
+    const bed = clips.filter(c => c.templateRole === 'bed')
+    assert.ok(bed.length >= 1 && bed.every(c => c.music && c.volume === 15), 'bed on a music track at 15%')
+  })
+
+  let posted
+  await step('Export renders an MP3 (levelled) and "Use this audio" posts it back to 3Speak', async () => {
+    await frame.getByRole('button', { name: /^Export$/ }).click()
+    await frame.getByRole('button', { name: 'Use this audio' }).first().waitFor({ timeout: 90000 })
+    await frame.getByRole('button', { name: 'Use this audio' }).first().click()
+    await frame.locator('.audio-preview-player').waitFor()
+    await frame.locator('.video-preview-send').click()
+    posted = await until(() => page.evaluate(() => window.__messages.find(m => m.type === 'post-to-3speak')), 'post-to-3speak')
+    assert.equal(posted.mediaType, 'audio')
+    assert.ok(posted.outputUrl.startsWith(`${BACKEND}/rendered/`) && posted.outputUrl.endsWith('.mp3'), posted.outputUrl)
+    assert.equal(posted.fileName, 'speech.mp3')
+    const mp3 = path.join(DATA, 'rendered', path.basename(new URL(posted.outputUrl).pathname))
+    const dur = ffDuration(mp3)
+    assert.ok(Math.abs(dur - posted.durationSec) < 0.15, `mp3 ${dur} s vs reported ${posted.durationSec} s`)
+    assert.ok(Math.abs(dur - (2 + 4.6 + 1.5)) < 0.8, `intro + speech + outro, got ${dur}`)
+    // the MP3 is fetchable cross-origin, as the 3Speak page fetches it
+    const r = await page.evaluate(async (u) => { const res = await fetch(u); return { ok: res.ok, type: res.headers.get('content-type'), size: (await res.arrayBuffer()).byteLength } }, posted.outputUrl)
+    assert.ok(r.ok && /audio\/mpeg/.test(r.type) && r.size > 10000, JSON.stringify(r))
+  })
+
+  await step('sending deletes the draft (its job is done)', async () => {
+    await until(() => drafts().length === 0, 'draft deleted')
+  })
+  await first.ctx.close()
+
+  await step('a new recording gets the template by itself: silences cut, intro/outro/bed placed', async () => {
+    const second = await openEditor()
+    const f = second.frame
+    await f.getByText(/Template applied: intro, outro, music bed/).waitFor({ timeout: 30000 })
+    const d = await until(() => drafts().find(p => clipsOf(p.state).some(c => c.templateRole === 'bed') && clipsOf(p.state).filter(c => !c.templateRole && !c.music).length === 3), 'auto-applied draft', 45000)
+    const clips = clipsOf(d.state)
+    assert.equal(clips.filter(c => c.templateRole === 'intro').length, 1)
+    assert.equal(clips.filter(c => c.templateRole === 'outro').length, 1)
+    // "Take it off" restores the plain recording in one click
+    await f.getByRole('button', { name: 'Take it off' }).click()
+    await until(() => drafts().find(p => !clipsOf(p.state).some(c => c.templateRole) && clipsOf(p.state).every(c => !c.templateRole)), 'template taken off')
+    const after = drafts()[0]
+    const content = clipsOf(after.state).sort((a, b) => a.timelinePosition - b.timelinePosition)
+    assert.equal(content[0].timelinePosition, 0, 'content back at 0:00')
+    await second.ctx.close()
+  })
+
+  await step('reopening offers the audio draft and restores it', async () => {
+    const third = await openEditor({ file: null })
+    const f = third.frame
+    await f.getByText(/Continue/i).first().waitFor({ timeout: 20000 })
+    await f.locator('.drafts-item').first().click()
+    await until(async () => (await f.locator('.timeline-clip-v2.audio').count()) === 3, 'draft restored with 3 parts')
+    await third.ctx.close()
+  })
+
+  await step('phone layout: tools collapse to icons, no horizontal overflow', async () => {
+    const phone = await openEditor({ viewport: { width: 390, height: 844 } })
+    const f = phone.frame
+    await f.getByRole('button', { name: 'Cut silences' }).waitFor()
+    assert.equal(await f.locator('.compact-tool-btn span').first().isVisible(), false, 'labels hidden on phones')
+    const overflow = await f.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+    assert.ok(overflow <= 1, `page overflows by ${overflow}px`)
+    await phone.ctx.close()
+  })
+  await step('the shorts video editor is unchanged (no mode, Video 1 + Audio 1, Render, no audio tools)', async () => {
+    const v = await openEditor({ file: null, mode: 'video' })
+    const ready = await v.page.evaluate(() => window.__messages.find(m => m.type === 'editor-ready'))
+    assert.equal(ready.mode, undefined)
+    assert.equal(ready.canEditAudio, undefined)
+    await v.frame.getByText('Shorts Editor').first().waitFor()
+    assert.equal(await v.frame.getByRole('button', { name: 'Cut silences' }).count(), 0)
+    assert.equal(await v.frame.locator('.track-label:not(.audio)').count(), 1, 'a video track')
+    assert.ok(await v.frame.getByRole('button', { name: /Render/ }).isVisible())
+    await v.ctx.close()
+  })
+} finally {
+  await browser.close()
+  for (const s of servers) s.close()
+  for (const c of children) c.kill('SIGTERM')
+  fs.rmSync(S, { recursive: true, force: true })
+  // Expected: the upload's "already on the server?" check (404 = no), and the free
+  // tier's one-draft limit (409) when a later step opens a second recording
+  const relevant = consoleErrors.filter(e => !/favicon|ERR_ABORTED|net::ERR_BLOCKED|by-hash|PUT \S+\/api\/projects\/|status of (404|409)/.test(e))
+  console.log(`\nconsole errors: ${relevant.length}`)
+  for (const e of relevant.slice(0, 15)) console.log('  ' + e.slice(0, 300))
+  console.log(`\n${results.filter(r => r[0] === 'PASS').length}/${results.length} steps passed`)
+  if (relevant.length || results.some(r => r[0] === 'FAIL')) process.exitCode = 1
+}

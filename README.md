@@ -85,6 +85,26 @@ Quality presets: High (CRF 18), Medium (CRF 23), Low (CRF 28).
 - Light and dark theme support
 - Iframe embedding API with postMessage communication
 
+### Audio editor (`?mode=audio`)
+The same editor for podcasts, music and voice. 3Speak opens it from its share menu (standalone) and from the audio upload ("Edit audio" on a track).
+- **Tracks:** a Voice track and a Music track. An audio stage shows the whole show with waveforms (click to jump), up to 3 hours. "Fit" zooms out to the whole show.
+- **Cut silences:** finds the pauses and cuts them out, closing the gaps. It works on one clip or on every voice clip with the same settings. Files too big for the browser are measured by the backend (`POST /api/clip/audio-analysis`).
+- **Basic edits:** split, trim, move, delete, volume, fades in and out, noise reduction, music library and sound effects, recording.
+- **Export:** an MP3 rendered by the backend (`timeline.output: 'audio'`), levelled to -16 LUFS for podcasts (can be switched off). "Use this audio" posts `{ type: 'post-to-3speak', mediaType: 'audio', outputUrl, fileName, durationSec, musicCredits? }`.
+- **Drafts:** like the video editor's. Each editor only offers its own drafts, and the limit counts both.
+- **Template:** one per user, kept for good (`/api/templates/audio`): intro, outro and a music bed (looped under the recording, faded out at the end), plus "cut silences" and "level loudness". It is applied by itself to a new recording, and one click takes it off again.
+- **Handshake:** `editor-ready` carries `mode: 'audio'` and `canEditAudio: true`. Load a recording with `load-media { file, name, mediaType: 'audio' }`.
+
+## Tests
+
+```bash
+npm test                        # editor unit tests (Vitest)
+cd backend && npm test          # backend: routes, audio render through real ffmpeg, templates
+npm run test:e2e:audio          # the audio editor end to end in Chromium against a local backend
+```
+
+The end-to-end test needs `ffmpeg`/`ffprobe` on PATH and Chromium (`E2E_CHROME`, default Playwright's chromium-1148). It makes its own test audio, starts a backend on a free port with throwaway folders and token secret, builds the editor against it, plays the 3Speak side (`e2e/host.html`), and removes everything afterwards.
+
 ## Keyboard Shortcuts
 
 | Shortcut | Action |
