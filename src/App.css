@@ -6443,3 +6443,206 @@ input[type="range"] {
 .audio-preview-player {
   width: min(520px, 80vw);
 }
+
+/* Audio editor: chapters */
+.audio-chapters-list {
+  list-style: none;
+  margin: 0 0 0.6rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 45dvh;
+  overflow-y: auto;
+}
+
+.audio-chapters-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.audio-chapters-list li.skipped {
+  opacity: 0.5;
+}
+
+.audio-chapters-list input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.audio-chapters-time {
+  min-width: 4.2rem;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.audio-chapters-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.audio-chapters kbd {
+  padding: 0 0.3rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+/* Chapter flags on the timeline ruler and the audio stage */
+.ruler-chapter {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 2px solid var(--accent-primary);
+  z-index: 2;
+  cursor: pointer;
+}
+
+.ruler-chapter span {
+  position: absolute;
+  top: 0;
+  left: 2px;
+  max-width: 120px;
+  padding: 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.65rem;
+  line-height: 1.2;
+  color: #fff;
+  background: var(--accent-primary);
+  border-radius: 0 3px 3px 0;
+}
+
+.audio-stage-chapter {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed var(--accent-primary);
+  pointer-events: none;
+}
+
+.audio-stage-chapter span {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+}
+
+.audio-stage-chapter-now {
+  color: var(--accent-primary);
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Audio editor: the duck menu */
+.audio-duck {
+  position: relative;
+}
+
+.audio-duck-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 50;
+  min-width: 230px;
+  padding: 0.4rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.audio-duck-menu p {
+  margin: 0.2rem 0.3rem 0.4rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.audio-duck-menu button {
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.audio-duck-menu button[aria-checked='true'] {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+/* Audio editor: audiogram */
+.audiogram-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 0.7rem;
+}
+
+.audiogram-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.audiogram-field input,
+.audiogram-field select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.audiogram-preview {
+  display: block;
+  margin: 0 auto 0.7rem;
+  max-width: 100%;
+  max-height: 40dvh;
+  border-radius: 8px;
+  background: #000;
+}
+
+.audiogram a.silence-cut-apply {
+  text-decoration: none;
+}

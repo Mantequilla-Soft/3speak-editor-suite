@@ -9,6 +9,7 @@ import { projectsRouter } from './routes/projects.js'
 import { sceneRenderRouter } from './routes/sceneRender.js'
 import { adDraftsRouter } from './routes/adDrafts.js'
 import { templatesRouter } from './routes/templates.js'
+import { audiogramRouter } from './routes/audiogram.js'
 import { pinnedUploads, uploadBase } from './utils/pinnedUploads.js'
 import { RENDER_CACHE_DIR } from './services/ffmpeg.js'
 
@@ -41,6 +42,8 @@ app.use('/api/clip', clipRouter)
 app.use('/api/projects', projectsRouter)
 // The one audio template per user (intro / outro / music bed), kept for good
 app.use('/api/templates', templatesRouter)
+// Audiogram videos of an exported episode (the audio editor's share clip)
+app.use('/api/audiogram', audiogramRouter)
 
 // Ad Wizard: scene-engine docs -> silent scene video (headless Chromium), and its drafts
 app.use('/api/scene-render', sceneRenderRouter)

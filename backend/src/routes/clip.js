@@ -376,7 +376,7 @@ function runFFmpegReverse(inputUrl, outputPath, seekTime, duration, onProgress) 
 }
 
 /**
- * POST /api/clip/denoise  { url, strength: 'light' | 'medium' | 'strong' }
+ * POST /api/clip/denoise  { url, strength: 'light' | 'medium' | 'strong' | 'studio' }
  * Background-noise reduction for an uploaded clip's audio (ffmpeg afftdn, an
  * FFT noise gate that follows the noise floor, plus a gentle high-pass). `url`
  * is one of our own /api/upload/files/<name> URLs, so nothing is uploaded
@@ -387,7 +387,11 @@ function runFFmpegReverse(inputUrl, outputPath, seekTime, duration, onProgress) 
 const DENOISE = {
   light: 'highpass=f=60,afftdn=nr=8:nf=-35:tn=1',
   medium: 'highpass=f=70,afftdn=nr=14:nf=-30:tn=1',
-  strong: 'highpass=f=80,afftdn=nr=24:nf=-25:tn=1'
+  strong: 'highpass=f=80,afftdn=nr=24:nf=-25:tn=1',
+  // The audio editor's "Studio voice": noise and rumble out, less mud (250 Hz),
+  // more presence (3.5 kHz), softer S sounds, evened out (3:1 over -20 dB),
+  // a limiter so the make-up gain never clips
+  studio: 'highpass=f=80,afftdn=nr=12:nf=-30:tn=1,equalizer=f=250:t=q:w=1:g=-2,equalizer=f=3500:t=q:w=1:g=2.5,deesser=i=0.4,acompressor=threshold=0.1:ratio=3:attack=8:release=200:makeup=2,alimiter=limit=0.95:level=false'
 }
 const UPLOAD_ROOT = process.env.UPLOAD_DIR || UPLOADS_DIR
 
@@ -397,7 +401,7 @@ async function resolveUpload(url) {
   const match = String(url || '').match(/\/api\/upload\/files\/([A-Za-z0-9_.-]+?)(?:\?.*)?$/)
   if (!match) return null
   const name = path.basename(match[1])
-  const base = path.basename(name, path.extname(name)).replace(/_dn-(light|medium|strong)$/, '')
+  const base = path.basename(name, path.extname(name)).replace(/_dn-(light|medium|strong|studio)$/, '')
   for (const c of [path.join(UPLOAD_ROOT, `${base}_480p.mp4`), path.join(UPLOAD_ROOT, name)]) {
     try { await fs.access(c); return { name, base, input: c } } catch {}
   }

@@ -22,7 +22,7 @@ describe('drafts remember their editor', () => {
   it('an audio project stores mode and finishing settings; local references are dropped', () => {
     const { state, pending } = serializeProject(tracks, [], new Map(), { mode: 'audio', master: { loudness: false } })
     expect(state.mode).toBe('audio')
-    expect(state.master).toEqual({ loudness: false })
+    expect(state.master).toEqual({ loudness: false, duck: false })
     expect(pending).toBe(0)
     const a = state.tracks[0].clips.find(c => c.id === 'a')
     expect(a.url).toBe(up('a'))

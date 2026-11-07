@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useMemo, useState } from 'react'
-import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2 } from 'lucide-react'
+import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, ArrowDownWideNarrow } from 'lucide-react'
 import { useFFmpeg } from './hooks/useFFmpeg'
 import { useCanvasExport } from './hooks/useCanvasExport'
 import { useTimeline } from './hooks/useTimeline'
@@ -24,6 +24,10 @@ import LengthLimitNotice from './components/LengthLimitNotice'
 import TooLargeNotice from './components/TooLargeNotice'
 import SilenceCutModal, { loadSettings as loadAutoCutSettings } from './components/SilenceCutModal'
 import AudioTemplateDialog from './components/AudioTemplateDialog'
+import ChaptersDialog from './components/ChaptersDialog'
+import AudiogramDialog from './components/AudiogramDialog'
+import { newChapter, moveChapter, resolveChapters, chapterSpans, MAX_CHAPTERS } from './utils/chapters'
+import { duckPlan, DUCK_DEPTHS, DUCK_DEFAULT_DB } from './utils/duck'
 import { useAudioTemplate } from './hooks/useAudioTemplate'
 import { applyAudioTemplate, removeAudioTemplate, appliedRoles, hasSlots } from './utils/audioTemplate'
 import { loadLoudness, planCuts } from './utils/silenceDetect'
@@ -45,6 +49,13 @@ function voiceClipsOf(list) {
     .flatMap(t => t.clips)
     .filter(c => !c.templateRole && c.audioEnabled !== false)
 }
+
+// The audio editor's finishing settings, from a draft, a template or nothing
+const masterOf = (m) => ({
+  loudness: m?.loudness !== false,
+  duck: m?.duck === true,
+  duckDb: DUCK_DEPTHS.includes(+m?.duckDb) ? +m.duckDb : DUCK_DEFAULT_DB
+})
 
 function App() {
   const { ffmpeg, loaded, loading, progress, exporting, exportProgress, loadFFmpeg, processVideo } = useFFmpeg()
@@ -131,6 +142,9 @@ function App() {
     ? 'This clip is still streaming from 3Speak. Try again once its download has finished.'
     : null
   const autoCutOpenRef = useRef(false)
+  // Audio editor: M adds a chapter at the playhead (set further down)
+  const addChapterRef = useRef(null)
+  const playheadRef = useRef(0)
   // Audio editor: a clip grouped with other voices is cut together with them
   // (only where everyone is quiet, the same cut through every voice)
   const autoCutGroup = useMemo(() => {
@@ -167,12 +181,19 @@ function App() {
   // The timeline may run long while editing; rendering waits until it fits
   const timelineEnd = useMemo(() => getTimelineEnd(tracks), [tracks])
   const overLengthLimit = timelineEnd > MAX_TIMELINE_SECONDS + 0.01
+  playheadRef.current = playheadPosition
 
   // The audio editor (?mode=audio): podcasts, music, voice. Same timeline and
   // tools; an audio stage instead of the picture, MP3 out, a template.
   const audioMode = isAudioMode
-  // Finishing settings of the audio editor (sent with the render, kept in drafts)
-  const [master, setMaster] = useState({ loudness: true })
+  // Finishing settings of the audio editor (sent with the render, kept in drafts
+  // and in the template): loudness levelling, music ducked under the voices
+  const [master, setMaster] = useState(() => masterOf(null))
+  // Chapters (utils/chapters.js): pinned to the recording, resolved to where they are now
+  const [chapters, setChapters] = useState([])
+  const resolvedChapters = useMemo(() => (audioMode ? resolveChapters(tracks, chapters, timelineEnd) : []), [audioMode, tracks, chapters, timelineEnd])
+  const chapterList = useMemo(() => chapterSpans(resolvedChapters, timelineEnd), [resolvedChapters, timelineEnd])
+  const duck = useMemo(() => (audioMode ? duckPlan(tracks, master) : null), [audioMode, tracks, master])
   // Name of the show: the first recording's name (the MP3's title and file name)
   const audioTitle = useMemo(() => {
     if (!audioMode) return null
@@ -207,7 +228,7 @@ function App() {
     remixSource,
     remixPrompt,
     clearRemixPrompt
-  } = useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay, audioMode, master, title: audioTitle })
+  } = useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay, audioMode, master, title: audioTitle, chapters: chapterList })
 
   // Apply theme to document on mount and changes
   useEffect(() => {
@@ -462,6 +483,12 @@ function App() {
           e.preventDefault()
           removeGapAtPlayhead()
         }
+      }
+
+      // M - a chapter at the playhead (audio editor)
+      if (e.key === 'm' && !e.ctrlKey && !e.metaKey && !e.altKey && addChapterRef.current) {
+        e.preventDefault()
+        addChapterRef.current()
       }
 
       // T - add text clip (shorts only)
@@ -868,7 +895,8 @@ function App() {
   const loadSavedProject = useCallback((state) => {
     draftLoadedRef.current = true
     loadProjectState(state)
-    if (state?.master) setMaster({ loudness: state.master.loudness !== false })
+    if (state?.master) setMaster(masterOf(state.master))
+    setChapters(Array.isArray(state?.chapters) ? state.chapters.slice(0, MAX_CHAPTERS) : [])
   }, [loadProjectState])
   const drafts = useDrafts({
     session: draftSession,
@@ -878,7 +906,8 @@ function App() {
     loadProjectState: loadSavedProject,
     onUnauthorized: requestDraftSignIn,
     mode: audioMode ? 'audio' : 'video',
-    master: audioMode ? master : null
+    master: audioMode ? master : null,
+    chapters: audioMode ? chapters : null
   })
   const canDraftSignIn = isIframe && !draftSession && ['sign-in-needed', 'sign-in-failed', 'signing-in'].includes(draftContext.reason)
 
@@ -964,7 +993,7 @@ function App() {
       }
       setCutProgress({ done: i + 1, total: units.length, failed })
     }
-    setCutProgress(failed ? { done: list.length, total: list.length, failed, finished: true } : null)
+    setCutProgress(failed ? { done: units.length, total: units.length, failed, finished: true } : null)
     if (cut) refitTemplate()
     return { cut, failed }
   }, [applySilenceCut, applyGroupSilenceCut, refitTemplate, fileStoreRef])
@@ -983,7 +1012,7 @@ function App() {
     autoTemplateRef.current = true
     if (!tpl || tpl.autoApply === false || appliedRoles(tracksRef.current).length) return
     ;(async () => {
-      setMaster({ loudness: tpl.master?.loudness !== false })
+      setMaster(masterOf(tpl.master))
       if (tpl.silence?.enabled) await cutAllSilences({ ...loadAutoCutSettings(), ...tpl.silence })
       if (hasSlots(tpl)) {
         applyTracks(t => applyAudioTemplate(t, tpl))
@@ -1005,9 +1034,36 @@ function App() {
     setGroupNotice(`${ids.length} voices grouped: they now move, trim and get their silences cut together.`)
   }, [groupClips])
 
+  // Chapters: added at the playhead (M), renamed, moved, removed
+  const [chaptersOpen, setChaptersOpen] = useState(false)
+  const [duckMenuOpen, setDuckMenuOpen] = useState(false)
+  const [audiogramOpen, setAudiogramOpen] = useState(false)
+  useEffect(() => {
+    if (!duckMenuOpen) return
+    const close = (e) => { if (!e.target.closest?.('.audio-duck')) setDuckMenuOpen(false) }
+    const esc = (e) => { if (e.key === 'Escape') setDuckMenuOpen(false) }
+    document.addEventListener('pointerdown', close)
+    document.addEventListener('keydown', esc)
+    return () => { document.removeEventListener('pointerdown', close); document.removeEventListener('keydown', esc) }
+  }, [duckMenuOpen])
+  const [chapterFocus, setChapterFocus] = useState(null)
+  const addChapter = useCallback((at) => {
+    setChapters(list => {
+      if (list.length >= MAX_CHAPTERS) return list
+      const ch = newChapter(tracksRef.current, at, list.length === 0 && at < 1 ? 'Intro' : `Chapter ${list.length + 1}`)
+      setChapterFocus(ch.id)
+      return [...list, ch]
+    })
+  }, [])
+  const renameChapter = useCallback((id, title) => setChapters(list => list.map(c => (c.id === id ? { ...c, title: String(title).slice(0, 80) } : c))), [])
+  const moveChapterTo = useCallback((id, at) => setChapters(list => list.map(c => (c.id === id ? moveChapter(tracksRef.current, c, at) : c))), [])
+  const removeChapter = useCallback((id) => setChapters(list => list.filter(c => c.id !== id)), [])
+  // M: a chapter at the playhead (and the list opens so it can be named)
+  addChapterRef.current = audioMode ? () => { addChapter(playheadRef.current); setChaptersOpen(true) } : null
+
   const applyTemplateNow = useCallback((tpl) => {
     applyTracks(t => applyAudioTemplate(t, tpl))
-    setMaster({ loudness: tpl.master?.loudness !== false })
+    setMaster(masterOf(tpl.master))
     setTemplateNotice(Object.keys(tpl.slots || {}))
   }, [applyTracks])
   const [limitOpen, setLimitOpen] = useState(false)
@@ -1052,6 +1108,16 @@ function App() {
     ? tracks.flatMap(t => t.clips).find(c => c.id === compactPropertiesClipId) || null
     : null
 
+  // Audio editor: a change to every clip of one recording (by its uploaded
+  // original; Cut silences makes many clips of one file), one undo step
+  const updateRecording = useCallback((source, updates) => {
+    if (!source) return
+    applyTracks(ts => ts.map(t => ({
+      ...t,
+      clips: t.clips.map(c => ((c.denoiseSourceUrl || c.serverUrl) === source ? { ...c, ...updates } : c))
+    })))
+  }, [applyTracks])
+
   // The audio-track clip a video's sound plays from (same group, type audio)
   const linkedAudioOf = (clip) => (clip?.type === 'video' && clip.groupId
     ? tracks.flatMap(t => t.clips).find(c => c.groupId === clip.groupId && c.type === 'audio') || null
@@ -1079,6 +1145,7 @@ function App() {
               onUpdateLinkedAudio={(u) => { const a = linkedAudioOf(sideClip); if (a) updateClip(a.id, u) }}
               onUpdateClip={(updates) => updateClip(sideClip.id, updates)}
               onSplit={() => splitClip(sideClip.id)}
+              onUpdateRecording={audioMode ? updateRecording : null}
               playheadPosition={playheadPosition}
               tabbed={!isDesktop}
             />
@@ -1158,6 +1225,12 @@ function App() {
                   <Download size={14} />
                   <span>Download</span>
                 </a>
+                {audioMode && (
+                  <button className="compact-download-btn" onClick={() => setAudiogramOpen(true)} title="A short video of the episode to share as a teaser">
+                    <Film size={14} />
+                    <span>Audiogram</span>
+                  </button>
+                )}
                 {isIframe && (
                   <button
                     className="compact-render-btn"
@@ -1198,6 +1271,45 @@ function App() {
                   title={master.loudness ? 'Loudness levelling is on: the export is levelled to -16 LUFS (podcast standard)' : 'Loudness levelling is off: the export keeps your levels'}
                 >
                   <Gauge size={15} /><span>{master.loudness ? 'Level: on' : 'Level: off'}</span>
+                </button>
+                <div className="audio-duck">
+                  <button
+                    className={`compact-btn compact-tool-btn${master.duck ? ' active' : ''}`}
+                    onClick={() => setDuckMenuOpen(o => !o)}
+                    aria-haspopup="true"
+                    aria-expanded={duckMenuOpen}
+                    aria-label="Duck music"
+                    title="Auto-duck: the music goes down while someone talks and back up in the pauses"
+                  >
+                    <ArrowDownWideNarrow size={15} /><span>{master.duck ? `Duck: ${master.duckDb} dB` : 'Duck: off'}</span>
+                  </button>
+                  {duckMenuOpen && (
+                    <div className="audio-duck-menu" role="radiogroup" aria-label="Music under the voices">
+                      <p>The music goes down while someone talks and comes back up in the pauses.</p>
+                      {[{ id: null, label: 'Off: the music keeps its level' }, ...DUCK_DEPTHS.map(db => ({ id: db, label: `${db} dB${db === -6 ? ' (a little)' : db === -18 ? ' (a lot)' : ''}` }))].map(o => {
+                        const on = o.id === null ? !master.duck : master.duck && master.duckDb === o.id
+                        return (
+                          <button
+                            key={String(o.id)}
+                            role="radio"
+                            aria-checked={on}
+                            onClick={() => { setMaster(m => (o.id === null ? { ...m, duck: false } : { ...m, duck: true, duckDb: o.id })); setDuckMenuOpen(false) }}
+                          >{o.label}</button>
+                        )
+                      })}
+                      {master.duck && !tracks.some(t => t.type === 'audio' && t.music && t.clips.length) && (
+                        <p>Nothing to duck yet: add music on a music track (or a music bed with your template).</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <button
+                  className={`compact-btn compact-tool-btn${chapters.length ? ' active' : ''}`}
+                  onClick={() => setChaptersOpen(true)}
+                  aria-label="Chapters"
+                  title="Chapters: mark where each part starts (M adds one at the playhead)"
+                >
+                  <Bookmark size={15} /><span>{chapters.length ? `Chapters (${chapters.length})` : 'Chapters'}</span>
                 </button>
               </>
             )}
@@ -1267,6 +1379,8 @@ function App() {
         <GlobalPreview
           emptyActions={audioMode ? emptyAudioActions : emptyTimelineActions}
           audioMode={audioMode}
+          duck={duck}
+          chapters={resolvedChapters}
           tracks={tracks}
           playheadPosition={playheadPosition}
           onSetPlayhead={setPlayheadPosition}
@@ -1324,6 +1438,8 @@ function App() {
             onBeatSync={setBeatClipId}
             isDesktop={isDesktop}
             audioMode={audioMode}
+            chapters={audioMode ? resolvedChapters : null}
+            onOpenChapters={audioMode ? () => setChaptersOpen(true) : undefined}
             onGroupVoices={audioMode ? groupWithVoices : undefined}
           />
 
@@ -1413,6 +1529,32 @@ function App() {
             allCount={audioMode && voiceClips.some(c => c.id === autoCutClip.id) ? voiceClips.length : 0}
             group={autoCutGroup}
             onClose={() => setAutoCutClipId(null)}
+          />
+        )}
+
+        {audiogramOpen && renderStatus?.status === 'completed' && renderStatus.outputUrl && (
+          <AudiogramDialog
+            outputUrl={renderStatus.outputUrl}
+            length={timelineEnd}
+            playheadPosition={playheadPosition}
+            title={audioTitle}
+            chapters={resolvedChapters}
+            onClose={() => setAudiogramOpen(false)}
+          />
+        )}
+
+        {chaptersOpen && (
+          <ChaptersDialog
+            resolved={resolvedChapters}
+            spans={chapterList}
+            playheadPosition={playheadPosition}
+            focusId={chapterFocus}
+            onAdd={addChapter}
+            onRename={renameChapter}
+            onMove={moveChapterTo}
+            onRemove={removeChapter}
+            onSeek={(t) => setPlayheadPosition(t)}
+            onClose={() => { setChaptersOpen(false); setChapterFocus(null) }}
           />
         )}
 
@@ -1516,6 +1658,8 @@ function App() {
                     sendToParent('post-to-3speak', {
                       outputUrl: renderStatus.outputUrl,
                       ...(audioMode && { mediaType: 'audio', fileName: audioFileName(audioTitle), durationSec: Math.round(timelineEnd * 1000) / 1000 }),
+                      // [{ start, end, title }]: 3Speak lists them in the description
+                      ...(audioMode && chapterList.length > 0 && { chapters: chapterList }),
                       ...(remixSource && { remixSource }),
                       ...(musicCredits.length > 0 && { musicCredits })
                     })

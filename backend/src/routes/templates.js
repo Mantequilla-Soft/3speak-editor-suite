@@ -56,6 +56,9 @@ export function cleanTemplate(input) {
     }
   }
   out.master.loudness = input.master?.loudness !== false
+  // Auto-duck: the music under the voices, by -6 / -12 / -18 dB
+  out.master.duck = input.master?.duck === true
+  out.master.duckDb = [-6, -12, -18].includes(+input.master?.duckDb) ? +input.master.duckDb : -12
   if (input.silence && typeof input.silence === 'object') {
     out.silence = {
       enabled: input.silence.enabled === true,

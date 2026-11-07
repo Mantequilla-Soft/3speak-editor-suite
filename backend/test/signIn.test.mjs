@@ -15,6 +15,7 @@ const express = (await import('express')).default
 const { uploadRouter } = await import('../src/routes/upload.js')
 const { renderRouter } = await import('../src/routes/render.js')
 const { clipRouter } = await import('../src/routes/clip.js')
+const { audiogramRouter } = await import('../src/routes/audiogram.js')
 
 const token = (u = 'alice', exp = Date.now() + 60000, secret = 'test-secret') => {
   const mid = Buffer.from(JSON.stringify({ u, exp })).toString('base64url')
@@ -27,6 +28,7 @@ before(async () => {
   app.use('/api/upload', uploadRouter)
   app.use('/api/render', renderRouter)
   app.use('/api/clip', clipRouter)
+  app.use('/api/audiogram', audiogramRouter)
   server = app.listen(0)
   await new Promise(r => server.once('listening', r))
   base = `http://127.0.0.1:${server.address().port}`
@@ -43,6 +45,7 @@ const STARTERS = [
   ['POST', '/api/upload'], ['POST', '/api/upload/chunked/init', { name: 'a.mp4', size: 10 }], ['PUT', '/api/upload/chunked/x/0'],
   ['POST', '/api/upload/chunked/x/complete', {}], ['POST', '/api/render', { timeline: { tracks: [] } }], ['POST', '/api/render/x/abort', {}],
   ['POST', '/api/clip/prepare', {}], ['POST', '/api/clip/reverse'], ['POST', '/api/clip/denoise', {}], ['POST', '/api/clip/scenes', {}],
+  ['POST', '/api/audiogram', { url: '/rendered/x.mp3', start: 0, duration: 10 }],
 ]
 
 test('nothing starts without a 3Speak sign-in', async () => {

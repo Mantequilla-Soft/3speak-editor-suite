@@ -59,6 +59,7 @@ function hideUntilPositioned(el) {
 import InlineRecorder from './InlineRecorder'
 import AudioStage from './AudioStage'
 import { clipGainAt } from '../utils/audioGain'
+import { duckGainAt } from '../utils/duck'
 import { clipColorFilter } from './ClipColorFilters'
 import { motionStyle, normalizeMotion, pivotPoint } from '../utils/stickerMotion'
 import usePhoneLayout from '../hooks/usePhoneLayout'
@@ -136,7 +137,7 @@ function FitTextBox({ measureKey, children, ...rest }) {
   return <span ref={ref} {...rest}>{children}</span>
 }
 
-function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVideo, activeAspectRatio, aspectRatioOverride, onSetAspectRatio, selectedClipId, onUpdateClip, onSelectClip, compact, inlineRecording, onRecordedInline, onCloseInlineRecorder, recorderSize, onSetRecorderSize, recorderGuide, onChangeRemixMode, onChangeStageLayout, controlRef, emptyActions, audioMode = false }) {
+function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVideo, activeAspectRatio, aspectRatioOverride, onSetAspectRatio, selectedClipId, onUpdateClip, onSelectClip, compact, inlineRecording, onRecordedInline, onCloseInlineRecorder, recorderSize, onSetRecorderSize, recorderGuide, onChangeRemixMode, onChangeStageLayout, controlRef, emptyActions, audioMode = false, duck = null, chapters = null }) {
   const videoRefs = useRef({}) // Map of clip ID to video element
   // Sticker motion: the layer container (= the frame) and the moving clips,
   // which the playback loop moves every frame (React renders only ~20/s)
@@ -230,10 +231,15 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
 
   // Get all audio clips with their timeline positions (respecting track mute)
   const audioRefs = useRef({})
+  // The volume an audio clip plays at: its own (volume, fades) and, on a music
+  // track with auto-duck on, the duck (audio editor, utils/duck.js)
+  const duckRef = useRef(duck)
+  duckRef.current = duck
+  const gainAt = (clip, t) => clipGainAt(clip, t) * (clip.musicTrack && duckRef.current?.tracks.includes(clip.trackId) ? duckGainAt(duckRef.current, t) : 1)
   const audioClips = useMemo(() => {
     return (tracks || [])
       .filter(t => t.type === 'audio' && t.muted !== true)
-      .flatMap(t => t.clips)
+      .flatMap(t => t.clips.map(c => (t.music ? { ...c, musicTrack: true, trackId: t.id } : c)))
       .filter(c => c.audioEnabled !== false)
       .map(clip => ({
         ...clip,
@@ -491,7 +497,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       const audioEl = audioRefs.current[clip.id]
       if (audioEl) {
         audioEl.muted = false
-        audioEl.volume = clipGainAt(clip, playheadPosition)
+        audioEl.volume = gainAt(clip, playheadPosition)
       }
     })
   }, [currentClips, currentAudioClips, isPlaying]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -564,7 +570,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       const audioEl = audioRefs.current[clip.id]
       if (audioEl) {
         audioEl.muted = false
-        audioEl.volume = clipGainAt(clip, playbackPosRef.current)
+        audioEl.volume = gainAt(clip, playbackPosRef.current)
         const mediaTime = latestRef.current.getMediaTime(clip, playbackPosRef.current)
         audioEl.currentTime = mediaTime
         audioEl.play().catch(() => {})
@@ -709,7 +715,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         const inRange = newPosition >= clip.timelineStart && newPosition < clip.timelineEnd
         if (inRange) {
           // volume and fades, every frame (a fade is a ramp, not a step)
-          audioEl.volume = clipGainAt(clip, newPosition)
+          audioEl.volume = gainAt(clip, newPosition)
           if (audioEl.paused) {
             audioEl.currentTime = gmt(clip, newPosition)
             audioEl.play().catch(() => {})
@@ -765,7 +771,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         const audioEl = audioRefs.current[clip.id]
         if (audioEl) {
           audioEl.muted = false
-          audioEl.volume = clipGainAt(clip, playbackPosRef.current)
+          audioEl.volume = gainAt(clip, playbackPosRef.current)
           const mt = getMediaTime(clip, playbackPosRef.current)
           audioEl.currentTime = mt
           audioEl.play().catch(() => {})
@@ -1253,6 +1259,8 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
               totalDuration={totalDuration}
               onSeek={(pos) => { if (isPlayingRef.current) playFrom(pos); else seekTo(pos) }}
               nowPlaying={currentAudioClips.filter(c => !c.templateRole).map(c => c.name).join(' + ') || currentAudioClips.map(c => c.name).join(' + ')}
+              duck={duck}
+              chapters={chapters}
               emptyActions={emptyActions}
             />
           ) : videoClips.length > 0 ? (

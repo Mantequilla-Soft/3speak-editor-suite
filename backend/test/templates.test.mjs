@@ -115,8 +115,11 @@ describe('validation', () => {
     assert.equal(cleanTemplate('x'), null)
   })
 
-  test('defaults: loudness on, auto apply on, no silence settings', () => {
-    assert.deepEqual(cleanTemplate({}), { version: 1, slots: {}, master: { loudness: true }, silence: null, autoApply: true })
+  test('defaults: loudness on, duck off, auto apply on, no silence settings', () => {
+    assert.deepEqual(cleanTemplate({}), { version: 1, slots: {}, master: { loudness: true, duck: false, duckDb: -12 }, silence: null, autoApply: true })
+    assert.deepEqual(cleanTemplate({ master: { duck: true, duckDb: -18 } }).master, { loudness: true, duck: true, duckDb: -18 })
+    assert.equal(cleanTemplate({ master: { duck: 'yes', duckDb: -40 } }).master.duck, false)
+    assert.equal(cleanTemplate({ master: { duck: true, duckDb: -40 } }).master.duckDb, -12)
     assert.equal(cleanTemplate({ master: { loudness: false }, autoApply: false }).autoApply, false)
   })
 

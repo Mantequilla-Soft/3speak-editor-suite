@@ -608,7 +608,9 @@ function Timeline({
   onBeatSync,
   isDesktop,
   audioMode = false,
-  onGroupVoices
+  onGroupVoices,
+  chapters = null,
+  onOpenChapters
 }) {
   const { min: MIN_ZOOM, max: MAX_ZOOM } = zoomRange(audioMode)
   const [zoom, setZoom] = useState(33) // pixels per second
@@ -829,8 +831,23 @@ function Timeline({
         marks.push(<div key={`beat-${b}`} className="ruler-beat" style={{ left: `${b * pixelsPerSecond}px` }} />)
       }
     }
+    // Chapter flags (audio editor): click to go there, double click for the list
+    for (const ch of chapters || []) {
+      marks.push(
+        <div
+          key={`ch-${ch.id}`}
+          className="ruler-chapter"
+          style={{ left: `${ch.at * pixelsPerSecond}px` }}
+          title={`${ch.title} (${formatTime(ch.at)})`}
+          onClick={(e) => { e.stopPropagation(); onSetPlayhead(ch.at) }}
+          onDoubleClick={(e) => { e.stopPropagation(); onOpenChapters?.() }}
+        >
+          <span>{ch.title}</span>
+        </div>
+      )
+    }
     return marks
-  }, [zoom, totalDuration, pixelsPerSecond, tracks, audioMode])
+  }, [zoom, totalDuration, pixelsPerSecond, tracks, audioMode, chapters, onSetPlayhead, onOpenChapters])
 
   const handleZoomIn = () => setZoom(z => Math.min(MAX_ZOOM, z * 1.5))
   const handleZoomOut = () => setZoom(z => Math.max(MIN_ZOOM, z / 1.5))

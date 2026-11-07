@@ -5,11 +5,12 @@ import { hasLayout } from '../utils/remixLayout'
 import { getClipChromaKey } from '../utils/chromaKey'
 import { normalizeColor } from '../utils/clipColor'
 import { normalizeMotion } from '../utils/stickerMotion'
+import { duckPlan } from '../utils/duck'
 
 const isIframe = typeof window !== 'undefined' && window.parent !== window
 const GATEWAY_URL = (import.meta.env.VITE_GATEWAY_URL || '').replace(/\/+$/, '')
 
-export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay, audioMode = false, master = null, title = null }) {
+export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay, audioMode = false, master = null, title = null, chapters = null }) {
   const parentOriginRef = useRef('*')
   const [renderStatus, setRenderStatus] = useState(null)
   const [theme, setTheme] = useState('dark')
@@ -430,8 +431,14 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
         timeline: {
           output: 'audio',
           tracks: trackData.filter(t => t.type === 'audio'),
-          master: { loudness: master?.loudness !== false },
-          ...(title ? { title: String(title).slice(0, 120) } : {})
+          master: {
+            loudness: master?.loudness !== false,
+            // Music down under the voices (utils/duck.js works out where)
+            ...(duckPlan(tracks, master) ? { duck: duckPlan(tracks, master) } : {})
+          },
+          ...(title ? { title: String(title).slice(0, 120) } : {}),
+          // ID3 chapters: [{ start, end, title }]
+          ...(chapters?.length ? { chapters } : {})
         },
         mediaUrls
       }
@@ -468,7 +475,7 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
       },
       mediaUrls
     }
-  }, [tracks, uploadFile, activeAspectRatio, audioMode, master, title])
+  }, [tracks, uploadFile, activeAspectRatio, audioMode, master, title, chapters])
 
   // Poll job status
   const pollJobStatus = useCallback((jobId, backendEndpoint) => {

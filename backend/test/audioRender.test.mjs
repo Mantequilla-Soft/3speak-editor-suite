@@ -13,7 +13,8 @@ const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'audio-render-'))
 process.env.WORK_DIR = dir
 const {
   planLanes, laneEntries, segmentFilter, segmentArgs, mixArgs, parseLoudnorm, concatList,
-  audioTimelineEnd, renderAudioTimeline, SEGMENT_RATE, OUTPUT_RATE, LOUDNESS_TARGET
+  audioTimelineEnd, renderAudioTimeline, SEGMENT_RATE, OUTPUT_RATE, LOUDNESS_TARGET,
+  cleanDuck, duckExpr, duckFilter, cleanChapters, chapterMetadata
 } = await import('../src/services/audioRender.js')
 after(() => fs.rmSync(dir, { recursive: true, force: true }))
 
@@ -137,6 +138,59 @@ describe('mixArgs / parseLoudnorm / concatList', () => {
   })
 })
 
+describe('auto-duck / chapters', () => {
+  const duck = { gain: 0.25, attack: 0.4, release: 0.8, spans: [[2, 5], [10, 12]], tracks: ['m'] }
+
+  test('cleanDuck keeps a good plan, merges ramps that would overlap, rejects junk', () => {
+    assert.deepEqual(cleanDuck(duck), duck)
+    assert.deepEqual(cleanDuck({ ...duck, spans: [[2, 5], [5.5, 7]] }).spans, [[2, 7]])
+    for (const bad of [null, {}, { ...duck, gain: 1 }, { ...duck, gain: -0.1 }, { ...duck, attack: 0 }, { ...duck, spans: [] },
+      { ...duck, tracks: [] }, { ...duck, spans: [[5, 2]] }, { ...duck, spans: [['a', 2]] }, { ...duck, spans: Array.from({ length: 2001 }, (_, i) => [i * 3, i * 3 + 1]) }]) {
+      assert.equal(cleanDuck(bad), null, JSON.stringify(bad)?.slice(0, 60))
+    }
+  })
+
+  test('duckExpr is the same trapezoid as the editor (evaluated here by hand)', () => {
+    const expr = duckExpr(duck)
+    // ffmpeg's clip/min, in JS, on the expression itself
+    const f = new Function('t', 'clip', 'min', `return ${expr}`)
+    const clip = (x, a, b) => Math.min(b, Math.max(a, x))
+    const at = (t) => f(t, clip, Math.min)
+    assert.equal(at(0), 1)
+    assert.ok(Math.abs(at(1.8) - (1 - 0.75 * 0.5)) < 1e-9, 'half way down the ramp')
+    assert.equal(at(3), 0.25)
+    assert.ok(Math.abs(at(5.4) - (1 - 0.75 * 0.5)) < 1e-9, 'half way back up')
+    assert.equal(at(7), 1)
+    assert.equal(at(11), 0.25)
+    assert.match(duckFilter(duck), /^asetnsamples=n=480:p=0,volume=eval=frame:volume='1-0\.75\*\(/)
+    assert.equal(duckFilter(null), null)
+  })
+
+  test('mixArgs puts a lane filter before the mix and maps the chapters', () => {
+    const args = mixArgs(['/a.txt', '/b.txt'], '/o.mp3', { laneFilters: [null, 'volume=0.5'], chaptersFile: '/c.txt' })
+    const graph = args[args.indexOf('-filter_complex') + 1]
+    assert.match(graph, /^\[1:a\]volume=0\.5\[d1\];\[0:a\]\[d1\]amix=inputs=2/)
+    assert.equal(args[args.indexOf('-map_chapters') + 1], '2')
+    assert.ok(args.includes('/c.txt'))
+    const measure = mixArgs(['/a.txt'], null, { level: true, mode: 'measure', chaptersFile: '/c.txt' })
+    assert.ok(!measure.includes('/c.txt') && !measure.includes('-map_chapters'), 'the measuring pass has no chapters')
+  })
+
+  test('cleanChapters: in order, inside the episode, titled; metadata escaped', () => {
+    const list = cleanChapters([
+      { start: 0, end: 10, title: ' Intro ' },
+      { start: 5, end: 12, title: 'overlaps, dropped' },
+      { start: 10, end: 99, title: 'Talk = #1; done' },
+      { start: 30, end: 30.2, title: 'too short' },
+      { start: 20, end: 25, title: '' },
+      'junk'
+    ], 40)
+    assert.deepEqual(list, [{ start: 0, end: 10, title: 'Intro' }, { start: 10, end: 40, title: 'Talk = #1; done' }])
+    assert.equal(chapterMetadata(list), ';FFMETADATA1\n[CHAPTER]\nTIMEBASE=1/1000\nSTART=0\nEND=10000\ntitle=Intro\n[CHAPTER]\nTIMEBASE=1/1000\nSTART=10000\nEND=40000\ntitle=Talk \\= \\#1\\; done\n')
+    assert.deepEqual(cleanChapters(null, 10), [])
+  })
+})
+
 // ---- Real renders ----
 const tone = (name, f, d, extra = []) => {
   const file = path.join(dir, name)
@@ -164,14 +218,14 @@ before(() => {
   quiet = tone('quiet.m4a', 300, 10, ['-af', 'volume=-30dB', '-c:a', 'aac'])
 })
 
-async function render(name, tracks, { master, files } = {}) {
+async function render(name, tracks, { master, files, chapters } = {}) {
   const downloadedFiles = new Map()
   for (const t of tracks) for (const c of t.clips) downloadedFiles.set(c.id, files?.[c.id] || toneA)
   const jobDir = path.join(dir, `job-${name}`)
   fs.mkdirSync(jobDir, { recursive: true })
   const out = path.join(dir, `${name}.mp3`)
   const phases = []
-  await renderAudioTimeline({ timeline: { output: 'audio', tracks, master, title: name }, downloadedFiles, outputPath: out, jobDir, onProgress: (p, ph) => phases.push([p, ph]) })
+  await renderAudioTimeline({ timeline: { output: 'audio', tracks, master, title: name, chapters }, downloadedFiles, outputPath: out, jobDir, onProgress: (p, ph) => phases.push([p, ph]) })
   return { out, phases }
 }
 
@@ -256,6 +310,40 @@ test('segments are cached: an unchanged second render cuts nothing new', { skip:
   const before = fs.readdirSync(segDir).length
   await render('cache-2', tracks, { master: { loudness: false } })
   assert.equal(fs.readdirSync(segDir).length, before)
+})
+
+test('auto-duck: the music is 12 dB down under the voice and back up in the pause', { skip: !hasFfmpeg }, async () => {
+  const tracks = [
+    track('v', [clip('talk1', { endTime: 3, timelinePosition: 2 }), clip('talk2', { endTime: 2, timelinePosition: 9 })]),
+    track('m', [clip('bed', { endTime: 12, timelinePosition: 0 })], { music: true })
+  ]
+  const files = { talk1: toneB, talk2: toneB, bed: toneA }
+  const duck = { gain: 0.2512, attack: 0.4, release: 0.8, spans: [[2, 5], [9, 11]], tracks: ['m'] }
+  const { out } = await render('duck', tracks, { master: { loudness: false, duck }, files })
+  // Only the music: the voice muted, so the levels are the bed's own
+  const music = await render('duck-music', [{ ...tracks[0], muted: true }, tracks[1]], { master: { loudness: false, duck }, files })
+  const full = peakDb(music.out, 0.3, 1)
+  const under = peakDb(music.out, 3, 1.5)
+  const pause = peakDb(music.out, 6.5, 1.5)
+  assert.ok(Math.abs(full - SRC_DB) < 1.5, `before the voice: full (${full})`)
+  assert.ok(Math.abs(under - (full - 12)) < 1.5, `under the voice: 12 dB down (${under} vs ${full})`)
+  assert.ok(Math.abs(pause - full) < 1.5, `in the pause: back up (${pause})`)
+  assert.ok(Math.abs(+probe(out).format.duration - 12) < 0.08)
+  // An unusable plan is ignored, not an error
+  const junk = await render('duck-junk', [{ ...tracks[0], muted: true }, tracks[1]], { master: { loudness: false, duck: { gain: 5 } }, files })
+  assert.ok(Math.abs(peakDb(junk.out, 3, 1.5) - full) < 1.5)
+})
+
+test('chapters end up in the MP3 as ID3 chapters', { skip: !hasFfmpeg }, async () => {
+  const { out } = await render('chapters', [track('v', [clip('ch', { endTime: 9 })])], {
+    master: { loudness: true },
+    chapters: [{ start: 0, end: 4, title: 'Intro' }, { start: 4, end: 9, title: 'Q&A = fun; really' }]
+  })
+  const { chapters } = JSON.parse(execFileSync('ffprobe', ['-v', 'error', '-show_chapters', '-of', 'json', out], { encoding: 'utf8' }))
+  assert.equal(chapters.length, 2)
+  assert.equal(chapters[0].tags.title, 'Intro')
+  assert.equal(chapters[1].tags.title, 'Q&A = fun; really')
+  assert.ok(Math.abs(+chapters[1].start_time - 4) < 0.01 && Math.abs(+chapters[1].end_time - 9) < 0.01)
 })
 
 test('nothing to render is an error, not an empty file', { skip: !hasFfmpeg }, async () => {

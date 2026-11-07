@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Mic } from 'lucide-react'
 import { getPeaks, peaksForRange } from '../utils/peakCache'
 import { formatLength } from '../utils/limits'
+import { duckGainAt } from '../utils/duck'
 
 // The audio editor's preview: the whole show at a glance, one lane per track,
 // each clip drawn with its waveform, the playhead, click or drag to jump.
@@ -15,7 +16,7 @@ function cssVar(el, name, fallback) {
   return v || fallback
 }
 
-export default function AudioStage({ tracks, playheadPosition, totalDuration, onSeek, nowPlaying, emptyActions }) {
+export default function AudioStage({ tracks, playheadPosition, totalDuration, onSeek, nowPlaying, emptyActions, duck = null, chapters = null }) {
   const wrapRef = useRef(null)
   const canvasRef = useRef(null)
   const [size, setSize] = useState({ w: 0, h: 0 })
@@ -51,6 +52,8 @@ export default function AudioStage({ tracks, playheadPosition, totalDuration, on
   }, [hasClips])
 
   const span = Math.max(1, totalDuration)
+  // The chapter the playhead is in
+  const currentChapter = (chapters || []).filter(c => c.at <= playheadPosition + 0.001).at(-1) || null
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -90,16 +93,20 @@ export default function AudioStage({ tracks, playheadPosition, totalDuration, on
         const bars = Math.max(1, Math.floor(w / BAR_PX))
         const heights = env ? peaksForRange(env, c.startTime, c.endTime, bars) : null
         const vol = Math.min(2, Math.max(0, (Number.isFinite(+c.volume) ? +c.volume : 100) / 100))
+        // Auto-duck shows: the music's bars go down where the voices talk
+        const ducked = duck && track.music && duck.tracks.includes(track.id)
+        const barSec = (len / bars)
         for (let b = 0; b < bars; b++) {
           // peaksForRange gives 10..90 (timeline bar heights); back to 0..1
           const level = heights ? Math.max(0, (heights[b] - 10) / 80) : 0.15
-          const h = Math.max(1, Math.min(laneH - 6, level * vol * (laneH - 6)))
+          const d = ducked ? duckGainAt(duck, start + (b + 0.5) * barSec) : 1
+          const h = Math.max(1, Math.min(laneH - 6, level * vol * d * (laneH - 6)))
           g.fillRect(x0 + b * BAR_PX, mid - h / 2, Math.max(1, BAR_PX - 1), h)
         }
       }
     })
     g.globalAlpha = 1
-  }, [lanes, envelopes, size, span])
+  }, [lanes, envelopes, size, span, duck])
 
   const seekAt = (clientX) => {
     const rect = wrapRef.current.getBoundingClientRect()
@@ -122,6 +129,7 @@ export default function AudioStage({ tracks, playheadPosition, totalDuration, on
         <span className="audio-stage-time">{formatLength(playheadPosition)}</span>
         <span className="audio-stage-total">/ {formatLength(totalDuration)}</span>
         {nowPlaying && <span className="audio-stage-clip" title={nowPlaying}>{nowPlaying}</span>}
+        {currentChapter && <span className="audio-stage-chapter-now" title="Chapter">{currentChapter.title}</span>}
       </div>
       <div
         className="audio-stage-overview"
@@ -139,6 +147,11 @@ export default function AudioStage({ tracks, playheadPosition, totalDuration, on
         onPointerCancel={() => { draggingRef.current = false }}
       >
         <canvas ref={canvasRef} />
+        {(chapters || []).map(ch => (
+          <div key={ch.id} className="audio-stage-chapter" style={{ left: `${(ch.at / span) * 100}%` }}>
+            <span>{ch.title}</span>
+          </div>
+        ))}
         <div className="audio-stage-playhead" style={{ left: `${(playheadPosition / span) * 100}%` }} />
       </div>
       <div className="audio-stage-legend">

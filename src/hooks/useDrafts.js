@@ -58,7 +58,7 @@ async function uploadLocalImage(localUrl, name) {
  * autosave after their upload picks them up. `plates` maps local plate / noise
  * map URLs to their uploaded copies (see useDrafts).
  */
-export function serializeProject(tracks, library, plates = new Map(), { mode = 'video', master = null } = {}) {
+export function serializeProject(tracks, library, plates = new Map(), { mode = 'video', master = null, chapters = null } = {}) {
   let pending = 0
   const serverRef = (x) => x.serverUrl || (x.url && !LOCAL.test(x.url) ? x.url : null)
   const outTracks = tracks.map(t => ({
@@ -84,11 +84,13 @@ export function serializeProject(tracks, library, plates = new Map(), { mode = '
     return url ? [stripLocal({ ...i, url })] : []
   })
   // mode: which editor it belongs to (the audio editor only offers audio drafts);
-  // master: the audio editor's finishing settings (loudness levelling)
+  // master: the audio editor's finishing settings (loudness levelling, auto-duck);
+  // chapters: its chapters as placed (utils/chapters.js)
   const state = { version: 1, tracks: outTracks, library: outLibrary }
   if (mode === 'audio') {
     state.mode = 'audio'
-    state.master = { loudness: master?.loudness !== false }
+    state.master = { loudness: master?.loudness !== false, duck: master?.duck === true, ...(Number.isFinite(+master?.duckDb) ? { duckDb: +master.duckDb } : {}) }
+    if (Array.isArray(chapters) && chapters.length) state.chapters = chapters
   }
   return { state, pending }
 }
@@ -103,7 +105,7 @@ export const projectMode = (p) => (p?.mode === 'audio' ? 'audio' : 'video')
  * per-tier limit (free: 1 for 7 days, Pro: 3 for 30 days; each save restarts
  * the clock) and deleting the draft once the video is sent.
  */
-export function useDrafts({ session, hasMedia, tracks, library, loadProjectState, onUnauthorized, mode = 'video', master = null }) {
+export function useDrafts({ session, hasMedia, tracks, library, loadProjectState, onUnauthorized, mode = 'video', master = null, chapters = null }) {
   const [drafts, setDrafts] = useState(null) // summaries, once fetched
   const [limits, setLimits] = useState(null)
   const [prompt, setPrompt] = useState(false) // "continue a draft?" on start
@@ -156,7 +158,7 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
     if (!session || !hasContent(tracks)) return { ok: false }
     setStatus('saving')
     await uploadPlates()
-    const { state, pending: notYet } = serializeProject(tracks, library, platesRef.current, { mode, master })
+    const { state, pending: notYet } = serializeProject(tracks, library, platesRef.current, { mode, master, chapters })
     setPending(notYet)
     if (!projectIdRef.current) projectIdRef.current = newId()
     const finalName = (saveName ?? name).trim() || defaultName(tracks, mode)
@@ -191,7 +193,7 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
       setStatus('error')
       return { ok: false }
     }
-  }, [session, tracks, library, name, authed, limits, uploadPlates, mode, master])
+  }, [session, tracks, library, name, authed, limits, uploadPlates, mode, master, chapters])
 
   // Autosave from the first edit on (not while the limit question is open)
   useEffect(() => {
@@ -202,7 +204,7 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
     clearTimeout(timerRef.current)
     timerRef.current = setTimeout(() => { save() }, AUTOSAVE_DELAY)
     return () => clearTimeout(timerRef.current)
-  }, [tracks, library, session, master]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tracks, library, session, master, chapters]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadDraft = useCallback(async (id) => {
     const res = await authed(`/${id}`)

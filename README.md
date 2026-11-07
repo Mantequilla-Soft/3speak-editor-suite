@@ -91,9 +91,13 @@ The same editor for podcasts, music and voice. 3Speak opens it from its share me
 - **Cut silences:** finds the pauses and cuts them out, closing the gaps. It works on one clip or on every voice clip with the same settings. Files too big for the browser are measured by the backend (`POST /api/clip/audio-analysis`).
 - **Several voices:** a host and a guest on their own Voice tracks can be grouped ("Group with other voices" in a clip's ⋯ menu). A group moves and trims together, and Cut silences on it cuts only where everyone is quiet, the same stretch from every voice, so they stay in sync. "Cut all voice clips" also cuts groups this way.
 - **Basic edits:** split, trim, move, delete, volume, fades in and out, noise reduction, music library and sound effects, recording.
-- **Export:** an MP3 rendered by the backend (`timeline.output: 'audio'`), levelled to -16 LUFS for podcasts (can be switched off). "Use this audio" posts `{ type: 'post-to-3speak', mediaType: 'audio', outputUrl, fileName, durationSec, musicCredits? }`.
+- **Studio voice:** a one-click clean-up in a voice clip's settings (noise and rumble out, less mud, more presence, softer S sounds, evened out: `POST /api/clip/denoise` with `strength: 'studio'`). In the audio editor it, and the noise levels, apply to every piece of the recording at once.
+- **Duck:** the music tracks go down (-6, -12 or -18 dB) while a voice clip plays and come back up in the pauses. The editor works out where (`src/utils/duck.js`) and sends it as `timeline.master.duck`; the backend applies the same ramps (`duckExpr`), the preview plays them.
+- **Chapters:** `M` or "Chapters" marks where a part starts. A chapter is pinned to the moment in the recording, so it moves with Cut silences, trims and the template intro. They go into the MP3 as ID3 chapters (`timeline.chapters`) and to 3Speak with "Use this audio".
+- **Export:** an MP3 rendered by the backend (`timeline.output: 'audio'`), levelled to -16 LUFS for podcasts (can be switched off). "Use this audio" posts `{ type: 'post-to-3speak', mediaType: 'audio', outputUrl, fileName, durationSec, musicCredits?, chapters? }` (chapters: `[{ start, end, title }]`).
+- **Audiogram:** after an export, a short video (up to 60 s, square or vertical) of a piece of the episode with its title and a moving waveform, to share as a teaser (`POST /api/audiogram`, then `GET /api/audiogram/:jobId`).
 - **Drafts:** like the video editor's. Each editor only offers its own drafts, and the limit counts both.
-- **Template:** one per user, kept for good (`/api/templates/audio`): intro, outro and a music bed (looped under the recording, faded out at the end), plus "cut silences" and "level loudness". It is applied by itself to a new recording, and one click takes it off again.
+- **Template:** one per user, kept for good (`/api/templates/audio`): intro, outro and a music bed (looped under the recording, faded out at the end), plus "cut silences", "level loudness" and "duck". It is applied by itself to a new recording, and one click takes it off again.
 - **Handshake:** `editor-ready` carries `mode: 'audio'` and `canEditAudio: true`. Load a recording with `load-media { file, name, mediaType: 'audio' }`.
 
 ## Tests
@@ -116,6 +120,7 @@ The end-to-end test needs `ffmpeg`/`ffprobe` on PATH and Chromium (`E2E_CHROME`,
 | `Ctrl+Shift+Z` / `Ctrl+Y` | Redo |
 | `Ctrl+Shift+G` | Ungroup clips |
 | `Arrow Left/Right` | Move playhead (100ms, 1s with Shift) |
+| `M` | Add a chapter at the playhead (audio editor) |
 
 ## Getting Started
 

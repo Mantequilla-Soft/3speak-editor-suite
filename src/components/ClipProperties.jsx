@@ -212,6 +212,9 @@ const NOISE_LEVELS = [
   { id: 'medium', label: 'Medium' },
   { id: 'strong', label: 'Strong' }
 ]
+// The audio editor's one-click voice: noise down, rumble and mud out, presence
+// and evenness in (de-esser, compressor), see DENOISE in the backend's clip.js
+const STUDIO_LEVEL = { id: 'studio', label: 'Studio voice', title: 'Studio voice: less noise, no rumble, clearer and more even, softer S sounds' }
 
 /**
  * Background-noise reduction for an audio clip: the backend cleans the
@@ -257,17 +260,21 @@ function FadeControls({ clip, onUpdateClip }) {
   )
 }
 
-function NoiseControls({ clip, onUpdateClip }) {
+function NoiseControls({ clip, onUpdateClip, onUpdateRecording = null }) {
   const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
   // The uploaded original (kept while a cleaned version is in use)
   const source = clip.denoiseSourceUrl || clip.serverUrl
   const canClean = !!source && /\/api\/upload\/files\//.test(source)
+  // Audio editor: every piece of the recording at once (after Cut silences a
+  // recording is many clips), else just this clip
+  const apply = (updates) => (onUpdateRecording ? onUpdateRecording(source, updates) : onUpdateClip(updates))
+  const levels = onUpdateRecording ? [...NOISE_LEVELS, STUDIO_LEVEL] : NOISE_LEVELS
 
   const choose = async (level) => {
     setError(null)
     if (!level) {
-      if (clip.denoise) onUpdateClip({ url: clip.denoiseLocalUrl || source, serverUrl: source, denoise: null, denoiseSourceUrl: null, denoiseLocalUrl: null })
+      if (clip.denoise) apply({ url: clip.denoiseLocalUrl || source, serverUrl: source, denoise: null, denoiseSourceUrl: null, denoiseLocalUrl: null })
       return
     }
     setBusy(level)
@@ -281,7 +288,7 @@ function NoiseControls({ clip, onUpdateClip }) {
       const { url } = await res.json()
       const backend = getBackendUrl()
       const cleaned = backend && url.startsWith('/') ? `${backend}${url}` : url
-      onUpdateClip({
+      apply({
         url: cleaned,
         serverUrl: cleaned,
         denoise: level,
@@ -298,12 +305,13 @@ function NoiseControls({ clip, onUpdateClip }) {
 
   return (
     <div className="property-group">
-      <label>Reduce background noise</label>
+      <label>{onUpdateRecording ? 'Clean up the voice' : 'Reduce background noise'}</label>
       {canClean ? (
         <div className="noise-levels" role="radiogroup" aria-label="Noise reduction">
-          {NOISE_LEVELS.map(({ id, label }) => (
+          {levels.map(({ id, label, title }) => (
             <button
               key={label}
+              title={title}
               role="radio"
               aria-checked={(clip.denoise || null) === id}
               className={(clip.denoise || null) === id ? 'active' : ''}
@@ -317,6 +325,7 @@ function NoiseControls({ clip, onUpdateClip }) {
       ) : (
         <p className="noise-hint">Available once this clip has finished uploading.</p>
       )}
+      {onUpdateRecording && canClean && <p className="noise-hint">Applies to the whole recording, every piece of it.</p>}
       {error && <p className="noise-hint error">{error}</p>}
     </div>
   )
@@ -678,7 +687,7 @@ function PositionDragHandle({ positionX, positionY, onChange }) {
 // The tab a phone user last picked, kept across clips (if the next clip has it)
 let lastTab = null
 
-function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false }) {
+function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, onUpdateRecording = null }) {
   // Phones (tabbed): one section at a time, a tab per section. The sections
   // differ per clip type and come from several components, so the tabs are
   // read from the rendered sections (.prop-group and its label) after render.
@@ -1075,7 +1084,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
 
           {isAudio && <FadeControls clip={clip} onUpdateClip={onUpdateClip} />}
 
-          {isAudio && <NoiseControls clip={clip} onUpdateClip={onUpdateClip} />}
+          {isAudio && <NoiseControls clip={clip} onUpdateClip={onUpdateClip} onUpdateRecording={onUpdateRecording} />}
         </div>
         )}
 

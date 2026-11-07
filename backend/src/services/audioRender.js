@@ -20,6 +20,10 @@ import { RENDER_CACHE_DIR } from './ffmpeg.js'
  *    with a limiter against clipping.
  * 4. Optional loudness levelling for podcasts: EBU R128 in two passes (measure,
  *    then apply linearly), -16 LUFS, true peak -1.5 dB. Then MP3.
+ *
+ * Optional, from the editor: auto-duck (the music tracks' lanes go down while a
+ * voice talks, timeline.master.duck, worked out by the editor's utils/duck.js)
+ * and chapters (timeline.chapters, written as ID3 chapter frames).
  */
 
 export const SEGMENT_RATE = 48000
@@ -147,17 +151,100 @@ export function concatList(files) {
   return files.map(f => `file '${f.replace(/'/g, "'\\''")}'`).join('\n') + '\n'
 }
 
+// Auto-duck limits (a plan is made by the editor; this only checks and applies it)
+const MAX_DUCK_SPANS = 2000
+const finite = (n) => typeof n === 'number' && Number.isFinite(n)
+
+/**
+ * timeline.master.duck checked: { gain 0..1, attack, release (s), spans [[s, e]]
+ * sorted and apart, tracks [ids] } or null when absent or unusable.
+ */
+export function cleanDuck(duck) {
+  if (!duck || typeof duck !== 'object') return null
+  const { gain, attack, release } = duck
+  if (!finite(gain) || gain < 0 || gain >= 1) return null
+  if (!finite(attack) || !finite(release) || attack < 0.05 || attack > 5 || release < 0.05 || release > 5) return null
+  if (!Array.isArray(duck.tracks) || !duck.tracks.length || !Array.isArray(duck.spans) || !duck.spans.length) return null
+  if (duck.spans.length > MAX_DUCK_SPANS) return null
+  const spans = []
+  for (const sp of duck.spans) {
+    if (!Array.isArray(sp) || !finite(sp[0]) || !finite(sp[1]) || sp[1] <= sp[0] || sp[0] < 0) return null
+    const last = spans[spans.length - 1]
+    // Ramps may not run into each other (the expression adds them up)
+    if (last && sp[0] - attack < last[1] + release - 0.0005) {
+      last[1] = Math.max(last[1], sp[1])
+      continue
+    }
+    spans.push([sp[0], sp[1]])
+  }
+  return { gain, attack, release, spans, tracks: duck.tracks.map(String).slice(0, 50) }
+}
+
+const n4 = (n) => String(Math.round(n * 10000) / 10000)
+
+/**
+ * The volume expression of a ducked lane (ffmpeg `volume`, t = lane seconds):
+ * 1 - (1 - gain) * sum of one trapezoid per span (ramp down over `attack`
+ * before it, up over `release` after it). The editor's duckGainAt is the same.
+ */
+export function duckExpr({ gain, attack, release, spans }) {
+  const terms = spans.map(([s, e]) => `min(clip((t-${n4(s - attack)})/${n4(attack)},0,1),clip((${n4(e + release)}-t)/${n4(release)},0,1))`)
+  return `1-${n4(1 - gain)}*(${terms.join('+')})`
+}
+
+/** The filter a lane gets before the mix (null: none). 10 ms frames so the ramps are smooth. */
+export function duckFilter(duck) {
+  return duck ? `asetnsamples=n=480:p=0,volume=eval=frame:volume='${duckExpr(duck)}'` : null
+}
+
+// Chapters (ID3 CHAP frames through an ffmetadata file)
+const MAX_CHAPTERS = 100
+const metaEscape = (v) => String(v).replace(/[\\=;#\n]/g, c => (c === '\n' ? ' ' : `\\${c}`))
+
+/** timeline.chapters checked: [{ start, end, title }] in order, inside [0, length]. */
+export function cleanChapters(chapters, length) {
+  if (!Array.isArray(chapters)) return []
+  const out = []
+  for (const c of chapters.slice(0, MAX_CHAPTERS)) {
+    if (!c || !finite(c.start) || !finite(c.end)) continue
+    const start = Math.max(0, c.start)
+    const end = Math.min(length, c.end)
+    const title = String(c.title ?? '').replace(/\s+/g, ' ').trim().slice(0, 80)
+    if (!title || end - start < 0.5) continue
+    if (out.length && start < out[out.length - 1].end - 0.001) continue
+    out.push({ start, end, title })
+  }
+  return out
+}
+
+/** The ffmetadata text with the chapters (milliseconds). */
+export function chapterMetadata(chapters) {
+  let text = ';FFMETADATA1\n'
+  for (const c of chapters) {
+    text += `[CHAPTER]\nTIMEBASE=1/1000\nSTART=${Math.round(c.start * 1000)}\nEND=${Math.round(c.end * 1000)}\ntitle=${metaEscape(c.title)}\n`
+  }
+  return text
+}
+
 /**
  * The final mix: one input per lane (concat lists), mixed, limited, optionally
  * loudness-levelled, encoded. `loudness` = null (no levelling) or the measured
  * values from the first pass ({ input_i, input_tp, input_lra, input_thresh, target_offset }).
  * `mode` 'measure' writes nothing (prints the loudnorm JSON).
  */
-export function mixArgs(listFiles, outputPath, { level = false, measured = null, mode = 'encode', title = null } = {}) {
+export function mixArgs(listFiles, outputPath, { level = false, measured = null, mode = 'encode', title = null, laneFilters = [], chaptersFile = null } = {}) {
   const args = ['-hide_banner', '-nostats']
   for (const list of listFiles) args.push('-f', 'concat', '-safe', '0', '-i', list)
+  const withChapters = chaptersFile && mode !== 'measure'
+  if (withChapters) args.push('-f', 'ffmetadata', '-i', chaptersFile)
   const chain = []
-  const inputs = listFiles.map((_, i) => `[${i}:a]`).join('')
+  // A lane with a filter of its own (the duck) goes through it first
+  const pre = []
+  const inputs = listFiles.map((_, i) => {
+    if (!laneFilters[i]) return `[${i}:a]`
+    pre.push(`[${i}:a]${laneFilters[i]}[d${i}]`)
+    return `[d${i}]`
+  }).join('')
   const mixed = listFiles.length > 1
     ? `${inputs}amix=inputs=${listFiles.length}:duration=longest:dropout_transition=0:normalize=0,alimiter=limit=0.95:level=false`
     : `${inputs}alimiter=limit=0.95:level=false`
@@ -172,10 +259,11 @@ export function mixArgs(listFiles, outputPath, { level = false, measured = null,
     chain.push(`loudnorm=I=${i}:TP=${tp}:LRA=${lra}`)
   }
   chain.push(`aresample=${OUTPUT_RATE}`)
-  args.push('-filter_complex', `${chain.join(',')}[out]`, '-map', '[out]')
+  args.push('-filter_complex', [...pre, `${chain.join(',')}[out]`].join(';'), '-map', '[out]')
   if (mode === 'measure') {
     args.push('-f', 'null', '-')
   } else {
+    if (withChapters) args.push('-map_chapters', String(listFiles.length))
     if (title) args.push('-metadata', `title=${String(title).slice(0, 120)}`)
     args.push('-c:a', 'libmp3lame', '-b:a', MP3_BITRATE, '-ar', String(OUTPUT_RATE), '-id3v2_version', '3', '-y', outputPath)
   }
@@ -241,7 +329,7 @@ async function exists(p) {
 
 /**
  * Render the audio timeline to `outputPath` (MP3).
- * timeline: { tracks, output: 'audio', master?: { loudness?: bool }, title? }
+ * timeline: { tracks, output: 'audio', master?: { loudness?: bool, duck? }, title?, chapters? }
  * downloadedFiles: Map clip id -> local source file.
  */
 export async function renderAudioTimeline({ timeline, downloadedFiles, outputPath, jobDir, onProgress = () => {}, signal }) {
@@ -299,17 +387,28 @@ export async function renderAudioTimeline({ timeline, downloadedFiles, outputPat
   }
   if (reused) console.log(`[audio-render] ${reused}/${clipCount} segments unchanged since an earlier render, reused`)
 
+  // Auto-duck on the music tracks' lanes, chapters as metadata
+  const duck = cleanDuck(timeline.master?.duck)
+  const ducked = duck ? new Set(duck.tracks) : null
+  const laneFilters = lanes.map(l => (ducked?.has(String(l.trackId)) ? duckFilter(duck) : null))
+  const chapters = cleanChapters(timeline.chapters, audioTimelineEnd(timeline.tracks))
+  let chaptersFile = null
+  if (chapters.length) {
+    chaptersFile = path.join(jobDir, 'chapters.txt')
+    await fs.writeFile(chaptersFile, chapterMetadata(chapters))
+  }
+
   // 2. Loudness: measure the mix first
   let measured = null
   if (level) {
     onProgress(0.55, 'Measuring loudness...')
-    const stderr = await run(mixArgs(listFiles, null, { level, mode: 'measure' }), signal, { keepStderr: true })
+    const stderr = await run(mixArgs(listFiles, null, { level, mode: 'measure', laneFilters }), signal, { keepStderr: true })
     measured = parseLoudnorm(stderr)
     if (!measured) console.warn('[audio-render] Loudness measurement unreadable, levelling in one pass')
   }
 
   // 3. Mix + encode
   onProgress(0.75, level ? 'Levelling and encoding...' : 'Mixing and encoding...')
-  await run(mixArgs(listFiles, outputPath, { level, measured, title: timeline.title || null }), signal)
+  await run(mixArgs(listFiles, outputPath, { level, measured, title: timeline.title || null, laneFilters, chaptersFile }), signal)
   onProgress(1, 'Complete')
 }
