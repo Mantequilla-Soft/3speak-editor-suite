@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Volume2, RotateCcw, Trash2 } from 'lucide-react'
+import { Volume2, RotateCcw, Trash2, Link, Unlink } from 'lucide-react'
 import { MAX_CLIP_VOLUME } from '../utils/audioGain'
 import { NOISE_LEVELS, STUDIO_LEVEL, recordingSource, canCleanSource, requestCleanVoice, cleanedFields, uncleanedFields } from './ClipProperties'
 import { commonValue, sourcesOf } from '../utils/multiSelect'
@@ -13,7 +13,7 @@ import { commonValue, sourcesOf } from '../utils/multiSelect'
  * place); onUpdateClips(updates) sets the same fields on all of them;
  * onUpdateRecording(source, updates) changes every piece of one recording.
  */
-export default function MultiClipProperties({ clips, audioMode = false, onUpdateClips, onUpdateRecording, onRemove }) {
+export default function MultiClipProperties({ clips, audioMode = false, onUpdateClips, onUpdateRecording, onRemove, count, grouped = false, onGroup, onUngroup }) {
   const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
 
@@ -109,11 +109,23 @@ export default function MultiClipProperties({ clips, audioMode = false, onUpdate
         </div>
       )}
 
-      {onRemove && (
+      {(onGroup || onRemove) && (
         <div className="property-group">
-          <button className="multi-remove-btn" onClick={onRemove}>
-            <Trash2 size={13} /> Remove {clips.length} clips
-          </button>
+          {onGroup && (grouped ? (
+            <button className="multi-action-btn" onClick={onUngroup}>
+              <Unlink size={13} /> Ungroup
+            </button>
+          ) : (
+            <button className="multi-action-btn" onClick={onGroup}>
+              <Link size={13} /> Group {count ?? clips.length} clips
+            </button>
+          ))}
+          {onGroup && <p className="noise-hint">{grouped ? 'These clips are one group: they move and trim together.' : 'Grouped clips move and trim together.'}</p>}
+          {onRemove && (
+            <button className="multi-action-btn multi-remove-btn" onClick={onRemove}>
+              <Trash2 size={13} /> Remove {count ?? clips.length} clips
+            </button>
+          )}
         </div>
       )}
     </div>

@@ -1164,6 +1164,20 @@ function App() {
   // the selected clip
   const sideClip = compactPropertiesClip || (isDesktop ? selectedClip : null)
 
+  // Phones: Select mode, each tap on a clip adds or removes it (the panel
+  // waits until Done, as it would cover the timeline)
+  const [selectMode, setSelectMode] = useState(false)
+
+  // Group what is selected (their existing groups come along: a video's
+  // sound is linked to it through its group), or ungroup a selection that is
+  // one group
+  const groupSelection = (clips) => {
+    const groups = new Set(clips.map(c => c.groupId).filter(Boolean))
+    const ids = new Set(clips.map(c => c.id))
+    for (const c of tracks.flatMap(t => t.clips)) if (groups.has(c.groupId)) ids.add(c.id)
+    groupClips([...ids])
+  }
+
   // Several clips selected: one panel for all of them (volume, mute, voice)
   const multiClips = useMemo(() => {
     if (selectedClipIds.length < 2) return []
@@ -1175,7 +1189,8 @@ function App() {
     const ids = new Set(multiTargets.map(c => c.id))
     applyTracks(ts => ts.map(t => ({ ...t, clips: t.clips.map(c => (ids.has(c.id) ? { ...c, ...updates } : c)) })))
   }
-  const multiPanel = multiClips.length > 1 ? (
+  const multiGroup = multiClips.length > 1 && multiClips[0].groupId && multiClips.every(c => c.groupId === multiClips[0].groupId) ? multiClips[0].groupId : null
+  const multiPanel = multiClips.length > 1 && !(selectMode && !isDesktop) ? (
           <div className="compact-properties-panel multi-clip-panel">
             <div className="compact-properties-header">
               <span className="compact-properties-title">{multiClips.length} clips selected</span>
@@ -1189,6 +1204,10 @@ function App() {
               onUpdateClips={updateClips}
               onUpdateRecording={audioMode ? updateRecording : null}
               onRemove={() => handleRemoveClips(multiClips.map(c => c.id))}
+              count={multiClips.length}
+              grouped={!!multiGroup}
+              onGroup={() => groupSelection(multiClips)}
+              onUngroup={() => ungroupClips(multiClips[0].id)}
             />
           </div>
   ) : null
@@ -1478,6 +1497,8 @@ function App() {
             selectedClipId={selectedClipId}
             selectedClipIds={selectedClipIds}
             onSelectClips={selectClips}
+            selectMode={selectMode}
+            onSelectModeChange={setSelectMode}
             playheadPosition={playheadPosition}
             onSetPlayhead={setPlayheadPosition}
             onSelectClip={selectClip}

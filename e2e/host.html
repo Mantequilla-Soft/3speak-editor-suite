@@ -20,7 +20,8 @@ window.addEventListener('message', async (e) => {
   window.__messages.push(e.data)
   if (e.data.type === 'editor-ready') {
     send({ type: 'set-theme', theme: 'dark' })
-    send({ type: 'set-desktop', isDesktop: true })
+    // like 3Speak's EditorModal: desktop layout from 768px
+    send({ type: 'set-desktop', isDesktop: window.matchMedia('(min-width: 768px)').matches })
     send({ type: 'drafts-session', session: window.__session || null, reason: window.__session ? null : 'logged-out', hasMedia: !!FILE })
     if (FILE) {
       const blob = await (await fetch(FILE)).blob()

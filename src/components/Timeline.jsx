@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo, memo } from 'react'
 import { boxFrom, clipIdsInBox, toggleInSelection } from '../utils/marquee'
-import { Trash2, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker, Maximize2 } from 'lucide-react'
+import { Trash2, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker, Maximize2, ListChecks } from 'lucide-react'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 import { getGroupColor } from '../hooks/useTimeline'
 import { MAX_TIMELINE_SECONDS } from '../utils/limits'
@@ -580,6 +580,8 @@ function Timeline({
   selectedClipId,
   selectedClipIds = null,
   onSelectClips,
+  selectMode = false,
+  onSelectModeChange,
   playheadPosition,
   onSetPlayhead,
   onSelectClip,
@@ -641,14 +643,15 @@ function Timeline({
   // memoised without their callbacks, so the click handler reads refs.
   const selectedSet = useMemo(() => new Set(selectedClipIds || []), [selectedClipIds])
   const selectionRef = useRef({})
-  selectionRef.current = { selectedClipId, selectedClipIds: selectedClipIds || [], onSelectClip, onSelectClips }
+  selectionRef.current = { selectedClipId, selectedClipIds: selectedClipIds || [], onSelectClip, onSelectClips, selectMode }
   const currentSelection = () => {
     const { selectedClipId: one, selectedClipIds: many } = selectionRef.current
     return many.length ? many : (one ? [one] : [])
   }
   const handleClipSelect = useCallback((clipId, e) => {
-    const { onSelectClip: one, onSelectClips: many } = selectionRef.current
-    if (many && (e?.shiftKey || e?.metaKey || e?.ctrlKey)) many(toggleInSelection(currentSelection(), clipId))
+    const { onSelectClip: one, onSelectClips: many, selectMode: picking } = selectionRef.current
+    // Select mode (phones: the Select button) or Shift/Ctrl/Cmd: each tap adds or removes a clip
+    if (many && (picking || e?.shiftKey || e?.metaKey || e?.ctrlKey)) many(toggleInSelection(currentSelection(), clipId))
     else one(clipId)
   }, [])
 
@@ -1138,6 +1141,17 @@ function Timeline({
           )}
         </div>
         <div className="toolbar-right">
+          {/* Phones have no box select: tap Select, then tap each clip */}
+          {!isDesktop && onSelectClips && onSelectModeChange && (
+            <button
+              className={`action-btn select-mode-btn${selectMode ? ' active' : ''}`}
+              onClick={() => onSelectModeChange(!selectMode)}
+              aria-pressed={selectMode}
+              title={selectMode ? 'Done selecting' : 'Select several clips: tap each one'}
+            >
+              <ListChecks size={14} /> <span>{selectMode ? 'Done' : 'Select'}</span>
+            </button>
+          )}
           <button
             className="action-btn"
             onClick={() => onRemoveGap && onRemoveGap()}
@@ -1231,6 +1245,16 @@ function Timeline({
           )}
         </div>
       </div>
+
+      {selectMode && (
+        <div className="timeline-select-hint" role="status">
+          <span>{(() => { const n = currentSelection().length; return n ? `${n} clip${n === 1 ? '' : 's'} selected: tap more, or Done` : 'Tap each clip you want to select' })()}</span>
+          {currentSelection().length > 0 && (
+            <button className="action-btn" onClick={() => onSelectClips([])}>Clear</button>
+          )}
+          <button className="action-btn" onClick={() => onSelectModeChange(false)}>Done</button>
+        </div>
+      )}
 
       {/* Timeline content wrapper */}
       <div

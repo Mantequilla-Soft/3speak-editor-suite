@@ -541,12 +541,54 @@ try {
     await f.locator('.multi-clip-panel').getByRole('radio', { name: 'Studio voice' }).click()
     await until(() => { const d = mine(); return d && clipsOf(d.state).filter(c => ids.includes(c.id)).every(c => c.denoise === 'studio') }, 'Studio voice on all three', 60000)
 
+    // Group them (one group id on all three), then Ungroup
+    const groupIds = () => { const d = mine(); return d ? clipsOf(d.state).filter(c => ids.includes(c.id)).map(c => c.groupId || null) : [] }
+    await f.locator('.multi-clip-panel').getByRole('button', { name: 'Group 3 clips' }).click()
+    await until(() => { const g = groupIds(); return g.length === 3 && g[0] && g.every(x => x === g[0]) }, 'one group for all three')
+    await f.locator('.multi-clip-panel').getByRole('button', { name: 'Ungroup' }).click()
+    await until(() => { const g = groupIds(); return g.length === 3 && g.every(x => x == null) }, 'ungrouped')
+
     // Escape clears it, Ctrl+A takes every clip again
     await m.page.keyboard.press('Escape')
     assert.equal(await f.locator('.timeline-clip-v2.selected').count(), 0)
     await m.page.keyboard.press('Control+a')
     assert.equal(await f.locator('.timeline-clip-v2.selected').count(), 3)
     await m.ctx.close()
+  })
+
+  await step('phones: Select, tap each clip, Done opens the panel for all of them, Group', async () => {
+    if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
+    const ph = await openEditor({ viewport: { width: 390, height: 844 } })
+    const f = ph.frame
+    await f.locator('.timeline-clip-v2.audio').first().waitFor({ timeout: 15000 })
+    const firstId = await f.locator('.timeline-clip-v2.audio').first().getAttribute('data-clip-id')
+    await until(() => drafts().find(p => clipsOf(p.state).some(c => c.id === firstId && /\/api\/upload\/files\//.test((c.url || '') + (c.serverUrl || '')))), 'recording uploaded', 45000)
+    await f.getByRole('button', { name: /Cut silences/ }).click()
+    await f.getByRole('dialog', { name: 'Cut silences' }).waitFor()
+    await until(async () => /cuts/.test(await f.locator('.silence-cut-summary').innerText().catch(() => '')), 'cut plan summary')
+    await f.getByRole('button', { name: /Edit for me|This clip only/ }).click()
+    await until(async () => (await f.locator('.timeline-clip-v2.audio').count()) === 3, 'three speech parts')
+    const ids = await f.locator('.timeline-clip-v2.audio').evaluateAll(els => els.map(e => e.dataset.clipId))
+
+    await f.locator('.select-mode-btn').click()
+    for (const id of ids) await f.locator(`.timeline-clip-v2[data-clip-id="${id}"]`).click()
+    assert.equal(await f.locator('.timeline-clip-v2.selected').count(), 3)
+    assert.match(await f.locator('.timeline-select-hint').innerText(), /3 clips selected/)
+    assert.equal(await f.locator('.multi-clip-panel').count(), 0, 'no panel over the timeline while picking')
+    // tapping one again takes it out, and back in
+    await f.locator(`.timeline-clip-v2[data-clip-id="${ids[1]}"]`).click()
+    assert.equal(await f.locator('.timeline-clip-v2.selected').count(), 2)
+    await f.locator(`.timeline-clip-v2[data-clip-id="${ids[1]}"]`).click()
+    await f.locator('.timeline-select-hint').getByRole('button', { name: 'Done' }).click()
+    assert.equal(await f.locator('.multi-clip-panel .compact-properties-title').innerText(), '3 clips selected')
+
+    await f.locator('.multi-clip-panel').getByRole('button', { name: 'Group 3 clips' }).click()
+    await until(() => {
+      const d = drafts().find(p => ids.every(id => clipsOf(p.state).some(c => c.id === id)))
+      const g = d ? clipsOf(d.state).filter(c => ids.includes(c.id)).map(c => c.groupId) : []
+      return g.length === 3 && g[0] && g.every(x => x === g[0])
+    }, 'grouped from the phone')
+    await ph.ctx.close()
   })
 
   await step('the shorts video editor is unchanged (no mode, Video 1 + Audio 1, Render, no audio tools)', async () => {

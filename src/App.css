@@ -6703,8 +6703,13 @@ input[type="range"] {
   pointer-events: none;
 }
 
-/* Several clips selected: remove them all */
-.multi-remove-btn {
+/* Several clips selected: group / remove them all */
+.multi-action-btn + .multi-action-btn,
+.noise-hint + .multi-action-btn {
+  margin-top: 0.5rem;
+}
+
+.multi-action-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -6717,7 +6722,35 @@ input[type="range"] {
   cursor: pointer;
 }
 
+.multi-action-btn:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
 .multi-remove-btn:hover {
   border-color: #ef4444;
   color: #ef4444;
+}
+
+/* Phones: Select mode (tap each clip) */
+.select-mode-btn.active {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  background: var(--accent-light);
+}
+
+.timeline-select-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  background: var(--accent-light);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.timeline-select-hint span {
+  flex: 1;
+  min-width: 0;
 }
