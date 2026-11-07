@@ -1,5 +1,12 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { X, Circle, Square, RotateCcw, Check, Mic } from 'lucide-react'
+import { X, Circle, Square, RotateCcw, Check } from 'lucide-react'
+import { finiteDuration, pickRecorderType, recordingExtension } from '../utils/mediaDuration'
+import { rmsLevel, levelHistory, drawLevels } from '../utils/voiceGraph'
+
+// Level samples per second for the graph (and the take's shape afterwards)
+const LEVEL_RATE = 20
+// Seconds shown in the live graph while recording (newest on the right)
+const LIVE_WINDOW = 8
 
 function RecordAudio({ onRecorded, onClose }) {
   const streamRef = useRef(null)
@@ -7,39 +14,63 @@ function RecordAudio({ onRecorded, onClose }) {
   const chunksRef = useRef([])
   const timerRef = useRef(null)
   const playbackRef = useRef(null)
+  const audioCtxRef = useRef(null)
+  const analyserRef = useRef(null)
+  const rafRef = useRef(null)
+  const canvasRef = useRef(null)
+  const levelsRef = useRef(levelHistory())
+  const startedAtRef = useRef(0)
+  const durationRef = useRef(0)
+  const phaseRef = useRef('starting')
 
   const [phase, setPhase] = useState('starting') // starting | ready | recording | done
   const [recordedBlob, setRecordedBlob] = useState(null)
   const [elapsed, setElapsed] = useState(0)
   const [error, setError] = useState(null)
+  const [previewReady, setPreviewReady] = useState(false)
+  phaseRef.current = phase
 
-  // Request microphone on mount
-  useEffect(() => {
-    let cancelled = false
-
-    async function startMic() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-        if (cancelled) {
-          stream.getTracks().forEach(t => t.stop())
-          return
-        }
-        streamRef.current = stream
-        setPhase('ready')
-      } catch {
-        if (!cancelled) {
-          setError('Could not access microphone. Please allow microphone permissions.')
-        }
-      }
-    }
-
-    startMic()
-
-    return () => {
-      cancelled = true
-      stopEverything()
-    }
+  // The live graph: the mic's level, drawn every frame. Before recording it is
+  // a level check; while recording every sample is kept for the take's shape.
+  const stopGraph = useCallback(() => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    rafRef.current = null
+    analyserRef.current = null
+    const ctx = audioCtxRef.current
+    audioCtxRef.current = null
+    if (ctx && ctx.state !== 'closed') ctx.close().catch(() => {})
   }, [])
+
+  const startGraph = useCallback((stream) => {
+    stopGraph()
+    const Ctx = window.AudioContext || window.webkitAudioContext
+    if (!Ctx) return
+    const ctx = new Ctx()
+    const analyser = ctx.createAnalyser()
+    analyser.fftSize = 1024
+    ctx.createMediaStreamSource(stream).connect(analyser)
+    audioCtxRef.current = ctx
+    analyserRef.current = analyser
+    const buf = new Float32Array(analyser.fftSize)
+    let lastSample = 0
+    let live = levelHistory()
+    const tick = (now) => {
+      const a = analyserRef.current
+      if (!a) return
+      a.getFloatTimeDomainData(buf)
+      const level = rmsLevel(buf)
+      if (now - lastSample >= 1000 / LEVEL_RATE) {
+        lastSample = now
+        live.push(level)
+        if (phaseRef.current === 'recording') levelsRef.current.push(level)
+        if (live.length > LIVE_WINDOW * LEVEL_RATE) live = live.slice(-LIVE_WINDOW * LEVEL_RATE)
+      }
+      const canvas = canvasRef.current
+      if (canvas) drawLevels(canvas, live, { slots: LIVE_WINDOW * LEVEL_RATE, align: 'right' })
+      rafRef.current = requestAnimationFrame(tick)
+    }
+    rafRef.current = requestAnimationFrame(tick)
+  }, [stopGraph])
 
   const stopEverything = useCallback(() => {
     if (timerRef.current) {
@@ -53,70 +84,94 @@ function RecordAudio({ onRecorded, onClose }) {
       streamRef.current.getTracks().forEach(t => t.stop())
       streamRef.current = null
     }
-  }, [])
+    stopGraph()
+  }, [stopGraph])
+
+  const openMic = useCallback(async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    streamRef.current = stream
+    startGraph(stream)
+    return stream
+  }, [startGraph])
+
+  // Request microphone on mount
+  useEffect(() => {
+    let cancelled = false
+    openMic().then(() => {
+      if (cancelled) stopEverything()
+      else setPhase('ready')
+    }, () => {
+      if (!cancelled) setError('Could not access microphone. Please allow microphone permissions.')
+    })
+    return () => {
+      cancelled = true
+      stopEverything()
+    }
+  }, [openMic, stopEverything])
 
   const startRecording = useCallback(() => {
     if (!streamRef.current) return
+    // An AudioContext made before the first click can start suspended
+    audioCtxRef.current?.resume?.().catch(() => {})
 
     chunksRef.current = []
-    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-      ? 'audio/webm;codecs=opus'
-      : 'audio/webm'
-    const recorder = new MediaRecorder(streamRef.current, { mimeType })
+    levelsRef.current = levelHistory()
+    const mimeType = pickRecorderType((t) => window.MediaRecorder?.isTypeSupported?.(t))
+    let recorder
+    try {
+      recorder = new MediaRecorder(streamRef.current, mimeType ? { mimeType } : undefined)
+    } catch {
+      setError('This browser cannot record audio here.')
+      return
+    }
 
     recorder.ondataavailable = (e) => {
       if (e.data.size > 0) chunksRef.current.push(e.data)
     }
 
     recorder.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
-      setRecordedBlob(blob)
+      durationRef.current = (performance.now() - startedAtRef.current) / 1000
+      const type = recorder.mimeType || mimeType || 'audio/webm'
+      setRecordedBlob(new Blob(chunksRef.current, { type }))
+      setPreviewReady(false)
       setPhase('done')
     }
 
     recorderRef.current = recorder
     recorder.start(100)
+    startedAtRef.current = performance.now()
     setElapsed(0)
     setPhase('recording')
 
-    const startTime = Date.now()
     timerRef.current = setInterval(() => {
-      setElapsed(Math.floor((Date.now() - startTime) / 1000))
+      setElapsed(Math.floor((performance.now() - startedAtRef.current) / 1000))
     }, 500)
   }, [])
 
   const stopRecording = useCallback(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current)
-      timerRef.current = null
-    }
-    if (recorderRef.current && recorderRef.current.state !== 'inactive') {
-      recorderRef.current.stop()
-    }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(t => t.stop())
-      streamRef.current = null
-    }
-  }, [])
+    stopEverything()
+  }, [stopEverything])
 
   const handleRetake = useCallback(async () => {
     setRecordedBlob(null)
     setElapsed(0)
     setPhase('starting')
-
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      streamRef.current = stream
+      await openMic()
       setPhase('ready')
     } catch {
       setError('Could not access microphone.')
     }
-  }, [])
+  }, [openMic])
 
   const handleUseClip = useCallback(() => {
     if (!recordedBlob) return
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
-    const file = new File([recordedBlob], `Recording_${timestamp}.webm`, { type: 'audio/webm' })
+    const type = recordedBlob.type || 'audio/webm'
+    const file = new File([recordedBlob], `Recording_${timestamp}.${recordingExtension(type)}`, { type: type.split(';')[0] })
+    // Browser recordings carry no length of their own: the recorder's clock
+    // stands in until the file is measured
+    file._durationHint = durationRef.current
     onRecorded([file])
     onClose()
   }, [recordedBlob, onRecorded, onClose])
@@ -126,12 +181,33 @@ function RecordAudio({ onRecorded, onClose }) {
     onClose()
   }, [stopEverything, onClose])
 
-  // Set playback source when done
+  // Playback: the file has no duration of its own, so measure it before the
+  // player shows (otherwise its bar grows while it plays)
   useEffect(() => {
-    if (phase === 'done' && recordedBlob && playbackRef.current) {
-      playbackRef.current.src = URL.createObjectURL(recordedBlob)
+    const el = playbackRef.current
+    if (phase !== 'done' || !recordedBlob || !el) return
+    const url = URL.createObjectURL(recordedBlob)
+    let cancelled = false
+    el.onloadedmetadata = async () => {
+      await finiteDuration(el)
+      if (cancelled) return
+      setPreviewReady(true)
+      el.play?.().catch(() => {})
+    }
+    el.src = url
+    return () => {
+      cancelled = true
+      el.onloadedmetadata = null
+      el.pause?.()
+      URL.revokeObjectURL(url)
     }
   }, [phase, recordedBlob])
+
+  // The whole take's shape, once it's done
+  useEffect(() => {
+    if (phase !== 'done' || !canvasRef.current) return
+    drawLevels(canvasRef.current, levelsRef.current, { align: 'fit' })
+  }, [phase])
 
   const formatTime = (secs) => {
     const m = Math.floor(secs / 60)
@@ -152,11 +228,14 @@ function RecordAudio({ onRecorded, onClose }) {
         <div className="record-audio-preview">
           {error ? (
             <div className="record-error">{error}</div>
-          ) : phase === 'done' ? (
-            <audio ref={playbackRef} controls autoPlay />
           ) : (
             <div className="record-audio-indicator">
-              <Mic size={48} className={phase === 'recording' ? 'recording-pulse' : ''} />
+              <canvas
+                ref={canvasRef}
+                className={`record-voice-graph${phase === 'recording' ? ' recording' : ''}`}
+                aria-label={phase === 'done' ? 'Your recording' : 'Microphone level'}
+                role="img"
+              />
               {phase === 'recording' && (
                 <div className="record-timer">
                   <span className="record-dot" />
@@ -167,7 +246,10 @@ function RecordAudio({ onRecorded, onClose }) {
                 <div className="record-loading">Accessing microphone...</div>
               )}
               {phase === 'ready' && (
-                <div className="record-loading">Ready to record</div>
+                <div className="record-loading">Ready to record: speak to check your level</div>
+              )}
+              {phase === 'done' && (
+                <audio ref={playbackRef} controls className={previewReady ? '' : 'record-audio-loading'} />
               )}
             </div>
           )}

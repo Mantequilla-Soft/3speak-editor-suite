@@ -111,7 +111,7 @@ const step = async (name, fn) => {
   }
 }
 
-const browser = await chromium.launch({ executablePath: CHROME, args: ['--autoplay-policy=no-user-gesture-required'] })
+const browser = await chromium.launch({ executablePath: CHROME, args: ['--autoplay-policy=no-user-gesture-required', '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'] })
 const consoleErrors = []
 // tourSeen: act as a returning user (the first-visit tours are already done),
 // so the tour overlay doesn't sit on top of the controls the steps click.
@@ -442,6 +442,37 @@ try {
     assert.deepEqual(chapters.map(c => c.tags.title), ['Intro', 'Second part'])
     assert.ok(Math.abs(+chapters[1].start_time - second.start) < 0.01)
     await p.ctx.close()
+  })
+
+  await step('recording a voice: live graph, full length in the preview, Use puts it on the Voice track with its length', async () => {
+    const r = await openEditor({ file: null })
+    const f = r.frame
+    await f.locator('.empty-timeline-actions').getByRole('button', { name: 'Record', exact: true }).click()
+    await f.locator('.record-start-btn').waitFor({ timeout: 15000 })
+    // bars away from the centre line = the graph moves with the (fake) mic
+    const inked = () => f.evaluate(() => {
+      const c = document.querySelector('.record-voice-graph')
+      const g = c.getContext('2d').getImageData(0, 0, c.width, Math.floor(c.height / 3)).data
+      let n = 0
+      for (let i = 3; i < g.length; i += 4) if (g[i] > 0) n++
+      return n
+    })
+    await until(async () => (await inked()) > 0, 'live voice graph before recording', 10000)
+    await f.locator('.record-start-btn').click()
+    await new Promise(res => setTimeout(res, 3000))
+    await f.locator('.record-stop-btn').click()
+    const audio = f.locator('.record-audio-indicator audio:not(.record-audio-loading)')
+    await audio.waitFor({ timeout: 15000 })
+    const shown = await audio.evaluate(el => el.duration)
+    assert.ok(Number.isFinite(shown) && shown > 2.3 && shown < 4.5, `preview length ${shown}`)
+    assert.ok((await inked()) > 0, 'the take\'s shape is drawn')
+    await f.locator('.record-use-btn').click()
+    const d = await until(() => drafts().find(p => clipsOf(p.state).some(c => /^Recording_/.test(c.name || ''))), 'draft with the recording', 45000)
+    const rec = clipsOf(d.state).find(c => /^Recording_/.test(c.name))
+    assert.equal(rec.track, clipsOf(d.state).find(c => !c.music && !c.templateRole)?.track, 'on the voice track')
+    assert.ok(Number.isFinite(rec.duration) && rec.duration > 2.3 && rec.duration < 4.5, `clip length ${rec.duration}`)
+    assert.ok(Math.abs((rec.endTime - rec.startTime) - rec.duration) < 0.05, `whole take on the timeline: ${rec.startTime}-${rec.endTime}`)
+    await r.ctx.close()
   })
 
   await step('the shorts video editor is unchanged (no mode, Video 1 + Audio 1, Render, no audio tools)', async () => {

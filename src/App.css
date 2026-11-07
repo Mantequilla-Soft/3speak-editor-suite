@@ -2999,7 +2999,32 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  width: 100%;
   color: var(--text-secondary);
+}
+
+/* The voice graph: live mic level while checking and recording, the whole
+   take's shape afterwards */
+.record-voice-graph {
+  display: block;
+  width: 100%;
+  height: 96px;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary, rgba(127, 127, 127, 0.08));
+  border-radius: 8px;
+}
+
+.record-voice-graph.recording {
+  color: #ef4444;
+}
+
+.record-audio-indicator audio {
+  width: 100%;
+}
+
+/* until the player knows the take's full length */
+.record-audio-loading {
+  visibility: hidden;
 }
 
 .record-audio-indicator .recording-pulse {

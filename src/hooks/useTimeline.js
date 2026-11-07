@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react'
+import { finiteDuration, isUsableDuration, pickDuration } from '../utils/mediaDuration'
 import { isHlsUrl, getHlsDuration } from '../utils/hlsHelper'
 import { downloadHlsToMp4 } from '../utils/hlsDownloader'
 import { api, getBackendUrl } from '../utils/backendSelector'
@@ -174,11 +175,15 @@ function probeMedia(file) {
       resolve({ duration: duration ?? 10, durationKnown: duration != null, playable })
     }
     const timer = setTimeout(() => finish(type !== 'video' && duration != null), 8000)
-    el.onloadedmetadata = () => {
-      duration = el.duration
+    let metaDone = false
+    el.onloadedmetadata = async () => {
+      // Browser recordings report Infinity until scanned to the end
+      duration = isUsableDuration(el.duration) ? el.duration : await finiteDuration(el)
+      metaDone = true
       if (type !== 'video') finish(true)
+      else if (el.readyState >= 2) finish(el.videoWidth > 0)
     }
-    el.onloadeddata = () => finish(el.videoWidth > 0)
+    el.onloadeddata = () => { if (metaDone) finish(el.videoWidth > 0) }
     el.onerror = () => finish(false)
     el.src = src
   })
@@ -269,9 +274,11 @@ function getMediaMetadataFromURL(url, mediaType) {
     const element = document.createElement(mediaType === 'audio' ? 'audio' : 'video')
     element.preload = 'metadata'
     element.crossOrigin = 'anonymous'
-    element.onloadedmetadata = () => {
+    element.onloadedmetadata = async () => {
+      // Browser recordings report Infinity until scanned to the end
+      const duration = isUsableDuration(element.duration) ? element.duration : await finiteDuration(element)
       resolve({
-        duration: element.duration,
+        duration,
         videoWidth: element.videoWidth || 0,
         videoHeight: element.videoHeight || 0
       })
@@ -878,7 +885,13 @@ export function useTimeline() {
     if (options.file && !keepImportable([options.file]).length) return
 
     const meta = await getMediaMetadataFromURL(url, mediaType)
-    const duration = meta.duration
+    // A clip of Infinity/NaN seconds would hang the timeline: fall back to the
+    // caller's hint (the recorder's own clock), and never add one without a length
+    const duration = pickDuration(meta.duration, options.durationHint)
+    if (duration == null) {
+      console.warn(`[load-media] ${name}: no duration, not added`)
+      return null
+    }
     const libraryId = generateLibraryId()
     const item = {
       id: libraryId,

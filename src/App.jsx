@@ -577,7 +577,8 @@ function App() {
       // Use pre-uploaded URL if InlineRecorder already uploaded it
       const preUploadedUrl = file._serverUrl || null
       const url = preUploadedUrl || URL.createObjectURL(file)
-      const added = await addToLibraryAndTimeline(url, file.name, type, { file, serverUrl: preUploadedUrl })
+      // durationHint: the recorder's own clock, for recordings that don't carry a length
+      const added = await addToLibraryAndTimeline(url, file.name, type, { file, serverUrl: preUploadedUrl, durationHint: file._durationHint })
       // Green screen take from the camera recorder
       if (added?.clipId && type === 'video' && file._chromaKey) updateClip(added.clipId, { chromaKey: file._chromaKey })
     }
