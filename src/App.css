@@ -6692,3 +6692,32 @@ input[type="range"] {
 .audiogram a.silence-cut-apply {
   text-decoration: none;
 }
+
+/* Box select on the timeline (drag from an empty spot over clips) */
+.timeline-marquee {
+  position: absolute;
+  z-index: 40;
+  border: 1px solid var(--accent-primary);
+  background: color-mix(in srgb, var(--accent-primary) 12%, transparent);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* Several clips selected: remove them all */
+.multi-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.multi-remove-btn:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+}

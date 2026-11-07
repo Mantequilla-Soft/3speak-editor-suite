@@ -498,6 +498,57 @@ try {
     await r.ctx.close()
   })
 
+  await step('select many: a box over the cut pieces, then louder (150%) and Studio voice for all of them, boosted in the preview', async () => {
+    // a free draft slot (the recording step's draft takes the last one)
+    if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
+    const m = await openEditor()
+    const f = m.frame
+    await f.locator('.timeline-clip-v2.audio').first().waitFor({ timeout: 15000 })
+    const firstId = await f.locator('.timeline-clip-v2.audio').first().getAttribute('data-clip-id')
+    await until(() => drafts().find(p => clipsOf(p.state).some(c => c.id === firstId && /\/api\/upload\/files\//.test((c.url || '') + (c.serverUrl || '')))), 'recording uploaded', 45000)
+    await f.getByRole('button', { name: /Cut silences/ }).click()
+    await f.getByRole('dialog', { name: 'Cut silences' }).waitFor()
+    await until(async () => /cuts/.test(await f.locator('.silence-cut-summary').innerText().catch(() => '')), 'cut plan summary')
+    await f.getByRole('button', { name: /Edit for me|This clip only/ }).click()
+    await until(async () => (await f.locator('.timeline-clip-v2.audio').count()) === 3, 'three speech parts')
+    const ids = await f.locator('.timeline-clip-v2.audio').evaluateAll(els => els.map(e => e.dataset.clipId))
+    const mine = () => drafts().find(p => ids.every(id => clipsOf(p.state).some(c => c.id === id)))
+
+    // drag from the empty music track (right) up over the voice pieces (left)
+    const [voiceRow, musicRow] = await f.locator('.timeline-track-v2.audio').all()
+    const content = await f.locator('.timeline-content').boundingBox()
+    const mb = await musicRow.boundingBox()
+    const vb = await voiceRow.boundingBox()
+    await m.page.mouse.move(Math.min(mb.x + mb.width, content.x + content.width) - 6, mb.y + mb.height / 2)
+    await m.page.mouse.down()
+    await m.page.mouse.move(vb.x + 2, vb.y + 2, { steps: 8 })
+    assert.equal(await f.locator('.timeline-marquee').count(), 1, 'the box shows while dragging')
+    await m.page.mouse.up()
+    assert.equal(await f.locator('.timeline-clip-v2.selected').count(), 3)
+    assert.equal(await f.locator('.multi-clip-panel .compact-properties-title').innerText(), '3 clips selected')
+
+    await f.locator('[aria-label="Volume of all selected clips"]').fill('150')
+    await until(() => { const d = mine(); return d && clipsOf(d.state).filter(c => ids.includes(c.id)).every(c => c.volume === 150) }, 'all three at 150%')
+
+    // the preview plays them louder than an <audio> element can: through a gain node
+    await f.locator('.global-preview button[title="Play"]').first().click()
+    await new Promise(res => setTimeout(res, 1200))
+    const el = await f.evaluate(() => { const a = document.querySelector('.global-preview audio'); return a && { boost: a.dataset.boost, cors: a.crossOrigin, paused: a.paused, t: a.currentTime, error: a.error && a.error.code } })
+    assert.ok(el && el.boost === '1' && el.cors === 'anonymous' && !el.paused && el.t > 0.3 && !el.error, `boosted playback: ${JSON.stringify(el)}`)
+    await f.locator('.global-preview button[title="Pause"]').first().click()
+
+    // (after the playback check: the cleaned copy is AAC, which this test Chromium can't decode)
+    await f.locator('.multi-clip-panel').getByRole('radio', { name: 'Studio voice' }).click()
+    await until(() => { const d = mine(); return d && clipsOf(d.state).filter(c => ids.includes(c.id)).every(c => c.denoise === 'studio') }, 'Studio voice on all three', 60000)
+
+    // Escape clears it, Ctrl+A takes every clip again
+    await m.page.keyboard.press('Escape')
+    assert.equal(await f.locator('.timeline-clip-v2.selected').count(), 0)
+    await m.page.keyboard.press('Control+a')
+    assert.equal(await f.locator('.timeline-clip-v2.selected').count(), 3)
+    await m.ctx.close()
+  })
+
   await step('the shorts video editor is unchanged (no mode, Video 1 + Audio 1, Render, no audio tools)', async () => {
     const v = await openEditor({ file: null, mode: 'video' })
     const ready = await v.page.evaluate(() => window.__messages.find(m => m.type === 'editor-ready'))

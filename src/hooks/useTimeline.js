@@ -376,6 +376,9 @@ export function useTimeline() {
   // Tracks: array of { id, type: 'video' | 'audio', clips: [] }
   const [tracks, setTracks] = useState(initialTracks)
   const [selectedClipId, setSelectedClipId] = useState(null)
+  // Several clips at once (drag a box on the timeline, Ctrl/Cmd+A, Shift-click):
+  // two or more ids, and then selectedClipId is null
+  const [selectedClipIds, setSelectedClipIds] = useState([])
   const [selectedLibraryId, setSelectedLibraryId] = useState(null)
 
   // Set when an import lands on the timeline; the effect below then tells the
@@ -760,6 +763,7 @@ export function useTimeline() {
     setTracks(nextTracks)
     setLibrary(Array.isArray(state?.library) ? state.library : [])
     setSelectedClipId(null)
+    setSelectedClipIds([])
   }, [])
 
   /**
@@ -1512,23 +1516,23 @@ export function useTimeline() {
   }, [setTracksWithHistory])
 
   // Remove clip from timeline (group-aware: removes all clips in the same group)
-  const removeClip = useCallback((clipId) => {
-    // Find the clip's groupId first
-    let groupId = null
+  // One clip id, or several (a multi-selection): one undo step either way
+  const removeClip = useCallback((clipIdOrIds) => {
+    const startIds = new Set(Array.isArray(clipIdOrIds) ? clipIdOrIds : [clipIdOrIds])
+    // The clips' groups go with them
+    const groupIds = new Set()
     for (const track of tracks) {
-      const clip = track.clips.find(c => c.id === clipId)
-      if (clip) {
-        groupId = clip.groupId
-        break
+      for (const clip of track.clips) {
+        if (startIds.has(clip.id) && clip.groupId) groupIds.add(clip.groupId)
       }
     }
 
     // Collect all IDs to remove
-    const idsToRemove = new Set([clipId])
-    if (groupId) {
+    const idsToRemove = new Set(startIds)
+    if (groupIds.size) {
       for (const track of tracks) {
         for (const clip of track.clips) {
-          if (clip.groupId === groupId) {
+          if (groupIds.has(clip.groupId)) {
             idsToRemove.add(clip.id)
           }
         }
@@ -1557,6 +1561,7 @@ export function useTimeline() {
     }))
 
     setSelectedClipId(prev => idsToRemove.has(prev) ? null : prev)
+    setSelectedClipIds(prev => (prev.some(id => idsToRemove.has(id)) ? prev.filter(id => !idsToRemove.has(id)) : prev))
   }, [setTracksWithHistory, tracks])
 
   // Update clip in any track (group-aware: moves/trims all clips in the same group)
@@ -1716,12 +1721,27 @@ export function useTimeline() {
 
   const selectClip = useCallback((clipId) => {
     setSelectedClipId(clipId)
+    setSelectedClipIds([])
     setSelectedLibraryId(null)
+  }, [])
+
+  // Select several clips: one id is a plain selection, none clears it
+  const selectClips = useCallback((clipIds) => {
+    const ids = [...new Set(clipIds || [])]
+    setSelectedLibraryId(null)
+    if (ids.length > 1) {
+      setSelectedClipIds(ids)
+      setSelectedClipId(null)
+    } else {
+      setSelectedClipIds([])
+      setSelectedClipId(ids[0] || null)
+    }
   }, [])
 
   const selectLibraryItem = useCallback((itemId) => {
     setSelectedLibraryId(itemId)
     setSelectedClipId(null)
+    setSelectedClipIds([])
   }, [])
 
   // Duplicate clip (group-aware: duplicates all clips in the same group)
@@ -2224,6 +2244,7 @@ export function useTimeline() {
     // Timeline
     tracks,
     selectedClipId,
+    selectedClipIds,
     selectedClip,
     playheadPosition,
     setPlayheadPosition,
@@ -2237,6 +2258,7 @@ export function useTimeline() {
     reorderClips,
     moveClipToTrack,
     selectClip,
+    selectClips,
     duplicateClip,
     splitClip,
     splitClipAtPlayhead,

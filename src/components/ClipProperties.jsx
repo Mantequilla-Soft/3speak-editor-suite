@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useLayoutEffect } from 'react'
+import { MAX_CLIP_VOLUME } from '../utils/audioGain'
 import { Volume2, ZoomIn, Move, Crop, Type, GripVertical, RotateCcw, RotateCw, Droplets, AlignLeft, AlignCenter, AlignRight, Palette, Minus, Plus, Wand2, SunMedium } from 'lucide-react'
 import { hasLayout, scaleLayout, layoutZoom, LAYOUT_ZOOM_MIN, LAYOUT_ZOOM_MAX } from '../utils/remixLayout'
 import { normalizeChromaKey, defaultChromaKey, KEY_RANGES, grabVideoFrame, canvasToBlobUrl } from '../utils/chromaKey'
@@ -206,7 +207,7 @@ function MotionControls({ clip, onUpdateClip }) {
   )
 }
 
-const NOISE_LEVELS = [
+export const NOISE_LEVELS = [
   { id: null, label: 'Off' },
   { id: 'light', label: 'Light' },
   { id: 'medium', label: 'Medium' },
@@ -214,7 +215,36 @@ const NOISE_LEVELS = [
 ]
 // The audio editor's one-click voice: noise down, rumble and mud out, presence
 // and evenness in (de-esser, compressor), see DENOISE in the backend's clip.js
-const STUDIO_LEVEL = { id: 'studio', label: 'Studio voice', title: 'Studio voice: less noise, no rumble, clearer and more even, softer S sounds' }
+export const STUDIO_LEVEL = { id: 'studio', label: 'Studio voice', title: 'Studio voice: less noise, no rumble, clearer and more even, softer S sounds' }
+
+// The uploaded original of a clip's recording (kept while a cleaned version
+// is in use), and whether the backend can clean it
+export const recordingSource = (clip) => clip.denoiseSourceUrl || clip.serverUrl
+export const canCleanSource = (source) => !!source && /\/api\/upload\/files\//.test(source)
+
+// Ask the backend for a cleaned copy of a recording; resolves its URL
+export async function requestCleanVoice(source, level) {
+  const res = await authFetch(api('/api/clip/denoise'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url: source, strength: level })
+  })
+  if (!res.ok) throw new Error(String(res.status))
+  const { url } = await res.json()
+  const backend = getBackendUrl()
+  return backend && url.startsWith('/') ? `${backend}${url}` : url
+}
+
+// The clip fields for a cleaned recording (clip = one of its pieces, for
+// what the preview played before), and for Off
+export const cleanedFields = (clip, source, level, cleaned) => ({
+  url: cleaned,
+  serverUrl: cleaned,
+  denoise: level,
+  denoiseSourceUrl: source,
+  denoiseLocalUrl: clip.denoise ? clip.denoiseLocalUrl : clip.url
+})
+export const uncleanedFields = (clip, source) => ({ url: clip.denoiseLocalUrl || source, serverUrl: source, denoise: null, denoiseSourceUrl: null, denoiseLocalUrl: null })
 
 /**
  * Background-noise reduction for an audio clip: the backend cleans the
@@ -264,8 +294,8 @@ function NoiseControls({ clip, onUpdateClip, onUpdateRecording = null }) {
   const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
   // The uploaded original (kept while a cleaned version is in use)
-  const source = clip.denoiseSourceUrl || clip.serverUrl
-  const canClean = !!source && /\/api\/upload\/files\//.test(source)
+  const source = recordingSource(clip)
+  const canClean = canCleanSource(source)
   // Audio editor: every piece of the recording at once (after Cut silences a
   // recording is many clips), else just this clip
   const apply = (updates) => (onUpdateRecording ? onUpdateRecording(source, updates) : onUpdateClip(updates))
@@ -274,28 +304,14 @@ function NoiseControls({ clip, onUpdateClip, onUpdateRecording = null }) {
   const choose = async (level) => {
     setError(null)
     if (!level) {
-      if (clip.denoise) apply({ url: clip.denoiseLocalUrl || source, serverUrl: source, denoise: null, denoiseSourceUrl: null, denoiseLocalUrl: null })
+      if (clip.denoise) apply(uncleanedFields(clip, source))
       return
     }
     setBusy(level)
     try {
-      const res = await authFetch(api('/api/clip/denoise'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: source, strength: level })
-      })
-      if (!res.ok) throw new Error(String(res.status))
-      const { url } = await res.json()
-      const backend = getBackendUrl()
-      const cleaned = backend && url.startsWith('/') ? `${backend}${url}` : url
-      apply({
-        url: cleaned,
-        serverUrl: cleaned,
-        denoise: level,
-        denoiseSourceUrl: source,
-        // What the preview played before (often the local file), for Off
-        denoiseLocalUrl: clip.denoise ? clip.denoiseLocalUrl : clip.url
-      })
+      const cleaned = await requestCleanVoice(source, level)
+      // denoiseLocalUrl: what the preview played before (often the local file), for Off
+      apply(cleanedFields(clip, source, level, cleaned))
     } catch {
       setError('Noise reduction failed. Try again.')
     } finally {
@@ -1066,9 +1082,10 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                   <input
                     type="range"
                     min="0"
-                    max="100"
+                    max={onUpdateRecording && isAudio ? MAX_CLIP_VOLUME : 100}
                     value={volume}
                     onChange={(e) => update({ volume: parseInt(e.target.value) })}
+                    aria-label="Volume"
                   />
                   <span>{volume}%</span>
                 </div>

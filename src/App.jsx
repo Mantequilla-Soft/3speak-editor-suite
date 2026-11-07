@@ -16,6 +16,8 @@ import ExportButton from './components/ExportButton'
 import RecordVideo from './components/RecordVideo'
 import RecordAudio from './components/RecordAudio'
 import OnboardingTour, { AUDIO_TOUR_STEPS } from './components/OnboardingTour'
+import MultiClipProperties from './components/MultiClipProperties'
+import { soundTargets } from './utils/multiSelect'
 import RemixModePicker from './components/RemixModePicker'
 import MusicLibrary from './components/MusicLibrary'
 import { REMIX_LAYOUTS, hasLayout, clampLayout } from './utils/remixLayout'
@@ -86,6 +88,8 @@ function App() {
     // Timeline
     tracks,
     selectedClipId,
+    selectedClipIds,
+    selectClips,
     selectedClip,
     playheadPosition,
     setPlayheadPosition,
@@ -277,6 +281,12 @@ function App() {
     }
   }, [removeClip])
 
+  const handleRemoveClips = useCallback((clipIds) => {
+    if (window.confirm(`Remove these ${clipIds.length} clips from the timeline?`)) {
+      removeClip(clipIds)
+    }
+  }, [removeClip])
+
   const handleRemoveFromLibrary = useCallback((itemId) => {
     if (window.confirm('Remove this item from the project library?')) {
       removeFromLibrary(itemId)
@@ -441,9 +451,25 @@ function App() {
         return
       }
 
-      // Delete key - remove selected clip
+      // Ctrl/Cmd+A - select every clip on the timeline
+      if (e.key === 'a' && (e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
+        e.preventDefault()
+        selectClips(tracksRef.current.flatMap(t => t.clips.map(c => c.id)))
+        return
+      }
+
+      // Escape - nothing selected
+      if (e.key === 'Escape' && (selectedClipIds.length || selectedClipId)) {
+        selectClips([])
+        return
+      }
+
+      // Delete key - remove selected clip (or all selected clips)
       if (e.key === 'Delete' || e.key === 'Backspace') {
-        if (selectedClipId) {
+        if (selectedClipIds.length > 1) {
+          e.preventDefault()
+          handleRemoveClips(selectedClipIds)
+        } else if (selectedClipId) {
           e.preventDefault()
           handleRemoveClip(selectedClipId)
         }
@@ -524,7 +550,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [selectedClipId, handleRemoveClip, splitClipAtPlayhead, undo, redo, setPlayheadPosition, ungroupClips, duplicateClip, isPlayheadOnGap, removeGapAtPlayhead, addTextClip, audioMode])
+  }, [selectedClipId, selectedClipIds, selectClips, handleRemoveClips, handleRemoveClip, splitClipAtPlayhead, undo, redo, setPlayheadPosition, ungroupClips, duplicateClip, isPlayheadOnGap, removeGapAtPlayhead, addTextClip, audioMode])
 
   // Prevent external file drops anywhere except the project library
   useEffect(() => {
@@ -1137,6 +1163,35 @@ function App() {
   // "Options" (a panel over the timeline); on desktop a sidebar that follows
   // the selected clip
   const sideClip = compactPropertiesClip || (isDesktop ? selectedClip : null)
+
+  // Several clips selected: one panel for all of them (volume, mute, voice)
+  const multiClips = useMemo(() => {
+    if (selectedClipIds.length < 2) return []
+    const ids = new Set(selectedClipIds)
+    return tracks.flatMap(t => t.clips).filter(c => ids.has(c.id))
+  }, [selectedClipIds, tracks])
+  const multiTargets = soundTargets(multiClips, linkedAudioOf)
+  const updateClips = (updates) => {
+    const ids = new Set(multiTargets.map(c => c.id))
+    applyTracks(ts => ts.map(t => ({ ...t, clips: t.clips.map(c => (ids.has(c.id) ? { ...c, ...updates } : c)) })))
+  }
+  const multiPanel = multiClips.length > 1 ? (
+          <div className="compact-properties-panel multi-clip-panel">
+            <div className="compact-properties-header">
+              <span className="compact-properties-title">{multiClips.length} clips selected</span>
+              <button className="compact-btn compact-properties-close" onClick={() => selectClips([])} title="Clear the selection">
+                <X size={14} />
+              </button>
+            </div>
+            <MultiClipProperties
+              clips={multiTargets}
+              audioMode={audioMode}
+              onUpdateClips={updateClips}
+              onUpdateRecording={audioMode ? updateRecording : null}
+              onRemove={() => handleRemoveClips(multiClips.map(c => c.id))}
+            />
+          </div>
+  ) : null
   const compactPropertiesPanel = sideClip ? (
           <div className="compact-properties-panel">
             <div className="compact-properties-header">
@@ -1421,6 +1476,8 @@ function App() {
           <Timeline
             tracks={tracks}
             selectedClipId={selectedClipId}
+            selectedClipIds={selectedClipIds}
+            onSelectClips={selectClips}
             playheadPosition={playheadPosition}
             onSetPlayhead={setPlayheadPosition}
             onSelectClip={selectClip}
@@ -1469,15 +1526,15 @@ function App() {
           )}
 
           {/* Compact properties panel (phones: over the timeline; desktop: the sidebar) */}
-          {!isDesktop && compactPropertiesPanel}
+          {!isDesktop && (multiPanel || compactPropertiesPanel)}
         </div>
         </div>
         {/* Desktop: the selected clip's settings beside preview and timeline */}
         {isDesktop && (
           <aside className="compact-side">
-            {sideClip ? compactPropertiesPanel : (
-              <p className="compact-side-empty">Select a clip on the timeline to see its settings.</p>
-            )}
+            {multiPanel || (sideClip ? compactPropertiesPanel : (
+              <p className="compact-side-empty">Select a clip on the timeline to see its settings. Drag a box over several clips to change them together.</p>
+            ))}
           </aside>
         )}
         </div>
@@ -1849,6 +1906,8 @@ function App() {
             <Timeline
               tracks={tracks}
               selectedClipId={selectedClipId}
+              selectedClipIds={selectedClipIds}
+              onSelectClips={selectClips}
               playheadPosition={playheadPosition}
               onSetPlayhead={setPlayheadPosition}
               onSelectClip={selectClip}

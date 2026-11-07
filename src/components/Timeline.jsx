@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo, memo } from 'react'
+import { boxFrom, clipIdsInBox, toggleInSelection } from '../utils/marquee'
 import { Trash2, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker, Maximize2 } from 'lucide-react'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 import { getGroupColor } from '../hooks/useTimeline'
@@ -447,7 +448,8 @@ const TimelineClip = memo(function TimelineClip({
         left: `${clipLeft}px`,
         ...(clip.groupId ? { borderLeftColor: getGroupColor(clip.groupId), borderLeftWidth: '3px', borderLeftStyle: 'solid' } : {})
       }}
-      onClick={(e) => { e.stopPropagation(); onSelect() }}
+      data-clip-id={clip.id}
+      onClick={(e) => { e.stopPropagation(); onSelect(e) }}
     >
       {/* Trim handle - start */}
       <div
@@ -576,6 +578,8 @@ const TimelineClip = memo(function TimelineClip({
 function Timeline({
   tracks,
   selectedClipId,
+  selectedClipIds = null,
+  onSelectClips,
   playheadPosition,
   onSetPlayhead,
   onSelectClip,
@@ -632,6 +636,62 @@ function Timeline({
   const trackFileInputRefs = useRef({})
 
   const pixelsPerSecond = zoom
+
+  // Several clips selected (box select, Ctrl/Cmd+A, Shift-click). Clips are
+  // memoised without their callbacks, so the click handler reads refs.
+  const selectedSet = useMemo(() => new Set(selectedClipIds || []), [selectedClipIds])
+  const selectionRef = useRef({})
+  selectionRef.current = { selectedClipId, selectedClipIds: selectedClipIds || [], onSelectClip, onSelectClips }
+  const currentSelection = () => {
+    const { selectedClipId: one, selectedClipIds: many } = selectionRef.current
+    return many.length ? many : (one ? [one] : [])
+  }
+  const handleClipSelect = useCallback((clipId, e) => {
+    const { onSelectClip: one, onSelectClips: many } = selectionRef.current
+    if (many && (e?.shiftKey || e?.metaKey || e?.ctrlKey)) many(toggleInSelection(currentSelection(), clipId))
+    else one(clipId)
+  }, [])
+
+  // Box select (mouse): press on an empty spot of the tracks and drag over
+  // clips; Shift/Ctrl/Cmd adds to what is selected. A plain click on an empty
+  // spot clears the selection.
+  const [marquee, setMarquee] = useState(null) // { x, y, w, h } in content px
+  const handleContentMouseDown = (e) => {
+    if (e.button !== 0 || !onSelectClips) return
+    if (e.target.closest('.timeline-clip-v2, .timeline-playhead, .timeline-ruler, .timeline-chapter, button, input, select, a')) return
+    const content = timelineContentRef.current
+    if (!content) return
+    e.preventDefault() // no text selection while dragging
+    const toContent = (cx, cy) => {
+      const r = content.getBoundingClientRect()
+      return { x: cx - r.left + content.scrollLeft, y: cy - r.top + content.scrollTop }
+    }
+    const origin = { x: e.clientX, y: e.clientY }
+    const start = toContent(e.clientX, e.clientY)
+    const additive = e.shiftKey || e.metaKey || e.ctrlKey
+    const base = additive ? currentSelection() : []
+    let moved = false
+    const onMove = (ev) => {
+      if (!moved && Math.hypot(ev.clientX - origin.x, ev.clientY - origin.y) < 4) return
+      moved = true
+      const box = boxFrom(start, toContent(ev.clientX, ev.clientY))
+      setMarquee(box)
+      const r = content.getBoundingClientRect()
+      const rects = [...content.querySelectorAll('.timeline-clip-v2[data-clip-id]')].map(el => {
+        const c = el.getBoundingClientRect()
+        return { id: el.dataset.clipId, x: c.left - r.left + content.scrollLeft, y: c.top - r.top + content.scrollTop, w: c.width, h: c.height }
+      })
+      onSelectClips([...new Set([...base, ...clipIdsInBox(box, rects)])])
+    }
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+      setMarquee(null)
+      if (!moved && !additive) onSelectClips([])
+    }
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
+  }
 
   // Find the selected clip and its groupId (for group/ungroup button state)
   const selectedClip = useMemo(() => {
@@ -1319,7 +1379,10 @@ function Timeline({
           ))}
         </div>
 
-        <div className="timeline-content" ref={timelineContentRef}>
+        <div className="timeline-content" ref={timelineContentRef} onMouseDown={handleContentMouseDown}>
+          {marquee && (
+            <div className="timeline-marquee" style={{ left: marquee.x, top: marquee.y, width: marquee.w, height: marquee.h }} />
+          )}
           {/* Ruler */}
           <div
             className="timeline-ruler"
@@ -1367,14 +1430,14 @@ function Timeline({
                 <TimelineClip
                   key={clip.id}
                   clip={clip}
-                  isSelected={clip.id === selectedClipId}
+                  isSelected={clip.id === selectedClipId || selectedSet.has(clip.id)}
                   selectedGroupId={selectedClipGroupId}
                   pixelsPerSecond={pixelsPerSecond}
                   trackIndex={trackIndex}
                   trackId={track.id}
                   trackType={track.type}
                   allTracks={tracks}
-                  onSelect={() => onSelectClip(clip.id)}
+                  onSelect={(e) => handleClipSelect(clip.id, e)}
                   onRemove={() => onRemoveClip(clip.id)}
                   onUpdateClip={(updates) => onUpdateClip(clip.id, updates)}
                   onDuplicate={() => onDuplicateClip(clip.id)}
@@ -1409,14 +1472,14 @@ function Timeline({
                 <TimelineClip
                   key={clip.id}
                   clip={clip}
-                  isSelected={clip.id === selectedClipId}
+                  isSelected={clip.id === selectedClipId || selectedSet.has(clip.id)}
                   selectedGroupId={selectedClipGroupId}
                   pixelsPerSecond={pixelsPerSecond}
                   trackIndex={trackIndex}
                   trackId={track.id}
                   trackType={track.type}
                   allTracks={tracks}
-                  onSelect={() => onSelectClip(clip.id)}
+                  onSelect={(e) => handleClipSelect(clip.id, e)}
                   onRemove={() => onRemoveClip(clip.id)}
                   onUpdateClip={(updates) => onUpdateClip(clip.id, updates)}
                   onDuplicate={() => onDuplicateClip(clip.id)}

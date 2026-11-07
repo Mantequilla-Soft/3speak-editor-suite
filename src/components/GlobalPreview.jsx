@@ -58,7 +58,7 @@ function hideUntilPositioned(el) {
 
 import InlineRecorder from './InlineRecorder'
 import AudioStage from './AudioStage'
-import { clipGainAt } from '../utils/audioGain'
+import { clipGainAt, clipVolume, splitGain } from '../utils/audioGain'
 import { duckGainAt } from '../utils/duck'
 import { clipColorFilter } from './ClipColorFilters'
 import { motionStyle, normalizeMotion, pivotPoint } from '../utils/stickerMotion'
@@ -236,6 +236,35 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   const duckRef = useRef(duck)
   duckRef.current = duck
   const gainAt = (clip, t) => clipGainAt(clip, t) * (clip.musicTrack && duckRef.current?.tracks.includes(clip.trackId) ? duckGainAt(duckRef.current, t) : 1)
+
+  // Louder than 100% (audio editor, up to 200%): an <audio> element stops at
+  // volume 1, so a boosted clip's element (data-boost, mounted with
+  // crossOrigin so its samples may be processed) plays through a gain node.
+  // The context is made and resumed from the Play click (autoplay policy).
+  const boostCtxRef = useRef(null)
+  const ensureBoostCtx = () => {
+    const Ctx = window.AudioContext || window.webkitAudioContext
+    if (!Ctx) return null
+    if (!boostCtxRef.current) boostCtxRef.current = new Ctx()
+    if (boostCtxRef.current.state === 'suspended') boostCtxRef.current.resume().catch(() => {})
+    return boostCtxRef.current
+  }
+  const setElementGain = (el, g) => {
+    const { element, boost } = splitGain(g)
+    el.volume = element
+    if (el.dataset.boost !== '1') return
+    if (!el._boostGain) {
+      const ctx = ensureBoostCtx()
+      if (!ctx) return
+      try {
+        const node = ctx.createGain()
+        ctx.createMediaElementSource(el).connect(node).connect(ctx.destination)
+        el._boostGain = node
+      } catch { return }
+    }
+    el._boostGain.gain.value = boost
+  }
+  useEffect(() => () => { boostCtxRef.current?.close?.().catch(() => {}) }, [])
   const audioClips = useMemo(() => {
     return (tracks || [])
       .filter(t => t.type === 'audio' && t.muted !== true)
@@ -497,7 +526,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       const audioEl = audioRefs.current[clip.id]
       if (audioEl) {
         audioEl.muted = false
-        audioEl.volume = gainAt(clip, playheadPosition)
+        setElementGain(audioEl, gainAt(clip, playheadPosition))
       }
     })
   }, [currentClips, currentAudioClips, isPlaying]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -570,7 +599,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       const audioEl = audioRefs.current[clip.id]
       if (audioEl) {
         audioEl.muted = false
-        audioEl.volume = gainAt(clip, playbackPosRef.current)
+        setElementGain(audioEl, gainAt(clip, playbackPosRef.current))
         const mediaTime = latestRef.current.getMediaTime(clip, playbackPosRef.current)
         audioEl.currentTime = mediaTime
         audioEl.play().catch(() => {})
@@ -715,7 +744,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         const inRange = newPosition >= clip.timelineStart && newPosition < clip.timelineEnd
         if (inRange) {
           // volume and fades, every frame (a fade is a ramp, not a step)
-          audioEl.volume = gainAt(clip, newPosition)
+          setElementGain(audioEl, gainAt(clip, newPosition))
           if (audioEl.paused) {
             audioEl.currentTime = gmt(clip, newPosition)
             audioEl.play().catch(() => {})
@@ -764,6 +793,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         }
       })
       // Start audio clips from click handler (for autoplay policy)
+      if (audioClips.some(c => clipVolume(c) > 1)) ensureBoostCtx()
       const audioAtPos = audioClips.filter(c =>
         playbackPosRef.current >= c.timelineStart && playbackPosRef.current < c.timelineEnd
       )
@@ -771,7 +801,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         const audioEl = audioRefs.current[clip.id]
         if (audioEl) {
           audioEl.muted = false
-          audioEl.volume = gainAt(clip, playbackPosRef.current)
+          setElementGain(audioEl, gainAt(clip, playbackPosRef.current))
           const mt = getMediaTime(clip, playbackPosRef.current)
           audioEl.currentTime = mt
           audioEl.play().catch(() => {})
@@ -1608,14 +1638,20 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
 
           {/* Audio track playback: <audio> (a video file's picture is never
               decoded for it), mounted only for clips playing now or about to */}
-          {mountedAudioClips.map(clip => (
-            <audio
-              key={`audio-${clip.id}`}
-              ref={el => { audioRefs.current[clip.id] = el }}
-              preload="auto"
-              src={clip.url}
-            />
-          ))}
+          {mountedAudioClips.map(clip => {
+            // above 100%: a new element (key) that may go through a gain node
+            const boosted = clipVolume(clip) > 1
+            return (
+              <audio
+                key={`audio-${clip.id}${boosted ? '-boost' : ''}`}
+                ref={el => { audioRefs.current[clip.id] = el }}
+                preload="auto"
+                crossOrigin={boosted ? 'anonymous' : undefined}
+                data-boost={boosted ? '1' : undefined}
+                src={clip.url}
+              />
+            )
+          })}
 
           {inlineRecording && recSize === 'small' && (
             <InlineRecorder
