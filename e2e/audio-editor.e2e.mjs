@@ -568,10 +568,16 @@ try {
 
     // Group them (one group id on all three), then Ungroup
     const groupIds = () => { const d = mine(); return d ? clipsOf(d.state).filter(c => ids.includes(c.id)).map(c => c.groupId || null) : [] }
-    await f.locator('.multi-clip-panel').getByRole('button', { name: 'Group 3 clips' }).click()
+    // in the timeline toolbar (next to Options), not in the panel
+    assert.equal(await f.locator('.multi-clip-panel button', { hasText: /Group/ }).count(), 0, 'no group buttons in the panel')
+    await f.locator('.timeline-toolbar button[title^="Group:"]').click()
     await until(() => { const g = groupIds(); return g.length === 3 && g[0] && g.every(x => x === g[0]) }, 'one group for all three')
-    await f.locator('.multi-clip-panel').getByRole('button', { name: 'Ungroup' }).click()
+    // one clip of the group selected: Ungroup sits next to Options
+    await f.locator(`.timeline-clip-v2[data-clip-id="${ids[0]}"]`).click()
+    assert.equal(await f.locator('.timeline-toolbar button[title="Clip settings"] + button[title^="Ungroup:"]').count(), 1, 'Ungroup next to Options')
+    await f.locator('.timeline-toolbar button[title^="Ungroup:"]').click()
     await until(() => { const g = groupIds(); return g.length === 3 && g.every(x => x == null) }, 'ungrouped')
+    await m.page.keyboard.press('Control+a')
 
     // Escape clears it, Ctrl+A takes every clip again
     await m.page.keyboard.press('Escape')
@@ -581,7 +587,7 @@ try {
     await m.ctx.close()
   })
 
-  await step('phones: Select, tap each clip, Done opens the panel for all of them, Group', async () => {
+  await step('phones: Select, tap each clip, Group in the toolbar, Done opens the panel for all of them', async () => {
     if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
     const ph = await openEditor({ viewport: { width: 390, height: 844 } })
     const f = ph.frame
@@ -604,10 +610,10 @@ try {
     await f.locator(`.timeline-clip-v2[data-clip-id="${ids[1]}"]`).click()
     assert.equal(await f.locator('.timeline-clip-v2.selected').count(), 2)
     await f.locator(`.timeline-clip-v2[data-clip-id="${ids[1]}"]`).click()
+    // Group sits in the toolbar while picking (the panel isn't over the timeline yet)
+    await f.locator('.timeline-toolbar button[title^="Group:"]').click()
     await f.locator('.timeline-select-hint').getByRole('button', { name: 'Done' }).click()
     assert.equal(await f.locator('.multi-clip-panel .compact-properties-title').innerText(), '3 clips selected')
-
-    await f.locator('.multi-clip-panel').getByRole('button', { name: 'Group 3 clips' }).click()
     await until(() => {
       const d = drafts().find(p => ids.every(id => clipsOf(p.state).some(c => c.id === id)))
       const g = d ? clipsOf(d.state).filter(c => ids.includes(c.id)).map(c => c.groupId) : []

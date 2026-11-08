@@ -582,6 +582,7 @@ function Timeline({
   onSelectClips,
   selectMode = false,
   onSelectModeChange,
+  onRemoveClips,
   playheadPosition,
   onSetPlayhead,
   onSelectClip,
@@ -642,6 +643,9 @@ function Timeline({
   // Several clips selected (box select, Ctrl/Cmd+A, Shift-click). Clips are
   // memoised without their callbacks, so the click handler reads refs.
   const selectedSet = useMemo(() => new Set(selectedClipIds || []), [selectedClipIds])
+  // Several selected: are they all one group already (then Ungroup)?
+  const multiClips = useMemo(() => (selectedSet.size > 1 ? (tracks || []).flatMap(t => t.clips).filter(c => selectedSet.has(c.id)) : []), [selectedSet, tracks])
+  const multiGroupId = multiClips.length > 1 && multiClips[0].groupId && multiClips.every(c => c.groupId === multiClips[0].groupId) ? multiClips[0].groupId : null
   const selectionRef = useRef({})
   selectionRef.current = { selectedClipId, selectedClipIds: selectedClipIds || [], onSelectClip, onSelectClips, selectMode }
   const currentSelection = () => {
@@ -1201,6 +1205,11 @@ function Timeline({
               >
                 <Settings size={14} /> <span>Options</span>
               </button>
+              {selectedClipGroupId && onUngroupClips && (
+                <button className="action-btn" onClick={() => onUngroupClips(selectedClipId)} title="Ungroup: its clips move and trim on their own again">
+                  <Unlink size={14} /> <span>Ungroup</span>
+                </button>
+              )}
               <div className="clip-actions-wrap" ref={clipActionsRef}>
                 <button
                   className="action-btn"
@@ -1222,11 +1231,6 @@ function Timeline({
                         <Link size={14} /> Group with other voices
                       </button>
                     )}
-                    {selectedClipGroupId && (
-                      <button onClick={() => { onUngroupClips && onUngroupClips(selectedClipId); setShowClipActions(false) }}>
-                        <Unlink size={14} /> Ungroup
-                      </button>
-                    )}
                     {selectedClip && (selectedClip.type === 'video' || selectedClip.type === 'audio') && onReverseClip && (
                       <button
                         className={selectedClip.reversed ? 'active' : ''}
@@ -1241,6 +1245,29 @@ function Timeline({
                   </div>
                 )}
               </div>
+            </>
+          )}
+          {/* Several clips selected: group them (or ungroup one group), delete them */}
+          {multiClips.length > 1 && (
+            <>
+              {multiGroupId ? (
+                onUngroupClips && (
+                  <button className="action-btn" onClick={() => onUngroupClips(multiClips[0].id)} title="Ungroup: these clips move and trim on their own again">
+                    <Unlink size={14} /> <span>Ungroup</span>
+                  </button>
+                )
+              ) : (
+                onGroupClips && (
+                  <button className="action-btn" onClick={() => onGroupClips(multiClips.map(c => c.id))} title="Group: these clips move and trim together">
+                    <Link size={14} /> <span>Group {multiClips.length}</span>
+                  </button>
+                )
+              )}
+              {onRemoveClips && (
+                <button className="action-btn delete-btn" onClick={() => onRemoveClips(multiClips.map(c => c.id))} title="Delete the selected clips (Del)">
+                  <Trash2 size={14} /> <span>Delete {multiClips.length}</span>
+                </button>
+              )}
             </>
           )}
         </div>
