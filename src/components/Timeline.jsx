@@ -640,6 +640,12 @@ function Timeline({
   const trackFileInputRefs = useRef({})
 
   const pixelsPerSecond = zoom
+  // The clips are memoised (TimelineClip): a callback that is new on every
+  // render (App passes an inline arrow) would re-render all of them on every
+  // playhead tick. One stable function that calls the latest one.
+  const openSettingsRef = useRef(onOpenClipSettings)
+  openSettingsRef.current = onOpenClipSettings
+  const openClipSettings = useCallback((clipId) => openSettingsRef.current?.(clipId), [])
 
   // Several clips selected (box select, Ctrl/Cmd+A, Shift-click). Clips are
   // memoised without their callbacks, so the click handler reads refs.
@@ -1129,16 +1135,33 @@ function Timeline({
   // reopened, arrow keys, zooming in), and then puts it in the middle too.
   // Scrolling away from a resting playhead (ruler drag, wheel) is left alone.
   const followedLeftRef = useRef(null)
+  const lastFollowRef = useRef(null) // the scroll the follow set last while playing
+  // The view's width, kept by a ResizeObserver: reading clientWidth on every
+  // playhead tick forced a layout each time
+  const viewWidthRef = useRef(0)
+  useEffect(() => {
+    const el = timelineContentRef.current
+    if (!el) return
+    viewWidthRef.current = el.clientWidth
+    const ro = new ResizeObserver(() => { viewWidthRef.current = el.clientWidth })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
   useLayoutEffect(() => {
     const el = timelineContentRef.current
     if (!el || isDraggingPlayhead || isDraggingRuler) return
-    const view = el.clientWidth
+    const view = viewWidthRef.current || el.clientWidth
     if (!view) return
+    if (!isPlaying) lastFollowRef.current = null
     const moved = followedLeftRef.current !== playheadLeft
     followedLeftRef.current = playheadLeft
     const centre = Math.max(0, playheadLeft - view / 2)
     if (isPlaying) {
-      if (Math.abs(el.scrollLeft - centre) >= 1) el.scrollLeft = centre
+      // what we set last (reading scrollLeft back would force a layout every tick)
+      if (lastFollowRef.current == null || Math.abs(lastFollowRef.current - centre) >= 1) {
+        el.scrollLeft = centre
+        lastFollowRef.current = centre
+      }
     } else if (moved && (playheadLeft < el.scrollLeft || playheadLeft > el.scrollLeft + view - 2)) {
       el.scrollLeft = centre
     }
@@ -1626,7 +1649,7 @@ function Timeline({
                   onPositionChange={(newPosition) => onUpdateClip(clip.id, { timelinePosition: newPosition })}
                   onMoveToTrack={(toTrackId, newPosition) => handleMoveClipToTrack(clip.id, track.id, toTrackId, newPosition)}
                   getSnapPoints={getSnapPoints}
-                  onOpenSettings={onOpenClipSettings}
+                  onOpenSettings={onOpenClipSettings ? openClipSettings : undefined}
                   onDragPreviewChange={setCrossTrackGhost}
                 />
               ))}
@@ -1668,7 +1691,7 @@ function Timeline({
                   onPositionChange={(newPosition) => onUpdateClip(clip.id, { timelinePosition: newPosition })}
                   onMoveToTrack={(toTrackId, newPosition) => handleMoveClipToTrack(clip.id, track.id, toTrackId, newPosition)}
                   getSnapPoints={getSnapPoints}
-                  onOpenSettings={onOpenClipSettings}
+                  onOpenSettings={onOpenClipSettings ? openClipSettings : undefined}
                   onDragPreviewChange={setCrossTrackGhost}
                 />
               ))}

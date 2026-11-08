@@ -304,8 +304,12 @@ export function defaultName(tracks, mode = 'video') {
 }
 
 // "until Thu, 22 Oct, 14:05"
+// One formatter, made once: toLocaleString builds a new one on every call, and
+// the draft status shows this on every render (20 times a second while playing)
+let untilFormat = null
 export function formatUntil(ms) {
-  return new Date(ms).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  if (!untilFormat) untilFormat = new Intl.DateTimeFormat(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  return untilFormat.format(new Date(ms))
 }
 
 // "7 days" / "30 days" (whole days from 2 days up, else hours)

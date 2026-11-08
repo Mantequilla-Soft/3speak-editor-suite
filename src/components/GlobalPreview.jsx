@@ -272,13 +272,32 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       if (!ctx) return
       try {
         const node = ctx.createGain()
-        ctx.createMediaElementSource(el).connect(node).connect(ctx.destination)
+        const source = ctx.createMediaElementSource(el)
+        source.connect(node).connect(ctx.destination)
         el._boostGain = node
+        el._boostSource = source
       } catch { return }
     }
     el._boostGain.gain.value = boost
   }
   useEffect(() => () => { boostCtxRef.current?.close?.().catch(() => {}) }, [])
+
+  // An <audio> element leaving (its clip scrolled out of the playing window):
+  // take it out of the boost graph (a connected source keeps the element, and
+  // the part of the file it buffered, alive for as long as the editor is open)
+  // and let go of its media now instead of whenever it is collected.
+  const liveAudioElsRef = useRef(new Set()) // every <audio> handed out, until released
+  const releaseAudioEl = (el) => {
+    try { el._boostSource?.disconnect() } catch { /* already */ }
+    try { el._boostGain?.disconnect() } catch { /* already */ }
+    el._boostSource = null
+    el._boostGain = null
+    try {
+      el.pause()
+      el.removeAttribute('src')
+      el.load()
+    } catch { /* gone */ }
+  }
   const audioClips = useMemo(() => {
     return (tracks || [])
       .filter(t => t.type === 'audio' && t.muted !== true)
@@ -297,6 +316,16 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   const mountedAudioClips = useMemo(() => audioClips.filter(clip =>
     clip.timelineEnd > playheadPosition - 0.25 && clip.timelineStart <= playheadPosition + PRELOAD_AHEAD
   ), [audioClips, playheadPosition])
+
+  // After clips leave the playing window: release the elements that left the page
+  useEffect(() => {
+    for (const el of liveAudioElsRef.current) {
+      if (el.isConnected) continue
+      liveAudioElsRef.current.delete(el)
+      releaseAudioEl(el)
+    }
+  }, [mountedAudioClips]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => { for (const el of liveAudioElsRef.current) releaseAudioEl(el) }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const currentAudioClips = useMemo(() => {
     return audioClips.filter(clip =>
@@ -1685,7 +1714,11 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
             return (
               <audio
                 key={`audio-${clip.id}${boosted ? '-boost' : ''}`}
-                ref={el => { audioRefs.current[clip.id] = el }}
+                ref={el => {
+                  // React clears the old ref (null) before it sets a new one for
+                  // the same clip, so null always means this clip's element left
+                  if (el) { audioRefs.current[clip.id] = el; liveAudioElsRef.current.add(el) } else delete audioRefs.current[clip.id]
+                }}
                 preload="auto"
                 crossOrigin={boosted ? 'anonymous' : undefined}
                 data-boost={boosted ? '1' : undefined}
