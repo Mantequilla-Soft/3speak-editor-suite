@@ -72,3 +72,32 @@ test('a render copy falls back to the 480p file once the original was replaced',
   assert.equal(fs.readFileSync(out2, 'utf8'), 'encoded')
   await assert.rejects(downloadMedia('/api/upload/files/nothing.webm', 'c3', work), /ENOENT/)
 })
+
+// MediaRecorder WebM has no Cues: the browser then reads through the file to
+// seek, and clips from late in a long recording started late in the preview
+const hasCues = (file) => fs.readFileSync(file).includes(Buffer.from([0x1c, 0x53, 0xbb, 0x6b]))
+const pcm = (file) => crypto.createHash('md5').update(execFileSync('ffmpeg', ['-loglevel', 'error', '-i', file, '-f', 's16le', '-ac', '1', '-'], { maxBuffer: 64 << 20 })).digest('hex')
+
+test('a browser voice recording without a seek index gets one on upload, same audio', { skip: !hasFfmpeg }, async () => {
+  const src = path.join(dir, 'live.webm')
+  // -live 1: no Cues, like a MediaRecorder recording
+  execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-f', 'lavfi', '-i', 'sine=f=300:d=20', '-c:a', 'libopus', '-live', '1', '-f', 'webm', src])
+  assert.equal(hasCues(src), false, 'test file has no index')
+  const body = await upload(src, 'Recording_long.webm', 'audio/webm')
+  assert.equal(body.encodes, false)
+  const stored = path.join(uploads, body.filename)
+  assert.equal(hasCues(stored), true, 'index added')
+  assert.ok(fs.readFileSync(stored).indexOf(Buffer.from([0x1c, 0x53, 0xbb, 0x6b])) < 4096, 'index at the front')
+  assert.equal(pcm(stored), pcm(src), 'the same samples')
+  assert.ok(Math.abs(body.duration - 20) < 0.1)
+  assert.deepEqual(fs.readdirSync(uploads).filter(f => f.includes('.seek.part')), [], 'no part file left')
+})
+
+test('a broken file is kept as it is (no seek index, no crash)', { skip: !hasFfmpeg }, async () => {
+  const { addSeekIndex } = await import('../src/routes/upload.js')
+  const bad = path.join(uploads, 'bad.webm')
+  fs.writeFileSync(bad, 'not a webm at all')
+  assert.equal(await addSeekIndex(bad), false)
+  assert.equal(fs.readFileSync(bad, 'utf8'), 'not a webm at all')
+  assert.deepEqual(fs.readdirSync(uploads).filter(f => f.includes('.seek.part')), [])
+})

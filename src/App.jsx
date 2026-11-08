@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useMemo, useState } from 'react'
-import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, ArrowDownWideNarrow, HelpCircle } from 'lucide-react'
+import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, ArrowDownWideNarrow, HelpCircle, Maximize, Minimize } from 'lucide-react'
 import { useFFmpeg } from './hooks/useFFmpeg'
 import { useCanvasExport } from './hooks/useCanvasExport'
 import { useTimeline } from './hooks/useTimeline'
@@ -289,6 +289,21 @@ function App() {
     return () => { cancelled = true }
   }, [])
 
+  // Full screen: the whole editor (inside 3Speak's popup the iframe allows it)
+  const canFullscreen = typeof document !== 'undefined' && !!document.fullscreenEnabled
+  const [isFullscreen, setIsFullscreen] = useState(() => typeof document !== 'undefined' && !!document.fullscreenElement)
+  useEffect(() => {
+    const onChange = () => setIsFullscreen(!!document.fullscreenElement)
+    document.addEventListener('fullscreenchange', onChange)
+    return () => document.removeEventListener('fullscreenchange', onChange)
+  }, [])
+  const toggleFullscreen = useCallback(() => {
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {})
+    else document.documentElement.requestFullscreen?.().catch(() => {})
+  }, [])
+  const toggleFullscreenRef = useRef(toggleFullscreen)
+  toggleFullscreenRef.current = toggleFullscreen
+
   // "Remove ...?" in the editor's own dialog (components/ConfirmDialog.jsx), never window.confirm()
   const [confirmAsk, setConfirmAsk] = useState(null) // { message, onYes }
   const confirmRef = useRef(null)
@@ -479,6 +494,13 @@ function App() {
       if (e.key === 'a' && (e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
         e.preventDefault()
         selectClips(tracksRef.current.flatMap(t => t.clips.map(c => c.id)))
+        return
+      }
+
+      // F - full screen on / off
+      if ((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey && document.fullscreenEnabled) {
+        e.preventDefault()
+        toggleFullscreenRef.current()
         return
       }
 
@@ -1340,6 +1362,17 @@ function App() {
             )}
           </div>
           <DraftStatus drafts={drafts} canSignIn={canDraftSignIn} signInState={draftContext.reason} onSignIn={requestDraftSignIn} onOpenLimit={() => drafts.save()} />
+          {canFullscreen && (
+            <button
+              className="branding-close-btn branding-fullscreen-btn"
+              onClick={(e) => { e.currentTarget.blur(); toggleFullscreen() }}
+              title={isFullscreen ? 'Leave full screen (F)' : 'Full screen (F)'}
+              aria-label={isFullscreen ? 'Leave full screen' : 'Full screen'}
+              aria-pressed={isFullscreen}
+            >
+              {isFullscreen ? <Minimize size={15} /> : <Maximize size={15} />}
+            </button>
+          )}
           <button className="branding-close-btn" onClick={handleCloseEditor} title="Close editor">
             <X size={16} />
           </button>

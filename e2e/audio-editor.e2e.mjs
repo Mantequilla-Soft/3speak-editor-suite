@@ -814,6 +814,89 @@ try {
     await r.ctx.close()
   })
 
+  await step('slow file requests: every cut piece still plays its own part of the recording, in step with the timeline', async () => {
+    // a cut-up draft (clips point at the server's file, not a local blob)
+    if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
+    const a = await openEditor()
+    await a.frame.locator('.timeline-clip-v2.audio').first().waitFor({ timeout: 15000 })
+    const id0 = await a.frame.locator('.timeline-clip-v2.audio').first().getAttribute('data-clip-id')
+    await until(() => drafts().find(p => clipsOf(p.state).some(c => c.id === id0 && /\/api\/upload\/files\//.test(c.url || ''))), 'uploaded', 45000)
+    await a.frame.getByRole('button', { name: /Cut silences/ }).click()
+    await a.frame.getByRole('dialog', { name: 'Cut silences' }).waitFor()
+    await until(async () => /cuts/.test(await a.frame.locator('.silence-cut-summary').innerText().catch(() => '')), 'cut plan summary')
+    await a.frame.getByRole('button', { name: /Edit for me|This clip only/ }).click()
+    await until(() => { const p = drafts()[0]; return p && clipsOf(p.state).filter(c => !c.music).length === 3 }, 'cut draft saved', 15000)
+    await a.ctx.close()
+
+    const b = await openEditor({ file: null })
+    const f = b.frame
+    // every request for the recording takes 2.5 s (a far seek in a long file without a seek index did)
+    await b.ctx.route(`${BACKEND}/api/upload/files/**`, async (route) => { await sleep(2500); route.continue().catch(() => {}) })
+    await f.locator('.drafts-item').first().click({ timeout: 20000 })
+    await until(async () => (await f.locator('.timeline-clip-v2.audio').count()) === 3, 'draft reopened')
+    const clips = clipsOf(drafts()[0].state).filter(c => !c.music)
+    await f.evaluate((cs) => {
+      window.__clips = Object.fromEntries(cs.map(c => [c.id, c]))
+      window.__err = []
+      const el0 = document.querySelector(`.timeline-clip-v2[data-clip-id="${cs[0].id}"]`)
+      const pps = el0.offsetWidth / (cs[0].endTime - cs[0].startTime)
+      window.__timer = setInterval(() => {
+        const pos = parseFloat(document.querySelector('.timeline-playhead').style.left) / pps
+        for (const el of document.querySelectorAll('audio[data-clip-id]')) {
+          const c = window.__clips[el.dataset.clipId]
+          if (!c || el.paused || el.seeking || el.readyState < 3) continue
+          const into = pos - c.timelinePosition
+          if (into < 0.3 || into > (c.endTime - c.startTime) - 0.1) continue // start-up and the cut itself
+          window.__err.push({ id: c.id, err: Math.abs(el.currentTime - (c.startTime + into)) })
+        }
+      }, 40)
+    }, clips)
+    await b.page.keyboard.press(' ')
+    const end = Math.max(...clips.map(c => c.timelinePosition + c.endTime - c.startTime))
+    await until(async () => (await f.locator('.global-preview button[title="Play"]').count()) > 0, 'played to the end', (end + 20) * 1000)
+    const errs = await f.evaluate(() => { clearInterval(window.__timer); return window.__err })
+    const heard = new Set(errs.map(e => e.id))
+    assert.equal(heard.size, 3, `all three pieces sounded (${heard.size})`)
+    const worst = Math.max(...errs.map(e => e.err))
+    assert.ok(worst < 0.25, `every piece in step with the timeline (worst ${worst.toFixed(3)} s off)`)
+    await b.ctx.close()
+  })
+
+  await step('wheel scrolls the timeline, Shift+wheel zooms around the mouse, full screen on and off (button and F)', async () => {
+    if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
+    const w = await openEditor()
+    const f = w.frame
+    await f.locator('.timeline-clip-v2.audio').first().waitFor({ timeout: 15000 })
+    for (let i = 0; i < 5; i++) await w.page.keyboard.press('Control+Equal')
+    const content = f.locator('.timeline-content')
+    const box = await content.boundingBox()
+    const scroll = () => content.evaluate(el => el.scrollLeft)
+    const clipWidth = () => f.locator('.timeline-clip-v2.audio').first().evaluate(el => el.offsetWidth)
+    await content.evaluate(el => { el.scrollLeft = 0 })
+    await w.page.mouse.move(box.x + 300, box.y + 60)
+    await w.page.mouse.wheel(0, 240)
+    await until(async () => (await scroll()) > 100, 'wheel scrolled the timeline', 3000)
+    // Shift + wheel up: zoom in, the moment under the mouse stays under it
+    const s0 = await scroll()
+    const w0 = await clipWidth()
+    const t0 = (300 + s0) / w0 // in clip widths (the clip starts at 0)
+    await w.page.keyboard.down('Shift')
+    await w.page.mouse.wheel(0, -200)
+    await w.page.keyboard.up('Shift')
+    await until(async () => (await clipWidth()) > w0 * 1.2, 'Shift+wheel zoomed in', 3000)
+    const w1 = await clipWidth()
+    const t1 = (300 + await scroll()) / w1
+    assert.ok(Math.abs(t1 - t0) * w1 < 6, `the spot under the mouse stayed (${t0.toFixed(4)} -> ${t1.toFixed(4)})`)
+    // full screen
+    const btn = f.getByRole('button', { name: 'Full screen' })
+    await btn.click()
+    await until(() => f.evaluate(() => !!document.fullscreenElement), 'full screen on', 5000)
+    assert.equal(await f.getByRole('button', { name: 'Leave full screen' }).getAttribute('aria-pressed'), 'true')
+    await w.page.keyboard.press('f')
+    await until(() => f.evaluate(() => !document.fullscreenElement), 'F leaves full screen', 5000)
+    await w.ctx.close()
+  })
+
   await step('the shorts video editor is unchanged (no mode, Video 1 + Audio 1, Render, no audio tools)', async () => {
     const v = await openEditor({ file: null, mode: 'video' })
     const ready = await v.page.evaluate(() => window.__messages.find(m => m.type === 'editor-ready'))

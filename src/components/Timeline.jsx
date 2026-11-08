@@ -1141,6 +1141,53 @@ function Timeline({
     }
   }, [playheadLeft, isPlaying, isDraggingPlayhead, isDraggingRuler])
 
+  // Mouse wheel over the timeline: scroll it sideways (a sideways trackpad
+  // swipe scrolls natively). Shift + wheel: zoom, keeping the moment under the
+  // mouse where it is. Ctrl + wheel stays the browser's (pinch zoom).
+  const scrollContainerRef = useRef(null)
+  const zoomRef = useRef(zoom)
+  zoomRef.current = zoom
+  const zoomAnchorRef = useRef(null) // { time, x }: put `time` back under `x` after the zoom renders
+  useEffect(() => {
+    const box = scrollContainerRef.current
+    if (!box) return
+    const onWheel = (e) => {
+      const content = timelineContentRef.current
+      if (!content || e.ctrlKey || e.metaKey) return
+      const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? content.clientWidth : 1
+      // Shift turns a wheel into deltaX in some browsers: take whichever moved
+      const dy = (Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * unit
+      if (e.shiftKey) {
+        if (!dy) return
+        e.preventDefault()
+        const { min, max } = zoomRange(audioMode)
+        const z = zoomRef.current
+        const next = Math.min(max, Math.max(min, z * Math.exp(-dy * 0.0015)))
+        if (next === z) return
+        const x = Math.max(0, e.clientX - content.getBoundingClientRect().left)
+        zoomAnchorRef.current = { time: (x + content.scrollLeft) / z, x }
+        zoomRef.current = next
+        setZoom(next)
+        return
+      }
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return // sideways swipe: native
+      if (!e.deltaY) return
+      e.preventDefault()
+      content.scrollLeft += e.deltaY * unit
+    }
+    box.addEventListener('wheel', onWheel, { passive: false })
+    return () => box.removeEventListener('wheel', onWheel)
+  }, [audioMode])
+  // After a Shift + wheel zoom: the moment that was under the mouse stays there
+  // (declared after the follow effect, so this scroll wins in the same render)
+  useLayoutEffect(() => {
+    const a = zoomAnchorRef.current
+    const content = timelineContentRef.current
+    if (!a || !content) return
+    zoomAnchorRef.current = null
+    content.scrollLeft = Math.max(0, a.time * zoom - a.x)
+  }, [zoom])
+
   // Handle moving clip to a different track
   const handleMoveClipToTrack = useCallback((clipId, fromTrackId, toTrackId, newPosition) => {
     if (onMoveClipToTrack) {
@@ -1362,6 +1409,7 @@ function Timeline({
       {/* Timeline content wrapper */}
       <div
         className="timeline-scroll-container"
+        ref={scrollContainerRef}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}

@@ -19,6 +19,15 @@ const PRELOAD_AHEAD = 1.5
 // matching earlier point of the file, so at the cut they are already running
 const PREROLL = 0.4
 
+// A sounding clip that is still seeking / loading its part of the file. The
+// audio editor holds the timeline until it plays (else the clip starts late
+// and stays late, out of step with its cut); never longer than STALL_MAX_MS.
+const STALL_MAX_MS = 4000
+// A playing clip further off its timeline time than this is put back on it
+// (at most once a second per clip, so a slow seek can't keep re-seeking)
+const AUDIO_DRIFT_MAX = 0.15
+export const isAudioWaiting = (el) => !!el && !el.paused && !el.ended && !el.error && (el.seeking || el.readyState < 3)
+
 // Start a hidden/silent element early so it reaches the clip's first frame
 // exactly at the cut. `target()` is where it should be right now. Play start-up
 // takes a few frames, so once it is really playing it is corrected once.
@@ -150,6 +159,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   const animationRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const isPlayingRef = useRef(false)
+  const stallMsRef = useRef(0) // how long the clock has waited for a loading clip
   // Tell the editor (the timeline follows the playhead while playing)
   const onPlayingChangeRef = useRef(onPlayingChange)
   onPlayingChangeRef.current = onPlayingChange
@@ -417,7 +427,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
 
   // Stable ref to latest values — RAF loop reads these without triggering re-renders
   const latestRef = useRef({})
-  latestRef.current = { findClipsAtPosition, getMediaTime, totalDuration, onSetPlayhead, setVideoSource, audioClips, videoClips }
+  latestRef.current = { findClipsAtPosition, getMediaTime, totalDuration, onSetPlayhead, setVideoSource, audioClips, videoClips, audioMode }
   loopRef.current = loop
 
   // Jump while playing: move the clock and every playing element to `pos`.
@@ -559,6 +569,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
     }
 
     isPlayingRef.current = true
+    stallMsRef.current = 0
     let lastTime = performance.now()
     lastUiUpdateRef.current = lastTime
 
@@ -617,6 +628,25 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       lastTime = currentTime
 
       const { findClipsAtPosition, getMediaTime, totalDuration, onSetPlayhead } = latestRef.current
+
+      // Audio editor: a clip that should sound now is still loading its spot
+      // of the file. Hold the clock (and pause the other sounding clips, the
+      // loop below starts them again at the right time) until it plays.
+      if (latestRef.current.audioMode) {
+        const at = playbackPosRef.current
+        const sounding = latestRef.current.audioClips.filter(c => at >= c.timelineStart && at < c.timelineEnd)
+        const waiting = sounding.some(c => isAudioWaiting(audioRefs.current[c.id]))
+        if (waiting && stallMsRef.current < STALL_MAX_MS) {
+          stallMsRef.current += deltaMs
+          for (const c of sounding) {
+            const el = audioRefs.current[c.id]
+            if (el && !el.paused && !isAudioWaiting(el)) el.pause()
+          }
+          animationRef.current = requestAnimationFrame(animate)
+          return
+        }
+        if (!waiting) stallMsRef.current = 0
+      }
 
       // Advance position via ref (no React re-render)
       const newPosition = playbackPosRef.current + (deltaMs / 1000)
@@ -752,6 +782,13 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
           if (audioEl.paused) {
             audioEl.currentTime = gmt(clip, newPosition)
             audioEl.play().catch(() => {})
+          } else if (!audioEl.seeking && audioEl.readyState >= 3) {
+            // Playing, but off its time (started late, or drifted): back on it
+            const target = gmt(clip, newPosition)
+            if (Math.abs(audioEl.currentTime - target) > AUDIO_DRIFT_MAX && currentTime - (+audioEl.dataset.synced || 0) > 1000) {
+              audioEl.dataset.synced = String(currentTime)
+              audioEl.currentTime = target
+            }
           }
         } else if (!audioEl.paused) {
           audioEl.pause()
@@ -1652,6 +1689,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                 preload="auto"
                 crossOrigin={boosted ? 'anonymous' : undefined}
                 data-boost={boosted ? '1' : undefined}
+                data-clip-id={clip.id}
                 src={clip.url}
               />
             )
