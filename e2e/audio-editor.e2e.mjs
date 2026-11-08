@@ -498,6 +498,29 @@ try {
     await r.ctx.close()
   })
 
+  await step('no voice track left: a new recording gets a new Voice track, not the Music track', async () => {
+    if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
+    const r = await openEditor({ file: null })
+    const f = r.frame
+    r.page.on('dialog', d => d.accept())
+    // remove the (empty) Voice track: only Music is left
+    await f.locator('.track-label.audio').first().locator('.track-delete-btn').click()
+    await until(async () => (await f.locator('.track-label.audio').count()) === 1, 'only the Music track left')
+    await f.locator('.empty-timeline-actions').getByRole('button', { name: 'Record', exact: true }).click()
+    await f.locator('.record-start-btn').waitFor({ timeout: 15000 })
+    await f.locator('.record-start-btn').click()
+    await new Promise(res => setTimeout(res, 2000))
+    await f.locator('.record-stop-btn').click()
+    await f.locator('.record-use-btn:not([disabled])').waitFor({ timeout: 15000 })
+    await f.locator('.record-use-btn').click()
+    const d = await until(() => drafts().find(p => clipsOf(p.state).some(c => /^Recording_/.test(c.name || ''))), 'draft with the recording', 45000)
+    const rec = clipsOf(d.state).find(c => /^Recording_/.test(c.name))
+    assert.equal(rec.music, false, `on a voice track, not Music (${rec.track})`)
+    assert.equal(rec.track, 'Voice')
+    assert.equal(await f.getByRole('button', { name: /Cut silences/ }).isEnabled(), true)
+    await r.ctx.close()
+  })
+
   await step('select many: a box over the cut pieces, then louder (150%) and Studio voice for all of them, boosted in the preview', async () => {
     // a free draft slot (the recording step's draft takes the last one)
     if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })

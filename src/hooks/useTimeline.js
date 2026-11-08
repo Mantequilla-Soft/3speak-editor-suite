@@ -928,11 +928,17 @@ export function useTimeline() {
     const newClipId = generateClipId()
 
     lengthCheckRef.current = true
-    setTracksWithHistory(prev => {
+    setTracksWithHistory(current => {
+      // Audio editor without a voice track (it was removed): a recording gets
+      // a new Voice track, never the Music track (Cut silences, Studio voice
+      // and grouping only work on voices)
+      const prev = isAudioMode && targetTrackType === 'audio' && !current.some(t => t.type === 'audio' && !t.music)
+        ? [{ id: generateTrackId(), type: 'audio', name: 'Voice', clips: [] }, ...current]
+        : current
       // Audio goes on the first track that is not a music track (the voice)
       const targetTrack = (targetTrackType === 'audio' && prev.find(t => t.type === 'audio' && !t.music)) ||
         prev.find(t => t.type === targetTrackType)
-      if (!targetTrack) return prev
+      if (!targetTrack) return current
 
       // Place at the end of existing clips on this track
       let timelinePosition = 0

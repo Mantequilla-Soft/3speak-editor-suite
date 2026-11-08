@@ -231,8 +231,12 @@ function queueEncode(inputPath, probe, { urgent = false, first = false } = {}) {
 async function finishUpload(res, { filename, originalName, size, wait, hash = null }) {
   const url = `/api/upload/files/${filename}`
   const filePath = path.join(UPLOAD_DIR, filename)
-  const isVideo = /\.(webm|mp4|mov|avi|mkv|m4v|hevc)$/i.test(filename)
   const probe = await probeMedia(filePath)
+  // Only real video gets a 480p copy (which replaces the original): a voice
+  // recording from the browser is .webm too, but holds no picture. Unreadable
+  // files keep the old behaviour (try the encode).
+  const isVideo = /\.(webm|mp4|mov|avi|mkv|m4v|hevc)$/i.test(filename) &&
+    (!!probe.videoCodec || !Object.keys(probe).length)
   const browserSafe = isBrowserSafe(probe)
   const body = { url, filename, originalName, size, duration: probe.duration, browserSafe, encodes: isVideo }
   if (hash) {

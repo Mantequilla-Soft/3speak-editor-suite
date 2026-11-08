@@ -1339,7 +1339,7 @@ function App() {
                   className="compact-btn compact-tool-btn"
                   onClick={openCutSilences}
                   disabled={!voiceClips.length || !!cutProgress}
-                  title="Cut the silences out (find the pauses, cut them, close the gaps)"
+                  title={voiceClips.length ? 'Cut the silences out (find the pauses, cut them, close the gaps)' : 'Cut silences works on voice tracks: add a recording, or move it from the Music track onto a voice track (+ then Audio Track)'}
                   aria-label="Cut silences"
                 >
                   <AudioWaveform size={15} /><span>Cut silences</span>
