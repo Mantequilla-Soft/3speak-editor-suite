@@ -6843,3 +6843,17 @@ input[type="range"] {
 .timeline-ruler.dragging * {
   cursor: grabbing;
 }
+
+/* Track number on the left (the clip settings name tracks by it: "2 · Music") */
+.track-number {
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 16px;
+  text-align: center;
+}

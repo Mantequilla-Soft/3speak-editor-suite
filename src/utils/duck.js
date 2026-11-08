@@ -1,8 +1,9 @@
 // Auto-duck: a clip gets quieter while its sidechain source plays and comes
 // back up in the pauses, so a music bed never fights the voice. It is a clip
-// setting (clip.duck): { db, source } with source 'voices' (any voice track)
-// or one track's id, or { off: true }. A clip without one follows Duck in the
-// top bar (master.duck), which ducks the music tracks under the voices.
+// setting only (clip.duck): { db, source } with source one track's id or
+// 'voices' (all voice tracks), or { off: true }. There is no whole-show Duck
+// any more: master.duck (old drafts, the template's "duck the music") is
+// turned into the music clips' own setting (applyMasterDuck).
 //
 // The editor works the spans out (here) and sends each ducked clip its own
 // with the render; the backend applies the same ramps (audioRender.js
@@ -65,17 +66,30 @@ export function sourceSpans(tracks, source, ownTrackId, opts = {}) {
 
 export const DUCK_SOURCE_VOICES = 'voices'
 
-/**
- * What a clip's duck is: its own setting, or Duck in the top bar for a clip on
- * a music track. { db, source, inherited } or null (not ducked).
- */
-export function clipDuckSetting(clip, track, master) {
+/** A clip's duck: { db, source } or null (not ducked). Only its own setting counts. */
+export function clipDuckSetting(clip, track) {
   if (!clip || !track || track.type !== 'audio') return null
   const own = clip.duck
-  if (own?.off) return null
-  if (own && Number.isFinite(+own.db)) return { db: +own.db, source: own.source || DUCK_SOURCE_VOICES, inherited: false }
-  if (track.music && master?.duck) return { db: Number.isFinite(+master.duckDb) ? +master.duckDb : DUCK_DEFAULT_DB, source: DUCK_SOURCE_VOICES, inherited: true }
-  return null
+  if (!own || own.off || !Number.isFinite(+own.db)) return null
+  return { db: +own.db, source: own.source || DUCK_SOURCE_VOICES }
+}
+
+/**
+ * The old whole-show Duck (master.duck: an old draft, or a template with "duck
+ * the music") as the music clips' own setting: every clip on a music track
+ * without a Duck of its own gets { db: master.duckDb, source: 'voices' }.
+ * Returns the same array when nothing changes.
+ */
+export function applyMasterDuck(tracks, master) {
+  if (!master?.duck) return tracks
+  const db = DUCK_DEPTHS.includes(+master.duckDb) ? +master.duckDb : DUCK_DEFAULT_DB
+  let changed = false
+  const out = (tracks || []).map(t => {
+    if (t.type !== 'audio' || !t.music || !t.clips.some(c => c.duck === undefined)) return t
+    changed = true
+    return { ...t, clips: t.clips.map(c => (c.duck === undefined ? { ...c, duck: { db, source: DUCK_SOURCE_VOICES } } : c)) }
+  })
+  return changed ? out : tracks
 }
 
 const r3 = (n) => Math.round(n * 1000) / 1000
@@ -86,13 +100,13 @@ const r3 = (n) => Math.round(n * 1000) / 1000
  * seconds (only those that reach the clip). Clips with nothing to duck under
  * are left out; null when no clip is ducked.
  */
-export function duckPlans(tracks, master) {
+export function duckPlans(tracks) {
   const plans = {}
   const cache = new Map()
   for (const t of tracks || []) {
     if (t.type !== 'audio' || t.muted === true) continue
     for (const c of t.clips) {
-      const setting = clipDuckSetting(c, t, master)
+      const setting = clipDuckSetting(c, t)
       if (!setting || !sounding(c)) continue
       const key = `${setting.source}|${t.id}`
       if (!cache.has(key)) cache.set(key, sourceSpans(tracks, setting.source, t.id))

@@ -67,7 +67,7 @@ export const AUDIO_TOUR_STEPS = [
   {
     target: '.compact-side',
     title: 'Clip settings',
-    text: 'Select a clip to see its settings. Studio voice takes out noise and rumble and makes the voice clearer and more even. Group voices that were recorded together to keep them in sync.',
+    text: 'Select a clip to see its settings. Clean up the voice (Strong takes out noise and rumble and makes it clearer and more even), and Duck: the clip goes down while another track plays. Group voices that were recorded together to keep them in sync.',
     position: 'below',
     fallbackTarget: '.compact-timeline-section'
   },
@@ -84,9 +84,9 @@ export const AUDIO_TOUR_STEPS = [
     position: 'below'
   },
   {
-    target: '[aria-label="Level loudness"]',
-    title: 'Level and duck',
-    text: 'Level brings the export to podcast loudness (-16 LUFS). Duck turns the music down while someone talks and back up in the pauses.',
+    target: '[aria-label="Normalize loudness"]',
+    title: 'Normalize',
+    text: 'Brings the export to an even podcast loudness (-16 LUFS), so every episode sounds as loud as the last. Turn it off to keep your own levels.',
     position: 'below'
   },
   {

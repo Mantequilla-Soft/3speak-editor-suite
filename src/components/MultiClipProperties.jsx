@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Volume2, RotateCcw, Trash2 } from 'lucide-react'
 import { MAX_CLIP_VOLUME } from '../utils/audioGain'
-import { NOISE_LEVELS, STUDIO_LEVEL, recordingSource, canCleanSource, cleanVoiceChanges } from './ClipProperties'
+import { AUDIO_NOISE_LEVELS, recordingSource, canCleanClip, cleanVoiceChanges } from './ClipProperties'
 import { commonValue, sourcesOf } from '../utils/multiSelect'
 
 /**
@@ -26,10 +26,10 @@ export default function MultiClipProperties({ clips, audioMode = false, onUpdate
 
   // Voice clean-up: these clips only (each recording is cleaned once)
   const targets = voiceTargets || clips
-  const sources = sourcesOf(targets, recordingSource).filter(canCleanSource)
+  const sources = sourcesOf(targets.filter(canCleanClip), (c) => recordingSource(c) || c.url)
   const level = commonValue(targets.map(c => c.denoise || null))
-  const levels = [...NOISE_LEVELS, STUDIO_LEVEL]
-  const waiting = targets.some(c => !canCleanSource(recordingSource(c)))
+  const levels = AUDIO_NOISE_LEVELS
+  const waiting = targets.some(c => !canCleanClip(c))
   const extra = targets.length - clips.length
 
   const chooseLevel = async (id) => {

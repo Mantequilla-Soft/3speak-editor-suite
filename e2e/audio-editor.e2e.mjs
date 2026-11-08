@@ -158,7 +158,7 @@ try {
       await next.click()
       if (last) break
     }
-    for (const want of ['Cut silences', 'Your template', 'Level and duck', 'Chapters', 'Export']) assert.ok(titles.includes(want), `tour step ${want} in ${titles.join(', ')}`)
+    for (const want of ['Cut silences', 'Your template', 'Normalize', 'Chapters', 'Export']) assert.ok(titles.includes(want), `tour step ${want} in ${titles.join(', ')}`)
     await until(async () => (await t.frame.locator('.tour-overlay').count()) === 0, 'tour closed')
     assert.equal(await t.frame.evaluate(() => localStorage.getItem('3speak-audio-tour-done')), '1')
     // the shorts editor's tour is a separate flag: seeing this one doesn't skip it
@@ -174,8 +174,11 @@ try {
     await frame.getByText('Audio Editor').first().waitFor()
     assert.ok(await frame.getByRole('button', { name: /Cut silences/ }).isVisible())
     assert.ok(await frame.getByRole('button', { name: /Template/ }).isVisible())
-    assert.equal(await frame.getByRole('button', { name: 'Level loudness' }).getAttribute('aria-pressed'), 'true')
-    assert.match(await frame.getByRole('button', { name: 'Level loudness' }).innerText(), /Level: on/)
+    assert.equal(await frame.getByRole('button', { name: 'Normalize loudness' }).getAttribute('aria-pressed'), 'true')
+    assert.match(await frame.getByRole('button', { name: 'Normalize loudness' }).innerText(), /Normalize: on/)
+    assert.equal(await frame.getByRole('button', { name: 'Duck music' }).count(), 0, 'no Duck in the top bar')
+    // tracks numbered on the left
+    assert.deepEqual(await frame.locator('.track-label .track-number').allInnerTexts(), ['1', '2'])
     const labels = await frame.locator('.track-label').evaluateAll(els => els.map(e => e.getAttribute('aria-label')))
     assert.deepEqual(labels, ['Voice', 'Music'])
     assert.equal(await frame.locator('.track-label:not(.audio)').count(), 0, 'no video track')
@@ -356,7 +359,7 @@ try {
     const pair = [hostPiece.id, guestTalk.id]
     await f.locator(`.timeline-clip-v2[data-clip-id="${hostPiece.id}"]`).click()
     assert.match(await f.locator('.noise-hint').first().innerText(), /and its group \(2 clips\)/)
-    await f.getByRole('radio', { name: 'Studio voice' }).click()
+    await f.getByRole('radio', { name: 'Strong' }).click()
     await until(() => drafts().find(p => {
       const voices = clipsOf(p.state).filter(c => !c.music)
       const studio = voices.filter(c => /_dn-studio\.m4a/.test(c.url)).map(c => c.id).sort()
@@ -372,10 +375,14 @@ try {
     await until(async () => (await f.locator('.timeline-clip-v2.audio').count()) === 1, 'recording loaded')
     await f.locator('.track-label[aria-label="Music"] input[type=file]').setInputFiles(path.join(HOST_DIR, 'bed.wav'))
     await until(async () => (await f.locator('.timeline-clip-v2.audio').count()) === 2, 'music on the Music track')
-    // Duck: -12 dB from the menu
-    await f.getByRole('button', { name: 'Duck music' }).click()
-    await f.getByRole('radio', { name: /^-12 dB/ }).click()
-    assert.match(await f.getByRole('button', { name: 'Duck music' }).innerText(), /Duck: -12 dB/)
+    // Duck on the music clip itself: -12 dB, listening to track 1 (Voice) by default;
+    // the list names the other tracks by number, never the clip's own track
+    await f.locator('.timeline-track-v2.audio').nth(1).locator('.timeline-clip-v2').first().click()
+    await f.getByRole('radiogroup', { name: 'Duck this clip' }).getByRole('radio', { name: '-12 dB' }).click()
+    const sourceOptions = await f.getByLabel('Duck source').locator('option').allInnerTexts()
+    assert.deepEqual(sourceOptions, ['1 · Voice', 'All voice tracks'])
+    // Cut silences works on the selected clip: back to the recording
+    await f.locator('.timeline-track-v2.audio').first().locator('.timeline-clip-v2').first().click()
     // Chapters: M at 0:00 ("Intro"), then at 3 s (inside the second phrase), renamed
     await f.locator('.audio-stage-overview').focus()
     await f.locator('body').press('m')
@@ -398,24 +405,23 @@ try {
     const firstPiece = await f.locator('.timeline-clip-v2.audio').first().getAttribute('data-clip-id')
     await f.locator('.timeline-clip-v2.audio').first().click()
     assert.match(await f.locator('.noise-hint').first().innerText(), /this clip only/)
-    await f.getByRole('radio', { name: 'Studio voice' }).click()
+    await f.getByRole('radio', { name: 'Strong' }).click()
     const d = await until(() => drafts().find(x => {
       const voice = clipsOf(x.state).filter(c => !c.music)
       return voice.length === 3 && voice.filter(c => /_dn-studio\.m4a/.test(c.url)).map(c => c.id).join() === firstPiece
     }), 'only that piece on the studio copy', 45000)
-    assert.deepEqual(d.state.master, { loudness: true, duck: true, duckDb: -12 })
+    assert.equal(d.state.master.duck, false, 'no whole-show duck')
     assert.equal(d.state.chapters.length, 2)
     assert.equal(d.state.chapters[1].title, 'Second part')
     assert.ok(d.state.chapters[1].anchor && Math.abs(d.state.chapters[1].anchor.t - 3) < 0.01, 'pinned to 3 s of the recording')
-    // Duck is a clip setting too: the music clip shows the top bar's -12 dB,
-    // then gets its own -18 dB with the Voice track as its sidechain source
+    // the music clip keeps its own -12 dB (Voice track), then -18 dB
     const musicTrack = d.state.tracks.find(t => t.music)
     const voiceTrack = d.state.tracks.find(t => !t.music)
     const bedId = musicTrack.clips[0].id
     await f.locator(`.timeline-clip-v2[data-clip-id="${bedId}"]`).click()
     const duckGroup = f.getByRole('radiogroup', { name: 'Duck this clip' })
     assert.equal(await duckGroup.getByRole('radio', { name: '-12 dB' }).getAttribute('aria-checked'), 'true')
-    assert.match(await f.locator('.compact-side').innerText(), /Set by Duck in the top bar/)
+    assert.equal(musicTrack.clips[0].duck.source, voiceTrack.id, 'listens to the Voice track')
     await duckGroup.getByRole('radio', { name: '-18 dB' }).click()
     await f.getByLabel('Duck source').selectOption(voiceTrack.id)
     await until(() => drafts().find(x => {
@@ -599,7 +605,7 @@ try {
     await f.locator('.global-preview button[title="Pause"]').first().click()
 
     // (after the playback check: the cleaned copy is AAC, which this test Chromium can't decode)
-    await f.locator('.multi-clip-panel').getByRole('radio', { name: 'Studio voice' }).click()
+    await f.locator('.multi-clip-panel').getByRole('radio', { name: 'Strong' }).click()
     await until(() => { const d = mine(); return d && clipsOf(d.state).filter(c => ids.includes(c.id)).every(c => c.denoise === 'studio') }, 'Studio voice on all three', 60000)
 
     // Group them (one group id on all three), then Ungroup
@@ -928,6 +934,42 @@ try {
     assert.ok(!after[1].music, 'a voice track like the one it came from')
     assert.ok(Math.abs(after[1].clips[0].timelinePosition - 3) < 0.15, `at the playhead: ${after[1].clips[0].timelinePosition}`)
     assert.ok(after[2].music, 'Music stays below')
+    await r.ctx.close()
+  })
+
+  await step('voice clean-up on any track: a Music Library song on the Music track is uploaded, then cleaned (Off, Light, Medium, Strong)', async () => {
+    // a tiny music library served by the editor (like /music/ in production)
+    fs.mkdirSync(path.join(S, 'dist', 'music'), { recursive: true })
+    fs.copyFileSync(path.join(HOST_DIR, 'bed.wav'), path.join(S, 'dist', 'music', 'bed.wav'))
+    fs.writeFileSync(path.join(S, 'dist', 'music', 'library.json'), JSON.stringify({ version: 2, moods: [{ id: 'chill', label: 'Chill' }], tracks: [{ id: 'bed', title: 'Test bed', artist: 'E2E', mood: 'chill', duration: 5, file: 'bed.wav' }] }))
+    if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
+    const r = await openEditor()
+    const f = r.frame
+    await f.locator('.timeline-clip-v2.audio').first().waitFor({ timeout: 15000 })
+    const voiceId = await f.locator('.timeline-clip-v2.audio').first().getAttribute('data-clip-id')
+    await until(() => drafts().find(p => clipsOf(p.state).some(c => c.id === voiceId && /\/api\/upload\/files\//.test(c.url || ''))), 'uploaded', 45000)
+    // the Music track's + -> Music Library -> add the song
+    const musicLabel = f.locator('.track-label.audio').nth(1)
+    await musicLabel.locator('.track-add-btn').click()
+    await f.locator('.track-add-popup').getByRole('button', { name: /Music Library/ }).click()
+    await f.locator('.music-library-add').first().click()
+    const musicRow = f.locator('.timeline-track-v2.audio').nth(1)
+    await musicRow.locator('.timeline-clip-v2').first().waitFor({ timeout: 15000 })
+    await musicRow.locator('.timeline-clip-v2').first().click()
+    const levels = f.getByRole('radiogroup', { name: 'Noise reduction' })
+    assert.deepEqual(await levels.getByRole('radio').allInnerTexts(), ['Off', 'Light', 'Medium', 'Strong'])
+    await levels.getByRole('radio', { name: 'Strong' }).click()
+    const song = await until(() => {
+      const music = drafts()[0]?.state.tracks.find(t => t.music)
+      const c = music?.clips[0]
+      return c && /_dn-studio\.m4a/.test(c.url || '') ? c : null
+    }, 'the song on its cleaned (uploaded) copy', 45000)
+    assert.equal(song.denoise, 'studio')
+    assert.match(song.denoiseSourceUrl, /\/api\/upload\/files\//, 'cleaned from an uploaded copy')
+    // Off: back to the library file
+    await levels.getByRole('radio', { name: 'Off' }).click()
+    // Off: the uncleaned audio again (the draft keeps the uploaded copy of the song)
+    await until(() => { const c = drafts()[0]?.state.tracks.find(t => t.music)?.clips[0]; return c && !c.denoise && !/_dn-/.test(c.url) }, 'Off: uncleaned again', 15000)
     await r.ctx.close()
   })
 

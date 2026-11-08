@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo, memo } from 'react'
 import { boxFrom, clipIdsInBox, toggleInSelection, clipIdsInRange } from '../utils/marquee'
+import { trackNumbers } from '../utils/trackNumbers'
 import { Trash2, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker, Maximize2, ListChecks } from 'lucide-react'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 import { getGroupColor } from '../hooks/useTimeline'
@@ -768,6 +769,8 @@ function Timeline({
   // Video tracks displayed first (top), then audio tracks (bottom)
   const videoTracks = useMemo(() => (tracks || []).filter(t => t.type === 'video'), [tracks])
   const audioTracks = useMemo(() => (tracks || []).filter(t => t.type === 'audio'), [tracks])
+  // Track numbers as shown (the clip settings name tracks the same way: "2 · Music")
+  const numbers = useMemo(() => trackNumbers(tracks), [tracks])
   // As shown, top to bottom (for Shift-click ranges)
   selectionRef.current.tracksInOrder = [...videoTracks, ...audioTracks]
 
@@ -1448,6 +1451,7 @@ function Timeline({
           {videoTracks.map((track, index) => (
             <div key={track.id} className={`track-label${track.visible === false ? ' track-hidden' : ''}`}>
               <div className="track-label-top">
+                <span className="track-number" title={track.name}>{numbers.get(track.id)}</span>
                 <Film size={16} title={track.name} />
                 {onUpdateTrack && (
                   <button
@@ -1517,6 +1521,7 @@ function Timeline({
           {audioTracks.map((track, index) => (
             <div key={track.id} className={`track-label audio${track.muted ? ' track-muted' : ''}`} title={track.name} aria-label={track.name}>
               <div className="track-label-top">
+                <span className="track-number" title={track.name}>{numbers.get(track.id)}</span>
                 <Music size={16} title={track.name} />
                 {onUpdateTrack && (
                   <button

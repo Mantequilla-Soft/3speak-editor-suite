@@ -35,8 +35,8 @@ export default function AudioTemplateDialog({
   const [slots, setSlots] = useState(() => ({ ...(template?.slots || {}) }))
   const [loudness, setLoudness] = useState(template ? template.master?.loudness !== false : master?.loudness !== false)
   const [duck, setDuck] = useState(template ? template.master?.duck === true : master?.duck === true)
-  // How far: what Duck in the menu bar is set to now, else what was saved
-  const duckDb = (master?.duck ? master.duckDb : template?.master?.duckDb ?? master?.duckDb) ?? -12
+  // How far: what was saved with the template, else -12 dB
+  const duckDb = template?.master?.duckDb ?? -12
   const [cutSilences, setCutSilences] = useState(!!template?.silence?.enabled)
   const [autoApply, setAutoApply] = useState(template ? template.autoApply !== false : true)
   const [busy, setBusy] = useState(null) // role being uploaded
@@ -192,11 +192,11 @@ export default function AudioTemplateDialog({
           </label>
           <label className="audio-template-check">
             <input type="checkbox" checked={loudness} onChange={(e) => setLoudness(e.target.checked)} />
-            <span>Level the loudness for podcasts <small>(-16 LUFS, applied when exporting)</small></span>
+            <span>Normalize the loudness for podcasts <small>(-16 LUFS, applied when exporting)</small></span>
           </label>
           <label className="audio-template-check">
             <input type="checkbox" checked={duck} onChange={(e) => setDuck(e.target.checked)} />
-            <span>Duck the music while someone talks <small>({duckDb} dB, set it with Duck in the menu bar)</small></span>
+            <span>Duck the music while someone talks <small>({duckDb} dB on the music bed; change it in the clip&apos;s settings)</small></span>
           </label>
           <label className="audio-template-check">
             <input type="checkbox" checked={autoApply} onChange={(e) => setAutoApply(e.target.checked)} />

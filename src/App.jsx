@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useMemo, useState } from 'react'
-import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, ArrowDownWideNarrow, HelpCircle, Maximize, Minimize } from 'lucide-react'
+import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, HelpCircle, Maximize, Minimize } from 'lucide-react'
 import { useFFmpeg } from './hooks/useFFmpeg'
 import { useCanvasExport } from './hooks/useCanvasExport'
 import { useTimeline } from './hooks/useTimeline'
@@ -29,7 +29,8 @@ import AudioTemplateDialog from './components/AudioTemplateDialog'
 import ChaptersDialog from './components/ChaptersDialog'
 import AudiogramDialog from './components/AudiogramDialog'
 import { newChapter, moveChapter, resolveChapters, chapterSpans, MAX_CHAPTERS } from './utils/chapters'
-import { duckPlans, clipDuckSetting, DUCK_DEPTHS, DUCK_DEFAULT_DB } from './utils/duck'
+import { duckPlans, clipDuckSetting, applyMasterDuck, DUCK_DEPTHS, DUCK_DEFAULT_DB } from './utils/duck'
+import { trackNumbers, trackLabel } from './utils/trackNumbers'
 import { useAudioTemplate } from './hooks/useAudioTemplate'
 import { applyAudioTemplate, removeAudioTemplate, appliedRoles, hasSlots } from './utils/audioTemplate'
 import { loadLoudness, planCuts } from './utils/silenceDetect'
@@ -211,7 +212,7 @@ function App() {
   const resolvedChapters = useMemo(() => (audioMode ? resolveChapters(tracks, chapters, timelineEnd) : []), [audioMode, tracks, chapters, timelineEnd])
   const chapterList = useMemo(() => chapterSpans(resolvedChapters, timelineEnd), [resolvedChapters, timelineEnd])
   // Every ducked clip's plan (its own Duck setting, or the top bar's for music)
-  const duck = useMemo(() => (audioMode ? duckPlans(tracks, master) : null), [audioMode, tracks, master])
+  const duck = useMemo(() => (audioMode ? duckPlans(tracks) : null), [audioMode, tracks])
   // Name of the show: the first recording's name (the MP3's title and file name)
   const audioTitle = useMemo(() => {
     if (!audioMode) return null
@@ -1140,16 +1141,14 @@ function App() {
 
   // Chapters: added at the playhead (M), renamed, moved, removed
   const [chaptersOpen, setChaptersOpen] = useState(false)
-  const [duckMenuOpen, setDuckMenuOpen] = useState(false)
   const [audiogramOpen, setAudiogramOpen] = useState(false)
+  // Duck is a clip setting only. A whole-show Duck (an old draft, or a
+  // template with "duck the music") becomes the music clips' own setting.
   useEffect(() => {
-    if (!duckMenuOpen) return
-    const close = (e) => { if (!e.target.closest?.('.audio-duck')) setDuckMenuOpen(false) }
-    const esc = (e) => { if (e.key === 'Escape') setDuckMenuOpen(false) }
-    document.addEventListener('pointerdown', close)
-    document.addEventListener('keydown', esc)
-    return () => { document.removeEventListener('pointerdown', close); document.removeEventListener('keydown', esc) }
-  }, [duckMenuOpen])
+    if (!audioMode || !master.duck) return
+    applyTracks(ts => applyMasterDuck(ts, master))
+    setMaster(m => ({ ...m, duck: false }))
+  }, [audioMode, master.duck]) // eslint-disable-line react-hooks/exhaustive-deps
   const [chapterFocus, setChapterFocus] = useState(null)
   const addChapter = useCallback((at) => {
     setChapters(list => {
@@ -1226,13 +1225,17 @@ function App() {
   const duckInfoFor = (clip) => {
     const track = clip && tracks.find(t => t.type === 'audio' && t.clips.some(c => c.id === clip.id))
     if (!track) return null
+    const numbers = trackNumbers(tracks)
+    const others = tracks.filter(t => t.type === 'audio' && t.id !== track.id)
     return {
-      setting: clipDuckSetting(clip, track, master),
-      followsTopBar: !!track.music,
+      setting: clipDuckSetting(clip, track),
+      // every other track by its number and name, then all voice tracks at once
       sources: [
-        { id: 'voices', label: 'any voice' },
-        ...tracks.filter(t => t.type === 'audio' && t.id !== track.id).map(t => ({ id: t.id, label: t.name || (t.music ? 'Music' : 'Voice') }))
-      ]
+        ...others.sort((a, b) => numbers.get(a.id) - numbers.get(b.id)).map(t => ({ id: t.id, label: trackLabel(t, numbers) })),
+        { id: 'voices', label: 'All voice tracks' }
+      ],
+      // a new Duck listens to the first other voice track (else the first other track)
+      defaultSource: (others.find(t => !t.music) || others[0])?.id || 'voices'
     }
   }
 
@@ -1475,42 +1478,11 @@ function App() {
                   className={`compact-btn compact-tool-btn${master.loudness ? ' active' : ''}`}
                   onClick={() => setMaster(m => ({ ...m, loudness: !m.loudness }))}
                   aria-pressed={master.loudness}
-                  aria-label="Level loudness"
-                  title={master.loudness ? 'Loudness levelling is on: the export is levelled to -16 LUFS (podcast standard)' : 'Loudness levelling is off: the export keeps your levels'}
+                  aria-label="Normalize loudness"
+                  title={master.loudness ? 'Normalize is on: the export is brought to an even -16 LUFS (the podcast standard)' : 'Normalize is off: the export keeps your levels as they are'}
                 >
-                  <Gauge size={15} /><span>{master.loudness ? 'Level: on' : 'Level: off'}</span>
+                  <Gauge size={15} /><span>{master.loudness ? 'Normalize: on' : 'Normalize: off'}</span>
                 </button>
-                <div className="audio-duck">
-                  <button
-                    className={`compact-btn compact-tool-btn${master.duck ? ' active' : ''}`}
-                    onClick={() => setDuckMenuOpen(o => !o)}
-                    aria-haspopup="true"
-                    aria-expanded={duckMenuOpen}
-                    aria-label="Duck music"
-                    title="Auto-duck: the music goes down while someone talks and back up in the pauses"
-                  >
-                    <ArrowDownWideNarrow size={15} /><span>{master.duck ? `Duck: ${master.duckDb} dB` : 'Duck: off'}</span>
-                  </button>
-                  {duckMenuOpen && (
-                    <div className="audio-duck-menu" role="radiogroup" aria-label="Music under the voices">
-                      <p>The music goes down while someone talks and comes back up in the pauses. A clip with its own Duck (clip settings) keeps that.</p>
-                      {[{ id: null, label: 'Off: the music keeps its level' }, ...DUCK_DEPTHS.map(db => ({ id: db, label: `${db} dB${db === -6 ? ' (a little)' : db === -18 ? ' (a lot)' : ''}` }))].map(o => {
-                        const on = o.id === null ? !master.duck : master.duck && master.duckDb === o.id
-                        return (
-                          <button
-                            key={String(o.id)}
-                            role="radio"
-                            aria-checked={on}
-                            onClick={() => { setMaster(m => (o.id === null ? { ...m, duck: false } : { ...m, duck: true, duckDb: o.id })); setDuckMenuOpen(false) }}
-                          >{o.label}</button>
-                        )
-                      })}
-                      {master.duck && !tracks.some(t => t.type === 'audio' && t.music && t.clips.length) && (
-                        <p>Nothing to duck yet: add music on a music track (or a music bed with your template).</p>
-                      )}
-                    </div>
-                  )}
-                </div>
                 <button
                   className={`compact-btn compact-tool-btn${chapters.length ? ' active' : ''}`}
                   onClick={() => setChaptersOpen(true)}

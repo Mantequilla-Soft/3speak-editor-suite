@@ -214,14 +214,46 @@ export const NOISE_LEVELS = [
   { id: 'medium', label: 'Medium' },
   { id: 'strong', label: 'Strong' }
 ]
-// The audio editor's one-click voice: noise down, rumble and mud out, presence
-// and evenness in (de-esser, compressor), see DENOISE in the backend's clip.js
-export const STUDIO_LEVEL = { id: 'studio', label: 'Studio voice', title: 'Studio voice: less noise, no rumble, clearer and more even, softer S sounds' }
+// The audio editor's levels: Off, Light, Medium and Strong, where Strong is
+// the full voice treatment ('studio': noise down, rumble and mud out, presence
+// and evenness in, de-esser, compressor; see DENOISE in the backend's clip.js).
+// The plain 'strong' noise reduction is the shorts editor's only.
+export const STUDIO_LEVEL = { id: 'studio', label: 'Strong', title: 'Strong: less noise, no rumble, clearer and more even, softer S sounds' }
+export const AUDIO_NOISE_LEVELS = [...NOISE_LEVELS.filter(l => l.id !== 'strong'), STUDIO_LEVEL]
 
 // The uploaded original of a clip's recording (kept while a cleaned version
 // is in use), and whether the backend can clean it
 export const recordingSource = (clip) => clip.denoiseSourceUrl || clip.serverUrl
 export const canCleanSource = (source) => !!source && /\/api\/upload\/files\//.test(source)
+// Audio that is not one of our uploads (a Music Library song, a sound effect)
+// but can be fetched: it is uploaded first, then cleaned like any recording
+const importable = (url) => !!url && !/^(blob|data):/.test(url)
+export const canCleanClip = (clip) => canCleanSource(recordingSource(clip)) || importable(clip.denoiseLocalUrl || clip.url)
+
+// One upload per outside file (url -> its upload's URL)
+const imported = new Map()
+async function uploadCopy(url) {
+  if (imported.has(url)) return imported.get(url)
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`fetch ${res.status}`)
+  const blob = await res.blob()
+  const form = new FormData()
+  form.append('file', blob, decodeURIComponent(url.split('?')[0].split('/').pop() || 'audio'))
+  const up = await authFetch(api('/api/upload'), { method: 'POST', body: form })
+  if (!up.ok) throw new Error(`upload ${up.status}`)
+  const { url: path } = await up.json()
+  const backend = getBackendUrl()
+  const full = backend && path.startsWith('/') ? `${backend}${path}` : path
+  imported.set(url, full)
+  return full
+}
+// Where a clip's cleaning starts from: its upload, or an uploaded copy of the outside file
+async function cleanSourceOf(clip) {
+  const source = recordingSource(clip)
+  if (canCleanSource(source)) return source
+  const outside = clip.denoiseLocalUrl || clip.url
+  return importable(outside) ? uploadCopy(new URL(outside, window.location.href).href) : null
+}
 
 // Ask the backend for a cleaned copy of a recording; resolves its URL
 export async function requestCleanVoice(source, level) {
@@ -261,7 +293,7 @@ export async function cleanVoiceChanges(targets, level) {
   }
   const bySource = new Map()
   for (const t of targets) {
-    const source = recordingSource(t)
+    const source = await cleanSourceOf(t)
     if (!canCleanSource(source)) continue
     if (!bySource.has(source)) bySource.set(source, [])
     bySource.get(source).push(t)
@@ -324,8 +356,8 @@ function NoiseControls({ clip, onUpdateClip, voiceTargets = null, onUpdateClipsE
   const [error, setError] = useState(null)
   const audioEditor = !!(voiceTargets && onUpdateClipsEach)
   const targets = audioEditor ? voiceTargets : [clip]
-  const canClean = targets.some(t => canCleanSource(recordingSource(t)))
-  const levels = audioEditor ? [...NOISE_LEVELS, STUDIO_LEVEL] : NOISE_LEVELS
+  const canClean = targets.some(audioEditor ? canCleanClip : (t) => canCleanSource(recordingSource(t)))
+  const levels = audioEditor ? AUDIO_NOISE_LEVELS : NOISE_LEVELS
   const apply = (changes) => {
     if (audioEditor) onUpdateClipsEach(changes)
     else for (const ch of changes) if (ch.id === clip.id) onUpdateClip(ch.updates)
@@ -380,21 +412,16 @@ function NoiseControls({ clip, onUpdateClip, voiceTargets = null, onUpdateClipsE
  * { db, source, inherited } or null), sources [{ id, label }], followsTopBar
  * (a music clip: without its own setting it follows Duck in the top bar) }.
  */
-function DuckControls({ clip, duckInfo, onUpdateClip }) {
-  const { setting, sources, followsTopBar } = duckInfo
-  const setDepth = (db) => onUpdateClip({ duck: db == null ? { off: true } : { db, source: setting?.source || DUCK_SOURCE_VOICES } })
-  const setSource = (source) => onUpdateClip({ duck: { db: setting?.db ?? DUCK_DEFAULT_DB, source } })
+function DuckControls({ duckInfo, onUpdateClip }) {
+  const { setting, sources, defaultSource } = duckInfo
+  // A source that is gone (its track removed) falls back to the default
+  const source = setting && sources.some(s => s.id === setting.source) ? setting.source : (defaultSource || DUCK_SOURCE_VOICES)
+  const setDepth = (db) => onUpdateClip({ duck: db == null ? { off: true } : { db, source } })
+  const setSource = (next) => onUpdateClip({ duck: { db: setting?.db ?? DUCK_DEFAULT_DB, source: next } })
   const active = setting ? setting.db : null
   return (
     <div className="property-group">
-      <label>
-        Duck
-        {followsTopBar && clip.duck !== undefined && (
-          <button className="prop-reset-btn" onClick={() => onUpdateClip({ duck: undefined })} title="Follow Duck in the top bar again">
-            <RotateCcw size={10} />
-          </button>
-        )}
-      </label>
+      <label>Duck</label>
       <div className="noise-levels" role="radiogroup" aria-label="Duck this clip">
         {[null, ...DUCK_DEPTHS].map(db => (
           <button
@@ -411,17 +438,13 @@ function DuckControls({ clip, duckInfo, onUpdateClip }) {
       {setting && (
         <div className="duck-source">
           <span>Goes down while</span>
-          <select value={setting.source} onChange={(e) => setSource(e.target.value)} aria-label="Duck source">
+          <select value={source} onChange={(e) => setSource(e.target.value)} aria-label="Duck source">
             {sources.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
           </select>
           <span>plays</span>
         </div>
       )}
-      <p className="noise-hint">
-        {setting?.inherited
-          ? 'Set by Duck in the top bar. Pick a level or a source to set it for this clip.'
-          : 'This clip gets quieter while its source plays, and comes back up in the pauses.'}
-      </p>
+      <p className="noise-hint">This clip gets quieter while the chosen track plays, and comes back up in the pauses.</p>
     </div>
   )
 }
@@ -1182,7 +1205,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
 
           {isAudio && <NoiseControls clip={clip} onUpdateClip={onUpdateClip} voiceTargets={voiceTargets} onUpdateClipsEach={onUpdateClipsEach} />}
 
-          {isAudio && duckInfo && <DuckControls clip={clip} duckInfo={duckInfo} onUpdateClip={onUpdateClip} />}
+          {isAudio && duckInfo && <DuckControls duckInfo={duckInfo} onUpdateClip={onUpdateClip} />}
         </div>
         )}
 
