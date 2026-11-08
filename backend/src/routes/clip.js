@@ -376,7 +376,7 @@ function runFFmpegReverse(inputUrl, outputPath, seekTime, duration, onProgress) 
 }
 
 /**
- * POST /api/clip/denoise  { url, strength: 'light' | 'medium' | 'strong' }
+ * POST /api/clip/denoise  { url, strength: 'light' | 'medium' | 'strong' | 'studio' }
  * Background-noise reduction for an uploaded clip's audio (ffmpeg afftdn, an
  * FFT noise gate that follows the noise floor, plus a gentle high-pass). `url`
  * is one of our own /api/upload/files/<name> URLs, so nothing is uploaded
@@ -387,7 +387,11 @@ function runFFmpegReverse(inputUrl, outputPath, seekTime, duration, onProgress) 
 const DENOISE = {
   light: 'highpass=f=60,afftdn=nr=8:nf=-35:tn=1',
   medium: 'highpass=f=70,afftdn=nr=14:nf=-30:tn=1',
-  strong: 'highpass=f=80,afftdn=nr=24:nf=-25:tn=1'
+  strong: 'highpass=f=80,afftdn=nr=24:nf=-25:tn=1',
+  // The audio editor's "Studio voice": noise and rumble out, less mud (250 Hz),
+  // more presence (3.5 kHz), softer S sounds, evened out (3:1 over -20 dB),
+  // a limiter so the make-up gain never clips
+  studio: 'highpass=f=80,afftdn=nr=12:nf=-30:tn=1,equalizer=f=250:t=q:w=1:g=-2,equalizer=f=3500:t=q:w=1:g=2.5,deesser=i=0.4,acompressor=threshold=0.1:ratio=3:attack=8:release=200:makeup=2,alimiter=limit=0.95:level=false'
 }
 const UPLOAD_ROOT = process.env.UPLOAD_DIR || UPLOADS_DIR
 
@@ -397,7 +401,7 @@ async function resolveUpload(url) {
   const match = String(url || '').match(/\/api\/upload\/files\/([A-Za-z0-9_.-]+?)(?:\?.*)?$/)
   if (!match) return null
   const name = path.basename(match[1])
-  const base = path.basename(name, path.extname(name)).replace(/_dn-(light|medium|strong)$/, '')
+  const base = path.basename(name, path.extname(name)).replace(/_dn-(light|medium|strong|studio)$/, '')
   for (const c of [path.join(UPLOAD_ROOT, `${base}_480p.mp4`), path.join(UPLOAD_ROOT, name)]) {
     try { await fs.access(c); return { name, base, input: c } } catch {}
   }
@@ -485,6 +489,80 @@ router.post('/scenes', requireSignIn, async (req, res) => {
   await fs.writeFile(cachePath, JSON.stringify(result)).catch(() => {})
   console.log(`[scenes] ${found.name}: ${scores.filter(s => s[1] >= 10).length} likely cuts`)
   res.json(result)
+})
+
+/**
+ * POST /api/clip/audio-analysis  { url }
+ * The loudness and peaks of an uploaded file's audio, for files too big to
+ * decode in the browser (a long WAV podcast): the waveform and "Cut silences"
+ * use this instead. Mono, 8 kHz, one value per 20 ms window:
+ * { step, duration, db: [RMS dBFS, -90 floor], peaks: [0..1] }.
+ * Same shape the browser makes (utils/silenceDetect.js, utils/peakCache.js).
+ * Cached next to the upload; one pass of ffmpeg per file.
+ */
+export const ANALYSIS_RATE = 8000
+export const ANALYSIS_WINDOW = 160 // samples: 20 ms at 8 kHz
+const ANALYSIS_FLOOR_DB = -90
+
+/** Fold raw mono float samples into { db, peaks } per window (exported for tests). */
+export function createAnalyser(windowSize = ANALYSIS_WINDOW) {
+  const db = []
+  const peaks = []
+  let sum = 0
+  let peak = 0
+  let n = 0
+  let carry = Buffer.alloc(0)
+  const flush = () => {
+    if (!n) return
+    const rms = Math.sqrt(sum / n)
+    db.push(rms > 0 ? Math.max(ANALYSIS_FLOOR_DB, Math.round(20 * Math.log10(rms) * 10) / 10) : ANALYSIS_FLOOR_DB)
+    peaks.push(Math.round(Math.min(1, peak) * 1000) / 1000)
+    sum = 0; peak = 0; n = 0
+  }
+  return {
+    push(chunk) {
+      const buf = carry.length ? Buffer.concat([carry, chunk]) : chunk
+      const whole = buf.length - (buf.length % 4)
+      for (let i = 0; i < whole; i += 4) {
+        const v = buf.readFloatLE(i)
+        sum += v * v
+        const a = v < 0 ? -v : v
+        if (a > peak) peak = a
+        if (++n === windowSize) flush()
+      }
+      carry = buf.subarray(whole)
+    },
+    end() {
+      flush()
+      return { db, peaks }
+    }
+  }
+}
+
+router.post('/audio-analysis', requireSignIn, async (req, res) => {
+  const found = await resolveUpload(req.body?.url)
+  if (!found) return res.status(400).json({ error: 'Need one of our upload URLs' })
+  if (!found.input) return res.status(404).json({ error: 'File not found' })
+  const cachePath = path.join(UPLOAD_ROOT, `${found.base}.audio.json`)
+  try {
+    return res.type('json').send(await fs.readFile(cachePath, 'utf8'))
+  } catch {}
+
+  const analyser = createAnalyser()
+  const ok = await new Promise((resolve) => {
+    const proc = spawn('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-threads', '2', '-i', found.input, '-vn',
+      '-ac', '1', '-ar', String(ANALYSIS_RATE), '-f', 'f32le', 'pipe:1'], { stdio: ['ignore', 'pipe', 'ignore'] })
+    proc.stdout.on('data', d => analyser.push(d))
+    proc.on('close', code => resolve(code === 0))
+    proc.on('error', () => resolve(false))
+  })
+  if (!ok) return res.status(500).json({ error: 'Audio analysis failed' })
+  const { db, peaks } = analyser.end()
+  const step = ANALYSIS_WINDOW / ANALYSIS_RATE
+  const result = JSON.stringify({ step, duration: Math.round(db.length * step * 1000) / 1000, db, peaks })
+  await fs.writeFile(cachePath, result).catch(() => {})
+  console.log(`[audio-analysis] ${found.name}: ${db.length} windows`)
+  res.type('json').send(result)
 })
 
 export { router as clipRouter }

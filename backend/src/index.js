@@ -5,9 +5,12 @@ import path from 'path'
 import { renderRouter, getRenderStats } from './routes/render.js'
 import { uploadRouter } from './routes/upload.js'
 import { clipRouter } from './routes/clip.js'
-import { projectsRouter, PROJECTS_DIR } from './routes/projects.js'
+import { projectsRouter } from './routes/projects.js'
 import { sceneRenderRouter } from './routes/sceneRender.js'
-import { adDraftsRouter, AD_DRAFTS_DIR } from './routes/adDrafts.js'
+import { adDraftsRouter } from './routes/adDrafts.js'
+import { templatesRouter } from './routes/templates.js'
+import { audiogramRouter } from './routes/audiogram.js'
+import { pinnedUploads, uploadBase } from './utils/pinnedUploads.js'
 import { RENDER_CACHE_DIR } from './services/ffmpeg.js'
 
 const app = express()
@@ -37,6 +40,10 @@ app.use('/api/clip', clipRouter)
 
 // Saved projects (drafts) of signed-in users
 app.use('/api/projects', projectsRouter)
+// The one audio template per user (intro / outro / music bed), kept for good
+app.use('/api/templates', templatesRouter)
+// Audiogram videos of an exported episode (the audio editor's share clip)
+app.use('/api/audiogram', audiogramRouter)
 
 // Ad Wizard: scene-engine docs -> silent scene video (headless Chromium), and its drafts
 app.use('/api/scene-render', sceneRenderRouter)
@@ -45,41 +52,6 @@ app.use('/api/ad-drafts', adDraftsRouter)
 // Serve rendered output files (for download)
 app.use('/rendered', express.static(RENDERED_DIR))
 
-// An upload's name without its derived suffixes: the original, its 480p copy,
-// cleaned audio and scene cache all share it
-const uploadBase = (name) => path.basename(name, path.extname(name))
-  .replace(/\.scenes$/, '')
-  .replace(/(_480p|_dn-(light|medium|strong))(\.part)?$/, '')
-
-// Files saved projects and Ad Wizard drafts still use (by upload base); expired ones go here
-async function pinnedUploads(now) {
-  const pinned = new Set()
-  for (const root of [PROJECTS_DIR, AD_DRAFTS_DIR]) await pinFrom(root, now, pinned)
-  return pinned
-}
-
-async function pinFrom(root, now, pinned) {
-  let users = []
-  try { users = await fs.readdir(root) } catch { return pinned }
-  for (const user of users) {
-    const dir = path.join(root, user)
-    let files = []
-    try { files = await fs.readdir(dir) } catch { continue }
-    for (const f of files) {
-      if (!f.endsWith('.json')) continue
-      try {
-        const p = JSON.parse(await fs.readFile(path.join(dir, f), 'utf8'))
-        if (p.expiresAt <= now) {
-          await fs.unlink(path.join(dir, f))
-          console.log(`[cleanup] Project ${p.id} of ${user} expired`)
-          continue
-        }
-        for (const name of p.files || []) pinned.add(uploadBase(name))
-      } catch {}
-    }
-  }
-  return pinned
-}
 
 // Periodic cleanup of old uploaded and rendered files
 async function cleanupOldFiles() {
@@ -90,7 +62,7 @@ async function cleanupOldFiles() {
   const pinned = await pinnedUploads(now)
 
   // ... and the render cache (downloads, processed clips), refreshed when used
-  for (const dir of [UPLOAD_DIR, RENDERED_DIR, path.join(RENDER_CACHE_DIR, 'downloads'), path.join(RENDER_CACHE_DIR, 'clips')]) {
+  for (const dir of [UPLOAD_DIR, RENDERED_DIR, path.join(RENDER_CACHE_DIR, 'downloads'), path.join(RENDER_CACHE_DIR, 'clips'), path.join(RENDER_CACHE_DIR, 'audio-segments')]) {
     try {
       const files = await fs.readdir(dir)
       for (const file of files) {

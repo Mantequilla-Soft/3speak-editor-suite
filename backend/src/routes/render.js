@@ -4,6 +4,7 @@ import path from 'path'
 import fs from 'fs/promises'
 import { downloadMedia } from '../utils/download.js'
 import { buildAndRunFFmpeg, RENDER_CACHE_DIR } from '../services/ffmpeg.js'
+import { renderAudioTimeline, audioTimelineEnd } from '../services/audioRender.js'
 import crypto from 'crypto'
 import { requireSignIn } from '../auth.js'
 
@@ -11,6 +12,8 @@ const router = Router()
 const RENDERED_DIR = process.env.RENDERED_DIR || '/app/rendered'
 const WORK_DIR = process.env.WORK_DIR || '/app/work'
 const MAX_CONCURRENT = parseInt(process.env.MAX_CONCURRENT_JOBS || '2', 10)
+// Longest audio-mode render (the editor's own limit is the same, src/utils/limits.js)
+export const MAX_AUDIO_RENDER_SECONDS = 3 * 60 * 60
 
 // In-memory job store
 const jobs = new Map()
@@ -61,6 +64,14 @@ router.post('/', requireSignIn, async (req, res) => {
 
     if (!timeline || !timeline.tracks || timeline.tracks.length === 0) {
       return res.status(400).json({ error: 'Invalid timeline: tracks required' })
+    }
+    // Audio mode: an MP3 of the audio tracks, up to MAX_AUDIO_RENDER_SECONDS
+    if (timeline.output === 'audio') {
+      const length = audioTimelineEnd(timeline.tracks)
+      if (!(length > 0)) return res.status(400).json({ error: 'Nothing to render: the audio tracks are empty or muted' })
+      if (length > MAX_AUDIO_RENDER_SECONDS + 1) {
+        return res.status(400).json({ error: `Audio is ${Math.ceil(length / 60)} minutes long; the limit is ${MAX_AUDIO_RENDER_SECONDS / 3600} hours` })
+      }
     }
 
     if (activeJobs >= MAX_CONCURRENT) {
@@ -171,8 +182,10 @@ async function processJob(jobId, jobDir) {
     const { timeline } = job
 
     // Nothing changed since an earlier render of this exact timeline
+    const audioOnly = timeline.output === 'audio'
+    const ext = audioOnly ? '.mp3' : '.mp4'
     const renderKey = sha(JSON.stringify(timeline))
-    const cachedOutput = `cache-${renderKey}.mp4`
+    const cachedOutput = `cache-${renderKey}${ext}`
     try {
       await fs.access(path.join(RENDERED_DIR, cachedOutput))
       await touch(path.join(RENDERED_DIR, cachedOutput))
@@ -220,14 +233,14 @@ async function processJob(jobId, jobDir) {
       }
     }
 
-    job.phase = 'Processing video...'
+    job.phase = audioOnly ? 'Processing audio...' : 'Processing video...'
     job.progress = 0.3
 
     // Build and run FFmpeg
-    const outputFilename = `${jobId}.mp4`
+    const outputFilename = `${jobId}${ext}`
     const outputPath = path.join(RENDERED_DIR, outputFilename)
 
-    await buildAndRunFFmpeg({
+    await (audioOnly ? renderAudioTimeline : buildAndRunFFmpeg)({
       timeline,
       downloadedFiles,
       outputPath,

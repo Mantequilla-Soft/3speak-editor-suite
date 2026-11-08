@@ -5,6 +5,7 @@
 // Decodes run one at a time; a handful of files stay cached.
 
 import { MAX_ANALYSE_BYTES } from './limits'
+import { serverAnalysis } from './serverAnalysis'
 
 const SAMPLE_RATE = 8000
 const STEP = 0.01 // seconds per peak
@@ -46,16 +47,23 @@ async function decodePeaks(url) {
   return { peaks, step: per / audio.sampleRate }
 }
 
-/** Peaks of a file (decoded once, shared); null when it cannot be decoded. */
-export function getPeaks(url) {
+/**
+ * Peaks of a file (decoded once, shared); null when it cannot be decoded.
+ * `analysisUrl`: the file's upload on our backend; when the browser cannot
+ * decode it (too big, unknown codec) the backend measures it instead.
+ */
+export function getPeaks(url, { analysisUrl = null } = {}) {
   if (cache.has(url)) {
     const hit = cache.get(url)
     cache.delete(url)
     cache.set(url, hit) // most recently used last
-    return Promise.resolve(hit)
+    if (hit || !analysisUrl) return Promise.resolve(hit)
+    cache.delete(url) // could not decode here: ask the backend now that it has the file
   }
   if (inflight.has(url)) return inflight.get(url)
-  const job = queue.then(() => decodePeaks(url)).catch(() => null).then(result => {
+  const decode = () => decodePeaks(url).catch(() => null)
+    .then(env => env || (analysisUrl ? serverAnalysis(analysisUrl).then(a => (a ? { peaks: Float32Array.from(a.peaks), step: a.step } : null)) : null))
+  const job = queue.then(decode).catch(() => null).then(result => {
     inflight.delete(url)
     cache.set(url, result)
     while (cache.size > MAX_FILES) cache.delete(cache.keys().next().value)

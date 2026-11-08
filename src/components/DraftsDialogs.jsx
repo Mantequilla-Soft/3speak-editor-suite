@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { X, Clock, Check, Loader2, AlertCircle, LogIn, FolderOpen, Crown, ExternalLink } from 'lucide-react'
 import { formatUntil, formatKeep, formatAgo } from '../hooks/useDrafts'
+import { formatLength } from '../utils/limits'
 
-const projectMeta = (p) => {
-  const secs = Math.round(p.length || 0)
-  const len = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`
-  return `${p.clips} clip${p.clips === 1 ? '' : 's'} · ${len} · edited ${formatAgo(p.updatedAt)}`
+// "Audio · 12 clips · 1:02:05 · edited 2 h ago" (the replace list shows both editors' drafts)
+export const projectMeta = (p) => {
+  const kind = p.mode === 'audio' ? 'Audio · ' : ''
+  return `${kind}${p.clips} clip${p.clips === 1 ? '' : 's'} · ${formatLength(p.length || 0)} · edited ${formatAgo(p.updatedAt)}`
 }
 
 /** On start: continue a saved draft, or start a new project. */

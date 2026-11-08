@@ -15,9 +15,16 @@ const RENDERED_DIR = process.env.RENDERED_DIR || '/app/rendered'
 export async function downloadMedia(url, clipId, workDir) {
   // Local uploaded file — just copy from uploads dir
   if (url.startsWith('/api/upload/files/')) {
-    const filename = url.split('/').pop()
-    const srcPath = path.join(UPLOAD_DIR, filename)
-    const ext = path.extname(filename) || '.bin'
+    const filename = path.basename(url.split('?')[0])
+    // The original, or its 480p copy (which replaces the original once it is
+    // done, and is what the GET route serves then)
+    const encoded = `${path.basename(filename, path.extname(filename))}_480p.mp4`
+    let srcPath = path.join(UPLOAD_DIR, filename)
+    try { await fs.access(srcPath) } catch {
+      const alt = path.join(UPLOAD_DIR, encoded)
+      try { await fs.access(alt); srcPath = alt } catch { /* copyFile reports the missing original */ }
+    }
+    const ext = path.extname(srcPath) || '.bin'
     const destPath = path.join(workDir, `${clipId}${ext}`)
     await fs.copyFile(srcPath, destPath)
     console.log(`[download] Local copy: ${srcPath} -> ${destPath}`)

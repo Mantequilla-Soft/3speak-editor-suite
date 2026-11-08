@@ -225,14 +225,65 @@ function queueEncode(inputPath, probe, { urgent = false, first = false } = {}) {
 }
 
 /**
+ * Browser voice recordings (MediaRecorder WebM / Ogg) have no seek index
+ * (Cues): to start at minute 15 the browser reads through the file up to
+ * there, so a clip cut from late in a long recording started late in the
+ * preview and played out of step with the timeline. A stream copy with the
+ * index at the front fixes that; the audio itself is not touched (same
+ * samples). Written to a .part file and swapped in before the upload is
+ * answered, so the URL never serves two different files.
+ */
+const SEEKABLE_AUDIO = /\.(webm|weba|ogg|oga|opus|mka)$/i
+export async function addSeekIndex(filePath) {
+  const dir = path.dirname(filePath)
+  const ext = path.extname(filePath)
+  const partPath = path.join(dir, `${path.basename(filePath, ext)}.seek.part${ext}`)
+  const format = /\.(ogg|oga|opus)$/i.test(ext) ? [] : ['-cues_to_front', '1']
+  const ok = await new Promise((resolve) => {
+    const proc = spawn('ffmpeg', ['-loglevel', 'error', '-y', '-i', filePath, '-map', '0', '-c', 'copy', ...format, partPath], { stdio: ['ignore', 'ignore', 'pipe'] })
+    let err = ''
+    proc.stderr.on('data', d => { err += d })
+    proc.on('error', () => resolve(false))
+    proc.on('close', (code) => {
+      if (code !== 0) console.warn(`[upload] seek index for ${path.basename(filePath)} failed: ${err.slice(-300)}`)
+      resolve(code === 0)
+    })
+  })
+  if (!ok) { await fs.unlink(partPath).catch(() => {}); return false }
+  // Only swap in a copy that is really the same length (a broken copy keeps the original)
+  const [before, after] = await Promise.all([probeMedia(filePath), probeMedia(partPath)])
+  // (a recording without a Duration in its header has none before: then any real length will do)
+  if (!after.duration || (before.duration && Math.abs(after.duration - before.duration) > 0.5)) {
+    console.warn(`[upload] seek index for ${path.basename(filePath)}: length changed (${before.duration} -> ${after.duration}), kept the original`)
+    await fs.unlink(partPath).catch(() => {})
+    return false
+  }
+  await fs.rename(partPath, filePath)
+  return true
+}
+
+/**
  * A file is fully on disk (single POST or joined chunks): probe it, answer the
  * client and start its 480p encode. `wait` answers only once the encode is done.
  */
 async function finishUpload(res, { filename, originalName, size, wait, hash = null }) {
   const url = `/api/upload/files/${filename}`
   const filePath = path.join(UPLOAD_DIR, filename)
-  const isVideo = /\.(webm|mp4|mov|avi|mkv|m4v|hevc)$/i.test(filename)
-  const probe = await probeMedia(filePath)
+  let probe = await probeMedia(filePath)
+  // An audio-only recording gets its seek index first (see addSeekIndex); its
+  // length is read again after (a header without a Duration has it then)
+  if (!probe.videoCodec && Object.keys(probe).length && SEEKABLE_AUDIO.test(filename)) {
+    const t0 = Date.now()
+    if (await addSeekIndex(filePath)) {
+      console.log(`[upload] seek index added to ${filename} (${Date.now() - t0} ms)`)
+      probe = await probeMedia(filePath)
+    }
+  }
+  // Only real video gets a 480p copy (which replaces the original): a voice
+  // recording from the browser is .webm too, but holds no picture. Unreadable
+  // files keep the old behaviour (try the encode).
+  const isVideo = /\.(webm|mp4|mov|avi|mkv|m4v|hevc)$/i.test(filename) &&
+    (!!probe.videoCodec || !Object.keys(probe).length)
   const browserSafe = isBrowserSafe(probe)
   const body = { url, filename, originalName, size, duration: probe.duration, browserSafe, encodes: isVideo }
   if (hash) {

@@ -1,10 +1,14 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react'
+import { fitAt, placeOnTrack } from '../utils/placement'
+import { finiteDuration, isUsableDuration, pickDuration } from '../utils/mediaDuration'
 import { isHlsUrl, getHlsDuration } from '../utils/hlsHelper'
 import { downloadHlsToMp4 } from '../utils/hlsDownloader'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authHeaders, authFetch, dropToken } from '../utils/editorAuth'
 import { MAX_TIMELINE_SECONDS, MAX_IMPORT_BYTES, getTimelineEnd } from '../utils/limits'
 import { createSHA256 } from 'hash-wasm'
+import { isAudioMode } from '../utils/editorMode'
+import { applyGroupCut } from '../utils/groupSilence'
 
 // Upload requests (whole small files or chunks of big ones) in flight at once,
 // shared by every upload; the rest wait for a free slot. Kept under the
@@ -172,18 +176,23 @@ function probeMedia(file) {
       resolve({ duration: duration ?? 10, durationKnown: duration != null, playable })
     }
     const timer = setTimeout(() => finish(type !== 'video' && duration != null), 8000)
-    el.onloadedmetadata = () => {
-      duration = el.duration
+    let metaDone = false
+    el.onloadedmetadata = async () => {
+      // Browser recordings report Infinity until scanned to the end
+      duration = isUsableDuration(el.duration) ? el.duration : await finiteDuration(el)
+      metaDone = true
       if (type !== 'video') finish(true)
+      else if (el.readyState >= 2) finish(el.videoWidth > 0)
     }
-    el.onloadeddata = () => finish(el.videoWidth > 0)
+    el.onloadeddata = () => { if (metaDone) finish(el.videoWidth > 0) }
     el.onerror = () => finish(false)
     el.src = src
   })
 }
 
 function getMediaType(file) {
-  if (file.type.startsWith('video/')) return 'video'
+  // The audio editor takes a video file for its sound (an <audio> element plays it)
+  if (file.type.startsWith('video/')) return isAudioMode ? 'audio' : 'video'
   if (file.type.startsWith('audio/')) return 'audio'
   if (file.type.startsWith('image/')) return 'image'
   return null
@@ -266,9 +275,11 @@ function getMediaMetadataFromURL(url, mediaType) {
     const element = document.createElement(mediaType === 'audio' ? 'audio' : 'video')
     element.preload = 'metadata'
     element.crossOrigin = 'anonymous'
-    element.onloadedmetadata = () => {
+    element.onloadedmetadata = async () => {
+      // Browser recordings report Infinity until scanned to the end
+      const duration = isUsableDuration(element.duration) ? element.duration : await finiteDuration(element)
       resolve({
-        duration: element.duration,
+        duration,
         videoWidth: element.videoWidth || 0,
         videoHeight: element.videoHeight || 0
       })
@@ -345,16 +356,37 @@ function ensurePairedAudioTracks(tracks) {
 
 export { getGroupColor }
 
+// A new project: video + its audio for shorts; a voice track and a music track
+// for the audio editor (music tracks never pair with video, see addMusicClip)
+export function initialTracks() {
+  return isAudioMode
+    ? [
+        { id: generateTrackId(), type: 'audio', name: 'Voice', clips: [] },
+        { id: generateTrackId(), type: 'audio', name: 'Music', music: true, clips: [] }
+      ]
+    : [
+        { id: generateTrackId(), type: 'video', name: 'Video 1', clips: [] },
+        { id: generateTrackId(), type: 'audio', name: 'Audio 1', clips: [] }
+      ]
+}
+
 export function useTimeline() {
   // Library: array of { id, file, url, name, duration, type }
   const [library, setLibrary] = useState([])
 
   // Tracks: array of { id, type: 'video' | 'audio', clips: [] }
-  const [tracks, setTracks] = useState([
-    { id: generateTrackId(), type: 'video', name: 'Video 1', clips: [] },
-    { id: generateTrackId(), type: 'audio', name: 'Audio 1', clips: [] }
-  ])
+  const [tracks, setTracks] = useState(initialTracks)
   const [selectedClipId, setSelectedClipId] = useState(null)
+
+  // The audio editor always has a voice track: a project that lost its last
+  // one (removed before that was blocked) gets an empty Voice track back
+  useEffect(() => {
+    if (!isAudioMode || !tracks.length || tracks.some(t => t.type === 'audio' && !t.music)) return
+    setTracks(prev => (prev.some(t => t.type === 'audio' && !t.music) ? prev : [{ id: generateTrackId(), type: 'audio', name: 'Voice', clips: [] }, ...prev]))
+  }, [tracks])
+  // Several clips at once (drag a box on the timeline, Ctrl/Cmd+A, Shift-click):
+  // two or more ids, and then selectedClipId is null
+  const [selectedClipIds, setSelectedClipIds] = useState([])
   const [selectedLibraryId, setSelectedLibraryId] = useState(null)
 
   // Set when an import lands on the timeline; the effect below then tells the
@@ -661,10 +693,21 @@ export function useTimeline() {
     return item
   }, [])
 
+  // A new track like `track` (same kind: voice / music / SFX / video), for a
+  // clip that has no room at the playhead on the track it was added to
+  const trackLike = useCallback((track, all) => {
+    const kind = (t) => t.type === track.type && !!t.music === !!track.music && !!t.sfx === !!track.sfx
+    const n = all.filter(kind).length + 1
+    const name = track.music ? `Music ${n}` : track.sfx ? `SFX ${n}` : track.type === 'video' ? `Video ${n}` : isAudioMode ? `Voice ${n}` : `Audio ${n}`
+    return { id: generateTrackId(), type: track.type, name, ...(track.music ? { music: true } : {}), ...(track.sfx ? { sfx: true } : {}) }
+  }, [])
+
   // Music library: the song goes on its own "Music" track (never paired with a
   // video track), from 0:00, cut to the length of the video content, at half
   // volume so voices stay on top. `credit` rides along into the post.
-  const addMusicClip = useCallback(async (url, name, credit, bpm = null) => {
+  // `place` { trackId?, at? }: from a track's + menu (that track, at the
+  // playhead), or the audio editor's general add (a music track, at the playhead)
+  const addMusicClip = useCallback(async (url, name, credit, bpm = null, place = null) => {
     const meta = await getMediaMetadataFromURL(url, 'audio')
     const duration = meta.duration
     if (!duration) return null
@@ -675,7 +718,8 @@ export function useTimeline() {
     setTracksWithHistory(prev => {
       let contentEnd = 0
       for (const t of prev) {
-        if (t.type !== 'video') continue
+        // Shorts: as long as the video. Audio editor: as long as the talking.
+        if (isAudioMode ? (t.type !== 'audio' || t.music) : t.type !== 'video') continue
         for (const c of t.clips) {
           contentEnd = Math.max(contentEnd, (c.timelinePosition || 0) + (c.endTime - c.startTime))
         }
@@ -707,6 +751,19 @@ export function useTimeline() {
         ...(bpm ? { bpm } : {}),
         ...(credit ? { credit } : {})
       }
+      // At the playhead: on the chosen track, or (audio editor) the first music
+      // track with room there, else a new music track
+      if (place && Number.isFinite(place.at)) {
+        const whole = { ...clip, endTime: duration }
+        if (place.trackId) {
+          const placed = placeOnTrack(prev, place.trackId, whole, place.at, (t) => trackLike(t, prev))
+          if (placed) return placed
+        }
+        const roomy = prev.find(t => t.type === 'audio' && t.music && fitAt(t.clips, place.at, duration))
+        if (roomy) return placeOnTrack(prev, roomy.id, whole, place.at, (t) => trackLike(t, prev))
+        const musicCount = prev.filter(t => t.type === 'audio' && t.music).length
+        return [...prev, { id: generateTrackId(), type: 'audio', name: musicCount ? `Music ${musicCount + 1}` : 'Music', music: true, clips: [{ ...whole, timelinePosition: Math.max(0, place.at) }] }]
+      }
       // Reuse an empty music track, else add one below the others
       const free = prev.find(t => t.type === 'audio' && t.music && t.clips.length === 0)
       if (free) {
@@ -722,7 +779,7 @@ export function useTimeline() {
       }]
     })
     return clipId
-  }, [setTracksWithHistory])
+  }, [setTracksWithHistory, trackLike])
 
   /**
    * Open a saved project (useDrafts): its tracks and library replace the
@@ -732,12 +789,13 @@ export function useTimeline() {
   const loadProjectState = useCallback((state) => {
     const nextTracks = Array.isArray(state?.tracks) && state.tracks.length
       ? state.tracks
-      : [{ id: generateTrackId(), type: 'video', name: 'Video 1', clips: [] }, { id: generateTrackId(), type: 'audio', name: 'Audio 1', clips: [] }]
+      : initialTracks()
     historyRef.current = [JSON.parse(JSON.stringify(nextTracks))]
     historyIndexRef.current = 0
     setTracks(nextTracks)
     setLibrary(Array.isArray(state?.library) ? state.library : [])
     setSelectedClipId(null)
+    setSelectedClipIds([])
   }, [])
 
   /**
@@ -809,6 +867,11 @@ export function useTimeline() {
       ? { ...base, type: 'text', name: sticker.name, text: sticker.text, textAlign: 'center', backgroundColor: 'transparent', ...sticker.props }
       : { ...base, type: 'image', name: sticker.name, url: sticker.url, serverUrl: null, file: null, zoom: sticker.zoom || 40 }
     setTracksWithHistory(prev => {
+      // From a track's + menu: that track (or a new one below it), at the playhead
+      if (trackId) {
+        const placed = placeOnTrack(prev, trackId, clip, start, (t) => trackLike(t, prev))
+        if (placed) return placed
+      }
       const fits = (t) => t.clips.every(c => {
         const cs = c.timelinePosition || 0
         return cs + (c.endTime - c.startTime) <= start + 0.001 || cs >= end - 0.001
@@ -826,7 +889,7 @@ export function useTimeline() {
    * A sound effect at `position` (the playhead), full length, on an "SFX"
    * audio track: the first one with room there, else a new one.
    */
-  const addSfxClip = useCallback(async (url, name, position) => {
+  const addSfxClip = useCallback(async (url, name, position, trackId = null) => {
     const meta = await getMediaMetadataFromURL(url, 'audio')
     const duration = meta.duration
     if (!duration) return null
@@ -844,6 +907,11 @@ export function useTimeline() {
         zoom: 100, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100, positionX: 0, positionY: 0,
         volume: 100
       }
+      // From a track's + menu: that track (or a new one below it), at the playhead
+      if (trackId) {
+        const placed = placeOnTrack(prev, trackId, clip, start, (t) => trackLike(t, prev))
+        if (placed) return placed
+      }
       const fits = (t) => t.clips.every(c => {
         const cs = c.timelinePosition || 0
         return cs + (c.endTime - c.startTime) <= start + 0.001 || cs >= end - 0.001
@@ -854,7 +922,7 @@ export function useTimeline() {
       return [...prev, { id: generateTrackId(), type: 'audio', name: count ? `SFX ${count + 1}` : 'SFX', sfx: true, clips: [clip] }]
     })
     return clipId
-  }, [setTracksWithHistory])
+  }, [setTracksWithHistory, trackLike])
 
   // Add media from URL to library AND place on timeline
   // options: { clipStart?: number, clipEnd?: number } — optional trim range
@@ -863,7 +931,13 @@ export function useTimeline() {
     if (options.file && !keepImportable([options.file]).length) return
 
     const meta = await getMediaMetadataFromURL(url, mediaType)
-    const duration = meta.duration
+    // A clip of Infinity/NaN seconds would hang the timeline: fall back to the
+    // caller's hint (the recorder's own clock), and never add one without a length
+    const duration = pickDuration(meta.duration, options.durationHint)
+    if (duration == null) {
+      console.warn(`[load-media] ${name}: no duration, not added`)
+      return null
+    }
     const libraryId = generateLibraryId()
     const item = {
       id: libraryId,
@@ -896,9 +970,17 @@ export function useTimeline() {
     const newClipId = generateClipId()
 
     lengthCheckRef.current = true
-    setTracksWithHistory(prev => {
-      const targetTrack = prev.find(t => t.type === targetTrackType)
-      if (!targetTrack) return prev
+    setTracksWithHistory(current => {
+      // Audio editor without a voice track (it was removed): a recording gets
+      // a new Voice track, never the Music track (Cut silences, Studio voice
+      // and grouping only work on voices)
+      const prev = isAudioMode && targetTrackType === 'audio' && !current.some(t => t.type === 'audio' && !t.music)
+        ? [{ id: generateTrackId(), type: 'audio', name: 'Voice', clips: [] }, ...current]
+        : current
+      // Audio goes on the first track that is not a music track (the voice)
+      const targetTrack = (targetTrackType === 'audio' && prev.find(t => t.type === 'audio' && !t.music)) ||
+        prev.find(t => t.type === targetTrackType)
+      if (!targetTrack) return current
 
       // Place at the end of existing clips on this track
       let timelinePosition = 0
@@ -942,6 +1024,12 @@ export function useTimeline() {
         fileStoreRef.current.set(newClip.id, item.file)
       }
 
+      // Audio from a track's + menu (a recording): that track, at the playhead
+      if (mediaType === 'audio' && options.trackId && Number.isFinite(options.at)) {
+        const placed = placeOnTrack(prev, options.trackId, newClip, options.at, (t) => trackLike(t, prev))
+        if (placed) return placed
+      }
+
       let updatedTracks = prev.map(track => {
         if (track.id === targetTrack.id) {
           return { ...track, clips: [...track.clips, newClip] }
@@ -969,6 +1057,21 @@ export function useTimeline() {
 
       return updatedTracks
     })
+
+    // The audio editor's file (from 3Speak): upload it now, in the background, so
+    // drafts, the template, server analysis and the render have it
+    if (options.file && mediaType === 'audio' && !options.serverUrl) {
+      const patchItem = (fields) => setLibrary(prev => prev.map(i => (i.id === libraryId ? { ...i, ...fields } : i)))
+      patchItem({ uploading: true, uploadProgress: 0 })
+      uploadFileToServer(options.file, item.name, (p) => patchItem({ uploadProgress: p })).then(info => {
+        patchItem({ uploading: false, uploadProgress: 1, serverUrl: info.url })
+        applyServerUrl(libraryId, info.url)
+        afterUpload(libraryId, { duration, durationKnown: !!duration, playable: true }, info)
+      }, err => {
+        console.warn(`[load-media] Upload failed: ${err.message}`)
+        patchItem({ uploading: false, uploadError: err.message })
+      })
+    }
 
     // The creator's own file (from the 3Speak uploader): if this browser cannot
     // show it, upload it now so its 480p copy can stand in for the preview
@@ -1192,7 +1295,9 @@ export function useTimeline() {
   }, [library, setTracksWithHistory])
 
   // Add files directly to a specific track (for compact mode "+" buttons)
-  const addFilesToTrack = useCallback(async (files, trackId) => {
+  // `at`: the playhead. Audio goes in there (see utils/placement.js); video
+  // keeps going after the track's last clip.
+  const addFilesToTrack = useCallback(async (files, trackId, at = null) => {
     for (const file of keepImportable(files)) {
       const type = getMediaType(file)
       if (!type) continue
@@ -1282,6 +1387,12 @@ export function useTimeline() {
 
         fileStoreRef.current.set(newClip.id, file)
 
+        // Audio: at the playhead on this track (a new one below when taken there)
+        if (type === 'audio' && Number.isFinite(at)) {
+          const placed = placeOnTrack(prev, targetTrack.id, newClip, at, (t) => trackLike(t, prev))
+          if (placed) return placed
+        }
+
         let updatedTracks = prev.map(track => {
           if (track.id === targetTrack.id) {
             return { ...track, clips: [...track.clips, newClip] }
@@ -1312,8 +1423,9 @@ export function useTimeline() {
 
   // Add a new track (prepend so new tracks appear on top)
   const addTrack = useCallback((type = 'video') => {
-    const trackCount = tracks.filter(t => t.type === type).length + 1
-    const name = type === 'video' ? `Video ${trackCount}` : `Audio ${trackCount}`
+    // The audio editor's tracks are voices (the Music track does not count)
+    const trackCount = tracks.filter(t => t.type === type && !(isAudioMode && t.music)).length + 1
+    const name = type === 'video' ? `Video ${trackCount}` : isAudioMode ? `Voice ${trackCount}` : `Audio ${trackCount}`
 
     const newTrack = {
       id: generateTrackId(),
@@ -1460,29 +1572,31 @@ export function useTimeline() {
 
       const sameTypeTracks = prev.filter(t => t.type === track.type)
       if (sameTypeTracks.length <= 1) return prev
+      // The audio editor keeps at least one voice track (recordings go there)
+      if (isAudioMode && track.type === 'audio' && !track.music && prev.filter(t => t.type === 'audio' && !t.music).length <= 1) return prev
 
       return prev.filter(t => t.id !== trackId)
     })
   }, [setTracksWithHistory])
 
   // Remove clip from timeline (group-aware: removes all clips in the same group)
-  const removeClip = useCallback((clipId) => {
-    // Find the clip's groupId first
-    let groupId = null
+  // One clip id, or several (a multi-selection): one undo step either way
+  const removeClip = useCallback((clipIdOrIds) => {
+    const startIds = new Set(Array.isArray(clipIdOrIds) ? clipIdOrIds : [clipIdOrIds])
+    // The clips' groups go with them
+    const groupIds = new Set()
     for (const track of tracks) {
-      const clip = track.clips.find(c => c.id === clipId)
-      if (clip) {
-        groupId = clip.groupId
-        break
+      for (const clip of track.clips) {
+        if (startIds.has(clip.id) && clip.groupId) groupIds.add(clip.groupId)
       }
     }
 
     // Collect all IDs to remove
-    const idsToRemove = new Set([clipId])
-    if (groupId) {
+    const idsToRemove = new Set(startIds)
+    if (groupIds.size) {
       for (const track of tracks) {
         for (const clip of track.clips) {
-          if (clip.groupId === groupId) {
+          if (groupIds.has(clip.groupId)) {
             idsToRemove.add(clip.id)
           }
         }
@@ -1511,6 +1625,7 @@ export function useTimeline() {
     }))
 
     setSelectedClipId(prev => idsToRemove.has(prev) ? null : prev)
+    setSelectedClipIds(prev => (prev.some(id => idsToRemove.has(id)) ? prev.filter(id => !idsToRemove.has(id)) : prev))
   }, [setTracksWithHistory, tracks])
 
   // Update clip in any track (group-aware: moves/trims all clips in the same group)
@@ -1556,11 +1671,15 @@ export function useTimeline() {
             if (hasPositionChange) {
               groupUpdates.timelinePosition = (clip.timelinePosition || 0) + positionDelta
             }
+            // Trims move every member by the same amount: a video and its own
+            // sound have equal in/out points either way, and two voices recorded
+            // on their own (audio editor groups) start at different points of
+            // their files, so copying the values would cut the wrong part
             if ('startTime' in updates) {
-              groupUpdates.startTime = updates.startTime
+              groupUpdates.startTime = Math.max(0, clip.startTime + (updates.startTime - targetClip.startTime))
             }
             if ('endTime' in updates) {
-              groupUpdates.endTime = updates.endTime
+              groupUpdates.endTime = clip.endTime + (updates.endTime - targetClip.endTime)
             }
             return { ...clip, ...groupUpdates }
           }
@@ -1666,12 +1785,27 @@ export function useTimeline() {
 
   const selectClip = useCallback((clipId) => {
     setSelectedClipId(clipId)
+    setSelectedClipIds([])
     setSelectedLibraryId(null)
+  }, [])
+
+  // Select several clips: one id is a plain selection, none clears it
+  const selectClips = useCallback((clipIds) => {
+    const ids = [...new Set(clipIds || [])]
+    setSelectedLibraryId(null)
+    if (ids.length > 1) {
+      setSelectedClipIds(ids)
+      setSelectedClipId(null)
+    } else {
+      setSelectedClipIds([])
+      setSelectedClipId(ids[0] || null)
+    }
   }, [])
 
   const selectLibraryItem = useCallback((itemId) => {
     setSelectedLibraryId(itemId)
     setSelectedClipId(null)
+    setSelectedClipIds([])
   }, [])
 
   // Duplicate clip (group-aware: duplicates all clips in the same group)
@@ -1882,6 +2016,23 @@ export function useTimeline() {
         }
         return { ...track, clips }
       })
+    })
+  }, [setTracksWithHistory])
+
+  /**
+   * Cut silences on a group of clips that play together (audio editor: two
+   * voices on their own tracks): `keep` = the stretches to keep, in timeline
+   * seconds, the same for every member (utils/groupSilence.js). One undo step.
+   */
+  const applyGroupSilenceCut = useCallback((memberIds, keep, { closeGaps = true } = {}) => {
+    if (!memberIds?.length || !keep?.length) return
+    setTracksWithHistory(prev => {
+      const { tracks: next, copies } = applyGroupCut(prev, memberIds, keep, { closeGaps, newId: generateClipId, newGroupId: generateGroupId })
+      for (const [id, fromId] of copies) {
+        const file = fileStoreRef.current.get(fromId)
+        if (file) fileStoreRef.current.set(id, file)
+      }
+      return next
     })
   }, [setTracksWithHistory])
 
@@ -2157,6 +2308,7 @@ export function useTimeline() {
     // Timeline
     tracks,
     selectedClipId,
+    selectedClipIds,
     selectedClip,
     playheadPosition,
     setPlayheadPosition,
@@ -2170,6 +2322,7 @@ export function useTimeline() {
     reorderClips,
     moveClipToTrack,
     selectClip,
+    selectClips,
     duplicateClip,
     splitClip,
     splitClipAtPlayhead,
@@ -2179,6 +2332,10 @@ export function useTimeline() {
     ungroupClips,
     getTotalDuration,
     applySilenceCut,
+    applyGroupSilenceCut,
+    // Replace the tracks with fn(tracks) as one undo step (the audio template)
+    applyTracks: setTracksWithHistory,
+    uploadFileToServer,
     addSfxClip,
     addStickerClip,
     fitClipsToBeats,

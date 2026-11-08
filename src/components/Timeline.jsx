@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo, memo } from 'react'
-import { Trash2, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker } from 'lucide-react'
+import { boxFrom, clipIdsInBox, toggleInSelection, clipIdsInRange } from '../utils/marquee'
+import { trackNumbers } from '../utils/trackNumbers'
+import { Trash2, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker, Maximize2, ListChecks } from 'lucide-react'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 import { getGroupColor } from '../hooks/useTimeline'
 import { MAX_TIMELINE_SECONDS } from '../utils/limits'
@@ -7,10 +9,22 @@ import { timelineBeats } from '../utils/beatDetect'
 import { getPeaks, peaksForRange } from '../utils/peakCache'
 
 function formatTime(seconds) {
-  const mins = Math.floor(seconds / 60)
-  const secs = Math.floor(seconds % 60)
-  return `${mins}:${secs.toString().padStart(2, '0')}`
+  const s = Math.floor(seconds)
+  const h = Math.floor(s / 3600)
+  const mins = Math.floor((s % 3600) / 60)
+  const secs = String(s % 60).padStart(2, '0')
+  return h ? `${h}:${String(mins).padStart(2, '0')}:${secs}` : `${Math.floor(s / 60)}:${secs}`
 }
+
+// Waveform bars per clip: a long podcast clip zoomed in would otherwise be
+// tens of thousands of elements; past this the bars just get wider
+const MAX_WAVE_BARS = 3000
+// Ruler steps (seconds); the first that keeps labels this far apart is used
+const RULER_STEPS = [1, 2, 5, 10, 15, 30, 60, 120, 300, 600, 900, 1800, 3600]
+const RULER_MIN_GAP_PX = 56
+export const rulerInterval = (pxPerSecond) => RULER_STEPS.find(s => s * pxPerSecond >= RULER_MIN_GAP_PX) || 7200
+// Zoom range in px per second: the audio editor zooms out to a 3-hour show
+export const zoomRange = (audioMode) => (audioMode ? { min: 0.05, max: 200 } : { min: 10, max: 200 })
 
 // Generate a stable pseudo-random sequence based on a seed (fallback)
 function seededRandom(seed) {
@@ -178,20 +192,21 @@ const TimelineClip = memo(function TimelineClip({
   }, [isVideo, clip.url, clip.duration, clip.startTime, clip.endTime])
 
   // Waveform data: try real audio, fall back to generated
-  const barCount = useMemo(() => Math.max(3, Math.floor(clipWidth / 6)), [clipWidth])
+  const barCount = useMemo(() => Math.min(MAX_WAVE_BARS, Math.max(3, Math.floor(clipWidth / 6))), [clipWidth])
   // The file's peaks, decoded once and shared by all its clips (utils/peakCache)
   const [peakEnvelope, setPeakEnvelope] = useState(null)
 
   useEffect(() => {
     if (!isAudio || !clip.url) return
     let cancelled = false
-    getPeaks(clip.url).then(env => {
+    // the backend measures files this browser cannot decode (once uploaded)
+    getPeaks(clip.url, { analysisUrl: clip.serverUrl || null }).then(env => {
       if (cancelled) return
       if (env) setPeakEnvelope(env)
       else setWaveformFailed(true)
     })
     return () => { cancelled = true }
-  }, [isAudio, clip.url])
+  }, [isAudio, clip.url, clip.serverUrl])
 
   // This clip's own stretch of the file (trim / zoom only re-read it)
   const realWaveform = useMemo(
@@ -434,7 +449,8 @@ const TimelineClip = memo(function TimelineClip({
         left: `${clipLeft}px`,
         ...(clip.groupId ? { borderLeftColor: getGroupColor(clip.groupId), borderLeftWidth: '3px', borderLeftStyle: 'solid' } : {})
       }}
-      onClick={(e) => { e.stopPropagation(); onSelect() }}
+      data-clip-id={clip.id}
+      onClick={(e) => { e.stopPropagation(); onSelect(e) }}
     >
       {/* Trim handle - start */}
       <div
@@ -563,6 +579,11 @@ const TimelineClip = memo(function TimelineClip({
 function Timeline({
   tracks,
   selectedClipId,
+  selectedClipIds = null,
+  onSelectClips,
+  selectMode = false,
+  onSelectModeChange,
+  onRemoveClips,
   playheadPosition,
   onSetPlayhead,
   onSelectClip,
@@ -593,8 +614,14 @@ function Timeline({
   onUpdateTrack,
   onAutoCut,
   onBeatSync,
-  isDesktop
+  isDesktop,
+  audioMode = false,
+  onGroupVoices,
+  chapters = null,
+  onOpenChapters,
+  isPlaying = false
 }) {
+  const { min: MIN_ZOOM, max: MAX_ZOOM } = zoomRange(audioMode)
   const [zoom, setZoom] = useState(33) // pixels per second
   const [isDraggingPlayhead, setIsDraggingPlayhead] = useState(false)
   const [showAddMenu, setShowAddMenu] = useState(false)
@@ -614,6 +641,90 @@ function Timeline({
   const trackFileInputRefs = useRef({})
 
   const pixelsPerSecond = zoom
+  // The clips are memoised (TimelineClip): a callback that is new on every
+  // render (App passes an inline arrow) would re-render all of them on every
+  // playhead tick. One stable function that calls the latest one.
+  const openSettingsRef = useRef(onOpenClipSettings)
+  openSettingsRef.current = onOpenClipSettings
+  const openClipSettings = useCallback((clipId) => openSettingsRef.current?.(clipId), [])
+
+  // Several clips selected (box select, Ctrl/Cmd+A, Shift-click). Clips are
+  // memoised without their callbacks, so the click handler reads refs.
+  const selectedSet = useMemo(() => new Set(selectedClipIds || []), [selectedClipIds])
+  // Several selected: are they all one group already (then Ungroup)?
+  const multiClips = useMemo(() => (selectedSet.size > 1 ? (tracks || []).flatMap(t => t.clips).filter(c => selectedSet.has(c.id)) : []), [selectedSet, tracks])
+  const multiGroupId = multiClips.length > 1 && multiClips[0].groupId && multiClips.every(c => c.groupId === multiClips[0].groupId) ? multiClips[0].groupId : null
+  const selectionRef = useRef({})
+  selectionRef.current = { selectedClipId, selectedClipIds: selectedClipIds || [], onSelectClip, onSelectClips, selectMode }
+  const currentSelection = () => {
+    const { selectedClipId: one, selectedClipIds: many } = selectionRef.current
+    return many.length ? many : (one ? [one] : [])
+  }
+  // Shift-click selects from this clip (the last one clicked or Ctrl-clicked) to the clicked one
+  const anchorRef = useRef(null)
+  const handleClipSelect = useCallback((clipId, e) => {
+    const { onSelectClip: one, onSelectClips: many, selectMode: picking, tracksInOrder } = selectionRef.current
+    const current = currentSelection()
+    // Shift: everything between the anchor and this clip (the anchor stays put)
+    if (many && e?.shiftKey && !picking) {
+      const anchor = current.includes(anchorRef.current) ? anchorRef.current : current[current.length - 1]
+      const ids = clipIdsInRange(tracksInOrder || [], anchor, clipId)
+      if (!anchor) anchorRef.current = clipId
+      if (ids.length > 1) many(ids)
+      else one(clipId)
+      return
+    }
+    // Select mode (phones: the Select button) or Ctrl/Cmd: each tap adds or removes a clip
+    if (many && (picking || e?.metaKey || e?.ctrlKey)) {
+      const next = toggleInSelection(current, clipId)
+      if (next.includes(clipId)) anchorRef.current = clipId
+      many(next)
+      return
+    }
+    anchorRef.current = clipId
+    one(clipId)
+  }, [])
+
+  // Box select (mouse): press on an empty spot of the tracks and drag over
+  // clips; Shift/Ctrl/Cmd adds to what is selected. A plain click on an empty
+  // spot clears the selection.
+  const [marquee, setMarquee] = useState(null) // { x, y, w, h } in content px
+  const handleContentMouseDown = (e) => {
+    if (e.button !== 0 || !onSelectClips) return
+    if (e.target.closest('.timeline-clip-v2, .timeline-playhead, .timeline-ruler, .timeline-chapter, button, input, select, a')) return
+    const content = timelineContentRef.current
+    if (!content) return
+    e.preventDefault() // no text selection while dragging
+    const toContent = (cx, cy) => {
+      const r = content.getBoundingClientRect()
+      return { x: cx - r.left + content.scrollLeft, y: cy - r.top + content.scrollTop }
+    }
+    const origin = { x: e.clientX, y: e.clientY }
+    const start = toContent(e.clientX, e.clientY)
+    const additive = e.shiftKey || e.metaKey || e.ctrlKey
+    const base = additive ? currentSelection() : []
+    let moved = false
+    const onMove = (ev) => {
+      if (!moved && Math.hypot(ev.clientX - origin.x, ev.clientY - origin.y) < 4) return
+      moved = true
+      const box = boxFrom(start, toContent(ev.clientX, ev.clientY))
+      setMarquee(box)
+      const r = content.getBoundingClientRect()
+      const rects = [...content.querySelectorAll('.timeline-clip-v2[data-clip-id]')].map(el => {
+        const c = el.getBoundingClientRect()
+        return { id: el.dataset.clipId, x: c.left - r.left + content.scrollLeft, y: c.top - r.top + content.scrollTop, w: c.width, h: c.height }
+      })
+      onSelectClips([...new Set([...base, ...clipIdsInBox(box, rects)])])
+    }
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+      setMarquee(null)
+      if (!moved && !additive) onSelectClips([])
+    }
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
+  }
 
   // Find the selected clip and its groupId (for group/ungroup button state)
   const selectedClip = useMemo(() => {
@@ -658,6 +769,10 @@ function Timeline({
   // Video tracks displayed first (top), then audio tracks (bottom)
   const videoTracks = useMemo(() => (tracks || []).filter(t => t.type === 'video'), [tracks])
   const audioTracks = useMemo(() => (tracks || []).filter(t => t.type === 'audio'), [tracks])
+  // Track numbers as shown (the clip settings name tracks the same way: "2 · Music")
+  const numbers = useMemo(() => trackNumbers(tracks), [tracks])
+  // As shown, top to bottom (for Shift-click ranges)
+  selectionRef.current.tracksInOrder = [...videoTracks, ...audioTracks]
 
   // Get snap points for a clip (excluding itself)
   // When snap is enabled, includes clip boundaries from ALL tracks for cross-track snapping
@@ -748,6 +863,40 @@ function Timeline({
     onSetPlayhead(snapPlayheadTime(clamped))
   }
 
+  // Dragging the ruler (mouse) scrolls the timeline; a short click still moves
+  // the playhead. Past a few pixels it is a drag: the click that the browser
+  // fires on release is swallowed, so the playhead stays where it was.
+  // (Touch scrolls the ruler natively, like the rest of the timeline.)
+  const RULER_DRAG_PX = 4
+  const [isDraggingRuler, setIsDraggingRuler] = useState(false)
+  const handleRulerMouseDown = (e) => {
+    if (e.button !== 0) return
+    const content = timelineContentRef.current
+    if (!content) return
+    const startX = e.clientX
+    const startScroll = content.scrollLeft
+    let dragging = false
+    const onMove = (ev) => {
+      const dx = ev.clientX - startX
+      if (!dragging && Math.abs(dx) < RULER_DRAG_PX) return
+      if (!dragging) { dragging = true; setIsDraggingRuler(true) }
+      ev.preventDefault()
+      content.scrollLeft = startScroll - dx
+    }
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+      if (!dragging) return
+      setIsDraggingRuler(false)
+      // The click after a drag (on the ruler, a chapter mark, anything) is not a click
+      const swallow = (ev) => { ev.stopPropagation(); ev.preventDefault() }
+      window.addEventListener('click', swallow, { capture: true, once: true })
+      setTimeout(() => window.removeEventListener('click', swallow, { capture: true }), 0)
+    }
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
+  }
+
   const handlePlayheadMouseDown = (e) => {
     e.stopPropagation()
     setIsDraggingPlayhead(true)
@@ -792,7 +941,7 @@ function Timeline({
   // Generate ruler marks - memoized to avoid recreating on every render
   const rulerMarks = useMemo(() => {
     const marks = []
-    const interval = zoom >= 80 ? 1 : zoom >= 40 ? 2 : zoom >= 20 ? 5 : 10
+    const interval = audioMode ? rulerInterval(zoom) : (zoom >= 80 ? 1 : zoom >= 40 ? 2 : zoom >= 20 ? 5 : 10)
     for (let t = 0; t <= totalDuration; t += interval) {
       marks.push(
         <div
@@ -813,11 +962,39 @@ function Timeline({
         marks.push(<div key={`beat-${b}`} className="ruler-beat" style={{ left: `${b * pixelsPerSecond}px` }} />)
       }
     }
+    // Chapter flags (audio editor): click to go there, double click for the list
+    for (const ch of chapters || []) {
+      marks.push(
+        <div
+          key={`ch-${ch.id}`}
+          className="ruler-chapter"
+          style={{ left: `${ch.at * pixelsPerSecond}px` }}
+          title={`${ch.title} (${formatTime(ch.at)})`}
+          onClick={(e) => { e.stopPropagation(); onSetPlayhead(ch.at) }}
+          onDoubleClick={(e) => { e.stopPropagation(); onOpenChapters?.() }}
+        >
+          <span>{ch.title}</span>
+        </div>
+      )
+    }
     return marks
-  }, [zoom, totalDuration, pixelsPerSecond, tracks])
+  }, [zoom, totalDuration, pixelsPerSecond, tracks, audioMode, chapters, onSetPlayhead, onOpenChapters])
 
-  const handleZoomIn = () => setZoom(z => Math.min(200, z * 1.5))
-  const handleZoomOut = () => setZoom(z => Math.max(10, z / 1.5))
+  const handleZoomIn = () => setZoom(z => Math.min(MAX_ZOOM, z * 1.5))
+  const handleZoomOut = () => setZoom(z => Math.max(MIN_ZOOM, z / 1.5))
+
+  // Audio editor: "Fit" shows the whole show; it also fits by itself when the
+  // first recording lands (a 1-hour file at the shorts zoom is 120,000 px wide)
+  const fitToView = useCallback(() => {
+    const width = (timelineContentRef.current?.clientWidth || 600) - 24
+    setZoom(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, width / Math.max(1, maxClipEnd))))
+  }, [maxClipEnd, MIN_ZOOM, MAX_ZOOM])
+  const hadContentRef = useRef(false)
+  useEffect(() => {
+    if (!audioMode) return
+    if (maxClipEnd > 0 && !hadContentRef.current) fitToView()
+    hadContentRef.current = maxClipEnd > 0
+  }, [audioMode, maxClipEnd > 0]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Ctrl+= zoom in, Ctrl+- zoom out
   useEffect(() => {
@@ -856,9 +1033,9 @@ function Timeline({
     const dy = e.touches[0].clientY - e.touches[1].clientY
     const distance = Math.hypot(dx, dy)
     const scale = distance / pinchRef.current.initialDistance
-    const newZoom = Math.min(200, Math.max(10, pinchRef.current.initialZoom * scale))
+    const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, pinchRef.current.initialZoom * scale))
     setZoom(newZoom)
-  }, [])
+  }, [MIN_ZOOM, MAX_ZOOM])
 
   const handleTouchEnd = useCallback(() => {
     pinchRef.current.active = false
@@ -942,15 +1119,103 @@ function Timeline({
     if (input) input.click()
   }, [])
 
+  // Files from a track's + menu: audio goes in at the playhead (useTimeline)
+  const playheadNowRef = useRef(playheadPosition)
+  playheadNowRef.current = playheadPosition
   const handleTrackFileChange = useCallback((e, trackId) => {
     const files = Array.from(e.target.files)
     if (files.length > 0 && onAddFilesToTrack) {
-      onAddFilesToTrack(files, trackId)
+      onAddFilesToTrack(files, trackId, playheadNowRef.current)
     }
     e.target.value = ''
   }, [onAddFilesToTrack])
 
   const playheadLeft = playheadPosition * pixelsPerSecond
+
+  // While playing, the timeline scrolls along so the playhead stays in the
+  // middle (at the very start and end it can't: the scroll stops at the edge).
+  // Paused, it only scrolls when the playhead lands out of sight (a draft
+  // reopened, arrow keys, zooming in), and then puts it in the middle too.
+  // Scrolling away from a resting playhead (ruler drag, wheel) is left alone.
+  const followedLeftRef = useRef(null)
+  const lastFollowRef = useRef(null) // the scroll the follow set last while playing
+  // The view's width, kept by a ResizeObserver: reading clientWidth on every
+  // playhead tick forced a layout each time
+  const viewWidthRef = useRef(0)
+  useEffect(() => {
+    const el = timelineContentRef.current
+    if (!el) return
+    viewWidthRef.current = el.clientWidth
+    const ro = new ResizeObserver(() => { viewWidthRef.current = el.clientWidth })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  useLayoutEffect(() => {
+    const el = timelineContentRef.current
+    if (!el || isDraggingPlayhead || isDraggingRuler) return
+    const view = viewWidthRef.current || el.clientWidth
+    if (!view) return
+    if (!isPlaying) lastFollowRef.current = null
+    const moved = followedLeftRef.current !== playheadLeft
+    followedLeftRef.current = playheadLeft
+    const centre = Math.max(0, playheadLeft - view / 2)
+    if (isPlaying) {
+      // what we set last (reading scrollLeft back would force a layout every tick)
+      if (lastFollowRef.current == null || Math.abs(lastFollowRef.current - centre) >= 1) {
+        el.scrollLeft = centre
+        lastFollowRef.current = centre
+      }
+    } else if (moved && (playheadLeft < el.scrollLeft || playheadLeft > el.scrollLeft + view - 2)) {
+      el.scrollLeft = centre
+    }
+  }, [playheadLeft, isPlaying, isDraggingPlayhead, isDraggingRuler])
+
+  // Mouse wheel over the timeline: scroll it sideways (a sideways trackpad
+  // swipe scrolls natively). Shift + wheel: zoom, keeping the moment under the
+  // mouse where it is. Ctrl + wheel stays the browser's (pinch zoom).
+  const scrollContainerRef = useRef(null)
+  const zoomRef = useRef(zoom)
+  zoomRef.current = zoom
+  const zoomAnchorRef = useRef(null) // { time, x }: put `time` back under `x` after the zoom renders
+  useEffect(() => {
+    const box = scrollContainerRef.current
+    if (!box) return
+    const onWheel = (e) => {
+      const content = timelineContentRef.current
+      if (!content || e.ctrlKey || e.metaKey) return
+      const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? content.clientWidth : 1
+      // Shift turns a wheel into deltaX in some browsers: take whichever moved
+      const dy = (Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * unit
+      if (e.shiftKey) {
+        if (!dy) return
+        e.preventDefault()
+        const { min, max } = zoomRange(audioMode)
+        const z = zoomRef.current
+        const next = Math.min(max, Math.max(min, z * Math.exp(-dy * 0.0015)))
+        if (next === z) return
+        const x = Math.max(0, e.clientX - content.getBoundingClientRect().left)
+        zoomAnchorRef.current = { time: (x + content.scrollLeft) / z, x }
+        zoomRef.current = next
+        setZoom(next)
+        return
+      }
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return // sideways swipe: native
+      if (!e.deltaY) return
+      e.preventDefault()
+      content.scrollLeft += e.deltaY * unit
+    }
+    box.addEventListener('wheel', onWheel, { passive: false })
+    return () => box.removeEventListener('wheel', onWheel)
+  }, [audioMode])
+  // After a Shift + wheel zoom: the moment that was under the mouse stays there
+  // (declared after the follow effect, so this scroll wins in the same render)
+  useLayoutEffect(() => {
+    const a = zoomAnchorRef.current
+    const content = timelineContentRef.current
+    if (!a || !content) return
+    zoomAnchorRef.current = null
+    content.scrollLeft = Math.max(0, a.time * zoom - a.x)
+  }, [zoom])
 
   // Handle moving clip to a different track
   const handleMoveClipToTrack = useCallback((clipId, fromTrackId, toTrackId, newPosition) => {
@@ -974,9 +1239,11 @@ function Timeline({
           </button>
           {showAddMenu && (
             <div className="add-menu-dropdown">
-              <button onClick={() => { onAddTrack && onAddTrack('video'); setShowAddMenu(false) }}>
-                <Film size={14} /> Video Track
-              </button>
+              {!audioMode && (
+                <button onClick={() => { onAddTrack && onAddTrack('video'); setShowAddMenu(false) }}>
+                  <Film size={14} /> Video Track
+                </button>
+              )}
               <button onClick={() => { onAddTrack && onAddTrack('audio'); setShowAddMenu(false) }}>
                 <Music size={14} /> Audio Track
               </button>
@@ -999,17 +1266,48 @@ function Timeline({
           )}
         </div>
         <div className="toolbar-center">
-          <input
-            type="range"
-            className="zoom-slider"
-            min={10}
-            max={200}
-            value={zoom}
-            onChange={(e) => setZoom(Number(e.target.value))}
-            title={`Zoom: ${Math.round(zoom)}px/s`}
-          />
+          {audioMode ? (
+            <>
+              {/* log scale: 0.05 to 200 px/s is too wide a range for a linear slider */}
+              <input
+                type="range"
+                className="zoom-slider"
+                min={Math.log(MIN_ZOOM)}
+                max={Math.log(MAX_ZOOM)}
+                step={0.01}
+                value={Math.log(zoom)}
+                onChange={(e) => setZoom(Math.exp(Number(e.target.value)))}
+                title={`Zoom: ${zoom < 1 ? zoom.toFixed(2) : Math.round(zoom)}px/s`}
+                aria-label="Zoom"
+              />
+              <button className="action-btn zoom-fit-btn" onClick={fitToView} disabled={maxClipEnd <= 0} title="Show the whole timeline">
+                <Maximize2 size={14} /> <span>Fit</span>
+              </button>
+            </>
+          ) : (
+            <input
+              type="range"
+              className="zoom-slider"
+              min={10}
+              max={200}
+              value={zoom}
+              onChange={(e) => setZoom(Number(e.target.value))}
+              title={`Zoom: ${Math.round(zoom)}px/s`}
+            />
+          )}
         </div>
         <div className="toolbar-right">
+          {/* Phones have no box select: tap Select, then tap each clip */}
+          {!isDesktop && onSelectClips && onSelectModeChange && (
+            <button
+              className={`action-btn select-mode-btn${selectMode ? ' active' : ''}`}
+              onClick={() => onSelectModeChange(!selectMode)}
+              aria-pressed={selectMode}
+              title={selectMode ? 'Done selecting' : 'Select several clips: tap each one'}
+            >
+              <ListChecks size={14} /> <span>{selectMode ? 'Done' : 'Select'}</span>
+            </button>
+          )}
           <button
             className="action-btn"
             onClick={() => onRemoveGap && onRemoveGap()}
@@ -1059,6 +1357,11 @@ function Timeline({
               >
                 <Settings size={14} /> <span>Options</span>
               </button>
+              {selectedClipGroupId && onUngroupClips && (
+                <button className="action-btn" onClick={() => onUngroupClips(selectedClipId)} title="Ungroup: its clips move and trim on their own again">
+                  <Unlink size={14} /> <span>Ungroup</span>
+                </button>
+              )}
               <div className="clip-actions-wrap" ref={clipActionsRef}>
                 <button
                   className="action-btn"
@@ -1072,9 +1375,12 @@ function Timeline({
                     <button onClick={() => { onDuplicate && onDuplicate(selectedClipId); setShowClipActions(false) }}>
                       <Copy size={14} /> Duplicate
                     </button>
-                    {selectedClipGroupId && (
-                      <button onClick={() => { onUngroupClips && onUngroupClips(selectedClipId); setShowClipActions(false) }}>
-                        <Unlink size={14} /> Ungroup
+                    {onGroupVoices && selectedClip?.type === 'audio' && !selectedClip.templateRole && (
+                      <button
+                        onClick={() => { onGroupVoices(selectedClipId); setShowClipActions(false) }}
+                        title="Group with what plays at the same time on the other voice tracks: they move, trim and get their silences cut together"
+                      >
+                        <Link size={14} /> Group with other voices
                       </button>
                     )}
                     {selectedClip && (selectedClip.type === 'video' || selectedClip.type === 'audio') && onReverseClip && (
@@ -1093,12 +1399,46 @@ function Timeline({
               </div>
             </>
           )}
+          {/* Several clips selected: group them (or ungroup one group), delete them */}
+          {multiClips.length > 1 && (
+            <>
+              {multiGroupId ? (
+                onUngroupClips && (
+                  <button className="action-btn" onClick={() => onUngroupClips(multiClips[0].id)} title="Ungroup: these clips move and trim on their own again">
+                    <Unlink size={14} /> <span>Ungroup</span>
+                  </button>
+                )
+              ) : (
+                onGroupClips && (
+                  <button className="action-btn" onClick={() => onGroupClips(multiClips.map(c => c.id))} title="Group: these clips move and trim together">
+                    <Link size={14} /> <span>Group {multiClips.length}</span>
+                  </button>
+                )
+              )}
+              {onRemoveClips && (
+                <button className="action-btn delete-btn" onClick={() => onRemoveClips(multiClips.map(c => c.id))} title="Delete the selected clips (Del)">
+                  <Trash2 size={14} /> <span>Delete {multiClips.length}</span>
+                </button>
+              )}
+            </>
+          )}
         </div>
       </div>
+
+      {selectMode && (
+        <div className="timeline-select-hint" role="status">
+          <span>{(() => { const n = currentSelection().length; return n ? `${n} clip${n === 1 ? '' : 's'} selected: tap more, or Done` : 'Tap each clip you want to select' })()}</span>
+          {currentSelection().length > 0 && (
+            <button className="action-btn" onClick={() => onSelectClips([])}>Clear</button>
+          )}
+          <button className="action-btn" onClick={() => onSelectModeChange(false)}>Done</button>
+        </div>
+      )}
 
       {/* Timeline content wrapper */}
       <div
         className="timeline-scroll-container"
+        ref={scrollContainerRef}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -1111,6 +1451,7 @@ function Timeline({
           {videoTracks.map((track, index) => (
             <div key={track.id} className={`track-label${track.visible === false ? ' track-hidden' : ''}`}>
               <div className="track-label-top">
+                <span className="track-number" title={track.name}>{numbers.get(track.id)}</span>
                 <Film size={16} title={track.name} />
                 {onUpdateTrack && (
                   <button
@@ -1178,8 +1519,9 @@ function Timeline({
 
           {/* Audio track labels */}
           {audioTracks.map((track, index) => (
-            <div key={track.id} className={`track-label audio${track.muted ? ' track-muted' : ''}`}>
+            <div key={track.id} className={`track-label audio${track.muted ? ' track-muted' : ''}`} title={track.name} aria-label={track.name}>
               <div className="track-label-top">
+                <span className="track-number" title={track.name}>{numbers.get(track.id)}</span>
                 <Music size={16} title={track.name} />
                 {onUpdateTrack && (
                   <button
@@ -1192,7 +1534,8 @@ function Timeline({
                 )}
               </div>
               <div className="track-label-bottom">
-                {onRemoveTrack && audioTracks.length > 1 && (
+                {/* the audio editor keeps its last voice track */}
+                {onRemoveTrack && audioTracks.length > 1 && !(audioMode && !track.music && audioTracks.filter(t => !t.music).length <= 1) && (
                   <button className="track-delete-btn" onClick={() => onRemoveTrack(track.id)} title="Remove track">
                     <Trash2 size={16} />
                   </button>
@@ -1212,17 +1555,17 @@ function Timeline({
                           <Music size={14} /> Add Audio File
                         </button>
                         {onOpenMusic && (
-                          <button onClick={() => { onOpenMusic(); setTrackAddPopup(null) }}>
+                          <button onClick={() => { onOpenMusic(track.id); setTrackAddPopup(null) }}>
                             <Music size={14} /> Music Library
                           </button>
                         )}
                         {onOpenSfx && (
-                          <button onClick={() => { onOpenSfx(); setTrackAddPopup(null) }}>
+                          <button onClick={() => { onOpenSfx(track.id); setTrackAddPopup(null) }}>
                             <AudioLines size={14} /> Sound Effects
                           </button>
                         )}
                         {onRecordAudio && (
-                          <button onClick={() => { onRecordAudio(); setTrackAddPopup(null) }}>
+                          <button onClick={() => { onRecordAudio(track.id); setTrackAddPopup(null) }}>
                             <Mic size={14} /> Record Audio
                           </button>
                         )}
@@ -1232,7 +1575,7 @@ function Timeline({
                       ref={el => { trackFileInputRefs.current[track.id] = el }}
                       type="file"
                       multiple
-                      accept="audio/*"
+                      accept={audioMode ? 'audio/*,video/*' : 'audio/*'}
                       style={{ display: 'none' }}
                       onChange={(e) => handleTrackFileChange(e, track.id)}
                     />
@@ -1243,13 +1586,17 @@ function Timeline({
           ))}
         </div>
 
-        <div className="timeline-content" ref={timelineContentRef}>
+        <div className="timeline-content" ref={timelineContentRef} onMouseDown={handleContentMouseDown}>
+          {marquee && (
+            <div className="timeline-marquee" style={{ left: marquee.x, top: marquee.y, width: marquee.w, height: marquee.h }} />
+          )}
           {/* Ruler */}
           <div
-            className="timeline-ruler"
+            className={`timeline-ruler${isDraggingRuler ? ' dragging' : ''}`}
             ref={rulerRef}
             style={{ width: `${timelineWidth}px` }}
             onClick={handleRulerClick}
+            onMouseDown={handleRulerMouseDown}
           >
             {rulerMarks}
           </div>
@@ -1291,14 +1638,14 @@ function Timeline({
                 <TimelineClip
                   key={clip.id}
                   clip={clip}
-                  isSelected={clip.id === selectedClipId}
+                  isSelected={clip.id === selectedClipId || selectedSet.has(clip.id)}
                   selectedGroupId={selectedClipGroupId}
                   pixelsPerSecond={pixelsPerSecond}
                   trackIndex={trackIndex}
                   trackId={track.id}
                   trackType={track.type}
                   allTracks={tracks}
-                  onSelect={() => onSelectClip(clip.id)}
+                  onSelect={(e) => handleClipSelect(clip.id, e)}
                   onRemove={() => onRemoveClip(clip.id)}
                   onUpdateClip={(updates) => onUpdateClip(clip.id, updates)}
                   onDuplicate={() => onDuplicateClip(clip.id)}
@@ -1307,7 +1654,7 @@ function Timeline({
                   onPositionChange={(newPosition) => onUpdateClip(clip.id, { timelinePosition: newPosition })}
                   onMoveToTrack={(toTrackId, newPosition) => handleMoveClipToTrack(clip.id, track.id, toTrackId, newPosition)}
                   getSnapPoints={getSnapPoints}
-                  onOpenSettings={onOpenClipSettings}
+                  onOpenSettings={onOpenClipSettings ? openClipSettings : undefined}
                   onDragPreviewChange={setCrossTrackGhost}
                 />
               ))}
@@ -1333,14 +1680,14 @@ function Timeline({
                 <TimelineClip
                   key={clip.id}
                   clip={clip}
-                  isSelected={clip.id === selectedClipId}
+                  isSelected={clip.id === selectedClipId || selectedSet.has(clip.id)}
                   selectedGroupId={selectedClipGroupId}
                   pixelsPerSecond={pixelsPerSecond}
                   trackIndex={trackIndex}
                   trackId={track.id}
                   trackType={track.type}
                   allTracks={tracks}
-                  onSelect={() => onSelectClip(clip.id)}
+                  onSelect={(e) => handleClipSelect(clip.id, e)}
                   onRemove={() => onRemoveClip(clip.id)}
                   onUpdateClip={(updates) => onUpdateClip(clip.id, updates)}
                   onDuplicate={() => onDuplicateClip(clip.id)}
@@ -1349,7 +1696,7 @@ function Timeline({
                   onPositionChange={(newPosition) => onUpdateClip(clip.id, { timelinePosition: newPosition })}
                   onMoveToTrack={(toTrackId, newPosition) => handleMoveClipToTrack(clip.id, track.id, toTrackId, newPosition)}
                   getSnapPoints={getSnapPoints}
-                  onOpenSettings={onOpenClipSettings}
+                  onOpenSettings={onOpenClipSettings ? openClipSettings : undefined}
                   onDragPreviewChange={setCrossTrackGhost}
                 />
               ))}

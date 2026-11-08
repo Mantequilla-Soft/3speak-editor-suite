@@ -80,7 +80,8 @@ async function listProjects(dir) {
   return out.sort((a, b) => b.updatedAt - a.updatedAt)
 }
 
-const summary = (p) => ({ id: p.id, name: p.name, updatedAt: p.updatedAt, expiresAt: p.expiresAt, clips: p.clips || 0, length: p.length || 0 })
+// mode: 'video' (shorts) or 'audio' (the audio editor); older projects are all video
+const summary = (p) => ({ id: p.id, name: p.name, mode: p.mode === 'audio' ? 'audio' : 'video', updatedAt: p.updatedAt, expiresAt: p.expiresAt, clips: p.clips || 0, length: p.length || 0 })
 const limits = (d) => ({ maxProjects: d.maxProjects, ttlHours: d.ttlMs / 3600000, pro: d.pro })
 
 // GET /api/projects -> { projects: [summary], limits }
@@ -127,6 +128,7 @@ router.put('/:id', async (req, res) => {
   const project = {
     id,
     name: String(req.body?.name || 'Untitled project').slice(0, 80),
+    mode: state.mode === 'audio' ? 'audio' : 'video',
     user: d.user,
     updatedAt: now,
     expiresAt: now + d.ttlMs,

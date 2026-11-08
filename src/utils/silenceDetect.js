@@ -9,14 +9,28 @@ const FLOOR_DB = -90
 
 // Anything bigger is not read into the browser at once
 import { MAX_ANALYSE_BYTES } from './limits'
+import { serverAnalysis } from './serverAnalysis'
 
 export const MAX_SOURCE_BYTES = MAX_ANALYSE_BYTES
 
 /**
  * Decode a File/Blob or URL and return its loudness curve:
  * { db: Float32Array (one value per window), step: seconds per window, duration }
+ * `analysisUrl`: the file's upload on our backend. When the browser cannot
+ * decode the file (too big, unknown codec), the backend measures it instead.
  */
-export async function loadLoudness(source, { signal } = {}) {
+export async function loadLoudness(source, { signal, analysisUrl = null } = {}) {
+  try {
+    return await decodeLoudness(source, { signal })
+  } catch (err) {
+    if (err?.name === 'AbortError' || !analysisUrl) throw err
+    const d = await serverAnalysis(analysisUrl, { signal })
+    if (!d) throw err
+    return { db: Float32Array.from(d.db), step: d.step, duration: d.duration }
+  }
+}
+
+async function decodeLoudness(source, { signal } = {}) {
   let buffer
   if (source instanceof Blob) {
     if (source.size > MAX_SOURCE_BYTES) throw new Error('too-large')

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useMemo, useState } from 'react'
-import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music } from 'lucide-react'
+import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, HelpCircle, Maximize, Minimize } from 'lucide-react'
 import { useFFmpeg } from './hooks/useFFmpeg'
 import { useCanvasExport } from './hooks/useCanvasExport'
 import { useTimeline } from './hooks/useTimeline'
@@ -15,21 +15,62 @@ import ClipProperties from './components/ClipProperties'
 import ExportButton from './components/ExportButton'
 import RecordVideo from './components/RecordVideo'
 import RecordAudio from './components/RecordAudio'
-import OnboardingTour from './components/OnboardingTour'
+import OnboardingTour, { AUDIO_TOUR_STEPS } from './components/OnboardingTour'
+import MultiClipProperties from './components/MultiClipProperties'
+import { soundTargets } from './utils/multiSelect'
 import RemixModePicker from './components/RemixModePicker'
 import MusicLibrary from './components/MusicLibrary'
 import { REMIX_LAYOUTS, hasLayout, clampLayout } from './utils/remixLayout'
 import { MAX_TIMELINE_SECONDS, MAX_TIMELINE_ADJ, MAX_TIMELINE_TEXT, getTimelineEnd } from './utils/limits'
 import LengthLimitNotice from './components/LengthLimitNotice'
 import TooLargeNotice from './components/TooLargeNotice'
-import SilenceCutModal from './components/SilenceCutModal'
+import SilenceCutModal, { loadSettings as loadAutoCutSettings } from './components/SilenceCutModal'
+import AudioTemplateDialog from './components/AudioTemplateDialog'
+import ChaptersDialog from './components/ChaptersDialog'
+import AudiogramDialog from './components/AudiogramDialog'
+import { newChapter, moveChapter, resolveChapters, chapterSpans, MAX_CHAPTERS } from './utils/chapters'
+import { duckPlans, clipDuckSetting, applyMasterDuck, DUCK_DEPTHS, DUCK_DEFAULT_DB } from './utils/duck'
+import { trackNumbers, trackLabel } from './utils/trackNumbers'
+import { useAudioTemplate } from './hooks/useAudioTemplate'
+import { applyAudioTemplate, removeAudioTemplate, appliedRoles, hasSlots } from './utils/audioTemplate'
+import { loadLoudness, planCuts } from './utils/silenceDetect'
+import { combineLoudness, groupSpan, overlappingVoices } from './utils/groupSilence'
+import { isAudioMode } from './utils/editorMode'
+import { audioFileName } from './utils/audioTemplate'
 import BeatSyncModal from './components/BeatSyncModal'
 import StickerPicker from './components/StickerPicker'
 import EncodingNotice from './components/EncodingNotice'
 import ClipColorFilters from './components/ClipColorFilters'
 import { DraftsPrompt, DraftLimitPicker, CloseDialog, DraftStatus } from './components/DraftsDialogs'
-import { useDrafts } from './hooks/useDrafts'
+import { useDrafts, savedPlayhead } from './hooks/useDrafts'
+import ConfirmDialog from './components/ConfirmDialog'
+import { useCleaningStatus, cleaningText } from './utils/cleaningStatus'
+import { isTypingTarget } from './utils/keyboard'
 import logo3speak from './assets/3speak.png'
+
+// Audio editor: the talking = clips on audio tracks that are not music and not template parts
+function voiceClipsOf(list) {
+  return list
+    .filter(t => t.type === 'audio' && !t.music && t.muted !== true)
+    .flatMap(t => t.clips)
+    .filter(c => !c.templateRole && c.audioEnabled !== false)
+}
+
+// Audio editor: what Cut silences can work on, clip by clip: any audio clip
+// on any track (a voice can end up on the Music track), not template parts
+function cuttableClipsOf(list) {
+  return list
+    .filter(t => t.type === 'audio' && t.muted !== true)
+    .flatMap(t => t.clips)
+    .filter(c => !c.templateRole && c.audioEnabled !== false)
+}
+
+// The audio editor's finishing settings, from a draft, a template or nothing
+const masterOf = (m) => ({
+  loudness: m?.loudness !== false,
+  duck: m?.duck === true,
+  duckDb: DUCK_DEPTHS.includes(+m?.duckDb) ? +m.duckDb : DUCK_DEFAULT_DB
+})
 
 function App() {
   const { ffmpeg, loaded, loading, progress, exporting, exportProgress, loadFFmpeg, processVideo } = useFFmpeg()
@@ -60,6 +101,8 @@ function App() {
     // Timeline
     tracks,
     selectedClipId,
+    selectedClipIds,
+    selectClips,
     selectedClip,
     playheadPosition,
     setPlayheadPosition,
@@ -73,6 +116,9 @@ function App() {
     splitClip,
     splitClipAtPlayhead,
     applySilenceCut,
+    applyGroupSilenceCut,
+    applyTracks,
+    uploadFileToServer,
     removeGapAtPlayhead,
     isPlayheadOnGap,
     groupClips,
@@ -113,10 +159,29 @@ function App() {
     ? 'This clip is still streaming from 3Speak. Try again once its download has finished.'
     : null
   const autoCutOpenRef = useRef(false)
+  // Audio editor: M adds a chapter at the playhead (set further down)
+  const addChapterRef = useRef(null)
+  const playheadRef = useRef(0)
+  // Audio editor: a clip grouped with other voices is cut together with them
+  // (only where everyone is quiet, the same cut through every voice)
+  const autoCutGroup = useMemo(() => {
+    if (!isAudioMode || !autoCutClip?.groupId) return null
+    const members = cuttableClipsOf(tracks).filter(c => c.groupId === autoCutClip.groupId)
+    if (members.length < 2) return null
+    return members.map(c => ({
+      clip: c,
+      source: fileStoreRef.current.get(c.id) || c.file || (isHlsUrl(c.url) ? null : c.url),
+      analysisUrl: c.serverUrl || null
+    }))
+  }, [autoCutClip, tracks, fileStoreRef])
   const handleAutoCutApply = useCallback((parts, options) => {
-    applySilenceCut(autoCutClipId, parts, options)
+    if (autoCutGroup) applyGroupSilenceCut(autoCutGroup.map(m => m.clip.id), parts, options)
+    else applySilenceCut(autoCutClipId, parts, options)
     setAutoCutClipId(null)
-  }, [applySilenceCut, autoCutClipId])
+    refitTemplateRef.current?.()
+  }, [applySilenceCut, applyGroupSilenceCut, autoCutClipId, autoCutGroup])
+  // (refitTemplate is defined further down, with the template)
+  const refitTemplateRef = useRef(null)
 
   // Beat sync popup (audio clips): same way of reading the clip's audio as Auto cut
   const [beatClipId, setBeatClipId] = useState(null)
@@ -133,6 +198,28 @@ function App() {
   // The timeline may run long while editing; rendering waits until it fits
   const timelineEnd = useMemo(() => getTimelineEnd(tracks), [tracks])
   const overLengthLimit = timelineEnd > MAX_TIMELINE_SECONDS + 0.01
+  playheadRef.current = playheadPosition
+
+  // The audio editor (?mode=audio): podcasts, music, voice. Same timeline and
+  // tools; an audio stage instead of the picture, MP3 out, a template.
+  const audioMode = isAudioMode
+  // Finishing settings of the audio editor (sent with the render, kept in drafts
+  // and in the template): loudness levelling, music ducked under the voices
+  const [master, setMaster] = useState(() => masterOf(null))
+  // Chapters (utils/chapters.js): pinned to the recording, resolved to where they are now
+  const [chapters, setChapters] = useState([])
+  // The preview is playing (the timeline then keeps the playhead in the middle)
+  const [previewPlaying, setPreviewPlaying] = useState(false)
+  const resolvedChapters = useMemo(() => (audioMode ? resolveChapters(tracks, chapters, timelineEnd) : []), [audioMode, tracks, chapters, timelineEnd])
+  const chapterList = useMemo(() => chapterSpans(resolvedChapters, timelineEnd), [resolvedChapters, timelineEnd])
+  // Every ducked clip's plan (its own Duck setting, or the top bar's for music)
+  const duck = useMemo(() => (audioMode ? duckPlans(tracks) : null), [audioMode, tracks])
+  // Name of the show: the first recording's name (the MP3's title and file name)
+  const audioTitle = useMemo(() => {
+    if (!audioMode) return null
+    const first = tracks.filter(t => t.type === 'audio' && !t.music).flatMap(t => t.clips).find(c => !c.templateRole)
+    return first ? String(first.name || '').replace(/^Part \d+ · /, '').replace(/\.[a-z0-9]{2,4}$/i, '').trim() || null : null
+  }, [audioMode, tracks])
 
   // Locked to 9:16 for shorts
   const activeAspectRatio = '9:16'
@@ -161,16 +248,25 @@ function App() {
     remixSource,
     remixPrompt,
     clearRemixPrompt
-  } = useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay })
+  } = useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay, audioMode, master, title: audioTitle, chapters: chapterList })
 
   // Apply theme to document on mount and changes
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
 
+  // First visit: the shorts editor and the audio editor each show their own
+  // tour once (separate keys, so seeing one doesn't skip the other). Storage
+  // can throw in a sandboxed iframe: then the tour just shows.
+  const tourKey = isAudioMode ? '3speak-audio-tour-done' : '3speak-tour-done'
   const [showTour, setShowTour] = useState(() => {
-    return compactMode && !localStorage.getItem('3speak-tour-done')
+    if (!isAudioMode && !compactMode) return false
+    try { return !localStorage.getItem(tourKey) } catch { return true }
   })
+  const finishTour = () => {
+    try { localStorage.setItem(tourKey, '1') } catch { /* storage blocked */ }
+    setShowTour(false)
+  }
   const [showBackendInfo, setShowBackendInfo] = useState(false)
   const [selectedBackendUrl, setSelectedBackendUrl] = useState('')
 
@@ -195,23 +291,49 @@ function App() {
     return () => { cancelled = true }
   }, [])
 
+  // Full screen: the whole editor (inside 3Speak's popup the iframe allows it)
+  const canFullscreen = typeof document !== 'undefined' && !!document.fullscreenEnabled
+  const [isFullscreen, setIsFullscreen] = useState(() => typeof document !== 'undefined' && !!document.fullscreenElement)
+  useEffect(() => {
+    const onChange = () => setIsFullscreen(!!document.fullscreenElement)
+    document.addEventListener('fullscreenchange', onChange)
+    return () => document.removeEventListener('fullscreenchange', onChange)
+  }, [])
+  const toggleFullscreen = useCallback(() => {
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {})
+    else document.documentElement.requestFullscreen?.().catch(() => {})
+  }, [])
+  const toggleFullscreenRef = useRef(toggleFullscreen)
+  toggleFullscreenRef.current = toggleFullscreen
+
+  // "Remove ...?" in the editor's own dialog (components/ConfirmDialog.jsx), never window.confirm()
+  const [confirmAsk, setConfirmAsk] = useState(null) // { message, onYes }
+  const confirmRef = useRef(null)
+  confirmRef.current = confirmAsk
+  const askConfirm = useCallback((message, onYes) => setConfirmAsk({ message, onYes }), [])
+  const closeConfirm = useCallback(() => setConfirmAsk(null), [])
+  const acceptConfirm = useCallback(() => {
+    const ask = confirmRef.current
+    confirmRef.current = null
+    setConfirmAsk(null)
+    ask?.onYes()
+  }, [])
+
   const handleRemoveClip = useCallback((clipId) => {
-    if (window.confirm('Remove this clip from the timeline?')) {
-      removeClip(clipId)
-    }
-  }, [removeClip])
+    askConfirm('Remove this clip from the timeline?', () => removeClip(clipId))
+  }, [removeClip, askConfirm])
+
+  const handleRemoveClips = useCallback((clipIds) => {
+    askConfirm(`Remove these ${clipIds.length} clips from the timeline?`, () => removeClip(clipIds))
+  }, [removeClip, askConfirm])
 
   const handleRemoveFromLibrary = useCallback((itemId) => {
-    if (window.confirm('Remove this item from the project library?')) {
-      removeFromLibrary(itemId)
-    }
-  }, [removeFromLibrary])
+    askConfirm('Remove this item from the project library?', () => removeFromLibrary(itemId))
+  }, [removeFromLibrary, askConfirm])
 
   const handleRemoveTrack = useCallback((trackId) => {
-    if (window.confirm('Remove this track and all its clips?')) {
-      removeTrack(trackId)
-    }
-  }, [removeTrack])
+    askConfirm('Remove this track and all its clips?', () => removeTrack(trackId))
+  }, [removeTrack, askConfirm])
 
   // Reverse clip: send to backend, get reversed file, swap URL
   const [reversingClipId, setReversingClipId] = useState(null)
@@ -350,24 +472,52 @@ function App() {
         if (e.key === 'Escape') { setAutoCutClipId(null); setBeatClipId(null) }
         return
       }
-      // Ignore if typing in an input
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        return
-      }
+      // A "Remove ...?" question is open: it handles Enter / Escape itself
+      if (confirmRef.current) return
 
-      // Space - play/pause the timeline preview
+      // Space - play/pause the timeline preview, wherever the focus is, except
+      // while typing text. A slider, checkbox, dropdown or button just used in
+      // the settings keeps the focus, so it is let go first (otherwise its own
+      // Space action, a toggle or a click on keyup, would run as well).
       if (e.key === ' ' || e.code === 'Space') {
-        if (e.target.tagName === 'SELECT' || e.target.isContentEditable) return
+        if (isTypingTarget(e.target)) return
         e.preventDefault()
-        // A focused button would also fire its click on keyup
-        if (e.target.tagName === 'BUTTON') e.target.blur()
+        if (e.target !== document.body && typeof e.target.blur === 'function') e.target.blur()
         if (!spaceBlockedRef.current) previewControlRef.current?.togglePlay()
         return
       }
 
-      // Delete key - remove selected clip
+      // Ignore the other shortcuts in an input (arrows move a slider, Backspace edits text)
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+        return
+      }
+
+      // Ctrl/Cmd+A - select every clip on the timeline
+      if (e.key === 'a' && (e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
+        e.preventDefault()
+        selectClips(tracksRef.current.flatMap(t => t.clips.map(c => c.id)))
+        return
+      }
+
+      // F - full screen on / off
+      if ((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey && document.fullscreenEnabled) {
+        e.preventDefault()
+        toggleFullscreenRef.current()
+        return
+      }
+
+      // Escape - nothing selected
+      if (e.key === 'Escape' && (selectedClipIds.length || selectedClipId)) {
+        selectClips([])
+        return
+      }
+
+      // Delete key - remove selected clip (or all selected clips)
       if (e.key === 'Delete' || e.key === 'Backspace') {
-        if (selectedClipId) {
+        if (selectedClipIds.length > 1) {
+          e.preventDefault()
+          handleRemoveClips(selectedClipIds)
+        } else if (selectedClipId) {
           e.preventDefault()
           handleRemoveClip(selectedClipId)
         }
@@ -418,8 +568,14 @@ function App() {
         }
       }
 
-      // T - add text clip
-      if (e.key === 't' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+      // M - a chapter at the playhead (audio editor)
+      if (e.key === 'm' && !e.ctrlKey && !e.metaKey && !e.altKey && addChapterRef.current) {
+        e.preventDefault()
+        addChapterRef.current()
+      }
+
+      // T - add text clip (shorts only)
+      if (!audioMode && e.key === 't' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
         e.preventDefault()
         addTextClip()
       }
@@ -442,7 +598,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [selectedClipId, handleRemoveClip, splitClipAtPlayhead, undo, redo, setPlayheadPosition, ungroupClips, duplicateClip, isPlayheadOnGap, removeGapAtPlayhead, addTextClip])
+  }, [selectedClipId, selectedClipIds, selectClips, handleRemoveClips, handleRemoveClip, splitClipAtPlayhead, undo, redo, setPlayheadPosition, ungroupClips, duplicateClip, isPlayheadOnGap, removeGapAtPlayhead, addTextClip, audioMode])
 
   // Prevent external file drops anywhere except the project library
   useEffect(() => {
@@ -487,7 +643,8 @@ function App() {
   }, [addToLibrary])
 
   // Add recorded files directly to library AND timeline
-  const handleRecordedFiles = useCallback(async (files) => {
+  // `place` { trackId, at }: a recording from a track's + menu goes there
+  const handleRecordedFiles = useCallback(async (files, place = null) => {
     for (const file of files) {
       const type = file.type.startsWith('video') ? 'video' : file.type.startsWith('audio') ? 'audio' : null
       if (!type) continue
@@ -495,7 +652,8 @@ function App() {
       // Use pre-uploaded URL if InlineRecorder already uploaded it
       const preUploadedUrl = file._serverUrl || null
       const url = preUploadedUrl || URL.createObjectURL(file)
-      const added = await addToLibraryAndTimeline(url, file.name, type, { file, serverUrl: preUploadedUrl })
+      // durationHint: the recorder's own clock, for recordings that don't carry a length
+      const added = await addToLibraryAndTimeline(url, file.name, type, { file, serverUrl: preUploadedUrl, durationHint: file._durationHint, ...(place || {}) })
       // Green screen take from the camera recorder
       if (added?.clipId && type === 'video' && file._chromaKey) updateClip(added.clipId, { chromaKey: file._chromaKey })
     }
@@ -524,6 +682,15 @@ function App() {
   const [recordingAudioOpen, setRecordingAudioOpen] = useState(false)
   const [musicOpen, setMusicOpen] = useState(false)
   const [sfxOpen, setSfxOpen] = useState(false)
+  // The track whose + menu opened Music / Sound effects / Record audio (null:
+  // the general add). The new audio goes on it, at the playhead.
+  const [addTarget, setAddTarget] = useState(null)
+  const openAdd = useCallback((what, trackId = null) => {
+    setAddTarget(typeof trackId === 'string' ? trackId : null)
+    if (what === 'music') setMusicOpen(true)
+    else if (what === 'sfx') setSfxOpen(true)
+    else setRecordingAudioOpen(true)
+  }, [])
   const [stickersOpen, setStickersOpen] = useState(false)
   const [inlineRecordingOpen, setInlineRecordingOpen] = useState(false)
   const [recorderSize, setRecorderSize] = useState('small') // 'small' | 'big'
@@ -683,10 +850,13 @@ function App() {
   }, [remixSession, handleRecordedFiles, tracks, updateClip, addRemixRecording, selectClip, setPlayheadPosition])
 
   // Music library: the song lands on its own track and is selected
+  // From a track's + menu: on that track at the playhead. The audio editor's
+  // general add: a music track at the playhead. Shorts: background music from 0:00.
   const handlePickMusic = useCallback(async (track) => {
-    const clipId = await addMusicClip(track.url, `${track.title} - ${track.artist}`, track.credit, track.bpm)
+    const place = addTarget ? { trackId: addTarget, at: playheadPosition } : audioMode ? { at: playheadPosition } : null
+    const clipId = await addMusicClip(track.url, `${track.title} - ${track.artist}`, track.credit, track.bpm, place)
     if (clipId) selectClip(clipId)
-  }, [addMusicClip, selectClip])
+  }, [addMusicClip, selectClip, addTarget, playheadPosition, audioMode])
 
   // Stickers go in at the playhead (on a "Stickers" track above the footage)
   const handlePickSticker = useCallback((sticker) => {
@@ -696,9 +866,9 @@ function App() {
 
   // Sound effects go in at the playhead
   const handlePickSfx = useCallback(async (track) => {
-    const clipId = await addSfxClip(track.url, track.title, playheadPosition)
+    const clipId = await addSfxClip(track.url, track.title, playheadPosition, addTarget)
     if (clipId) selectClip(clipId)
-  }, [addSfxClip, selectClip, playheadPosition])
+  }, [addSfxClip, selectClip, playheadPosition, addTarget])
 
   // Credits of the library songs still on the timeline, once each, sent with
   // the video so 3speak.tv can credit them (and pay 3Speak sound creators)
@@ -771,6 +941,22 @@ function App() {
     </div>
   )
 
+  // Audio editor, empty: add a recording, record one, or start from music
+  const emptyAudioActions = (
+    <div className="empty-timeline-actions">
+      <button type="button" onClick={() => emptyAudioInputRef.current?.click()}>
+        <Upload size={22} /> <span>Add recording</span>
+      </button>
+      <button type="button" onClick={() => openAdd('record')}>
+        <Mic size={22} /> <span>Record</span>
+      </button>
+      <button type="button" onClick={() => openAdd('music')}>
+        <Music size={22} /> <span>Music</span>
+      </button>
+      <input ref={emptyAudioInputRef} type="file" accept="audio/*,video/*" multiple hidden onChange={(e) => addFilesFromEmpty(e, 'audio')} />
+    </div>
+  )
+
   // Uploads still running in the background; Render waits for them
   const activeUpload = useMemo(() => {
     const uploading = library.filter(item => item.uploading)
@@ -801,15 +987,190 @@ function App() {
   }, [addToLibrary])
 
   // Drafts (saved projects of signed-in users, see hooks/useDrafts.js)
+  // A draft opened (not a new recording): its own template parts and settings stay as saved
+  const draftLoadedRef = useRef(false)
+  const loadSavedProject = useCallback((state) => {
+    draftLoadedRef.current = true
+    loadProjectState(state)
+    // Back where the playhead was when the draft was saved
+    setPlayheadPosition(savedPlayhead(state))
+    if (state?.master) setMaster(masterOf(state.master))
+    setChapters(Array.isArray(state?.chapters) ? state.chapters.slice(0, MAX_CHAPTERS) : [])
+  }, [loadProjectState, setPlayheadPosition])
   const drafts = useDrafts({
     session: draftSession,
     hasMedia: draftContext.hasMedia,
     tracks,
     library,
-    loadProjectState,
-    onUnauthorized: requestDraftSignIn
+    loadProjectState: loadSavedProject,
+    onUnauthorized: requestDraftSignIn,
+    mode: audioMode ? 'audio' : 'video',
+    master: audioMode ? master : null,
+    chapters: audioMode ? chapters : null,
+    playhead: playheadPosition,
+    playing: previewPlaying
   })
   const canDraftSignIn = isIframe && !draftSession && ['sign-in-needed', 'sign-in-failed', 'signing-in'].includes(draftContext.reason)
+
+  // ---- Audio editor: template, Cut silences for every voice clip ----
+  const audioTemplate = useAudioTemplate({ session: draftSession, enabled: audioMode })
+  const [templateOpen, setTemplateOpen] = useState(false)
+  const [templateNotice, setTemplateNotice] = useState(null) // roles just applied, for the notice
+  const tracksRef = useRef(tracks)
+  tracksRef.current = tracks
+
+  // Put the saved template back around the content (after cuts moved the end)
+  const refitTemplate = useCallback(() => {
+    const tpl = audioTemplate.template
+    if (!tpl || !appliedRoles(tracksRef.current).length) return
+    applyTracks(t => applyAudioTemplate(t, tpl))
+  }, [audioTemplate.template, applyTracks])
+
+  const voiceClips = useMemo(() => (audioMode ? voiceClipsOf(tracks) : []), [audioMode, tracks])
+
+  // "Cut silences" opens on the selected voice clip, else the longest one
+  // Cut silences works on a clip (its group, if it has one): the selected one,
+  // on any track; with none selected the longest voice clip, else the longest
+  // audio clip
+  const cuttableClips = useMemo(() => (audioMode ? cuttableClipsOf(tracks) : []), [audioMode, tracks])
+  const openCutSilences = useCallback(() => {
+    const longest = (list) => [...list].sort((a, b) => (b.endTime - b.startTime) - (a.endTime - a.startTime))[0]
+    const sel = cuttableClips.find(c => c.id === selectedClipId)
+    const target = sel || longest(voiceClips) || longest(cuttableClips)
+    if (target) setAutoCutClipId(target.id)
+  }, [voiceClips, cuttableClips, selectedClipId])
+
+  // The same settings for every voice clip: last on the timeline first, so the
+  // clips still to do are not moved by the cuts before them. Each file is read once.
+  const [cutProgress, setCutProgress] = useState(null) // { done, total, failed }
+  const cutAllSilences = useCallback(async (settings) => {
+    setAutoCutClipId(null)
+    // Units: a group of voices is cut as one (only where everyone is quiet, in
+    // sync); every other voice clip on its own. Last on the timeline first.
+    const voices = voiceClipsOf(tracksRef.current)
+    const units = []
+    const seenGroups = new Set()
+    for (const c of voices) {
+      const members = c.groupId ? voices.filter(v => v.groupId === c.groupId) : [c]
+      if (members.length > 1) {
+        if (seenGroups.has(c.groupId)) continue
+        seenGroups.add(c.groupId)
+      }
+      units.push({ members, start: groupSpan(members).from })
+    }
+    units.sort((a, b) => b.start - a.start)
+    if (!units.length) return { cut: 0, failed: 0 }
+    const loudness = new Map()
+    const loudnessOf = async (c) => {
+      const local = fileStoreRef.current.get(c.id) || c.file || null
+      const source = local || (isHlsUrl(c.url) ? null : c.url)
+      const key = local || c.serverUrl || c.url
+      if (!loudness.has(key)) loudness.set(key, await loadLoudness(source || c.serverUrl, { analysisUrl: c.serverUrl || null }))
+      return loudness.get(key)
+    }
+    let cut = 0
+    let failed = 0
+    setCutProgress({ done: 0, total: units.length, failed: 0 })
+    for (let i = 0; i < units.length; i++) {
+      const { members } = units[i]
+      try {
+        if (members.length > 1) {
+          const list = []
+          for (const m of members) list.push({ clip: m, loudness: await loudnessOf(m) })
+          const { from, to } = groupSpan(members)
+          const { parts } = planCuts(combineLoudness(list), { from, to, ...settings, mode: 'remove' })
+          const kept = parts.reduce((sum, p) => sum + (p.end - p.start), 0)
+          if (parts.length && (parts.length > 1 || kept < (to - from) - 0.05)) {
+            applyGroupSilenceCut(members.map(m => m.id), parts, { closeGaps: true })
+            cut++
+          }
+        } else {
+          const c = members[0]
+          const { parts } = planCuts(await loudnessOf(c), { from: c.startTime, to: c.endTime, ...settings, mode: 'remove' })
+          const kept = parts.reduce((sum, p) => sum + (p.end - p.start), 0)
+          if (parts.length && (parts.length > 1 || kept < (c.endTime - c.startTime) - 0.05)) {
+            applySilenceCut(c.id, parts, { closeGaps: true })
+            cut++
+          }
+        }
+      } catch (err) {
+        console.warn(`[cut silences] ${members.map(m => m.name).join(' + ')}: ${err.message}`)
+        failed++
+      }
+      setCutProgress({ done: i + 1, total: units.length, failed })
+    }
+    setCutProgress(failed ? { done: units.length, total: units.length, failed, finished: true } : null)
+    if (cut) refitTemplate()
+    return { cut, failed }
+  }, [applySilenceCut, applyGroupSilenceCut, refitTemplate, fileStoreRef])
+  refitTemplateRef.current = audioMode ? refitTemplate : null
+
+  // A new recording gets the template by itself (when the creator asked for that):
+  // silences cut first, then intro / outro / music bed around what is left.
+  // Not for a draft that was opened, and only once per editor session.
+  const autoTemplateRef = useRef(false)
+  const hasVoice = voiceClips.length > 0
+  useEffect(() => {
+    if (!audioMode || autoTemplateRef.current || !hasVoice) return
+    if (draftLoadedRef.current) { autoTemplateRef.current = true; return }
+    const tpl = audioTemplate.template
+    if (tpl === undefined) return // not known yet (the sign-in may still come)
+    autoTemplateRef.current = true
+    if (!tpl || tpl.autoApply === false || appliedRoles(tracksRef.current).length) return
+    ;(async () => {
+      setMaster(masterOf(tpl.master))
+      if (tpl.silence?.enabled) await cutAllSilences({ ...loadAutoCutSettings(), ...tpl.silence })
+      if (hasSlots(tpl)) {
+        applyTracks(t => applyAudioTemplate(t, tpl))
+        setTemplateNotice(Object.keys(tpl.slots || {}))
+      }
+    })()
+  }, [audioMode, hasVoice, audioTemplate.template]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // "Group with other voices": the clip and what plays at the same time on the
+  // other voice tracks become one group (they then move, trim and get cut together)
+  const [groupNotice, setGroupNotice] = useState(null)
+  const groupWithVoices = useCallback((clipId) => {
+    const ids = overlappingVoices(tracksRef.current, clipId)
+    if (ids.length < 2) {
+      setGroupNotice('Nothing plays at the same time on another voice track. Put the other voice on its own track first.')
+      return
+    }
+    groupClips(ids)
+    setGroupNotice(`${ids.length} voices grouped: they now move, trim and get their silences cut together.`)
+  }, [groupClips])
+
+  // Chapters: added at the playhead (M), renamed, moved, removed
+  const [chaptersOpen, setChaptersOpen] = useState(false)
+  const [audiogramOpen, setAudiogramOpen] = useState(false)
+  const cleaning = useCleaningStatus()
+  // Duck is a clip setting only. A whole-show Duck (an old draft, or a
+  // template with "duck the music") becomes the music clips' own setting.
+  useEffect(() => {
+    if (!audioMode || !master.duck) return
+    applyTracks(ts => applyMasterDuck(ts, master))
+    setMaster(m => ({ ...m, duck: false }))
+  }, [audioMode, master.duck]) // eslint-disable-line react-hooks/exhaustive-deps
+  const [chapterFocus, setChapterFocus] = useState(null)
+  const addChapter = useCallback((at) => {
+    setChapters(list => {
+      if (list.length >= MAX_CHAPTERS) return list
+      const ch = newChapter(tracksRef.current, at, list.length === 0 && at < 1 ? 'Intro' : `Chapter ${list.length + 1}`)
+      setChapterFocus(ch.id)
+      return [...list, ch]
+    })
+  }, [])
+  const renameChapter = useCallback((id, title) => setChapters(list => list.map(c => (c.id === id ? { ...c, title: String(title).slice(0, 80) } : c))), [])
+  const moveChapterTo = useCallback((id, at) => setChapters(list => list.map(c => (c.id === id ? moveChapter(tracksRef.current, c, at) : c))), [])
+  const removeChapter = useCallback((id) => setChapters(list => list.filter(c => c.id !== id)), [])
+  // M: a chapter at the playhead (and the list opens so it can be named)
+  addChapterRef.current = audioMode ? () => { addChapter(playheadRef.current); setChaptersOpen(true) } : null
+
+  const applyTemplateNow = useCallback((tpl) => {
+    applyTracks(t => applyAudioTemplate(t, tpl))
+    setMaster(masterOf(tpl.master))
+    setTemplateNotice(Object.keys(tpl.slots || {}))
+  }, [applyTracks])
   const [limitOpen, setLimitOpen] = useState(false)
   useEffect(() => {
     if (drafts.status === 'limit' && drafts.limitProjects.length) setLimitOpen(true)
@@ -852,6 +1213,44 @@ function App() {
     ? tracks.flatMap(t => t.clips).find(c => c.id === compactPropertiesClipId) || null
     : null
 
+  // Audio editor: a change to every clip of one recording (by its uploaded
+  // original; Cut silences makes many clips of one file), one undo step
+  // Clip by clip, each its own fields, one undo step (voice clean-up)
+  const updateClipsEach = useCallback((changes) => {
+    if (!changes?.length) return
+    const byId = new Map(changes.map(ch => [ch.id, ch.updates]))
+    applyTracks(ts => ts.map(t => ({ ...t, clips: t.clips.map(c => (byId.has(c.id) ? { ...c, ...byId.get(c.id) } : c)) })))
+  }, [applyTracks])
+
+  // A clip's Duck in the panel: its setting, and what it can listen to (any
+  // voice, or one of the other audio tracks)
+  const duckInfoFor = (clip) => {
+    const track = clip && tracks.find(t => t.type === 'audio' && t.clips.some(c => c.id === clip.id))
+    if (!track) return null
+    const numbers = trackNumbers(tracks)
+    const others = tracks.filter(t => t.type === 'audio' && t.id !== track.id)
+    return {
+      setting: clipDuckSetting(clip, track),
+      // every other track by its number and name, then all voice tracks at once
+      sources: [
+        ...others.sort((a, b) => numbers.get(a.id) - numbers.get(b.id)).map(t => ({ id: t.id, label: trackLabel(t, numbers) })),
+        { id: 'voices', label: 'All voice tracks' }
+      ],
+      // a new Duck listens to the first other voice track (else the first other track)
+      defaultSource: (others.find(t => !t.music) || others[0])?.id || 'voices'
+    }
+  }
+
+  // Audio clips plus the rest of their groups (not template parts): what the
+  // voice clean-up applies to (clip level, except a clip in a group)
+  const withGroups = (clips) => {
+    const all = tracks.filter(t => t.type === 'audio').flatMap(t => t.clips).filter(c => !c.templateRole)
+    const groups = new Set(clips.map(c => c.groupId).filter(Boolean))
+    const out = new Map(clips.filter(c => c.type === 'audio').map(c => [c.id, c]))
+    for (const c of all) if (groups.has(c.groupId)) out.set(c.id, c)
+    return [...out.values()]
+  }
+
   // The audio-track clip a video's sound plays from (same group, type audio)
   const linkedAudioOf = (clip) => (clip?.type === 'video' && clip.groupId
     ? tracks.flatMap(t => t.clips).find(c => c.groupId === clip.groupId && c.type === 'audio') || null
@@ -861,6 +1260,53 @@ function App() {
   // "Options" (a panel over the timeline); on desktop a sidebar that follows
   // the selected clip
   const sideClip = compactPropertiesClip || (isDesktop ? selectedClip : null)
+
+  // Phones: Select mode, each tap on a clip adds or removes it (the panel
+  // waits until Done, as it would cover the timeline)
+  const [selectMode, setSelectMode] = useState(false)
+
+  // Group what is selected (their existing groups come along: a video's
+  // sound is linked to it through its group), or ungroup a selection that is
+  // one group
+  const groupSelection = (clipIds) => {
+    const all = tracks.flatMap(t => t.clips)
+    const clips = all.filter(c => clipIds.includes(c.id))
+    const groups = new Set(clips.map(c => c.groupId).filter(Boolean))
+    const ids = new Set(clips.map(c => c.id))
+    for (const c of all) if (groups.has(c.groupId)) ids.add(c.id)
+    groupClips([...ids])
+  }
+
+  // Several clips selected: one panel for all of them (volume, mute, voice)
+  const multiClips = useMemo(() => {
+    if (selectedClipIds.length < 2) return []
+    const ids = new Set(selectedClipIds)
+    return tracks.flatMap(t => t.clips).filter(c => ids.has(c.id))
+  }, [selectedClipIds, tracks])
+  const multiTargets = soundTargets(multiClips, linkedAudioOf)
+  const updateClips = (updates) => {
+    const ids = new Set(multiTargets.map(c => c.id))
+    applyTracks(ts => ts.map(t => ({ ...t, clips: t.clips.map(c => (ids.has(c.id) ? { ...c, ...updates } : c)) })))
+  }
+  const multiPanel = multiClips.length > 1 && !(selectMode && !isDesktop) ? (
+          <div className="compact-properties-panel multi-clip-panel">
+            <div className="compact-properties-header">
+              <span className="compact-properties-title">{multiClips.length} clips selected</span>
+              <button className="compact-btn compact-properties-close" onClick={() => selectClips([])} title="Clear the selection">
+                <X size={14} />
+              </button>
+            </div>
+            <MultiClipProperties
+              clips={multiTargets}
+              audioMode={audioMode}
+              onUpdateClips={updateClips}
+              voiceTargets={audioMode ? withGroups(multiTargets) : null}
+              onUpdateClipsEach={audioMode ? updateClipsEach : null}
+              onRemove={() => handleRemoveClips(multiClips.map(c => c.id))}
+              count={multiClips.length}
+            />
+          </div>
+  ) : null
   const compactPropertiesPanel = sideClip ? (
           <div className="compact-properties-panel">
             <div className="compact-properties-header">
@@ -879,13 +1325,42 @@ function App() {
               onUpdateLinkedAudio={(u) => { const a = linkedAudioOf(sideClip); if (a) updateClip(a.id, u) }}
               onUpdateClip={(updates) => updateClip(sideClip.id, updates)}
               onSplit={() => splitClip(sideClip.id)}
+              voiceTargets={audioMode ? withGroups([sideClip]) : null}
+              onUpdateClipsEach={audioMode ? updateClipsEach : null}
+              duckInfo={audioMode ? duckInfoFor(sideClip) : null}
               playheadPosition={playheadPosition}
               tabbed={!isDesktop}
             />
           </div>
   ) : null
 
-  if (compactMode) {
+  // Desktop: the selected clip's settings in a sidebar. The audio editor puts
+  // it beside the stage only, so the timeline gets the full width below.
+  const sideBesideStage = isDesktop && audioMode
+  const sidePanel = (
+    <aside className="compact-side">
+      {multiPanel || (sideClip ? compactPropertiesPanel : (
+        <p className="compact-side-empty">Select a clip on the timeline to see its settings. Drag a box over several clips to change them together.</p>
+      ))}
+    </aside>
+  )
+
+  // A voice clean-up running (utils/cleaningStatus.js): stays on screen while
+  // other clips are selected, until the cleaned audio is in
+  const cleaningNotice = cleaning ? (
+    <div className="cleaning-notice" role="status" aria-live="polite">
+      <Loader2 size={15} className="encoding-notice-spin" />
+      <span>{cleaningText(cleaning)}</span>
+      <small>Long recordings can take a minute.</small>
+    </div>
+  ) : null
+
+  const confirmDialog = confirmAsk ? (
+    <ConfirmDialog message={confirmAsk.message} onConfirm={acceptConfirm} onCancel={closeConfirm} />
+  ) : null
+
+  // The audio editor only exists in the compact layout
+  if (compactMode || audioMode) {
     return (
       <div className={`app compact${isDesktop ? ' desktop' : ''}`}>
         <ClipColorFilters tracks={tracks} />
@@ -901,15 +1376,31 @@ function App() {
         <header className="app-branding">
           <div className="branding-left">
             <img src={logo3speak} alt="3Speak" className="branding-logo" />
-            <span className="branding-text">Shorts Editor <span className="branding-badge">beta</span></span>
+            <span className="branding-text">{audioMode ? 'Audio Editor' : 'Shorts Editor'} <span className="branding-badge">beta</span></span>
             <span className="branding-info" onClick={() => setShowBackendInfo(prev => !prev)}>
               <Info size={14} />
               {showBackendInfo && (
                 <span className="branding-info-popup">Backend: {selectedBackendUrl || 'selecting...'}</span>
               )}
             </span>
+            {audioMode && (
+              <button className="branding-help-btn" onClick={() => setShowTour(true)} title="Show the tour again" aria-label="Show the tour again">
+                <HelpCircle size={15} />
+              </button>
+            )}
           </div>
           <DraftStatus drafts={drafts} canSignIn={canDraftSignIn} signInState={draftContext.reason} onSignIn={requestDraftSignIn} onOpenLimit={() => drafts.save()} />
+          {canFullscreen && (
+            <button
+              className="branding-close-btn branding-fullscreen-btn"
+              onClick={(e) => { e.currentTarget.blur(); toggleFullscreen() }}
+              title={isFullscreen ? 'Leave full screen (F)' : 'Full screen (F)'}
+              aria-label={isFullscreen ? 'Leave full screen' : 'Full screen'}
+              aria-pressed={isFullscreen}
+            >
+              {isFullscreen ? <Minimize size={15} /> : <Maximize size={15} />}
+            </button>
+          )}
           <button className="branding-close-btn" onClick={handleCloseEditor} title="Close editor">
             <X size={16} />
           </button>
@@ -939,11 +1430,11 @@ function App() {
             <button
               className={renderStatus?.status === 'completed' ? 'compact-download-btn' : 'compact-render-btn'}
               onClick={() => { clearRenderStatus(); requestRender() }}
-              disabled={videoClips.length === 0 || (exporting || canvasExporting) || isBackendRendering || overLengthLimit || !!activeUpload}
-              title={overLengthLimit ? `Trim the timeline to ${MAX_TIMELINE_TEXT} or less to render` : undefined}
+              disabled={(audioMode ? audioClips.length === 0 : videoClips.length === 0) || (exporting || canvasExporting) || isBackendRendering || overLengthLimit || !!activeUpload || !!cutProgress}
+              title={overLengthLimit ? `Trim the timeline to ${MAX_TIMELINE_TEXT} or less to ${audioMode ? 'export' : 'render'}` : undefined}
             >
-              <Clapperboard size={14} />
-              <span>{isBackendRendering ? 'Rendering...' : activeUpload ? `Uploading ${Math.round(activeUpload.progress * 100)}%` : renderStatus?.status === 'completed' ? 'Re-render' : 'Render'}</span>
+              {audioMode ? <AudioWaveform size={14} /> : <Clapperboard size={14} />}
+              <span>{isBackendRendering ? (audioMode ? 'Exporting...' : 'Rendering...') : activeUpload ? `Uploading ${Math.round(activeUpload.progress * 100)}%` : renderStatus?.status === 'completed' ? (audioMode ? 'Export again' : 'Re-render') : (audioMode ? 'Export' : 'Render')}</span>
             </button>
             {renderStatus?.status === 'completed' && renderStatus.outputUrl && (
               <>
@@ -957,21 +1448,99 @@ function App() {
                   <Download size={14} />
                   <span>Download</span>
                 </a>
+                {audioMode && (
+                  <button className="compact-download-btn" onClick={() => setAudiogramOpen(true)} title="A short video of the episode to share as a teaser">
+                    <Film size={14} />
+                    <span>Audiogram</span>
+                  </button>
+                )}
                 {isIframe && (
                   <button
                     className="compact-render-btn"
                     onClick={() => setShowPreview(true)}
                   >
                     <Send size={14} />
-                    <span>Send Video</span>
+                    <span>{audioMode ? 'Use this audio' : 'Send Video'}</span>
                   </button>
                 )}
               </>
             )}
           </div>
           <div className="compact-menu-right">
+            {audioMode && (
+              <>
+                <button
+                  className="compact-btn compact-tool-btn"
+                  onClick={openCutSilences}
+                  disabled={!cuttableClips.length || !!cutProgress}
+                  title="Cut the silences out of the selected clip (or its group): find the pauses, cut them, close the gaps"
+                  aria-label="Cut silences"
+                >
+                  <AudioWaveform size={15} /><span>Cut silences</span>
+                </button>
+                <button
+                  className={`compact-btn compact-tool-btn${appliedRoles(tracks).length ? ' active' : ''}`}
+                  onClick={() => setTemplateOpen(true)}
+                  title="Your template: intro, outro and music bed for every recording"
+                  aria-label="Template"
+                >
+                  <LayoutTemplate size={15} /><span>Template</span>
+                </button>
+                <button
+                  className={`compact-btn compact-tool-btn${master.loudness ? ' active' : ''}`}
+                  onClick={() => setMaster(m => ({ ...m, loudness: !m.loudness }))}
+                  aria-pressed={master.loudness}
+                  aria-label="Normalize loudness"
+                  title={master.loudness ? 'Normalize is on: the export is brought to an even -16 LUFS (the podcast standard)' : 'Normalize is off: the export keeps your levels as they are'}
+                >
+                  <Gauge size={15} /><span>{master.loudness ? 'Normalize: on' : 'Normalize: off'}</span>
+                </button>
+                <button
+                  className={`compact-btn compact-tool-btn${chapters.length ? ' active' : ''}`}
+                  onClick={() => setChaptersOpen(true)}
+                  aria-label="Chapters"
+                  title="Chapters: mark where each part starts (M adds one at the playhead)"
+                >
+                  <Bookmark size={15} /><span>{chapters.length ? `Chapters (${chapters.length})` : 'Chapters'}</span>
+                </button>
+              </>
+            )}
           </div>
         </div>
+
+        {/* Audio editor: Cut silences over every voice clip */}
+        {cutProgress && (
+          <div className="compact-render-progress audio-cut-progress" role="status">
+            {cutProgress.finished ? (
+              <>
+                <span className="compact-render-progress-text">
+                  {cutProgress.failed} clip{cutProgress.failed === 1 ? '' : 's'} could not be read{activeUpload ? ' yet: try again when the upload is done' : ''}. The others were cut.
+                </span>
+                <button className="compact-btn" onClick={() => setCutProgress(null)} title="Dismiss"><X size={12} /></button>
+              </>
+            ) : (
+              <>
+                <Loader2 size={14} className="encoding-notice-spin" />
+                <span className="compact-render-progress-text">Cutting silences: clip {cutProgress.done} of {cutProgress.total}</span>
+              </>
+            )}
+          </div>
+        )}
+        {groupNotice && (
+          <div className="compact-render-progress audio-template-notice" role="status">
+            <span className="compact-render-progress-text">{groupNotice}</span>
+            <button className="compact-btn" onClick={() => setGroupNotice(null)} title="Dismiss"><X size={12} /></button>
+          </div>
+        )}
+        {templateNotice && (
+          <div className="compact-render-progress audio-template-notice" role="status">
+            <span className="compact-render-progress-text">
+              Template applied: {templateNotice.map(r => ({ intro: 'intro', outro: 'outro', bed: 'music bed' }[r])).filter(Boolean).join(', ')}.
+            </span>
+            <button className="compact-btn" onClick={() => { applyTracks(t => removeAudioTemplate(t)); setTemplateNotice(null) }}>Take it off</button>
+            <button className="compact-btn" onClick={() => setTemplateNotice(null)} title="Dismiss"><X size={12} /></button>
+          </div>
+        )}
 
         {/* Render progress bar (shown below menu bar when active) */}
         {isBackendRendering && (
@@ -999,8 +1568,12 @@ function App() {
         {/* Global Preview */}
         <div className={`compact-workspace${isDesktop ? ' desktop' : ''}`}>
         <div className="compact-main">
+        <div className={sideBesideStage ? 'compact-top-row' : 'compact-stage-wrap'}>
         <GlobalPreview
-          emptyActions={emptyTimelineActions}
+          emptyActions={audioMode ? emptyAudioActions : emptyTimelineActions}
+          audioMode={audioMode}
+          duck={duck}
+          chapters={resolvedChapters}
           tracks={tracks}
           playheadPosition={playheadPosition}
           onSetPlayhead={setPlayheadPosition}
@@ -1019,17 +1592,25 @@ function App() {
           controlRef={previewControlRef}
           recorderSize={recorderSize}
           onSetRecorderSize={setRecorderSize}
+          onPlayingChange={setPreviewPlaying}
         />
+        {sideBesideStage && sidePanel}
+        </div>
 
         {/* Timeline (includes its own toolbar) */}
         <div className="compact-timeline-section">
           <Timeline
             tracks={tracks}
             selectedClipId={selectedClipId}
+            selectedClipIds={selectedClipIds}
+            onSelectClips={selectClips}
+            selectMode={selectMode}
+            onSelectModeChange={setSelectMode}
             playheadPosition={playheadPosition}
             onSetPlayhead={setPlayheadPosition}
             onSelectClip={selectClip}
             onRemoveClip={handleRemoveClip}
+            onRemoveClips={handleRemoveClips}
             onUpdateClip={updateClip}
             onDuplicateClip={duplicateClip}
             onSplitClip={splitClip}
@@ -1037,26 +1618,31 @@ function App() {
             onRemoveGap={removeGapAtPlayhead}
             isPlayheadOnGap={isPlayheadOnGap}
             onDuplicate={duplicateClip}
-            onGroupClips={groupClips}
+            onGroupClips={groupSelection}
             onUngroupClips={ungroupClips}
             onAddTrack={addTrack}
-            onAddTextClip={addTextClip}
-            onAddColorClip={addColorClip}
+            onAddTextClip={audioMode ? undefined : addTextClip}
+            onAddColorClip={audioMode ? undefined : addColorClip}
             onRemoveTrack={handleRemoveTrack}
             onLibraryDrop={handleTimelineDrop}
             onMoveClipToTrack={moveClipToTrack}
             onAddFilesToTrack={addFilesToTrack}
             onOpenClipSettings={(clipId) => setCompactPropertiesClipId(clipId)}
-            onRecordAudio={() => setRecordingAudioOpen(true)}
-            onOpenMusic={() => setMusicOpen(true)}
-            onOpenSfx={() => setSfxOpen(true)}
-            onOpenStickers={() => setStickersOpen(true)}
-            onRecordVideo={openRecorder}
-            onReverseClip={handleReverseClip}
+            onRecordAudio={(trackId) => openAdd('record', trackId)}
+            onOpenMusic={(trackId) => openAdd('music', trackId)}
+            onOpenSfx={(trackId) => openAdd('sfx', trackId)}
+            onOpenStickers={audioMode ? undefined : () => setStickersOpen(true)}
+            onRecordVideo={audioMode ? undefined : openRecorder}
+            onReverseClip={audioMode ? undefined : handleReverseClip}
             onUpdateTrack={updateTrack}
             onAutoCut={setAutoCutClipId}
             onBeatSync={setBeatClipId}
             isDesktop={isDesktop}
+            audioMode={audioMode}
+            chapters={audioMode ? resolvedChapters : null}
+            onOpenChapters={audioMode ? () => setChaptersOpen(true) : undefined}
+            onGroupVoices={audioMode ? groupWithVoices : undefined}
+            isPlaying={previewPlaying}
           />
 
           {/* Reversing overlay */}
@@ -1070,32 +1656,26 @@ function App() {
           )}
 
           {/* Compact properties panel (phones: over the timeline; desktop: the sidebar) */}
-          {!isDesktop && compactPropertiesPanel}
+          {!isDesktop && (multiPanel || compactPropertiesPanel)}
         </div>
         </div>
-        {/* Desktop: the selected clip's settings beside preview and timeline */}
-        {isDesktop && (
-          <aside className="compact-side">
-            {sideClip ? compactPropertiesPanel : (
-              <p className="compact-side-empty">Select a clip on the timeline to see its settings.</p>
-            )}
-          </aside>
-        )}
+        {/* Desktop shorts editor: the selected clip's settings beside preview and timeline */}
+        {isDesktop && !sideBesideStage && sidePanel}
         </div>
 
-        {/* Onboarding Tour */}
+        {confirmDialog}
+        {cleaningNotice}
+
+        {/* Onboarding Tour (the shorts editor's, or the audio editor's) */}
         {showTour && (
-          <OnboardingTour onComplete={() => {
-            localStorage.setItem('3speak-tour-done', '1')
-            setShowTour(false)
-          }} />
+          <OnboardingTour steps={audioMode ? AUDIO_TOUR_STEPS : undefined} onComplete={finishTour} />
         )}
 
         {/* Remix mode picker (whole video arriving from the remix button) */}
         {remixPrompt && !showTour && <RemixModePicker onChoose={handleRemixChoice} />}
         {rejectedFiles.length > 0 && <TooLargeNotice files={rejectedFiles} onClose={dismissRejectedFiles} />}
         {lengthNotice && !remixPrompt && !showTour && <LengthLimitNotice length={lengthNotice.length} onClose={dismissLengthNotice} />}
-        {drafts.prompt && drafts.drafts?.length > 0 && (
+        {drafts.prompt && !showTour && drafts.drafts?.length > 0 && (
           <DraftsPrompt drafts={drafts.drafts} limits={drafts.limits} onLoad={drafts.loadDraft} onStartNew={drafts.startNew} />
         )}
         {limitOpen && drafts.limitProjects.length > 0 && (
@@ -1138,9 +1718,57 @@ function App() {
             key={autoCutClip.id}
             clip={autoCutClip}
             source={autoCutSource}
-            unavailable={autoCutUnavailable}
+            analysisUrl={autoCutClip.serverUrl || null}
+            unavailable={autoCutSource || autoCutClip.serverUrl ? null : autoCutUnavailable}
             onApply={handleAutoCutApply}
+            onApplyAll={audioMode ? cutAllSilences : null}
+            allCount={audioMode && voiceClips.some(c => c.id === autoCutClip.id) ? voiceClips.length : 0}
+            group={autoCutGroup}
             onClose={() => setAutoCutClipId(null)}
+          />
+        )}
+
+        {audiogramOpen && renderStatus?.status === 'completed' && renderStatus.outputUrl && (
+          <AudiogramDialog
+            outputUrl={renderStatus.outputUrl}
+            length={timelineEnd}
+            playheadPosition={playheadPosition}
+            title={audioTitle}
+            chapters={resolvedChapters}
+            onClose={() => setAudiogramOpen(false)}
+          />
+        )}
+
+        {chaptersOpen && (
+          <ChaptersDialog
+            resolved={resolvedChapters}
+            spans={chapterList}
+            playheadPosition={playheadPosition}
+            focusId={chapterFocus}
+            onAdd={addChapter}
+            onRename={renameChapter}
+            onMove={moveChapterTo}
+            onRemove={removeChapter}
+            onSeek={(t) => setPlayheadPosition(t)}
+            onClose={() => { setChaptersOpen(false); setChapterFocus(null) }}
+          />
+        )}
+
+        {templateOpen && (
+          <AudioTemplateDialog
+            template={audioTemplate.template || null}
+            selectedClip={selectedClip}
+            uploadFile={uploadFileToServer}
+            signedIn={audioTemplate.enabled}
+            canSignIn={canDraftSignIn || (isIframe && draftContext.reason === 'unavailable')}
+            onSignIn={requestDraftSignIn}
+            silenceSettings={(() => { const st = loadAutoCutSettings(); return { thresholdDb: st.thresholdDb, minSilence: st.minSilence, keepStartMs: st.keepStartMs, keepEndMs: st.keepEndMs } })()}
+            master={master}
+            saving={audioTemplate.status === 'saving'}
+            onSave={async (tpl) => { const r = await audioTemplate.save(tpl); if (r.ok) setTemplateOpen(false) }}
+            onApply={async (tpl) => { const r = await audioTemplate.save(tpl); if (r.ok) { setTemplateOpen(false); applyTemplateNow(r.template) } }}
+            onRemove={async () => { await audioTemplate.remove(); setTemplateOpen(false) }}
+            onClose={() => setTemplateOpen(false)}
           />
         )}
 
@@ -1161,7 +1789,7 @@ function App() {
         {/* Record Audio Modal */}
         {recordingAudioOpen && (
           <RecordAudio
-            onRecorded={handleRecordedFiles}
+            onRecorded={(files) => handleRecordedFiles(files, addTarget ? { trackId: addTarget, at: playheadPosition } : null)}
             onClose={() => setRecordingAudioOpen(false)}
           />
         )}
@@ -1195,19 +1823,23 @@ function App() {
           <div className="video-preview-overlay">
             <div className="video-preview-modal">
               <div className="video-preview-header">
-                <h3>Preview your video</h3>
+                <h3>{audioMode ? 'Listen before you use it' : 'Preview your video'}</h3>
                 <button className="video-preview-close" onClick={() => setShowPreview(false)}>
                   <X size={18} />
                 </button>
               </div>
               <div className="video-preview-player">
-                <video
-                  src={renderStatus.outputUrl}
-                  controls
-                  autoPlay
-                  playsInline
-                  style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: 8, background: '#000' }}
-                />
+                {audioMode ? (
+                  <audio src={renderStatus.outputUrl} controls autoPlay className="audio-preview-player" />
+                ) : (
+                  <video
+                    src={renderStatus.outputUrl}
+                    controls
+                    autoPlay
+                    playsInline
+                    style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: 8, background: '#000' }}
+                  />
+                )}
               </div>
               <div className="video-preview-actions">
                 <button className="video-preview-back" onClick={() => setShowPreview(false)}>
@@ -1221,13 +1853,16 @@ function App() {
                     drafts.deleteCurrent()
                     sendToParent('post-to-3speak', {
                       outputUrl: renderStatus.outputUrl,
+                      ...(audioMode && { mediaType: 'audio', fileName: audioFileName(audioTitle), durationSec: Math.round(timelineEnd * 1000) / 1000 }),
+                      // [{ start, end, title }]: 3Speak lists them in the description
+                      ...(audioMode && chapterList.length > 0 && { chapters: chapterList }),
                       ...(remixSource && { remixSource }),
                       ...(musicCredits.length > 0 && { musicCredits })
                     })
                   }}
                 >
                   <Send size={14} />
-                  <span>Send Video</span>
+                  <span>{audioMode ? 'Use this audio' : 'Send Video'}</span>
                 </button>
               </div>
             </div>
@@ -1398,10 +2033,13 @@ function App() {
             <Timeline
               tracks={tracks}
               selectedClipId={selectedClipId}
+              selectedClipIds={selectedClipIds}
+              onSelectClips={selectClips}
               playheadPosition={playheadPosition}
               onSetPlayhead={setPlayheadPosition}
               onSelectClip={selectClip}
               onRemoveClip={handleRemoveClip}
+              onRemoveClips={handleRemoveClips}
               onUpdateClip={updateClip}
               onDuplicateClip={duplicateClip}
               onSplitClip={splitClip}
@@ -1409,7 +2047,7 @@ function App() {
               onRemoveGap={removeGapAtPlayhead}
               isPlayheadOnGap={isPlayheadOnGap}
               onDuplicate={duplicateClip}
-              onGroupClips={groupClips}
+              onGroupClips={groupSelection}
               onUngroupClips={ungroupClips}
               onAddTrack={addTrack}
               onAddTextClip={addTextClip}
@@ -1418,9 +2056,9 @@ function App() {
               onLibraryDrop={handleTimelineDrop}
               onMoveClipToTrack={moveClipToTrack}
               onAddFilesToTrack={addFilesToTrack}
-              onRecordAudio={() => setRecordingAudioOpen(true)}
-              onOpenMusic={() => setMusicOpen(true)}
-              onOpenSfx={() => setSfxOpen(true)}
+              onRecordAudio={(trackId) => openAdd('record', trackId)}
+              onOpenMusic={(trackId) => openAdd('music', trackId)}
+              onOpenSfx={(trackId) => openAdd('sfx', trackId)}
               onOpenStickers={() => setStickersOpen(true)}
               onRecordVideo={openRecorder}
               onReverseClip={handleReverseClip}
@@ -1559,7 +2197,7 @@ function App() {
       {/* Record Audio Modal */}
       {recordingAudioOpen && (
         <RecordAudio
-          onRecorded={handleRecordedFiles}
+          onRecorded={(files) => handleRecordedFiles(files, addTarget ? { trackId: addTarget, at: playheadPosition } : null)}
           onClose={() => setRecordingAudioOpen(false)}
         />
       )}
@@ -1588,6 +2226,7 @@ function App() {
         <EncodingNotice items={encodingItems} onClose={hideEncodingNotice} />
       )}
 
+      {confirmDialog}
     </div>
   )
 }

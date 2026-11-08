@@ -3,13 +3,12 @@ import { Play, Pause, SkipBack, Minus, Plus, Maximize, Minimize2, Repeat } from 
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 
 function formatTime(seconds) {
-  const mins = Math.floor(seconds / 60)
-  const secs = Math.floor(seconds % 60)
-  return `${mins}:${secs.toString().padStart(2, '0')}`
+  const s = Math.floor(seconds)
+  const h = Math.floor(s / 3600)
+  const mins = Math.floor((s % 3600) / 60)
+  const secs = String(s % 60).padStart(2, '0')
+  return h ? `${h}:${String(mins).padStart(2, '0')}:${secs}` : `${Math.floor(s / 60)}:${secs}`
 }
-
-// clip volume 0..100 -> element volume. 0 is silent: `volume || 100` used to play it at full volume.
-const clipVol = clip => Math.min(1, Math.max(0, (Number.isFinite(+clip.volume) ? +clip.volume : 100) / 100))
 
 const SIZES = ['small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge', 'huge', 'massive', 'giant', 'max', 'fullscreen']
 const UI_UPDATE_INTERVAL = 50 // ~20fps for React state updates during playback
@@ -19,6 +18,15 @@ const PRELOAD_AHEAD = 1.5
 // ...and start playing (hidden / silent) this long before their cut, from the
 // matching earlier point of the file, so at the cut they are already running
 const PREROLL = 0.4
+
+// A sounding clip that is still seeking / loading its part of the file. The
+// audio editor holds the timeline until it plays (else the clip starts late
+// and stays late, out of step with its cut); never longer than STALL_MAX_MS.
+const STALL_MAX_MS = 4000
+// A playing clip further off its timeline time than this is put back on it
+// (at most once a second per clip, so a slow seek can't keep re-seeking)
+const AUDIO_DRIFT_MAX = 0.15
+export const isAudioWaiting = (el) => !!el && !el.paused && !el.ended && !el.error && (el.seeking || el.readyState < 3)
 
 // Start a hidden/silent element early so it reaches the clip's first frame
 // exactly at the cut. `target()` is where it should be right now. Play start-up
@@ -58,6 +66,9 @@ function hideUntilPositioned(el) {
 }
 
 import InlineRecorder from './InlineRecorder'
+import AudioStage from './AudioStage'
+import { clipGainAt, clipVolume, splitGain } from '../utils/audioGain'
+import { duckGainAt } from '../utils/duck'
 import { clipColorFilter } from './ClipColorFilters'
 import { motionStyle, normalizeMotion, pivotPoint } from '../utils/stickerMotion'
 import usePhoneLayout from '../hooks/usePhoneLayout'
@@ -135,7 +146,7 @@ function FitTextBox({ measureKey, children, ...rest }) {
   return <span ref={ref} {...rest}>{children}</span>
 }
 
-function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVideo, activeAspectRatio, aspectRatioOverride, onSetAspectRatio, selectedClipId, onUpdateClip, onSelectClip, compact, inlineRecording, onRecordedInline, onCloseInlineRecorder, recorderSize, onSetRecorderSize, recorderGuide, onChangeRemixMode, onChangeStageLayout, controlRef, emptyActions }) {
+function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVideo, activeAspectRatio, aspectRatioOverride, onSetAspectRatio, selectedClipId, onUpdateClip, onSelectClip, compact, inlineRecording, onRecordedInline, onCloseInlineRecorder, recorderSize, onSetRecorderSize, recorderGuide, onChangeRemixMode, onChangeStageLayout, controlRef, emptyActions, audioMode = false, duck = null, chapters = null, onPlayingChange }) {
   const videoRefs = useRef({}) // Map of clip ID to video element
   // Sticker motion: the layer container (= the frame) and the moving clips,
   // which the playback loop moves every frame (React renders only ~20/s)
@@ -148,6 +159,11 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   const animationRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const isPlayingRef = useRef(false)
+  const stallMsRef = useRef(0) // how long the clock has waited for a loading clip
+  // Tell the editor (the timeline follows the playhead while playing)
+  const onPlayingChangeRef = useRef(onPlayingChange)
+  onPlayingChangeRef.current = onPlayingChange
+  useEffect(() => { onPlayingChangeRef.current?.(isPlaying) }, [isPlaying])
   const [size, setSize] = useState('xlarge')
   const [compactSize, setCompactSize] = useState('full') // 'full' or 'half'
   const [loop, setLoop] = useState(false)
@@ -229,10 +245,63 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
 
   // Get all audio clips with their timeline positions (respecting track mute)
   const audioRefs = useRef({})
+  // The volume an audio clip plays at: its own (volume, fades) and, on a music
+  // clip that is ducked (its own Duck or the top bar's), the duck (audio editor, utils/duck.js)
+  const duckRef = useRef(duck)
+  duckRef.current = duck
+  const gainAt = (clip, t) => clipGainAt(clip, t) * (duckRef.current?.[clip.id] ? duckGainAt(duckRef.current[clip.id], t) : 1)
+
+  // Louder than 100% (audio editor, up to 200%): an <audio> element stops at
+  // volume 1, so a boosted clip's element (data-boost, mounted with
+  // crossOrigin so its samples may be processed) plays through a gain node.
+  // The context is made and resumed from the Play click (autoplay policy).
+  const boostCtxRef = useRef(null)
+  const ensureBoostCtx = () => {
+    const Ctx = window.AudioContext || window.webkitAudioContext
+    if (!Ctx) return null
+    if (!boostCtxRef.current) boostCtxRef.current = new Ctx()
+    if (boostCtxRef.current.state === 'suspended') boostCtxRef.current.resume().catch(() => {})
+    return boostCtxRef.current
+  }
+  const setElementGain = (el, g) => {
+    const { element, boost } = splitGain(g)
+    el.volume = element
+    if (el.dataset.boost !== '1') return
+    if (!el._boostGain) {
+      const ctx = ensureBoostCtx()
+      if (!ctx) return
+      try {
+        const node = ctx.createGain()
+        const source = ctx.createMediaElementSource(el)
+        source.connect(node).connect(ctx.destination)
+        el._boostGain = node
+        el._boostSource = source
+      } catch { return }
+    }
+    el._boostGain.gain.value = boost
+  }
+  useEffect(() => () => { boostCtxRef.current?.close?.().catch(() => {}) }, [])
+
+  // An <audio> element leaving (its clip scrolled out of the playing window):
+  // take it out of the boost graph (a connected source keeps the element, and
+  // the part of the file it buffered, alive for as long as the editor is open)
+  // and let go of its media now instead of whenever it is collected.
+  const liveAudioElsRef = useRef(new Set()) // every <audio> handed out, until released
+  const releaseAudioEl = (el) => {
+    try { el._boostSource?.disconnect() } catch { /* already */ }
+    try { el._boostGain?.disconnect() } catch { /* already */ }
+    el._boostSource = null
+    el._boostGain = null
+    try {
+      el.pause()
+      el.removeAttribute('src')
+      el.load()
+    } catch { /* gone */ }
+  }
   const audioClips = useMemo(() => {
     return (tracks || [])
       .filter(t => t.type === 'audio' && t.muted !== true)
-      .flatMap(t => t.clips)
+      .flatMap(t => t.clips.map(c => (t.music ? { ...c, musicTrack: true, trackId: t.id } : c)))
       .filter(c => c.audioEnabled !== false)
       .map(clip => ({
         ...clip,
@@ -247,6 +316,16 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   const mountedAudioClips = useMemo(() => audioClips.filter(clip =>
     clip.timelineEnd > playheadPosition - 0.25 && clip.timelineStart <= playheadPosition + PRELOAD_AHEAD
   ), [audioClips, playheadPosition])
+
+  // After clips leave the playing window: release the elements that left the page
+  useEffect(() => {
+    for (const el of liveAudioElsRef.current) {
+      if (el.isConnected) continue
+      liveAudioElsRef.current.delete(el)
+      releaseAudioEl(el)
+    }
+  }, [mountedAudioClips]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => { for (const el of liveAudioElsRef.current) releaseAudioEl(el) }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const currentAudioClips = useMemo(() => {
     return audioClips.filter(clip =>
@@ -377,7 +456,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
 
   // Stable ref to latest values — RAF loop reads these without triggering re-renders
   const latestRef = useRef({})
-  latestRef.current = { findClipsAtPosition, getMediaTime, totalDuration, onSetPlayhead, setVideoSource, audioClips, videoClips }
+  latestRef.current = { findClipsAtPosition, getMediaTime, totalDuration, onSetPlayhead, setVideoSource, audioClips, videoClips, audioMode }
   loopRef.current = loop
 
   // Jump while playing: move the clock and every playing element to `pos`.
@@ -490,10 +569,10 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       const audioEl = audioRefs.current[clip.id]
       if (audioEl) {
         audioEl.muted = false
-        audioEl.volume = clipVol(clip)
+        setElementGain(audioEl, gainAt(clip, playheadPosition))
       }
     })
-  }, [currentClips, currentAudioClips, isPlaying])
+  }, [currentClips, currentAudioClips, isPlaying]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle playback — ref-driven animation loop
   useEffect(() => {
@@ -519,6 +598,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
     }
 
     isPlayingRef.current = true
+    stallMsRef.current = 0
     let lastTime = performance.now()
     lastUiUpdateRef.current = lastTime
 
@@ -563,7 +643,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       const audioEl = audioRefs.current[clip.id]
       if (audioEl) {
         audioEl.muted = false
-        audioEl.volume = clipVol(clip)
+        setElementGain(audioEl, gainAt(clip, playbackPosRef.current))
         const mediaTime = latestRef.current.getMediaTime(clip, playbackPosRef.current)
         audioEl.currentTime = mediaTime
         audioEl.play().catch(() => {})
@@ -577,6 +657,25 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       lastTime = currentTime
 
       const { findClipsAtPosition, getMediaTime, totalDuration, onSetPlayhead } = latestRef.current
+
+      // Audio editor: a clip that should sound now is still loading its spot
+      // of the file. Hold the clock (and pause the other sounding clips, the
+      // loop below starts them again at the right time) until it plays.
+      if (latestRef.current.audioMode) {
+        const at = playbackPosRef.current
+        const sounding = latestRef.current.audioClips.filter(c => at >= c.timelineStart && at < c.timelineEnd)
+        const waiting = sounding.some(c => isAudioWaiting(audioRefs.current[c.id]))
+        if (waiting && stallMsRef.current < STALL_MAX_MS) {
+          stallMsRef.current += deltaMs
+          for (const c of sounding) {
+            const el = audioRefs.current[c.id]
+            if (el && !el.paused && !isAudioWaiting(el)) el.pause()
+          }
+          animationRef.current = requestAnimationFrame(animate)
+          return
+        }
+        if (!waiting) stallMsRef.current = 0
+      }
 
       // Advance position via ref (no React re-render)
       const newPosition = playbackPosRef.current + (deltaMs / 1000)
@@ -707,10 +806,18 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         if (!audioEl) return
         const inRange = newPosition >= clip.timelineStart && newPosition < clip.timelineEnd
         if (inRange) {
-          audioEl.volume = clipVol(clip)
+          // volume and fades, every frame (a fade is a ramp, not a step)
+          setElementGain(audioEl, gainAt(clip, newPosition))
           if (audioEl.paused) {
             audioEl.currentTime = gmt(clip, newPosition)
             audioEl.play().catch(() => {})
+          } else if (!audioEl.seeking && audioEl.readyState >= 3) {
+            // Playing, but off its time (started late, or drifted): back on it
+            const target = gmt(clip, newPosition)
+            if (Math.abs(audioEl.currentTime - target) > AUDIO_DRIFT_MAX && currentTime - (+audioEl.dataset.synced || 0) > 1000) {
+              audioEl.dataset.synced = String(currentTime)
+              audioEl.currentTime = target
+            }
           }
         } else if (!audioEl.paused) {
           audioEl.pause()
@@ -756,6 +863,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         }
       })
       // Start audio clips from click handler (for autoplay policy)
+      if (audioClips.some(c => clipVolume(c) > 1)) ensureBoostCtx()
       const audioAtPos = audioClips.filter(c =>
         playbackPosRef.current >= c.timelineStart && playbackPosRef.current < c.timelineEnd
       )
@@ -763,7 +871,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         const audioEl = audioRefs.current[clip.id]
         if (audioEl) {
           audioEl.muted = false
-          audioEl.volume = clipVol(clip)
+          setElementGain(audioEl, gainAt(clip, playbackPosRef.current))
           const mt = getMediaTime(clip, playbackPosRef.current)
           audioEl.currentTime = mt
           audioEl.play().catch(() => {})
@@ -1218,7 +1326,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   ) : null
 
   return (
-    <div ref={previewContainerRef} className={`global-preview${stage ? ` remix-stage remix-stage-${recorderGuide.mode}` : ''}${compact ? ` compact-global-preview compact-${compactSize}` : ` size-${size}`}${isVerticalVideo ? ' vertical-video' : ''} aspect-${activeAspectRatio?.replace(':', '-') || '16-9'}`}>
+    <div ref={previewContainerRef} className={`global-preview${audioMode ? ' audio-mode' : ''}${stage ? ` remix-stage remix-stage-${recorderGuide.mode}` : ''}${compact ? ` compact-global-preview compact-${compactSize}` : ` size-${size}`}${isVerticalVideo ? ' vertical-video' : ''} aspect-${activeAspectRatio?.replace(':', '-') || '16-9'}`}>
       {!compact && (
         <div className="global-preview-header">
           <h3>Timeline Preview</h3>
@@ -1244,7 +1352,18 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       <div className={`global-preview-video-wrap${inlineRecording && recSize === 'big' ? ' with-big-recorder' : ''}${inlineRecording && recSize === 'big' && !hasAnyVideo ? ' no-preview' : ''}${isVerticalVideo ? ' vertical-layout' : ''}`}>
         <PreviewColumn own={ownPlayer} controls={ownControls}>
         <div className="global-preview-video">
-          {videoClips.length > 0 ? (
+          {audioMode ? (
+            <AudioStage
+              tracks={tracks}
+              playheadPosition={playheadPosition}
+              totalDuration={totalDuration}
+              onSeek={(pos) => { if (isPlayingRef.current) playFrom(pos); else seekTo(pos) }}
+              nowPlaying={currentAudioClips.filter(c => !c.templateRole).map(c => c.name).join(' + ') || currentAudioClips.map(c => c.name).join(' + ')}
+              duck={duck}
+              chapters={chapters}
+              emptyActions={emptyActions}
+            />
+          ) : videoClips.length > 0 ? (
             <div className="preview-layer-container" ref={layerContainerRef}>
               {currentClips.length > 0 ? (
                 [...heldClips, ...reversedClips, ...upcomingClips].map((clip) => {
@@ -1589,14 +1708,25 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
 
           {/* Audio track playback: <audio> (a video file's picture is never
               decoded for it), mounted only for clips playing now or about to */}
-          {mountedAudioClips.map(clip => (
-            <audio
-              key={`audio-${clip.id}`}
-              ref={el => { audioRefs.current[clip.id] = el }}
-              preload="auto"
-              src={clip.url}
-            />
-          ))}
+          {mountedAudioClips.map(clip => {
+            // above 100%: a new element (key) that may go through a gain node
+            const boosted = clipVolume(clip) > 1
+            return (
+              <audio
+                key={`audio-${clip.id}${boosted ? '-boost' : ''}`}
+                ref={el => {
+                  // React clears the old ref (null) before it sets a new one for
+                  // the same clip, so null always means this clip's element left
+                  if (el) { audioRefs.current[clip.id] = el; liveAudioElsRef.current.add(el) } else delete audioRefs.current[clip.id]
+                }}
+                preload="auto"
+                crossOrigin={boosted ? 'anonymous' : undefined}
+                data-boost={boosted ? '1' : undefined}
+                data-clip-id={clip.id}
+                src={clip.url}
+              />
+            )
+          })}
 
           {inlineRecording && recSize === 'small' && (
             <InlineRecorder
@@ -1653,7 +1783,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         <span className="time-display">
           {formatTime(playheadPosition)} / {formatTime(totalDuration)}
         </span>
-        {compact && (
+        {compact && !audioMode && (
           <div className="compact-size-controls">
             <button
               className={compactSize === 'half' ? 'active' : ''}

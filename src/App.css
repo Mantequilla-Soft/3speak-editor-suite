@@ -187,6 +187,21 @@ body {
   opacity: 0.8;
 }
 
+.branding-help-btn {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.branding-help-btn:hover {
+  opacity: 1;
+}
+
 .branding-info-popup {
   position: absolute;
   top: calc(100% + 6px);
@@ -2135,9 +2150,12 @@ body {
   padding: 0 2px;
 }
 
+/* The bars always span the whole clip: bar i is the i-th slice of its time
+   (the bar count follows the clip's width, about one per 6px). A width cap
+   here packed them to the left, so they ran ahead of the audio. */
 .wave-bar {
-  flex: 1;
-  max-width: 4px;
+  flex: 1 1 0;
+  min-width: 0;
   background: #60a5fa;
   border-radius: 1px;
   opacity: 0.5;
@@ -2979,7 +2997,38 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  width: 100%;
   color: var(--text-secondary);
+}
+
+/* The voice graph: live mic level while checking and recording, the whole
+   take's shape afterwards */
+.record-voice-graph {
+  display: block;
+  width: 100%;
+  height: 96px;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary, rgba(127, 127, 127, 0.08));
+  border-radius: 8px;
+}
+
+.record-voice-graph.recording {
+  color: #ef4444;
+}
+
+.record-audio-indicator audio {
+  width: 100%;
+}
+
+.record-busy {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* until the player knows the take's full length */
+.record-audio-loading {
+  visibility: hidden;
 }
 
 .record-audio-indicator .recording-pulse {
@@ -6102,4 +6151,749 @@ input[type="range"] {
 
 .properties-groups.tabbed .color-group-label > span:first-child {
   visibility: hidden;
+}
+
+/* ===================== Audio editor (?mode=audio) ===================== */
+
+.audio-stage {
+  --audio-stage-voice: #60a5fa;
+  --audio-stage-music: #a78bfa;
+  --audio-stage-template: #34d399;
+  --audio-stage-lane: rgba(148, 163, 184, 0.10);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+  min-height: 160px;
+  padding: 0.75rem;
+  box-sizing: border-box;
+  color: var(--text-primary);
+}
+
+.audio-stage-now {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.audio-stage-time {
+  font-size: 1.6rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.audio-stage-total {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.audio-stage-clip {
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  max-width: 50%;
+}
+
+.audio-stage-overview {
+  position: relative;
+  flex: 1;
+  min-height: 90px;
+  border-radius: 6px;
+  background: var(--bg-tertiary);
+  cursor: pointer;
+  touch-action: none;
+  overflow: hidden;
+}
+
+.audio-stage-overview:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.audio-stage-overview canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.audio-stage-playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--accent-primary);
+  pointer-events: none;
+}
+
+.audio-stage-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.audio-stage-lane-name::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 4px;
+  border-radius: 2px;
+  background: var(--audio-stage-voice);
+}
+
+.audio-stage-lane-name.music::before {
+  background: var(--audio-stage-music);
+}
+
+.audio-stage-lane-name.muted {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.audio-stage-empty {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.audio-stage-empty p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.audio-stage-empty-icon {
+  color: var(--text-muted);
+}
+
+/* the audio editor has no picture: the stage takes a calm, fixed height */
+.global-preview.audio-mode .global-preview-video {
+  aspect-ratio: auto;
+  height: clamp(170px, 28vh, 320px);
+  width: 100%;
+  max-width: none;
+  background: var(--bg-secondary);
+}
+
+.global-preview.audio-mode .global-preview-video-wrap {
+  width: 100%;
+}
+
+/* Menu bar tools (Cut silences, Template, Level) */
+.compact-tool-btn {
+  width: auto;
+  padding: 0 0.55rem;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.compact-tool-btn.active {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  background: var(--accent-light);
+}
+
+.compact-tool-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  /* phones: icons only, the title says what each does */
+  .compact-tool-btn span {
+    display: none;
+  }
+  .compact-tool-btn {
+    width: 32px;
+    padding: 0;
+  }
+}
+
+.audio-cut-progress,
+.audio-template-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.audio-template-notice .compact-btn {
+  width: auto;
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
+}
+
+/* Clip settings: fades */
+.fade-slider .fade-label {
+  min-width: 2rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Cut silences: "Cut all N voice clips" sits beside "This clip only" */
+.silence-cut-apply-all {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--accent-primary);
+}
+
+/* Template dialog */
+.audio-template {
+  max-width: 560px;
+  width: calc(100vw - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+}
+
+.audio-template-intro,
+.audio-template-hint {
+  margin: 0 0 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.audio-template-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.audio-template-slot {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.6rem 0.7rem;
+  background: var(--bg-secondary);
+}
+
+.audio-template-slot-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin-bottom: 0.4rem;
+}
+
+.audio-template-slot-head small {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.audio-template-slot-body {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.audio-template-file {
+  flex: 1;
+  min-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+}
+
+.audio-template-file em {
+  font-style: normal;
+  color: var(--text-secondary);
+  margin-left: 0.25rem;
+}
+
+.audio-template-file.empty {
+  color: var(--text-muted);
+}
+
+.audio-template-slot-actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.audio-template-slot-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.55rem;
+  font-size: 0.78rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.audio-template-slot-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.audio-template-bed {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.audio-template-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0.8rem 0 0.4rem;
+}
+
+.audio-template-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.audio-template-check small {
+  color: var(--text-secondary);
+}
+
+.audio-template-error {
+  color: var(--accent-primary);
+  font-size: 0.85rem;
+  margin: 0.4rem 0;
+}
+
+.audio-template-actions {
+  flex-wrap: wrap;
+}
+
+.audio-template-spacer {
+  flex: 1;
+}
+
+.audio-template-delete {
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+.audio-template-signin {
+  width: 100%;
+  justify-content: center;
+}
+
+.audio-preview-player {
+  width: min(520px, 80vw);
+}
+
+/* Audio editor: chapters */
+.audio-chapters-list {
+  list-style: none;
+  margin: 0 0 0.6rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 45dvh;
+  overflow-y: auto;
+}
+
+.audio-chapters-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.audio-chapters-list li.skipped {
+  opacity: 0.5;
+}
+
+.audio-chapters-list input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.audio-chapters-time {
+  min-width: 4.2rem;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.audio-chapters-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.audio-chapters kbd {
+  padding: 0 0.3rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+/* Chapter flags on the timeline ruler and the audio stage */
+.ruler-chapter {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 2px solid var(--accent-primary);
+  z-index: 2;
+  cursor: pointer;
+}
+
+.ruler-chapter span {
+  position: absolute;
+  top: 0;
+  left: 2px;
+  max-width: 120px;
+  padding: 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.65rem;
+  line-height: 1.2;
+  color: #fff;
+  background: var(--accent-primary);
+  border-radius: 0 3px 3px 0;
+}
+
+.audio-stage-chapter {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed var(--accent-primary);
+  pointer-events: none;
+}
+
+.audio-stage-chapter span {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+}
+
+.audio-stage-chapter-now {
+  color: var(--accent-primary);
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Audio editor: the duck menu */
+.audio-duck {
+  position: relative;
+}
+
+.audio-duck-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 50;
+  min-width: 230px;
+  padding: 0.4rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.audio-duck-menu p {
+  margin: 0.2rem 0.3rem 0.4rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.audio-duck-menu button {
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.audio-duck-menu button[aria-checked='true'] {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+/* Audio editor: audiogram */
+.audiogram-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 0.7rem;
+}
+
+.audiogram-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.audiogram-field input,
+.audiogram-field select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.audiogram-preview {
+  display: block;
+  margin: 0 auto 0.7rem;
+  max-width: 100%;
+  max-height: 40dvh;
+  border-radius: 8px;
+  background: #000;
+}
+
+.audiogram a.silence-cut-apply {
+  text-decoration: none;
+}
+
+/* Box select on the timeline (drag from an empty spot over clips) */
+.timeline-marquee {
+  position: absolute;
+  z-index: 40;
+  border: 1px solid var(--accent-primary);
+  background: color-mix(in srgb, var(--accent-primary) 12%, transparent);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* Several clips selected: group / remove them all */
+.multi-action-btn + .multi-action-btn,
+.noise-hint + .multi-action-btn {
+  margin-top: 0.5rem;
+}
+
+.multi-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.multi-action-btn:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.multi-remove-btn:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+/* Phones: Select mode (tap each clip) */
+.select-mode-btn.active {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  background: var(--accent-light);
+}
+
+.timeline-select-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  background: var(--accent-light);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.timeline-select-hint span {
+  flex: 1;
+  min-width: 0;
+}
+
+/* A clip's Duck: "Goes down while [source] plays" */
+.duck-source {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.duck-source select {
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.25rem 0.4rem;
+  background: var(--bg-tertiary, var(--bg-secondary));
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+/* "Remove ...?" (components/ConfirmDialog.jsx, instead of window.confirm) */
+.confirm-dialog {
+  max-width: 360px;
+  padding: 16px;
+}
+
+.confirm-dialog-text {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.confirm-dialog-text svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--accent-primary);
+}
+
+/* An editor, not a page of text: dragging over the timeline or the panels
+   never paints a text selection. Fields you type in keep it. */
+.app {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.app input,
+.app textarea,
+.app [contenteditable="true"] {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
+/* Audio editor on desktop: the settings sit beside the stage only; the
+   timeline runs the full width underneath */
+.compact-top-row {
+  display: flex;
+  gap: 10px;
+  min-height: 0;
+  flex-shrink: 0;
+}
+
+.compact-top-row > .global-preview {
+  flex: 1;
+  min-width: 0;
+}
+
+/* elsewhere the wrapper is not a box of its own */
+.compact-stage-wrap {
+  display: contents;
+}
+
+/* contain: size = the panel takes the stage's height and scrolls inside;
+   its own content never makes the row taller */
+.compact-top-row > .compact-side {
+  align-self: stretch;
+  contain: size;
+}
+
+/* Dragging the ruler scrolls the timeline (Timeline.jsx handleRulerMouseDown) */
+.timeline-ruler.dragging,
+.timeline-ruler.dragging * {
+  cursor: grabbing;
+}
+
+/* Track number on the left (the clip settings name tracks by it: "2 · Music") */
+.track-number {
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 16px;
+  text-align: center;
+}
+
+/* Voice clean-up running (utils/cleaningStatus.js) */
+.noise-busy {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-primary);
+}
+
+.noise-levels button .encoding-notice-spin {
+  vertical-align: middle;
+}
+
+.cleaning-notice {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  max-width: calc(100vw - 32px);
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  font-size: 0.85rem;
+}
+
+.cleaning-notice small {
+  width: 100%;
+  padding-left: 23px;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
 }
