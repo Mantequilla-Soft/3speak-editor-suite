@@ -52,6 +52,15 @@ function voiceClipsOf(list) {
     .filter(c => !c.templateRole && c.audioEnabled !== false)
 }
 
+// Audio editor: what Cut silences can work on, clip by clip: any audio clip
+// on any track (a voice can end up on the Music track), not template parts
+function cuttableClipsOf(list) {
+  return list
+    .filter(t => t.type === 'audio' && t.muted !== true)
+    .flatMap(t => t.clips)
+    .filter(c => !c.templateRole && c.audioEnabled !== false)
+}
+
 // The audio editor's finishing settings, from a draft, a template or nothing
 const masterOf = (m) => ({
   loudness: m?.loudness !== false,
@@ -153,7 +162,7 @@ function App() {
   // (only where everyone is quiet, the same cut through every voice)
   const autoCutGroup = useMemo(() => {
     if (!isAudioMode || !autoCutClip?.groupId) return null
-    const members = voiceClipsOf(tracks).filter(c => c.groupId === autoCutClip.groupId)
+    const members = cuttableClipsOf(tracks).filter(c => c.groupId === autoCutClip.groupId)
     if (members.length < 2) return null
     return members.map(c => ({
       clip: c,
@@ -964,11 +973,16 @@ function App() {
   const voiceClips = useMemo(() => (audioMode ? voiceClipsOf(tracks) : []), [audioMode, tracks])
 
   // "Cut silences" opens on the selected voice clip, else the longest one
+  // Cut silences works on a clip (its group, if it has one): the selected one,
+  // on any track; with none selected the longest voice clip, else the longest
+  // audio clip
+  const cuttableClips = useMemo(() => (audioMode ? cuttableClipsOf(tracks) : []), [audioMode, tracks])
   const openCutSilences = useCallback(() => {
-    const sel = voiceClips.find(c => c.id === selectedClipId)
-    const target = sel || [...voiceClips].sort((a, b) => (b.endTime - b.startTime) - (a.endTime - a.startTime))[0]
+    const longest = (list) => [...list].sort((a, b) => (b.endTime - b.startTime) - (a.endTime - a.startTime))[0]
+    const sel = cuttableClips.find(c => c.id === selectedClipId)
+    const target = sel || longest(voiceClips) || longest(cuttableClips)
     if (target) setAutoCutClipId(target.id)
-  }, [voiceClips, selectedClipId])
+  }, [voiceClips, cuttableClips, selectedClipId])
 
   // The same settings for every voice clip: last on the timeline first, so the
   // clips still to do are not moved by the cuts before them. Each file is read once.
@@ -1338,8 +1352,8 @@ function App() {
                 <button
                   className="compact-btn compact-tool-btn"
                   onClick={openCutSilences}
-                  disabled={!voiceClips.length || !!cutProgress}
-                  title={voiceClips.length ? 'Cut the silences out (find the pauses, cut them, close the gaps)' : 'Cut silences works on voice tracks: add a recording, or move it from the Music track onto a voice track (+ then Audio Track)'}
+                  disabled={!cuttableClips.length || !!cutProgress}
+                  title="Cut the silences out of the selected clip (or its group): find the pauses, cut them, close the gaps"
                   aria-label="Cut silences"
                 >
                   <AudioWaveform size={15} /><span>Cut silences</span>

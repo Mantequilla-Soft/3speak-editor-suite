@@ -1352,7 +1352,8 @@ function Timeline({
                 )}
               </div>
               <div className="track-label-bottom">
-                {onRemoveTrack && audioTracks.length > 1 && (
+                {/* the audio editor keeps its last voice track */}
+                {onRemoveTrack && audioTracks.length > 1 && !(audioMode && !track.music && audioTracks.filter(t => !t.music).length <= 1) && (
                   <button className="track-delete-btn" onClick={() => onRemoveTrack(track.id)} title="Remove track">
                     <Trash2 size={16} />
                   </button>

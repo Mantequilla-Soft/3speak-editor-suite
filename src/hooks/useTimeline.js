@@ -376,6 +376,13 @@ export function useTimeline() {
   // Tracks: array of { id, type: 'video' | 'audio', clips: [] }
   const [tracks, setTracks] = useState(initialTracks)
   const [selectedClipId, setSelectedClipId] = useState(null)
+
+  // The audio editor always has a voice track: a project that lost its last
+  // one (removed before that was blocked) gets an empty Voice track back
+  useEffect(() => {
+    if (!isAudioMode || !tracks.length || tracks.some(t => t.type === 'audio' && !t.music)) return
+    setTracks(prev => (prev.some(t => t.type === 'audio' && !t.music) ? prev : [{ id: generateTrackId(), type: 'audio', name: 'Voice', clips: [] }, ...prev]))
+  }, [tracks])
   // Several clips at once (drag a box on the timeline, Ctrl/Cmd+A, Shift-click):
   // two or more ids, and then selectedClipId is null
   const [selectedClipIds, setSelectedClipIds] = useState([])
@@ -1516,6 +1523,8 @@ export function useTimeline() {
 
       const sameTypeTracks = prev.filter(t => t.type === track.type)
       if (sameTypeTracks.length <= 1) return prev
+      // The audio editor keeps at least one voice track (recordings go there)
+      if (isAudioMode && track.type === 'audio' && !track.music && prev.filter(t => t.type === 'audio' && !t.music).length <= 1) return prev
 
       return prev.filter(t => t.id !== trackId)
     })
