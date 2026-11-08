@@ -247,6 +247,32 @@ export const cleanedFields = (clip, source, level, cleaned) => ({
 export const uncleanedFields = (clip, source) => ({ url: clip.denoiseLocalUrl || source, serverUrl: source, denoise: null, denoiseSourceUrl: null, denoiseLocalUrl: null })
 
 /**
+ * Voice clean-up for some clips, clip by clip: each recording among them is
+ * cleaned once (the cleaned copy is as long as the original, so every piece
+ * keeps its cut), and each clip gets its own fields. Clips not uploaded yet
+ * are left out. Resolves [{ id, updates }]. level null = Off.
+ */
+export async function cleanVoiceChanges(targets, level) {
+  const changes = []
+  if (!level) {
+    for (const t of targets) if (t.denoise) changes.push({ id: t.id, updates: uncleanedFields(t, recordingSource(t)) })
+    return changes
+  }
+  const bySource = new Map()
+  for (const t of targets) {
+    const source = recordingSource(t)
+    if (!canCleanSource(source)) continue
+    if (!bySource.has(source)) bySource.set(source, [])
+    bySource.get(source).push(t)
+  }
+  for (const [source, list] of bySource) {
+    const cleaned = await requestCleanVoice(source, level)
+    for (const t of list) changes.push({ id: t.id, updates: cleanedFields(t, source, level, cleaned) })
+  }
+  return changes
+}
+
+/**
  * Background-noise reduction for an audio clip: the backend cleans the
  * uploaded file (POST /api/clip/denoise) and the clip switches to the cleaned
  * audio, so preview and render both play it. Off switches back.
@@ -290,28 +316,26 @@ function FadeControls({ clip, onUpdateClip }) {
   )
 }
 
-function NoiseControls({ clip, onUpdateClip, onUpdateRecording = null }) {
+// voiceTargets (audio editor): the clip and the rest of its group; the
+// clean-up applies to them, never to other pieces of the same recording
+function NoiseControls({ clip, onUpdateClip, voiceTargets = null, onUpdateClipsEach = null }) {
   const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
-  // The uploaded original (kept while a cleaned version is in use)
-  const source = recordingSource(clip)
-  const canClean = canCleanSource(source)
-  // Audio editor: every piece of the recording at once (after Cut silences a
-  // recording is many clips), else just this clip
-  const apply = (updates) => (onUpdateRecording ? onUpdateRecording(source, updates) : onUpdateClip(updates))
-  const levels = onUpdateRecording ? [...NOISE_LEVELS, STUDIO_LEVEL] : NOISE_LEVELS
+  const audioEditor = !!(voiceTargets && onUpdateClipsEach)
+  const targets = audioEditor ? voiceTargets : [clip]
+  const canClean = targets.some(t => canCleanSource(recordingSource(t)))
+  const levels = audioEditor ? [...NOISE_LEVELS, STUDIO_LEVEL] : NOISE_LEVELS
+  const apply = (changes) => {
+    if (audioEditor) onUpdateClipsEach(changes)
+    else for (const ch of changes) if (ch.id === clip.id) onUpdateClip(ch.updates)
+  }
 
   const choose = async (level) => {
     setError(null)
-    if (!level) {
-      if (clip.denoise) apply(uncleanedFields(clip, source))
-      return
-    }
-    setBusy(level)
+    setBusy(level ?? 'off')
     try {
-      const cleaned = await requestCleanVoice(source, level)
       // denoiseLocalUrl: what the preview played before (often the local file), for Off
-      apply(cleanedFields(clip, source, level, cleaned))
+      apply(await cleanVoiceChanges(targets, level))
     } catch {
       setError('Noise reduction failed. Try again.')
     } finally {
@@ -321,7 +345,7 @@ function NoiseControls({ clip, onUpdateClip, onUpdateRecording = null }) {
 
   return (
     <div className="property-group">
-      <label>{onUpdateRecording ? 'Clean up the voice' : 'Reduce background noise'}</label>
+      <label>{audioEditor ? 'Clean up the voice' : 'Reduce background noise'}</label>
       {canClean ? (
         <div className="noise-levels" role="radiogroup" aria-label="Noise reduction">
           {levels.map(({ id, label, title }) => (
@@ -341,7 +365,9 @@ function NoiseControls({ clip, onUpdateClip, onUpdateRecording = null }) {
       ) : (
         <p className="noise-hint">Available once this clip has finished uploading.</p>
       )}
-      {onUpdateRecording && canClean && <p className="noise-hint">Applies to the whole recording, every piece of it.</p>}
+      {audioEditor && canClean && (
+        <p className="noise-hint">{targets.length > 1 ? `Applies to this clip and its group (${targets.length} clips).` : 'Applies to this clip only.'}</p>
+      )}
       {error && <p className="noise-hint error">{error}</p>}
     </div>
   )
@@ -703,7 +729,7 @@ function PositionDragHandle({ positionX, positionY, onChange }) {
 // The tab a phone user last picked, kept across clips (if the next clip has it)
 let lastTab = null
 
-function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, onUpdateRecording = null }) {
+function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, voiceTargets = null, onUpdateClipsEach = null }) {
   // Phones (tabbed): one section at a time, a tab per section. The sections
   // differ per clip type and come from several components, so the tabs are
   // read from the rendered sections (.prop-group and its label) after render.
@@ -1082,7 +1108,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                   <input
                     type="range"
                     min="0"
-                    max={onUpdateRecording && isAudio ? MAX_CLIP_VOLUME : 100}
+                    max={voiceTargets && isAudio ? MAX_CLIP_VOLUME : 100}
                     value={volume}
                     onChange={(e) => update({ volume: parseInt(e.target.value) })}
                     aria-label="Volume"
@@ -1101,7 +1127,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
 
           {isAudio && <FadeControls clip={clip} onUpdateClip={onUpdateClip} />}
 
-          {isAudio && <NoiseControls clip={clip} onUpdateClip={onUpdateClip} onUpdateRecording={onUpdateRecording} />}
+          {isAudio && <NoiseControls clip={clip} onUpdateClip={onUpdateClip} voiceTargets={voiceTargets} onUpdateClipsEach={onUpdateClipsEach} />}
         </div>
         )}
 

@@ -1,19 +1,20 @@
 import { useState } from 'react'
 import { Volume2, RotateCcw, Trash2 } from 'lucide-react'
 import { MAX_CLIP_VOLUME } from '../utils/audioGain'
-import { NOISE_LEVELS, STUDIO_LEVEL, recordingSource, canCleanSource, requestCleanVoice, cleanedFields, uncleanedFields } from './ClipProperties'
+import { NOISE_LEVELS, STUDIO_LEVEL, recordingSource, canCleanSource, cleanVoiceChanges } from './ClipProperties'
 import { commonValue, sourcesOf } from '../utils/multiSelect'
 
 /**
  * Settings for several selected clips at once (box select on the timeline):
  * volume and mute for all of them and, in the audio editor, the voice
- * clean-up for every recording they come from.
+ * clean-up for them (and the groups they are in), clip by clip.
  *
  * clips: the clips whose sound to change (a video's linked audio clip in its
  * place); onUpdateClips(updates) sets the same fields on all of them;
- * onUpdateRecording(source, updates) changes every piece of one recording.
+ * voiceTargets: the clips the clean-up applies to (the selection plus their
+ * groups); onUpdateClipsEach([{ id, updates }]) gives each its own fields.
  */
-export default function MultiClipProperties({ clips, audioMode = false, onUpdateClips, onUpdateRecording, onRemove, count }) {
+export default function MultiClipProperties({ clips, audioMode = false, onUpdateClips, voiceTargets = null, onUpdateClipsEach = null, onRemove, count }) {
   const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
 
@@ -23,25 +24,19 @@ export default function MultiClipProperties({ clips, audioMode = false, onUpdate
   const allMuted = clips.length > 0 && clips.every(c => c.audioEnabled === false)
   const maxVolume = audioMode ? MAX_CLIP_VOLUME : 100
 
-  // Voice clean-up: per recording (after Cut silences a recording is many clips)
-  const sources = sourcesOf(clips, recordingSource).filter(canCleanSource)
-  const level = commonValue(clips.map(c => c.denoise || null))
+  // Voice clean-up: these clips only (each recording is cleaned once)
+  const targets = voiceTargets || clips
+  const sources = sourcesOf(targets, recordingSource).filter(canCleanSource)
+  const level = commonValue(targets.map(c => c.denoise || null))
   const levels = [...NOISE_LEVELS, STUDIO_LEVEL]
-  const waiting = clips.some(c => !canCleanSource(recordingSource(c)))
+  const waiting = targets.some(c => !canCleanSource(recordingSource(c)))
+  const extra = targets.length - clips.length
 
   const chooseLevel = async (id) => {
     setError(null)
     setBusy(id ?? 'off')
     try {
-      for (const source of sources) {
-        const piece = clips.find(c => recordingSource(c) === source)
-        if (!id) {
-          if (piece.denoise) onUpdateRecording(source, uncleanedFields(piece, source))
-          continue
-        }
-        const cleaned = await requestCleanVoice(source, id)
-        onUpdateRecording(source, cleanedFields(piece, source, id, cleaned))
-      }
+      onUpdateClipsEach(await cleanVoiceChanges(targets, id))
     } catch {
       setError('Cleaning up the voice failed. Try again.')
     } finally {
@@ -77,7 +72,7 @@ export default function MultiClipProperties({ clips, audioMode = false, onUpdate
         </button>
       </div>
 
-      {audioMode && onUpdateRecording && (
+      {audioMode && onUpdateClipsEach && (
         <div className="property-group">
           <label>Clean up the voice</label>
           {sources.length ? (
@@ -101,7 +96,7 @@ export default function MultiClipProperties({ clips, audioMode = false, onUpdate
           )}
           {sources.length > 0 && (
             <p className="noise-hint">
-              Applies to {sources.length === 1 ? 'the whole recording' : `all ${sources.length} recordings`} these clips come from.
+              Applies to the {clips.length} selected clips{extra > 0 ? ` and the ${extra} other clip${extra === 1 ? '' : 's'} in their groups` : ''}.
               {waiting ? ' Clips still uploading are left as they are.' : ''}
             </p>
           )}

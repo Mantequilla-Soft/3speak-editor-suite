@@ -351,10 +351,21 @@ try {
     await f.getByRole('button', { name: 'Use this audio' }).first().waitFor({ timeout: 90000 })
     const mp3 = path.join(DATA, 'rendered', fs.readdirSync(path.join(DATA, 'rendered')).filter(x => x.endsWith('.mp3') && !x.startsWith('cache-')).map(x => [x, fs.statSync(path.join(DATA, 'rendered', x)).mtimeMs]).sort((a, b) => b[1] - a[1])[0][0])
     assert.ok(Math.abs(ffDuration(mp3) - hostEnd) < 0.15, `mp3 ${ffDuration(mp3)} s vs timeline ${hostEnd} s`)
+    // a grouped piece: Studio voice goes to its group (host AND guest piece,
+    // two recordings), and to nothing else
+    const pair = [hostPiece.id, guestTalk.id]
+    await f.locator(`.timeline-clip-v2[data-clip-id="${hostPiece.id}"]`).click()
+    assert.match(await f.locator('.noise-hint').first().innerText(), /and its group \(2 clips\)/)
+    await f.getByRole('radio', { name: 'Studio voice' }).click()
+    await until(() => drafts().find(p => {
+      const voices = clipsOf(p.state).filter(c => !c.music)
+      const studio = voices.filter(c => /_dn-studio\.m4a/.test(c.url)).map(c => c.id).sort()
+      return studio.join() === [...pair].sort().join()
+    }), 'the grouped pair cleaned, nothing else', 60000)
     await g.ctx.close()
   })
 
-  await step('podcast tools: chapters follow the cuts into the MP3 and the post, Studio voice on the whole recording, music ducked, audiogram', async () => {
+  await step('podcast tools: chapters follow the cuts into the MP3 and the post, Studio voice on one piece, music ducked, audiogram', async () => {
     fs.rmSync(projectsDir, { recursive: true, force: true })
     const p = await openEditor()
     const f = p.frame
@@ -383,13 +394,15 @@ try {
     await until(async () => /cuts/.test(await f.locator('.silence-cut-summary').innerText().catch(() => '')), 'cut plan summary')
     await f.getByRole('button', { name: /Edit for me|This clip only/ }).click()
     await until(async () => (await f.locator('.timeline-clip-v2.audio').count()) === 4, 'three speech parts + music')
-    // Studio voice on one piece cleans every piece of the recording
+    // Studio voice on one piece cleans that piece only (clip level; a group would go along)
+    const firstPiece = await f.locator('.timeline-clip-v2.audio').first().getAttribute('data-clip-id')
     await f.locator('.timeline-clip-v2.audio').first().click()
+    assert.match(await f.locator('.noise-hint').first().innerText(), /this clip only/)
     await f.getByRole('radio', { name: 'Studio voice' }).click()
     const d = await until(() => drafts().find(x => {
       const voice = clipsOf(x.state).filter(c => !c.music)
-      return voice.length === 3 && voice.every(c => /_dn-studio\.m4a/.test(c.url))
-    }), 'every piece on the studio copy', 45000)
+      return voice.length === 3 && voice.filter(c => /_dn-studio\.m4a/.test(c.url)).map(c => c.id).join() === firstPiece
+    }), 'only that piece on the studio copy', 45000)
     assert.deepEqual(d.state.master, { loudness: true, duck: true, duckDb: -12 })
     assert.equal(d.state.chapters.length, 2)
     assert.equal(d.state.chapters[1].title, 'Second part')

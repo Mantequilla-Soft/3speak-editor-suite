@@ -1160,13 +1160,22 @@ function App() {
 
   // Audio editor: a change to every clip of one recording (by its uploaded
   // original; Cut silences makes many clips of one file), one undo step
-  const updateRecording = useCallback((source, updates) => {
-    if (!source) return
-    applyTracks(ts => ts.map(t => ({
-      ...t,
-      clips: t.clips.map(c => ((c.denoiseSourceUrl || c.serverUrl) === source ? { ...c, ...updates } : c))
-    })))
+  // Clip by clip, each its own fields, one undo step (voice clean-up)
+  const updateClipsEach = useCallback((changes) => {
+    if (!changes?.length) return
+    const byId = new Map(changes.map(ch => [ch.id, ch.updates]))
+    applyTracks(ts => ts.map(t => ({ ...t, clips: t.clips.map(c => (byId.has(c.id) ? { ...c, ...byId.get(c.id) } : c)) })))
   }, [applyTracks])
+
+  // Audio clips plus the rest of their groups (not template parts): what the
+  // voice clean-up applies to (clip level, except a clip in a group)
+  const withGroups = (clips) => {
+    const all = tracks.filter(t => t.type === 'audio').flatMap(t => t.clips).filter(c => !c.templateRole)
+    const groups = new Set(clips.map(c => c.groupId).filter(Boolean))
+    const out = new Map(clips.filter(c => c.type === 'audio').map(c => [c.id, c]))
+    for (const c of all) if (groups.has(c.groupId)) out.set(c.id, c)
+    return [...out.values()]
+  }
 
   // The audio-track clip a video's sound plays from (same group, type audio)
   const linkedAudioOf = (clip) => (clip?.type === 'video' && clip.groupId
@@ -1217,7 +1226,8 @@ function App() {
               clips={multiTargets}
               audioMode={audioMode}
               onUpdateClips={updateClips}
-              onUpdateRecording={audioMode ? updateRecording : null}
+              voiceTargets={audioMode ? withGroups(multiTargets) : null}
+              onUpdateClipsEach={audioMode ? updateClipsEach : null}
               onRemove={() => handleRemoveClips(multiClips.map(c => c.id))}
               count={multiClips.length}
             />
@@ -1241,7 +1251,8 @@ function App() {
               onUpdateLinkedAudio={(u) => { const a = linkedAudioOf(sideClip); if (a) updateClip(a.id, u) }}
               onUpdateClip={(updates) => updateClip(sideClip.id, updates)}
               onSplit={() => splitClip(sideClip.id)}
-              onUpdateRecording={audioMode ? updateRecording : null}
+              voiceTargets={audioMode ? withGroups([sideClip]) : null}
+              onUpdateClipsEach={audioMode ? updateClipsEach : null}
               playheadPosition={playheadPosition}
               tabbed={!isDesktop}
             />
