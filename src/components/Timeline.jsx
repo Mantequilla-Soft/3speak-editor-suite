@@ -1110,10 +1110,13 @@ function Timeline({
     if (input) input.click()
   }, [])
 
+  // Files from a track's + menu: audio goes in at the playhead (useTimeline)
+  const playheadNowRef = useRef(playheadPosition)
+  playheadNowRef.current = playheadPosition
   const handleTrackFileChange = useCallback((e, trackId) => {
     const files = Array.from(e.target.files)
     if (files.length > 0 && onAddFilesToTrack) {
-      onAddFilesToTrack(files, trackId)
+      onAddFilesToTrack(files, trackId, playheadNowRef.current)
     }
     e.target.value = ''
   }, [onAddFilesToTrack])
@@ -1524,17 +1527,17 @@ function Timeline({
                           <Music size={14} /> Add Audio File
                         </button>
                         {onOpenMusic && (
-                          <button onClick={() => { onOpenMusic(); setTrackAddPopup(null) }}>
+                          <button onClick={() => { onOpenMusic(track.id); setTrackAddPopup(null) }}>
                             <Music size={14} /> Music Library
                           </button>
                         )}
                         {onOpenSfx && (
-                          <button onClick={() => { onOpenSfx(); setTrackAddPopup(null) }}>
+                          <button onClick={() => { onOpenSfx(track.id); setTrackAddPopup(null) }}>
                             <AudioLines size={14} /> Sound Effects
                           </button>
                         )}
                         {onRecordAudio && (
-                          <button onClick={() => { onRecordAudio(); setTrackAddPopup(null) }}>
+                          <button onClick={() => { onRecordAudio(track.id); setTrackAddPopup(null) }}>
                             <Mic size={14} /> Record Audio
                           </button>
                         )}

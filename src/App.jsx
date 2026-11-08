@@ -641,7 +641,8 @@ function App() {
   }, [addToLibrary])
 
   // Add recorded files directly to library AND timeline
-  const handleRecordedFiles = useCallback(async (files) => {
+  // `place` { trackId, at }: a recording from a track's + menu goes there
+  const handleRecordedFiles = useCallback(async (files, place = null) => {
     for (const file of files) {
       const type = file.type.startsWith('video') ? 'video' : file.type.startsWith('audio') ? 'audio' : null
       if (!type) continue
@@ -650,7 +651,7 @@ function App() {
       const preUploadedUrl = file._serverUrl || null
       const url = preUploadedUrl || URL.createObjectURL(file)
       // durationHint: the recorder's own clock, for recordings that don't carry a length
-      const added = await addToLibraryAndTimeline(url, file.name, type, { file, serverUrl: preUploadedUrl, durationHint: file._durationHint })
+      const added = await addToLibraryAndTimeline(url, file.name, type, { file, serverUrl: preUploadedUrl, durationHint: file._durationHint, ...(place || {}) })
       // Green screen take from the camera recorder
       if (added?.clipId && type === 'video' && file._chromaKey) updateClip(added.clipId, { chromaKey: file._chromaKey })
     }
@@ -679,6 +680,15 @@ function App() {
   const [recordingAudioOpen, setRecordingAudioOpen] = useState(false)
   const [musicOpen, setMusicOpen] = useState(false)
   const [sfxOpen, setSfxOpen] = useState(false)
+  // The track whose + menu opened Music / Sound effects / Record audio (null:
+  // the general add). The new audio goes on it, at the playhead.
+  const [addTarget, setAddTarget] = useState(null)
+  const openAdd = useCallback((what, trackId = null) => {
+    setAddTarget(typeof trackId === 'string' ? trackId : null)
+    if (what === 'music') setMusicOpen(true)
+    else if (what === 'sfx') setSfxOpen(true)
+    else setRecordingAudioOpen(true)
+  }, [])
   const [stickersOpen, setStickersOpen] = useState(false)
   const [inlineRecordingOpen, setInlineRecordingOpen] = useState(false)
   const [recorderSize, setRecorderSize] = useState('small') // 'small' | 'big'
@@ -838,10 +848,13 @@ function App() {
   }, [remixSession, handleRecordedFiles, tracks, updateClip, addRemixRecording, selectClip, setPlayheadPosition])
 
   // Music library: the song lands on its own track and is selected
+  // From a track's + menu: on that track at the playhead. The audio editor's
+  // general add: a music track at the playhead. Shorts: background music from 0:00.
   const handlePickMusic = useCallback(async (track) => {
-    const clipId = await addMusicClip(track.url, `${track.title} - ${track.artist}`, track.credit, track.bpm)
+    const place = addTarget ? { trackId: addTarget, at: playheadPosition } : audioMode ? { at: playheadPosition } : null
+    const clipId = await addMusicClip(track.url, `${track.title} - ${track.artist}`, track.credit, track.bpm, place)
     if (clipId) selectClip(clipId)
-  }, [addMusicClip, selectClip])
+  }, [addMusicClip, selectClip, addTarget, playheadPosition, audioMode])
 
   // Stickers go in at the playhead (on a "Stickers" track above the footage)
   const handlePickSticker = useCallback((sticker) => {
@@ -851,9 +864,9 @@ function App() {
 
   // Sound effects go in at the playhead
   const handlePickSfx = useCallback(async (track) => {
-    const clipId = await addSfxClip(track.url, track.title, playheadPosition)
+    const clipId = await addSfxClip(track.url, track.title, playheadPosition, addTarget)
     if (clipId) selectClip(clipId)
-  }, [addSfxClip, selectClip, playheadPosition])
+  }, [addSfxClip, selectClip, playheadPosition, addTarget])
 
   // Credits of the library songs still on the timeline, once each, sent with
   // the video so 3speak.tv can credit them (and pay 3Speak sound creators)
@@ -932,10 +945,10 @@ function App() {
       <button type="button" onClick={() => emptyAudioInputRef.current?.click()}>
         <Upload size={22} /> <span>Add recording</span>
       </button>
-      <button type="button" onClick={() => setRecordingAudioOpen(true)}>
+      <button type="button" onClick={() => openAdd('record')}>
         <Mic size={22} /> <span>Record</span>
       </button>
-      <button type="button" onClick={() => setMusicOpen(true)}>
+      <button type="button" onClick={() => openAdd('music')}>
         <Music size={22} /> <span>Music</span>
       </button>
       <input ref={emptyAudioInputRef} type="file" accept="audio/*,video/*" multiple hidden onChange={(e) => addFilesFromEmpty(e, 'audio')} />
@@ -1631,9 +1644,9 @@ function App() {
             onMoveClipToTrack={moveClipToTrack}
             onAddFilesToTrack={addFilesToTrack}
             onOpenClipSettings={(clipId) => setCompactPropertiesClipId(clipId)}
-            onRecordAudio={() => setRecordingAudioOpen(true)}
-            onOpenMusic={() => setMusicOpen(true)}
-            onOpenSfx={() => setSfxOpen(true)}
+            onRecordAudio={(trackId) => openAdd('record', trackId)}
+            onOpenMusic={(trackId) => openAdd('music', trackId)}
+            onOpenSfx={(trackId) => openAdd('sfx', trackId)}
             onOpenStickers={audioMode ? undefined : () => setStickersOpen(true)}
             onRecordVideo={audioMode ? undefined : openRecorder}
             onReverseClip={audioMode ? undefined : handleReverseClip}
@@ -1791,7 +1804,7 @@ function App() {
         {/* Record Audio Modal */}
         {recordingAudioOpen && (
           <RecordAudio
-            onRecorded={handleRecordedFiles}
+            onRecorded={(files) => handleRecordedFiles(files, addTarget ? { trackId: addTarget, at: playheadPosition } : null)}
             onClose={() => setRecordingAudioOpen(false)}
           />
         )}
@@ -2058,9 +2071,9 @@ function App() {
               onLibraryDrop={handleTimelineDrop}
               onMoveClipToTrack={moveClipToTrack}
               onAddFilesToTrack={addFilesToTrack}
-              onRecordAudio={() => setRecordingAudioOpen(true)}
-              onOpenMusic={() => setMusicOpen(true)}
-              onOpenSfx={() => setSfxOpen(true)}
+              onRecordAudio={(trackId) => openAdd('record', trackId)}
+              onOpenMusic={(trackId) => openAdd('music', trackId)}
+              onOpenSfx={(trackId) => openAdd('sfx', trackId)}
               onOpenStickers={() => setStickersOpen(true)}
               onRecordVideo={openRecorder}
               onReverseClip={handleReverseClip}
@@ -2199,7 +2212,7 @@ function App() {
       {/* Record Audio Modal */}
       {recordingAudioOpen && (
         <RecordAudio
-          onRecorded={handleRecordedFiles}
+          onRecorded={(files) => handleRecordedFiles(files, addTarget ? { trackId: addTarget, at: playheadPosition } : null)}
           onClose={() => setRecordingAudioOpen(false)}
         />
       )}

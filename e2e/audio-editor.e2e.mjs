@@ -897,6 +897,40 @@ try {
     await w.ctx.close()
   })
 
+  await step('audio added from a track\'s + goes on that track at the playhead (a new track below when the spot is taken)', async () => {
+    if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
+    const r = await openEditor()
+    const f = r.frame
+    await f.locator('.timeline-clip-v2.audio').first().waitFor({ timeout: 15000 })
+    const voiceId = await f.locator('.timeline-clip-v2.audio').first().getAttribute('data-clip-id')
+    await until(() => drafts().find(p => clipsOf(p.state).some(c => c.id === voiceId && /\/api\/upload\/files\//.test(c.url || ''))), 'uploaded', 45000)
+    // playhead to 3.0 s (on the voice clip, the Music track is empty there)
+    await f.locator('.timeline-content').click({ position: { x: 3, y: 60 } }).catch(() => {})
+    for (let i = 0; i < 30; i++) await r.page.keyboard.press('ArrowRight')
+    const labels = f.locator('.track-label.audio')
+    // the Music track's + -> Add Audio File
+    await labels.nth(1).locator('input[type=file]').setInputFiles(path.join(HOST_DIR, 'outro.wav'))
+    const placed = await until(() => {
+      const p = drafts()[0]
+      const music = p && p.state.tracks.find(t => t.music)
+      return music?.clips.find(c => /outro/.test(c.name) && /\/api\/upload\/files\//.test(c.url || '')) || null
+    }, 'outro on the Music track', 30000)
+    assert.ok(Math.abs(placed.timelinePosition - 3) < 0.15, `at the playhead: ${placed.timelinePosition}`)
+    assert.equal(drafts()[0].state.tracks.filter(t => t.type === 'audio').length, 2, 'no new track')
+    // the Voice track's + while the playhead is on its clip: a new track right below Voice, at the playhead
+    await labels.nth(0).locator('input[type=file]').setInputFiles(path.join(HOST_DIR, 'intro.wav'))
+    const after = await until(() => {
+      const p = drafts()[0]
+      const ts = p && p.state.tracks.filter(t => t.type === 'audio')
+      return ts && ts.length === 3 && ts[1].clips.some(c => /intro/.test(c.name) && /\/api\/upload\/files\//.test(c.url || '')) ? ts : null
+    }, 'intro on a new track below Voice', 30000)
+    assert.equal(after[0].clips.length, 1, 'the voice clip is untouched')
+    assert.ok(!after[1].music, 'a voice track like the one it came from')
+    assert.ok(Math.abs(after[1].clips[0].timelinePosition - 3) < 0.15, `at the playhead: ${after[1].clips[0].timelinePosition}`)
+    assert.ok(after[2].music, 'Music stays below')
+    await r.ctx.close()
+  })
+
   await step('the shorts video editor is unchanged (no mode, Video 1 + Audio 1, Render, no audio tools)', async () => {
     const v = await openEditor({ file: null, mode: 'video' })
     const ready = await v.page.evaluate(() => window.__messages.find(m => m.type === 'editor-ready'))

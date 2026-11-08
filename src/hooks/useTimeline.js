@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react'
+import { fitAt, placeOnTrack } from '../utils/placement'
 import { finiteDuration, isUsableDuration, pickDuration } from '../utils/mediaDuration'
 import { isHlsUrl, getHlsDuration } from '../utils/hlsHelper'
 import { downloadHlsToMp4 } from '../utils/hlsDownloader'
@@ -692,10 +693,21 @@ export function useTimeline() {
     return item
   }, [])
 
+  // A new track like `track` (same kind: voice / music / SFX / video), for a
+  // clip that has no room at the playhead on the track it was added to
+  const trackLike = useCallback((track, all) => {
+    const kind = (t) => t.type === track.type && !!t.music === !!track.music && !!t.sfx === !!track.sfx
+    const n = all.filter(kind).length + 1
+    const name = track.music ? `Music ${n}` : track.sfx ? `SFX ${n}` : track.type === 'video' ? `Video ${n}` : isAudioMode ? `Voice ${n}` : `Audio ${n}`
+    return { id: generateTrackId(), type: track.type, name, ...(track.music ? { music: true } : {}), ...(track.sfx ? { sfx: true } : {}) }
+  }, [])
+
   // Music library: the song goes on its own "Music" track (never paired with a
   // video track), from 0:00, cut to the length of the video content, at half
   // volume so voices stay on top. `credit` rides along into the post.
-  const addMusicClip = useCallback(async (url, name, credit, bpm = null) => {
+  // `place` { trackId?, at? }: from a track's + menu (that track, at the
+  // playhead), or the audio editor's general add (a music track, at the playhead)
+  const addMusicClip = useCallback(async (url, name, credit, bpm = null, place = null) => {
     const meta = await getMediaMetadataFromURL(url, 'audio')
     const duration = meta.duration
     if (!duration) return null
@@ -739,6 +751,19 @@ export function useTimeline() {
         ...(bpm ? { bpm } : {}),
         ...(credit ? { credit } : {})
       }
+      // At the playhead: on the chosen track, or (audio editor) the first music
+      // track with room there, else a new music track
+      if (place && Number.isFinite(place.at)) {
+        const whole = { ...clip, endTime: duration }
+        if (place.trackId) {
+          const placed = placeOnTrack(prev, place.trackId, whole, place.at, (t) => trackLike(t, prev))
+          if (placed) return placed
+        }
+        const roomy = prev.find(t => t.type === 'audio' && t.music && fitAt(t.clips, place.at, duration))
+        if (roomy) return placeOnTrack(prev, roomy.id, whole, place.at, (t) => trackLike(t, prev))
+        const musicCount = prev.filter(t => t.type === 'audio' && t.music).length
+        return [...prev, { id: generateTrackId(), type: 'audio', name: musicCount ? `Music ${musicCount + 1}` : 'Music', music: true, clips: [{ ...whole, timelinePosition: Math.max(0, place.at) }] }]
+      }
       // Reuse an empty music track, else add one below the others
       const free = prev.find(t => t.type === 'audio' && t.music && t.clips.length === 0)
       if (free) {
@@ -754,7 +779,7 @@ export function useTimeline() {
       }]
     })
     return clipId
-  }, [setTracksWithHistory])
+  }, [setTracksWithHistory, trackLike])
 
   /**
    * Open a saved project (useDrafts): its tracks and library replace the
@@ -842,6 +867,11 @@ export function useTimeline() {
       ? { ...base, type: 'text', name: sticker.name, text: sticker.text, textAlign: 'center', backgroundColor: 'transparent', ...sticker.props }
       : { ...base, type: 'image', name: sticker.name, url: sticker.url, serverUrl: null, file: null, zoom: sticker.zoom || 40 }
     setTracksWithHistory(prev => {
+      // From a track's + menu: that track (or a new one below it), at the playhead
+      if (trackId) {
+        const placed = placeOnTrack(prev, trackId, clip, start, (t) => trackLike(t, prev))
+        if (placed) return placed
+      }
       const fits = (t) => t.clips.every(c => {
         const cs = c.timelinePosition || 0
         return cs + (c.endTime - c.startTime) <= start + 0.001 || cs >= end - 0.001
@@ -859,7 +889,7 @@ export function useTimeline() {
    * A sound effect at `position` (the playhead), full length, on an "SFX"
    * audio track: the first one with room there, else a new one.
    */
-  const addSfxClip = useCallback(async (url, name, position) => {
+  const addSfxClip = useCallback(async (url, name, position, trackId = null) => {
     const meta = await getMediaMetadataFromURL(url, 'audio')
     const duration = meta.duration
     if (!duration) return null
@@ -877,6 +907,11 @@ export function useTimeline() {
         zoom: 100, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100, positionX: 0, positionY: 0,
         volume: 100
       }
+      // From a track's + menu: that track (or a new one below it), at the playhead
+      if (trackId) {
+        const placed = placeOnTrack(prev, trackId, clip, start, (t) => trackLike(t, prev))
+        if (placed) return placed
+      }
       const fits = (t) => t.clips.every(c => {
         const cs = c.timelinePosition || 0
         return cs + (c.endTime - c.startTime) <= start + 0.001 || cs >= end - 0.001
@@ -887,7 +922,7 @@ export function useTimeline() {
       return [...prev, { id: generateTrackId(), type: 'audio', name: count ? `SFX ${count + 1}` : 'SFX', sfx: true, clips: [clip] }]
     })
     return clipId
-  }, [setTracksWithHistory])
+  }, [setTracksWithHistory, trackLike])
 
   // Add media from URL to library AND place on timeline
   // options: { clipStart?: number, clipEnd?: number } — optional trim range
@@ -987,6 +1022,12 @@ export function useTimeline() {
       // Store File reference if available
       if (item.file) {
         fileStoreRef.current.set(newClip.id, item.file)
+      }
+
+      // Audio from a track's + menu (a recording): that track, at the playhead
+      if (mediaType === 'audio' && options.trackId && Number.isFinite(options.at)) {
+        const placed = placeOnTrack(prev, options.trackId, newClip, options.at, (t) => trackLike(t, prev))
+        if (placed) return placed
       }
 
       let updatedTracks = prev.map(track => {
@@ -1254,7 +1295,9 @@ export function useTimeline() {
   }, [library, setTracksWithHistory])
 
   // Add files directly to a specific track (for compact mode "+" buttons)
-  const addFilesToTrack = useCallback(async (files, trackId) => {
+  // `at`: the playhead. Audio goes in there (see utils/placement.js); video
+  // keeps going after the track's last clip.
+  const addFilesToTrack = useCallback(async (files, trackId, at = null) => {
     for (const file of keepImportable(files)) {
       const type = getMediaType(file)
       if (!type) continue
@@ -1343,6 +1386,12 @@ export function useTimeline() {
         }
 
         fileStoreRef.current.set(newClip.id, file)
+
+        // Audio: at the playhead on this track (a new one below when taken there)
+        if (type === 'audio' && Number.isFinite(at)) {
+          const placed = placeOnTrack(prev, targetTrack.id, newClip, at, (t) => trackLike(t, prev))
+          if (placed) return placed
+        }
 
         let updatedTracks = prev.map(track => {
           if (track.id === targetTrack.id) {
