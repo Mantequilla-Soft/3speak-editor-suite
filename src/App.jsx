@@ -41,7 +41,9 @@ import StickerPicker from './components/StickerPicker'
 import EncodingNotice from './components/EncodingNotice'
 import ClipColorFilters from './components/ClipColorFilters'
 import { DraftsPrompt, DraftLimitPicker, CloseDialog, DraftStatus } from './components/DraftsDialogs'
-import { useDrafts } from './hooks/useDrafts'
+import { useDrafts, savedPlayhead } from './hooks/useDrafts'
+import ConfirmDialog from './components/ConfirmDialog'
+import { isTypingTarget } from './utils/keyboard'
 import logo3speak from './assets/3speak.png'
 
 // Audio editor: the talking = clips on audio tracks that are not music and not template parts
@@ -204,6 +206,8 @@ function App() {
   const [master, setMaster] = useState(() => masterOf(null))
   // Chapters (utils/chapters.js): pinned to the recording, resolved to where they are now
   const [chapters, setChapters] = useState([])
+  // The preview is playing (the timeline then keeps the playhead in the middle)
+  const [previewPlaying, setPreviewPlaying] = useState(false)
   const resolvedChapters = useMemo(() => (audioMode ? resolveChapters(tracks, chapters, timelineEnd) : []), [audioMode, tracks, chapters, timelineEnd])
   const chapterList = useMemo(() => chapterSpans(resolvedChapters, timelineEnd), [resolvedChapters, timelineEnd])
   // Every ducked clip's plan (its own Duck setting, or the top bar's for music)
@@ -285,29 +289,34 @@ function App() {
     return () => { cancelled = true }
   }, [])
 
+  // "Remove ...?" in the editor's own dialog (components/ConfirmDialog.jsx), never window.confirm()
+  const [confirmAsk, setConfirmAsk] = useState(null) // { message, onYes }
+  const confirmRef = useRef(null)
+  confirmRef.current = confirmAsk
+  const askConfirm = useCallback((message, onYes) => setConfirmAsk({ message, onYes }), [])
+  const closeConfirm = useCallback(() => setConfirmAsk(null), [])
+  const acceptConfirm = useCallback(() => {
+    const ask = confirmRef.current
+    confirmRef.current = null
+    setConfirmAsk(null)
+    ask?.onYes()
+  }, [])
+
   const handleRemoveClip = useCallback((clipId) => {
-    if (window.confirm('Remove this clip from the timeline?')) {
-      removeClip(clipId)
-    }
-  }, [removeClip])
+    askConfirm('Remove this clip from the timeline?', () => removeClip(clipId))
+  }, [removeClip, askConfirm])
 
   const handleRemoveClips = useCallback((clipIds) => {
-    if (window.confirm(`Remove these ${clipIds.length} clips from the timeline?`)) {
-      removeClip(clipIds)
-    }
-  }, [removeClip])
+    askConfirm(`Remove these ${clipIds.length} clips from the timeline?`, () => removeClip(clipIds))
+  }, [removeClip, askConfirm])
 
   const handleRemoveFromLibrary = useCallback((itemId) => {
-    if (window.confirm('Remove this item from the project library?')) {
-      removeFromLibrary(itemId)
-    }
-  }, [removeFromLibrary])
+    askConfirm('Remove this item from the project library?', () => removeFromLibrary(itemId))
+  }, [removeFromLibrary, askConfirm])
 
   const handleRemoveTrack = useCallback((trackId) => {
-    if (window.confirm('Remove this track and all its clips?')) {
-      removeTrack(trackId)
-    }
-  }, [removeTrack])
+    askConfirm('Remove this track and all its clips?', () => removeTrack(trackId))
+  }, [removeTrack, askConfirm])
 
   // Reverse clip: send to backend, get reversed file, swap URL
   const [reversingClipId, setReversingClipId] = useState(null)
@@ -446,18 +455,23 @@ function App() {
         if (e.key === 'Escape') { setAutoCutClipId(null); setBeatClipId(null) }
         return
       }
-      // Ignore if typing in an input
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+      // A "Remove ...?" question is open: it handles Enter / Escape itself
+      if (confirmRef.current) return
+
+      // Space - play/pause the timeline preview, wherever the focus is, except
+      // while typing text. A slider, checkbox, dropdown or button just used in
+      // the settings keeps the focus, so it is let go first (otherwise its own
+      // Space action, a toggle or a click on keyup, would run as well).
+      if (e.key === ' ' || e.code === 'Space') {
+        if (isTypingTarget(e.target)) return
+        e.preventDefault()
+        if (e.target !== document.body && typeof e.target.blur === 'function') e.target.blur()
+        if (!spaceBlockedRef.current) previewControlRef.current?.togglePlay()
         return
       }
 
-      // Space - play/pause the timeline preview
-      if (e.key === ' ' || e.code === 'Space') {
-        if (e.target.tagName === 'SELECT' || e.target.isContentEditable) return
-        e.preventDefault()
-        // A focused button would also fire its click on keyup
-        if (e.target.tagName === 'BUTTON') e.target.blur()
-        if (!spaceBlockedRef.current) previewControlRef.current?.togglePlay()
+      // Ignore the other shortcuts in an input (arrows move a slider, Backspace edits text)
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
         return
       }
 
@@ -941,9 +955,11 @@ function App() {
   const loadSavedProject = useCallback((state) => {
     draftLoadedRef.current = true
     loadProjectState(state)
+    // Back where the playhead was when the draft was saved
+    setPlayheadPosition(savedPlayhead(state))
     if (state?.master) setMaster(masterOf(state.master))
     setChapters(Array.isArray(state?.chapters) ? state.chapters.slice(0, MAX_CHAPTERS) : [])
-  }, [loadProjectState])
+  }, [loadProjectState, setPlayheadPosition])
   const drafts = useDrafts({
     session: draftSession,
     hasMedia: draftContext.hasMedia,
@@ -953,7 +969,9 @@ function App() {
     onUnauthorized: requestDraftSignIn,
     mode: audioMode ? 'audio' : 'video',
     master: audioMode ? master : null,
-    chapters: audioMode ? chapters : null
+    chapters: audioMode ? chapters : null,
+    playhead: playheadPosition,
+    playing: previewPlaying
   })
   const canDraftSignIn = isIframe && !draftSession && ['sign-in-needed', 'sign-in-failed', 'signing-in'].includes(draftContext.reason)
 
@@ -1276,6 +1294,21 @@ function App() {
           </div>
   ) : null
 
+  // Desktop: the selected clip's settings in a sidebar. The audio editor puts
+  // it beside the stage only, so the timeline gets the full width below.
+  const sideBesideStage = isDesktop && audioMode
+  const sidePanel = (
+    <aside className="compact-side">
+      {multiPanel || (sideClip ? compactPropertiesPanel : (
+        <p className="compact-side-empty">Select a clip on the timeline to see its settings. Drag a box over several clips to change them together.</p>
+      ))}
+    </aside>
+  )
+
+  const confirmDialog = confirmAsk ? (
+    <ConfirmDialog message={confirmAsk.message} onConfirm={acceptConfirm} onCancel={closeConfirm} />
+  ) : null
+
   // The audio editor only exists in the compact layout
   if (compactMode || audioMode) {
     return (
@@ -1505,6 +1538,7 @@ function App() {
         {/* Global Preview */}
         <div className={`compact-workspace${isDesktop ? ' desktop' : ''}`}>
         <div className="compact-main">
+        <div className={sideBesideStage ? 'compact-top-row' : 'compact-stage-wrap'}>
         <GlobalPreview
           emptyActions={audioMode ? emptyAudioActions : emptyTimelineActions}
           audioMode={audioMode}
@@ -1528,7 +1562,10 @@ function App() {
           controlRef={previewControlRef}
           recorderSize={recorderSize}
           onSetRecorderSize={setRecorderSize}
+          onPlayingChange={setPreviewPlaying}
         />
+        {sideBesideStage && sidePanel}
+        </div>
 
         {/* Timeline (includes its own toolbar) */}
         <div className="compact-timeline-section">
@@ -1575,6 +1612,7 @@ function App() {
             chapters={audioMode ? resolvedChapters : null}
             onOpenChapters={audioMode ? () => setChaptersOpen(true) : undefined}
             onGroupVoices={audioMode ? groupWithVoices : undefined}
+            isPlaying={previewPlaying}
           />
 
           {/* Reversing overlay */}
@@ -1591,15 +1629,11 @@ function App() {
           {!isDesktop && (multiPanel || compactPropertiesPanel)}
         </div>
         </div>
-        {/* Desktop: the selected clip's settings beside preview and timeline */}
-        {isDesktop && (
-          <aside className="compact-side">
-            {multiPanel || (sideClip ? compactPropertiesPanel : (
-              <p className="compact-side-empty">Select a clip on the timeline to see its settings. Drag a box over several clips to change them together.</p>
-            ))}
-          </aside>
-        )}
+        {/* Desktop shorts editor: the selected clip's settings beside preview and timeline */}
+        {isDesktop && !sideBesideStage && sidePanel}
         </div>
+
+        {confirmDialog}
 
         {/* Onboarding Tour (the shorts editor's, or the audio editor's) */}
         {showTour && (
@@ -2161,6 +2195,7 @@ function App() {
         <EncodingNotice items={encodingItems} onClose={hideEncodingNotice} />
       )}
 
+      {confirmDialog}
     </div>
   )
 }

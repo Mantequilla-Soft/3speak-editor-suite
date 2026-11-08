@@ -658,6 +658,97 @@ try {
     await ph.ctx.close()
   })
 
+  await step('delete asks in the editor (not window.confirm), Space plays from a slider, the timeline follows the playhead, the draft keeps it', async () => {
+    if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
+    const d = await openEditor()
+    const f = d.frame
+    // native dialogs would be dismissed here (= "Cancel"): the old confirm() could never delete in this test
+    let nativeDialogs = 0
+    d.page.on('dialog', (dlg) => { nativeDialogs++; dlg.dismiss().catch(() => {}) })
+    await f.locator('.timeline-clip-v2.audio').first().waitFor({ timeout: 15000 })
+    const firstId = await f.locator('.timeline-clip-v2.audio').first().getAttribute('data-clip-id')
+    await until(() => drafts().find(p => clipsOf(p.state).some(c => c.id === firstId && /\/api\/upload\/files\//.test((c.url || '') + (c.serverUrl || '')))), 'recording uploaded', 45000)
+    await f.getByRole('button', { name: /Cut silences/ }).click()
+    await f.getByRole('dialog', { name: 'Cut silences' }).waitFor()
+    await until(async () => /cuts/.test(await f.locator('.silence-cut-summary').innerText().catch(() => '')), 'cut plan summary')
+    await f.getByRole('button', { name: /Edit for me|This clip only/ }).click()
+    const clips = f.locator('.timeline-clip-v2.audio')
+    await until(async () => (await clips.count()) === 3, 'three speech parts')
+
+    // layout: the settings sit beside the stage only; the timeline runs the full width below
+    await clips.first().click()
+    const side = f.locator('.compact-top-row > .compact-side')
+    await side.locator('input[type=range]').first().waitFor()
+    const box = await f.evaluate(() => {
+      const r = (s) => document.querySelector(s).getBoundingClientRect()
+      return { side: r('.compact-top-row > .compact-side'), stage: r('.compact-top-row > .global-preview'), timeline: r('.compact-timeline-section'), main: r('.compact-main') }
+    })
+    assert.ok(box.side.bottom <= box.timeline.top + 1, `panel ends above the timeline: ${JSON.stringify(box)}`)
+    assert.ok(Math.abs(box.side.height - box.stage.height) < 2, 'panel as tall as the stage')
+    assert.ok(Math.abs(box.timeline.width - box.main.width) < 2, 'timeline full width')
+    // no text selection on the editor, but in the fields you type in
+    assert.equal(await f.evaluate(() => getComputedStyle(document.querySelector('.app')).userSelect), 'none')
+
+    // Delete key -> the editor's own question; Enter removes; Ctrl+Z brings it back
+    await f.locator('.timeline-content').click({ position: { x: 5, y: 5 } }).catch(() => {})
+    await clips.first().click()
+    await d.page.keyboard.press('Delete')
+    await f.locator('.confirm-dialog').waitFor({ timeout: 5000 })
+    await d.page.keyboard.press('Enter')
+    await until(async () => (await clips.count()) === 2, 'one part removed')
+    assert.equal(await f.locator('.confirm-dialog').count(), 0)
+    await d.page.keyboard.press('Control+z')
+    await until(async () => (await clips.count()) === 3, 'undo brings it back')
+    // the toolbar's Delete: Cancel keeps it, Remove removes it
+    await clips.nth(1).click()
+    await f.locator('.timeline-v2 .delete-btn').first().click()
+    await f.getByRole('alertdialog').getByRole('button', { name: 'Cancel' }).click()
+    assert.equal(await clips.count(), 3)
+    await f.locator('.timeline-v2 .delete-btn').first().click()
+    await f.getByRole('alertdialog').getByRole('button', { name: 'Remove' }).click()
+    await until(async () => (await clips.count()) === 2, 'removed from the toolbar')
+    assert.equal(nativeDialogs, 0, 'no window.confirm')
+
+    // Space right after changing a setting with a slider (focus still on it)
+    await clips.first().click()
+    const slider = side.locator('input[type=range]').first()
+    await slider.focus()
+    await d.page.keyboard.press('ArrowRight')
+    const playBtn = f.locator('.global-preview button[title="Play"], .global-preview button[title="Pause"]').first()
+    assert.equal(await playBtn.getAttribute('title'), 'Play')
+    await d.page.keyboard.press(' ')
+    await until(async () => (await playBtn.getAttribute('title')) === 'Pause', 'Space plays from the slider', 5000)
+    await d.page.keyboard.press(' ')
+    await until(async () => (await playBtn.getAttribute('title')) === 'Play', 'Space pauses again', 5000)
+
+    // zoomed in: while playing the timeline scrolls so the playhead stays in the middle
+    for (let i = 0; i < 5; i++) await d.page.keyboard.press('Control+Equal')
+    await f.evaluate(() => { document.querySelector('.timeline-content').scrollLeft = 0 })
+    await f.locator('.timeline-ruler').click({ position: { x: 40, y: 5 } })
+    await d.page.keyboard.press(' ')
+    await until(async () => (await f.evaluate(() => document.querySelector('.timeline-content').scrollLeft)) > 20, 'timeline scrolls along', 8000)
+    const offset = await f.evaluate(() => {
+      const c = document.querySelector('.timeline-content').getBoundingClientRect()
+      const p = document.querySelector('.timeline-playhead').getBoundingClientRect()
+      return Math.abs((p.left - c.left) - c.width / 2)
+    })
+    assert.ok(offset < 40, `playhead in the middle (${offset} px off)`)
+    await sleep(700)
+    await d.page.keyboard.press(' ')
+    await until(async () => (await playBtn.getAttribute('title')) === 'Play', 'paused', 5000)
+
+    // the draft keeps where the playhead stopped, and reopens there
+    const stopped = await until(() => { const p = drafts()[0]; return p && p.state.playhead > 0.5 ? p.state.playhead : null }, 'playhead in the draft', 15000)
+    await d.ctx.close()
+    const again = await openEditor({ file: null })
+    await again.frame.locator('.drafts-item').first().click({ timeout: 20000 })
+    await until(async () => (await again.frame.locator('.timeline-clip-v2.audio').count()) === 2, 'draft reopened')
+    const up = Math.ceil(stopped) // the stage rounds up (utils/limits formatLength)
+    const want = `${Math.floor(up / 60)}:${String(up % 60).padStart(2, '0')}`
+    await until(async () => (await again.frame.locator('.audio-stage-time').innerText()) === want, `stage shows ${want}`, 5000)
+    await again.ctx.close()
+  })
+
   await step('the shorts video editor is unchanged (no mode, Video 1 + Audio 1, Render, no audio tools)', async () => {
     const v = await openEditor({ file: null, mode: 'video' })
     const ready = await v.page.evaluate(() => window.__messages.find(m => m.type === 'editor-ready'))

@@ -617,7 +617,8 @@ function Timeline({
   audioMode = false,
   onGroupVoices,
   chapters = null,
-  onOpenChapters
+  onOpenChapters,
+  isPlaying = false
 }) {
   const { min: MIN_ZOOM, max: MAX_ZOOM } = zoomRange(audioMode)
   const [zoom, setZoom] = useState(33) // pixels per second
@@ -1064,6 +1065,23 @@ function Timeline({
   }, [onAddFilesToTrack])
 
   const playheadLeft = playheadPosition * pixelsPerSecond
+
+  // While playing, the timeline scrolls along so the playhead stays in the
+  // middle (at the very start and end it can't: the scroll stops at the edge).
+  // Paused, it only scrolls when the playhead lands out of sight (a draft
+  // reopened, arrow keys, zooming in), and then puts it in the middle too.
+  useLayoutEffect(() => {
+    const el = timelineContentRef.current
+    if (!el || isDraggingPlayhead) return
+    const view = el.clientWidth
+    if (!view) return
+    const centre = Math.max(0, playheadLeft - view / 2)
+    if (isPlaying) {
+      if (Math.abs(el.scrollLeft - centre) >= 1) el.scrollLeft = centre
+    } else if (playheadLeft < el.scrollLeft || playheadLeft > el.scrollLeft + view - 2) {
+      el.scrollLeft = centre
+    }
+  }, [playheadLeft, isPlaying, isDraggingPlayhead])
 
   // Handle moving clip to a different track
   const handleMoveClipToTrack = useCallback((clipId, fromTrackId, toTrackId, newPosition) => {

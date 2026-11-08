@@ -137,7 +137,7 @@ function FitTextBox({ measureKey, children, ...rest }) {
   return <span ref={ref} {...rest}>{children}</span>
 }
 
-function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVideo, activeAspectRatio, aspectRatioOverride, onSetAspectRatio, selectedClipId, onUpdateClip, onSelectClip, compact, inlineRecording, onRecordedInline, onCloseInlineRecorder, recorderSize, onSetRecorderSize, recorderGuide, onChangeRemixMode, onChangeStageLayout, controlRef, emptyActions, audioMode = false, duck = null, chapters = null }) {
+function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVideo, activeAspectRatio, aspectRatioOverride, onSetAspectRatio, selectedClipId, onUpdateClip, onSelectClip, compact, inlineRecording, onRecordedInline, onCloseInlineRecorder, recorderSize, onSetRecorderSize, recorderGuide, onChangeRemixMode, onChangeStageLayout, controlRef, emptyActions, audioMode = false, duck = null, chapters = null, onPlayingChange }) {
   const videoRefs = useRef({}) // Map of clip ID to video element
   // Sticker motion: the layer container (= the frame) and the moving clips,
   // which the playback loop moves every frame (React renders only ~20/s)
@@ -150,6 +150,10 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   const animationRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const isPlayingRef = useRef(false)
+  // Tell the editor (the timeline follows the playhead while playing)
+  const onPlayingChangeRef = useRef(onPlayingChange)
+  onPlayingChangeRef.current = onPlayingChange
+  useEffect(() => { onPlayingChangeRef.current?.(isPlaying) }, [isPlaying])
   const [size, setSize] = useState('xlarge')
   const [compactSize, setCompactSize] = useState('full') // 'full' or 'half'
   const [loop, setLoop] = useState(false)
