@@ -2150,17 +2150,15 @@ body {
   padding: 0 2px;
 }
 
+/* The bars always span the whole clip: bar i is the i-th slice of its time
+   (the bar count follows the clip's width, about one per 6px). A width cap
+   here packed them to the left, so they ran ahead of the audio. */
 .wave-bar {
-  flex: 1;
-  max-width: 4px;
+  flex: 1 1 0;
+  min-width: 0;
   background: #60a5fa;
   border-radius: 1px;
   opacity: 0.5;
-}
-
-/* A very long clip (audio editor, zoomed in): capped bar count, bars stretch */
-.waveform-visual.wave-wide .wave-bar {
-  max-width: none;
 }
 
 .waveform-label {

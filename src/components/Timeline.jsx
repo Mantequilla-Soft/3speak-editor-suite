@@ -470,7 +470,7 @@ const TimelineClip = memo(function TimelineClip({
       >
         {isAudio ? (
           <div className="clip-waveform">
-            <div className={`waveform-visual${barCount >= MAX_WAVE_BARS ? ' wave-wide' : ''}`}>
+            <div className="waveform-visual">
               {waveformBars.map((height, i) => (
                 <div key={i} className="wave-bar" style={{ height: `${height}%` }} />
               ))}

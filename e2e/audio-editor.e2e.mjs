@@ -512,6 +512,14 @@ try {
     await musicRow.locator('.timeline-clip-v2').first().waitFor({ timeout: 15000 })
     const id = await musicRow.locator('.timeline-clip-v2').first().getAttribute('data-clip-id')
     await until(() => drafts().find(p => clipsOf(p.state).some(c => c.id === id && /\/api\/upload\/files\//.test((c.url || '') + (c.serverUrl || '')))), 'uploaded', 45000)
+    // the clip's waveform spans the whole clip (bar i = i-th slice of its time),
+    // so it lines up with the stage and the playhead
+    const span = await musicRow.locator('.waveform-visual').first().evaluate(el => {
+      const box = el.getBoundingClientRect()
+      const bars = el.querySelectorAll('.wave-bar')
+      return { left: bars[0].getBoundingClientRect().left - box.left, right: box.right - bars[bars.length - 1].getBoundingClientRect().right }
+    })
+    assert.ok(span.left < 4 && span.right < 4, `waveform fills the clip: ${JSON.stringify(span)}`)
     await musicRow.locator('.timeline-clip-v2').first().click()
     const cut = f.getByRole('button', { name: /Cut silences/ })
     assert.equal(await cut.isEnabled(), true, 'Cut silences works without a voice clip')
