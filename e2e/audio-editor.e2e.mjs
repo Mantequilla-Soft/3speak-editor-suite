@@ -749,6 +749,71 @@ try {
     await again.ctx.close()
   })
 
+  await step('dragging the ruler scrolls the timeline and leaves the playhead; a short click moves it', async () => {
+    if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
+    const r = await openEditor()
+    const f = r.frame
+    await f.locator('.timeline-clip-v2.audio').first().waitFor({ timeout: 15000 })
+    for (let i = 0; i < 5; i++) await r.page.keyboard.press('Control+Equal')
+    const state = () => f.evaluate(() => ({
+      scroll: document.querySelector('.timeline-content').scrollLeft,
+      playhead: parseFloat(document.querySelector('.timeline-playhead').style.left)
+    }))
+    await f.evaluate(() => { document.querySelector('.timeline-content').scrollLeft = 100 })
+    const before = await state()
+    // the scroll box stays put (the ruler inside it moves with the scroll)
+    const ruler = { ...(await f.locator('.timeline-content').boundingBox()), height: (await f.locator('.timeline-ruler').boundingBox()).height }
+    const y = ruler.y + ruler.height / 2
+    // drag right-to-left by 150 px: scrolls 150 px further, playhead untouched
+    await r.page.mouse.move(ruler.x + 500, y)
+    await r.page.mouse.down()
+    for (let i = 1; i <= 10; i++) await r.page.mouse.move(ruler.x + 500 - i * 15, y)
+    await r.page.mouse.up()
+    await sleep(100)
+    const dragged = await state()
+    assert.ok(Math.abs(dragged.scroll - (before.scroll + 150)) < 3, `scrolled by the drag: ${before.scroll} -> ${dragged.scroll}`)
+    assert.equal(dragged.playhead, before.playhead, 'the drag did not move the playhead')
+    // a short click (a pixel or two of wobble) still moves the playhead to the spot
+    await r.page.mouse.move(ruler.x + 200, y)
+    await r.page.mouse.down()
+    await r.page.mouse.move(ruler.x + 201, y)
+    await r.page.mouse.up()
+    await sleep(300)
+    const clicked = await state()
+    const info = await f.evaluate(() => ({ ruler: document.querySelector('.timeline-ruler').offsetWidth, view: document.querySelector('.timeline-content').clientWidth, clipEnd: Math.max(...[...document.querySelectorAll('.timeline-clip-v2')].map(e => e.offsetLeft + e.offsetWidth)) }))
+    assert.ok(Math.abs(clicked.playhead - (dragged.scroll + 200)) < 12, `click moved the playhead: ${JSON.stringify({ before, dragged, clicked, info })}`)
+    await r.ctx.close()
+  })
+
+  await step('Ctrl+click adds / takes out a clip, Shift+click selects everything from the selected clip to the clicked one', async () => {
+    if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
+    const r = await openEditor()
+    const f = r.frame
+    await f.locator('.timeline-clip-v2.audio').first().waitFor({ timeout: 15000 })
+    const firstId = await f.locator('.timeline-clip-v2.audio').first().getAttribute('data-clip-id')
+    await until(() => drafts().find(p => clipsOf(p.state).some(c => c.id === firstId && /\/api\/upload\/files\//.test((c.url || '') + (c.serverUrl || '')))), 'recording uploaded', 45000)
+    await f.getByRole('button', { name: /Cut silences/ }).click()
+    await f.getByRole('dialog', { name: 'Cut silences' }).waitFor()
+    await until(async () => /cuts/.test(await f.locator('.silence-cut-summary').innerText().catch(() => '')), 'cut plan summary')
+    await f.getByRole('button', { name: /Edit for me|This clip only/ }).click()
+    const clips = f.locator('.timeline-clip-v2.audio')
+    await until(async () => (await clips.count()) === 3, 'three speech parts')
+    const selected = () => f.locator('.compact-properties-title').first().innerText().catch(() => '')
+    await clips.nth(0).click()
+    await clips.nth(2).click({ modifiers: ['Shift'] })
+    await until(async () => /^3 clips selected/.test(await selected()), 'Shift+click: all three')
+    await clips.nth(1).click({ modifiers: ['Control'] })
+    await until(async () => /^2 clips selected/.test(await selected()), 'Ctrl+click takes the middle one out')
+    await clips.nth(1).click({ modifiers: ['Control'] })
+    await until(async () => /^3 clips selected/.test(await selected()), 'Ctrl+click puts it back')
+    // the anchor is the last Ctrl-clicked clip (the middle one): Shift+click on the last = middle + last
+    await clips.nth(2).click({ modifiers: ['Shift'] })
+    await until(async () => /^2 clips selected/.test(await selected()), 'Shift+click from the anchor')
+    await clips.nth(0).click()
+    await until(async () => !/clips selected/.test(await selected()), 'a plain click selects one')
+    await r.ctx.close()
+  })
+
   await step('the shorts video editor is unchanged (no mode, Video 1 + Audio 1, Render, no audio tools)', async () => {
     const v = await openEditor({ file: null, mode: 'video' })
     const ready = await v.page.evaluate(() => window.__messages.find(m => m.type === 'editor-ready'))

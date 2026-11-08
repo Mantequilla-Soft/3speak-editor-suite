@@ -1,6 +1,6 @@
 // Box select on the timeline and settings for several clips at once.
 import { describe, it, expect } from 'vitest'
-import { boxesTouch, clipIdsInBox, boxFrom, toggleInSelection } from '../src/utils/marquee.js'
+import { boxesTouch, clipIdsInBox, boxFrom, toggleInSelection, clipIdsInRange } from '../src/utils/marquee.js'
 import { commonValue, sourcesOf, soundTargets } from '../src/utils/multiSelect.js'
 
 describe('box select', () => {
@@ -46,5 +46,34 @@ describe('settings for several clips', () => {
     const text = { id: 't1', type: 'text' }
     const targets = soundTargets([audio, video, text, linked], c => (c.id === 'v1' ? linked : null))
     expect(targets.map(c => c.id)).toEqual(['a1', 'a2'])
+  })
+})
+
+describe('Shift-click: from the selected clip to the clicked one', () => {
+  const c = (id, at, len) => ({ id, timelinePosition: at, startTime: 0, endTime: len })
+  const tracks = [
+    { id: 'v1', clips: [c('a', 0, 2), c('b', 2, 2), c('c', 4, 2), c('d', 8, 1)] },
+    { id: 'v2', clips: [c('x', 1, 2), c('y', 6, 1)] },
+    { id: 'm', clips: [c('m1', 0, 10)] }
+  ]
+
+  it('on one track: everything between, either way round', () => {
+    expect(clipIdsInRange(tracks.slice(0, 1), 'a', 'c')).toEqual(['a', 'b', 'c'])
+    expect(clipIdsInRange(tracks.slice(0, 1), 'c', 'a')).toEqual(['a', 'b', 'c'])
+    expect(clipIdsInRange(tracks.slice(0, 1), 'b', 'd')).toEqual(['b', 'c', 'd'])
+  })
+
+  it('across tracks: the tracks in between and the time in between', () => {
+    // a (track 1, 0-2) to y (track 2, 6-7): 0-7 on tracks 1 and 2, not the music below
+    expect(clipIdsInRange(tracks, 'a', 'y').sort()).toEqual(['a', 'b', 'c', 'x', 'y'])
+    // b (2-4) to x (1-3): 1-4 on tracks 1 and 2; a (0-2) overlaps it, c (4-6) only touches it
+    expect(clipIdsInRange(tracks, 'b', 'x').sort()).toEqual(['a', 'b', 'x'])
+  })
+
+  it('without an anchor it is just the clicked clip', () => {
+    expect(clipIdsInRange(tracks, null, 'c')).toEqual(['c'])
+    expect(clipIdsInRange(tracks, 'gone', 'c')).toEqual(['c'])
+    expect(clipIdsInRange(tracks, 'c', 'c')).toEqual(['c'])
+    expect(clipIdsInRange(tracks, 'a', 'gone')).toEqual([])
   })
 })

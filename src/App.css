@@ -6837,3 +6837,9 @@ input[type="range"] {
   align-self: stretch;
   contain: size;
 }
+
+/* Dragging the ruler scrolls the timeline (Timeline.jsx handleRulerMouseDown) */
+.timeline-ruler.dragging,
+.timeline-ruler.dragging * {
+  cursor: grabbing;
+}

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo, memo } from 'react'
-import { boxFrom, clipIdsInBox, toggleInSelection } from '../utils/marquee'
+import { boxFrom, clipIdsInBox, toggleInSelection, clipIdsInRange } from '../utils/marquee'
 import { Trash2, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker, Maximize2, ListChecks } from 'lucide-react'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 import { getGroupColor } from '../hooks/useTimeline'
@@ -653,11 +653,29 @@ function Timeline({
     const { selectedClipId: one, selectedClipIds: many } = selectionRef.current
     return many.length ? many : (one ? [one] : [])
   }
+  // Shift-click selects from this clip (the last one clicked or Ctrl-clicked) to the clicked one
+  const anchorRef = useRef(null)
   const handleClipSelect = useCallback((clipId, e) => {
-    const { onSelectClip: one, onSelectClips: many, selectMode: picking } = selectionRef.current
-    // Select mode (phones: the Select button) or Shift/Ctrl/Cmd: each tap adds or removes a clip
-    if (many && (picking || e?.shiftKey || e?.metaKey || e?.ctrlKey)) many(toggleInSelection(currentSelection(), clipId))
-    else one(clipId)
+    const { onSelectClip: one, onSelectClips: many, selectMode: picking, tracksInOrder } = selectionRef.current
+    const current = currentSelection()
+    // Shift: everything between the anchor and this clip (the anchor stays put)
+    if (many && e?.shiftKey && !picking) {
+      const anchor = current.includes(anchorRef.current) ? anchorRef.current : current[current.length - 1]
+      const ids = clipIdsInRange(tracksInOrder || [], anchor, clipId)
+      if (!anchor) anchorRef.current = clipId
+      if (ids.length > 1) many(ids)
+      else one(clipId)
+      return
+    }
+    // Select mode (phones: the Select button) or Ctrl/Cmd: each tap adds or removes a clip
+    if (many && (picking || e?.metaKey || e?.ctrlKey)) {
+      const next = toggleInSelection(current, clipId)
+      if (next.includes(clipId)) anchorRef.current = clipId
+      many(next)
+      return
+    }
+    anchorRef.current = clipId
+    one(clipId)
   }, [])
 
   // Box select (mouse): press on an empty spot of the tracks and drag over
@@ -744,6 +762,8 @@ function Timeline({
   // Video tracks displayed first (top), then audio tracks (bottom)
   const videoTracks = useMemo(() => (tracks || []).filter(t => t.type === 'video'), [tracks])
   const audioTracks = useMemo(() => (tracks || []).filter(t => t.type === 'audio'), [tracks])
+  // As shown, top to bottom (for Shift-click ranges)
+  selectionRef.current.tracksInOrder = [...videoTracks, ...audioTracks]
 
   // Get snap points for a clip (excluding itself)
   // When snap is enabled, includes clip boundaries from ALL tracks for cross-track snapping
@@ -832,6 +852,40 @@ function Timeline({
     const time = x / pixelsPerSecond
     const clamped = Math.max(0, Math.min(time, maxClipEnd))
     onSetPlayhead(snapPlayheadTime(clamped))
+  }
+
+  // Dragging the ruler (mouse) scrolls the timeline; a short click still moves
+  // the playhead. Past a few pixels it is a drag: the click that the browser
+  // fires on release is swallowed, so the playhead stays where it was.
+  // (Touch scrolls the ruler natively, like the rest of the timeline.)
+  const RULER_DRAG_PX = 4
+  const [isDraggingRuler, setIsDraggingRuler] = useState(false)
+  const handleRulerMouseDown = (e) => {
+    if (e.button !== 0) return
+    const content = timelineContentRef.current
+    if (!content) return
+    const startX = e.clientX
+    const startScroll = content.scrollLeft
+    let dragging = false
+    const onMove = (ev) => {
+      const dx = ev.clientX - startX
+      if (!dragging && Math.abs(dx) < RULER_DRAG_PX) return
+      if (!dragging) { dragging = true; setIsDraggingRuler(true) }
+      ev.preventDefault()
+      content.scrollLeft = startScroll - dx
+    }
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+      if (!dragging) return
+      setIsDraggingRuler(false)
+      // The click after a drag (on the ruler, a chapter mark, anything) is not a click
+      const swallow = (ev) => { ev.stopPropagation(); ev.preventDefault() }
+      window.addEventListener('click', swallow, { capture: true, once: true })
+      setTimeout(() => window.removeEventListener('click', swallow, { capture: true }), 0)
+    }
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
   }
 
   const handlePlayheadMouseDown = (e) => {
@@ -1070,18 +1124,22 @@ function Timeline({
   // middle (at the very start and end it can't: the scroll stops at the edge).
   // Paused, it only scrolls when the playhead lands out of sight (a draft
   // reopened, arrow keys, zooming in), and then puts it in the middle too.
+  // Scrolling away from a resting playhead (ruler drag, wheel) is left alone.
+  const followedLeftRef = useRef(null)
   useLayoutEffect(() => {
     const el = timelineContentRef.current
-    if (!el || isDraggingPlayhead) return
+    if (!el || isDraggingPlayhead || isDraggingRuler) return
     const view = el.clientWidth
     if (!view) return
+    const moved = followedLeftRef.current !== playheadLeft
+    followedLeftRef.current = playheadLeft
     const centre = Math.max(0, playheadLeft - view / 2)
     if (isPlaying) {
       if (Math.abs(el.scrollLeft - centre) >= 1) el.scrollLeft = centre
-    } else if (playheadLeft < el.scrollLeft || playheadLeft > el.scrollLeft + view - 2) {
+    } else if (moved && (playheadLeft < el.scrollLeft || playheadLeft > el.scrollLeft + view - 2)) {
       el.scrollLeft = centre
     }
-  }, [playheadLeft, isPlaying, isDraggingPlayhead])
+  }, [playheadLeft, isPlaying, isDraggingPlayhead, isDraggingRuler])
 
   // Handle moving clip to a different track
   const handleMoveClipToTrack = useCallback((clipId, fromTrackId, toTrackId, newPosition) => {
@@ -1455,10 +1513,11 @@ function Timeline({
           )}
           {/* Ruler */}
           <div
-            className="timeline-ruler"
+            className={`timeline-ruler${isDraggingRuler ? ' dragging' : ''}`}
             ref={rulerRef}
             style={{ width: `${timelineWidth}px` }}
             onClick={handleRulerClick}
+            onMouseDown={handleRulerMouseDown}
           >
             {rulerMarks}
           </div>
