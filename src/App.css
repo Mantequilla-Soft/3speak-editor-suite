@@ -6857,3 +6857,43 @@ input[type="range"] {
   line-height: 16px;
   text-align: center;
 }
+
+/* Voice clean-up running (utils/cleaningStatus.js) */
+.noise-busy {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-primary);
+}
+
+.noise-levels button .encoding-notice-spin {
+  vertical-align: middle;
+}
+
+.cleaning-notice {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  max-width: calc(100vw - 32px);
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  font-size: 0.85rem;
+}
+
+.cleaning-notice small {
+  width: 100%;
+  padding-left: 23px;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}

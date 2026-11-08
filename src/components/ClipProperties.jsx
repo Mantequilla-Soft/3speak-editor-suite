@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback, useLayoutEffect } from 'react'
 import { DUCK_DEPTHS, DUCK_DEFAULT_DB, DUCK_SOURCE_VOICES } from '../utils/duck'
+import { startCleaning, useCleaningStatus, cleaningText } from '../utils/cleaningStatus'
 import { MAX_CLIP_VOLUME } from '../utils/audioGain'
-import { Volume2, ZoomIn, Move, Crop, Type, GripVertical, RotateCcw, RotateCw, Droplets, AlignLeft, AlignCenter, AlignRight, Palette, Minus, Plus, Wand2, SunMedium } from 'lucide-react'
+import { Loader2, Volume2, ZoomIn, Move, Crop, Type, GripVertical, RotateCcw, RotateCw, Droplets, AlignLeft, AlignCenter, AlignRight, Palette, Minus, Plus, Wand2, SunMedium } from 'lucide-react'
 import { hasLayout, scaleLayout, layoutZoom, LAYOUT_ZOOM_MIN, LAYOUT_ZOOM_MAX } from '../utils/remixLayout'
 import { normalizeChromaKey, defaultChromaKey, KEY_RANGES, grabVideoFrame, canvasToBlobUrl } from '../utils/chromaKey'
 import { COLOR_DEFAULTS, normalizeColor } from '../utils/clipColor'
@@ -291,18 +292,27 @@ export async function cleanVoiceChanges(targets, level) {
     for (const t of targets) if (t.denoise) changes.push({ id: t.id, updates: uncleanedFields(t, recordingSource(t)) })
     return changes
   }
-  const bySource = new Map()
-  for (const t of targets) {
-    const source = await cleanSourceOf(t)
-    if (!canCleanSource(source)) continue
-    if (!bySource.has(source)) bySource.set(source, [])
-    bySource.get(source).push(t)
+  // Shown while it runs (the panel and the editor's notice, utils/cleaningStatus.js)
+  const job = startCleaning({ clips: targets.length, level })
+  try {
+    const bySource = new Map()
+    for (const t of targets) {
+      const source = await cleanSourceOf(t)
+      if (!canCleanSource(source)) continue
+      if (!bySource.has(source)) bySource.set(source, [])
+      bySource.get(source).push(t)
+    }
+    job.recordings(bySource.size)
+    let done = 0
+    for (const [source, list] of bySource) {
+      const cleaned = await requestCleanVoice(source, level)
+      for (const t of list) changes.push({ id: t.id, updates: cleanedFields(t, source, level, cleaned) })
+      job.done(++done)
+    }
+    return changes
+  } finally {
+    job.end()
   }
-  for (const [source, list] of bySource) {
-    const cleaned = await requestCleanVoice(source, level)
-    for (const t of list) changes.push({ id: t.id, updates: cleanedFields(t, source, level, cleaned) })
-  }
-  return changes
 }
 
 /**
@@ -376,6 +386,7 @@ function NoiseControls({ clip, onUpdateClip, voiceTargets = null, onUpdateClipsE
     }
   }
 
+  const running = useCleaningStatus()
   return (
     <div className="property-group">
       <label>{audioEditor ? 'Clean up the voice' : 'Reduce background noise'}</label>
@@ -388,15 +399,18 @@ function NoiseControls({ clip, onUpdateClip, voiceTargets = null, onUpdateClipsE
               role="radio"
               aria-checked={(clip.denoise || null) === id}
               className={(clip.denoise || null) === id ? 'active' : ''}
-              disabled={!!busy}
+              disabled={!!busy || !!running}
               onClick={() => choose(id)}
             >
-              {busy && busy === id ? '…' : label}
+              {busy && busy === (id ?? 'off') ? <Loader2 size={12} className="encoding-notice-spin" aria-label="Working" /> : label}
             </button>
           ))}
         </div>
       ) : (
         <p className="noise-hint">Available once this clip has finished uploading.</p>
+      )}
+      {(busy || running) && (
+        <p className="noise-busy" role="status"><Loader2 size={14} className="encoding-notice-spin" /> {running ? cleaningText(running) : 'Working…'}</p>
       )}
       {audioEditor && canClean && (
         <p className="noise-hint">{targets.length > 1 ? `Applies to this clip and its group (${targets.length} clips).` : 'Applies to this clip only.'}</p>

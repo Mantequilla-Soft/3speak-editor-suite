@@ -44,6 +44,7 @@ import ClipColorFilters from './components/ClipColorFilters'
 import { DraftsPrompt, DraftLimitPicker, CloseDialog, DraftStatus } from './components/DraftsDialogs'
 import { useDrafts, savedPlayhead } from './hooks/useDrafts'
 import ConfirmDialog from './components/ConfirmDialog'
+import { useCleaningStatus, cleaningText } from './utils/cleaningStatus'
 import { isTypingTarget } from './utils/keyboard'
 import logo3speak from './assets/3speak.png'
 
@@ -1142,6 +1143,7 @@ function App() {
   // Chapters: added at the playhead (M), renamed, moved, removed
   const [chaptersOpen, setChaptersOpen] = useState(false)
   const [audiogramOpen, setAudiogramOpen] = useState(false)
+  const cleaning = useCleaningStatus()
   // Duck is a clip setting only. A whole-show Duck (an old draft, or a
   // template with "duck the music") becomes the music clips' own setting.
   useEffect(() => {
@@ -1342,6 +1344,16 @@ function App() {
       ))}
     </aside>
   )
+
+  // A voice clean-up running (utils/cleaningStatus.js): stays on screen while
+  // other clips are selected, until the cleaned audio is in
+  const cleaningNotice = cleaning ? (
+    <div className="cleaning-notice" role="status" aria-live="polite">
+      <Loader2 size={15} className="encoding-notice-spin" />
+      <span>{cleaningText(cleaning)}</span>
+      <small>Long recordings can take a minute.</small>
+    </div>
+  ) : null
 
   const confirmDialog = confirmAsk ? (
     <ConfirmDialog message={confirmAsk.message} onConfirm={acceptConfirm} onCancel={closeConfirm} />
@@ -1652,6 +1664,7 @@ function App() {
         </div>
 
         {confirmDialog}
+        {cleaningNotice}
 
         {/* Onboarding Tour (the shorts editor's, or the audio editor's) */}
         {showTour && (

@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Volume2, RotateCcw, Trash2 } from 'lucide-react'
+import { Loader2, Volume2, RotateCcw, Trash2 } from 'lucide-react'
 import { MAX_CLIP_VOLUME } from '../utils/audioGain'
 import { AUDIO_NOISE_LEVELS, recordingSource, canCleanClip, cleanVoiceChanges } from './ClipProperties'
+import { useCleaningStatus, cleaningText } from '../utils/cleaningStatus'
 import { commonValue, sourcesOf } from '../utils/multiSelect'
 
 /**
@@ -17,6 +18,7 @@ import { commonValue, sourcesOf } from '../utils/multiSelect'
 export default function MultiClipProperties({ clips, audioMode = false, onUpdateClips, voiceTargets = null, onUpdateClipsEach = null, onRemove, count }) {
   const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
+  const running = useCleaningStatus()
 
   const volumes = clips.map(c => c.volume ?? 100)
   const volume = commonValue(volumes)
@@ -84,15 +86,18 @@ export default function MultiClipProperties({ clips, audioMode = false, onUpdate
                   role="radio"
                   aria-checked={level === id}
                   className={level === id ? 'active' : ''}
-                  disabled={!!busy}
+                  disabled={!!busy || !!running}
                   onClick={() => chooseLevel(id)}
                 >
-                  {busy && busy === (id ?? 'off') ? '…' : label}
+                  {busy && busy === (id ?? 'off') ? <Loader2 size={12} className="encoding-notice-spin" aria-label="Working" /> : label}
                 </button>
               ))}
             </div>
           ) : (
             <p className="noise-hint">Available once these clips have finished uploading.</p>
+          )}
+          {(busy || running) && (
+            <p className="noise-busy" role="status"><Loader2 size={14} className="encoding-notice-spin" /> {running ? cleaningText(running) : 'Working…'}</p>
           )}
           {sources.length > 0 && (
             <p className="noise-hint">

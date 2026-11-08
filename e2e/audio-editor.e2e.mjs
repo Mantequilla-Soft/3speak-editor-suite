@@ -605,7 +605,23 @@ try {
     await f.locator('.global-preview button[title="Pause"]').first().click()
 
     // (after the playback check: the cleaned copy is AAC, which this test Chromium can't decode)
+    // while it runs: a spinner in the panel and the editor's notice (recorded as they
+    // appear: a clean-up the backend already has cached is over in a moment)
+    await f.evaluate(() => {
+      window.__seen = []
+      new MutationObserver(() => {
+        for (const sel of ['.cleaning-notice', '.multi-clip-panel .noise-busy']) {
+          const el = document.querySelector(sel)
+          if (el) window.__seen.push(`${sel}: ${el.textContent}`)
+        }
+      }).observe(document.body, { subtree: true, childList: true, characterData: true })
+    })
     await f.locator('.multi-clip-panel').getByRole('radio', { name: 'Strong' }).click()
+    await until(() => f.evaluate(() => window.__seen.length > 0), 'the clean-up shows', 5000)
+    await f.locator('.cleaning-notice').waitFor({ state: 'detached', timeout: 60000 })
+    const seen = await f.evaluate(() => window.__seen)
+    assert.ok(seen.some(t => /^\.cleaning-notice: Cleaning up the voice of 3 clips/.test(t)), `notice: ${seen.slice(0, 3).join(' / ')}`)
+    assert.ok(seen.some(t => /noise-busy: .*Cleaning up the voice/.test(t)), 'spinner in the panel')
     await until(() => { const d = mine(); return d && clipsOf(d.state).filter(c => ids.includes(c.id)).every(c => c.denoise === 'studio') }, 'Studio voice on all three', 60000)
 
     // Group them (one group id on all three), then Ungroup
