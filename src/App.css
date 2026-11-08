@@ -6752,3 +6752,25 @@ input[type="range"] {
   flex: 1;
   min-width: 0;
 }
+
+/* A clip's Duck: "Goes down while [source] plays" */
+.duck-source {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.duck-source select {
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.25rem 0.4rem;
+  background: var(--bg-tertiary, var(--bg-secondary));
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.8rem;
+}

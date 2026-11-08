@@ -232,10 +232,10 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   // Get all audio clips with their timeline positions (respecting track mute)
   const audioRefs = useRef({})
   // The volume an audio clip plays at: its own (volume, fades) and, on a music
-  // track with auto-duck on, the duck (audio editor, utils/duck.js)
+  // clip that is ducked (its own Duck or the top bar's), the duck (audio editor, utils/duck.js)
   const duckRef = useRef(duck)
   duckRef.current = duck
-  const gainAt = (clip, t) => clipGainAt(clip, t) * (clip.musicTrack && duckRef.current?.tracks.includes(clip.trackId) ? duckGainAt(duckRef.current, t) : 1)
+  const gainAt = (clip, t) => clipGainAt(clip, t) * (duckRef.current?.[clip.id] ? duckGainAt(duckRef.current[clip.id], t) : 1)
 
   // Louder than 100% (audio editor, up to 200%): an <audio> element stops at
   // volume 1, so a boosted clip's element (data-boost, mounted with

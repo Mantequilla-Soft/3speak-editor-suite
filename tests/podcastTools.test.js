@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { voiceSpans, duckPlan, duckGainAt, duckGain, DUCK_ATTACK, DUCK_RELEASE } from '../src/utils/duck'
+import { voiceSpans, duckPlans, clipDuckSetting, sourceSpans, localDuckPlan, duckGainAt, duckGain, DUCK_ATTACK, DUCK_RELEASE } from '../src/utils/duck'
 import {
   anchorAt, anchorPosition, newChapter, moveChapter, resolveChapters, chapterSpans, chapterTime, chaptersText, cleanTitle
 } from '../src/utils/chapters'
@@ -22,20 +22,58 @@ describe('auto-duck', () => {
     expect(voiceSpans(tracks)).toEqual([[0, 4.5], [10, 11]])
   })
 
-  it('duckPlan: off, no music or no voice gives null; otherwise the music tracks and spans', () => {
+  it('duckPlans (top bar): off, no music or no voice gives null; otherwise each music clip and its spans', () => {
     const tracks = [voice('v', [clip('a', { endTime: 3, timelinePosition: 1 })]), music('m', [clip('bed', { endTime: 20 })])]
-    expect(duckPlan(tracks, { duck: false })).toBeNull()
-    expect(duckPlan([tracks[0]], { duck: true })).toBeNull()
-    expect(duckPlan([tracks[1]], { duck: true })).toBeNull()
-    expect(duckPlan([tracks[0], { ...tracks[1], muted: true }], { duck: true })).toBeNull()
-    const plan = duckPlan(tracks, { duck: true, duckDb: -12 })
-    expect(plan).toEqual({ gain: 0.2512, attack: DUCK_ATTACK, release: DUCK_RELEASE, spans: [[1, 4]], tracks: ['m'] })
-    expect(duckPlan(tracks, { duck: true }).gain).toBe(0.2512) // default depth
+    expect(duckPlans(tracks, { duck: false })).toBeNull()
+    expect(duckPlans([tracks[0]], { duck: true })).toBeNull()
+    expect(duckPlans([tracks[1]], { duck: true })).toBeNull()
+    expect(duckPlans([tracks[0], { ...tracks[1], muted: true }], { duck: true })).toBeNull()
+    const plans = duckPlans(tracks, { duck: true, duckDb: -12 })
+    expect(plans).toEqual({ bed: { gain: 0.2512, attack: DUCK_ATTACK, release: DUCK_RELEASE, spans: [[1, 4]] } })
+    expect(duckPlans(tracks, { duck: true }).bed.gain).toBe(0.2512) // default depth
     expect(duckGain(-6)).toBeCloseTo(0.501, 3)
   })
 
+  it('a clip setting wins over the top bar: its own depth, Off, or a voice clip ducked under music', () => {
+    const tracks = [
+      voice('v', [clip('a', { endTime: 3, timelinePosition: 1 }), clip('host', { endTime: 30, timelinePosition: 20, duck: { db: -6, source: 'm' } })]),
+      music('m', [clip('bed', { endTime: 20, duck: { db: -18 } }), clip('bed2', { endTime: 10, timelinePosition: 25 }), clip('quiet', { endTime: 5, timelinePosition: 40, duck: { off: true } })])
+    ]
+    const plans = duckPlans(tracks, { duck: true, duckDb: -12 })
+    expect(plans.bed.gain).toBe(0.1259) // its own -18, not the top bar's -12
+    expect(plans.bed2.gain).toBe(0.2512) // follows the top bar
+    expect(plans.quiet).toBeUndefined() // Off
+    // the voice clip listens to the Music track: down wherever music plays there
+    // (quiet is not ducked itself, but it still plays)
+    expect(plans.host.gain).toBe(0.5012)
+    expect(plans.host.spans).toEqual([[0, 20], [25, 35], [40, 45]])
+    expect(clipDuckSetting(tracks[0].clips[0], tracks[0], { duck: true })).toBeNull() // a voice never follows the top bar
+    expect(clipDuckSetting(tracks[1].clips[1], tracks[1], { duck: true, duckDb: -6 })).toEqual({ db: -6, source: 'voices', inherited: true })
+  })
+
+  it('sidechain sources: any voice leaves the clip\'s own track out; one track; never itself', () => {
+    const tracks = [
+      voice('host', [clip('h', { endTime: 4 })]),
+      voice('guest', [clip('g', { endTime: 2, timelinePosition: 10 })]),
+      music('m', [clip('bed', { endTime: 30 })])
+    ]
+    expect(sourceSpans(tracks, 'voices', 'host')).toEqual([[10, 12]])
+    expect(sourceSpans(tracks, 'voices', 'm')).toEqual([[0, 4], [10, 12]])
+    expect(sourceSpans(tracks, 'guest', 'host')).toEqual([[10, 12]])
+    expect(sourceSpans(tracks, 'host', 'host')).toEqual([])
+    expect(sourceSpans(tracks, 'gone', 'host')).toEqual([])
+  })
+
+  it('only spans that reach the clip, and in the clip\'s own seconds for the render', () => {
+    const tracks = [voice('v', [clip('a', { endTime: 2 }), clip('b', { endTime: 2, timelinePosition: 50 })]), music('m', [clip('bed', { endTime: 10, timelinePosition: 45 })])]
+    const plans = duckPlans(tracks, { duck: true })
+    expect(plans.bed.spans).toEqual([[50, 52]])
+    expect(localDuckPlan(plans.bed, tracks[1].clips[0]).spans).toEqual([[5, 7]])
+    expect(localDuckPlan(null, tracks[1].clips[0])).toBeNull()
+  })
+
   it('duckGainAt ramps down before the voice, stays down, comes back up after', () => {
-    const plan = { gain: 0.25, attack: 0.4, release: 0.8, spans: [[2, 5], [10, 12]], tracks: ['m'] }
+    const plan = { gain: 0.25, attack: 0.4, release: 0.8, spans: [[2, 5], [10, 12]] }
     expect(duckGainAt(plan, 0)).toBe(1)
     expect(duckGainAt(plan, 1.6)).toBe(1)
     expect(duckGainAt(plan, 1.8)).toBeCloseTo(0.625, 6)

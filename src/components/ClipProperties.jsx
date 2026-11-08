@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useLayoutEffect } from 'react'
+import { DUCK_DEPTHS, DUCK_DEFAULT_DB, DUCK_SOURCE_VOICES } from '../utils/duck'
 import { MAX_CLIP_VOLUME } from '../utils/audioGain'
 import { Volume2, ZoomIn, Move, Crop, Type, GripVertical, RotateCcw, RotateCw, Droplets, AlignLeft, AlignCenter, AlignRight, Palette, Minus, Plus, Wand2, SunMedium } from 'lucide-react'
 import { hasLayout, scaleLayout, layoutZoom, LAYOUT_ZOOM_MIN, LAYOUT_ZOOM_MAX } from '../utils/remixLayout'
@@ -373,6 +374,58 @@ function NoiseControls({ clip, onUpdateClip, voiceTargets = null, onUpdateClipsE
   )
 }
 
+/**
+ * Auto-duck for this clip (audio editor): how far down it goes while its
+ * sidechain source plays. duckInfo: { setting (utils/duck clipDuckSetting:
+ * { db, source, inherited } or null), sources [{ id, label }], followsTopBar
+ * (a music clip: without its own setting it follows Duck in the top bar) }.
+ */
+function DuckControls({ clip, duckInfo, onUpdateClip }) {
+  const { setting, sources, followsTopBar } = duckInfo
+  const setDepth = (db) => onUpdateClip({ duck: db == null ? { off: true } : { db, source: setting?.source || DUCK_SOURCE_VOICES } })
+  const setSource = (source) => onUpdateClip({ duck: { db: setting?.db ?? DUCK_DEFAULT_DB, source } })
+  const active = setting ? setting.db : null
+  return (
+    <div className="property-group">
+      <label>
+        Duck
+        {followsTopBar && clip.duck !== undefined && (
+          <button className="prop-reset-btn" onClick={() => onUpdateClip({ duck: undefined })} title="Follow Duck in the top bar again">
+            <RotateCcw size={10} />
+          </button>
+        )}
+      </label>
+      <div className="noise-levels" role="radiogroup" aria-label="Duck this clip">
+        {[null, ...DUCK_DEPTHS].map(db => (
+          <button
+            key={String(db)}
+            role="radio"
+            aria-checked={active === db}
+            className={active === db ? 'active' : ''}
+            onClick={() => setDepth(db)}
+          >
+            {db == null ? 'Off' : `${db} dB`}
+          </button>
+        ))}
+      </div>
+      {setting && (
+        <div className="duck-source">
+          <span>Goes down while</span>
+          <select value={setting.source} onChange={(e) => setSource(e.target.value)} aria-label="Duck source">
+            {sources.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+          </select>
+          <span>plays</span>
+        </div>
+      )}
+      <p className="noise-hint">
+        {setting?.inherited
+          ? 'Set by Duck in the top bar. Pick a level or a source to set it for this clip.'
+          : 'This clip gets quieter while its source plays, and comes back up in the pauses.'}
+      </p>
+    </div>
+  )
+}
+
 function GreenScreenControls({ clip, onUpdateClip, playheadPosition }) {
   const [grabbing, setGrabbing] = useState(false)
   const [grabError, setGrabError] = useState(null)
@@ -729,7 +782,7 @@ function PositionDragHandle({ positionX, positionY, onChange }) {
 // The tab a phone user last picked, kept across clips (if the next clip has it)
 let lastTab = null
 
-function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, voiceTargets = null, onUpdateClipsEach = null }) {
+function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, voiceTargets = null, onUpdateClipsEach = null, duckInfo = null }) {
   // Phones (tabbed): one section at a time, a tab per section. The sections
   // differ per clip type and come from several components, so the tabs are
   // read from the rendered sections (.prop-group and its label) after render.
@@ -1128,6 +1181,8 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
           {isAudio && <FadeControls clip={clip} onUpdateClip={onUpdateClip} />}
 
           {isAudio && <NoiseControls clip={clip} onUpdateClip={onUpdateClip} voiceTargets={voiceTargets} onUpdateClipsEach={onUpdateClipsEach} />}
+
+          {isAudio && duckInfo && <DuckControls clip={clip} duckInfo={duckInfo} onUpdateClip={onUpdateClip} />}
         </div>
         )}
 

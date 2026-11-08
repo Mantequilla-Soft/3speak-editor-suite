@@ -29,7 +29,7 @@ import AudioTemplateDialog from './components/AudioTemplateDialog'
 import ChaptersDialog from './components/ChaptersDialog'
 import AudiogramDialog from './components/AudiogramDialog'
 import { newChapter, moveChapter, resolveChapters, chapterSpans, MAX_CHAPTERS } from './utils/chapters'
-import { duckPlan, DUCK_DEPTHS, DUCK_DEFAULT_DB } from './utils/duck'
+import { duckPlans, clipDuckSetting, DUCK_DEPTHS, DUCK_DEFAULT_DB } from './utils/duck'
 import { useAudioTemplate } from './hooks/useAudioTemplate'
 import { applyAudioTemplate, removeAudioTemplate, appliedRoles, hasSlots } from './utils/audioTemplate'
 import { loadLoudness, planCuts } from './utils/silenceDetect'
@@ -206,7 +206,8 @@ function App() {
   const [chapters, setChapters] = useState([])
   const resolvedChapters = useMemo(() => (audioMode ? resolveChapters(tracks, chapters, timelineEnd) : []), [audioMode, tracks, chapters, timelineEnd])
   const chapterList = useMemo(() => chapterSpans(resolvedChapters, timelineEnd), [resolvedChapters, timelineEnd])
-  const duck = useMemo(() => (audioMode ? duckPlan(tracks, master) : null), [audioMode, tracks, master])
+  // Every ducked clip's plan (its own Duck setting, or the top bar's for music)
+  const duck = useMemo(() => (audioMode ? duckPlans(tracks, master) : null), [audioMode, tracks, master])
   // Name of the show: the first recording's name (the MP3's title and file name)
   const audioTitle = useMemo(() => {
     if (!audioMode) return null
@@ -1167,6 +1168,21 @@ function App() {
     applyTracks(ts => ts.map(t => ({ ...t, clips: t.clips.map(c => (byId.has(c.id) ? { ...c, ...byId.get(c.id) } : c)) })))
   }, [applyTracks])
 
+  // A clip's Duck in the panel: its setting, and what it can listen to (any
+  // voice, or one of the other audio tracks)
+  const duckInfoFor = (clip) => {
+    const track = clip && tracks.find(t => t.type === 'audio' && t.clips.some(c => c.id === clip.id))
+    if (!track) return null
+    return {
+      setting: clipDuckSetting(clip, track, master),
+      followsTopBar: !!track.music,
+      sources: [
+        { id: 'voices', label: 'any voice' },
+        ...tracks.filter(t => t.type === 'audio' && t.id !== track.id).map(t => ({ id: t.id, label: t.name || (t.music ? 'Music' : 'Voice') }))
+      ]
+    }
+  }
+
   // Audio clips plus the rest of their groups (not template parts): what the
   // voice clean-up applies to (clip level, except a clip in a group)
   const withGroups = (clips) => {
@@ -1253,6 +1269,7 @@ function App() {
               onSplit={() => splitClip(sideClip.id)}
               voiceTargets={audioMode ? withGroups([sideClip]) : null}
               onUpdateClipsEach={audioMode ? updateClipsEach : null}
+              duckInfo={audioMode ? duckInfoFor(sideClip) : null}
               playheadPosition={playheadPosition}
               tabbed={!isDesktop}
             />
@@ -1397,7 +1414,7 @@ function App() {
                   </button>
                   {duckMenuOpen && (
                     <div className="audio-duck-menu" role="radiogroup" aria-label="Music under the voices">
-                      <p>The music goes down while someone talks and comes back up in the pauses.</p>
+                      <p>The music goes down while someone talks and comes back up in the pauses. A clip with its own Duck (clip settings) keeps that.</p>
                       {[{ id: null, label: 'Off: the music keeps its level' }, ...DUCK_DEPTHS.map(db => ({ id: db, label: `${db} dB${db === -6 ? ' (a little)' : db === -18 ? ' (a lot)' : ''}` }))].map(o => {
                         const on = o.id === null ? !master.duck : master.duck && master.duckDb === o.id
                         return (

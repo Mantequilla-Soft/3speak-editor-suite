@@ -14,7 +14,7 @@ process.env.WORK_DIR = dir
 const {
   planLanes, laneEntries, segmentFilter, segmentArgs, mixArgs, parseLoudnorm, concatList,
   audioTimelineEnd, renderAudioTimeline, SEGMENT_RATE, OUTPUT_RATE, LOUDNESS_TARGET,
-  cleanDuck, duckExpr, duckFilter, cleanChapters, chapterMetadata
+  cleanDuck, cleanClipDuck, duckExpr, duckFilter, cleanChapters, chapterMetadata
 } = await import('../src/services/audioRender.js')
 after(() => fs.rmSync(dir, { recursive: true, force: true }))
 
@@ -148,6 +148,17 @@ describe('auto-duck / chapters', () => {
       { ...duck, tracks: [] }, { ...duck, spans: [[5, 2]] }, { ...duck, spans: [['a', 2]] }, { ...duck, spans: Array.from({ length: 2001 }, (_, i) => [i * 3, i * 3 + 1]) }]) {
       assert.equal(cleanDuck(bad), null, JSON.stringify(bad)?.slice(0, 60))
     }
+  })
+
+  test('a clip brings its own duck: spans in its own seconds (may start before it), no tracks', () => {
+    const plan = { gain: 0.5, attack: 0.4, release: 0.8, spans: [[-3, 1], [4, 6]] }
+    assert.deepEqual(cleanClipDuck(plan), plan)
+    assert.equal(cleanClipDuck({ ...plan, gain: 1 }), null)
+    assert.equal(cleanClipDuck(null), null)
+    // the clip's segment filter gets the ramps after its volume
+    const f = segmentFilter({ startTime: 0, endTime: 8, volume: 150, duckPlan: plan })
+    assert.match(f, /^volume=1\.500,asetnsamples=n=480:p=0,volume=eval=frame:volume='1-0\.5\*\(/)
+    assert.equal(segmentFilter({ startTime: 0, endTime: 8, volume: 100, duckPlan: { ...plan, gain: 2 } }), null, 'a bad plan is dropped')
   })
 
   test('duckExpr is the same trapezoid as the editor (evaluated here by hand)', () => {

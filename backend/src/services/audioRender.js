@@ -94,7 +94,7 @@ export function laneEntries(lane) {
   return entries
 }
 
-/** ffmpeg filter for a clip's fades and volume (null when it needs none). */
+/** ffmpeg filter for a clip's fades, volume and duck (null when it needs none). */
 export function segmentFilter(clip) {
   const duration = clipLength(clip)
   const parts = []
@@ -104,6 +104,9 @@ export function segmentFilter(clip) {
   if (fo > 0) parts.push(`afade=t=out:st=${Math.max(0, duration - fo).toFixed(3)}:d=${fo.toFixed(3)}`)
   const vol = clipVolume(clip)
   if (Math.abs(vol - 1) > 0.0001) parts.push(`volume=${vol.toFixed(3)}`)
+  // The clip's own auto-duck (its sidechain source's spans, in clip seconds)
+  const duck = cleanClipDuck(clip.duckPlan)
+  if (duck) parts.push(duckFilter(duck))
   return parts.length ? parts.join(',') : null
 }
 
@@ -153,22 +156,28 @@ export function concatList(files) {
 
 // Auto-duck limits (a plan is made by the editor; this only checks and applies it)
 const MAX_DUCK_SPANS = 2000
+// A clip's source can start up to a whole show before it (routes/render.js MAX_AUDIO_RENDER_SECONDS)
+const MAX_SHOW_SECONDS = 3 * 60 * 60
 const finite = (n) => typeof n === 'number' && Number.isFinite(n)
 
 /**
  * timeline.master.duck checked: { gain 0..1, attack, release (s), spans [[s, e]]
- * sorted and apart, tracks [ids] } or null when absent or unusable.
+ * sorted and apart, tracks [ids] } or null when absent or unusable. (Editors
+ * before the per-clip duck sent this; now each clip brings its own.)
  */
-export function cleanDuck(duck) {
+export function cleanDuck(duck, { perClip = false } = {}) {
   if (!duck || typeof duck !== 'object') return null
   const { gain, attack, release } = duck
   if (!finite(gain) || gain < 0 || gain >= 1) return null
   if (!finite(attack) || !finite(release) || attack < 0.05 || attack > 5 || release < 0.05 || release > 5) return null
-  if (!Array.isArray(duck.tracks) || !duck.tracks.length || !Array.isArray(duck.spans) || !duck.spans.length) return null
+  if (!perClip && (!Array.isArray(duck.tracks) || !duck.tracks.length)) return null
+  if (!Array.isArray(duck.spans) || !duck.spans.length) return null
   if (duck.spans.length > MAX_DUCK_SPANS) return null
+  // A clip's spans are in its own seconds: its source may start before it
+  const minStart = perClip ? -MAX_SHOW_SECONDS : 0
   const spans = []
   for (const sp of duck.spans) {
-    if (!Array.isArray(sp) || !finite(sp[0]) || !finite(sp[1]) || sp[1] <= sp[0] || sp[0] < 0) return null
+    if (!Array.isArray(sp) || !finite(sp[0]) || !finite(sp[1]) || sp[1] <= sp[0] || sp[0] < minStart) return null
     const last = spans[spans.length - 1]
     // Ramps may not run into each other (the expression adds them up)
     if (last && sp[0] - attack < last[1] + release - 0.0005) {
@@ -177,8 +186,11 @@ export function cleanDuck(duck) {
     }
     spans.push([sp[0], sp[1]])
   }
-  return { gain, attack, release, spans, tracks: duck.tracks.map(String).slice(0, 50) }
+  return perClip ? { gain, attack, release, spans } : { gain, attack, release, spans, tracks: duck.tracks.map(String).slice(0, 50) }
 }
+
+/** A clip's duckPlan checked ({ gain, attack, release, spans } in clip seconds) or null. */
+export const cleanClipDuck = (plan) => cleanDuck(plan, { perClip: true })
 
 const n4 = (n) => String(Math.round(n * 10000) / 10000)
 

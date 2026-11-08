@@ -407,14 +407,29 @@ try {
     assert.equal(d.state.chapters.length, 2)
     assert.equal(d.state.chapters[1].title, 'Second part')
     assert.ok(d.state.chapters[1].anchor && Math.abs(d.state.chapters[1].anchor.t - 3) < 0.01, 'pinned to 3 s of the recording')
-    // Export: the render gets the duck plan and the chapters
+    // Duck is a clip setting too: the music clip shows the top bar's -12 dB,
+    // then gets its own -18 dB with the Voice track as its sidechain source
+    const musicTrack = d.state.tracks.find(t => t.music)
+    const voiceTrack = d.state.tracks.find(t => !t.music)
+    const bedId = musicTrack.clips[0].id
+    await f.locator(`.timeline-clip-v2[data-clip-id="${bedId}"]`).click()
+    const duckGroup = f.getByRole('radiogroup', { name: 'Duck this clip' })
+    assert.equal(await duckGroup.getByRole('radio', { name: '-12 dB' }).getAttribute('aria-checked'), 'true')
+    assert.match(await f.locator('.compact-side').innerText(), /Set by Duck in the top bar/)
+    await duckGroup.getByRole('radio', { name: '-18 dB' }).click()
+    await f.getByLabel('Duck source').selectOption(voiceTrack.id)
+    await until(() => drafts().find(x => {
+      const bed = x.state.tracks.find(t => t.music)?.clips.find(c => c.id === bedId)
+      return bed?.duck?.db === -18 && bed.duck.source === voiceTrack.id
+    }), 'the clip keeps its own duck')
+    // Export: each ducked clip brings its own ramps (clip seconds), plus the chapters
     const renderReq = p.page.waitForRequest(r => r.method() === 'POST' && /\/api\/render$/.test(new URL(r.url()).pathname))
     await f.getByRole('button', { name: /^Export$/ }).click()
     const { timeline } = (await renderReq).postDataJSON()
-    const musicTrack = d.state.tracks.find(t => t.music)
-    assert.deepEqual(timeline.master.duck.tracks, [musicTrack.id])
-    assert.equal(timeline.master.duck.gain, 0.2512)
-    assert.ok(timeline.master.duck.spans.length >= 1)
+    const bedOut = timeline.tracks.flatMap(t => t.clips).find(c => c.id === bedId)
+    assert.equal(bedOut.duckPlan.gain, 0.1259)
+    assert.ok(bedOut.duckPlan.spans.length >= 1)
+    assert.equal(timeline.master.duck, undefined, 'no whole-show duck any more')
     assert.equal(timeline.chapters[0].title, 'Intro')
     assert.equal(timeline.chapters[0].start, 0)
     const second = timeline.chapters[1]

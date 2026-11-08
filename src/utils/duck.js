@@ -1,10 +1,12 @@
-// Auto-duck: the music tracks get quieter while someone talks and come back up
-// in the pauses, so a music bed never fights the voice. "Someone talks" = a
-// voice clip plays there (after Cut silences the clips are the talking).
+// Auto-duck: a clip gets quieter while its sidechain source plays and comes
+// back up in the pauses, so a music bed never fights the voice. It is a clip
+// setting (clip.duck): { db, source } with source 'voices' (any voice track)
+// or one track's id, or { off: true }. A clip without one follows Duck in the
+// top bar (master.duck), which ducks the music tracks under the voices.
 //
-// The editor works the spans out (here) and sends them with the render; the
-// backend applies the same ramps (audioRender.js duckExpr), the preview plays
-// them through duckGainAt, so both sound the same.
+// The editor works the spans out (here) and sends each ducked clip its own
+// with the render; the backend applies the same ramps (audioRender.js
+// duckExpr), the preview plays them through duckGainAt, so both sound the same.
 
 export const DUCK_DEPTHS = [-6, -12, -18] // dB under the voice
 export const DUCK_DEFAULT_DB = -12
@@ -17,21 +19,9 @@ const len = (c) => Math.max(0, c.endTime - c.startTime)
 /** dB -> the gain the music keeps under the voice (0..1). */
 export const duckGain = (db) => Math.min(1, Math.max(0, 10 ** ((Number.isFinite(+db) ? +db : DUCK_DEFAULT_DB) / 20)))
 
-/**
- * Where the voices talk: [[start, end], ...] in timeline seconds, merged where
- * the gap between them is shorter than a whole ramp down and up (the music would
- * only bob for a breath). Muted tracks, clips with their sound off and the
- * template's intro / outro (those are music themselves) do not count.
- */
-export function voiceSpans(tracks, { attack = DUCK_ATTACK, release = DUCK_RELEASE } = {}) {
-  const raw = []
-  for (const t of tracks || []) {
-    if (t.type !== 'audio' || t.music || t.muted === true) continue
-    for (const c of t.clips) {
-      if (c.templateRole || c.audioEnabled === false || len(c) < 0.01) continue
-      raw.push([pos(c), pos(c) + len(c)])
-    }
-  }
+// Merge spans where the gap between them is shorter than a whole ramp down
+// and up (the ducked clip would only bob for a breath)
+function mergeSpans(raw, attack, release) {
   raw.sort((a, b) => a[0] - b[0])
   const spans = []
   for (const [s, e] of raw) {
@@ -42,24 +32,90 @@ export function voiceSpans(tracks, { attack = DUCK_ATTACK, release = DUCK_RELEAS
   return spans
 }
 
+// A clip that plays and counts as sound
+const sounding = (c) => c.audioEnabled !== false && len(c) >= 0.01
+
 /**
- * The duck for a render or the preview: { gain, attack, release, spans, tracks }
- * (`tracks`: ids of the music tracks it applies to), or null when it is off or
- * there is nothing to duck.
+ * Where the voices talk: [[start, end], ...] in timeline seconds, merged.
+ * Muted tracks, clips with their sound off and the template's intro / outro
+ * (those are music themselves) do not count. `exceptTrackId`: leave that
+ * track out (a voice is never ducked by itself).
  */
-export function duckPlan(tracks, master) {
-  if (!master?.duck) return null
-  const music = (tracks || []).filter(t => t.type === 'audio' && t.music && t.muted !== true && t.clips.length)
-  if (!music.length) return null
-  const spans = voiceSpans(tracks)
-  if (!spans.length) return null
-  return {
-    gain: Math.round(duckGain(master.duckDb) * 10000) / 10000,
-    attack: DUCK_ATTACK,
-    release: DUCK_RELEASE,
-    spans: spans.map(([s, e]) => [Math.round(s * 1000) / 1000, Math.round(e * 1000) / 1000]),
-    tracks: music.map(t => t.id)
+export function voiceSpans(tracks, { attack = DUCK_ATTACK, release = DUCK_RELEASE, exceptTrackId = null } = {}) {
+  const raw = []
+  for (const t of tracks || []) {
+    if (t.type !== 'audio' || t.music || t.muted === true || t.id === exceptTrackId) continue
+    for (const c of t.clips) {
+      if (c.templateRole || !sounding(c)) continue
+      raw.push([pos(c), pos(c) + len(c)])
+    }
   }
+  return mergeSpans(raw, attack, release)
+}
+
+/** Where a sidechain source plays: 'voices', or one track (never the ducked clip's own). */
+export function sourceSpans(tracks, source, ownTrackId, opts = {}) {
+  const { attack = DUCK_ATTACK, release = DUCK_RELEASE } = opts
+  if (!source || source === DUCK_SOURCE_VOICES) return voiceSpans(tracks, { attack, release, exceptTrackId: ownTrackId })
+  if (source === ownTrackId) return []
+  const track = (tracks || []).find(t => t.id === source && t.type === 'audio' && t.muted !== true)
+  if (!track) return []
+  return mergeSpans(track.clips.filter(sounding).map(c => [pos(c), pos(c) + len(c)]), attack, release)
+}
+
+export const DUCK_SOURCE_VOICES = 'voices'
+
+/**
+ * What a clip's duck is: its own setting, or Duck in the top bar for a clip on
+ * a music track. { db, source, inherited } or null (not ducked).
+ */
+export function clipDuckSetting(clip, track, master) {
+  if (!clip || !track || track.type !== 'audio') return null
+  const own = clip.duck
+  if (own?.off) return null
+  if (own && Number.isFinite(+own.db)) return { db: +own.db, source: own.source || DUCK_SOURCE_VOICES, inherited: false }
+  if (track.music && master?.duck) return { db: Number.isFinite(+master.duckDb) ? +master.duckDb : DUCK_DEFAULT_DB, source: DUCK_SOURCE_VOICES, inherited: true }
+  return null
+}
+
+const r3 = (n) => Math.round(n * 1000) / 1000
+
+/**
+ * Every ducked clip's plan, for the preview and the render:
+ * { [clipId]: { gain, attack, release, spans } } with spans in timeline
+ * seconds (only those that reach the clip). Clips with nothing to duck under
+ * are left out; null when no clip is ducked.
+ */
+export function duckPlans(tracks, master) {
+  const plans = {}
+  const cache = new Map()
+  for (const t of tracks || []) {
+    if (t.type !== 'audio' || t.muted === true) continue
+    for (const c of t.clips) {
+      const setting = clipDuckSetting(c, t, master)
+      if (!setting || !sounding(c)) continue
+      const key = `${setting.source}|${t.id}`
+      if (!cache.has(key)) cache.set(key, sourceSpans(tracks, setting.source, t.id))
+      const from = pos(c) - DUCK_RELEASE
+      const to = pos(c) + len(c) + DUCK_ATTACK
+      const spans = cache.get(key).filter(([s, e]) => s < to && e > from)
+      if (!spans.length) continue
+      plans[c.id] = {
+        gain: Math.round(duckGain(setting.db) * 10000) / 10000,
+        attack: DUCK_ATTACK,
+        release: DUCK_RELEASE,
+        spans: spans.map(([s, e]) => [r3(s), r3(e)])
+      }
+    }
+  }
+  return Object.keys(plans).length ? plans : null
+}
+
+/** A clip's plan for the render: its spans in the clip's own seconds (0 = where it starts). */
+export function localDuckPlan(plan, clip) {
+  if (!plan) return null
+  const p0 = pos(clip)
+  return { gain: plan.gain, attack: plan.attack, release: plan.release, spans: plan.spans.map(([s, e]) => [r3(s - p0), r3(e - p0)]) }
 }
 
 /**

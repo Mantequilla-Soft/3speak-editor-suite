@@ -93,13 +93,13 @@ export default function AudioStage({ tracks, playheadPosition, totalDuration, on
         const bars = Math.max(1, Math.floor(w / BAR_PX))
         const heights = env ? peaksForRange(env, c.startTime, c.endTime, bars) : null
         const vol = Math.min(2, Math.max(0, (Number.isFinite(+c.volume) ? +c.volume : 100) / 100))
-        // Auto-duck shows: the music's bars go down where the voices talk
-        const ducked = duck && track.music && duck.tracks.includes(track.id)
+        // Auto-duck shows: a ducked clip's bars go down where its source plays
+        const ducked = duck?.[c.id] || null
         const barSec = (len / bars)
         for (let b = 0; b < bars; b++) {
           // peaksForRange gives 10..90 (timeline bar heights); back to 0..1
           const level = heights ? Math.max(0, (heights[b] - 10) / 80) : 0.15
-          const d = ducked ? duckGainAt(duck, start + (b + 0.5) * barSec) : 1
+          const d = ducked ? duckGainAt(ducked, start + (b + 0.5) * barSec) : 1
           const h = Math.max(1, Math.min(laneH - 6, level * vol * d * (laneH - 6)))
           g.fillRect(x0 + b * BAR_PX, mid - h / 2, Math.max(1, BAR_PX - 1), h)
         }

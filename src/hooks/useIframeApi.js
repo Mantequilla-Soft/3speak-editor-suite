@@ -5,7 +5,7 @@ import { hasLayout } from '../utils/remixLayout'
 import { getClipChromaKey } from '../utils/chromaKey'
 import { normalizeColor } from '../utils/clipColor'
 import { normalizeMotion } from '../utils/stickerMotion'
-import { duckPlan } from '../utils/duck'
+import { duckPlans, localDuckPlan } from '../utils/duck'
 
 const isIframe = typeof window !== 'undefined' && window.parent !== window
 const GATEWAY_URL = (import.meta.env.VITE_GATEWAY_URL || '').replace(/\/+$/, '')
@@ -427,14 +427,17 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
 
     // The audio editor renders an MP3 of the audio tracks (backend audioRender.js)
     if (audioMode) {
+      // Ducked clips (their own Duck, or the top bar's for music) carry their
+      // ramps in their own seconds; the backend applies them per clip
+      const plans = duckPlans(tracks, master)
       return {
         timeline: {
           output: 'audio',
-          tracks: trackData.filter(t => t.type === 'audio'),
+          tracks: trackData.filter(t => t.type === 'audio').map(t => (plans
+            ? { ...t, clips: t.clips.map(c => (plans[c.id] ? { ...c, duckPlan: localDuckPlan(plans[c.id], c) } : c)) }
+            : t)),
           master: {
-            loudness: master?.loudness !== false,
-            // Music down under the voices (utils/duck.js works out where)
-            ...(duckPlan(tracks, master) ? { duck: duckPlan(tracks, master) } : {})
+            loudness: master?.loudness !== false
           },
           ...(title ? { title: String(title).slice(0, 120) } : {}),
           // ID3 chapters: [{ start, end, title }]
