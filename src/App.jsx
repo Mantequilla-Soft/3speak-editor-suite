@@ -27,7 +27,6 @@ import TooLargeNotice from './components/TooLargeNotice'
 import SilenceCutModal, { loadSettings as loadAutoCutSettings } from './components/SilenceCutModal'
 import AudioTemplateDialog from './components/AudioTemplateDialog'
 import ChaptersDialog from './components/ChaptersDialog'
-import AudiogramDialog from './components/AudiogramDialog'
 import { newChapter, moveChapter, resolveChapters, chapterSpans, MAX_CHAPTERS } from './utils/chapters'
 import { duckPlans, clipDuckSetting, applyMasterDuck, DUCK_DEPTHS, DUCK_DEFAULT_DB } from './utils/duck'
 import { trackNumbers, trackLabel } from './utils/trackNumbers'
@@ -1173,7 +1172,6 @@ function App() {
 
   // Chapters: added at the playhead (M), renamed, moved, removed
   const [chaptersOpen, setChaptersOpen] = useState(false)
-  const [audiogramOpen, setAudiogramOpen] = useState(false)
   const cleaning = useCleaningStatus()
   // Duck is a clip setting only. A whole-show Duck (an old draft, or a
   // template with "duck the music") becomes the music clips' own setting.
@@ -1480,12 +1478,6 @@ function App() {
                   <Download size={14} />
                   <span>Download</span>
                 </a>
-                {audioMode && (
-                  <button className="compact-download-btn" onClick={() => setAudiogramOpen(true)} title="A short video of the episode to share as a teaser">
-                    <Film size={14} />
-                    <span>Audiogram</span>
-                  </button>
-                )}
                 {isIframe && (
                   <button
                     className="compact-render-btn"
@@ -1764,17 +1756,6 @@ function App() {
             allCount={audioMode && voiceClips.some(c => c.id === autoCutClip.id) ? voiceClips.length : 0}
             group={autoCutGroup}
             onClose={() => setAutoCutClipId(null)}
-          />
-        )}
-
-        {audiogramOpen && renderStatus?.status === 'completed' && renderStatus.outputUrl && (
-          <AudiogramDialog
-            outputUrl={renderStatus.outputUrl}
-            length={timelineEnd}
-            playheadPosition={playheadPosition}
-            title={audioTitle}
-            chapters={resolvedChapters}
-            onClose={() => setAudiogramOpen(false)}
           />
         )}
 

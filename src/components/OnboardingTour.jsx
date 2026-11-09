@@ -98,7 +98,7 @@ export const AUDIO_TOUR_STEPS = [
   {
     target: '.compact-render-btn',
     title: 'Export',
-    text: 'Export makes an MP3. Listen to it, then use it for your upload or download it. You can also make an Audiogram: a short video teaser to share. Signed in, your project is kept as a draft while you work.',
+    text: 'Export makes an MP3. Listen to it, then use it for your upload or download it. Signed in, your project is kept as a draft while you work.',
     position: 'below'
   }
 ]
