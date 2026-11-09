@@ -58,7 +58,7 @@ async function uploadLocalImage(localUrl, name) {
  * autosave after their upload picks them up. `plates` maps local plate / noise
  * map URLs to their uploaded copies (see useDrafts).
  */
-export function serializeProject(tracks, library, plates = new Map(), { mode = 'video', master = null, chapters = null, playhead = null } = {}) {
+export function serializeProject(tracks, library, plates = new Map(), { mode = 'video', master = null, chapters = null, playhead = null, zoom = null, flags = null, selected = null } = {}) {
   let pending = 0
   const serverRef = (x) => x.serverUrl || (x.url && !LOCAL.test(x.url) ? x.url : null)
   const outTracks = tracks.map(t => ({
@@ -89,6 +89,11 @@ export function serializeProject(tracks, library, plates = new Map(), { mode = '
   const state = { version: 1, tracks: outTracks, library: outLibrary }
   // playhead: where it stood (seconds), so the draft opens there again
   if (Number.isFinite(playhead) && playhead > 0) state.playhead = Math.round(playhead * 1000) / 1000
+  // zoom: the timeline's px per second, so the draft opens as it was seen
+  if (Number.isFinite(zoom) && zoom > 0) state.zoom = Math.round(zoom * 10000) / 10000
+  // flags: the creator's own markers (utils/flags.js); selected: the clip(s) selected
+  if (Array.isArray(flags) && flags.length) state.flags = flags
+  if (Array.isArray(selected) && selected.length) state.selected = selected.slice(0, 500)
   if (mode === 'audio') {
     state.mode = 'audio'
     state.master = { loudness: master?.loudness !== false, duck: master?.duck === true, ...(Number.isFinite(+master?.duckDb) ? { duckDb: +master.duckDb } : {}) }
@@ -115,7 +120,7 @@ export const projectMode = (p) => (p?.mode === 'audio' ? 'audio' : 'video')
  * per-tier limit (free: 1 for 7 days, Pro: 3 for 30 days; each save restarts
  * the clock) and deleting the draft once the video is sent.
  */
-export function useDrafts({ session, hasMedia, tracks, library, loadProjectState, onUnauthorized, mode = 'video', master = null, chapters = null, playhead = 0, playing = false }) {
+export function useDrafts({ session, hasMedia, tracks, library, loadProjectState, onUnauthorized, mode = 'video', master = null, chapters = null, playhead = 0, playing = false, zoom = null, flags = null, selected = null }) {
   const [drafts, setDrafts] = useState(null) // summaries, once fetched
   const [limits, setLimits] = useState(null)
   const [prompt, setPrompt] = useState(false) // "continue a draft?" on start
@@ -136,6 +141,14 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
   playheadRef.current = playhead
   const savedPlayheadRef = useRef(null) // the playhead (0.1 s) the server copy has
   const tenths = (t) => Math.round((+t || 0) * 10) / 10
+  const zoomRef = useRef(zoom)
+  zoomRef.current = zoom
+  const savedZoomRef = useRef(null) // the zoom (in 2% steps) the server copy has
+  const selectedRef = useRef(selected)
+  selectedRef.current = selected
+  const savedSelRef = useRef(null) // the selection the server copy has
+  const selKey = (ids) => (Array.isArray(ids) && ids.length ? [...ids].sort().join(',') : '')
+  const zoomStep = (z) => (Number.isFinite(+z) && +z > 0 ? Math.round(Math.log(+z) * 50) : null)
 
   // Upload the green-screen plates a save needs (failures just leave those clips unkeyed)
   const uploadPlates = useCallback(async () => {
@@ -174,7 +187,9 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
     setStatus('saving')
     await uploadPlates()
     const at = playheadRef.current
-    const { state, pending: notYet } = serializeProject(tracks, library, platesRef.current, { mode, master, chapters, playhead: at })
+    const z = zoomRef.current
+    const sel = selectedRef.current
+    const { state, pending: notYet } = serializeProject(tracks, library, platesRef.current, { mode, master, chapters, playhead: at, zoom: z, flags, selected: sel })
     setPending(notYet)
     if (!projectIdRef.current) projectIdRef.current = newId()
     const finalName = (saveName ?? name).trim() || defaultName(tracks, mode)
@@ -201,6 +216,8 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
       const d = await res.json()
       replaceRef.current = null
       savedPlayheadRef.current = tenths(at)
+      savedZoomRef.current = zoomStep(z)
+      savedSelRef.current = selKey(sel)
       setSaved({ updatedAt: d.project.updatedAt, expiresAt: d.project.expiresAt })
       setLimits(d.limits)
       if (!name) setName(d.project.name)
@@ -210,7 +227,7 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
       setStatus('error')
       return { ok: false }
     }
-  }, [session, tracks, library, name, authed, limits, uploadPlates, mode, master, chapters])
+  }, [session, tracks, library, name, authed, limits, uploadPlates, mode, master, chapters, flags])
 
   // Autosave from the first edit on (not while the limit question is open)
   useEffect(() => {
@@ -221,18 +238,19 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
     clearTimeout(timerRef.current)
     timerRef.current = setTimeout(() => { save() }, AUTOSAVE_DELAY)
     return () => clearTimeout(timerRef.current)
-  }, [tracks, library, session, master, chapters]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tracks, library, session, master, chapters, flags]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // The playhead came to rest somewhere else (paused, moved, a draft opened):
-  // a draft already on the server is saved again so it reopens there. Not
+  // The playhead came to rest somewhere else (paused, moved, a draft opened),
+  // the timeline was zoomed or another clip selected: a draft already on the
+  // server is saved again so it reopens like that. Not
   // while playing (it moves every frame), and never the first save of a
   // project (only an edit makes a draft).
   useEffect(() => {
     if (!session || playing || !projectIdRef.current || status === 'limit' || !hasContent(tracks)) return
-    if (savedPlayheadRef.current === tenths(playhead)) return
+    if (savedPlayheadRef.current === tenths(playhead) && savedZoomRef.current === zoomStep(zoom) && savedSelRef.current === selKey(selected)) return
     clearTimeout(timerRef.current)
     timerRef.current = setTimeout(() => { save() }, AUTOSAVE_DELAY)
-  }, [playhead, playing]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [playhead, playing, zoom, selKey(selected)]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadDraft = useCallback(async (id) => {
     const res = await authed(`/${id}`)
@@ -244,6 +262,8 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
     setSaved({ updatedAt: p.updatedAt, expiresAt: p.expiresAt })
     setStatus('saved')
     savedPlayheadRef.current = tenths(savedPlayhead(p.state))
+    savedZoomRef.current = zoomStep(p.state?.zoom)
+    savedSelRef.current = selKey(p.state?.selected)
     loadProjectState(p.state)
     setPrompt(false)
     return true

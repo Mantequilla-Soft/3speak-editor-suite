@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo, memo } from 'react'
 import { boxFrom, clipIdsInBox, toggleInSelection, clipIdsInRange } from '../utils/marquee'
 import { trackNumbers } from '../utils/trackNumbers'
-import { Trash2, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker, Maximize2, ListChecks } from 'lucide-react'
+import { Trash2, Flag, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker, Maximize2, ListChecks } from 'lucide-react'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 import { getGroupColor } from '../hooks/useTimeline'
 import { MAX_TIMELINE_SECONDS } from '../utils/limits'
@@ -594,6 +594,12 @@ function Timeline({
   onSplitAtPlayhead,
   onRemoveGap,
   rippleTrackId = null,
+  restoreZoom = null,
+  onZoomChange,
+  flags = null,
+  onAddFlag,
+  onMoveFlag,
+  onRemoveFlag,
   isPlayheadOnGap,
   onDuplicate,
   onGroupClips,
@@ -991,11 +997,23 @@ function Timeline({
     setZoom(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, width / Math.max(1, maxClipEnd))))
   }, [maxClipEnd, MIN_ZOOM, MAX_ZOOM])
   const hadContentRef = useRef(false)
+  // A draft opened: back to the zoom it was saved with (and no Fit below, which
+  // would run in the same render because the timeline just got its clips)
+  useEffect(() => {
+    const z = +restoreZoom?.value
+    if (!Number.isFinite(z) || z <= 0) return
+    hadContentRef.current = true
+    setZoom(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z)))
+  }, [restoreZoom?.key]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!audioMode) return
     if (maxClipEnd > 0 && !hadContentRef.current) fitToView()
     hadContentRef.current = maxClipEnd > 0
   }, [audioMode, maxClipEnd > 0]) // eslint-disable-line react-hooks/exhaustive-deps
+  // The zoom goes into the draft (App -> useDrafts)
+  const onZoomChangeRef = useRef(onZoomChange)
+  onZoomChangeRef.current = onZoomChange
+  useEffect(() => { onZoomChangeRef.current?.(zoom) }, [zoom])
 
   // Ctrl+= zoom in, Ctrl+- zoom out
   useEffect(() => {
@@ -1130,6 +1148,35 @@ function Timeline({
     }
     e.target.value = ''
   }, [onAddFilesToTrack])
+
+  // Flags: click jumps there, a drag moves the flag, right-click removes it
+  const [flagDrag, setFlagDrag] = useState(null) // { id, at } while a flag is dragged
+  const startFlagDrag = (e, flag) => {
+    if (e.button !== 0) return
+    e.preventDefault()
+    e.stopPropagation()
+    const content = timelineContentRef.current
+    if (!content) return
+    const startX = e.clientX
+    let moved = false
+    let at = flag.at
+    const onMove = (ev) => {
+      if (!moved && Math.abs(ev.clientX - startX) < 4) return
+      moved = true
+      const rect = content.getBoundingClientRect()
+      at = Math.max(0, (ev.clientX - rect.left + content.scrollLeft) / pixelsPerSecond)
+      setFlagDrag({ id: flag.id, at })
+    }
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+      setFlagDrag(null)
+      if (moved) onMoveFlag?.(flag.id, at)
+      else onSetPlayhead(flag.at)
+    }
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
+  }
 
   const playheadLeft = playheadPosition * pixelsPerSecond
 
@@ -1319,6 +1366,15 @@ function Timeline({
           >
             <ArrowLeftToLine size={14} /> <span>Ripple</span>
           </button>
+          {onAddFlag && (
+            <button
+              className="action-btn"
+              onClick={() => onAddFlag(playheadPosition)}
+              title="Set a flag at the playhead (B): your own marker, numbered and coloured, never exported"
+            >
+              <Flag size={14} /> <span>Flag</span>
+            </button>
+          )}
           {selectedClipId && (
             <>
               <button
@@ -1626,6 +1682,27 @@ function Timeline({
             <div className="playhead-head" />
             <div className="playhead-line" />
           </div>
+
+          {/* Flags: the creator's own numbered markers */}
+          {(flags || []).map(fl => (
+            <div
+              key={fl.id}
+              className="timeline-flag"
+              style={{ left: `${(flagDrag?.id === fl.id ? flagDrag.at : fl.at) * pixelsPerSecond}px`, '--flag-color': fl.color }}
+            >
+              <button
+                type="button"
+                className="timeline-flag-head"
+                data-flag={fl.n}
+                aria-label={`Flag ${fl.n} at ${formatTime(fl.at)}`}
+                title={`Flag ${fl.n} · ${formatTime(fl.at)}: click to jump there, drag to move, right-click to remove`}
+                onMouseDown={(e) => startFlagDrag(e, fl)}
+                onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); onRemoveFlag?.(fl.id) }}
+              >
+                {fl.n}
+              </button>
+            </div>
+          ))}
 
           {/* Video tracks - first track at top (highest layer) */}
           {videoTracks.map((track, trackIndex) => (
