@@ -7161,6 +7161,16 @@ input[type="range"] {
   color: var(--text-secondary);
 }
 
+/* Cancel next to Use this piece: a text button of the same size (compact-btn
+   alone is a 32 px square for icons) */
+.range-pick-bar .compact-btn {
+  width: auto;
+  height: auto;
+  padding: 0.4rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
 .range-pick-bar strong {
   color: var(--text-primary);
 }

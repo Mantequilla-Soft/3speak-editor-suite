@@ -484,6 +484,12 @@ try {
     await p.page.mouse.move(clipBox.x + clipBox.width / 2 + 60, clipBox.y + clipBox.height / 2, { steps: 5 })
     await p.page.mouse.up()
     assert.equal((await f.locator('.timeline-clip-v2').first().boundingBox()).x, clipLeft, 'the clip stayed where it was')
+    // Cancel and Use this piece: text buttons of the same height, the words inside them
+    const cancelBtn = f.locator('.range-pick-bar').getByRole('button', { name: 'Cancel' })
+    const cb = await cancelBtn.boundingBox()
+    const ub = await f.getByRole('button', { name: 'Use this piece' }).boundingBox()
+    assert.ok(Math.abs(cb.height - ub.height) <= 1, `Cancel ${cb.height}px high, Use this piece ${ub.height}px`)
+    assert.ok(await cancelBtn.evaluate(el => el.scrollWidth <= el.clientWidth), 'the word Cancel fits its button')
     const ruler = await f.locator('.timeline-ruler').boundingBox()
     await p.page.mouse.move(ruler.x + 3, ruler.y + ruler.height / 2)
     await p.page.mouse.down()
