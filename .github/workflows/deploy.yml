@@ -1,0 +1,96 @@
+name: Deploy
+
+# Every commit that lands on main (a merged PR) goes to both production editor boxes once
+# the tests workflow has passed for it:
+#   1. B (editor.3speak.tv): render backend only, the canary
+#   2. A (3speak-editor.okinoko.io): gateway, backend (the upload + drafts home), frontend,
+#      only if B succeeded
+# Each box runs /usr/local/sbin/editor-deploy through a forced-command SSH user: it deploys
+# exactly the tested commit, rebuilds only what changed, keeps the box's own
+# docker-compose.yml, swaps a backend only between renders, smoke tests, and rolls back to
+# the previous images on any failure.
+#
+# Manual run (Actions > Deploy > Run workflow): mode `check` verifies both boxes without
+# changing anything; `deploy` deploys the selected main commit.
+on:
+  workflow_run:
+    workflows: [tests]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: check = verify only, deploy = deploy main
+        type: choice
+        options: [check, deploy]
+        default: check
+      target:
+        type: choice
+        options: [both, b, a]
+        default: both
+
+permissions:
+  contents: read
+
+# One deploy at a time, never cancelled half way: a newer merge waits for the running one.
+concurrency:
+  group: editor-deploy
+  cancel-in-progress: false
+
+env:
+  # workflow_run: the commit the tests run passed for. Manual: the main tip it was started on.
+  SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+  MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'deploy' }}
+
+jobs:
+  b:
+    name: B (editor.3speak.tv, render backend)
+    if: >-
+      (github.event_name == 'workflow_run'
+        && github.event.workflow_run.conclusion == 'success'
+        && github.event.workflow_run.event == 'push')
+      || (github.event_name == 'workflow_dispatch' && inputs.target != 'a')
+    runs-on: ubuntu-latest
+    environment: editor-production
+    # a backend waits up to 30 min for running renders, plus the build
+    timeout-minutes: 60
+    steps:
+      - name: ${{ env.MODE }} ${{ env.SHA }} on B
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          [[ "$SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "bad sha"; exit 1; }
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id && chmod 600 ~/.ssh/id
+          printf '%s\n' "$KNOWN" > ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id -p "${{ vars.B_PORT }}" -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            -o BatchMode=yes -o ServerAliveInterval=30 \
+            "${{ vars.DEPLOY_USER }}@${{ vars.B_HOST }}" "$MODE $SHA"
+
+  a:
+    name: A (3speak-editor.okinoko.io, frontend + gateway + backend)
+    needs: b
+    if: >-
+      always()
+      && (needs.b.result == 'success'
+          || (needs.b.result == 'skipped' && github.event_name == 'workflow_dispatch' && inputs.target == 'a'))
+      && (github.event_name == 'workflow_run' || inputs.target != 'b')
+    runs-on: ubuntu-latest
+    environment: editor-production
+    timeout-minutes: 60
+    steps:
+      - name: ${{ env.MODE }} ${{ env.SHA }} on A
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          [[ "$SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "bad sha"; exit 1; }
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id && chmod 600 ~/.ssh/id
+          printf '%s\n' "$KNOWN" > ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id -p "${{ vars.A_PORT }}" -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            -o BatchMode=yes -o ServerAliveInterval=30 \
+            "${{ vars.DEPLOY_USER }}@${{ vars.A_HOST }}" "$MODE $SHA"
