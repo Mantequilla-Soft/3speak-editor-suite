@@ -16,9 +16,9 @@ import path from 'path'
 import vm from 'vm'
 import crypto from 'crypto'
 import dns from 'dns/promises'
-import net from 'net'
 import { fileURLToPath } from 'url'
 import { requireSignIn } from '../auth.js'
+import { privateAddress } from '../utils/privateAddress.js'
 
 const router = Router()
 const PORT = process.env.PORT || 3100
@@ -49,14 +49,6 @@ function chromiumPath() {
 const UPLOAD_PATH = /^\/api\/upload\/files\/([\w.-]+)$/
 const localUpload = name => `http://127.0.0.1:${PORT}/api/upload/files/${name}`
 
-function privateAddress(ip) {
-  if (net.isIPv4(ip)) {
-    const [a, b] = ip.split('.').map(Number)
-    return a === 10 || a === 127 || a === 0 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a === 100 && b >= 64 && b <= 127) || a >= 224
-  }
-  const v = ip.toLowerCase()
-  return v === '::1' || v === '::' || v.startsWith('fc') || v.startsWith('fd') || v.startsWith('fe80') || v.startsWith('::ffff:')
-}
 
 // https://… on a public host -> saved as an upload; returns the local URL (or null)
 async function fetchRemote(u) {

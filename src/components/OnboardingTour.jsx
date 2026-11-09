@@ -103,6 +103,96 @@ export const AUDIO_TOUR_STEPS = [
   }
 ]
 
+// The audiogram studio's tour, the first time it opens (targets in AudiogramDialog.jsx)
+export const AUDIOGRAM_TOUR_STEPS = [
+  {
+    target: '.audiogram-studio .remix-picker-header',
+    title: 'Audiograms',
+    text: 'Short videos of a piece of your episode: a moving waveform, your title and picture, with the 3Speak look. They go out as 3Speak Shorts together with the episode.',
+    position: 'below'
+  },
+  {
+    target: '.audiogram-pick',
+    title: 'Your piece',
+    text: 'The piece you picked on the timeline, up to 2 minutes. Change it here any time.',
+    position: 'below'
+  },
+  {
+    target: '.audiogram-stage',
+    title: 'Arrange it your way',
+    text: 'Drag any part to move it, pull a corner to resize it (Shift keeps the shape), and turn it with the round handle under it. The 3Speak logo always stays in, as the 3S or the full logo.',
+    position: 'below'
+  },
+  {
+    target: '[aria-label="Picture"]',
+    title: 'A picture',
+    text: 'Upload one or take the cover of one of your playlists. It shows as a card you can move and resize like the other parts.',
+    position: 'below'
+  },
+  {
+    target: '[aria-label="Waveform type"]',
+    title: 'The waveform',
+    text: 'Bars, lines, a circle or a circle wave, in the 3Speak red or any colour you like.',
+    position: 'below'
+  },
+  {
+    target: '.audiogram-layers',
+    title: 'Parts',
+    text: 'Hide a part, or bring it forward or send it back when parts overlap.',
+    position: 'above'
+  },
+  {
+    target: '.audiogram-make',
+    title: 'Make it',
+    text: 'Make as many as you like: each goes out as a Short with the episode, with its own text and a link to it. Your last look is kept as your template for the next one.',
+    position: 'above'
+  }
+]
+
+// Choosing the audiogram's piece on the timeline, the first time (targets in App.jsx and Timeline.jsx)
+export const RANGE_PICK_TOUR_STEPS = [
+  {
+    target: '.timeline-content',
+    title: 'Click the start, then the end',
+    text: 'Click where the piece should start, then where it ends: up to 2 minutes. Pull its edges to adjust it, or drag across the tracks to draw a whole piece. A new click starts over.',
+    position: 'above'
+  },
+  {
+    target: '.timeline-toolbar .toolbar-center',
+    title: 'Move around',
+    text: 'Drag the ruler or scroll to move along the episode. Zoom in with the slider for a precise start, or tap Fit to see the whole episode.',
+    position: 'above'
+  },
+  {
+    target: '.range-pick-play',
+    title: 'Listen to it',
+    text: 'Play the piece (or Space) plays just the part you picked, then goes back to its start.',
+    position: 'above'
+  },
+  {
+    target: '.range-pick-bar',
+    title: 'Use it',
+    text: 'Use this piece (or Enter) takes it back to your audiogram, Cancel (or Escape) keeps the old one. Until then the rest of the editor is locked, so nothing else changes by accident.',
+    position: 'above'
+  }
+]
+
+/**
+ * A tour shown the first time something is used: [show, finish]. `key` is the
+ * storage key; storage that throws (a sandboxed iframe) shows the tour.
+ * `when` false: not now (shows once it turns true and was never finished).
+ */
+export function useFirstTimeTour(key, when = true) {
+  const [done, setDone] = useState(() => {
+    try { return !!localStorage.getItem(key) } catch { return false }
+  })
+  const finish = useCallback(() => {
+    try { localStorage.setItem(key, '1') } catch { /* storage blocked */ }
+    setDone(true)
+  }, [key])
+  return [when && !done, finish]
+}
+
 export default function OnboardingTour({ onComplete, steps = TOUR_STEPS }) {
   const [step, setStep] = useState(0)
   const [rect, setRect] = useState(null)

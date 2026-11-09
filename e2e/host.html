@@ -30,6 +30,12 @@ window.addEventListener('message', async (e) => {
   }
   if (e.data.type === 'drafts-sign-in') send({ type: 'drafts-session', session: window.__session, reason: null, hasMedia: !!FILE })
   if (e.data.type === 'request-close' || e.data.type === 'editor-closed') window.__closed = true
+  // 3Speak's post editor for a Short's text: only when a test sets the answer
+  // (window.__textEditor); else no answer, like an older 3Speak
+  if (e.data.type === 'edit-text' && typeof window.__textEditor === 'string') {
+    send({ type: 'text-edit-open', requestId: e.data.requestId })
+    setTimeout(() => send({ type: 'text-edited', requestId: e.data.requestId, value: window.__textEditor }), 50)
+  }
 })
 </script>
 </body></html>

@@ -634,7 +634,14 @@ function Timeline({
   onGroupVoices,
   chapters = null,
   onOpenChapters,
-  isPlaying = false
+  isPlaying = false,
+  // A piece of the timeline being picked (the audiograms) while
+  // `rangePicking`: { start, end } in seconds, end null while only the start
+  // is marked
+  range = null,
+  rangePicking = false,
+  rangeMax = 120,
+  onRangeChange
 }) {
   const { min: MIN_ZOOM, max: MAX_ZOOM } = zoomRange(audioMode)
   const [zoom, setZoom] = useState(33) // pixels per second
@@ -706,6 +713,7 @@ function Timeline({
   // spot clears the selection.
   const [marquee, setMarquee] = useState(null) // { x, y, w, h } in content px
   const handleContentMouseDown = (e) => {
+    if (rangePicking) return // picking has the press already (pickCapture)
     if (e.button !== 0 || !onSelectClips) return
     if (e.target.closest('.timeline-clip-v2, .timeline-playhead, .timeline-ruler, .timeline-chapter, button, input, select, a')) return
     const content = timelineContentRef.current
@@ -885,6 +893,102 @@ function Timeline({
   // (Touch scrolls the ruler natively, like the rest of the timeline.)
   const RULER_DRAG_PX = 4
   const [isDraggingRuler, setIsDraggingRuler] = useState(false)
+  // Picking a piece (at most rangeMax long). The timeline still moves: the
+  // wheel, the zoom, and dragging the ruler scroll it as always.
+  //   a click marks the start (the old end goes), the next click the end;
+  //   dragging across the tracks draws a whole piece;
+  //   the piece's edges can be dragged.
+  // Every press goes here, never to a clip, a flag or the playhead.
+  const round1 = (t) => Math.round(t * 10) / 10
+  const pickTimeAt = (cx) => {
+    const content = timelineContentRef.current
+    const r = content.getBoundingClientRect()
+    return Math.max(0, Math.min(Math.max(maxClipEnd, 0), (cx - r.left + content.scrollLeft) / pixelsPerSecond))
+  }
+  const swallowNextClick = () => {
+    const swallow = (ev) => { ev.stopPropagation(); ev.preventDefault() }
+    window.addEventListener('click', swallow, { capture: true, once: true })
+    setTimeout(() => window.removeEventListener('click', swallow, { capture: true }), 0)
+  }
+  // the latest piece, also between two quick clicks (before the next render)
+  const liveRangeRef = useRef(range)
+  useEffect(() => { liveRangeRef.current = range }, [range])
+  const setPiece = (r) => { liveRangeRef.current = r; onRangeChange(r) }
+  const markAt = (t) => {
+    const r = liveRangeRef.current
+    if (r && r.end == null) {
+      // the end: on either side of the start, at most rangeMax from it
+      const anchor = r.start
+      const a = t < anchor ? Math.max(t, anchor - rangeMax) : anchor
+      const b = t < anchor ? anchor : Math.min(t, anchor + rangeMax)
+      setPiece({ start: round1(a), end: round1(b) })
+    } else {
+      setPiece({ start: round1(t), end: null })
+    }
+  }
+  const startPickPress = (e) => {
+    const content = timelineContentRef.current
+    if (!content || !onRangeChange) return
+    e.preventDefault()
+    e.stopPropagation()
+    const onRuler = !!e.target.closest('.timeline-ruler')
+    const t0 = pickTimeAt(e.clientX)
+    const startX = e.clientX
+    const startScroll = content.scrollLeft
+    let dragging = false
+    const onMove = (ev) => {
+      const dx = ev.clientX - startX
+      if (!dragging && Math.abs(dx) < RULER_DRAG_PX) return
+      if (!dragging && onRuler) setIsDraggingRuler(true)
+      dragging = true
+      if (onRuler) { content.scrollLeft = startScroll - dx; return }
+      const t1 = pickTimeAt(ev.clientX)
+      const a = t1 >= t0 ? t0 : Math.max(t1, t0 - rangeMax)
+      const b = t1 >= t0 ? Math.min(t1, t0 + rangeMax) : t0
+      setPiece({ start: round1(a), end: round1(b) })
+    }
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+      if (dragging && onRuler) setIsDraggingRuler(false)
+      if (!dragging) markAt(t0)
+      swallowNextClick()
+    }
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
+  }
+  const startEdgeDrag = (e, edge) => {
+    const base = liveRangeRef.current
+    if (!base || !onRangeChange) return
+    e.preventDefault()
+    e.stopPropagation()
+    // where on the edge it was grabbed: the edge moves with the pointer, no jump
+    const grab = pickTimeAt(e.clientX) - (edge === 'start' ? base.start : base.end)
+    const onMove = (ev) => {
+      const t = pickTimeAt(ev.clientX) - grab
+      if (edge === 'start') {
+        const start = base.end == null ? t : Math.max(base.end - rangeMax, Math.min(t, base.end - 1))
+        setPiece({ start: round1(start), end: base.end })
+      } else {
+        setPiece({ start: base.start, end: round1(Math.min(base.start + rangeMax, Math.max(t, base.start + 1))) })
+      }
+    }
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+      swallowNextClick()
+    }
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
+  }
+  const pickCapture = (e) => {
+    if (e.button !== 0) { e.stopPropagation(); return }
+    const edge = e.target.closest('[data-range-edge]')
+    if (edge) startEdgeDrag(e, edge.dataset.rangeEdge)
+    else startPickPress(e)
+  }
+  const blockWhilePicking = (e) => { e.stopPropagation() }
+
   const handleRulerMouseDown = (e) => {
     if (e.button !== 0) return
     const content = timelineContentRef.current
@@ -1704,6 +1808,10 @@ function Timeline({
           className="timeline-content"
           ref={timelineContentRef}
           onMouseDown={handleContentMouseDown}
+          onMouseDownCapture={rangePicking ? pickCapture : undefined}
+          onTouchStartCapture={rangePicking ? blockWhilePicking : undefined}
+          onDoubleClickCapture={rangePicking ? blockWhilePicking : undefined}
+          onContextMenuCapture={rangePicking ? (e) => { e.preventDefault(); e.stopPropagation() } : undefined}
           onScroll={(e) => { if (sidebarRef.current) sidebarRef.current.scrollTop = e.currentTarget.scrollTop }}
         >
           {marquee && (
@@ -1736,6 +1844,30 @@ function Timeline({
               </button>
             ))}
           </div>
+
+          {/* The piece being picked (audiograms) */}
+          {range && range.end != null && range.end > range.start && (
+            <div
+              className={`timeline-range${rangePicking ? ' picking' : ''}`}
+              data-testid="timeline-range"
+              style={{ left: `${range.start * pixelsPerSecond}px`, width: `${(range.end - range.start) * pixelsPerSecond}px`, height: `${contentHeight}px` }}
+            >
+              <span className="timeline-range-label">{formatTime(range.start)} – {formatTime(range.end)} · {Math.round(range.end - range.start)}s</span>
+              {rangePicking && <span className="timeline-range-edge start" data-range-edge="start" title="Drag to move the start" />}
+              {rangePicking && <span className="timeline-range-edge end" data-range-edge="end" title="Drag to move the end" />}
+            </div>
+          )}
+          {/* only the start marked: waiting for the click on the end */}
+          {range && range.end == null && (
+            <div
+              className="timeline-range start-only"
+              data-testid="timeline-range-start"
+              style={{ left: `${range.start * pixelsPerSecond}px`, width: 0, height: `${contentHeight}px` }}
+            >
+              <span className="timeline-range-label">{formatTime(range.start)} · click where it ends</span>
+              {rangePicking && <span className="timeline-range-edge start" data-range-edge="start" title="Drag to move the start" />}
+            </div>
+          )}
 
           {/* Past the render limit: only shown once the timeline runs over it */}
           {maxClipEnd > MAX_TIMELINE_SECONDS + 0.01 && (

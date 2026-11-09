@@ -58,6 +58,10 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
   const [closeRequest, setCloseRequest] = useState(0)
   // A remix (someone else's video, posted under it) is never kept as a draft
   const [remixing, setRemixing] = useState(false)
+  // The person's playlist covers (from 3Speak, asked for by the audiograms): [{ title, url }]; null = not asked or no answer yet
+  const [playlistCovers, setPlaylistCovers] = useState(null)
+  // Texts written in 3Speak's own post editor (edit-text): requestId -> { resolve, timer }
+  const textEditsRef = useRef(new Map())
 
   const sendToParent = useCallback((type, payload = {}) => {
     if (!isIframe) return
@@ -137,6 +141,31 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
         case 'drafts-session': {
           setDraftSession(data.session && typeof data.session.token === 'string' ? data.session : null)
           setDraftContext({ hasMedia: !!data.hasMedia, reason: data.reason || null })
+          break
+        }
+
+        case 'playlist-covers': {
+          const list = Array.isArray(data.covers) ? data.covers : []
+          setPlaylistCovers(list
+            .filter(c => c && typeof c.url === 'string' && /^https:\/\//.test(c.url))
+            .slice(0, 50)
+            .map(c => ({ title: String(c.title || '').slice(0, 120), url: c.url })))
+          break
+        }
+
+        // 3Speak's post editor for a text (editTextInHost): opened, then done or cancelled
+        case 'text-edit-open': {
+          const job = textEditsRef.current.get(data.requestId)
+          if (job) clearTimeout(job.timer)
+          break
+        }
+        case 'text-edited':
+        case 'text-edit-cancelled': {
+          const job = textEditsRef.current.get(data.requestId)
+          if (!job) break
+          clearTimeout(job.timer)
+          textEditsRef.current.delete(data.requestId)
+          job.resolve(data.type === 'text-edited' && typeof data.value === 'string' ? { value: data.value.slice(0, job.maxLength) } : { cancelled: true })
           break
         }
 
@@ -586,9 +615,31 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     sendToParent('drafts-sign-in')
   }, [sendToParent])
 
+  const requestPlaylistCovers = useCallback(() => sendToParent('get-playlist-covers'), [sendToParent])
+
+  /**
+   * A text written in 3Speak's own post editor (toolbar, emoji, GIFs, images,
+   * preview), over the editor. Resolves { value } (done), { cancelled: true },
+   * or { unsupported: true } when there is no 3Speak around it or it does not
+   * answer within a moment (an older 3Speak): then the text is typed here.
+   */
+  const editTextInHost = useCallback((value, { kind = 'short-text', maxLength = 5000 } = {}) => new Promise((resolve) => {
+    if (!isIframe) { resolve({ unsupported: true }); return }
+    const requestId = `t${Date.now()}${Math.random().toString(36).slice(2, 8)}`
+    const timer = setTimeout(() => {
+      textEditsRef.current.delete(requestId)
+      resolve({ unsupported: true })
+    }, 1500)
+    textEditsRef.current.set(requestId, { resolve, timer, maxLength })
+    sendToParent('edit-text', { requestId, kind, value: String(value || ''), maxLength })
+  }), [sendToParent])
+
   return {
     isIframe,
     compactMode,
+    playlistCovers,
+    requestPlaylistCovers,
+    editTextInHost,
     isDesktop,
     theme,
     requestRender,
