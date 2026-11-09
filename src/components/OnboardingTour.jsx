@@ -153,14 +153,14 @@ export const AUDIOGRAM_TOUR_STEPS = [
 export const RANGE_PICK_TOUR_STEPS = [
   {
     target: '.timeline-content',
-    title: 'Drag across the timeline',
-    text: 'Press where the piece should start and drag to where it ends, on the tracks or the ruler: up to 2 minutes. A single click picks 30 seconds from there.',
+    title: 'Click the start, then the end',
+    text: 'Click where the piece should start, then where it ends: up to 2 minutes. Pull its edges to adjust it, or drag across the tracks to draw a whole piece. A new click starts over.',
     position: 'above'
   },
   {
     target: '.timeline-toolbar .toolbar-center',
-    title: 'Zoom to find the spot',
-    text: 'Zoom in with the slider for a precise start, or tap Fit to see the whole episode.',
+    title: 'Move around',
+    text: 'Drag the ruler or scroll to move along the episode. Zoom in with the slider for a precise start, or tap Fit to see the whole episode.',
     position: 'above'
   },
   {

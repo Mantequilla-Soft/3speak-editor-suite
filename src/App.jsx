@@ -1202,7 +1202,7 @@ function App() {
   const toggleRangePreview = useCallback(() => {
     const r = rangeRef.current
     if (rangePreviewRef.current) { stopRangePreview(); return }
-    if (!r || r.end - r.start < 3) return
+    if (!r || r.end == null || r.end - r.start < 3) return
     sawRangePlayRef.current = false
     setRangePreview(true)
     previewControlRef.current?.playFrom(r.start)
@@ -1212,7 +1212,7 @@ function App() {
     const id = setInterval(() => {
       const pos = previewControlRef.current?.getPosition?.()
       const r = rangeRef.current
-      if (!r || (typeof pos === 'number' && pos >= r.end - 0.03)) stopRangePreview()
+      if (!r || r.end == null || (typeof pos === 'number' && pos >= r.end - 0.03)) stopRangePreview()
     }, 25)
     return () => clearInterval(id)
   }, [rangePreview, stopRangePreview])
@@ -1254,8 +1254,9 @@ function App() {
       // Enter on a button of the bar or the tour: that button
       if (e.key === 'Enter' && e.target.closest?.('.range-pick-bar button, .tour-overlay button')) return
       e.preventDefault()
+      const r = rangeRef.current
       if (e.key === 'Escape') finishPickingRange(false)
-      else if (e.key === 'Enter') finishPickingRange(true)
+      else if (e.key === 'Enter' && r && r.end != null && r.end - r.start >= 3) finishPickingRange(true)
       else if (e.key === ' ' && !e.repeat) toggleRangePreview()
     }
     window.addEventListener('keydown', onKey, true)
@@ -1721,12 +1722,14 @@ function App() {
           {audioMode && pickingRange && (
             <div className="range-pick-bar" role="status">
               <Scissors size={14} />
-              <span>Drag across the timeline to pick the audiogram's piece (up to 2 minutes).</span>
-              {audiogramRange && <strong data-testid="range-pick-value">{chapterTime(audiogramRange.start)} – {chapterTime(audiogramRange.end)} · {Math.round(audiogramRange.end - audiogramRange.start)}s</strong>}
+              <span>Click where the audiogram's piece starts, then where it ends (up to 2 minutes). Pull its edges to adjust.</span>
+              {audiogramRange && (audiogramRange.end == null
+                ? <strong data-testid="range-pick-value">From {chapterTime(audiogramRange.start)}: now click where it ends</strong>
+                : <strong data-testid="range-pick-value">{chapterTime(audiogramRange.start)} – {chapterTime(audiogramRange.end)} · {Math.round(audiogramRange.end - audiogramRange.start)}s</strong>)}
               <button
                 className={`compact-btn range-pick-play${rangePreview ? ' active' : ''}`}
                 onClick={toggleRangePreview}
-                disabled={!audiogramRange || audiogramRange.end - audiogramRange.start < 3}
+                disabled={!audiogramRange || audiogramRange.end == null || audiogramRange.end - audiogramRange.start < 3}
                 aria-pressed={rangePreview}
                 title="Listen to just this piece (Space)"
               >
@@ -1734,7 +1737,7 @@ function App() {
               </button>
               <span className="range-pick-spacer" />
               <button className="compact-btn" onClick={() => finishPickingRange(false)}>Cancel</button>
-              <button className="compact-render-btn" onClick={() => finishPickingRange(true)} disabled={!audiogramRange || audiogramRange.end - audiogramRange.start < 3}>Use this piece</button>
+              <button className="compact-render-btn" onClick={() => finishPickingRange(true)} disabled={!audiogramRange || audiogramRange.end == null || audiogramRange.end - audiogramRange.start < 3}>Use this piece</button>
             </div>
           )}
           <Timeline

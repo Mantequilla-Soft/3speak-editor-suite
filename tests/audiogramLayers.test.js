@@ -114,6 +114,7 @@ describe('the piece and the Shorts', () => {
     expect(pieceOf(null, 600, 100)).toEqual({ start: 100, end: 130 })
     expect(pieceOf(null, 600, 590)).toEqual({ start: 570, end: 600 })
     expect(pieceOf(null, 20, 5)).toEqual({ start: 0, end: 20 })
+    expect(pieceOf({ start: 40, end: null }, 600, 100)).toEqual({ start: 100, end: 130 })
   })
 
   it('only vertical ones up to 2 minutes, marked to post, go out as Shorts', () => {

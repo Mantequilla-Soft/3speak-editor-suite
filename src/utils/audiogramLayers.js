@@ -153,10 +153,10 @@ export function withPicture(layouts, { hasImage, plainDefaults, coverDefaults })
   return out
 }
 
-/** The piece to use: the one picked (kept inside the episode, 3 s to 2 min), else 30 s from the playhead. */
+/** The piece to use: the one picked (kept inside the episode, 3 s to 2 min), else (none, or only its start) 30 s from the playhead. */
 export function pieceOf(range, length, playhead = 0) {
   const end = Math.max(0, length)
-  if (range && range.end - range.start >= AUDIOGRAM_MIN_SECONDS) {
+  if (range && range.end != null && range.end - range.start >= AUDIOGRAM_MIN_SECONDS) {
     const start = clamp(range.start, 0, Math.max(0, end - AUDIOGRAM_MIN_SECONDS))
     return { start, end: Math.min(end, start + AUDIOGRAM_MAX_SECONDS, Math.max(range.end, start + AUDIOGRAM_MIN_SECONDS)) }
   }

@@ -7120,7 +7120,8 @@ input[type="range"] {
 }
 
 /* every spot of the tracks and the ruler picks: a crosshair over all of it,
-   clips, their edges, flags and the playhead included (none of them moves now) */
+   clips, their edges, flags and the playhead included (none of them moves
+   now); only the piece's own edges show they can be pulled */
 .app.picking-range .timeline-content,
 .app.picking-range .timeline-content * {
   cursor: crosshair !important;
@@ -7135,6 +7136,40 @@ input[type="range"] {
   border-left: 2px solid var(--accent-primary);
   border-right: 2px solid var(--accent-primary);
   background: color-mix(in srgb, var(--accent-primary) 14%, transparent);
+}
+
+.timeline-range.start-only {
+  border-right: none;
+  background: none;
+}
+
+/* The piece's edges: drag to move the start or the end */
+.timeline-range-edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  pointer-events: auto;
+  cursor: ew-resize;
+}
+
+.timeline-range-edge.start { left: -7px; }
+.timeline-range-edge.end { right: -7px; }
+
+.timeline-range-edge::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  width: 6px;
+  height: 22px;
+  margin-top: -11px;
+  border-radius: 3px;
+  background: var(--accent-primary);
+}
+
+.app.picking-range .timeline-content .timeline-range-edge {
+  cursor: ew-resize !important;
 }
 
 .timeline-range-label {
