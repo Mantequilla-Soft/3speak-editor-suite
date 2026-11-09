@@ -368,7 +368,7 @@ try {
     await g.ctx.close()
   })
 
-  await step('podcast tools: chapters follow the cuts into the MP3 and the post, Studio voice on one piece, music ducked, audiogram', async () => {
+  await step('podcast tools: chapters follow the cuts into the MP3 and the post, Studio voice on one piece, music ducked, no audiogram button', async () => {
     fs.rmSync(projectsDir, { recursive: true, force: true })
     const p = await openEditor()
     const f = p.frame
@@ -441,24 +441,8 @@ try {
     const second = timeline.chapters[1]
     assert.ok(second.start > 1.5 && second.start < 2.3, `second chapter moved with the cut, at ${second.start}`)
     await f.getByRole('button', { name: 'Use this audio' }).first().waitFor({ timeout: 90000 })
-    // Audiogram of the export: vertical, the whole (short) episode, with the title
-    await f.getByRole('button', { name: 'Audiogram' }).click()
-    const ag = f.getByRole('dialog', { name: 'Audiogram' })
-    await ag.waitFor()
-    assert.equal(await ag.getByLabel('Title on the video').inputValue(), 'speech')
-    await ag.getByRole('radio', { name: 'Vertical' }).click()
-    assert.equal(await ag.getByRole('radio', { name: /^All/ }).getAttribute('aria-checked'), 'true', 'a short episode: all of it')
-    await ag.getByRole('button', { name: 'Make audiogram' }).click()
-    await ag.locator('video.audiogram-preview').waitFor({ timeout: 60000 })
-    const agUrl = await ag.locator('video.audiogram-preview').getAttribute('src')
-    assert.ok(agUrl.startsWith(`${BACKEND}/rendered/audiogram-`), agUrl)
-    const agFile = path.join(DATA, 'rendered', path.basename(new URL(agUrl).pathname))
-    const agProbe = JSON.parse(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'stream=codec_name,width,height:format=duration', '-of', 'json', agFile], { encoding: 'utf8' }))
-    const vs = agProbe.streams.find(x => x.codec_name === 'h264')
-    assert.deepEqual([vs.width, vs.height], [1080, 1920])
-    assert.ok(agProbe.streams.some(x => x.codec_name === 'aac'))
-    assert.ok(await ag.getByRole('link', { name: 'Download' }).isVisible())
-    await ag.getByTitle('Close').click()
+    // The audiogram is switched off for now: no button after the export
+    assert.equal(await f.getByRole('button', { name: 'Audiogram' }).count(), 0)
     // phones: the finished export's buttons still fit
     await p.page.setViewportSize({ width: 390, height: 844 })
     await sleep(300)
