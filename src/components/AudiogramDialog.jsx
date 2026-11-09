@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { X, Film, Download, Loader2, Eye, EyeOff, ChevronUp, ChevronDown, Upload, Trash2, Send, Scissors, RotateCcw, Lock } from 'lucide-react'
+import { X, Film, Download, Loader2, Eye, EyeOff, ChevronUp, ChevronDown, Upload, Trash2, Send, Scissors, RotateCcw, Lock, HelpCircle } from 'lucide-react'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
 import { chapterTime } from '../utils/chapters'
@@ -7,6 +7,7 @@ import {
   SIZES, LAYERS, moveLayer, resizeLayer, rotateLayer, squareWave, restack, stackOrder, toggleLayer, withPicture, pieceOf, canBeShort,
   AUDIOGRAM_MAX_SECONDS, ROUND_WAVES
 } from '../utils/audiogramLayers'
+import OnboardingTour, { AUDIOGRAM_TOUR_STEPS, useFirstTimeTour } from './OnboardingTour'
 
 const WAVES = [
   { id: 'bars', label: 'Bars' },
@@ -276,6 +277,12 @@ export default function AudiogramDialog({
     }
   }
 
+  // The first time: a tour of the studio (once its controls are there)
+  const [firstTour, finishFirstTour] = useFirstTimeTour('3speak-audiogram-tour-done', !!(style && layers))
+  const [tourAgain, setTourAgain] = useState(false) // the ? button
+  const showTour = firstTour || tourAgain
+  const finishTour = () => { finishFirstTour(); setTourAgain(false) }
+
   const busy = job?.status === 'processing'
   const order = layers ? stackOrder(layers) : []
   const pictureLayout = style?.background?.imageLayout || 'blur'
@@ -285,10 +292,13 @@ export default function AudiogramDialog({
   const chapterHere = (chapters || []).filter(c => c.at <= piece.start + 0.5).pop()
 
   return (
-    <div className="remix-picker-overlay" onClick={busy ? undefined : onClose}>
+    <div className="remix-picker-overlay" onClick={busy || showTour ? undefined : onClose}>
+      {showTour && <OnboardingTour steps={AUDIOGRAM_TOUR_STEPS} onComplete={finishTour} />}
       <div className="remix-picker audiogram-studio" role="dialog" aria-modal="true" aria-labelledby="audiogram-title" onClick={e => e.stopPropagation()}>
         <div className="remix-picker-header">
-          <span className="remix-picker-icon-spacer" />
+          {style && layers ? (
+            <button className="remix-picker-icon-btn" onClick={() => setTourAgain(true)} title="Show the tour again" aria-label="Show the audiogram tour again"><HelpCircle size={16} /></button>
+          ) : <span className="remix-picker-icon-spacer" />}
           <h3 id="audiogram-title">Audiograms</h3>
           <button className="remix-picker-icon-btn" onClick={onClose} title="Close"><X size={16} /></button>
         </div>

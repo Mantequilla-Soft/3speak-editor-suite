@@ -445,9 +445,30 @@ try {
     await f.getByRole('button', { name: /^Audiograms/ }).click()
     let ag = f.getByRole('dialog', { name: 'Audiograms' })
     await ag.locator('.audiogram-box[data-layer="title"]').waitFor({ timeout: 20000 })
+    // the first time: the studio's tour, all the way through
+    const tip = f.locator('.tour-tooltip')
+    await tip.waitFor({ timeout: 10000 })
+    assert.equal(await tip.locator('.tour-tooltip-title').innerText(), 'Audiograms')
+    const tourTitles = []
+    for (let i = 0; i < 12 && await tip.count(); i++) {
+      tourTitles.push(await tip.locator('.tour-tooltip-title').innerText())
+      await tip.locator('.tour-next-btn').click()
+    }
+    assert.deepEqual(tourTitles, ['Audiograms', 'Pick the piece', 'Arrange it your way', 'A picture', 'The waveform', 'Parts', 'Make it'])
+    assert.ok(await ag.isVisible(), 'the tour does not close the studio')
     assert.equal(await ag.getByLabel('Title on the video').inputValue(), 'speech')
     await ag.getByRole('button', { name: 'Choose on the timeline' }).click()
     await f.locator('.range-pick-bar').waitFor()
+    // the first time: a short tour of picking (its buttons work although the editor is locked)
+    await tip.waitFor({ timeout: 10000 })
+    assert.equal(await tip.locator('.tour-tooltip-title').innerText(), 'Drag across the timeline')
+    await tip.locator('.tour-next-btn').click()
+    assert.equal(await tip.locator('.tour-tooltip-title').innerText(), 'Zoom to find the spot')
+    await tip.getByRole('button', { name: 'Skip' }).click()
+    await tip.waitFor({ state: 'detached' })
+    assert.ok(await f.locator('.range-pick-bar').isVisible(), 'the tour leaves the picking on')
+    // a crosshair over all of the timeline, clips too
+    assert.equal(await f.locator('.timeline-clip-v2').first().evaluate(el => getComputedStyle(el).cursor), 'crosshair')
     // the rest of the editor is locked while picking: no clicks, no shortcuts
     const clipsBefore = await f.locator('.timeline-clip-v2').count()
     assert.equal(await f.locator('.compact-menu-bar button').first().evaluate(el => getComputedStyle(el).pointerEvents), 'none', 'the menu bar is locked')
@@ -520,6 +541,7 @@ try {
     await f.getByRole('button', { name: 'Audiograms (1)' }).click()
     ag = f.getByRole('dialog', { name: 'Audiograms' })
     await ag.getByText('Your last audiogram is the starting point').waitFor({ timeout: 15000 })
+    assert.equal(await f.locator('.tour-tooltip').count(), 0, 'the tour shows only the first time')
     assert.equal(await ag.getByRole('radio', { name: 'Circle wave' }).getAttribute('aria-checked'), 'true')
     assert.equal(await ag.getByRole('button', { name: 'Post together with the audio' }).getAttribute('aria-pressed'), 'true')
     await ag.getByTitle('Close').click()

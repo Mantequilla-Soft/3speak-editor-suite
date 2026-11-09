@@ -15,7 +15,7 @@ import ClipProperties from './components/ClipProperties'
 import ExportButton from './components/ExportButton'
 import RecordVideo from './components/RecordVideo'
 import RecordAudio from './components/RecordAudio'
-import OnboardingTour, { AUDIO_TOUR_STEPS } from './components/OnboardingTour'
+import OnboardingTour, { AUDIO_TOUR_STEPS, RANGE_PICK_TOUR_STEPS, useFirstTimeTour } from './components/OnboardingTour'
 import MultiClipProperties from './components/MultiClipProperties'
 import { soundTargets } from './utils/multiSelect'
 import RemixModePicker from './components/RemixModePicker'
@@ -1198,6 +1198,8 @@ function App() {
     setPickingRange(false)
     setAudiogramOpen(true)
   }, [])
+  // The first time a piece is picked: a short tour of how
+  const [showPickTour, finishPickTour] = useFirstTimeTour('3speak-audiogram-pick-tour-done', audioMode && pickingRange)
   // While picking, the editor is locked (App.css .picking-range): no clicks
   // outside the timeline, and no shortcuts. Escape cancels, Enter uses the
   // piece (on a button of the bar: that button).
@@ -1205,7 +1207,7 @@ function App() {
     if (!pickingRange) return
     const onKey = (e) => {
       if (e.key === 'Tab') return
-      if ((e.key === 'Enter' || e.key === ' ') && e.target.closest?.('.range-pick-bar button')) return
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.closest?.('.range-pick-bar button, .tour-overlay button')) return
       e.stopPropagation()
       e.preventDefault()
       if (e.key === 'Escape') finishPickingRange(false)
@@ -1762,6 +1764,7 @@ function App() {
         {showTour && (
           <OnboardingTour steps={audioMode ? AUDIO_TOUR_STEPS : undefined} onComplete={finishTour} />
         )}
+        {showPickTour && !showTour && <OnboardingTour steps={RANGE_PICK_TOUR_STEPS} onComplete={finishPickTour} />}
 
         {/* Remix mode picker (whole video arriving from the remix button) */}
         {remixPrompt && !showTour && <RemixModePicker onChoose={handleRemixChoice} />}

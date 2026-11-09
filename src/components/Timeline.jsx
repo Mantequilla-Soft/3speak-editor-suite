@@ -934,16 +934,13 @@ function Timeline({
   }
 
   // While picking, every press on the tracks or the ruler picks: it never
-  // reaches a clip, a flag or a handle (no moving or trimming by accident)
+  // reaches a clip, a flag, the playhead or a handle (no moving or trimming
+  // by accident)
   const pickCapture = (e) => {
-    if (e.target.closest('.timeline-playhead')) return
     if (e.button !== 0) { e.stopPropagation(); return }
     startRangeDrag(e)
   }
-  const blockWhilePicking = (e) => {
-    if (e.target.closest('.timeline-playhead')) return
-    e.stopPropagation()
-  }
+  const blockWhilePicking = (e) => { e.stopPropagation() }
 
   const handleRulerMouseDown = (e) => {
     if (e.button !== 0) return

@@ -7099,7 +7099,9 @@ input[type="range"] {
 .app.picking-range .timeline-content,
 .app.picking-range .timeline-content *,
 .app.picking-range .timeline-toolbar .toolbar-center,
-.app.picking-range .timeline-toolbar .toolbar-center * {
+.app.picking-range .timeline-toolbar .toolbar-center *,
+.app.picking-range .tour-tooltip,
+.app.picking-range .tour-tooltip * {
   pointer-events: auto;
 }
 
@@ -7117,8 +7119,11 @@ input[type="range"] {
   user-select: none;
 }
 
-.app.picking-range .timeline-content {
-  cursor: crosshair;
+/* every spot of the tracks and the ruler picks: a crosshair over all of it,
+   clips, their edges, flags and the playhead included (none of them moves now) */
+.app.picking-range .timeline-content,
+.app.picking-range .timeline-content * {
+  cursor: crosshair !important;
 }
 
 /* Picking a piece of the timeline (audiograms) */
