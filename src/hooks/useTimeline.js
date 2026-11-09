@@ -133,6 +133,22 @@ function generateTrackId() {
   return `track_${++trackIdCounter}_${Date.now()}`
 }
 
+/**
+ * An overlay clip (a sticker, a text) from `start` to `end`: on the first
+ * overlay track with room there, else on a new one at the top (track 0 draws
+ * on top of everything). Returns the new tracks.
+ */
+function placeOverlay(prev, clip, start, end) {
+  const fits = (t) => t.clips.every(c => {
+    const cs = c.timelinePosition || 0
+    return cs + (c.endTime - c.startTime) <= start + 0.001 || cs >= end - 0.001
+  })
+  const free = prev.find(t => t.type === 'video' && t.stickers && fits(t))
+  if (free) return prev.map(t => (t.id === free.id ? { ...t, clips: [...t.clips, clip] } : t))
+  const count = prev.filter(t => t.type === 'video' && t.stickers).length
+  return [{ id: generateTrackId(), type: 'video', name: count ? `Stickers ${count + 1}` : 'Stickers', stickers: true, clips: [clip] }, ...prev]
+}
+
 function generateLibraryId() {
   return `lib_${++libraryIdCounter}_${Date.now()}`
 }
@@ -855,7 +871,7 @@ export function useTimeline() {
    * shape, logo: an image clip) or { kind: 'text', name, text, props } (a
    * pre-styled text box: an ordinary, editable text clip). Returns the clip id.
    */
-  const addStickerClip = useCallback((sticker, position, length = 3) => {
+  const addStickerClip = useCallback((sticker, position, length = 3, trackId = null) => {
     const clipId = generateClipId()
     const start = Math.max(0, position || 0)
     const end = start + length
@@ -873,15 +889,8 @@ export function useTimeline() {
         const placed = placeOnTrack(prev, trackId, clip, start, (t) => trackLike(t, prev))
         if (placed) return placed
       }
-      const fits = (t) => t.clips.every(c => {
-        const cs = c.timelinePosition || 0
-        return cs + (c.endTime - c.startTime) <= start + 0.001 || cs >= end - 0.001
-      })
-      const free = prev.find(t => t.type === 'video' && t.stickers && fits(t))
-      if (free) return prev.map(t => (t.id === free.id ? { ...t, clips: [...t.clips, clip] } : t))
-      const count = prev.filter(t => t.type === 'video' && t.stickers).length
-      // Track 0 draws on top: stickers go above everything
-      return [{ id: generateTrackId(), type: 'video', name: count ? `Stickers ${count + 1}` : 'Stickers', stickers: true, clips: [clip] }, ...prev]
+      // Stickers go above everything
+      return placeOverlay(prev, clip, start, end)
     })
     return clipId
   }, [setTracksWithHistory])
@@ -1453,7 +1462,21 @@ export function useTimeline() {
   }, [setTracksWithHistory])
 
   // Add a text clip to a video track
+  // A text clip. Dropped on a track at a time: there. Else (the + menu, T):
+  // at the playhead, over everything (an overlay track, like the stickers), so
+  // it shows at once. Returns the new clip's id.
   const addTextClip = useCallback((trackId, dropTime) => {
+    if (dropTime === undefined) {
+      const start = Math.max(0, playheadPosition || 0)
+      const clip = {
+        id: generateClipId(), name: 'Text Layer', type: 'text', duration: 5, startTime: 0, endTime: 5, timelinePosition: start,
+        audioEnabled: false, text: 'Enter text here', fontSize: 48, fontFamily: 'Roboto', fontColor: '#ffffff', fontWeight: 'normal',
+        textAlign: 'center', backgroundColor: 'transparent',
+        zoom: 100, positionX: 0, positionY: 0, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100
+      }
+      setTracksWithHistory(prev => placeOverlay(prev, clip, start, start + 5))
+      return clip.id
+    }
     setTracksWithHistory(prev => {
       let targetTrack = trackId
         ? prev.find(t => t.id === trackId)
@@ -1510,7 +1533,8 @@ export function useTimeline() {
         return track
       })
     })
-  }, [setTracksWithHistory])
+    return null
+  }, [setTracksWithHistory, playheadPosition])
 
   // Add a color clip to a track
   const addColorClip = useCallback((trackId, dropTime) => {
