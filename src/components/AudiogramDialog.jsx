@@ -152,10 +152,16 @@ export default function AudiogramDialog({
     wave: style.wave,
     logo: logoStyle
   } : null), [style, layers, size, text, image, logoStyle])
+  // A preview page that says it is ready gets the state at once: the frame is
+  // made anew whenever the studio shows again (after picking the piece), and
+  // the new one must not wait for the next change.
+  const pageStateRef = useRef(null)
+  pageStateRef.current = pageState
   useEffect(() => {
     const onMsg = (e) => {
       if (e.source !== frameRef.current?.contentWindow || e.data?.type !== 'audiogram-page-ready') return
       setFrameReady(true)
+      if (pageStateRef.current) e.source.postMessage({ type: 'audiogram-state', state: pageStateRef.current }, '*')
     }
     window.addEventListener('message', onMsg)
     return () => window.removeEventListener('message', onMsg)

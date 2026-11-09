@@ -588,6 +588,9 @@ try {
     assert.ok(await ag.isVisible(), 'the tour does not close the studio')
     assert.equal(await ag.getByLabel('Title on the video').inputValue(), 'speech')
     assert.equal(await ag.getByRole('radiogroup', { name: 'Picture layout' }).count(), 0, 'no picture layouts: the card')
+    // the preview draws the look (the backend's page, in its own frame)
+    const preview = () => f.frameLocator('iframe[title="Audiogram preview"]')
+    await until(async () => (await preview().locator('#l-title').count()) === 1, 'the preview draws the title', 15000)
     assert.equal((await ag.getByTestId('audiogram-piece').innerText()).replace(/\s+/g, ' '), picked.replace(/\s+/g, ' '), 'the dialog uses the picked piece')
     const pieceSeconds = +/(\d+)s$/.exec(picked)[1]
     assert.ok(pieceSeconds >= 3, picked)
@@ -671,6 +674,17 @@ try {
     assert.equal(await f.locator('.tour-tooltip').count(), 0, 'the tour shows only the first time')
     assert.equal(await ag.getByRole('radio', { name: 'Circle wave' }).getAttribute('aria-checked'), 'true')
     assert.match(await ag.getByTestId('audiogram-text').first().innerText(), /Written in the \*\*3Speak\*\* editor/)
+    // change the piece: the studio comes back with a new preview frame, and it draws too
+    await ag.getByRole('button', { name: 'Change the piece' }).click()
+    await f.locator('.range-pick-bar').waitFor()
+    await f.locator('.timeline-content').evaluate(el => { el.scrollLeft = 0 }) // it followed the playhead
+    const rp = await f.locator('.timeline-ruler').boundingBox()
+    // (a little in from 0:00: the old piece's start grip is there)
+    await p.page.mouse.click(rp.x + 12, rp.y + rp.height / 2)
+    await p.page.mouse.click(rp.x + Math.min(rp.width, (await f.locator('.timeline-content').boundingBox()).width) * 0.6, rp.y + rp.height / 2)
+    await f.getByRole('button', { name: 'Use this piece' }).click()
+    await ag.locator('.audiogram-box[data-layer="title"]').waitFor({ timeout: 20000 })
+    await until(async () => (await preview().locator('#l-title').count()) === 1, 'the new preview frame draws the title too', 15000)
     // a look not in an audiogram yet: closing asks first (outside the dialog, and X)
     await ag.getByLabel('Line on the video').fill('A changed line')
     await p.page.mouse.click(5, 400)
