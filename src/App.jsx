@@ -262,6 +262,8 @@ function App() {
     renderStatus,
     clearRenderStatus,
     remixSource,
+    remixing,
+    restoreRemixSource,
     remixPrompt,
     clearRemixPrompt,
     playlistCovers,
@@ -1031,11 +1033,13 @@ function App() {
     if (state?.master) setMaster(masterOf(state.master))
     setChapters(Array.isArray(state?.chapters) ? state.chapters.slice(0, MAX_CHAPTERS) : [])
     setFlags(cleanFlags(state?.flags))
+    // a remix draft: its export posts under the original again
+    restoreRemixSource(state?.remix || null)
     // and the clip(s) that were selected (those still on the timeline)
     const ids = new Set((state?.tracks || []).flatMap(t => (t.clips || []).map(c => c.id)))
     const sel = Array.isArray(state?.selected) ? state.selected.filter(id => ids.has(id)) : []
     if (sel.length) selectClips(sel)
-  }, [loadProjectState, setPlayheadPosition, selectClips])
+  }, [loadProjectState, setPlayheadPosition, selectClips, restoreRemixSource])
   const drafts = useDrafts({
     session: draftSession,
     hasMedia: draftContext.hasMedia,
@@ -1050,7 +1054,8 @@ function App() {
     playing: previewPlaying,
     zoom: timelineZoom,
     flags,
-    selected: selectedClipIds.length ? selectedClipIds : (selectedClipId ? [selectedClipId] : [])
+    selected: selectedClipIds.length ? selectedClipIds : (selectedClipId ? [selectedClipId] : []),
+    remix: remixing ? remixSource : null
   })
   const canDraftSignIn = isIframe && !draftSession && ['sign-in-needed', 'sign-in-failed', 'signing-in'].includes(draftContext.reason)
 

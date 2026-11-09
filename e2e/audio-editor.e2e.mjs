@@ -1408,6 +1408,30 @@ try {
     await r.ctx.close()
   })
 
+  await step('a remix saves a draft that keeps its original; opened again, it goes under that original', async () => {
+    if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
+    ff(['-f', 'lavfi', '-i', 'testsrc=size=360x640:rate=30:duration=4', '-f', 'lavfi', '-i', 'sine=f=440:d=4', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-shortest', path.join(S, 'dist', 'remix-original.mp4')])
+    const r = await openEditor({ file: null, mode: 'video' })
+    await r.frame.getByText('Shorts Editor').first().waitFor()
+    await r.page.evaluate((u) => window.__send({ type: 'load-media', url: u, name: 'Original', mediaType: 'video', parentAuthor: 'bob', parentPermlink: 'orig' }), `${EDITOR}/remix-original.mp4`)
+    await r.frame.getByText('Free edit').first().click({ timeout: 20000 })
+    await r.frame.locator('.timeline-clip-v2').first().waitFor()
+    await r.frame.locator('.timeline-clip-v2').first().click()
+    await r.page.keyboard.press('t') // an edit: a text
+    const d = await until(() => drafts().find(p => p.state?.remix), 'a remix draft', 30000)
+    assert.deepEqual(d.state.remix, { parentAuthor: 'bob', parentPermlink: 'orig' })
+    await r.ctx.close()
+    // opened again (not from the remix button): the draft brings the original back
+    const o = await openEditor({ file: null, mode: 'video' })
+    await o.frame.getByText(/Continue/i).first().waitFor({ timeout: 20000 })
+    await o.frame.locator('.drafts-item').first().click()
+    await o.frame.locator('.timeline-clip-v2').first().waitFor()
+    await o.page.evaluate(() => window.__send({ type: 'get-state' }))
+    const st = await until(() => o.page.evaluate(() => window.__messages.find(m => m.type === 'state-response')), 'state-response')
+    assert.deepEqual(st.remixSource, { parentAuthor: 'bob', parentPermlink: 'orig' }, 'the export posts under the original')
+    await o.ctx.close()
+  })
+
   await step('shorts editor in a remix: Add Text goes in at the playhead over the video, selected; image and text stickers go in', async () => {
     // a sticker library and a video to remix, served by the editor's own origin
     const st = path.join(S, 'dist', 'stickers')
