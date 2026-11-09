@@ -933,6 +933,18 @@ function Timeline({
     document.addEventListener('mouseup', onUp)
   }
 
+  // While picking, every press on the tracks or the ruler picks: it never
+  // reaches a clip, a flag or a handle (no moving or trimming by accident)
+  const pickCapture = (e) => {
+    if (e.target.closest('.timeline-playhead')) return
+    if (e.button !== 0) { e.stopPropagation(); return }
+    startRangeDrag(e)
+  }
+  const blockWhilePicking = (e) => {
+    if (e.target.closest('.timeline-playhead')) return
+    e.stopPropagation()
+  }
+
   const handleRulerMouseDown = (e) => {
     if (e.button !== 0) return
     if (rangePicking) { startRangeDrag(e); return }
@@ -1753,6 +1765,10 @@ function Timeline({
           className="timeline-content"
           ref={timelineContentRef}
           onMouseDown={handleContentMouseDown}
+          onMouseDownCapture={rangePicking ? pickCapture : undefined}
+          onTouchStartCapture={rangePicking ? blockWhilePicking : undefined}
+          onDoubleClickCapture={rangePicking ? blockWhilePicking : undefined}
+          onContextMenuCapture={rangePicking ? (e) => { e.preventDefault(); e.stopPropagation() } : undefined}
           onScroll={(e) => { if (sidebarRef.current) sidebarRef.current.scrollTop = e.currentTarget.scrollTop }}
         >
           {marquee && (

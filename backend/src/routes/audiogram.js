@@ -6,7 +6,7 @@ import fs from 'fs/promises'
 import dns from 'dns/promises'
 import { requireSignIn } from '../auth.js'
 import { downloadMedia } from '../utils/download.js'
-import { audiogramArgs, cleanAudiogramOptions, cleanAudiogramStyle, pageState, uploadPathOf, AUDIOGRAM_MAX_SECONDS } from '../services/audiogram.js'
+import { audiogramArgs, cleanAudiogramOptions, cleanAudiogramStyle, pageState, uploadPathOf, circleMaps, CIRCLE_WAVES, AUDIOGRAM_MAX_SECONDS } from '../services/audiogram.js'
 import { audiogramPageHtml, renderStills, defaultLayers, SIZES } from '../services/audiogramPage.js'
 import { privateAddress } from '../utils/privateAddress.js'
 
@@ -107,11 +107,19 @@ async function process_(job, { url }) {
       belowFile: path.join(jobDir, 'below.png'),
       aboveFile: path.join(jobDir, 'above.png')
     })
+    // a round waveform: the maps that bend its strip into the circle
+    let maps = null
+    if (stills.box && CIRCLE_WAVES.includes(o.style.wave.type)) {
+      const m = circleMaps(o.style.wave.type, stills.box.w)
+      maps = { x: path.join(jobDir, 'xmap.pgm'), y: path.join(jobDir, 'ymap.pgm') }
+      await fs.writeFile(maps.x, m.x)
+      await fs.writeFile(maps.y, m.y)
+    }
     await fs.mkdir(RENDERED_DIR, { recursive: true })
     const name = `audiogram-${job.id}.mp4`
     const part = path.join(RENDERED_DIR, `${name}.part.mp4`)
     job.phase = 'Drawing the audiogram...'
-    await run(audiogramArgs({ input, ...stills, output: part, start: o.start, duration: o.duration, style: o.style }), (t) => {
+    await run(audiogramArgs({ input, ...stills, maps, output: part, start: o.start, duration: o.duration, style: o.style }), (t) => {
       job.progress = Math.min(0.99, t / o.duration)
     })
     await fs.rename(part, path.join(RENDERED_DIR, name))

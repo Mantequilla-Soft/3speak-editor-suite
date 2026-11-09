@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
-  SIZES, clampBox, moveLayer, resizeLayer, restack, stackOrder, toggleLayer, withPicture, pieceOf, canBeShort, audiogramsToPost
+  SIZES, clampBox, moveLayer, resizeLayer, rotateLayer, squareWave, restack, stackOrder, toggleLayer, withPicture, pieceOf, canBeShort, audiogramsToPost
 } from '../src/utils/audiogramLayers'
 
 const V = SIZES.vertical
@@ -24,9 +24,14 @@ describe('audiogram parts: move and resize', () => {
   })
 
   it('keeps at least 16 px of a part in the frame', () => {
-    const r = moveLayer(layers(), 'logo', -5000, 9000, V, false)
-    expect(r.layers.logo).toMatchObject({ x: -484, y: 1904 })
+    const r = moveLayer(layers(), 'title', -5000, 9000, V, false)
+    expect(r.layers.title).toMatchObject({ x: -904, y: 1904 })
     expect(clampBox({ x: 0, y: 0, w: 2, h: 99999 }, V)).toMatchObject({ w: 16, h: 1920 })
+  })
+
+  it('the logo stays whole in the frame and at least 240 x 40', () => {
+    expect(moveLayer(layers(), 'logo', -5000, 9000, V, false).layers.logo).toMatchObject({ x: 0, y: 1840, w: 500, h: 80 })
+    expect(resizeLayer(layers(), 'logo', 'se', -9000, -9000, V, true).logo).toMatchObject({ w: 240, h: 40 })
   })
 
   it('resizes from any corner; the opposite corner stays put', () => {
@@ -35,6 +40,30 @@ describe('audiogram parts: move and resize', () => {
     const nw = resizeLayer(layers(), 'wave', 'nw', 40, 40, V)
     expect(nw.wave).toMatchObject({ x: 130, y: 1160, w: 860, h: 320 })
     expect(nw.wave.x + nw.wave.w).toBe(990)
+  })
+
+  it('a turned part grows along its own sides; its opposite corner stays put', () => {
+    const turned = { ...layers(), wave: { ...layers().wave, r: 90 } }
+    // turned a quarter: pulling down on the screen makes it wider
+    const r = resizeLayer(turned, 'wave', 'se', 0, 100, V)
+    expect(r.wave).toMatchObject({ w: 1000, h: 360, r: 90 })
+    const corner = (b) => { const a = (b.r * Math.PI) / 180; const dx = -b.w / 2; const dy = -b.h / 2; return [Math.round(b.x + b.w / 2 + dx * Math.cos(a) - dy * Math.sin(a)), Math.round(b.y + b.h / 2 + dx * Math.sin(a) + dy * Math.cos(a))] }
+    expect(corner(r.wave)).toEqual(corner(turned.wave))
+  })
+
+  it('turns: snaps to a quarter turn when close, to 15 degrees with Shift, -180..180', () => {
+    expect(rotateLayer(layers(), 'title', 12).title.r).toBe(12)
+    expect(rotateLayer(layers(), 'title', 88).title.r).toBe(90)
+    expect(rotateLayer(layers(), 'title', 37, 15).title.r).toBe(30)
+    expect(rotateLayer(layers(), 'title', 200).title.r).toBe(-160)
+    expect(rotateLayer(layers(), 'title', -180).title.r).toBe(180)
+  })
+
+  it('a round waveform gets a square box around the same middle', () => {
+    const r = squareWave(layers(), V).wave
+    expect(r.w).toBe(r.h)
+    expect(r.x + r.w / 2).toBe(540)
+    expect(r.y + r.h / 2).toBe(1300)
   })
 
   it('keeps the shape with keepAspect (the picture card, Shift)', () => {
@@ -51,9 +80,16 @@ describe('audiogram parts: stacking', () => {
     expect(stackOrder(fwd)).toEqual(['logo', 'line', 'wave', 'title', 'cover'])
     expect(new Set(Object.values(fwd).map(l => l.z)).size).toBe(5)
     expect(restack(layers(), 'logo', 1)).toEqual(layers())
+    expect(restack(layers(), 'logo', -1)).toEqual(layers())
+    expect(restack(layers(), 'line', 1)).toEqual(layers())
+    // the logo in front, whatever its z was
+    const low = { ...layers(), logo: { ...layers().logo, z: 0 } }
+    expect(stackOrder(low)[0]).toBe('logo')
+    expect(stackOrder(restack(low, 'cover', 1))[0]).toBe('logo')
   })
 
-  it('hides and shows a part', () => {
+  it('hides and shows a part, never the logo', () => {
+    expect(toggleLayer(layers(), 'logo').logo.on).toBe(true)
     expect(toggleLayer(layers(), 'line').line.on).toBe(false)
     expect(toggleLayer(toggleLayer(layers(), 'line'), 'line').line.on).toBe(true)
   })

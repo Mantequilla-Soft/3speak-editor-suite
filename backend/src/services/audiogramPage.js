@@ -9,9 +9,10 @@ import { fileURLToPath } from 'url'
  * 500 line with the red accent, the cover in a rounded card. NO cyan except in
  * the mark itself.
  *
- * Everything on it is a layer the person can move, resize and stack
- * (`layers`: logo, cover, title, line, wave, each { x, y, w, h, z, on } in
- * pixels of the video). The page builds itself from a state object
+ * Everything on it is a layer the person can move, resize, turn and stack
+ * (`layers`: logo, cover, title, line, wave, each { x, y, w, h, z, r, on } in
+ * pixels of the video, r in degrees). The 3Speak logo always shows: it can
+ * not be hidden, stays in the frame, at least LOGO_MIN big, in front of the rest. The page builds itself from a state object
  * (window.applyAudiogram(state, part)), so the editor shows the very same page
  * as its preview (GET /api/audiogram/page, state by postMessage) and the
  * backend screenshots it for the video:
@@ -27,9 +28,23 @@ export const BRAND = {
   bg: '#0a0b12', ink: '#f4f5f8', mute: '#dfe2ec', accent: '#E32933',
   glow1: 'rgba(227,41,51,.38)', glow2: 'rgba(49,56,134,.75)'
 }
-export const SIZES = { vertical: { w: 1080, h: 1920 }, square: { w: 1080, h: 1080 } }
+// Vertical only: the shape of a Short
+export const SIZES = { vertical: { w: 1080, h: 1920 } }
 export const LAYER_IDS = ['logo', 'cover', 'title', 'line', 'wave']
 export const DEFAULT_LINE = 'Full episode on *3speak.tv*'
+export const LOGO_MIN = { w: 240, h: 40 }
+export const LOGO_Z = 20
+/**
+ * The round waveforms, in parts of the circle's radius: 'circle' is bars
+ * standing out from an inner ring (`cols` bars per half, mirrored, `gap` of
+ * each bar's slot empty), 'ring' a wavy line around the middle of the band.
+ */
+export const CIRCLE_SHAPES = {
+  circle: { inner: 0.42, cols: 48, gap: 0.36 },
+  ring: { inner: 0.5, cols: 200, gap: 0 }
+}
+/** How the picture is used: a card on the dark 3Speak background, a card on the picture blurred, or the picture over the whole frame (no card). */
+export const IMAGE_LAYOUTS = ['card', 'blur', 'fill']
 
 /**
  * The first arrangement (no template yet): a calm stack. Vertical keeps text
@@ -52,29 +67,15 @@ export const DEFAULT_LAYOUTS = {
       line: { x: 80, y: 960, w: 920, h: 64, z: 4 },
       wave: { x: 90, y: 1120, w: 900, h: 360, z: 2 }
     }
-  },
-  square: {
-    cover: {
-      logo: { x: 340, y: 50, w: 400, h: 60, z: 5 },
-      cover: { x: 370, y: 140, w: 340, h: 340, z: 1 },
-      title: { x: 80, y: 510, w: 920, h: 210, z: 3 },
-      line: { x: 80, y: 730, w: 920, h: 52, z: 4 },
-      wave: { x: 90, y: 810, w: 900, h: 190, z: 2 }
-    },
-    plain: {
-      logo: { x: 340, y: 50, w: 400, h: 60, z: 5 },
-      cover: { x: 370, y: 140, w: 340, h: 340, z: 1, on: false },
-      title: { x: 80, y: 200, w: 920, h: 330, z: 3 },
-      line: { x: 80, y: 550, w: 920, h: 52, z: 4 },
-      wave: { x: 90, y: 660, w: 900, h: 300, z: 2 }
-    }
   }
 }
 
 /** The default layers of a shape, with or without a cover: { id: box }. */
 export function defaultLayers(format, withCover) {
   const set = (DEFAULT_LAYOUTS[format] || DEFAULT_LAYOUTS.vertical)[withCover ? 'cover' : 'plain']
-  return Object.fromEntries(LAYER_IDS.map(id => [id, { on: true, ...set[id] }]))
+  const out = Object.fromEntries(LAYER_IDS.map(id => [id, { on: true, r: 0, ...set[id] }]))
+  out.logo.z = LOGO_Z
+  return out
 }
 
 const num = (v, min, max, fallback) => {
@@ -82,9 +83,19 @@ const num = (v, min, max, fallback) => {
   return Number.isFinite(n) ? Math.min(max, Math.max(min, Math.round(n))) : fallback
 }
 
+// Degrees, -180..180 (whole degrees)
+const angle = (v) => {
+  const n = Number(v)
+  if (!Number.isFinite(n)) return 0
+  const a = ((Math.round(n) + 180) % 360 + 360) % 360 - 180
+  return a === -180 ? 180 : a
+}
+
 /**
- * Layers as sent, checked against the frame: every box inside it, at least
- * 16 px, z 0..20. Missing ones come from the default arrangement.
+ * Layers as sent, checked against the frame: every box at least 16 px with
+ * 16 px of it in the frame, z 0..19, turned -180..180 degrees. The logo: on,
+ * whole inside the frame, at least LOGO_MIN, in front (z 20). Missing ones
+ * come from the default arrangement.
  */
 export function cleanLayers(input, format, withCover = true) {
   const size = SIZES[format] || SIZES.vertical
@@ -94,6 +105,12 @@ export function cleanLayers(input, format, withCover = true) {
   for (const id of LAYER_IDS) {
     const d = base[id]
     const l = src[id] && typeof src[id] === 'object' ? src[id] : {}
+    if (id === 'logo') {
+      const w = num(l.w, LOGO_MIN.w, size.w, d.w)
+      const h = num(l.h, LOGO_MIN.h, size.h, d.h)
+      out.logo = { x: num(l.x, 0, size.w - w, d.x), y: num(l.y, 0, size.h - h, d.y), w, h, z: LOGO_Z, r: angle(l.r), on: true }
+      continue
+    }
     const w = num(l.w, 16, size.w, d.w)
     const h = num(l.h, 16, size.h, d.h)
     out[id] = {
@@ -101,7 +118,8 @@ export function cleanLayers(input, format, withCover = true) {
       y: num(l.y, -h + 16, size.h - 16, d.y),
       w,
       h,
-      z: num(l.z, 0, 20, d.z),
+      z: num(l.z, 0, LOGO_Z - 1, Math.min(d.z, LOGO_Z - 1)),
+      r: angle(l.r),
       on: typeof l.on === 'boolean' ? l.on : d.on !== false
     }
   }
@@ -121,7 +139,8 @@ html,body{overflow:hidden;background:transparent;font-family:Roboto,'Noto Sans',
 .bgimg.blur{inset:-80px;filter:blur(48px) saturate(1.1)}
 .shade{position:absolute;inset:0}
 .glow{position:absolute;inset:0}
-.layer{position:absolute;display:flex;align-items:center;justify-content:center;text-align:center}
+.layer{position:absolute;display:flex;align-items:center;justify-content:center;text-align:center;transform-origin:50% 50%}
+.txt{display:block;max-width:100%}
 .logo{gap:.28em;white-space:nowrap}
 .logo svg{height:1em;width:auto;flex:none}
 .logo span{font-weight:700;font-size:.86em;letter-spacing:-.015em;line-height:1}
@@ -135,6 +154,7 @@ html,body{overflow:hidden;background:transparent;font-family:Roboto,'Noto Sans',
 <script>
 const MARK = ${JSON.stringify(MARK_SVG)};
 const BRAND = ${JSON.stringify(BRAND)};
+const CIRCLE = ${JSON.stringify(CIRCLE_SHAPES)};
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const cssUrl = u => 'url("' + String(u).replace(/["\\\\\\n]/g, '') + '")';
 
@@ -163,6 +183,22 @@ function waveSvg(type, color, w, h) {
   } else if (type === 'dots') {
     let d = ''; for (let i = 0; i <= n; i++) d += (i ? 'L' : 'M') + (i * w / n) + ' ' + (h / 2 + Math.sin(i * 0.5) * amp(i) * h * 0.4);
     s = '<path d="' + d + '" stroke="' + color + '" stroke-width="2" fill="none"/>';
+  } else if (type === 'circle' || type === 'ring') {
+    // round, in the middle of the box, as big as its shorter side (like the video's)
+    const g = CIRCLE[type], R = Math.min(w, h) / 2, cx = w / 2, cy = h / 2;
+    const at = (th, r) => (cx + Math.sin(th) * r).toFixed(1) + ' ' + (cy - Math.cos(th) * r).toFixed(1);
+    if (type === 'circle') {
+      const n2 = g.cols * 2, inner = R * g.inner, len = R - inner;
+      for (let i = 0; i < n2; i++) {
+        const th = (i + 0.5) / n2 * Math.PI * 2, k = i < g.cols ? i : n2 - 1 - i;
+        s += '<path d="M' + at(th, inner) + 'L' + at(th, inner + len * (0.2 + 0.8 * amp(k))) + '" stroke="' + color + '" stroke-width="' + Math.max(2, Math.PI * 2 * inner / n2 * (1 - g.gap)) + '"/>';
+      }
+    } else {
+      const mid = R * (g.inner + 1) / 2, a = R * (1 - g.inner) / 2;
+      let d = ''; const m = 120;
+      for (let i = 0; i <= m; i++) { const th = i / m * Math.PI * 2, k = i <= m / 2 ? i : m - i; d += (i ? 'L' : 'M') + at(th, mid + a * 0.8 * (amp(k * 2) - 0.5) * (k % 2 ? 1 : -1)); }
+      s = '<path d="' + d + 'Z" stroke="' + color + '" stroke-width="' + Math.max(2, R / 60) + '" fill="none" stroke-linejoin="round"/>';
+    }
   } else {
     for (let i = 0; i < n; i++) { const a = amp(i) * h * 0.9; s += '<rect x="' + (i * w / n) + '" y="' + (h - a) / 2 + '" width="' + Math.max(1, w / n * 0.6) + '" height="' + a + '" fill="' + color + '"/>'; }
   }
@@ -170,7 +206,7 @@ function waveSvg(type, color, w, h) {
 }
 
 /**
- * state: { width, height, layers, title, line, image, imageLayout: 'blur' | 'fill' | 'none',
+ * state: { width, height, layers, title, line, image, imageLayout: 'card' | 'blur' | 'fill',
  *          wave: { type, color } }; part: 'all' (preview, with a drawn waveform),
  * 'below' (background + layers under the waveform), 'above' (layers over it, transparent)
  */
@@ -185,27 +221,33 @@ window.applyAudiogram = function (state, part = 'all') {
   const layout = image ? (state.imageLayout || 'blur') : 'none';
   let html = '';
   if (part !== 'above') {
-    if (layout !== 'none') html += '<div class="bgimg' + (layout === 'blur' ? ' blur' : '') + '" style="background-image:' + cssUrl(image) + '"></div><div class="shade" style="background:rgba(10,11,18,' + (layout === 'fill' ? '.62' : '.72') + ')"></div>';
+    // blur: the picture soft and dark behind its card; fill: the picture itself
+    // over the whole frame (no card), dimmed only enough to read the text
+    if (layout === 'blur') html += '<div class="bgimg blur" style="background-image:' + cssUrl(image) + '"></div><div class="shade" style="background:rgba(10,11,18,.6)"></div>';
+    if (layout === 'fill') html += '<div class="bgimg" style="background-image:' + cssUrl(image) + '"></div><div class="shade" style="background:linear-gradient(rgba(10,11,18,.15),rgba(10,11,18,.35) 45%,rgba(10,11,18,.6))"></div>';
     html += '<div class="glow" style="background:radial-gradient(' + Math.round(W * 0.95) + 'px ' + Math.round(H * 0.42) + 'px at 50% 0%, ' + BRAND.glow1 + ', transparent 70%),radial-gradient(' + Math.round(W * 0.9) + 'px ' + Math.round(H * 0.5) + 'px at 100% 100%, ' + BRAND.glow2 + ', transparent 70%)"></div>';
   }
   const shows = (id) => {
     const l = L[id];
-    if (!l || l.on === false) return false;
-    if (id === 'cover' && !image) return false;
+    if (!l || (l.on === false && id !== 'logo')) return false;
+    if (id === 'cover' && (!image || layout === 'fill')) return false;
     if (id === 'wave') return part === 'all';
+    if (id === 'logo') return part !== 'below';
     if (part === 'below') return l.z < waveZ;
     if (part === 'above') return l.z >= waveZ;
     return true;
   };
-  const box = l => 'left:' + l.x + 'px;top:' + l.y + 'px;width:' + l.w + 'px;height:' + l.h + 'px;z-index:' + (l.z + 1);
+  // the logo always in front
+  const box = (l, id) => 'left:' + l.x + 'px;top:' + l.y + 'px;width:' + l.w + 'px;height:' + l.h + 'px;z-index:' + (id === 'logo' ? 100 : l.z + 1) + (l.r ? ';transform:rotate(' + Number(l.r) + 'deg)' : '');
   for (const id of ['logo', 'cover', 'title', 'line', 'wave']) {
     if (!shows(id)) continue;
     const l = L[id];
-    if (id === 'logo') html += '<div class="layer logo" id="l-logo" style="' + box(l) + '">' + MARK + '<span>3Speak</span></div>';
-    if (id === 'cover') html += '<div class="layer cover" style="' + box(l) + ';border-radius:' + Math.round(Math.min(l.w, l.h) * 0.055) + 'px"><img src="' + esc(image) + '" alt=""></div>';
-    if (id === 'title' && state.title) html += '<div class="layer title" id="l-title" style="' + box(l) + '">' + esc(state.title) + '</div>';
-    if (id === 'line' && state.line) html += '<div class="layer line" id="l-line" style="' + box(l) + '">' + esc(state.line).replace(/\\*([^*]+)\\*/g, '<b>$1</b>') + '</div>';
-    if (id === 'wave') html += '<div class="layer wave" style="' + box(l) + '">' + waveSvg((state.wave || {}).type, (state.wave || {}).color || BRAND.accent, l.w, l.h) + '</div>';
+    if (id === 'logo') html += '<div class="layer logo" id="l-logo" style="' + box(l, id) + '">' + MARK + '<span>3Speak</span></div>';
+    if (id === 'cover') html += '<div class="layer cover" style="' + box(l, id) + ';border-radius:' + Math.round(Math.min(l.w, l.h) * 0.055) + 'px"><img src="' + esc(image) + '" alt=""></div>';
+    // the text in one inline box: as flex items the spaces next to the red words would go
+    if (id === 'title' && state.title) html += '<div class="layer title" id="l-title" style="' + box(l, id) + '"><span class="txt">' + esc(state.title) + '</span></div>';
+    if (id === 'line' && state.line) html += '<div class="layer line" id="l-line" style="' + box(l, id) + '"><span class="txt">' + esc(state.line).replace(/\\*([^*]+)\\*/g, '<b>$1</b>') + '</span></div>';
+    if (id === 'wave') html += '<div class="layer wave" style="' + box(l, id) + '">' + waveSvg((state.wave || {}).type, (state.wave || {}).color || BRAND.accent, l.w, l.h) + '</div>';
   }
   frame.innerHTML = html;
   const logo = document.getElementById('l-logo');
@@ -239,10 +281,29 @@ export function chromiumPath() {
 const even = (n) => Math.round(n / 2) * 2
 
 /**
+ * Where the moving waveform goes: { cx, cy, w, h, r } (its middle, its size
+ * in even pixels, turned r degrees), or null when it is off. The round ones
+ * are square, as big as the box's shorter side. ffmpeg places it by its
+ * middle, so a box partly out of the frame or turned needs no clipping.
+ */
+export function waveBox(wave, type) {
+  if (!wave || wave.on === false) return null
+  const round = type === 'circle' || type === 'ring'
+  const side = even(Math.max(64, Math.min(wave.w, wave.h)))
+  return {
+    cx: Math.round(wave.x + wave.w / 2),
+    cy: Math.round(wave.y + wave.h / 2),
+    w: round ? side : even(Math.max(16, wave.w)),
+    h: round ? side : even(Math.max(16, wave.h)),
+    r: Number(wave.r) || 0
+  }
+}
+
+/**
  * The two stills of an audiogram: `below` (opaque PNG) and `above` (transparent
  * PNG, or null when nothing is over the waveform). The page loads nothing from
- * the network: the picture comes as a data: URI. Returns the waveform box,
- * clipped to the frame (even numbers, for the video), or null when it is off.
+ * the network: the picture comes as a data: URI. Returns the waveform's place
+ * too (waveBox).
  */
 export async function renderStills({ state, belowFile, aboveFile, timeoutMs = 30000 }) {
   const { chromium } = await import('playwright-core')
@@ -258,19 +319,15 @@ export async function renderStills({ state, belowFile, aboveFile, timeoutMs = 30
     await page.evaluate(() => Promise.all([...document.images].map(i => (i.complete ? null : new Promise(r => { i.onload = i.onerror = r })))))
     await page.screenshot({ path: belowFile, type: 'png', clip: { x: 0, y: 0, width: state.width, height: state.height } })
     const L = state.layers
-    const anyAbove = Object.entries(L).some(([id, l]) => id !== 'wave' && l.on !== false && l.z >= L.wave.z && (id !== 'cover' || state.image))
+    const coverShows = state.image && state.imageLayout !== 'fill'
+    const anyAbove = Object.entries(L).some(([id, l]) => id !== 'wave' && l.on !== false && l.z >= L.wave.z && (id !== 'cover' || coverShows))
     let above = null
     if (anyAbove) {
       await page.evaluate(s => window.applyAudiogram(s, 'above'), state)
       await page.screenshot({ path: aboveFile, type: 'png', omitBackground: true, clip: { x: 0, y: 0, width: state.width, height: state.height } })
       above = aboveFile
     }
-    const w = L.wave
-    if (w.on === false) return { below: belowFile, above, box: null }
-    const x0 = Math.max(0, w.x), y0 = Math.max(0, w.y)
-    const x1 = Math.min(state.width, w.x + w.w), y1 = Math.min(state.height, w.y + w.h)
-    const box = x1 - x0 >= 16 && y1 - y0 >= 16 ? { x: even(x0), y: even(y0), w: even(x1 - x0), h: even(y1 - y0) } : null
-    return { below: belowFile, above, box }
+    return { below: belowFile, above, box: waveBox(L.wave, state.wave?.type) }
   } finally {
     clearTimeout(kill)
     await browser.close().catch(() => {})

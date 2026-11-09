@@ -1,31 +1,31 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { X, Film, Download, Loader2, Eye, EyeOff, ChevronUp, ChevronDown, Upload, Trash2, Send, Scissors, RotateCcw } from 'lucide-react'
+import { X, Film, Download, Loader2, Eye, EyeOff, ChevronUp, ChevronDown, Upload, Trash2, Send, Scissors, RotateCcw, Lock } from 'lucide-react'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
 import { chapterTime } from '../utils/chapters'
 import {
-  SIZES, LAYERS, moveLayer, resizeLayer, restack, stackOrder, toggleLayer, withPicture, pieceOf, canBeShort,
-  AUDIOGRAM_MAX_SECONDS
+  SIZES, LAYERS, moveLayer, resizeLayer, rotateLayer, squareWave, restack, stackOrder, toggleLayer, withPicture, pieceOf, canBeShort,
+  AUDIOGRAM_MAX_SECONDS, ROUND_WAVES
 } from '../utils/audiogramLayers'
 
-const FORMATS = [
-  { id: 'vertical', label: 'Vertical', hint: 'Shorts, Reels, Stories' },
-  { id: 'square', label: 'Square', hint: 'Feeds' }
-]
 const WAVES = [
   { id: 'bars', label: 'Bars' },
   { id: 'centered', label: 'Centered' },
   { id: 'line', label: 'Line' },
-  { id: 'dots', label: 'Thin' }
+  { id: 'dots', label: 'Thin' },
+  { id: 'circle', label: 'Circle' },
+  { id: 'ring', label: 'Circle wave' }
 ]
 // The 3Speak red, white, the navy lightened for the dark background (no cyan)
 const COLORS = ['#e32933', '#f4f5f8', '#7f88ea']
 const PICTURE_LAYOUTS = [
-  { id: 'blur', label: 'Card on a blur' },
-  { id: 'fill', label: 'Fill the frame' }
+  { id: 'card', label: 'Card', hint: 'The picture as a card on the dark 3Speak background' },
+  { id: 'blur', label: 'Card on a blur', hint: 'The picture as a card, and soft and dark behind it' },
+  { id: 'fill', label: 'Fill the frame', hint: 'The picture over the whole video, no card' }
 ]
 const CORNERS = ['nw', 'ne', 'sw', 'se']
-const PREVIEW = { vertical: 520, square: 400 } // preview height in px
+const FORMAT = 'vertical' // the shape of a Short
+const PREVIEW_HEIGHT = 520 // px
 
 const absolute = (u) => {
   if (!u || !u.startsWith('/')) return u
@@ -78,7 +78,11 @@ export default function AudiogramDialog({
         if (gone) return
         setDefaults(d)
         setHasTemplate(!!tpl)
-        setStyle(tpl ? { format: tpl.format, duration: tpl.duration, wave: tpl.wave, background: tpl.background, line: tpl.line, layouts: tpl.layouts } : d.style)
+        const look = tpl ? { format: FORMAT, duration: tpl.duration, wave: tpl.wave, background: tpl.background, line: tpl.line, layouts: tpl.layouts } : { ...d.style, format: FORMAT }
+        // a template from before the logo was fixed: it shows again (the backend does the same)
+        const own = look.layouts?.[FORMAT] || d.style.layouts[FORMAT]
+        look.layouts = { [FORMAT]: { ...own, logo: { ...own.logo, on: true } } }
+        setStyle(look)
       } catch (err) {
         if (!gone) setLoadError(err.message)
       }
@@ -86,17 +90,26 @@ export default function AudiogramDialog({
     return () => { gone = true }
   }, [])
 
-  const format = style?.format || 'vertical'
+  const format = FORMAT
   const size = SIZES[format]
-  const scale = PREVIEW[format] / size.h
+  const scale = PREVIEW_HEIGHT / size.h
+  const stageRef = useRef(null)
   const layers = style?.layouts?.[format]
   const image = style?.background?.image || null
   const piece = pieceOf(range, length, playheadPosition)
   const seconds = Math.round((piece.end - piece.start) * 10) / 10
 
   const setLayers = useCallback((fn) => {
-    setStyle(s => ({ ...s, layouts: { ...s.layouts, [s.format]: fn(s.layouts[s.format]) } }))
+    setStyle(s => ({ ...s, layouts: { ...s.layouts, [FORMAT]: fn(s.layouts[FORMAT]) } }))
   }, [])
+  const setWaveType = (type) => {
+    setStyle(s => {
+      const next = { ...s, wave: { ...s.wave, type } }
+      // a round one fills a square: square the box when coming from a straight one
+      if (ROUND_WAVES.includes(type) && !ROUND_WAVES.includes(s.wave.type)) next.layouts = { ...s.layouts, [FORMAT]: squareWave(s.layouts[FORMAT], SIZES[FORMAT]) }
+      return next
+    })
+  }
   const setImage = (url) => {
     setStyle(s => {
       const next = { ...s, background: { ...s.background, image: url } }
@@ -140,7 +153,8 @@ export default function AudiogramDialog({
       const dx = (ev.clientX - sx) / scale
       const dy = (ev.clientY - sy) / scale
       if (corner) {
-        setLayers(() => resizeLayer(base, id, corner, dx, dy, size, ev.shiftKey || id === 'cover' || id === 'logo'))
+        const keep = ev.shiftKey || id === 'cover' || id === 'logo' || (id === 'wave' && ROUND_WAVES.includes(style.wave.type))
+        setLayers(() => resizeLayer(base, id, corner, dx, dy, size, keep))
       } else {
         const r = moveLayer(base, id, dx, dy, size, !ev.altKey)
         setGuide(r.guide)
@@ -155,8 +169,36 @@ export default function AudiogramDialog({
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerup', onUp)
   }
+  // Turn with the handle over the box: around its middle (Shift: 15 degree steps)
+  const startRotate = (e, id) => {
+    if (e.button !== 0 || !stageRef.current) return
+    e.preventDefault()
+    e.stopPropagation()
+    setSelected(id)
+    const rect = stageRef.current.getBoundingClientRect()
+    const base = layers
+    const b = base[id]
+    const cx = rect.left + (b.x + b.w / 2) * scale
+    const cy = rect.top + (b.y + b.h / 2) * scale
+    const onMove = (ev) => {
+      const deg = (Math.atan2(ev.clientY - cy, ev.clientX - cx) * 180) / Math.PI + 90
+      setLayers(() => rotateLayer(base, id, deg, ev.shiftKey ? 15 : 0))
+    }
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+    }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+  }
   const nudge = (e) => {
     if (!selected || !layers) return
+    if (e.key === '[' || e.key === ']') {
+      e.preventDefault()
+      const by = (e.key === ']' ? 1 : -1) * (e.shiftKey ? 15 : 1)
+      setLayers(l => rotateLayer(l, selected, (l[selected].r || 0) + by, 0))
+      return
+    }
     const step = e.shiftKey ? 10 : 1
     const d = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key]
     if (!d) return
@@ -236,7 +278,10 @@ export default function AudiogramDialog({
 
   const busy = job?.status === 'processing'
   const order = layers ? stackOrder(layers) : []
-  const shown = (id) => layers?.[id] && layers[id].on !== false && (id !== 'cover' || image)
+  const pictureLayout = style?.background?.imageLayout || 'blur'
+  // the picture card: only with a picture that is not filling the frame
+  const hasCard = !!image && pictureLayout !== 'fill'
+  const shown = (id) => layers?.[id] && layers[id].on !== false && (id !== 'cover' || hasCard)
   const chapterHere = (chapters || []).filter(c => c.at <= piece.start + 0.5).pop()
 
   return (
@@ -255,12 +300,13 @@ export default function AudiogramDialog({
           <div className="audiogram-body">
             <div className="audiogram-stage-col">
               <div
+                ref={stageRef}
                 className="audiogram-stage"
                 style={{ width: size.w * scale, height: size.h * scale }}
                 tabIndex={0}
                 onKeyDown={nudge}
                 onPointerDown={() => setSelected(null)}
-                aria-label="Audiogram preview: drag the parts to move them, the corners to resize"
+                aria-label="Audiogram preview: drag the parts to move them, the corners to resize, the round handle to turn"
               >
                 <iframe
                   ref={frameRef}
@@ -279,20 +325,29 @@ export default function AudiogramDialog({
                       key={id}
                       className={`audiogram-box${selected === id ? ' selected' : ''}`}
                       data-layer={id}
-                      title={`${name}: drag to move${selected === id ? ', corners to resize' : ''}`}
-                      style={{ left: b.x * scale, top: b.y * scale, width: b.w * scale, height: b.h * scale, zIndex: b.z + 1 }}
+                      title={`${name}: drag to move${selected === id ? ', corners to resize, the round handle to turn' : ''}`}
+                      style={{ left: b.x * scale, top: b.y * scale, width: b.w * scale, height: b.h * scale, zIndex: id === 'logo' ? 30 : b.z + 1, transform: b.r ? `rotate(${b.r}deg)` : undefined }}
                       onPointerDown={(e) => startDrag(e, id)}
                     >
-                      {selected === id && <span className="audiogram-box-name">{name}</span>}
+                      {selected === id && <span className="audiogram-box-name">{name}{b.r ? ` · ${b.r}°` : ''}</span>}
                       {selected === id && CORNERS.map(c => (
                         <span key={c} className={`audiogram-handle ${c}`} data-corner={c} onPointerDown={(e) => startDrag(e, id, c)} />
                       ))}
+                      {selected === id && (
+                        <span
+                          className="audiogram-rotate"
+                          data-rotate={id}
+                          title="Turn (Shift: 15° steps). Double-click: straight"
+                          onPointerDown={(e) => startRotate(e, id)}
+                          onDoubleClick={(e) => { e.stopPropagation(); setLayers(l => rotateLayer(l, id, 0)) }}
+                        />
+                      )}
                     </div>
                   )
                 })}
               </div>
               <p className="audiogram-stage-hint">
-                Drag the parts, pull a corner to resize (Shift keeps the shape), arrow keys nudge.{hasTemplate ? ' Your last audiogram is the starting point.' : ''}
+                Drag the parts, pull a corner to resize (Shift keeps the shape), the round handle to turn. Arrow keys nudge, [ and ] turn.{hasTemplate ? ' Your last audiogram is the starting point.' : ''}
               </p>
             </div>
 
@@ -307,15 +362,6 @@ export default function AudiogramDialog({
                   <Scissors size={14} /> Choose on the timeline
                 </button>
                 <small className="audiogram-note">Up to {AUDIOGRAM_MAX_SECONDS / 60} minutes. Drag across the timeline to pick it.</small>
-              </div>
-
-              <div className="audiogram-field">
-                <span>Shape</span>
-                <div className="noise-levels" role="radiogroup" aria-label="Shape">
-                  {FORMATS.map(f => (
-                    <button key={f.id} role="radio" aria-checked={format === f.id} className={format === f.id ? 'active' : ''} title={f.hint} onClick={() => { setSelected(null); setStyle(s => ({ ...s, format: f.id })) }}>{f.label}</button>
-                  ))}
-                </div>
               </div>
 
               <label className="audiogram-field">
@@ -348,7 +394,7 @@ export default function AudiogramDialog({
                 {image && (
                   <div className="noise-levels" role="radiogroup" aria-label="Picture layout">
                     {PICTURE_LAYOUTS.map(p => (
-                      <button key={p.id} role="radio" aria-checked={style.background.imageLayout === p.id} className={style.background.imageLayout === p.id ? 'active' : ''} onClick={() => setStyle(s => ({ ...s, background: { ...s.background, imageLayout: p.id } }))}>{p.label}</button>
+                      <button key={p.id} role="radio" aria-checked={pictureLayout === p.id} className={pictureLayout === p.id ? 'active' : ''} title={p.hint} onClick={() => setStyle(s => ({ ...s, background: { ...s.background, imageLayout: p.id } }))}>{p.label}</button>
                     ))}
                   </div>
                 )}
@@ -356,9 +402,9 @@ export default function AudiogramDialog({
 
               <div className="audiogram-field">
                 <span>Waveform</span>
-                <div className="noise-levels" role="radiogroup" aria-label="Waveform type">
+                <div className="noise-levels audiogram-wave-types" role="radiogroup" aria-label="Waveform type">
                   {WAVES.map(w => (
-                    <button key={w.id} role="radio" aria-checked={style.wave.type === w.id} className={style.wave.type === w.id ? 'active' : ''} onClick={() => setStyle(s => ({ ...s, wave: { ...s.wave, type: w.id } }))}>{w.label}</button>
+                    <button key={w.id} role="radio" aria-checked={style.wave.type === w.id} className={style.wave.type === w.id ? 'active' : ''} onClick={() => setWaveType(w.id)}>{w.label}</button>
                   ))}
                 </div>
                 <div className="audiogram-colors" role="radiogroup" aria-label="Waveform colour">
@@ -374,14 +420,23 @@ export default function AudiogramDialog({
               <div className="audiogram-field">
                 <span>Parts <small>(front to back)</small></span>
                 <ul className="audiogram-layers">
-                  {order.filter(id => id !== 'cover' || image).map((id, i, list) => {
+                  {order.filter(id => id !== 'cover' || hasCard).map((id, i, list) => {
                     const meta = LAYERS.find(l => l.id === id)
+                    if (id === 'logo') {
+                      // always shown and in front: it can be moved, resized and turned only
+                      return (
+                        <li key={id} className={`audiogram-layer-locked${selected === id ? ' selected' : ''}`}>
+                          <button className="audiogram-layer-name" onClick={() => setSelected(id)}>{meta.name}</button>
+                          <span className="audiogram-layer-lock" title="The 3Speak logo is always shown, in front"><Lock size={12} /> Always shown</span>
+                        </li>
+                      )
+                    }
                     const on = layers[id].on !== false
                     return (
                       <li key={id} className={selected === id ? 'selected' : ''}>
                         <button className="audiogram-layer-name" onClick={() => setSelected(id)}>{meta.name}</button>
                         <button className="audiogram-layer-btn" onClick={() => setLayers(l => toggleLayer(l, id))} aria-label={on ? `Hide ${meta.name}` : `Show ${meta.name}`} title={on ? 'Hide' : 'Show'}>{on ? <Eye size={14} /> : <EyeOff size={14} />}</button>
-                        <button className="audiogram-layer-btn" onClick={() => setLayers(l => restack(l, id, 1))} disabled={i === 0} aria-label={`Bring ${meta.name} forward`} title="Forward"><ChevronUp size={14} /></button>
+                        <button className="audiogram-layer-btn" onClick={() => setLayers(l => restack(l, id, 1))} disabled={i <= 1} aria-label={`Bring ${meta.name} forward`} title="Forward"><ChevronUp size={14} /></button>
                         <button className="audiogram-layer-btn" onClick={() => setLayers(l => restack(l, id, -1))} disabled={i === list.length - 1} aria-label={`Send ${meta.name} back`} title="Back"><ChevronDown size={14} /></button>
                       </li>
                     )
@@ -412,7 +467,7 @@ export default function AudiogramDialog({
                 <li key={a.id} className="audiogram-made-item" data-testid="audiogram-item">
                   <video className={`audiogram-preview ${a.format}`} src={a.url} controls playsInline preload="metadata" />
                   <div className="audiogram-made-info">
-                    <strong>#{i + 1} · {chapterTime(a.start)} · {Math.round(a.duration)}s · {a.format === 'vertical' ? 'Vertical' : 'Square'}</strong>
+                    <strong>#{i + 1} · {chapterTime(a.start)} · {Math.round(a.duration)}s</strong>
                     {canBeShort(a) ? (
                       <button
                         className={`audiogram-post${a.post ? ' active' : ''}`}
@@ -422,7 +477,7 @@ export default function AudiogramDialog({
                         <Send size={13} /> Post together with the audio
                       </button>
                     ) : (
-                      <small className="audiogram-note">Shorts are vertical: make a vertical one to post it with the audio.</small>
+                      <small className="audiogram-note">Only vertical audiograms up to 2 minutes can go out as Shorts.</small>
                     )}
                     {a.post && (
                       <textarea

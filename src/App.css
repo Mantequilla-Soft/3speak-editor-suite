@@ -6738,6 +6738,36 @@ input[type="range"] {
 .audiogram-handle.sw { left: -6px; bottom: -6px; cursor: nesw-resize; }
 .audiogram-handle.se { right: -6px; bottom: -6px; cursor: nwse-resize; }
 
+/* Turn handle: a round knob on a stick under the box (the name sits on top) */
+.audiogram-rotate {
+  position: absolute;
+  left: 50%;
+  bottom: -26px;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--accent-primary);
+  cursor: grab;
+  touch-action: none;
+}
+
+.audiogram-rotate::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  width: 2px;
+  height: 12px;
+  margin-left: -1px;
+  background: var(--accent-primary);
+}
+
+.audiogram-rotate:active {
+  cursor: grabbing;
+}
+
 .audiogram-guide {
   position: absolute;
   left: 50%;
@@ -6898,6 +6928,23 @@ input[type="range"] {
   background: var(--bg-tertiary);
 }
 
+.audiogram-layer-lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.audiogram-wave-types {
+  flex-wrap: wrap;
+}
+
+.audiogram-wave-types button {
+  flex: 1 0 30%;
+}
+
 .audiogram-layer-name {
   flex: 1;
   text-align: left;
@@ -7038,6 +7085,40 @@ input[type="range"] {
     flex-direction: column;
     align-items: stretch;
   }
+}
+
+/* Picking a piece of the timeline (audiograms): the rest of the editor is
+   locked (no clicks, dimmed) until Use this piece / Cancel. The timeline's
+   tracks and ruler, its zoom and the bar stay usable. */
+.app.picking-range * {
+  pointer-events: none;
+}
+
+.app.picking-range .range-pick-bar,
+.app.picking-range .range-pick-bar *,
+.app.picking-range .timeline-content,
+.app.picking-range .timeline-content *,
+.app.picking-range .timeline-toolbar .toolbar-center,
+.app.picking-range .timeline-toolbar .toolbar-center * {
+  pointer-events: auto;
+}
+
+.app.picking-range .app-branding,
+.app.picking-range .compact-menu-bar,
+.app.picking-range .compact-stage-wrap,
+.app.picking-range .compact-top-row,
+.app.picking-range .compact-side,
+.app.picking-range .compact-render-progress,
+.app.picking-range .timeline-toolbar .toolbar-left,
+.app.picking-range .timeline-toolbar .toolbar-right,
+.app.picking-range .timeline-sidebar,
+.app.picking-range .timeline-select-hint {
+  opacity: 0.35;
+  user-select: none;
+}
+
+.app.picking-range .timeline-content {
+  cursor: crosshair;
 }
 
 /* Picking a piece of the timeline (audiograms) */

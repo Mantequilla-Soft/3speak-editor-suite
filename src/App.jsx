@@ -1198,14 +1198,21 @@ function App() {
     setPickingRange(false)
     setAudiogramOpen(true)
   }, [])
+  // While picking, the editor is locked (App.css .picking-range): no clicks
+  // outside the timeline, and no shortcuts. Escape cancels, Enter uses the
+  // piece (on a button of the bar: that button).
   useEffect(() => {
     if (!pickingRange) return
     const onKey = (e) => {
-      if (e.key === 'Escape') { e.preventDefault(); finishPickingRange(false) }
-      if (e.key === 'Enter' && !isTypingTarget(e.target)) { e.preventDefault(); finishPickingRange(true) }
+      if (e.key === 'Tab') return
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.closest?.('.range-pick-bar button')) return
+      e.stopPropagation()
+      e.preventDefault()
+      if (e.key === 'Escape') finishPickingRange(false)
+      else if (e.key === 'Enter') finishPickingRange(true)
     }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
   }, [pickingRange, finishPickingRange])
   const cleaning = useCleaningStatus()
   // Duck is a clip setting only. A whole-show Duck (an old draft, or a
@@ -1427,7 +1434,7 @@ function App() {
   // The audio editor only exists in the compact layout
   if (compactMode || audioMode) {
     return (
-      <div className={`app compact${isDesktop ? ' desktop' : ''}`}>
+      <div className={`app compact${isDesktop ? ' desktop' : ''}${audioMode && pickingRange ? ' picking-range' : ''}`}>
         <ClipColorFilters tracks={tracks} />
         {/* Backend health warning */}
         {backendStatus === 'error' && (

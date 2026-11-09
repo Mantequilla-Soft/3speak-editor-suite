@@ -29,8 +29,8 @@ process.env.UPLOAD_DIR = path.join(dir, 'uploads')
 process.env.EDITOR_TOKEN_SECRET = 'test-secret'
 const express = (await import('express')).default
 const { audiogramRouter } = await import('../src/routes/audiogram.js')
-const { cleanAudiogramOptions, cleanAudiogramStyle, cleanImageUrl, audiogramArgs, pageState, waveFilter, AUDIOGRAM_MAX_SECONDS } = await import('../src/services/audiogram.js')
-const { cleanLayers, defaultLayers, audiogramPageHtml, renderStills } = await import('../src/services/audiogramPage.js')
+const { cleanAudiogramOptions, cleanAudiogramStyle, cleanImageUrl, audiogramArgs, pageState, waveFilter, circleMaps, circleGeometry, AUDIOGRAM_MAX_SECONDS } = await import('../src/services/audiogram.js')
+const { cleanLayers, defaultLayers, audiogramPageHtml, renderStills, waveBox } = await import('../src/services/audiogramPage.js')
 const { imageDataUri } = await import('../src/routes/audiogram.js')
 
 const mint = (u) => {
@@ -55,13 +55,13 @@ const post = async (body) => {
 }
 
 describe('audiogram options and look', () => {
-  test('cleanAudiogramOptions: 3 seconds to 2 minutes from 0 on, vertical unless square', () => {
+  test('cleanAudiogramOptions: 3 seconds to 2 minutes from 0 on, always vertical', () => {
     const o = cleanAudiogramOptions({ start: 12.34567, duration: 95, title: '  My   episode ' })
     assert.equal(o.start, 12.346)
     assert.equal(o.duration, 95)
     assert.equal(o.format, 'vertical')
     assert.equal(o.title, 'My episode')
-    assert.equal(cleanAudiogramOptions({ start: 0, duration: 30, format: 'square' }).format, 'square')
+    assert.equal(cleanAudiogramOptions({ start: 0, duration: 30, format: 'square' }).format, 'vertical', 'no square any more: Shorts are vertical')
     assert.equal(AUDIOGRAM_MAX_SECONDS, 120)
     for (const bad of [{ start: -1, duration: 10 }, { start: 0, duration: 2 }, { start: 0, duration: 121 }, { start: 'a', duration: 10 }, {}]) {
       assert.ok(cleanAudiogramOptions(bad).error, JSON.stringify(bad))
@@ -75,11 +75,14 @@ describe('audiogram options and look', () => {
     assert.equal(d.line, 'Full episode on *3speak.tv*')
     assert.equal(d.layouts.vertical.cover.on, false, 'no picture: no cover in the first arrangement')
     const s = cleanAudiogramStyle({ format: 'square', duration: 500, wave: { type: 'nope', color: 'red' }, background: { image: 'javascript:alert(1)', imageLayout: 'x' }, line: 'x'.repeat(300) })
-    assert.equal(s.format, 'square')
+    assert.equal(s.format, 'vertical')
+    assert.deepEqual(Object.keys(s.layouts), ['vertical'])
     assert.equal(s.duration, 120)
     assert.deepEqual(s.wave, { type: 'bars', color: '#e32933' })
     assert.equal(s.background.image, null)
     assert.equal(s.line.length, 120)
+    for (const type of ['bars', 'centered', 'line', 'dots', 'circle', 'ring']) assert.equal(cleanAudiogramStyle({ wave: { type } }).wave.type, type)
+    for (const imageLayout of ['card', 'blur', 'fill']) assert.equal(cleanAudiogramStyle({ background: { imageLayout } }).background.imageLayout, imageLayout)
     const withPic = cleanAudiogramStyle({ background: { image: 'https://images.example/cover.jpg' } })
     assert.equal(withPic.layouts.vertical.cover.on, true, 'a picture: the cover card in the first arrangement')
   })
@@ -94,11 +97,19 @@ describe('audiogram options and look', () => {
     }
   })
 
-  test('cleanLayers: boxes kept inside the frame, at least 16 px, the rest from the default', () => {
-    const l = cleanLayers({ title: { x: -5000, y: 99999, w: 2, h: 99999, z: 99, on: false }, wave: 'nope' }, 'vertical', true)
-    assert.deepEqual(l.title, { x: 0, y: 1904, w: 16, h: 1920, z: 20, on: false })
+  test('cleanLayers: boxes kept inside the frame, at least 16 px, turned -180..180, the rest from the default', () => {
+    const l = cleanLayers({ title: { x: -5000, y: 99999, w: 2, h: 99999, z: 99, r: 370.4, on: false }, line: { r: -190 }, wave: 'nope' }, 'vertical', true)
+    assert.deepEqual(l.title, { x: 0, y: 1904, w: 16, h: 1920, z: 19, r: 10, on: false })
+    assert.equal(l.line.r, 170)
     assert.deepEqual(l.wave, defaultLayers('vertical', true).wave)
     assert.deepEqual(Object.keys(l).sort(), ['cover', 'line', 'logo', 'title', 'wave'])
+  })
+
+  test('the 3Speak logo can not be hidden, shrunk away, pushed out or covered', () => {
+    const l = cleanLayers({ logo: { x: -900, y: 5000, w: 3, h: 3, z: 0, r: 30, on: false } }, 'vertical', false)
+    assert.deepEqual(l.logo, { x: 0, y: 1920 - 40, w: 240, h: 40, z: 20, r: 30, on: true })
+    assert.ok(Object.entries(l).every(([id, b]) => id === 'logo' || b.z < l.logo.z))
+    assert.equal(defaultLayers('vertical', true).logo.z, 20)
   })
 
   test('the first arrangements keep vertical text clear of the Shorts buttons (top 12 %, bottom 15 %)', () => {
@@ -114,20 +125,56 @@ describe('audiogram options and look', () => {
 describe('the ffmpeg graph', () => {
   const style = cleanAudiogramStyle({})
   test('cut from start, waveform between the two stills', () => {
-    const args = audiogramArgs({ input: '/in.mp3', below: '/b.png', above: '/a.png', box: { x: 90, y: 1440, w: 900, h: 180 }, output: '/o.mp4', start: 5, duration: 15, style })
+    const args = audiogramArgs({ input: '/in.mp3', below: '/b.png', above: '/a.png', box: { cx: 540, cy: 1530, w: 900, h: 180, r: 0 }, output: '/o.mp4', start: 5, duration: 15, style })
     assert.deepEqual(args.slice(args.indexOf('-ss'), args.indexOf('-ss') + 6), ['-ss', '5', '-t', '15', '-i', '/in.mp3'])
     assert.ok(args.includes('/b.png') && args.includes('/a.png'))
     const graph = args[args.indexOf('-filter_complex') + 1]
-    assert.match(graph, /\[bg\]\[wave\]overlay=x=90:y=1440/)
+    assert.match(graph, /\[bg\]\[w0\]overlay=x=540-overlay_w\/2:y=1530-overlay_h\/2/)
+    assert.doesNotMatch(graph, /rotate/)
     assert.match(graph, /\[bw\]\[top\]overlay/)
     assert.equal(args.at(-1), '/o.mp4')
   })
 
   test('nothing over the waveform: one still; waveform off: no waveform', () => {
-    const one = audiogramArgs({ input: '/in', below: '/b.png', box: { x: 0, y: 0, w: 100, h: 100 }, output: '/o', start: 0, duration: 5, style })
+    const one = audiogramArgs({ input: '/in', below: '/b.png', box: { cx: 50, cy: 50, w: 100, h: 100, r: 0 }, output: '/o', start: 0, duration: 5, style })
     assert.doesNotMatch(one[one.indexOf('-filter_complex') + 1], /\[top\]/)
     const none = audiogramArgs({ input: '/in', below: '/b.png', box: null, output: '/o', start: 0, duration: 5, style })
     assert.doesNotMatch(none[none.indexOf('-filter_complex') + 1], /showwaves/)
+  })
+
+  test('a turned waveform is turned around its middle, on transparent', () => {
+    const args = audiogramArgs({ input: '/in', below: '/b.png', box: { cx: 540, cy: 1300, w: 900, h: 360, r: -90 }, output: '/o', start: 0, duration: 5, style })
+    assert.match(args[args.indexOf('-filter_complex') + 1], /\[w0\]rotate=a=-1\.57080:ow=rotw\(-1\.57080\):oh=roth\(-1\.57080\):c=none\[w1\];\[bg\]\[w1\]overlay=x=540-overlay_w\/2/)
+  })
+
+  test('a round waveform: its strip bent round by the two maps (inputs after the stills)', () => {
+    const round = cleanAudiogramStyle({ wave: { type: 'circle' } })
+    const box = { cx: 540, cy: 1300, w: 600, h: 600, r: 0 }
+    const args = audiogramArgs({ input: '/in', below: '/b.png', above: '/a.png', box, maps: { x: '/x.pgm', y: '/y.pgm' }, output: '/o', start: 0, duration: 5, style: round })
+    assert.deepEqual(args.slice(args.indexOf('/x.pgm') - 1, args.indexOf('/x.pgm') + 3), ['-i', '/x.pgm', '-i', '/y.pgm'])
+    assert.match(args[args.indexOf('-filter_complex') + 1], /\[strip\]\[3:v\]\[4:v\]remap=fill=black@0/)
+    const noMaps = audiogramArgs({ input: '/in', below: '/b.png', box, output: '/o', start: 0, duration: 5, style: round })
+    assert.doesNotMatch(noMaps[noMaps.indexOf('-filter_complex') + 1], /showwaves/, 'no maps: no round waveform')
+  })
+
+  test('circleMaps: 16-bit PGMs, nothing in the middle or the corners, the band mapped and mirrored', () => {
+    const side = 200
+    const { x, y } = circleMaps('ring', side)
+    const head = `P5\n${side} ${side}\n65535\n`
+    assert.equal(x.subarray(0, head.length).toString(), head)
+    assert.equal(x.length, head.length + side * side * 2)
+    const at = (buf, px, py) => buf.readUInt16BE(head.length + (py * side + px) * 2)
+    assert.equal(at(x, 100, 100), 65535, 'the middle is empty')
+    assert.equal(at(x, 0, 0), 65535, 'the corners are empty')
+    const g = circleGeometry('ring', side)
+    assert.equal(at(x, 100, 2), 0, 'the top is the start of the strip')
+    assert.equal(at(y, 100, 2), 0, 'the outside is row 0')
+    assert.equal(at(x, 100, 197), g.cols - 1, 'the bottom is its end')
+    assert.equal(at(x, 30, 100), at(x, 169, 100), 'left and right mirror each other')
+    const bars = circleMaps('circle', side)
+    const cols = new Set()
+    for (let px = 0; px < side; px++) cols.add(at(bars.x, px, 4))
+    assert.ok(cols.has(65535), 'gaps between the bars')
   })
 
   test('each waveform kind has its filter', () => {
@@ -135,6 +182,8 @@ describe('the ffmpeg graph', () => {
     assert.match(waveFilter('centered', 900, 180, '#ffffff'), /mode=cline/)
     assert.match(waveFilter('line', 900, 180, '#ffffff'), /mode=line/)
     assert.match(waveFilter('dots', 900, 180, '#ffffff'), /mode=p2p/)
+    assert.match(waveFilter('circle', 600, 600, '#ffffff'), /aeval=abs.*showwaves=s=48x\d+:mode=cline.*crop=48:/)
+    assert.match(waveFilter('ring', 600, 600, '#ffffff'), /lowpass.*showwaves=s=200x\d+:mode=p2p/)
   })
 
   test('the page is static and builds itself from the state', () => {
@@ -143,8 +192,14 @@ describe('the ffmpeg graph', () => {
     assert.doesNotMatch(html, /fonts\.googleapis/, 'the render page loads nothing')
     assert.match(audiogramPageHtml({ preview: true }), /audiogram-state/)
     const st = pageState({ format: 'square', title: 'T', style, image: null })
-    assert.deepEqual([st.width, st.height], [1080, 1080])
-    assert.equal(st.layers, style.layouts.square)
+    assert.deepEqual([st.width, st.height], [1080, 1920])
+    assert.equal(st.layers, style.layouts.vertical)
+  })
+
+  test('waveBox: placed by its middle; the round ones square', () => {
+    assert.deepEqual(waveBox({ x: 90, y: 1120, w: 900, h: 361, r: 12, on: true }, 'bars'), { cx: 540, cy: 1301, w: 900, h: 362, r: 12 })
+    assert.deepEqual(waveBox({ x: -200, y: 1000, w: 900, h: 500 }, 'ring'), { cx: 250, cy: 1250, w: 500, h: 500, r: 0 })
+    assert.equal(waveBox({ x: 0, y: 0, w: 100, h: 100, on: false }, 'bars'), null)
   })
 })
 
@@ -165,15 +220,15 @@ test('stills: the layers over the waveform go on a transparent second still', { 
   const st = pageState({ format: 'vertical', title: 'Over the wave', style, image: null })
   const r = await renderStills({ state: st, belowFile: path.join(dir, 'below.png'), aboveFile: path.join(dir, 'above.png') })
   assert.equal(r.above, path.join(dir, 'above.png'))
-  assert.deepEqual(r.box, { x: 90, y: 1120, w: 900, h: 360 })
+  assert.deepEqual(r.box, { cx: 540, cy: 1300, w: 900, h: 360, r: 0 })
   assert.ok(fs.statSync(r.below).size > 1000)
   const flat = cleanAudiogramStyle({ layouts: { vertical: { title: { z: 0 }, line: { z: 0 }, logo: { z: 0 } } } })
   const r2 = await renderStills({ state: pageState({ format: 'vertical', title: 'x', style: flat, image: null }), belowFile: path.join(dir, 'b2.png'), aboveFile: path.join(dir, 'a2.png') })
-  assert.equal(r2.above, null, 'nothing over the waveform: no second still')
+  assert.ok(r2.above, 'the logo is always over the waveform')
 })
 
 test('the route renders an MP4 of the asked piece from our own export', { skip: !canRender }, async () => {
-  const [status, { jobId }] = await post({ url: 'https://elsewhere.example/rendered/episode.mp3?x=1', start: 4, duration: 6, format: 'square', title: 'Episode: "quotes", <b>tags</b> and \\ backslashes' })
+  const [status, { jobId }] = await post({ url: 'https://elsewhere.example/rendered/episode.mp3?x=1', start: 4, duration: 6, style: { wave: { type: 'circle' }, layouts: { vertical: { wave: { x: 240, y: 1000, w: 600, h: 600, r: 15 } } } }, title: 'Episode: "quotes", <b>tags</b> and \\ backslashes' })
   assert.equal(status, 200)
   let job
   for (let i = 0; i < 600; i++) {
@@ -187,6 +242,7 @@ test('the route renders an MP4 of the asked piece from our own export', { skip: 
   const p = JSON.parse(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'stream=codec_name,width,height:format=duration', '-of', 'json', out], { encoding: 'utf8' }))
   assert.deepEqual(p.streams.map(s => s.codec_name).sort(), ['aac', 'h264'])
   assert.equal(p.streams.find(s => s.codec_name === 'h264').width, 1080)
+  assert.equal(p.streams.find(s => s.codec_name === 'h264').height, 1920)
   assert.ok(Math.abs(+p.format.duration - 6) < 0.15, `duration ${p.format.duration}`)
   assert.equal(fs.readdirSync(rendered).filter(f => f.includes('.part')).length, 0, 'no part file left')
 })
