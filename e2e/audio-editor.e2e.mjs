@@ -1432,6 +1432,45 @@ try {
     await o.ctx.close()
   })
 
+  await step('shorts editor in a remix: Add Text goes in at the playhead over the video, selected; image and text stickers go in', async () => {
+    // a sticker library and a video to remix, served by the editor's own origin
+    const st = path.join(S, 'dist', 'stickers')
+    fs.mkdirSync(st, { recursive: true })
+    fs.writeFileSync(path.join(st, 'star.svg'), '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path d="M5 0l1.5 3.5H10L7 6l1 4-3-2.5L2 10l1-4-3-2.5h3.5z" fill="gold"/></svg>')
+    fs.writeFileSync(path.join(st, 'library.json'), JSON.stringify({ version: 1, categories: [{ id: 'emoji', label: 'Emojis' }], items: [{ id: 'star', category: 'emoji', title: 'Star', file: 'star.svg', keywords: ['star'] }] }))
+    ff(['-f', 'lavfi', '-i', 'testsrc=size=360x640:rate=30:duration=6', '-f', 'lavfi', '-i', 'sine=f=440:d=6', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-shortest', path.join(S, 'dist', 'original.mp4')])
+    const v = await openEditor({ file: null, mode: 'video' })
+    const f = v.frame
+    await f.getByText('Shorts Editor').first().waitFor()
+    await v.page.evaluate((u) => window.__send({ type: 'load-media', url: u, name: 'Original', mediaType: 'video', parentAuthor: 'bob', parentPermlink: 'orig' }), `${EDITOR}/original.mp4`)
+    await f.getByText('Free edit').first().click({ timeout: 20000 })
+    await f.locator('.timeline-clip-v2').first().waitFor()
+    const videoLeft = (await f.locator('.timeline-clip-v2').first().boundingBox()).x
+    // Add Text from the video track's +: at the playhead (0:00), over the video, selected, showing
+    await f.locator('.track-add-btn').first().click()
+    await f.getByRole('button', { name: 'Add Text' }).click()
+    const text = f.locator('.timeline-clip-v2.text')
+    await text.waitFor()
+    assert.ok(Math.abs((await text.boundingBox()).x - videoLeft) < 3, 'the text starts at the playhead, not after the video')
+    assert.match(await text.getAttribute('class'), /selected/, 'the new text is selected (its settings open)')
+    await until(async () => (await f.locator('.compact-global-preview').innerText()).includes('Enter text here'), 'the preview shows the text', 5000)
+    // an image sticker, then a text sticker: they go in, the editor stays
+    const openStickers = async () => {
+      await f.locator('.track-add-btn').first().click()
+      await f.getByRole('button', { name: 'Stickers' }).click()
+      await f.locator('.sticker-grid').waitFor()
+    }
+    await openStickers()
+    await f.locator('.sticker-tile:not(.text)').first().click()
+    await until(async () => (await f.locator('.timeline-clip-v2.image').count()) === 1, 'the image sticker is on the timeline', 5000)
+    await openStickers()
+    await f.getByRole('button', { name: 'Text boxes' }).click()
+    await f.locator('.sticker-tile.text').first().click()
+    await until(async () => (await f.locator('.timeline-clip-v2.text').count()) === 2, 'the text sticker is on the timeline', 5000)
+    assert.equal(await f.locator('.app').count(), 1, 'the editor is still there')
+    await v.ctx.close()
+  })
+
   await step('the shorts video editor is unchanged (no mode, Video 1 + Audio 1, Render, no audio tools)', async () => {
     const v = await openEditor({ file: null, mode: 'video' })
     const ready = await v.page.evaluate(() => window.__messages.find(m => m.type === 'editor-ready'))

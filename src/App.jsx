@@ -602,10 +602,11 @@ function App() {
         addChapterRef.current()
       }
 
-      // T - add text clip (shorts only)
+      // T - add text clip (shorts only): at the playhead, selected
       if (!audioMode && e.key === 't' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
         e.preventDefault()
-        addTextClip()
+        const id = addTextClip()
+        if (id) selectClip(id)
       }
 
       // Arrow keys - move playhead
@@ -626,7 +627,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [selectedClipId, selectedClipIds, selectClips, handleRemoveClips, handleRemoveClip, splitClipAtPlayhead, undo, redo, setPlayheadPosition, ungroupClips, duplicateClip, isPlayheadOnGap, removeGapAtPlayhead, addTextClip, audioMode])
+  }, [selectedClipId, selectedClipIds, selectClips, selectClip, handleRemoveClips, handleRemoveClip, splitClipAtPlayhead, undo, redo, setPlayheadPosition, ungroupClips, duplicateClip, isPlayheadOnGap, removeGapAtPlayhead, addTextClip, audioMode])
 
   // Prevent external file drops anywhere except the project library
   useEffect(() => {
@@ -887,6 +888,12 @@ function App() {
   }, [addMusicClip, selectClip, addTarget, playheadPosition, audioMode])
 
   // Stickers go in at the playhead (on a "Stickers" track above the footage)
+  // Add Text (a track's + menu): at the playhead over the video, selected so its settings open
+  const addTextHere = useCallback((trackId) => {
+    const id = addTextClip(trackId)
+    if (id) selectClip(id)
+  }, [addTextClip, selectClip])
+
   const handlePickSticker = useCallback((sticker) => {
     const clipId = addStickerClip(sticker, playheadPosition)
     if (clipId) selectClip(clipId)
@@ -1798,7 +1805,7 @@ function App() {
             onGroupClips={groupSelection}
             onUngroupClips={ungroupClips}
             onAddTrack={addTrack}
-            onAddTextClip={audioMode ? undefined : addTextClip}
+            onAddTextClip={audioMode ? undefined : addTextHere}
             onAddColorClip={audioMode ? undefined : addColorClip}
             onRemoveTrack={handleRemoveTrack}
             onLibraryDrop={handleTimelineDrop}
@@ -2256,7 +2263,7 @@ function App() {
               onGroupClips={groupSelection}
               onUngroupClips={ungroupClips}
               onAddTrack={addTrack}
-              onAddTextClip={addTextClip}
+              onAddTextClip={addTextHere}
               onAddColorClip={addColorClip}
               onRemoveTrack={handleRemoveTrack}
               onLibraryDrop={handleTimelineDrop}
