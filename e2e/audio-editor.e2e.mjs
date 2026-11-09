@@ -267,8 +267,11 @@ try {
     assert.ok(r.ok && /audio\/mpeg/.test(r.type) && r.size > 10000, JSON.stringify(r))
   })
 
-  await step('sending deletes the draft (its job is done)', async () => {
-    await until(() => drafts().length === 0, 'draft deleted')
+  await step('sending keeps the draft (the upload on 3Speak can still be cancelled)', async () => {
+    await sleep(3500) // past an autosave
+    const kept = drafts()
+    assert.equal(kept.length, 1, 'the draft is still there')
+    assert.ok(clipsOf(kept[0].state).some(c => c.templateRole === 'outro'), 'with the project as it was sent')
   })
   await first.ctx.close()
 
@@ -276,6 +279,9 @@ try {
     const second = await openEditor()
     const f = second.frame
     await f.getByText(/Template applied: intro, outro, music bed/).waitFor({ timeout: 30000 })
+    // the kept draft holds the free tier's one slot: the new project asks to replace it
+    await f.getByText('Replace your saved draft?').waitFor({ timeout: 30000 })
+    await f.locator('.drafts-item').first().click()
     const d = await until(() => drafts().find(p => clipsOf(p.state).some(c => c.templateRole === 'bed') && clipsOf(p.state).filter(c => !c.templateRole && !c.music).length === 3), 'auto-applied draft', 45000)
     const clips = clipsOf(d.state)
     assert.equal(clips.filter(c => c.templateRole === 'intro').length, 1)
@@ -641,12 +647,17 @@ try {
     const { chapters } = JSON.parse(execFileSync('ffprobe', ['-v', 'error', '-show_chapters', '-of', 'json', mp3], { encoding: 'utf8' }))
     assert.deepEqual(chapters.map(c => c.tags.title), ['Intro', 'Second part'])
     assert.ok(Math.abs(+chapters[1].start_time - second.start) < 0.01)
+    // sent: the draft is still there (the upload may still be cancelled on 3Speak)
+    await sleep(3500)
+    assert.ok(drafts().length >= 1, 'the draft is kept after Use this audio')
     await p.ctx.close()
   })
 
   await step('recording a voice: live graph, full length in the preview, Use puts it on the Voice track with its length', async () => {
-    // no template: the take sits at 0 on its own
+    // no template: the take sits at 0 on its own; no drafts: sending keeps the
+    // last step's draft, which would be offered first
     fs.rmSync(templateFile, { force: true })
+    if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
     const r = await openEditor({ file: null })
     const f = r.frame
     await f.locator('.empty-timeline-actions').getByRole('button', { name: 'Record', exact: true }).click()

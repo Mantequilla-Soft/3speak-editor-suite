@@ -2009,8 +2009,10 @@ function App() {
                   className="video-preview-send"
                   onClick={() => {
                     setShowPreview(false)
-                    // Sent: the draft has done its job ("Download" keeps it)
-                    drafts.deleteCurrent()
+                    // Sent: the draft stays, saved as it is now. The upload on 3Speak
+                    // can still be cancelled; the draft then still has the project.
+                    // It goes when it expires or a new project replaces it.
+                    if (drafts.hasEdits()) drafts.save().catch(() => {})
                     sendToParent('post-to-3speak', {
                       outputUrl: renderStatus.outputUrl,
                       ...(audioMode && { mediaType: 'audio', fileName: audioFileName(audioTitle), durationSec: Math.round(timelineEnd * 1000) / 1000 }),
