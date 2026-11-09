@@ -1101,6 +1101,52 @@ try {
     await again.ctx.close()
   })
 
+  await step('track heights: drag the handle under a track label; the track and its label grow, the tracks scroll up and down with their labels, the draft keeps it', async () => {
+    if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
+    const r = await openEditor({ viewport: { width: 1280, height: 700 } })
+    const f = r.frame
+    const clip = f.locator('.timeline-clip-v2.audio').first()
+    await clip.waitFor({ timeout: 15000 })
+    const id = await clip.getAttribute('data-clip-id')
+    await until(() => drafts().find(p => clipsOf(p.state).some(c => c.id === id && /\/api\/upload\/files\//.test(c.url || ''))), 'uploaded', 45000)
+    const row = f.locator('.timeline-track-v2.audio').first()
+    const label = f.locator('.track-label.audio').first()
+    assert.equal(await row.evaluate(el => el.offsetHeight), 60)
+    const handle = await label.locator('.track-resize-handle').boundingBox()
+    await r.page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2)
+    await r.page.mouse.down()
+    for (let i = 1; i <= 9; i++) await r.page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2 + i * 20)
+    await r.page.mouse.up()
+    await until(async () => (await row.evaluate(el => el.offsetHeight)) === 240, 'the track grew to the maximum (240)')
+    assert.equal(await label.evaluate(el => el.offsetHeight), 240, 'its label too')
+    // two tall tracks no longer fit: the tracks scroll, the labels follow, the ruler stays
+    // (scroll down first, as a person would, so the second handle is in view)
+    await f.evaluate(async () => { document.querySelector('.timeline-content').scrollTop = 10000; await new Promise(res => setTimeout(res, 100)) })
+    const handle2 = await f.locator('.track-label.audio').nth(1).locator('.track-resize-handle').boundingBox()
+    await r.page.mouse.move(handle2.x + 20, handle2.y + 3)
+    await r.page.mouse.down()
+    for (let i = 1; i <= 9; i++) await r.page.mouse.move(handle2.x + 20, handle2.y + 3 + i * 20)
+    await r.page.mouse.up()
+    const scroll = await f.evaluate(async () => {
+      const c = document.querySelector('.timeline-content')
+      const can = c.scrollHeight > c.clientHeight + 10
+      c.scrollTop = 100
+      await new Promise(res => setTimeout(res, 100))
+      return { can, content: c.scrollTop, labels: document.querySelector('.timeline-sidebar').scrollTop, rulerTop: document.querySelector('.timeline-ruler').getBoundingClientRect().top - c.getBoundingClientRect().top }
+    })
+    assert.ok(scroll.can, 'the tracks scroll up and down')
+    assert.equal(scroll.labels, scroll.content, 'the labels follow the tracks')
+    assert.ok(Math.abs(scroll.rulerTop) < 1, `the ruler stays at the top (${scroll.rulerTop})`)
+    // the draft keeps the heights; double-click resets
+    let last = null
+    await until(() => { const p = drafts()[0]; const ts = p?.state.tracks.filter(t => t.type === 'audio'); last = ts?.map(t => t.height); return ts && ts[0].height === 240 && ts[1].height === 240 }, 'heights in the draft', 15000)
+      .catch((err) => { throw new Error(`${err.message}: saved heights ${JSON.stringify(last)}`) })
+    await f.evaluate(() => { document.querySelector('.timeline-content').scrollTop = 0 })
+    await label.locator('.track-resize-handle').dblclick()
+    await until(async () => (await row.evaluate(el => el.offsetHeight)) === 60, 'double-click: back to 60')
+    await r.ctx.close()
+  })
+
   await step('the shorts video editor is unchanged (no mode, Video 1 + Audio 1, Render, no audio tools)', async () => {
     const v = await openEditor({ file: null, mode: 'video' })
     const ready = await v.page.evaluate(() => window.__messages.find(m => m.type === 'editor-ready'))
