@@ -58,7 +58,7 @@ async function uploadLocalImage(localUrl, name) {
  * autosave after their upload picks them up. `plates` maps local plate / noise
  * map URLs to their uploaded copies (see useDrafts).
  */
-export function serializeProject(tracks, library, plates = new Map(), { mode = 'video', master = null, chapters = null, playhead = null, zoom = null, flags = null, selected = null } = {}) {
+export function serializeProject(tracks, library, plates = new Map(), { mode = 'video', master = null, chapters = null, playhead = null, zoom = null, flags = null, selected = null, remix = null } = {}) {
   let pending = 0
   const serverRef = (x) => x.serverUrl || (x.url && !LOCAL.test(x.url) ? x.url : null)
   const outTracks = tracks.map(t => ({
@@ -94,6 +94,8 @@ export function serializeProject(tracks, library, plates = new Map(), { mode = '
   // flags: the creator's own markers (utils/flags.js); selected: the clip(s) selected
   if (Array.isArray(flags) && flags.length) state.flags = flags
   if (Array.isArray(selected) && selected.length) state.selected = selected.slice(0, 500)
+  // remix: the original post a remix goes under ({ parentAuthor, parentPermlink })
+  if (remix?.parentAuthor && remix?.parentPermlink) state.remix = { parentAuthor: String(remix.parentAuthor), parentPermlink: String(remix.parentPermlink) }
   if (mode === 'audio') {
     state.mode = 'audio'
     state.master = { loudness: master?.loudness !== false, duck: master?.duck === true, ...(Number.isFinite(+master?.duckDb) ? { duckDb: +master.duckDb } : {}) }
@@ -120,7 +122,7 @@ export const projectMode = (p) => (p?.mode === 'audio' ? 'audio' : 'video')
  * per-tier limit (free: 1 for 7 days, Pro: 3 for 30 days; each save restarts
  * the clock) and deleting the draft once the video is sent.
  */
-export function useDrafts({ session, hasMedia, tracks, library, loadProjectState, onUnauthorized, mode = 'video', master = null, chapters = null, playhead = 0, playing = false, zoom = null, flags = null, selected = null }) {
+export function useDrafts({ session, hasMedia, tracks, library, loadProjectState, onUnauthorized, mode = 'video', master = null, chapters = null, playhead = 0, playing = false, zoom = null, flags = null, selected = null, remix = null }) {
   const [drafts, setDrafts] = useState(null) // summaries, once fetched
   const [limits, setLimits] = useState(null)
   const [prompt, setPrompt] = useState(false) // "continue a draft?" on start
@@ -189,7 +191,7 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
     const at = playheadRef.current
     const z = zoomRef.current
     const sel = selectedRef.current
-    const { state, pending: notYet } = serializeProject(tracks, library, platesRef.current, { mode, master, chapters, playhead: at, zoom: z, flags, selected: sel })
+    const { state, pending: notYet } = serializeProject(tracks, library, platesRef.current, { mode, master, chapters, playhead: at, zoom: z, flags, selected: sel, remix })
     setPending(notYet)
     if (!projectIdRef.current) projectIdRef.current = newId()
     const finalName = (saveName ?? name).trim() || defaultName(tracks, mode)
@@ -227,7 +229,7 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
       setStatus('error')
       return { ok: false }
     }
-  }, [session, tracks, library, name, authed, limits, uploadPlates, mode, master, chapters, flags])
+  }, [session, tracks, library, name, authed, limits, uploadPlates, mode, master, chapters, flags, remix])
 
   // Autosave from the first edit on (not while the limit question is open)
   useEffect(() => {

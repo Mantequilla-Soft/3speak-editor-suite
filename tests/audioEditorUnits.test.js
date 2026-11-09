@@ -34,6 +34,12 @@ describe('drafts remember their editor', () => {
     expect(state.mode).toBeUndefined()
     expect(state.master).toBeUndefined()
   })
+  it('a remix keeps the original it goes under; nothing else does', () => {
+    const v = [{ id: 'v', type: 'video', clips: [] }]
+    expect(serializeProject(v, [], new Map(), { remix: { parentAuthor: 'bob', parentPermlink: 'orig' } }).state.remix).toEqual({ parentAuthor: 'bob', parentPermlink: 'orig' })
+    expect(serializeProject(v, [], new Map(), { remix: { parentAuthor: 'bob' } }).state.remix).toBeUndefined()
+    expect(serializeProject(v, []).state.remix).toBeUndefined()
+  })
   it('projectMode: old summaries are video', () => {
     expect(projectMode({ mode: 'audio' })).toBe('audio')
     expect(projectMode({})).toBe('video')

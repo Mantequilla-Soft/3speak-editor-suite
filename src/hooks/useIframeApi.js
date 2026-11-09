@@ -56,7 +56,8 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
   const [draftSession, setDraftSession] = useState(undefined) // undefined = not told yet
   const [draftContext, setDraftContext] = useState({ hasMedia: false, reason: null })
   const [closeRequest, setCloseRequest] = useState(0)
-  // A remix (someone else's video, posted under it) is never kept as a draft
+  // A remix (someone else's video, posted under it): the original travels with
+  // the export (remixSource) and with the draft (restoreRemixSource)
   const [remixing, setRemixing] = useState(false)
   // The person's playlist covers (from 3Speak, asked for by the audiograms): [{ title, url }]; null = not asked or no answer yet
   const [playlistCovers, setPlaylistCovers] = useState(null)
@@ -176,7 +177,9 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
 
         case 'get-state': {
           sendToParent('state-response', {
-            timeline: { tracks, library, playheadPosition }
+            timeline: { tracks, library, playheadPosition },
+            // a remix: the original its export goes under
+            ...(remixSourceRef.current && { remixSource: remixSourceRef.current })
           })
           break
         }
@@ -615,6 +618,13 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     sendToParent('drafts-sign-in')
   }, [sendToParent])
 
+  // A draft opened: its remix original (or none), so its export posts under it again
+  const restoreRemixSource = useCallback((src) => {
+    const ok = !!(src && typeof src.parentAuthor === 'string' && src.parentAuthor && typeof src.parentPermlink === 'string' && src.parentPermlink)
+    remixSourceRef.current = ok ? { parentAuthor: src.parentAuthor, parentPermlink: src.parentPermlink } : null
+    setRemixing(ok)
+  }, [])
+
   const requestPlaylistCovers = useCallback(() => sendToParent('get-playlist-covers'), [sendToParent])
 
   /**
@@ -650,9 +660,11 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     remixSource: remixSourceRef.current,
     remixPrompt,
     clearRemixPrompt,
-    // Remixing: no drafts session, so no autosave, draft prompts or sign-in offer
-    draftSession: remixing ? null : draftSession,
-    draftContext: remixing ? { ...draftContext, reason: 'remix' } : draftContext,
+    remixing,
+    restoreRemixSource,
+    // Remixes save drafts like anything else (the draft keeps the original)
+    draftSession,
+    draftContext,
     closeRequest,
     answerClose,
     requestDraftSignIn
