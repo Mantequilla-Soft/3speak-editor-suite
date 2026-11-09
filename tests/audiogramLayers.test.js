@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import {
-  SIZES, clampBox, moveLayer, resizeLayer, rotateLayer, squareWave, restack, stackOrder, toggleLayer, withPicture, pieceOf, canBeShort, audiogramsToPost
+  SIZES, clampBox, moveLayer, resizeLayer, rotateLayer, squareWave, setLogoStyle, dragAngle, LOGO_STYLES, restack, stackOrder, toggleLayer, withPicture, pieceOf, canBeShort, audiogramsToPost
 } from '../src/utils/audiogramLayers'
 
 const V = SIZES.vertical
 const layers = () => ({
-  logo: { x: 290, y: 236, w: 500, h: 80, z: 5, on: true },
+  logo: { x: 340, y: 236, w: 400, h: 80, z: 5, on: true },
   cover: { x: 230, y: 380, w: 620, h: 620, z: 1, on: false },
   title: { x: 80, y: 520, w: 920, h: 420, z: 3, on: true },
   line: { x: 80, y: 960, w: 920, h: 64, z: 4, on: true },
@@ -29,9 +29,30 @@ describe('audiogram parts: move and resize', () => {
     expect(clampBox({ x: 0, y: 0, w: 2, h: 99999 }, V)).toMatchObject({ w: 16, h: 1920 })
   })
 
-  it('the logo stays whole in the frame and at least 240 x 40', () => {
-    expect(moveLayer(layers(), 'logo', -5000, 9000, V, false).layers.logo).toMatchObject({ x: 0, y: 1840, w: 500, h: 80 })
-    expect(resizeLayer(layers(), 'logo', 'se', -9000, -9000, V, true).logo).toMatchObject({ w: 240, h: 40 })
+  it('the logo stays whole in the frame, in its own shape, never under its minimum', () => {
+    expect(moveLayer(layers(), 'logo', -5000, 9000, V, false).layers.logo).toMatchObject({ x: 0, y: 1840, w: 400, h: 80 })
+    expect(resizeLayer(layers(), 'logo', 'se', -9000, -9000, V, true).logo).toMatchObject({ w: 320, h: 64 })
+    // pulled wide and flat: it keeps its shape (a thin box would shrink the logo)
+    const flat = resizeLayer(layers(), 'logo', 'se', 600, -70, V).logo
+    expect(flat.w / flat.h).toBeCloseTo(5, 1)
+    expect(flat.h).toBeGreaterThanOrEqual(64)
+    const mark = resizeLayer(setLogoStyle(layers(), 'mark', V), 'logo', 'se', -500, -500, V, true, 'mark').logo
+    expect(mark).toMatchObject({ w: 138, h: 120 })
+  })
+
+  it('switching the logo style: that style\'s shape and size around the same middle', () => {
+    const m = setLogoStyle(layers(), 'mark', V).logo
+    expect([m.w, m.h]).toEqual([161, 140])
+    expect(Math.abs(m.x + m.w / 2 - 540)).toBeLessThanOrEqual(1)
+    const back = setLogoStyle({ ...layers(), logo: m }, 'full', V).logo
+    expect([back.w, back.h]).toEqual([400, 80])
+    expect(LOGO_STYLES.mark.minH).toBe(120)
+  })
+
+  it('turning: pressing the handle does not move the part; it turns by how far the pointer goes round', () => {
+    expect(dragAngle(10, 90, 90)).toBe(10)
+    expect(dragAngle(10, 90, 120)).toBe(40)
+    expect(dragAngle(undefined, -45, -90)).toBe(-45)
   })
 
   it('resizes from any corner; the opposite corner stays put', () => {
@@ -117,16 +138,19 @@ describe('the piece and the Shorts', () => {
     expect(pieceOf({ start: 40, end: null }, 600, 100)).toEqual({ start: 100, end: 130 })
   })
 
-  it('only vertical ones up to 2 minutes, marked to post, go out as Shorts', () => {
+  it('every audiogram goes out as a Short (vertical, up to 2 minutes)', () => {
     const list = [
-      { id: 1, url: 'https://b/1.mp4', format: 'vertical', duration: 30, post: true, description: '  Hi  ', title: 'T' },
-      { id: 2, url: 'https://b/2.mp4', format: 'square', duration: 30, post: true },
-      { id: 3, url: 'https://b/3.mp4', format: 'vertical', duration: 30, post: false },
-      { id: 4, url: 'https://b/4.mp4', format: 'vertical', duration: 121, post: true }
+      { id: 1, url: 'https://b/1.mp4', format: 'vertical', duration: 30, description: '  Hi  ', title: 'T' },
+      { id: 2, url: 'https://b/2.mp4', format: 'square', duration: 30 },
+      { id: 3, url: 'https://b/3.mp4', format: 'vertical', duration: 20, description: 'x'.repeat(6000) },
+      { id: 4, url: 'https://b/4.mp4', format: 'vertical', duration: 121 }
     ]
     expect(canBeShort(list[0])).toBe(true)
     expect(canBeShort(list[1])).toBe(false)
-    expect(audiogramsToPost(list)).toEqual([{ url: 'https://b/1.mp4', description: 'Hi', title: 'T', duration: 30, width: 1080, height: 1920 }])
+    const out = audiogramsToPost(list)
+    expect(out.map(a => a.url)).toEqual(['https://b/1.mp4', 'https://b/3.mp4'])
+    expect(out[0]).toEqual({ url: 'https://b/1.mp4', description: 'Hi', title: 'T', duration: 30, width: 1080, height: 1920 })
+    expect(out[1].description).toHaveLength(5000)
     expect(audiogramsToPost(null)).toEqual([])
   })
 })

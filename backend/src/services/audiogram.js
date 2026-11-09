@@ -1,4 +1,4 @@
-import { cleanLayers, defaultLayers, DEFAULT_LINE, SIZES, CIRCLE_SHAPES, IMAGE_LAYOUTS } from './audiogramPage.js'
+import { cleanLayers, defaultLayers, DEFAULT_LINE, SIZES, CIRCLE_SHAPES, IMAGE_LAYOUTS, LOGO_STYLES } from './audiogramPage.js'
 
 /**
  * Audiogram: a short video of a piece of an episode for sharing (3Speak Shorts,
@@ -26,8 +26,9 @@ export const DEFAULT_STYLE = Object.freeze({
   format: 'vertical',
   duration: 30,
   wave: Object.freeze({ type: 'bars', color: '#e32933' }),
-  background: Object.freeze({ image: null, imageLayout: 'blur' }),
-  line: DEFAULT_LINE
+  background: Object.freeze({ image: null, imageLayout: 'card' }),
+  line: DEFAULT_LINE,
+  logo: 'full'
 })
 
 const HEX = /^#[0-9a-f]{6}$/i
@@ -73,9 +74,10 @@ export function cleanAudiogramStyle(input = {}) {
   const d = DEFAULT_STYLE
   const duration = Number(s.duration)
   const image = cleanImageUrl(b.image)
+  const logo = LOGO_STYLES[s.logo] ? s.logo : d.logo
   const layouts = {}
   for (const f of Object.keys(SIZES)) {
-    layouts[f] = s.layouts?.[f] ? cleanLayers(s.layouts[f], f, !!image) : defaultLayers(f, !!image)
+    layouts[f] = s.layouts?.[f] ? cleanLayers(s.layouts[f], f, !!image, logo) : defaultLayers(f, !!image, logo)
   }
   return {
     format: SIZES[s.format] ? s.format : d.format,
@@ -83,6 +85,7 @@ export function cleanAudiogramStyle(input = {}) {
     wave: { type: pick(w.type, WAVE_TYPES, d.wave.type), color: colour(w.color, d.wave.color) },
     background: { image, imageLayout: pick(b.imageLayout, IMAGE_LAYOUTS, d.background.imageLayout) },
     line: typeof s.line === 'string' ? s.line.replace(/\s+/g, ' ').trim().slice(0, MAX_LINE) : d.line,
+    logo,
     layouts
   }
 }
@@ -112,7 +115,8 @@ export function pageState({ format, title, style, image }) {
     line: style.line,
     image: image || null,
     imageLayout: style.background.imageLayout,
-    wave: style.wave
+    wave: style.wave,
+    logo: style.logo
   }
 }
 

@@ -4143,6 +4143,21 @@ body {
   background: #000;
 }
 
+/* Before "Use this audio" sends: make audiograms first? */
+.video-preview-ask h4 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+}
+
+.video-preview-ask p {
+  margin: 0 0 14px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
 .video-preview-actions {
   display: flex;
   justify-content: flex-end;
@@ -7051,28 +7066,138 @@ input[type="range"] {
 }
 
 /* outlined, never a red fill (3Speak buttons) */
-.audiogram-post {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  background: transparent;
-  color: var(--text-primary);
-  font-size: 0.8rem;
-  cursor: pointer;
-}
-
-.audiogram-post.active {
-  border-color: var(--accent-primary);
-  color: var(--accent-primary);
-  background: color-mix(in srgb, var(--accent-primary) 10%, transparent);
-}
-
 .audiogram-desc {
   resize: vertical;
+}
+
+.audiogram-made-hint {
+  margin: -4px 0 10px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.audiogram-made-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The Short's text: shown as written; a click opens 3Speak's post editor */
+.audiogram-desc-box {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  width: 100%;
+  min-height: 64px;
+  text-align: left;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+}
+
+.audiogram-desc-box:hover:not(:disabled) {
+  border-color: var(--accent-primary);
+}
+
+.audiogram-desc-box.empty .audiogram-desc-text {
+  color: var(--text-secondary);
+}
+
+.audiogram-desc-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.audiogram-desc-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+  font-size: 0.72rem;
+  color: var(--accent-primary);
+}
+
+/* First the piece: the start of the studio before anything else shows */
+.audiogram-start {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-width: 440px;
+  margin: 12px auto 4px;
+  padding: 20px 16px;
+  text-align: center;
+  border: 1px dashed var(--border-color);
+  border-radius: 10px;
+  color: var(--text-secondary);
+}
+
+.audiogram-start h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.audiogram-start p {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.audiogram-start svg:first-child {
+  color: var(--accent-primary);
+}
+
+/* Closing with unsaved changes */
+.audiogram-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.audiogram-confirm-card {
+  width: min(360px, 100%);
+  padding: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-secondary);
+}
+
+.audiogram-confirm-card h4 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+}
+
+.audiogram-confirm-card p {
+  margin: 0 0 14px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.audiogram-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.audiogram-confirm-actions .compact-btn {
+  width: auto;
+  height: auto;
+  padding: 0.4rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
 .audiogram-made-actions {

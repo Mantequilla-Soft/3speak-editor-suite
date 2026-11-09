@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { X, Film, Download, Loader2, Eye, EyeOff, ChevronUp, ChevronDown, Upload, Trash2, Send, Scissors, RotateCcw, Lock, HelpCircle } from 'lucide-react'
+import { X, Film, Download, Loader2, Eye, EyeOff, ChevronUp, ChevronDown, Upload, Trash2, Scissors, RotateCcw, Lock, HelpCircle, PenLine } from 'lucide-react'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
 import { chapterTime } from '../utils/chapters'
 import {
-  SIZES, LAYERS, moveLayer, resizeLayer, rotateLayer, squareWave, restack, stackOrder, toggleLayer, withPicture, pieceOf, canBeShort,
-  AUDIOGRAM_MAX_SECONDS, ROUND_WAVES
+  SIZES, LAYERS, moveLayer, resizeLayer, rotateLayer, squareWave, restack, stackOrder, toggleLayer, withPicture, pieceOf,
+  setLogoStyle, dragAngle, AUDIOGRAM_MAX_SECONDS, ROUND_WAVES
 } from '../utils/audiogramLayers'
 import OnboardingTour, { AUDIOGRAM_TOUR_STEPS, useFirstTimeTour } from './OnboardingTour'
 
@@ -19,34 +19,43 @@ const WAVES = [
 ]
 // The 3Speak red, white, the navy lightened for the dark background (no cyan)
 const COLORS = ['#e32933', '#f4f5f8', '#7f88ea']
-const PICTURE_LAYOUTS = [
-  { id: 'card', label: 'Card', hint: 'The picture as a card on the dark 3Speak background' },
-  { id: 'blur', label: 'Card on a blur', hint: 'The picture as a card, and soft and dark behind it' },
-  { id: 'fill', label: 'Fill the frame', hint: 'The picture over the whole video, no card' }
+const LOGOS = [
+  { id: 'mark', label: '3S logo' },
+  { id: 'full', label: '3Speak logo' }
 ]
 const CORNERS = ['nw', 'ne', 'sw', 'se']
 const FORMAT = 'vertical' // the shape of a Short
 const PREVIEW_HEIGHT = 520 // px
+const TEXT_MAX = 5000
 
 const absolute = (u) => {
   if (!u || !u.startsWith('/')) return u
   return new URL(u, getBackendUrl() || window.location.origin).href
 }
 
+// The look as the studio uses it: vertical, the picture as a card
+const asLook = (s) => ({ ...s, format: FORMAT, background: { ...(s.background || {}), imageLayout: 'card' }, logo: s.logo === 'mark' ? 'mark' : 'full' })
+const lookKey = (style, text) => JSON.stringify([style, text])
+
 /**
  * Audiograms: short videos of pieces of the exported episode (moving waveform,
- * title, picture, the 3Speak branding) to share as teasers, and to post as
- * Shorts together with the episode ("Post together with the audio").
+ * title, picture, the 3Speak branding) that go out as 3Speak Shorts together
+ * with the episode, each linking to it.
  *
- * The preview is the backend's own page (GET /api/audiogram/page), so what is
- * shown is what gets made; its parts are boxes to move, resize and stack. The
- * look of the last audiogram made is the person's template (kept on the
- * backend, /api/templates/audiogram), the start of the next one.
+ * It goes step by step without a stepper: first the piece is picked on the
+ * timeline, then the look shows. The preview is the backend's own page (GET
+ * /api/audiogram/page), so what is shown is what gets made; its parts are
+ * boxes to move, resize, turn and stack. The look of the last audiogram made
+ * is the person's template (kept on the backend, /api/templates/audiogram).
+ *
+ * While the piece is picked the dialog stays mounted, only hidden (`hidden`),
+ * so the look being worked on is not lost. Closing with a look that is not in
+ * an audiogram yet asks first.
  */
 export default function AudiogramDialog({
-  outputUrl, length, playheadPosition, title, chapters, range, onPickRange,
+  outputUrl, length, title, chapters, range, onPickRange, hidden = false,
   audiograms, onAddAudiogram, onUpdateAudiogram, onRemoveAudiogram,
-  playlistCovers, onRequestCovers, onClose
+  playlistCovers, onRequestCovers, onEditText, onClose
 }) {
   const [defaults, setDefaults] = useState(null) // { style, coverLayouts }
   const [style, setStyle] = useState(null)
@@ -57,6 +66,10 @@ export default function AudiogramDialog({
   const [job, setJob] = useState(null) // { status, progress, phase, error }
   const [uploading, setUploading] = useState(false)
   const [loadError, setLoadError] = useState(null)
+  const [confirmClose, setConfirmClose] = useState(false)
+  const [inlineText, setInlineText] = useState(null) // an audiogram's id: its text typed here (no 3Speak editor)
+  const [editingText, setEditingText] = useState(null) // an audiogram's id: its text open in 3Speak's editor
+  const savedLookRef = useRef(null)
   const pollRef = useRef(null)
   const frameRef = useRef(null)
   const fileRef = useRef(null)
@@ -79,17 +92,18 @@ export default function AudiogramDialog({
         if (gone) return
         setDefaults(d)
         setHasTemplate(!!tpl)
-        const look = tpl ? { format: FORMAT, duration: tpl.duration, wave: tpl.wave, background: tpl.background, line: tpl.line, layouts: tpl.layouts } : { ...d.style, format: FORMAT }
+        const look = asLook(tpl ? { duration: tpl.duration, wave: tpl.wave, background: tpl.background, line: tpl.line, logo: tpl.logo, layouts: tpl.layouts } : d.style)
         // a template from before the logo was fixed: it shows again (the backend does the same)
         const own = look.layouts?.[FORMAT] || d.style.layouts[FORMAT]
         look.layouts = { [FORMAT]: { ...own, logo: { ...own.logo, on: true } } }
+        savedLookRef.current = lookKey(look, title || '')
         setStyle(look)
       } catch (err) {
         if (!gone) setLoadError(err.message)
       }
     })()
     return () => { gone = true }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const format = FORMAT
   const size = SIZES[format]
@@ -97,8 +111,13 @@ export default function AudiogramDialog({
   const stageRef = useRef(null)
   const layers = style?.layouts?.[format]
   const image = style?.background?.image || null
-  const piece = pieceOf(range, length, playheadPosition)
+  const logoStyle = style?.logo || 'full'
+  // Step by step: nothing else until a piece is picked
+  const picked = !!(range && range.end != null && range.end - range.start >= 3)
+  const piece = pieceOf(picked ? range : null, length, 0)
   const seconds = Math.round((piece.end - piece.start) * 10) / 10
+  // The look is not in an audiogram yet (closing asks first)
+  const dirty = !!style && savedLookRef.current !== null && lookKey(style, text) !== savedLookRef.current
 
   const setLayers = useCallback((fn) => {
     setStyle(s => ({ ...s, layouts: { ...s.layouts, [FORMAT]: fn(s.layouts[FORMAT]) } }))
@@ -111,9 +130,12 @@ export default function AudiogramDialog({
       return next
     })
   }
+  const setLogo = (logo) => {
+    setStyle(s => (s.logo === logo ? s : { ...s, logo, layouts: { ...s.layouts, [FORMAT]: setLogoStyle(s.layouts[FORMAT], logo, SIZES[FORMAT]) } }))
+  }
   const setImage = (url) => {
     setStyle(s => {
-      const next = { ...s, background: { ...s.background, image: url } }
+      const next = { ...s, background: { ...s.background, image: url, imageLayout: 'card' } }
       return url ? { ...next, layouts: withPicture(s.layouts, { hasImage: true, plainDefaults: defaults?.style?.layouts, coverDefaults: defaults?.coverLayouts }) } : next
     })
   }
@@ -126,9 +148,10 @@ export default function AudiogramDialog({
     title: text,
     line: style.line,
     image: absolute(image),
-    imageLayout: style.background.imageLayout,
-    wave: style.wave
-  } : null), [style, layers, size, text, image])
+    imageLayout: 'card',
+    wave: style.wave,
+    logo: logoStyle
+  } : null), [style, layers, size, text, image, logoStyle])
   useEffect(() => {
     const onMsg = (e) => {
       if (e.source !== frameRef.current?.contentWindow || e.data?.type !== 'audiogram-page-ready') return
@@ -155,9 +178,9 @@ export default function AudiogramDialog({
       const dy = (ev.clientY - sy) / scale
       if (corner) {
         const keep = ev.shiftKey || id === 'cover' || id === 'logo' || (id === 'wave' && ROUND_WAVES.includes(style.wave.type))
-        setLayers(() => resizeLayer(base, id, corner, dx, dy, size, keep))
+        setLayers(() => resizeLayer(base, id, corner, dx, dy, size, keep, logoStyle))
       } else {
-        const r = moveLayer(base, id, dx, dy, size, !ev.altKey)
+        const r = moveLayer(base, id, dx, dy, size, !ev.altKey, logoStyle)
         setGuide(r.guide)
         setLayers(() => r.layers)
       }
@@ -170,7 +193,8 @@ export default function AudiogramDialog({
     window.addEventListener('pointermove', onMove)
     window.addEventListener('pointerup', onUp)
   }
-  // Turn with the handle over the box: around its middle (Shift: 15 degree steps)
+  // Turn with the round handle, around the part's middle: by how far the
+  // pointer goes round from where it was pressed (Shift: 15 degree steps)
   const startRotate = (e, id) => {
     if (e.button !== 0 || !stageRef.current) return
     e.preventDefault()
@@ -181,9 +205,10 @@ export default function AudiogramDialog({
     const b = base[id]
     const cx = rect.left + (b.x + b.w / 2) * scale
     const cy = rect.top + (b.y + b.h / 2) * scale
+    const angleAt = (ev) => (Math.atan2(ev.clientY - cy, ev.clientX - cx) * 180) / Math.PI
+    const start = angleAt(e)
     const onMove = (ev) => {
-      const deg = (Math.atan2(ev.clientY - cy, ev.clientX - cx) * 180) / Math.PI + 90
-      setLayers(() => rotateLayer(base, id, deg, ev.shiftKey ? 15 : 0))
+      setLayers(() => rotateLayer(base, id, dragAngle(b.r, start, angleAt(ev)), ev.shiftKey ? 15 : 0))
     }
     const onUp = () => {
       window.removeEventListener('pointermove', onMove)
@@ -204,7 +229,7 @@ export default function AudiogramDialog({
     const d = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key]
     if (!d) return
     e.preventDefault()
-    setLayers(l => moveLayer(l, selected, d[0], d[1], size, false).layers)
+    setLayers(l => moveLayer(l, selected, d[0], d[1], size, false, logoStyle).layers)
   }
 
   const upload = async (file) => {
@@ -227,13 +252,14 @@ export default function AudiogramDialog({
   const resetArrangement = () => {
     if (!defaults) return
     const fresh = image ? defaults.coverLayouts[format] : defaults.style.layouts[format]
-    setLayers(() => fresh)
+    setLayers(() => (logoStyle === 'full' ? fresh : setLogoStyle(fresh, logoStyle, size)))
   }
 
   const make = async () => {
     clearInterval(pollRef.current)
     setJob({ status: 'processing', progress: 0, phase: 'Starting...' })
     const used = { ...style, duration: Math.round(seconds) }
+    const usedKey = lookKey(style, text)
     try {
       const res = await authFetch(api('/api/audiogram'), {
         method: 'POST',
@@ -248,6 +274,7 @@ export default function AudiogramDialog({
           if (st.status === 'completed') {
             clearInterval(pollRef.current)
             setJob(null)
+            savedLookRef.current = usedKey // that look is in an audiogram now
             onAddAudiogram({
               id: data.jobId,
               url: absolute(st.outputUrl),
@@ -255,7 +282,6 @@ export default function AudiogramDialog({
               start: piece.start,
               duration: seconds,
               title: text,
-              post: false,
               description: ''
             })
             // The last one made is the template for the next ones (kept for good)
@@ -277,36 +303,61 @@ export default function AudiogramDialog({
     }
   }
 
-  // The first time: a tour of the studio (once its controls are there)
-  const [firstTour, finishFirstTour] = useFirstTimeTour('3speak-audiogram-tour-done', !!(style && layers))
+  // An audiogram's text for its Short: in 3Speak's own post editor, else typed here
+  const editText = async (a) => {
+    if (!onEditText) { setInlineText(a.id); return }
+    setEditingText(a.id)
+    const r = await onEditText(a.description || '', { kind: 'short-text', maxLength: TEXT_MAX })
+    setEditingText(null)
+    if (r?.unsupported) setInlineText(a.id)
+    else if (typeof r?.value === 'string') onUpdateAudiogram(a.id, { description: r.value })
+  }
+
+  // The first time: a tour of the studio (once its controls show, after the piece is picked)
+  const [firstTour, finishFirstTour] = useFirstTimeTour('3speak-audiogram-tour-done', !!(style && layers && picked && !hidden))
   const [tourAgain, setTourAgain] = useState(false) // the ? button
-  const showTour = firstTour || tourAgain
+  const showTour = (firstTour || tourAgain) && !hidden
   const finishTour = () => { finishFirstTour(); setTourAgain(false) }
 
   const busy = job?.status === 'processing'
+  const requestClose = () => {
+    if (busy) return
+    if (dirty) setConfirmClose(true)
+    else onClose()
+  }
   const order = layers ? stackOrder(layers) : []
-  const pictureLayout = style?.background?.imageLayout || 'blur'
-  // the picture card: only with a picture that is not filling the frame
-  const hasCard = !!image && pictureLayout !== 'fill'
+  const hasCard = !!image
   const shown = (id) => layers?.[id] && layers[id].on !== false && (id !== 'cover' || hasCard)
   const chapterHere = (chapters || []).filter(c => c.at <= piece.start + 0.5).pop()
 
   return (
-    <div className="remix-picker-overlay" onClick={busy || showTour ? undefined : onClose}>
+    <div className="remix-picker-overlay" style={hidden ? { display: 'none' } : undefined} onClick={busy || showTour || confirmClose ? undefined : requestClose}>
       {showTour && <OnboardingTour steps={AUDIOGRAM_TOUR_STEPS} onComplete={finishTour} />}
       <div className="remix-picker audiogram-studio" role="dialog" aria-modal="true" aria-labelledby="audiogram-title" onClick={e => e.stopPropagation()}>
         <div className="remix-picker-header">
-          {style && layers ? (
+          {style && layers && picked ? (
             <button className="remix-picker-icon-btn" onClick={() => setTourAgain(true)} title="Show the tour again" aria-label="Show the audiogram tour again"><HelpCircle size={16} /></button>
           ) : <span className="remix-picker-icon-spacer" />}
           <h3 id="audiogram-title">Audiograms</h3>
-          <button className="remix-picker-icon-btn" onClick={onClose} title="Close"><X size={16} /></button>
+          <button className="remix-picker-icon-btn" onClick={requestClose} title="Close" disabled={busy}><X size={16} /></button>
         </div>
 
         {loadError && <p className="audio-template-error" role="alert">The audiogram settings could not be loaded: {loadError}</p>}
         {!style && !loadError && <p className="audio-template-intro"><Loader2 size={14} className="encoding-notice-spin" /> Loading your audiogram look…</p>}
 
-        {style && layers && (
+        {/* First the piece: nothing else until it is picked */}
+        {style && layers && !picked && (
+          <div className="audiogram-start" data-testid="audiogram-start">
+            <Scissors size={22} aria-hidden="true" />
+            <h4>Pick a piece of the episode</h4>
+            <p>An audiogram is a short video of a piece of your episode, up to {AUDIOGRAM_MAX_SECONDS / 60} minutes. It goes out as a 3Speak Short together with the audio. Start by marking its start and end on the timeline.</p>
+            <button className="silence-cut-apply audiogram-pick" onClick={onPickRange}>
+              <Scissors size={14} /> Choose on the timeline
+            </button>
+          </div>
+        )}
+
+        {style && layers && picked && (
           <div className="audiogram-body">
             <div className="audiogram-stage-col">
               <div
@@ -369,9 +420,8 @@ export default function AudiogramDialog({
                   {chapterHere && <small>in “{chapterHere.title}”</small>}
                 </div>
                 <button className="silence-cut-apply audiogram-pick" onClick={onPickRange} disabled={busy}>
-                  <Scissors size={14} /> Choose on the timeline
+                  <Scissors size={14} /> Change the piece
                 </button>
-                <small className="audiogram-note">Up to {AUDIOGRAM_MAX_SECONDS / 60} minutes. Drag across the timeline to pick it.</small>
               </div>
 
               <label className="audiogram-field">
@@ -382,6 +432,15 @@ export default function AudiogramDialog({
                 <span>Line under it <small>(*stars* make it red)</small></span>
                 <input value={style.line} maxLength={120} onChange={(e) => { const v = e.target.value; setStyle(s => ({ ...s, line: v })) }} aria-label="Line on the video" />
               </label>
+
+              <div className="audiogram-field">
+                <span>3Speak branding</span>
+                <div className="noise-levels" role="radiogroup" aria-label="Logo">
+                  {LOGOS.map(l => (
+                    <button key={l.id} role="radio" aria-checked={logoStyle === l.id} className={logoStyle === l.id ? 'active' : ''} onClick={() => setLogo(l.id)}>{l.label}</button>
+                  ))}
+                </div>
+              </div>
 
               <div className="audiogram-field">
                 <span>Picture</span>
@@ -401,13 +460,6 @@ export default function AudiogramDialog({
                   <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(e) => { upload(e.target.files?.[0]); e.target.value = '' }} />
                 </div>
                 {playlistCovers && playlistCovers.length === 0 && <small className="audiogram-note">Your playlists have no covers yet.</small>}
-                {image && (
-                  <div className="noise-levels" role="radiogroup" aria-label="Picture layout">
-                    {PICTURE_LAYOUTS.map(p => (
-                      <button key={p.id} role="radio" aria-checked={pictureLayout === p.id} className={pictureLayout === p.id ? 'active' : ''} title={p.hint} onClick={() => setStyle(s => ({ ...s, background: { ...s.background, imageLayout: p.id } }))}>{p.label}</button>
-                    ))}
-                  </div>
-                )}
               </div>
 
               <div className="audiogram-field">
@@ -433,11 +485,11 @@ export default function AudiogramDialog({
                   {order.filter(id => id !== 'cover' || hasCard).map((id, i, list) => {
                     const meta = LAYERS.find(l => l.id === id)
                     if (id === 'logo') {
-                      // always shown and in front: it can be moved, resized and turned only
+                      // always shown, in front, never under its minimum size: it can be moved, resized and turned only
                       return (
                         <li key={id} className={`audiogram-layer-locked${selected === id ? ' selected' : ''}`}>
                           <button className="audiogram-layer-name" onClick={() => setSelected(id)}>{meta.name}</button>
-                          <span className="audiogram-layer-lock" title="The 3Speak logo is always shown, in front"><Lock size={12} /> Always shown</span>
+                          <span className="audiogram-layer-lock" title="The 3Speak logo is always shown, in front, and never smaller than a set size"><Lock size={12} /> Always shown</span>
                         </li>
                       )
                     }
@@ -472,33 +524,38 @@ export default function AudiogramDialog({
         {audiograms.length > 0 && (
           <div className="audiogram-made">
             <h4>Your audiograms</h4>
+            <p className="audiogram-made-hint">They go out as 3Speak Shorts together with the audio, each with a link to the audio’s post, snap or comment.</p>
             <ul>
               {audiograms.map((a, i) => (
                 <li key={a.id} className="audiogram-made-item" data-testid="audiogram-item">
                   <video className={`audiogram-preview ${a.format}`} src={a.url} controls playsInline preload="metadata" />
                   <div className="audiogram-made-info">
-                    <strong>#{i + 1} · {chapterTime(a.start)} · {Math.round(a.duration)}s</strong>
-                    {canBeShort(a) ? (
-                      <button
-                        className={`audiogram-post${a.post ? ' active' : ''}`}
-                        aria-pressed={!!a.post}
-                        onClick={() => onUpdateAudiogram(a.id, { post: !a.post })}
-                      >
-                        <Send size={13} /> Post together with the audio
-                      </button>
-                    ) : (
-                      <small className="audiogram-note">Only vertical audiograms up to 2 minutes can go out as Shorts.</small>
-                    )}
-                    {a.post && (
+                    <strong className="audiogram-made-title">{a.title || `Audiogram ${i + 1}`}</strong>
+                    <small className="audiogram-note">{chapterTime(a.start)} · {Math.round(a.duration)}s</small>
+                    {inlineText === a.id ? (
                       <textarea
                         className="audiogram-desc"
-                        rows={3}
-                        maxLength={500}
-                        placeholder="Text for the Short (optional). A link to the episode is added for you."
+                        rows={4}
+                        maxLength={TEXT_MAX}
+                        autoFocus
+                        placeholder="Text for the Short (optional). A link to the audio is added for you."
                         value={a.description}
                         onChange={(e) => onUpdateAudiogram(a.id, { description: e.target.value })}
+                        onBlur={() => setInlineText(null)}
                         aria-label={`Text for Short ${i + 1}`}
                       />
+                    ) : (
+                      <button
+                        type="button"
+                        className={`audiogram-desc audiogram-desc-box${a.description ? '' : ' empty'}`}
+                        onClick={() => editText(a)}
+                        disabled={editingText === a.id}
+                        aria-label={`Text for Short ${i + 1}`}
+                        data-testid="audiogram-text"
+                      >
+                        <span className="audiogram-desc-text">{a.description || 'Text for the Short (optional). A link to the audio is added for you.'}</span>
+                        <span className="audiogram-desc-edit">{editingText === a.id ? <Loader2 size={12} className="encoding-notice-spin" /> : <PenLine size={12} />} {a.description ? 'Edit text' : 'Write text'}</span>
+                      </button>
                     )}
                     <div className="audiogram-made-actions">
                       <a className="audiogram-layer-btn" href={a.url} download target="_blank" rel="noopener noreferrer" title="Download"><Download size={14} /></a>
@@ -508,6 +565,20 @@ export default function AudiogramDialog({
                 </li>
               ))}
             </ul>
+          </div>
+        )}
+
+        {/* Closing with a look that is not in an audiogram yet */}
+        {confirmClose && (
+          <div className="audiogram-confirm" role="alertdialog" aria-modal="true" aria-labelledby="audiogram-confirm-title">
+            <div className="audiogram-confirm-card">
+              <h4 id="audiogram-confirm-title">Close without making it?</h4>
+              <p>Your changes to the look are not in an audiogram yet. They are lost when you close.</p>
+              <div className="audiogram-confirm-actions">
+                <button className="compact-btn audiogram-confirm-keep" onClick={() => setConfirmClose(false)} autoFocus>Keep editing</button>
+                <button className="compact-render-btn" onClick={() => { setConfirmClose(false); onClose() }}>Close</button>
+              </div>
+            </div>
           </div>
         )}
       </div>

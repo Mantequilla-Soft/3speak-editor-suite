@@ -108,25 +108,25 @@ export const AUDIOGRAM_TOUR_STEPS = [
   {
     target: '.audiogram-studio .remix-picker-header',
     title: 'Audiograms',
-    text: 'Short videos of a piece of your episode: a moving waveform, your title and picture, with the 3Speak look. Share them, or post them as Shorts together with the episode.',
+    text: 'Short videos of a piece of your episode: a moving waveform, your title and picture, with the 3Speak look. They go out as 3Speak Shorts together with the episode.',
     position: 'below'
   },
   {
     target: '.audiogram-pick',
-    title: 'Pick the piece',
-    text: 'Choose on the timeline which part of the episode goes in: anything up to 2 minutes.',
+    title: 'Your piece',
+    text: 'The piece you picked on the timeline, up to 2 minutes. Change it here any time.',
     position: 'below'
   },
   {
     target: '.audiogram-stage',
     title: 'Arrange it your way',
-    text: 'Drag any part to move it, pull a corner to resize it (Shift keeps the shape), and turn it with the round handle under it. The 3Speak logo always stays in.',
+    text: 'Drag any part to move it, pull a corner to resize it (Shift keeps the shape), and turn it with the round handle under it. The 3Speak logo always stays in, as the 3S or the full logo.',
     position: 'below'
   },
   {
     target: '[aria-label="Picture"]',
     title: 'A picture',
-    text: 'Upload one or take the cover of one of your playlists. Show it as a card, as a card on a blur of itself, or over the whole video.',
+    text: 'Upload one or take the cover of one of your playlists. It shows as a card you can move and resize like the other parts.',
     position: 'below'
   },
   {
@@ -144,7 +144,7 @@ export const AUDIOGRAM_TOUR_STEPS = [
   {
     target: '.audiogram-make',
     title: 'Make it',
-    text: 'Make as many as you like. Your last look is kept as your template for the next one. Then tap "Post together with the audio" on the ones that should go out as Shorts with the episode, each with its own text.',
+    text: 'Make as many as you like: each goes out as a Short with the episode, with its own text and a link to it. Your last look is kept as your template for the next one.',
     position: 'above'
   }
 ]

@@ -30,7 +30,7 @@ process.env.EDITOR_TOKEN_SECRET = 'test-secret'
 const express = (await import('express')).default
 const { audiogramRouter } = await import('../src/routes/audiogram.js')
 const { cleanAudiogramOptions, cleanAudiogramStyle, cleanImageUrl, audiogramArgs, pageState, waveFilter, circleMaps, circleGeometry, AUDIOGRAM_MAX_SECONDS } = await import('../src/services/audiogram.js')
-const { cleanLayers, defaultLayers, audiogramPageHtml, renderStills, waveBox } = await import('../src/services/audiogramPage.js')
+const { cleanLayers, defaultLayers, audiogramPageHtml, renderStills, waveBox, logoBox, LOGO_STYLES } = await import('../src/services/audiogramPage.js')
 const { imageDataUri } = await import('../src/routes/audiogram.js')
 
 const mint = (u) => {
@@ -71,7 +71,10 @@ describe('audiogram options and look', () => {
   test('cleanAudiogramStyle: defaults for anything missing or wrong', () => {
     const d = cleanAudiogramStyle({})
     assert.deepEqual(d.wave, { type: 'bars', color: '#e32933' })
-    assert.deepEqual(d.background, { image: null, imageLayout: 'blur' })
+    assert.deepEqual(d.background, { image: null, imageLayout: 'card' })
+    assert.equal(d.logo, 'full')
+    assert.equal(cleanAudiogramStyle({ logo: 'mark' }).logo, 'mark')
+    assert.equal(cleanAudiogramStyle({ logo: 'nope' }).logo, 'full')
     assert.equal(d.line, 'Full episode on *3speak.tv*')
     assert.equal(d.layouts.vertical.cover.on, false, 'no picture: no cover in the first arrangement')
     const s = cleanAudiogramStyle({ format: 'square', duration: 500, wave: { type: 'nope', color: 'red' }, background: { image: 'javascript:alert(1)', imageLayout: 'x' }, line: 'x'.repeat(300) })
@@ -105,9 +108,20 @@ describe('audiogram options and look', () => {
     assert.deepEqual(Object.keys(l).sort(), ['cover', 'line', 'logo', 'title', 'wave'])
   })
 
-  test('the 3Speak logo can not be hidden, shrunk away, pushed out or covered', () => {
+  test('the 3Speak logo can not be hidden, shrunk away, squeezed thin, pushed out or covered', () => {
     const l = cleanLayers({ logo: { x: -900, y: 5000, w: 3, h: 3, z: 0, r: 30, on: false } }, 'vertical', false)
-    assert.deepEqual(l.logo, { x: 0, y: 1920 - 40, w: 240, h: 40, z: 20, r: 30, on: true })
+    assert.deepEqual(l.logo, { x: 0, y: 1920 - 64, w: 320, h: 64, z: 20, r: 30, on: true })
+    // a wide, flat box (the logo would be tiny in it) gets the logo's shape, around the same middle
+    const flat = cleanLayers({ logo: { x: 0, y: 500, w: 1080, h: 30 } }, 'vertical', false).logo
+    assert.deepEqual([flat.w, flat.h, flat.x + flat.w / 2, flat.y + flat.h / 2], [320, 64, 540, 515])
+    // the 3S only: square-ish, at least 120 high
+    const mark = cleanLayers({ logo: { x: 100, y: 100, w: 10, h: 10 } }, 'vertical', false, 'mark').logo
+    assert.deepEqual([mark.w, mark.h], [138, 120])
+    assert.deepEqual(defaultLayers('vertical', true, 'mark').logo, { on: true, r: 0, x: 460, y: 206, w: 161, h: 140, z: 20 })
+    for (const [style, s] of Object.entries(LOGO_STYLES)) {
+      const box = logoBox(style, { cx: 540, cy: 960, h: 99999 }, { w: 1080, h: 1920 })
+      assert.ok(box.w <= 1080 && box.x >= 0 && Math.abs(box.w / box.h - s.aspect) < 0.02, `${style} ${JSON.stringify(box)}`)
+    }
     assert.ok(Object.entries(l).every(([id, b]) => id === 'logo' || b.z < l.logo.z))
     assert.equal(defaultLayers('vertical', true).logo.z, 20)
   })
@@ -191,6 +205,8 @@ describe('the ffmpeg graph', () => {
     assert.match(html, /window\.applyAudiogram/)
     assert.doesNotMatch(html, /fonts\.googleapis/, 'the render page loads nothing')
     assert.match(audiogramPageHtml({ preview: true }), /audiogram-state/)
+    assert.match(html, /state\.logo === 'mark' \? '' : '<span>3Speak<\/span>'/)
+    assert.equal(pageState({ format: 'vertical', title: 'T', style: cleanAudiogramStyle({ logo: 'mark' }), image: null }).logo, 'mark')
     const st = pageState({ format: 'square', title: 'T', style, image: null })
     assert.deepEqual([st.width, st.height], [1080, 1920])
     assert.equal(st.layers, style.layouts.vertical)

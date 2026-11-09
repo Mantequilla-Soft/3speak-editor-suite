@@ -3,8 +3,9 @@
 // turns and stacks in the preview. The backend draws the same boxes
 // (backend/src/services/audiogramPage.js) and checks them again.
 //
-// The 3Speak logo always shows: it can not be hidden, stays whole in the
-// frame, at least LOGO_MIN big, and in front of the other parts.
+// The 3Speak logo always shows: it can not be hidden, keeps its own shape
+// and a minimum size (so it can not be squeezed thin or small), stays whole
+// in the frame, and in front of the other parts.
 
 // Vertical only: the shape of a Short
 export const SIZES = { vertical: { w: 1080, h: 1920 } }
@@ -19,22 +20,32 @@ export const MIN_BOX = 16
 export const AUDIOGRAM_MIN_SECONDS = 3
 export const AUDIOGRAM_MAX_SECONDS = 120
 export const SNAP_PX = 14
-export const LOGO_MIN = { w: 240, h: 40 }
+// The same as the backend's (backend/src/services/audiogramPage.js LOGO_STYLES)
+export const LOGO_STYLES = {
+  full: { aspect: 5, minH: 64, defaultH: 80 },
+  mark: { aspect: 1.15, minH: 120, defaultH: 140 }
+}
 export const ROUND_WAVES = ['circle', 'ring']
 
 const round = (n) => Math.round(n)
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v))
 
+/** The logo's box for a style: its shape, at least its minimum, whole in the frame, around its middle. */
+export function logoBox(b, size, logoStyle = 'full') {
+  const st = LOGO_STYLES[logoStyle] || LOGO_STYLES.full
+  const h = round(clamp(b.h, st.minH, Math.min(size.h, size.w / st.aspect)))
+  const w = round(h * st.aspect)
+  const cx = b.x + b.w / 2
+  const cy = b.y + b.h / 2
+  return { ...b, w, h, x: round(clamp(cx - w / 2, 0, size.w - w)), y: round(clamp(cy - h / 2, 0, size.h - h)), on: true }
+}
+
 /**
  * A box kept usable: at least MIN_BOX, at least MIN_BOX of it in the frame.
- * The logo's (`id` 'logo'): at least LOGO_MIN, all of it in the frame.
+ * The logo's (`id` 'logo'): see logoBox.
  */
-export function clampBox(b, size, id = null) {
-  if (id === 'logo') {
-    const w = clamp(round(b.w), LOGO_MIN.w, size.w)
-    const h = clamp(round(b.h), LOGO_MIN.h, size.h)
-    return { ...b, w, h, x: clamp(round(b.x), 0, size.w - w), y: clamp(round(b.y), 0, size.h - h), on: true }
-  }
+export function clampBox(b, size, id = null, logoStyle = 'full') {
+  if (id === 'logo') return logoBox(b, size, logoStyle)
   const w = clamp(round(b.w), MIN_BOX, size.w)
   const h = clamp(round(b.h), MIN_BOX, size.h)
   return { ...b, w, h, x: clamp(round(b.x), -w + MIN_BOX, size.w - MIN_BOX), y: clamp(round(b.y), -h + MIN_BOX, size.h - MIN_BOX) }
@@ -54,12 +65,12 @@ function framePoint(b, px, py) {
  * when close (`snap` false: no snapping). Returns { layers, guide } (guide:
  * 'x' when it snapped).
  */
-export function moveLayer(layers, id, dx, dy, size, snap = true) {
+export function moveLayer(layers, id, dx, dy, size, snap = true, logoStyle = 'full') {
   const l = layers[id]
   let x = l.x + dx
   let guide = null
   if (snap && Math.abs(x + l.w / 2 - size.w / 2) <= SNAP_PX) { x = size.w / 2 - l.w / 2; guide = 'x' }
-  return { layers: { ...layers, [id]: clampBox({ ...l, x, y: l.y + dy }, size, id) }, guide }
+  return { layers: { ...layers, [id]: clampBox({ ...l, x, y: l.y + dy }, size, id, logoStyle) }, guide }
 }
 
 /**
@@ -68,7 +79,7 @@ export function moveLayer(layers, id, dx, dy, size, snap = true) {
  * card and the logo). A turned layer grows along its own sides and its
  * opposite corner stays where it is.
  */
-export function resizeLayer(layers, id, corner, dx, dy, size, keepAspect = false) {
+export function resizeLayer(layers, id, corner, dx, dy, size, keepAspect = false, logoStyle = 'full') {
   const l = layers[id]
   const a = rad(l.r || 0)
   // the pull along the layer's own sides
@@ -86,8 +97,21 @@ export function resizeLayer(layers, id, corner, dx, dy, size, keepAspect = false
   // the opposite corner stays put in the frame
   const fixed = framePoint(l, west ? l.w : 0, north ? l.h : 0)
   const moved = framePoint({ ...l, w, h, x: 0, y: 0 }, west ? w : 0, north ? h : 0)
-  return { ...layers, [id]: clampBox({ ...l, w, h, x: fixed.x - moved.x, y: fixed.y - moved.y }, size, id) }
+  return { ...layers, [id]: clampBox({ ...l, w, h, x: fixed.x - moved.x, y: fixed.y - moved.y }, size, id, logoStyle) }
 }
+
+/** The logo switched to another style: that style's shape and size, around the same middle. */
+export function setLogoStyle(layers, logoStyle, size) {
+  const st = LOGO_STYLES[logoStyle] || LOGO_STYLES.full
+  return { ...layers, logo: logoBox({ ...layers.logo, h: st.defaultH }, size, logoStyle) }
+}
+
+/**
+ * Turning with the handle: the angle the part had, plus how far the pointer
+ * went round its middle since it was pressed (so pressing does not move it).
+ * Angles in degrees.
+ */
+export const dragAngle = (baseR, pointerStart, pointerNow) => (baseR || 0) + (pointerNow - pointerStart)
 
 /**
  * The layer turned to `deg` (-180..180). Near a quarter turn it snaps to it;
@@ -167,11 +191,11 @@ export function pieceOf(range, length, playhead = 0) {
 /** Can this audiogram go out as a Short? Vertical and at most 2 minutes. */
 export const canBeShort = (a) => a.format === 'vertical' && a.duration <= AUDIOGRAM_MAX_SECONDS
 
-/** What goes to 3Speak with "Use this audio": the audiograms marked to post. */
+/** What goes to 3Speak with "Use this audio": every audiogram (posting them as Shorts with it is what they are for). */
 export function audiogramsToPost(list) {
-  return (list || []).filter(a => a.post && canBeShort(a) && a.url).map(a => ({
+  return (list || []).filter(a => canBeShort(a) && a.url).map(a => ({
     url: a.url,
-    description: String(a.description || '').trim().slice(0, 500),
+    description: String(a.description || '').trim().slice(0, 5000),
     title: a.title || '',
     duration: a.duration,
     width: 1080,

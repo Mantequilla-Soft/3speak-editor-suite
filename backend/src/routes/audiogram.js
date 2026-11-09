@@ -7,7 +7,7 @@ import dns from 'dns/promises'
 import { requireSignIn } from '../auth.js'
 import { downloadMedia } from '../utils/download.js'
 import { audiogramArgs, cleanAudiogramOptions, cleanAudiogramStyle, pageState, uploadPathOf, circleMaps, CIRCLE_WAVES, AUDIOGRAM_MAX_SECONDS } from '../services/audiogram.js'
-import { audiogramPageHtml, renderStills, defaultLayers, SIZES } from '../services/audiogramPage.js'
+import { audiogramPageHtml, renderStills, defaultLayers, SIZES, LOGO_STYLES } from '../services/audiogramPage.js'
 import { privateAddress } from '../utils/privateAddress.js'
 
 /**
@@ -17,7 +17,7 @@ import { privateAddress } from '../utils/privateAddress.js'
  *        backend, else fetched like a render's media); style is the look and
  *        the arrangement (services/audiogram.js cleanAudiogramStyle)
  *   GET /api/audiogram/page -> the page the editor shows as its live preview
- *   GET /api/audiogram/defaults -> { style, coverLayouts, maxSeconds }: the first look
+ *   GET /api/audiogram/defaults -> { style, coverLayouts, logoStyles, maxSeconds }: the first look
  *       (no template yet), and the arrangement with a cover for when a picture comes in
  *   GET /api/audiogram/:jobId -> { status, progress, outputUrl? , error? }
  * The MP4 lands in the rendered folder (removed by the usual cleanup).
@@ -147,6 +147,7 @@ router.get('/defaults', (req, res) => {
   res.json({
     style: cleanAudiogramStyle({}),
     coverLayouts: Object.fromEntries(Object.keys(SIZES).map(f => [f, defaultLayers(f, true)])),
+    logoStyles: LOGO_STYLES,
     maxSeconds: AUDIOGRAM_MAX_SECONDS
   })
 })

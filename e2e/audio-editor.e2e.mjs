@@ -254,6 +254,9 @@ try {
     await frame.getByRole('button', { name: 'Use this audio' }).first().click()
     await frame.locator('.audio-preview-player').waitFor()
     await frame.locator('.video-preview-send').click()
+    // no audiograms for this audio: it asks first, once
+    await frame.getByText('Make audiograms for Shorts?').waitFor()
+    await frame.getByRole('button', { name: 'No, use the audio' }).click()
     posted = await until(() => page.evaluate(() => window.__messages.find(m => m.type === 'post-to-3speak')), 'post-to-3speak')
     assert.equal(posted.mediaType, 'audio')
     assert.ok(posted.outputUrl.startsWith(`${BACKEND}/rendered/`) && posted.outputUrl.endsWith('.mp3'), posted.outputUrl)
@@ -447,22 +450,18 @@ try {
     const second = timeline.chapters[1]
     assert.ok(second.start > 1.5 && second.start < 2.3, `second chapter moved with the cut, at ${second.start}`)
     await f.getByRole('button', { name: 'Use this audio' }).first().waitFor({ timeout: 90000 })
-    // Audiograms: pick the piece on the timeline, move the title, make one, mark it to post
-    await f.getByRole('button', { name: /^Audiograms/ }).click()
+    // Audiograms: "Use this audio" with none yet asks first; "Make audiograms" opens them
+    await f.getByRole('button', { name: 'Use this audio' }).first().click()
+    await f.locator('.video-preview-send').click()
+    await f.getByText('Make audiograms for Shorts?').waitFor()
+    await f.getByRole('button', { name: 'Make audiograms' }).click()
     let ag = f.getByRole('dialog', { name: 'Audiograms' })
-    await ag.locator('.audiogram-box[data-layer="title"]').waitFor({ timeout: 20000 })
-    // the first time: the studio's tour, all the way through
+    // first the piece: nothing else shows until it is picked (and no tour yet)
+    await ag.getByTestId('audiogram-start').waitFor({ timeout: 20000 })
+    assert.equal(await ag.locator('.audiogram-box').count(), 0, 'no studio before the piece')
+    assert.equal(await ag.getByLabel('Title on the video').count(), 0)
     const tip = f.locator('.tour-tooltip')
-    await tip.waitFor({ timeout: 10000 })
-    assert.equal(await tip.locator('.tour-tooltip-title').innerText(), 'Audiograms')
-    const tourTitles = []
-    for (let i = 0; i < 12 && await tip.count(); i++) {
-      tourTitles.push(await tip.locator('.tour-tooltip-title').innerText())
-      await tip.locator('.tour-next-btn').click()
-    }
-    assert.deepEqual(tourTitles, ['Audiograms', 'Pick the piece', 'Arrange it your way', 'A picture', 'The waveform', 'Parts', 'Make it'])
-    assert.ok(await ag.isVisible(), 'the tour does not close the studio')
-    assert.equal(await ag.getByLabel('Title on the video').inputValue(), 'speech')
+    assert.equal(await tip.count(), 0, 'the studio tour waits for the studio')
     await ag.getByRole('button', { name: 'Choose on the timeline' }).click()
     await f.locator('.range-pick-bar').waitFor()
     // the first time: a short tour of picking (its buttons work although the editor is locked)
@@ -577,6 +576,18 @@ try {
     await f.getByRole('button', { name: 'Use this piece' }).click()
     assert.equal(await f.locator('.app.picking-range').count(), 0, 'the editor is unlocked again')
     ag = f.getByRole('dialog', { name: 'Audiograms' })
+    // now the studio, and the first time its tour
+    await ag.locator('.audiogram-box[data-layer="title"]').waitFor({ timeout: 20000 })
+    await tip.waitFor({ timeout: 10000 })
+    const tourTitles = []
+    for (let i = 0; i < 12 && await tip.count(); i++) {
+      tourTitles.push(await tip.locator('.tour-tooltip-title').innerText())
+      await tip.locator('.tour-next-btn').click()
+    }
+    assert.deepEqual(tourTitles, ['Audiograms', 'Your piece', 'Arrange it your way', 'A picture', 'The waveform', 'Parts', 'Make it'])
+    assert.ok(await ag.isVisible(), 'the tour does not close the studio')
+    assert.equal(await ag.getByLabel('Title on the video').inputValue(), 'speech')
+    assert.equal(await ag.getByRole('radiogroup', { name: 'Picture layout' }).count(), 0, 'no picture layouts: the card')
     assert.equal((await ag.getByTestId('audiogram-piece').innerText()).replace(/\s+/g, ' '), picked.replace(/\s+/g, ' '), 'the dialog uses the picked piece')
     const pieceSeconds = +/(\d+)s$/.exec(picked)[1]
     assert.ok(pieceSeconds >= 3, picked)
@@ -586,15 +597,33 @@ try {
     await p.page.mouse.down()
     await p.page.mouse.move(tb.x + tb.width / 2 + 30, tb.y + 70, { steps: 6 })
     await p.page.mouse.up()
-    // turn it about 10 degrees to the left with its handle (the angle is the pointer's around the middle)
+    // turn it about 10 degrees to the left with its handle (under the box): a press alone does not turn it
     const knob = await ag.locator('.audiogram-rotate').boundingBox()
     const moved = await ag.locator('.audiogram-box[data-layer="title"]').boundingBox()
     const mid = { x: moved.x + moved.width / 2, y: moved.y + moved.height / 2 }
     await p.page.mouse.move(knob.x + knob.width / 2, knob.y + knob.height / 2)
     await p.page.mouse.down()
-    await p.page.mouse.move(mid.x + 200 * Math.cos(-100 * Math.PI / 180), mid.y + 200 * Math.sin(-100 * Math.PI / 180), { steps: 10 })
+    await p.page.mouse.up()
+    assert.equal(await ag.locator('.audiogram-box-name').innerText(), 'Title', 'pressing the handle does not flip it')
+    await p.page.mouse.move(knob.x + knob.width / 2, knob.y + knob.height / 2)
+    await p.page.mouse.down()
+    await p.page.mouse.move(mid.x + 200 * Math.cos(80 * Math.PI / 180), mid.y + 200 * Math.sin(80 * Math.PI / 180), { steps: 10 })
     await p.page.mouse.up()
     await ag.getByText('Title · -10°').waitFor()
+    // the branding: the 3S only, in its own shape, never under its minimum size
+    const PX = 520 / 1920
+    await ag.getByRole('radio', { name: '3S logo' }).click()
+    const logo = ag.locator('.audiogram-box[data-layer="logo"]')
+    await until(async () => { const b = await logo.boundingBox(); return Math.abs(b.width / b.height - 1.15) < 0.06 }, 'the 3S logo box')
+    await logo.click()
+    const lb = await logo.boundingBox()
+    const corner = await logo.locator('[data-corner="se"]').boundingBox()
+    await p.page.mouse.move(corner.x + 3, corner.y + 3)
+    await p.page.mouse.down()
+    await p.page.mouse.move(lb.x - 200, lb.y - 200, { steps: 6 })
+    await p.page.mouse.up()
+    const small = await logo.boundingBox()
+    assert.ok(small.height >= 120 * PX - 1, `the logo stays at least 120 px high (${small.height / PX})`)
     // the logo can not be hidden
     assert.equal(await ag.getByRole('button', { name: 'Hide 3Speak logo' }).count(), 0)
     assert.equal(await ag.getByRole('radio', { name: 'Square' }).count(), 0, 'no square: Shorts are vertical')
@@ -615,9 +644,25 @@ try {
     assert.equal(tpl.wave.type, 'ring')
     assert.equal(tpl.layouts.vertical.wave.w, tpl.layouts.vertical.wave.h, 'a round waveform has a square box')
     assert.equal(tpl.layouts.vertical.title.r, -10)
+    assert.equal(tpl.logo, 'mark')
+    assert.ok(tpl.layouts.vertical.logo.h >= 120, `logo ${JSON.stringify(tpl.layouts.vertical.logo)}`)
     assert.ok(tpl.layouts.vertical.title.y > 520 + 150 - 60, `title moved down in the template (y ${tpl.layouts.vertical.title.y})`)
-    await ag.getByRole('button', { name: 'Post together with the audio' }).click()
-    await ag.getByLabel('Text for Short 1').fill('A teaser of the new episode')
+    // every audiogram goes out with the audio: no toggle, a hint, its title as its name
+    assert.equal(await ag.getByRole('button', { name: 'Post together with the audio' }).count(), 0)
+    await ag.getByText(/They go out as 3Speak Shorts together with the audio/).waitFor()
+    assert.equal(await ag.locator('.audiogram-made-title').first().innerText(), 'speech')
+    // its text: typed here when 3Speak's editor does not answer (an older 3Speak) ...
+    await ag.getByRole('button', { name: 'Text for Short 1' }).click()
+    const typed = ag.getByRole('textbox', { name: 'Text for Short 1' })
+    await typed.waitFor({ timeout: 5000 })
+    await typed.fill('A teaser of the new episode')
+    await typed.blur()
+    // ... and written in 3Speak's own editor when it does
+    await p.page.evaluate(() => { window.__textEditor = 'Written in the **3Speak** editor' })
+    await ag.getByRole('button', { name: 'Text for Short 1' }).click()
+    await until(async () => (await ag.getByTestId('audiogram-text').first().innerText()).includes('Written in the **3Speak** editor'), 'the text from 3Speak\'s editor')
+    const asked = await p.page.evaluate(() => window.__messages.filter(m => m.type === 'edit-text').at(-1))
+    assert.equal(asked.value, 'A teaser of the new episode', '3Speak\'s editor starts from the text there was')
     await ag.getByTitle('Close').click()
     // opened again: the template is the starting point, the audiogram is still there
     await f.getByRole('button', { name: 'Audiograms (1)' }).click()
@@ -625,8 +670,18 @@ try {
     await ag.getByText('Your last audiogram is the starting point').waitFor({ timeout: 15000 })
     assert.equal(await f.locator('.tour-tooltip').count(), 0, 'the tour shows only the first time')
     assert.equal(await ag.getByRole('radio', { name: 'Circle wave' }).getAttribute('aria-checked'), 'true')
-    assert.equal(await ag.getByRole('button', { name: 'Post together with the audio' }).getAttribute('aria-pressed'), 'true')
+    assert.match(await ag.getByTestId('audiogram-text').first().innerText(), /Written in the \*\*3Speak\*\* editor/)
+    // a look not in an audiogram yet: closing asks first (outside the dialog, and X)
+    await ag.getByLabel('Line on the video').fill('A changed line')
+    await p.page.mouse.click(5, 400)
+    const confirm = f.locator('.audiogram-confirm')
+    await confirm.getByText('Close without making it?').waitFor()
+    await confirm.getByRole('button', { name: 'Keep editing' }).click()
+    assert.ok(await ag.isVisible(), 'still open')
+    assert.equal(await ag.getByLabel('Line on the video').inputValue(), 'A changed line')
     await ag.getByTitle('Close').click()
+    await confirm.getByRole('button', { name: 'Close' }).click()
+    await ag.waitFor({ state: 'detached' })
     // phones: the finished export's buttons still fit
     await p.page.setViewportSize({ width: 390, height: 844 })
     await sleep(300)
@@ -639,7 +694,7 @@ try {
     assert.deepEqual(post.chapters.map(c => c.title), ['Intro', 'Second part'])
     assert.equal(post.audiograms.length, 1)
     assert.equal(post.audiograms[0].url, agUrl)
-    assert.equal(post.audiograms[0].description, 'A teaser of the new episode')
+    assert.equal(post.audiograms[0].description, 'Written in the **3Speak** editor')
     assert.deepEqual([post.audiograms[0].width, post.audiograms[0].height], [1080, 1920])
     assert.ok(Math.abs(post.chapters.at(-1).end - post.durationSec) < 0.01, 'the last chapter runs to the end')
     // ID3 chapters in the MP3 itself

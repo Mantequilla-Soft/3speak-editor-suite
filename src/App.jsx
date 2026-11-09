@@ -37,7 +37,7 @@ import { loadLoudness, planCuts } from './utils/silenceDetect'
 import { combineLoudness, groupSpan, overlappingVoices } from './utils/groupSilence'
 import { isAudioMode } from './utils/editorMode'
 import AudiogramDialog from './components/AudiogramDialog'
-import { audiogramsToPost, pieceOf } from './utils/audiogramLayers'
+import { audiogramsToPost } from './utils/audiogramLayers'
 import { audioFileName } from './utils/audioTemplate'
 import BeatSyncModal from './components/BeatSyncModal'
 import StickerPicker from './components/StickerPicker'
@@ -265,7 +265,8 @@ function App() {
     remixPrompt,
     clearRemixPrompt,
     playlistCovers,
-    requestPlaylistCovers
+    requestPlaylistCovers,
+    editTextInHost
   } = useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay, audioMode, master, title: audioTitle, chapters: chapterList })
 
   // Apply theme to document on mount and changes
@@ -1230,11 +1231,10 @@ function App() {
   const startPickingRange = useCallback(() => {
     previewControlRef.current?.pause()
     rangeBeforePickRef.current = audiogramRange
-    // start from what the dialog showed, so there is a band to see at once
-    setAudiogramRange(pieceOf(audiogramRange, timelineEnd, playheadPosition))
+    // the piece picked before (if any) shows as a band; else the first click marks the start
     setAudiogramOpen(false)
     setPickingRange(true)
-  }, [audiogramRange, timelineEnd, playheadPosition])
+  }, [audiogramRange])
   const finishPickingRange = useCallback((keep) => {
     if (rangePreviewRef.current) stopRangePreview(false)
     if (!keep) setAudiogramRange(rangeBeforePickRef.current)
@@ -1262,6 +1262,11 @@ function App() {
     window.addEventListener('keydown', onKey, true)
     return () => window.removeEventListener('keydown', onKey, true)
   }, [pickingRange, finishPickingRange, toggleRangePreview])
+  // "Use this audio" / "Send Video": the export goes to 3Speak
+  const [askAudiograms, setAskAudiograms] = useState(false)
+  const askedAudiogramsRef = useRef(new Set()) // exports already asked about audiograms
+  const sendToHostRef = useRef(null)
+  const sendToHost = () => sendToHostRef.current?.()
   const cleaning = useCleaningStatus()
   // Duck is a clip setting only. A whole-show Duck (an old draft, or a
   // template with "duck the music") becomes the music clips' own setting.
@@ -1481,7 +1486,26 @@ function App() {
 
   // The audio editor only exists in the compact layout
   if (compactMode || audioMode) {
-    return (
+    // What "Use this audio" / "Send Video" sends (after the audiograms question, if asked)
+  sendToHostRef.current = () => {
+    setShowPreview(false)
+    // Sent: the draft stays, saved as it is now. The upload on 3Speak
+    // can still be cancelled; the draft then still has the project.
+    // It goes when it expires or a new project replaces it.
+    if (drafts.hasEdits()) drafts.save().catch(() => {})
+    sendToParent('post-to-3speak', {
+      outputUrl: renderStatus.outputUrl,
+      ...(audioMode && { mediaType: 'audio', fileName: audioFileName(audioTitle), durationSec: Math.round(timelineEnd * 1000) / 1000 }),
+      // [{ start, end, title }]: 3Speak lists them in the description
+      ...(audioMode && chapterList.length > 0 && { chapters: chapterList }),
+      // The audiograms: 3Speak posts them as Shorts linking to the episode
+      ...(audioMode && audiogramsToPost(audiograms).length > 0 && { audiograms: audiogramsToPost(audiograms) }),
+      ...(remixSource && { remixSource }),
+      ...(musicCredits.length > 0 && { musicCredits })
+    })
+  }
+
+  return (
       <div className={`app compact${isDesktop ? ' desktop' : ''}${audioMode && pickingRange ? ' picking-range' : ''}`}>
         <ClipColorFilters tracks={tracks} />
         {/* Backend health warning */}
@@ -1880,11 +1904,12 @@ function App() {
           />
         )}
 
-        {audiogramOpen && renderStatus?.status === 'completed' && renderStatus.outputUrl && (
+        {/* Kept mounted (hidden) while its piece is picked on the timeline, so its look is not lost */}
+        {(audiogramOpen || pickingRange) && renderStatus?.status === 'completed' && renderStatus.outputUrl && (
           <AudiogramDialog
             outputUrl={renderStatus.outputUrl}
             length={timelineEnd}
-            playheadPosition={playheadPosition}
+            hidden={pickingRange}
             title={audioTitle}
             chapters={resolvedChapters}
             range={audiogramRange}
@@ -1895,6 +1920,7 @@ function App() {
             onRemoveAudiogram={removeAudiogram}
             playlistCovers={playlistCovers}
             onRequestCovers={requestPlaylistCovers}
+            onEditText={isIframe ? editTextInHost : undefined}
             onClose={() => setAudiogramOpen(false)}
           />
         )}
@@ -2001,6 +2027,22 @@ function App() {
                   />
                 )}
               </div>
+              {askAudiograms ? (
+                // No audiograms for this audio yet: offer them before it goes (once per export)
+                <div className="video-preview-ask" role="alertdialog" aria-labelledby="ask-audiograms-title">
+                  <h4 id="ask-audiograms-title"><Film size={15} /> Make audiograms for Shorts?</h4>
+                  <p>Short videos of the best pieces of this audio, posted as 3Speak Shorts together with it, each linking back to it.</p>
+                  <div className="video-preview-actions">
+                    <button className="video-preview-back" onClick={() => { askedAudiogramsRef.current.add(renderStatus.outputUrl); setAskAudiograms(false); sendToHost() }}>
+                      No, use the audio
+                    </button>
+                    <button className="video-preview-send" onClick={() => { askedAudiogramsRef.current.add(renderStatus.outputUrl); setAskAudiograms(false); setShowPreview(false); setAudiogramOpen(true) }}>
+                      <Film size={14} />
+                      <span>Make audiograms</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
               <div className="video-preview-actions">
                 <button className="video-preview-back" onClick={() => setShowPreview(false)}>
                   Back to Editor
@@ -2008,27 +2050,15 @@ function App() {
                 <button
                   className="video-preview-send"
                   onClick={() => {
-                    setShowPreview(false)
-                    // Sent: the draft stays, saved as it is now. The upload on 3Speak
-                    // can still be cancelled; the draft then still has the project.
-                    // It goes when it expires or a new project replaces it.
-                    if (drafts.hasEdits()) drafts.save().catch(() => {})
-                    sendToParent('post-to-3speak', {
-                      outputUrl: renderStatus.outputUrl,
-                      ...(audioMode && { mediaType: 'audio', fileName: audioFileName(audioTitle), durationSec: Math.round(timelineEnd * 1000) / 1000 }),
-                      // [{ start, end, title }]: 3Speak lists them in the description
-                      ...(audioMode && chapterList.length > 0 && { chapters: chapterList }),
-                      // Audiograms marked "Post together with the audio": 3Speak posts them as Shorts linking to the episode
-                      ...(audioMode && audiogramsToPost(audiograms).length > 0 && { audiograms: audiogramsToPost(audiograms) }),
-                      ...(remixSource && { remixSource }),
-                      ...(musicCredits.length > 0 && { musicCredits })
-                    })
+                    if (audioMode && audiograms.length === 0 && !askedAudiogramsRef.current.has(renderStatus.outputUrl)) { setAskAudiograms(true); return }
+                    sendToHost()
                   }}
                 >
                   <Send size={14} />
                   <span>{audioMode ? 'Use this audio' : 'Send Video'}</span>
                 </button>
               </div>
+              )}
             </div>
           </div>
         )}

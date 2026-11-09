@@ -12,7 +12,8 @@ import { fileURLToPath } from 'url'
  * Everything on it is a layer the person can move, resize, turn and stack
  * (`layers`: logo, cover, title, line, wave, each { x, y, w, h, z, r, on } in
  * pixels of the video, r in degrees). The 3Speak logo always shows: it can
- * not be hidden, stays in the frame, at least LOGO_MIN big, in front of the rest. The page builds itself from a state object
+ * not be hidden, keeps its shape and a minimum size (LOGO_STYLES), stays in
+ * the frame, in front of the rest. The page builds itself from a state object
  * (window.applyAudiogram(state, part)), so the editor shows the very same page
  * as its preview (GET /api/audiogram/page, state by postMessage) and the
  * backend screenshots it for the video:
@@ -32,8 +33,27 @@ export const BRAND = {
 export const SIZES = { vertical: { w: 1080, h: 1920 } }
 export const LAYER_IDS = ['logo', 'cover', 'title', 'line', 'wave']
 export const DEFAULT_LINE = 'Full episode on *3speak.tv*'
-export const LOGO_MIN = { w: 240, h: 40 }
 export const LOGO_Z = 20
+/**
+ * The 3Speak branding: 'full' (the 3S mark and "3Speak") or 'mark' (the 3S
+ * only). Its box always has the logo's own shape (w = h * aspect), so it can
+ * not be made thin to shrink the logo, and is never under `minH` high.
+ */
+export const LOGO_STYLES = {
+  full: { aspect: 5, minH: 64, defaultH: 80 },
+  mark: { aspect: 1.15, minH: 120, defaultH: 140 }
+}
+
+/** The logo's box for a style: the logo's shape, at least its minimum, whole in the frame, around (cx, cy). */
+export function logoBox(style, { cx, cy, h }, size) {
+  const s = LOGO_STYLES[style] || LOGO_STYLES.full
+  const maxH = Math.min(size.h, size.w / s.aspect)
+  const hh = Math.round(Math.min(maxH, Math.max(s.minH, Number(h) || s.defaultH)))
+  const w = Math.round(hh * s.aspect)
+  const x = Math.round(Math.min(size.w - w, Math.max(0, cx - w / 2)))
+  const y = Math.round(Math.min(size.h - hh, Math.max(0, cy - hh / 2)))
+  return { x, y, w, h: hh }
+}
 /**
  * The round waveforms, in parts of the circle's radius: 'circle' is bars
  * standing out from an inner ring (`cols` bars per half, mirrored, `gap` of
@@ -43,7 +63,11 @@ export const CIRCLE_SHAPES = {
   circle: { inner: 0.42, cols: 48, gap: 0.36 },
   ring: { inner: 0.5, cols: 200, gap: 0 }
 }
-/** How the picture is used: a card on the dark 3Speak background, a card on the picture blurred, or the picture over the whole frame (no card). */
+/**
+ * How the picture is used: a card on the dark 3Speak background (the one the
+ * studio offers), a card on the picture blurred, or the picture over the whole
+ * frame (no card). The last two are still drawn for older templates.
+ */
 export const IMAGE_LAYOUTS = ['card', 'blur', 'fill']
 
 /**
@@ -54,14 +78,14 @@ export const IMAGE_LAYOUTS = ['card', 'blur', 'fill']
 export const DEFAULT_LAYOUTS = {
   vertical: {
     cover: {
-      logo: { x: 290, y: 236, w: 500, h: 80, z: 5 },
+      logo: { x: 340, y: 236, w: 400, h: 80, z: 5 },
       cover: { x: 230, y: 380, w: 620, h: 620, z: 1 },
       title: { x: 80, y: 1050, w: 920, h: 280, z: 3 },
       line: { x: 80, y: 1350, w: 920, h: 64, z: 4 },
       wave: { x: 90, y: 1440, w: 900, h: 180, z: 2 }
     },
     plain: {
-      logo: { x: 290, y: 236, w: 500, h: 80, z: 5 },
+      logo: { x: 340, y: 236, w: 400, h: 80, z: 5 },
       cover: { x: 230, y: 380, w: 620, h: 620, z: 1, on: false },
       title: { x: 80, y: 520, w: 920, h: 420, z: 3 },
       line: { x: 80, y: 960, w: 920, h: 64, z: 4 },
@@ -71,10 +95,14 @@ export const DEFAULT_LAYOUTS = {
 }
 
 /** The default layers of a shape, with or without a cover: { id: box }. */
-export function defaultLayers(format, withCover) {
+export function defaultLayers(format, withCover, logoStyle = 'full') {
   const set = (DEFAULT_LAYOUTS[format] || DEFAULT_LAYOUTS.vertical)[withCover ? 'cover' : 'plain']
   const out = Object.fromEntries(LAYER_IDS.map(id => [id, { on: true, r: 0, ...set[id] }]))
   out.logo.z = LOGO_Z
+  if (logoStyle !== 'full') {
+    const l = out.logo
+    out.logo = { ...l, ...logoBox(logoStyle, { cx: l.x + l.w / 2, cy: l.y + l.h / 2, h: LOGO_STYLES[logoStyle]?.defaultH }, SIZES[format] || SIZES.vertical) }
+  }
   return out
 }
 
@@ -94,21 +122,24 @@ const angle = (v) => {
 /**
  * Layers as sent, checked against the frame: every box at least 16 px with
  * 16 px of it in the frame, z 0..19, turned -180..180 degrees. The logo: on,
- * whole inside the frame, at least LOGO_MIN, in front (z 20). Missing ones
+ * in its own shape and at least its minimum (logoBox), whole inside the
+ * frame, in front (z 20). Missing ones
  * come from the default arrangement.
  */
-export function cleanLayers(input, format, withCover = true) {
+export function cleanLayers(input, format, withCover = true, logoStyle = 'full') {
   const size = SIZES[format] || SIZES.vertical
-  const base = defaultLayers(format, withCover)
+  const base = defaultLayers(format, withCover, logoStyle)
   const src = input && typeof input === 'object' ? input : {}
   const out = {}
   for (const id of LAYER_IDS) {
     const d = base[id]
     const l = src[id] && typeof src[id] === 'object' ? src[id] : {}
     if (id === 'logo') {
-      const w = num(l.w, LOGO_MIN.w, size.w, d.w)
-      const h = num(l.h, LOGO_MIN.h, size.h, d.h)
-      out.logo = { x: num(l.x, 0, size.w - w, d.x), y: num(l.y, 0, size.h - h, d.y), w, h, z: LOGO_Z, r: angle(l.r), on: true }
+      const w = num(l.w, 1, size.w, d.w)
+      const h = num(l.h, 1, size.h, d.h)
+      const x = num(l.x, -size.w, size.w, d.x)
+      const y = num(l.y, -size.h, size.h, d.y)
+      out.logo = { ...logoBox(logoStyle, { cx: x + w / 2, cy: y + h / 2, h }, size), z: LOGO_Z, r: angle(l.r), on: true }
       continue
     }
     const w = num(l.w, 16, size.w, d.w)
@@ -242,7 +273,7 @@ window.applyAudiogram = function (state, part = 'all') {
   for (const id of ['logo', 'cover', 'title', 'line', 'wave']) {
     if (!shows(id)) continue;
     const l = L[id];
-    if (id === 'logo') html += '<div class="layer logo" id="l-logo" style="' + box(l, id) + '">' + MARK + '<span>3Speak</span></div>';
+    if (id === 'logo') html += '<div class="layer logo" id="l-logo" style="' + box(l, id) + '">' + MARK + (state.logo === 'mark' ? '' : '<span>3Speak</span>') + '</div>';
     if (id === 'cover') html += '<div class="layer cover" style="' + box(l, id) + ';border-radius:' + Math.round(Math.min(l.w, l.h) * 0.055) + 'px"><img src="' + esc(image) + '" alt=""></div>';
     // the text in one inline box: as flex items the spaces next to the red words would go
     if (id === 'title' && state.title) html += '<div class="layer title" id="l-title" style="' + box(l, id) + '"><span class="txt">' + esc(state.title) + '</span></div>';
