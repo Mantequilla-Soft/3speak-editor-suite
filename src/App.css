@@ -6930,3 +6930,72 @@ input[type="range"] {
 .timeline-flag-head:active {
   cursor: grabbing;
 }
+
+/* Track heights (Timeline.jsx clampTrackHeight): rows and labels take the
+   track's own height; tracks that no longer fit scroll up and down, the ruler
+   (with the flag heads) stays at the top, the labels follow the tracks */
+.timeline-content {
+  overflow: auto;
+}
+
+.timeline-ruler {
+  position: sticky;
+  top: 0;
+  z-index: 8;
+}
+
+.timeline-sidebar {
+  overflow: hidden;
+  /* room for the tracks' horizontal scrollbar, so both can scroll to the bottom */
+  padding-bottom: 16px;
+}
+
+.sidebar-ruler-space {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg-tertiary);
+}
+
+.timeline-playhead,
+.timeline-limit-zone,
+.timeline-flag {
+  bottom: auto;
+}
+
+.track-label {
+  position: relative;
+}
+
+.track-resize-handle {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 7px;
+  cursor: ns-resize;
+  z-index: 3;
+  touch-action: none;
+}
+
+.track-resize-handle::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 2px;
+  height: 2px;
+  border-radius: 1px;
+  background: transparent;
+}
+
+.track-resize-handle:hover::after,
+.track-resize-handle:active::after {
+  background: var(--text-muted);
+}
+
+/* the flag head now sits in the ruler (sticky), its line runs through the tracks */
+.timeline-ruler .timeline-flag-head {
+  top: 10px;
+  z-index: 3;
+}

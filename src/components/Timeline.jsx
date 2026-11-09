@@ -20,6 +20,10 @@ function formatTime(seconds) {
 // tens of thousands of elements; past this the bars just get wider
 const MAX_WAVE_BARS = 3000
 // Ruler steps (seconds); the first that keeps labels this far apart is used
+// Track heights in px (track.height); 60 is the default
+export const TRACK_HEIGHT = 60
+export const clampTrackHeight = (h) => (Number.isFinite(+h) && +h > 0 ? Math.min(240, Math.max(36, Math.round(+h))) : TRACK_HEIGHT)
+
 const RULER_STEPS = [1, 2, 5, 10, 15, 30, 60, 120, 300, 600, 900, 1800, 3600]
 const RULER_MIN_GAP_PX = 56
 export const rulerInterval = (pxPerSecond) => RULER_STEPS.find(s => s * pxPerSecond >= RULER_MIN_GAP_PX) || 7200
@@ -344,13 +348,17 @@ const TimelineClip = memo(function TimelineClip({
         const snappedPosition = calculateSnappedPosition(rawPosition)
 
         // Check for track change (vertical movement)
+        // Tracks have their own heights: the row under the pointer (above the
+        // first / below the last compatible row: that one)
         const compatibleTracks = allTracks.filter(t => t.type === trackType)
-        const trackHeight = 60 // approximate track height
-        const trackOffset = Math.round(deltaY / trackHeight)
-
-        const currentTrackIndex = compatibleTracks.findIndex(t => t.id === trackId)
-        const newTrackIndex = Math.max(0, Math.min(currentTrackIndex + trackOffset, compatibleTracks.length - 1))
-        const newTrackId = compatibleTracks[newTrackIndex]?.id || trackId
+        const rows = compatibleTracks
+          .map(t => ({ id: t.id, box: document.querySelector(`.timeline-track-v2[data-track-id="${t.id}"]`)?.getBoundingClientRect() }))
+          .filter(r => r.box)
+        let newTrackId = trackId
+        if (rows.length && deltaY !== 0) {
+          const hit = rows.find(r => clientY >= r.box.top && clientY < r.box.bottom)
+          newTrackId = hit ? hit.id : (clientY < rows[0].box.top ? rows[0].id : (clientY >= rows[rows.length - 1].box.bottom ? rows[rows.length - 1].id : trackId))
+        }
 
         dragDataRef.current.currentTrackId = newTrackId
 
@@ -641,6 +649,7 @@ function Timeline({
   const clipActionsRef = useRef(null)
   const trackAddPopupRef = useRef(null)
   const timelineContentRef = useRef(null)
+  const sidebarRef = useRef(null) // the track labels scroll up and down with the tracks
   const rulerRef = useRef(null)
   const pinchRef = useRef({ active: false, initialDistance: 0, initialZoom: 0 })
 
@@ -1149,6 +1158,48 @@ function Timeline({
     e.target.value = ''
   }, [onAddFilesToTrack])
 
+  // Track heights: each track its own (track.height, saved with the draft); the
+  // handle under a track label drags it, a double-click resets it
+  const [resizing, setResizing] = useState(null) // { id, h } while a handle is dragged
+  const heightOf = (t) => (resizing?.id === t.id ? resizing.h : clampTrackHeight(t.height))
+  const startTrackResize = (e, track) => {
+    if (e.button !== 0) return
+    e.preventDefault()
+    e.stopPropagation()
+    const el = e.currentTarget
+    el.setPointerCapture?.(e.pointerId)
+    const startY = e.clientY
+    const startH = clampTrackHeight(track.height)
+    let h = startH
+    const onMove = (ev) => {
+      h = clampTrackHeight(startH + (ev.clientY - startY))
+      setResizing({ id: track.id, h })
+    }
+    const onUp = () => {
+      el.removeEventListener('pointermove', onMove)
+      el.removeEventListener('pointerup', onUp)
+      el.removeEventListener('pointercancel', onUp)
+      setResizing(null)
+      if (h !== startH) onUpdateTrack?.(track.id, { height: h })
+    }
+    el.addEventListener('pointermove', onMove)
+    el.addEventListener('pointerup', onUp)
+    el.addEventListener('pointercancel', onUp)
+  }
+  const resizeHandle = (track) => (onUpdateTrack ? (
+    <div
+      className="track-resize-handle"
+      role="separator"
+      aria-orientation="horizontal"
+      aria-label={`Height of ${track.name || 'this track'}`}
+      title="Drag to make the track taller or shorter (double-click: back to normal)"
+      onPointerDown={(e) => startTrackResize(e, track)}
+      onDoubleClick={() => onUpdateTrack(track.id, { height: undefined })}
+    />
+  ) : null)
+  // Everything below the ruler, for the lines that run through all tracks
+  const contentHeight = 24 + [...videoTracks, ...audioTracks].reduce((sum, t) => sum + heightOf(t), 0) + (audioTracks.length ? 2 : 0)
+
   // Flags: click jumps there, a drag moves the flag, right-click removes it
   const [flagDrag, setFlagDrag] = useState(null) // { id, at } while a flag is dragged
   const startFlagDrag = (e, flag) => {
@@ -1250,7 +1301,9 @@ function Timeline({
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return // sideways swipe: native
       if (!e.deltaY) return
       e.preventDefault()
-      content.scrollLeft += e.deltaY * unit
+      // Over the track labels, or with Alt: up and down (taller tracks); else along the time
+      if (e.altKey || e.target.closest?.('.timeline-sidebar')) content.scrollTop += e.deltaY * unit
+      else content.scrollLeft += e.deltaY * unit
     }
     box.addEventListener('wheel', onWheel, { passive: false })
     return () => box.removeEventListener('wheel', onWheel)
@@ -1502,13 +1555,14 @@ function Timeline({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="timeline-sidebar">
+        <div className="timeline-sidebar" ref={sidebarRef}>
           {/* Empty space for ruler */}
           <div className="sidebar-ruler-space" />
 
           {/* Video track labels - first track at top */}
           {videoTracks.map((track, index) => (
-            <div key={track.id} className={`track-label${track.visible === false ? ' track-hidden' : ''}`}>
+            <div key={track.id} className={`track-label${track.visible === false ? ' track-hidden' : ''}`} style={{ height: `${heightOf(track)}px` }}>
+              {resizeHandle(track)}
               <div className="track-label-top">
                 <span className="track-number" title={track.name}>{numbers.get(track.id)}</span>
                 <Film size={16} title={track.name} />
@@ -1578,7 +1632,8 @@ function Timeline({
 
           {/* Audio track labels */}
           {audioTracks.map((track, index) => (
-            <div key={track.id} className={`track-label audio${track.muted ? ' track-muted' : ''}`} title={track.name} aria-label={track.name}>
+            <div key={track.id} className={`track-label audio${track.muted ? ' track-muted' : ''}`} title={track.name} aria-label={track.name} style={{ height: `${heightOf(track)}px` }}>
+              {resizeHandle(track)}
               <div className="track-label-top">
                 <span className="track-number" title={track.name}>{numbers.get(track.id)}</span>
                 <Music size={16} title={track.name} />
@@ -1645,7 +1700,12 @@ function Timeline({
           ))}
         </div>
 
-        <div className="timeline-content" ref={timelineContentRef} onMouseDown={handleContentMouseDown}>
+        <div
+          className="timeline-content"
+          ref={timelineContentRef}
+          onMouseDown={handleContentMouseDown}
+          onScroll={(e) => { if (sidebarRef.current) sidebarRef.current.scrollTop = e.currentTarget.scrollTop }}
+        >
           {marquee && (
             <div className="timeline-marquee" style={{ left: marquee.x, top: marquee.y, width: marquee.w, height: marquee.h }} />
           )}
@@ -1658,6 +1718,23 @@ function Timeline({
             onMouseDown={handleRulerMouseDown}
           >
             {rulerMarks}
+            {/* Flag heads live in the ruler, so they stay in view when the tracks scroll */}
+            {(flags || []).map(fl => (
+              <button
+                key={fl.id}
+                type="button"
+                className="timeline-flag-head"
+                data-flag={fl.n}
+                style={{ left: `${(flagDrag?.id === fl.id ? flagDrag.at : fl.at) * pixelsPerSecond}px`, '--flag-color': fl.color }}
+                aria-label={`Flag ${fl.n} at ${formatTime(fl.at)}`}
+                title={`Flag ${fl.n} · ${formatTime(fl.at)}: click to jump there, drag to move, right-click to remove`}
+                onMouseDown={(e) => startFlagDrag(e, fl)}
+                onClick={(e) => e.stopPropagation()}
+                onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); onRemoveFlag?.(fl.id) }}
+              >
+                {fl.n}
+              </button>
+            ))}
           </div>
 
           {/* Past the render limit: only shown once the timeline runs over it */}
@@ -1666,7 +1743,8 @@ function Timeline({
               className="timeline-limit-zone"
               style={{
                 left: `${MAX_TIMELINE_SECONDS * pixelsPerSecond}px`,
-                width: `${Math.max(0, timelineWidth - MAX_TIMELINE_SECONDS * pixelsPerSecond)}px`
+                width: `${Math.max(0, timelineWidth - MAX_TIMELINE_SECONDS * pixelsPerSecond)}px`,
+                height: `${contentHeight}px`
               }}
               title="Past the render limit"
             />
@@ -1675,7 +1753,7 @@ function Timeline({
           {/* Playhead */}
           <div
             className="timeline-playhead"
-            style={{ left: `${playheadLeft}px` }}
+            style={{ left: `${playheadLeft}px`, height: `${contentHeight}px` }}
             onMouseDown={handlePlayheadMouseDown}
             onTouchStart={handlePlayheadTouchStart}
           >
@@ -1688,20 +1766,8 @@ function Timeline({
             <div
               key={fl.id}
               className="timeline-flag"
-              style={{ left: `${(flagDrag?.id === fl.id ? flagDrag.at : fl.at) * pixelsPerSecond}px`, '--flag-color': fl.color }}
-            >
-              <button
-                type="button"
-                className="timeline-flag-head"
-                data-flag={fl.n}
-                aria-label={`Flag ${fl.n} at ${formatTime(fl.at)}`}
-                title={`Flag ${fl.n} · ${formatTime(fl.at)}: click to jump there, drag to move, right-click to remove`}
-                onMouseDown={(e) => startFlagDrag(e, fl)}
-                onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); onRemoveFlag?.(fl.id) }}
-              >
-                {fl.n}
-              </button>
-            </div>
+              style={{ left: `${(flagDrag?.id === fl.id ? flagDrag.at : fl.at) * pixelsPerSecond}px`, height: `${contentHeight}px`, '--flag-color': fl.color }}
+            />
           ))}
 
           {/* Video tracks - first track at top (highest layer) */}
@@ -1710,7 +1776,7 @@ function Timeline({
               key={track.id}
               className="timeline-track-v2"
               data-track-id={track.id}
-              style={{ width: `${timelineWidth}px` }}
+              style={{ width: `${timelineWidth}px`, height: `${heightOf(track)}px` }}
               onDragOver={(e) => handleTrackDragOver(e, track.id)}
               onDrop={(e) => handleTrackDrop(e, track.id)}
             >
@@ -1752,7 +1818,7 @@ function Timeline({
               key={track.id}
               className="timeline-track-v2 audio"
               data-track-id={track.id}
-              style={{ width: `${timelineWidth}px` }}
+              style={{ width: `${timelineWidth}px`, height: `${heightOf(track)}px` }}
               onDragOver={(e) => handleTrackDragOver(e, track.id)}
               onDrop={(e) => handleTrackDrop(e, track.id)}
             >
