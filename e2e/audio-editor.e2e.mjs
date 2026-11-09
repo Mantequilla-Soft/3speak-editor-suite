@@ -588,6 +588,7 @@ try {
     assert.ok(await ag.isVisible(), 'the tour does not close the studio')
     assert.equal(await ag.getByLabel('Title on the video').inputValue(), 'speech')
     assert.equal(await ag.getByRole('radiogroup', { name: 'Picture layout' }).count(), 0, 'no picture layouts: the card')
+    assert.equal(await ag.getByRole('button', { name: 'Save and close' }).count(), 0, 'nothing to save before the first audiogram')
     // the preview draws the look (the backend's page, in its own frame)
     const preview = () => f.frameLocator('iframe[title="Audiogram preview"]')
     await until(async () => (await preview().locator('#l-title').count()) === 1, 'the preview draws the title', 15000)
@@ -678,7 +679,9 @@ try {
     await until(async () => (await ag.getByTestId('audiogram-text').first().innerText()).includes('Written in the **3Speak** editor'), 'the text from 3Speak\'s editor')
     const asked = await p.page.evaluate(() => window.__messages.filter(m => m.type === 'edit-text').at(-1))
     assert.equal(asked.value, 'A teaser of the new episode', '3Speak\'s editor starts from the text there was')
-    await ag.getByTitle('Close').click()
+    // with an audiogram there: Save and close at the top (the audiograms stay with the audio)
+    await ag.getByRole('button', { name: 'Save and close' }).click()
+    await ag.waitFor({ state: 'detached' })
     // opened again: the template is the starting point, the audiogram is still there
     await f.getByRole('button', { name: 'Audiograms (1)' }).click()
     ag = f.getByRole('dialog', { name: 'Audiograms' })

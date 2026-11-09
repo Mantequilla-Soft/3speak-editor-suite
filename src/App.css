@@ -7070,6 +7070,17 @@ input[type="range"] {
   resize: vertical;
 }
 
+/* The studio's header: Save and close (once there is an audiogram) and X */
+.audiogram-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.audiogram-save-close {
+  white-space: nowrap;
+}
+
 .audiogram-made-hint {
   margin: -4px 0 10px;
   font-size: 0.75rem;

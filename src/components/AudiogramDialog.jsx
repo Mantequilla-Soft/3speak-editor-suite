@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { X, Film, Download, Loader2, Eye, EyeOff, ChevronUp, ChevronDown, Upload, Trash2, Scissors, RotateCcw, Lock, HelpCircle, PenLine } from 'lucide-react'
+import { X, Film, Download, Loader2, Eye, EyeOff, ChevronUp, ChevronDown, Upload, Trash2, Scissors, RotateCcw, Lock, HelpCircle, PenLine, Check } from 'lucide-react'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
 import { chapterTime } from '../utils/chapters'
@@ -331,6 +331,19 @@ export default function AudiogramDialog({
     if (dirty) setConfirmClose(true)
     else onClose()
   }
+  // Save and close (there is at least one audiogram): the audiograms stay with
+  // this audio anyway; the look as it is now becomes the template for the next
+  const saveAndClose = () => {
+    if (busy) return
+    if (dirty && style) {
+      authFetch(api('/api/templates/audiogram'), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ template: { ...style, duration: Math.round(seconds) || style.duration } })
+      }).catch(() => {})
+    }
+    onClose()
+  }
   const order = layers ? stackOrder(layers) : []
   const hasCard = !!image
   const shown = (id) => layers?.[id] && layers[id].on !== false && (id !== 'cover' || hasCard)
@@ -345,7 +358,14 @@ export default function AudiogramDialog({
             <button className="remix-picker-icon-btn" onClick={() => setTourAgain(true)} title="Show the tour again" aria-label="Show the audiogram tour again"><HelpCircle size={16} /></button>
           ) : <span className="remix-picker-icon-spacer" />}
           <h3 id="audiogram-title">Audiograms</h3>
-          <button className="remix-picker-icon-btn" onClick={requestClose} title="Close" disabled={busy}><X size={16} /></button>
+          <div className="audiogram-header-actions">
+            {audiograms.length > 0 && (
+              <button className="compact-render-btn audiogram-save-close" onClick={saveAndClose} disabled={busy} title="Your audiograms stay with this audio and go out with it as Shorts">
+                <Check size={14} /> Save and close
+              </button>
+            )}
+            <button className="remix-picker-icon-btn" onClick={requestClose} title="Close" disabled={busy}><X size={16} /></button>
+          </div>
         </div>
 
         {loadError && <p className="audio-template-error" role="alert">The audiogram settings could not be loaded: {loadError}</p>}
@@ -579,7 +599,10 @@ export default function AudiogramDialog({
           <div className="audiogram-confirm" role="alertdialog" aria-modal="true" aria-labelledby="audiogram-confirm-title">
             <div className="audiogram-confirm-card">
               <h4 id="audiogram-confirm-title">Close without making it?</h4>
-              <p>Your changes to the look are not in an audiogram yet. They are lost when you close.</p>
+              <p>
+                Your changes to the look are not in an audiogram yet. They are lost when you close.
+                {audiograms.length > 0 && <> The {audiograms.length === 1 ? 'audiogram you made stays' : `${audiograms.length} audiograms you made stay`} with this audio.</>}
+              </p>
               <div className="audiogram-confirm-actions">
                 <button className="compact-btn audiogram-confirm-keep" onClick={() => setConfirmClose(false)} autoFocus>Keep editing</button>
                 <button className="compact-render-btn" onClick={() => { setConfirmClose(false); onClose() }}>Close</button>
