@@ -58,6 +58,8 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
   const [closeRequest, setCloseRequest] = useState(0)
   // A remix (someone else's video, posted under it) is never kept as a draft
   const [remixing, setRemixing] = useState(false)
+  // The person's playlist covers (from 3Speak, asked for by the audiograms): [{ title, url }]; null = not asked or no answer yet
+  const [playlistCovers, setPlaylistCovers] = useState(null)
 
   const sendToParent = useCallback((type, payload = {}) => {
     if (!isIframe) return
@@ -137,6 +139,15 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
         case 'drafts-session': {
           setDraftSession(data.session && typeof data.session.token === 'string' ? data.session : null)
           setDraftContext({ hasMedia: !!data.hasMedia, reason: data.reason || null })
+          break
+        }
+
+        case 'playlist-covers': {
+          const list = Array.isArray(data.covers) ? data.covers : []
+          setPlaylistCovers(list
+            .filter(c => c && typeof c.url === 'string' && /^https:\/\//.test(c.url))
+            .slice(0, 50)
+            .map(c => ({ title: String(c.title || '').slice(0, 120), url: c.url })))
           break
         }
 
@@ -586,9 +597,13 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     sendToParent('drafts-sign-in')
   }, [sendToParent])
 
+  const requestPlaylistCovers = useCallback(() => sendToParent('get-playlist-covers'), [sendToParent])
+
   return {
     isIframe,
     compactMode,
+    playlistCovers,
+    requestPlaylistCovers,
     isDesktop,
     theme,
     requestRender,

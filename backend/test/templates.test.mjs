@@ -152,3 +152,24 @@ describe('cleanup keeps template files for good', () => {
     }
   })
 })
+
+describe('the audiogram template (the look of the last audiogram)', () => {
+  test('saved checked, read back, its picture kept by the cleanup', async () => {
+    const [status, { template }] = await call('/audiogram', {
+      user: 'carol',
+      method: 'PUT',
+      body: { template: { format: 'square', wave: { type: 'line', color: '#FFFFFF' }, background: { image: '/api/upload/files/my-cover.png', imageLayout: 'fill' }, line: 'Listen on *3speak.tv*', layouts: { square: { title: { x: 10, y: 20, w: 300, h: 100, z: 7 } } }, junk: 'dropped' } }
+    })
+    assert.equal(status, 200)
+    assert.equal(template.kind, 'audiogram')
+    assert.equal(template.format, 'square')
+    assert.deepEqual(template.wave, { type: 'line', color: '#ffffff' })
+    assert.deepEqual(template.layouts.square.title, { x: 10, y: 20, w: 300, h: 100, z: 7, on: true })
+    assert.equal(template.junk, undefined)
+    assert.deepEqual(template.files, ['my-cover.png'])
+    assert.deepEqual((await call('/audiogram', { user: 'carol' }))[1].template.line, 'Listen on *3speak.tv*')
+    assert.ok((await pinnedUploads(Date.now(), [TEMPLATES_DIR])).has('my-cover'))
+    // the audio template of the same person is a different one
+    assert.deepEqual(await call('/audio', { user: 'carol' }), [200, { template: null }])
+  })
+})

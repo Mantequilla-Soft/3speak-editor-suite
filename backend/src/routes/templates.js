@@ -2,6 +2,7 @@ import { Router } from 'express'
 import path from 'path'
 import fs from 'fs/promises'
 import { verifyEditorToken, referencedFiles } from './projects.js'
+import { cleanAudiogramStyle } from '../services/audiogram.js'
 
 /**
  * The audio template of a signed-in 3Speak user: ONE per person, kept for good
@@ -13,12 +14,15 @@ import { verifyEditorToken, referencedFiles } from './projects.js'
  * UPLOAD_DIR/.templates/<user>/audio.json; it has no expiresAt, so the upload
  * files it lists are kept by the cleanup (index.js) for as long as it exists.
  * Saving a new template replaces the old one (and frees the old one's files).
+ *
+ * Kind "audiogram": the look and arrangement of the last audiogram the person
+ * made (services/audiogram.js), the start of every next one.
  */
 const router = Router()
 const UPLOAD_DIR = process.env.UPLOAD_DIR || '/app/uploads'
 export const TEMPLATES_DIR = path.join(UPLOAD_DIR, '.templates')
 export const MAX_TEMPLATE_BYTES = 256 * 1024
-export const TEMPLATE_KINDS = new Set(['audio'])
+export const TEMPLATE_KINDS = new Set(['audio', 'audiogram'])
 const SLOTS = ['intro', 'outro', 'bed']
 const UPLOAD_URL = /\/api\/upload\/files\/[A-Za-z0-9_.-]+(\?[^\s"]*)?$/
 
@@ -99,7 +103,9 @@ router.get('/:kind', async (req, res) => {
 router.put('/:kind', async (req, res) => {
   const raw = req.body?.template
   if (JSON.stringify(raw || null).length > MAX_TEMPLATE_BYTES) return res.status(413).json({ error: 'Template too large' })
-  const template = cleanTemplate(raw)
+  // audiogram: the look of the last audiogram made (services/audiogram.js)
+  const audiogram = req.params.kind === 'audiogram'
+  const template = audiogram ? (raw && typeof raw === 'object' ? { version: 1, ...cleanAudiogramStyle(raw) } : null) : cleanTemplate(raw)
   if (!template) return res.status(400).json({ error: 'Bad template' })
   const now = Date.now()
   const stored = {
@@ -107,7 +113,7 @@ router.put('/:kind', async (req, res) => {
     kind: req.params.kind,
     user: req.templateUser,
     updatedAt: now,
-    files: referencedFiles(JSON.stringify(template.slots))
+    files: referencedFiles(JSON.stringify(audiogram ? template.background : template.slots))
   }
   const target = fileFor(req.templateUser, req.params.kind)
   await fs.mkdir(path.dirname(target), { recursive: true })

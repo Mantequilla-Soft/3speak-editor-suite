@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useMemo, useState } from 'react'
-import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, HelpCircle, Maximize, Minimize } from 'lucide-react'
+import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, HelpCircle, Maximize, Minimize, Scissors } from 'lucide-react'
 import { useFFmpeg } from './hooks/useFFmpeg'
 import { useCanvasExport } from './hooks/useCanvasExport'
 import { useTimeline } from './hooks/useTimeline'
@@ -27,7 +27,7 @@ import TooLargeNotice from './components/TooLargeNotice'
 import SilenceCutModal, { loadSettings as loadAutoCutSettings } from './components/SilenceCutModal'
 import AudioTemplateDialog from './components/AudioTemplateDialog'
 import ChaptersDialog from './components/ChaptersDialog'
-import { newChapter, moveChapter, resolveChapters, chapterSpans, MAX_CHAPTERS } from './utils/chapters'
+import { newChapter, moveChapter, resolveChapters, chapterSpans, chapterTime, MAX_CHAPTERS } from './utils/chapters'
 import { duckPlans, clipDuckSetting, applyMasterDuck, DUCK_DEPTHS, DUCK_DEFAULT_DB } from './utils/duck'
 import { trackNumbers, trackLabel } from './utils/trackNumbers'
 import { addFlag, moveFlag, removeFlag, resolveFlags, cleanFlags } from './utils/flags'
@@ -36,6 +36,8 @@ import { applyAudioTemplate, removeAudioTemplate, appliedRoles, hasSlots } from 
 import { loadLoudness, planCuts } from './utils/silenceDetect'
 import { combineLoudness, groupSpan, overlappingVoices } from './utils/groupSilence'
 import { isAudioMode } from './utils/editorMode'
+import AudiogramDialog from './components/AudiogramDialog'
+import { audiogramsToPost, pieceOf } from './utils/audiogramLayers'
 import { audioFileName } from './utils/audioTemplate'
 import BeatSyncModal from './components/BeatSyncModal'
 import StickerPicker from './components/StickerPicker'
@@ -261,7 +263,9 @@ function App() {
     clearRenderStatus,
     remixSource,
     remixPrompt,
-    clearRemixPrompt
+    clearRemixPrompt,
+    playlistCovers,
+    requestPlaylistCovers
   } = useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay, audioMode, master, title: audioTitle, chapters: chapterList })
 
   // Apply theme to document on mount and changes
@@ -1172,6 +1176,37 @@ function App() {
 
   // Chapters: added at the playhead (M), renamed, moved, removed
   const [chaptersOpen, setChaptersOpen] = useState(false)
+  // Audiograms (after an export): the ones made, the piece of the timeline
+  // they are made from, and picking that piece on the timeline
+  const [audiogramOpen, setAudiogramOpen] = useState(false)
+  const [audiograms, setAudiograms] = useState([])
+  const [audiogramRange, setAudiogramRange] = useState(null)
+  const [pickingRange, setPickingRange] = useState(false)
+  const rangeBeforePickRef = useRef(null)
+  const addAudiogram = useCallback((a) => setAudiograms(list => [...list, a]), [])
+  const updateAudiogram = useCallback((id, patch) => setAudiograms(list => list.map(a => (a.id === id ? { ...a, ...patch } : a))), [])
+  const removeAudiogram = useCallback((id) => setAudiograms(list => list.filter(a => a.id !== id)), [])
+  const startPickingRange = useCallback(() => {
+    rangeBeforePickRef.current = audiogramRange
+    // start from what the dialog showed, so there is a band to see at once
+    setAudiogramRange(pieceOf(audiogramRange, timelineEnd, playheadPosition))
+    setAudiogramOpen(false)
+    setPickingRange(true)
+  }, [audiogramRange, timelineEnd, playheadPosition])
+  const finishPickingRange = useCallback((keep) => {
+    if (!keep) setAudiogramRange(rangeBeforePickRef.current)
+    setPickingRange(false)
+    setAudiogramOpen(true)
+  }, [])
+  useEffect(() => {
+    if (!pickingRange) return
+    const onKey = (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); finishPickingRange(false) }
+      if (e.key === 'Enter' && !isTypingTarget(e.target)) { e.preventDefault(); finishPickingRange(true) }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [pickingRange, finishPickingRange])
   const cleaning = useCleaningStatus()
   // Duck is a clip setting only. A whole-show Duck (an old draft, or a
   // template with "duck the music") becomes the music clips' own setting.
@@ -1478,6 +1513,12 @@ function App() {
                   <Download size={14} />
                   <span>Download</span>
                 </a>
+                {audioMode && (
+                  <button className="compact-download-btn" onClick={() => setAudiogramOpen(true)} title="Short videos of pieces of the episode, to share or to post as Shorts with it">
+                    <Film size={14} />
+                    <span>Audiograms{audiograms.length ? ` (${audiograms.length})` : ''}</span>
+                  </button>
+                )}
                 {isIframe && (
                   <button
                     className="compact-render-btn"
@@ -1623,6 +1664,16 @@ function App() {
 
         {/* Timeline (includes its own toolbar) */}
         <div className="compact-timeline-section">
+          {audioMode && pickingRange && (
+            <div className="range-pick-bar" role="status">
+              <Scissors size={14} />
+              <span>Drag across the timeline to pick the audiogram's piece (up to 2 minutes).</span>
+              {audiogramRange && <strong data-testid="range-pick-value">{chapterTime(audiogramRange.start)} – {chapterTime(audiogramRange.end)} · {Math.round(audiogramRange.end - audiogramRange.start)}s</strong>}
+              <span className="range-pick-spacer" />
+              <button className="compact-btn" onClick={() => finishPickingRange(false)}>Cancel</button>
+              <button className="compact-render-btn" onClick={() => finishPickingRange(true)} disabled={!audiogramRange || audiogramRange.end - audiogramRange.start < 3}>Use this piece</button>
+            </div>
+          )}
           <Timeline
             tracks={tracks}
             selectedClipId={selectedClipId}
@@ -1674,6 +1725,9 @@ function App() {
             onOpenChapters={audioMode ? () => setChaptersOpen(true) : undefined}
             onGroupVoices={audioMode ? groupWithVoices : undefined}
             isPlaying={previewPlaying}
+            range={audioMode && pickingRange ? audiogramRange : null}
+            rangePicking={audioMode && pickingRange}
+            onRangeChange={setAudiogramRange}
           />
 
           {/* Reversing overlay */}
@@ -1756,6 +1810,25 @@ function App() {
             allCount={audioMode && voiceClips.some(c => c.id === autoCutClip.id) ? voiceClips.length : 0}
             group={autoCutGroup}
             onClose={() => setAutoCutClipId(null)}
+          />
+        )}
+
+        {audiogramOpen && renderStatus?.status === 'completed' && renderStatus.outputUrl && (
+          <AudiogramDialog
+            outputUrl={renderStatus.outputUrl}
+            length={timelineEnd}
+            playheadPosition={playheadPosition}
+            title={audioTitle}
+            chapters={resolvedChapters}
+            range={audiogramRange}
+            onPickRange={startPickingRange}
+            audiograms={audiograms}
+            onAddAudiogram={addAudiogram}
+            onUpdateAudiogram={updateAudiogram}
+            onRemoveAudiogram={removeAudiogram}
+            playlistCovers={playlistCovers}
+            onRequestCovers={requestPlaylistCovers}
+            onClose={() => setAudiogramOpen(false)}
           />
         )}
 
@@ -1876,6 +1949,8 @@ function App() {
                       ...(audioMode && { mediaType: 'audio', fileName: audioFileName(audioTitle), durationSec: Math.round(timelineEnd * 1000) / 1000 }),
                       // [{ start, end, title }]: 3Speak lists them in the description
                       ...(audioMode && chapterList.length > 0 && { chapters: chapterList }),
+                      // Audiograms marked "Post together with the audio": 3Speak posts them as Shorts linking to the episode
+                      ...(audioMode && audiogramsToPost(audiograms).length > 0 && { audiograms: audiogramsToPost(audiograms) }),
                       ...(remixSource && { remixSource }),
                       ...(musicCredits.length > 0 && { musicCredits })
                     })

@@ -55,7 +55,7 @@ const USER = 'e2etester'
 const children = []
 const backend = spawn(process.execPath, ['src/index.js'], {
   cwd: path.join(ROOT, 'backend'),
-  env: { ...process.env, PORT: String(BACKEND_PORT), EDITOR_TOKEN_SECRET: SECRET, UPLOAD_DIR: path.join(DATA, 'uploads'), UPLOADS_DIR: path.join(DATA, 'uploads'), RENDERED_DIR: path.join(DATA, 'rendered'), WORK_DIR: path.join(DATA, 'work') },
+  env: { ...process.env, PORT: String(BACKEND_PORT), EDITOR_TOKEN_SECRET: SECRET, UPLOAD_DIR: path.join(DATA, 'uploads'), UPLOADS_DIR: path.join(DATA, 'uploads'), RENDERED_DIR: path.join(DATA, 'rendered'), WORK_DIR: path.join(DATA, 'work'), CHROMIUM_PATH: CHROME },
   stdio: ['ignore', 'ignore', 'inherit']
 })
 children.push(backend)
@@ -368,7 +368,7 @@ try {
     await g.ctx.close()
   })
 
-  await step('podcast tools: chapters follow the cuts into the MP3 and the post, Studio voice on one piece, music ducked, no audiogram button', async () => {
+  await step('podcast tools: chapters follow the cuts into the MP3 and the post, Studio voice on one piece, music ducked, audiograms picked on the timeline, arranged, posted with the audio', async () => {
     fs.rmSync(projectsDir, { recursive: true, force: true })
     const p = await openEditor()
     const f = p.frame
@@ -441,8 +441,58 @@ try {
     const second = timeline.chapters[1]
     assert.ok(second.start > 1.5 && second.start < 2.3, `second chapter moved with the cut, at ${second.start}`)
     await f.getByRole('button', { name: 'Use this audio' }).first().waitFor({ timeout: 90000 })
-    // The audiogram is switched off for now: no button after the export
-    assert.equal(await f.getByRole('button', { name: 'Audiogram' }).count(), 0)
+    // Audiograms: pick the piece on the timeline, move the title, make one, mark it to post
+    await f.getByRole('button', { name: /^Audiograms/ }).click()
+    let ag = f.getByRole('dialog', { name: 'Audiograms' })
+    await ag.locator('.audiogram-box[data-layer="title"]').waitFor({ timeout: 20000 })
+    assert.equal(await ag.getByLabel('Title on the video').inputValue(), 'speech')
+    await ag.getByRole('button', { name: 'Choose on the timeline' }).click()
+    await f.locator('.range-pick-bar').waitFor()
+    const ruler = await f.locator('.timeline-ruler').boundingBox()
+    await p.page.mouse.move(ruler.x + 3, ruler.y + ruler.height / 2)
+    await p.page.mouse.down()
+    await p.page.mouse.move(ruler.x + ruler.width / 2, ruler.y + ruler.height / 2, { steps: 8 })
+    await p.page.mouse.move(ruler.x + ruler.width - 4, ruler.y + ruler.height / 2, { steps: 8 })
+    await p.page.mouse.up()
+    await f.getByTestId('timeline-range').waitFor()
+    const picked = await f.getByTestId('range-pick-value').innerText()
+    await f.getByRole('button', { name: 'Use this piece' }).click()
+    ag = f.getByRole('dialog', { name: 'Audiograms' })
+    assert.equal((await ag.getByTestId('audiogram-piece').innerText()).replace(/\s+/g, ' '), picked.replace(/\s+/g, ' '), 'the dialog uses the picked piece')
+    const pieceSeconds = +/(\d+)s$/.exec(picked)[1]
+    assert.ok(pieceSeconds >= 3, picked)
+    // drag the title 60 preview px down
+    const tb = await ag.locator('.audiogram-box[data-layer="title"]').boundingBox()
+    await p.page.mouse.move(tb.x + tb.width / 2 + 30, tb.y + 10)
+    await p.page.mouse.down()
+    await p.page.mouse.move(tb.x + tb.width / 2 + 30, tb.y + 70, { steps: 6 })
+    await p.page.mouse.up()
+    await ag.getByRole('radio', { name: 'Line' }).click()
+    await ag.getByRole('button', { name: 'Make audiogram' }).click()
+    await ag.getByTestId('audiogram-item').first().waitFor({ timeout: 120000 })
+    const agUrl = await ag.locator('[data-testid="audiogram-item"] video').first().getAttribute('src')
+    assert.ok(agUrl.startsWith(`${BACKEND}/rendered/audiogram-`), agUrl)
+    const agFile = path.join(DATA, 'rendered', path.basename(new URL(agUrl).pathname))
+    const agProbe = JSON.parse(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'stream=codec_name,width,height:format=duration', '-of', 'json', agFile], { encoding: 'utf8' }))
+    const vs = agProbe.streams.find(x => x.codec_name === 'h264')
+    assert.deepEqual([vs.width, vs.height], [1080, 1920])
+    assert.ok(agProbe.streams.some(x => x.codec_name === 'aac'))
+    assert.ok(Math.abs(+agProbe.format.duration - pieceSeconds) < 1.2, `audiogram ${agProbe.format.duration}s, piece ${pieceSeconds}s`)
+    // the look is the template now: kept on the server, the moved title in it
+    const agTemplate = path.join(DATA, 'uploads', '.templates', USER, 'audiogram.json')
+    const tpl = JSON.parse(await until(() => (fs.existsSync(agTemplate) ? fs.readFileSync(agTemplate, 'utf8') : null), 'audiogram template saved'))
+    assert.equal(tpl.wave.type, 'line')
+    assert.ok(tpl.layouts.vertical.title.y > 520 + 150, `title moved down in the template (y ${tpl.layouts.vertical.title.y})`)
+    await ag.getByRole('button', { name: 'Post together with the audio' }).click()
+    await ag.getByLabel('Text for Short 1').fill('A teaser of the new episode')
+    await ag.getByTitle('Close').click()
+    // opened again: the template is the starting point, the audiogram is still there
+    await f.getByRole('button', { name: 'Audiograms (1)' }).click()
+    ag = f.getByRole('dialog', { name: 'Audiograms' })
+    await ag.getByText('Your last audiogram is the starting point').waitFor({ timeout: 15000 })
+    assert.equal(await ag.getByRole('radio', { name: 'Line' }).getAttribute('aria-checked'), 'true')
+    assert.equal(await ag.getByRole('button', { name: 'Post together with the audio' }).getAttribute('aria-pressed'), 'true')
+    await ag.getByTitle('Close').click()
     // phones: the finished export's buttons still fit
     await p.page.setViewportSize({ width: 390, height: 844 })
     await sleep(300)
@@ -453,6 +503,10 @@ try {
     await f.locator('.video-preview-send').click()
     const post = await until(() => p.page.evaluate(() => window.__messages.find(m => m.type === 'post-to-3speak')), 'post-to-3speak')
     assert.deepEqual(post.chapters.map(c => c.title), ['Intro', 'Second part'])
+    assert.equal(post.audiograms.length, 1)
+    assert.equal(post.audiograms[0].url, agUrl)
+    assert.equal(post.audiograms[0].description, 'A teaser of the new episode')
+    assert.deepEqual([post.audiograms[0].width, post.audiograms[0].height], [1080, 1920])
     assert.ok(Math.abs(post.chapters.at(-1).end - post.durationSec) < 0.01, 'the last chapter runs to the end')
     // ID3 chapters in the MP3 itself
     const mp3 = path.join(DATA, 'rendered', path.basename(new URL(post.outputUrl).pathname))
