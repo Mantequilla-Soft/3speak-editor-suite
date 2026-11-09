@@ -7171,6 +7171,15 @@ input[type="range"] {
   font-weight: 500;
 }
 
+.range-pick-bar .range-pick-play {
+  gap: 0.35rem;
+}
+
+.range-pick-bar .range-pick-play.active {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
 .range-pick-bar strong {
   color: var(--text-primary);
 }

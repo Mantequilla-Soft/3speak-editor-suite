@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useMemo, useState } from 'react'
-import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, HelpCircle, Maximize, Minimize, Scissors } from 'lucide-react'
+import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, HelpCircle, Maximize, Minimize, Scissors, Play, Pause } from 'lucide-react'
 import { useFFmpeg } from './hooks/useFFmpeg'
 import { useCanvasExport } from './hooks/useCanvasExport'
 import { useTimeline } from './hooks/useTimeline'
@@ -1186,7 +1186,49 @@ function App() {
   const addAudiogram = useCallback((a) => setAudiograms(list => [...list, a]), [])
   const updateAudiogram = useCallback((id, patch) => setAudiograms(list => list.map(a => (a.id === id ? { ...a, ...patch } : a))), [])
   const removeAudiogram = useCallback((id) => setAudiograms(list => list.filter(a => a.id !== id)), [])
+  // Listening to the piece while picking: plays from its start, stops at its
+  // end and goes back to the start (Play the piece, or Space)
+  const [rangePreview, setRangePreview] = useState(false)
+  const rangeRef = useRef(audiogramRange)
+  rangeRef.current = audiogramRange
+  const rangePreviewRef = useRef(false)
+  rangePreviewRef.current = rangePreview
+  const sawRangePlayRef = useRef(false)
+  const stopRangePreview = useCallback((rewind = true) => {
+    setRangePreview(false)
+    previewControlRef.current?.pause()
+    if (rewind && rangeRef.current) previewControlRef.current?.seek(rangeRef.current.start)
+  }, [])
+  const toggleRangePreview = useCallback(() => {
+    const r = rangeRef.current
+    if (rangePreviewRef.current) { stopRangePreview(); return }
+    if (!r || r.end - r.start < 3) return
+    sawRangePlayRef.current = false
+    setRangePreview(true)
+    previewControlRef.current?.playFrom(r.start)
+  }, [stopRangePreview])
+  useEffect(() => {
+    if (!rangePreview) return
+    const id = setInterval(() => {
+      const pos = previewControlRef.current?.getPosition?.()
+      const r = rangeRef.current
+      if (!r || (typeof pos === 'number' && pos >= r.end - 0.03)) stopRangePreview()
+    }, 25)
+    return () => clearInterval(id)
+  }, [rangePreview, stopRangePreview])
+  // the preview stopped by itself (the end of the episode, or paused elsewhere)
+  useEffect(() => {
+    if (!rangePreview) return
+    if (previewPlaying) sawRangePlayRef.current = true
+    else if (sawRangePlayRef.current) stopRangePreview()
+  }, [rangePreview, previewPlaying, stopRangePreview])
+  // a new piece: stop listening to the old one
+  useEffect(() => {
+    if (rangePreviewRef.current) stopRangePreview()
+  }, [audiogramRange, stopRangePreview])
+
   const startPickingRange = useCallback(() => {
+    previewControlRef.current?.pause()
     rangeBeforePickRef.current = audiogramRange
     // start from what the dialog showed, so there is a band to see at once
     setAudiogramRange(pieceOf(audiogramRange, timelineEnd, playheadPosition))
@@ -1194,28 +1236,31 @@ function App() {
     setPickingRange(true)
   }, [audiogramRange, timelineEnd, playheadPosition])
   const finishPickingRange = useCallback((keep) => {
+    if (rangePreviewRef.current) stopRangePreview(false)
     if (!keep) setAudiogramRange(rangeBeforePickRef.current)
     setPickingRange(false)
     setAudiogramOpen(true)
-  }, [])
+  }, [stopRangePreview])
   // The first time a piece is picked: a short tour of how
   const [showPickTour, finishPickTour] = useFirstTimeTour('3speak-audiogram-pick-tour-done', audioMode && pickingRange)
   // While picking, the editor is locked (App.css .picking-range): no clicks
   // outside the timeline, and no shortcuts. Escape cancels, Enter uses the
-  // piece (on a button of the bar: that button).
+  // piece (on a button of the bar: that button), Space plays or stops the piece.
   useEffect(() => {
     if (!pickingRange) return
     const onKey = (e) => {
       if (e.key === 'Tab') return
-      if ((e.key === 'Enter' || e.key === ' ') && e.target.closest?.('.range-pick-bar button, .tour-overlay button')) return
       e.stopPropagation()
+      // Enter on a button of the bar or the tour: that button
+      if (e.key === 'Enter' && e.target.closest?.('.range-pick-bar button, .tour-overlay button')) return
       e.preventDefault()
       if (e.key === 'Escape') finishPickingRange(false)
       else if (e.key === 'Enter') finishPickingRange(true)
+      else if (e.key === ' ' && !e.repeat) toggleRangePreview()
     }
     window.addEventListener('keydown', onKey, true)
     return () => window.removeEventListener('keydown', onKey, true)
-  }, [pickingRange, finishPickingRange])
+  }, [pickingRange, finishPickingRange, toggleRangePreview])
   const cleaning = useCleaningStatus()
   // Duck is a clip setting only. A whole-show Duck (an old draft, or a
   // template with "duck the music") becomes the music clips' own setting.
@@ -1678,6 +1723,15 @@ function App() {
               <Scissors size={14} />
               <span>Drag across the timeline to pick the audiogram's piece (up to 2 minutes).</span>
               {audiogramRange && <strong data-testid="range-pick-value">{chapterTime(audiogramRange.start)} – {chapterTime(audiogramRange.end)} · {Math.round(audiogramRange.end - audiogramRange.start)}s</strong>}
+              <button
+                className={`compact-btn range-pick-play${rangePreview ? ' active' : ''}`}
+                onClick={toggleRangePreview}
+                disabled={!audiogramRange || audiogramRange.end - audiogramRange.start < 3}
+                aria-pressed={rangePreview}
+                title="Listen to just this piece (Space)"
+              >
+                {rangePreview ? <Pause size={14} /> : <Play size={14} />} {rangePreview ? 'Stop' : 'Play the piece'}
+              </button>
               <span className="range-pick-spacer" />
               <button className="compact-btn" onClick={() => finishPickingRange(false)}>Cancel</button>
               <button className="compact-render-btn" onClick={() => finishPickingRange(true)} disabled={!audiogramRange || audiogramRange.end - audiogramRange.start < 3}>Use this piece</button>

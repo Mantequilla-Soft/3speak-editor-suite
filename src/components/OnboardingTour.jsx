@@ -164,6 +164,12 @@ export const RANGE_PICK_TOUR_STEPS = [
     position: 'above'
   },
   {
+    target: '.range-pick-play',
+    title: 'Listen to it',
+    text: 'Play the piece (or Space) plays just the part you picked, then goes back to its start.',
+    position: 'above'
+  },
+  {
     target: '.range-pick-bar',
     title: 'Use it',
     text: 'Use this piece (or Enter) takes it back to your audiogram, Cancel (or Escape) keeps the old one. Until then the rest of the editor is locked, so nothing else changes by accident.',

@@ -484,6 +484,43 @@ try {
     await p.page.mouse.move(clipBox.x + clipBox.width / 2 + 60, clipBox.y + clipBox.height / 2, { steps: 5 })
     await p.page.mouse.up()
     assert.equal((await f.locator('.timeline-clip-v2').first().boundingBox()).x, clipLeft, 'the clip stayed where it was')
+    // Play the piece: plays only the picked part, stops at its end and goes back to its start
+    {
+      const r0 = await f.locator('.timeline-ruler').boundingBox()
+      await p.page.mouse.move(r0.x + 3, r0.y + r0.height / 2)
+      await p.page.mouse.down()
+      await p.page.mouse.move(r0.x + r0.width * 0.4, r0.y + r0.height / 2, { steps: 8 })
+      await p.page.mouse.up()
+      const band = await f.getByTestId('timeline-range').boundingBox()
+      const playBtn = f.getByRole('button', { name: 'Play the piece' })
+      await playBtn.click()
+      await f.getByRole('button', { name: 'Stop' }).waitFor()
+      let maxX = 0
+      let moved = false
+      const started = Date.now()
+      while (Date.now() - started < 30000 && await f.getByRole('button', { name: 'Stop' }).count()) {
+        const ph = await f.locator('.timeline-playhead').boundingBox()
+        if (ph) { maxX = Math.max(maxX, ph.x); if (ph.x > band.x + 4) moved = true }
+        await sleep(40)
+      }
+      assert.ok(moved, 'the playhead ran through the piece')
+      assert.ok(maxX <= band.x + band.width + 6, `the playhead stayed in the piece (${maxX} > ${band.x + band.width})`)
+      await playBtn.waitFor()
+      let back = null
+      for (let i = 0; i < 40; i++) {
+        back = await f.locator('.timeline-playhead').boundingBox()
+        if (Math.abs(back.x - band.x) <= 4) break
+        await sleep(50)
+      }
+      assert.ok(Math.abs(back.x - band.x) <= 4, `back at the start of the piece (${back.x} vs ${band.x})`)
+      // Space plays it too, and stops it (also with the Play button focused)
+      await playBtn.focus()
+      await p.page.keyboard.press('Space')
+      await f.getByRole('button', { name: 'Stop' }).waitFor()
+      await p.page.keyboard.press('Space')
+      await playBtn.waitFor()
+      assert.ok(await f.locator('.range-pick-bar').isVisible(), 'still picking')
+    }
     // Cancel and Use this piece: text buttons of the same height, the words inside them
     const cancelBtn = f.locator('.range-pick-bar').getByRole('button', { name: 'Cancel' })
     const cb = await cancelBtn.boundingBox()
