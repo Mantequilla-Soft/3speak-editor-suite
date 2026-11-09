@@ -593,6 +593,7 @@ function Timeline({
   onSplitClip,
   onSplitAtPlayhead,
   onRemoveGap,
+  rippleTrackId = null,
   isPlayheadOnGap,
   onDuplicate,
   onGroupClips,
@@ -1312,7 +1313,9 @@ function Timeline({
             className="action-btn"
             onClick={() => onRemoveGap && onRemoveGap()}
             disabled={!isPlayheadOnGap}
-            title="Remove gap at playhead (G)"
+            title={rippleTrackId
+              ? `Close the gap at the playhead on track ${numbers.get(rippleTrackId)} (G). Other tracks stay as they are.`
+              : (selectedClipId ? 'No gap at the playhead on the selected clip\'s track' : 'Remove gap at playhead (G)')}
           >
             <ArrowLeftToLine size={14} /> <span>Ripple</span>
           </button>
