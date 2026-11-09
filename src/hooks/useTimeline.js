@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react'
 import { fitAt, placeOnTrack } from '../utils/placement'
+import { rippleTrackId, rippleTrack } from '../utils/ripple'
 import { finiteDuration, isUsableDuration, pickDuration } from '../utils/mediaDuration'
 import { isHlsUrl, getHlsDuration } from '../utils/hlsHelper'
 import { downloadHlsToMp4 } from '../utils/hlsDownloader'
@@ -2073,80 +2074,19 @@ export function useTimeline() {
     }))
   }, [setTracksWithHistory])
 
-  // Remove gap at playhead position across all tracks
+  // Ripple: close the gap at the playhead on ONE track, the selected clip's
+  // (nothing selected: the topmost track with a gap there), see utils/ripple.js.
+  // Tracks in the order the timeline shows them.
+  const shownTracks = useMemo(() => [...tracks.filter(t => t.type === 'video'), ...tracks.filter(t => t.type === 'audio')], [tracks])
+  const rippleTarget = useMemo(
+    () => rippleTrackId(shownTracks, playheadPosition, selectedClipId || selectedClipIds[0] || null),
+    [shownTracks, playheadPosition, selectedClipId, selectedClipIds]
+  )
   const removeGapAtPlayhead = useCallback(() => {
-    setTracksWithHistory(prev => prev.map(track => {
-      // Find the end of the last clip before playhead on this track
-      let prevEnd = 0
-      for (const c of track.clips) {
-        const cEnd = (c.timelinePosition || 0) + (c.endTime - c.startTime)
-        if (cEnd <= playheadPosition + 0.01) {
-          prevEnd = Math.max(prevEnd, cEnd)
-        }
-      }
-
-      // Find the start of the first clip after playhead on this track
-      let nextStart = Infinity
-      for (const c of track.clips) {
-        const cStart = c.timelinePosition || 0
-        if (cStart >= playheadPosition - 0.01 && cStart > prevEnd - 0.01) {
-          nextStart = Math.min(nextStart, cStart)
-        }
-      }
-
-      if (nextStart === Infinity) return track // No clips after playhead
-
-      const gap = nextStart - prevEnd
-      if (gap < 0.01) return track // No gap
-
-      // Shift all clips at or after nextStart left by gap amount
-      const newClips = track.clips.map(c => {
-        const cStart = c.timelinePosition || 0
-        if (cStart >= nextStart - 0.01) {
-          return { ...c, timelinePosition: cStart - gap }
-        }
-        return c
-      })
-
-      return { ...track, clips: newClips }
-    }))
-  }, [setTracksWithHistory, playheadPosition])
-
-  // Check if playhead is on a gap (not inside any clip) and there are clips after it
-  const isPlayheadOnGap = useMemo(() => {
-    for (const track of tracks) {
-      if (track.clips.length === 0) continue
-
-      let onClip = false
-      let hasClipAfter = false
-      let prevEnd = 0
-
-      for (const c of track.clips) {
-        const cStart = c.timelinePosition || 0
-        const cEnd = cStart + (c.endTime - c.startTime)
-
-        if (playheadPosition >= cStart - 0.01 && playheadPosition < cEnd + 0.01) {
-          onClip = true
-        }
-        if (cStart > playheadPosition + 0.01) {
-          hasClipAfter = true
-        }
-        if (cEnd <= playheadPosition + 0.01) {
-          prevEnd = Math.max(prevEnd, cEnd)
-        }
-      }
-
-      // Gap exists if playhead is not on a clip, there are clips after, and there's actual space
-      if (!onClip && hasClipAfter) {
-        return true
-      }
-      // Also check if playhead is before the first clip (gap at start)
-      if (!onClip && playheadPosition < prevEnd) {
-        continue
-      }
-    }
-    return false
-  }, [tracks, playheadPosition])
+    if (!rippleTarget) return
+    setTracksWithHistory(prev => rippleTrack(prev, rippleTarget, playheadPosition))
+  }, [setTracksWithHistory, playheadPosition, rippleTarget])
+  const isPlayheadOnGap = !!rippleTarget
 
   // Group selected clips together
   const groupClips = useCallback((clipIds) => {
@@ -2328,6 +2268,7 @@ export function useTimeline() {
     splitClipAtPlayhead,
     removeGapAtPlayhead,
     isPlayheadOnGap,
+    rippleTarget,
     groupClips,
     ungroupClips,
     getTotalDuration,

@@ -121,6 +121,7 @@ function App() {
     uploadFileToServer,
     removeGapAtPlayhead,
     isPlayheadOnGap,
+    rippleTarget,
     groupClips,
     ungroupClips,
     moveClipToTrack,
@@ -1617,6 +1618,7 @@ function App() {
             onSplitAtPlayhead={splitClipAtPlayhead}
             onRemoveGap={removeGapAtPlayhead}
             isPlayheadOnGap={isPlayheadOnGap}
+            rippleTrackId={rippleTarget}
             onDuplicate={duplicateClip}
             onGroupClips={groupSelection}
             onUngroupClips={ungroupClips}
@@ -2046,6 +2048,7 @@ function App() {
               onSplitAtPlayhead={splitClipAtPlayhead}
               onRemoveGap={removeGapAtPlayhead}
               isPlayheadOnGap={isPlayheadOnGap}
+            rippleTrackId={rippleTarget}
               onDuplicate={duplicateClip}
               onGroupClips={groupSelection}
               onUngroupClips={ungroupClips}

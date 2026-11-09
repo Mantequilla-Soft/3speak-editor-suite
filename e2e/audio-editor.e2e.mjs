@@ -989,6 +989,51 @@ try {
     await r.ctx.close()
   })
 
+  await step('Ripple closes the gap on the selected clip\'s track only: the music on track 2 stays', async () => {
+    if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
+    const r = await openEditor()
+    const f = r.frame
+    await f.locator('.timeline-clip-v2.audio').first().waitFor({ timeout: 15000 })
+    const id0 = await f.locator('.timeline-clip-v2.audio').first().getAttribute('data-clip-id')
+    await until(() => drafts().find(p => clipsOf(p.state).some(c => c.id === id0 && /\/api\/upload\/files\//.test(c.url || ''))), 'uploaded', 45000)
+    await f.locator('.track-label.audio').nth(1).locator('input[type=file]').setInputFiles(path.join(HOST_DIR, 'bed.wav'))
+    await f.locator('.timeline-track-v2.audio').nth(1).locator('.timeline-clip-v2').first().waitFor({ timeout: 15000 })
+    await f.locator('.timeline-track-v2.audio').first().locator('.timeline-clip-v2').first().click()
+    await f.getByRole('button', { name: /Cut silences/ }).click()
+    await f.getByRole('dialog', { name: 'Cut silences' }).waitFor()
+    await until(async () => /cuts/.test(await f.locator('.silence-cut-summary').innerText().catch(() => '')), 'cut plan summary')
+    await f.getByRole('button', { name: /Edit for me|This clip only/ }).click()
+    const voice = f.locator('.timeline-track-v2.audio').first().locator('.timeline-clip-v2')
+    await until(async () => (await voice.count()) === 3, 'three pieces')
+    // the middle piece out: a gap on track 1 (the first piece is left alone: no ripple from the delete)
+    await voice.nth(1).click()
+    await r.page.keyboard.press('Delete')
+    await f.getByRole('alertdialog').getByRole('button', { name: 'Remove' }).click()
+    await until(async () => (await voice.count()) === 2, 'two pieces, a gap between')
+    const before = await until(() => { const p = drafts()[0]; const v = p && p.state.tracks.find(t => !t.music); return v && v.clips.length === 2 && p.state.tracks.find(t => t.music).clips.length === 1 ? p.state : null }, 'saved with the gap', 15000)
+    const [a, b] = before.tracks.find(t => !t.music).clips.slice().sort((x, y) => x.timelinePosition - y.timelinePosition)
+    const musicAt = before.tracks.find(t => t.music).clips[0].timelinePosition
+    // select the first voice piece, playhead into the gap, G
+    await voice.first().click()
+    await f.evaluate(() => document.querySelector('.timeline-content').scrollLeft = 0)
+    const pxPerSec = await voice.first().evaluate((el, len) => el.offsetWidth / len, a.endTime - a.startTime)
+    const gapMid = (a.timelinePosition + (a.endTime - a.startTime) + b.timelinePosition) / 2
+    await f.locator('.timeline-ruler').click({ position: { x: Math.round(gapMid * pxPerSec), y: 5 } })
+    await until(async () => !(await f.getByRole('button', { name: /Ripple/ }).isDisabled()), 'Ripple enabled', 3000)
+    assert.match(await f.getByRole('button', { name: /Ripple/ }).getAttribute('title'), /on track 1/)
+    await voice.first().click() // the ruler click keeps the selection; make sure
+    await r.page.keyboard.press('g')
+    const after = await until(() => {
+      const p = drafts()[0]
+      const v = p?.state.tracks.find(t => !t.music)?.clips.find(c => c.id === b.id)
+      return v && Math.abs(v.timelinePosition - b.timelinePosition) > 0.01 ? p.state : null
+    }, 'the second piece moved up', 15000)
+    const b2 = after.tracks.find(t => !t.music).clips.find(c => c.id === b.id)
+    assert.ok(Math.abs(b2.timelinePosition - (a.timelinePosition + (a.endTime - a.startTime))) < 0.02, `closed the gap: ${b2.timelinePosition}`)
+    assert.equal(after.tracks.find(t => t.music).clips[0].timelinePosition, musicAt, 'the music on track 2 did not move')
+    await r.ctx.close()
+  })
+
   await step('the shorts video editor is unchanged (no mode, Video 1 + Audio 1, Render, no audio tools)', async () => {
     const v = await openEditor({ file: null, mode: 'video' })
     const ready = await v.page.evaluate(() => window.__messages.find(m => m.type === 'editor-ready'))
