@@ -31,6 +31,7 @@ import AudiogramDialog from './components/AudiogramDialog'
 import { newChapter, moveChapter, resolveChapters, chapterSpans, MAX_CHAPTERS } from './utils/chapters'
 import { duckPlans, clipDuckSetting, applyMasterDuck, DUCK_DEPTHS, DUCK_DEFAULT_DB } from './utils/duck'
 import { trackNumbers, trackLabel } from './utils/trackNumbers'
+import { addFlag, moveFlag, removeFlag, resolveFlags, cleanFlags } from './utils/flags'
 import { useAudioTemplate } from './hooks/useAudioTemplate'
 import { applyAudioTemplate, removeAudioTemplate, appliedRoles, hasSlots } from './utils/audioTemplate'
 import { loadLoudness, planCuts } from './utils/silenceDetect'
@@ -211,7 +212,20 @@ function App() {
   const [chapters, setChapters] = useState([])
   // The preview is playing (the timeline then keeps the playhead in the middle)
   const [previewPlaying, setPreviewPlaying] = useState(false)
+  // The timeline's zoom (px per second): saved with the draft, and handed back
+  // to the timeline when a draft opens ({ value, key }: a new key re-applies it)
+  const [timelineZoom, setTimelineZoom] = useState(null)
+  const [restoreZoom, setRestoreZoom] = useState(null)
   const resolvedChapters = useMemo(() => (audioMode ? resolveChapters(tracks, chapters, timelineEnd) : []), [audioMode, tracks, chapters, timelineEnd])
+  // Flags: the creator's own numbered markers (utils/flags.js), kept with the draft
+  const [flags, setFlags] = useState([])
+  const resolvedFlags = useMemo(() => resolveFlags(tracks, flags, Math.max(timelineEnd, 0)), [tracks, flags, timelineEnd])
+  const tracksNowRef = useRef(tracks)
+  tracksNowRef.current = tracks
+  const handleAddFlag = useCallback((at) => setFlags(f => addFlag(f, tracksNowRef.current, at)), [])
+  const handleMoveFlag = useCallback((id, at) => setFlags(f => moveFlag(f, tracksNowRef.current, id, at)), [])
+  const handleRemoveFlag = useCallback((id) => setFlags(f => removeFlag(f, id)), [])
+  const addFlagRef = useRef(null)
   const chapterList = useMemo(() => chapterSpans(resolvedChapters, timelineEnd), [resolvedChapters, timelineEnd])
   // Every ducked clip's plan (its own Duck setting, or the top bar's for music)
   const duck = useMemo(() => (audioMode ? duckPlans(tracks) : null), [audioMode, tracks])
@@ -567,6 +581,13 @@ function App() {
           e.preventDefault()
           removeGapAtPlayhead()
         }
+      }
+
+      // B - a flag at the playhead
+      if (e.key === 'b' && !e.ctrlKey && !e.metaKey && !e.altKey && addFlagRef.current) {
+        e.preventDefault()
+        addFlagRef.current()
+        return
       }
 
       // M - a chapter at the playhead (audio editor)
@@ -993,11 +1014,17 @@ function App() {
   const loadSavedProject = useCallback((state) => {
     draftLoadedRef.current = true
     loadProjectState(state)
-    // Back where the playhead was when the draft was saved
+    // Back where the playhead was when the draft was saved, at the zoom it had
     setPlayheadPosition(savedPlayhead(state))
+    if (Number.isFinite(+state?.zoom) && +state.zoom > 0) setRestoreZoom({ value: +state.zoom, key: Date.now() })
     if (state?.master) setMaster(masterOf(state.master))
     setChapters(Array.isArray(state?.chapters) ? state.chapters.slice(0, MAX_CHAPTERS) : [])
-  }, [loadProjectState, setPlayheadPosition])
+    setFlags(cleanFlags(state?.flags))
+    // and the clip(s) that were selected (those still on the timeline)
+    const ids = new Set((state?.tracks || []).flatMap(t => (t.clips || []).map(c => c.id)))
+    const sel = Array.isArray(state?.selected) ? state.selected.filter(id => ids.has(id)) : []
+    if (sel.length) selectClips(sel)
+  }, [loadProjectState, setPlayheadPosition, selectClips])
   const drafts = useDrafts({
     session: draftSession,
     hasMedia: draftContext.hasMedia,
@@ -1009,7 +1036,10 @@ function App() {
     master: audioMode ? master : null,
     chapters: audioMode ? chapters : null,
     playhead: playheadPosition,
-    playing: previewPlaying
+    playing: previewPlaying,
+    zoom: timelineZoom,
+    flags,
+    selected: selectedClipIds.length ? selectedClipIds : (selectedClipId ? [selectedClipId] : [])
   })
   const canDraftSignIn = isIframe && !draftSession && ['sign-in-needed', 'sign-in-failed', 'signing-in'].includes(draftContext.reason)
 
@@ -1166,6 +1196,7 @@ function App() {
   const removeChapter = useCallback((id) => setChapters(list => list.filter(c => c.id !== id)), [])
   // M: a chapter at the playhead (and the list opens so it can be named)
   addChapterRef.current = audioMode ? () => { addChapter(playheadRef.current); setChaptersOpen(true) } : null
+  addFlagRef.current = () => handleAddFlag(playheadPositionRef.current)
 
   const applyTemplateNow = useCallback((tpl) => {
     applyTracks(t => applyAudioTemplate(t, tpl))
@@ -1619,6 +1650,12 @@ function App() {
             onRemoveGap={removeGapAtPlayhead}
             isPlayheadOnGap={isPlayheadOnGap}
             rippleTrackId={rippleTarget}
+            restoreZoom={restoreZoom}
+            onZoomChange={setTimelineZoom}
+            flags={resolvedFlags}
+            onAddFlag={handleAddFlag}
+            onMoveFlag={handleMoveFlag}
+            onRemoveFlag={handleRemoveFlag}
             onDuplicate={duplicateClip}
             onGroupClips={groupSelection}
             onUngroupClips={ungroupClips}
@@ -2049,6 +2086,12 @@ function App() {
               onRemoveGap={removeGapAtPlayhead}
               isPlayheadOnGap={isPlayheadOnGap}
             rippleTrackId={rippleTarget}
+            restoreZoom={restoreZoom}
+            onZoomChange={setTimelineZoom}
+            flags={resolvedFlags}
+            onAddFlag={handleAddFlag}
+            onMoveFlag={handleMoveFlag}
+            onRemoveFlag={handleRemoveFlag}
               onDuplicate={duplicateClip}
               onGroupClips={groupSelection}
               onUngroupClips={ungroupClips}

@@ -6897,3 +6897,36 @@ input[type="range"] {
   color: var(--text-secondary);
   font-size: 0.75rem;
 }
+
+/* Flags (utils/flags.js): a numbered head on the ruler, a thin line through the tracks */
+.timeline-flag {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed var(--flag-color);
+  z-index: 9;
+  pointer-events: none;
+}
+
+.timeline-flag-head {
+  position: absolute;
+  top: 10px;
+  left: -1px;
+  min-width: 16px;
+  height: 14px;
+  padding: 0 4px;
+  border: none;
+  border-radius: 0 3px 3px 0;
+  background: var(--flag-color);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 14px;
+  cursor: grab;
+  pointer-events: auto;
+}
+
+.timeline-flag-head:active {
+  cursor: grabbing;
+}

@@ -39,3 +39,13 @@ describe('the playhead in a draft', () => {
     expect(savedPlayhead(null)).toBe(0)
   })
 })
+
+describe('the timeline zoom in a draft', () => {
+  const tracks = [{ id: 'v', type: 'audio', clips: [{ id: 'a', type: 'audio', url: 'https://x/api/upload/files/a.wav', timelinePosition: 0, startTime: 0, endTime: 10 }] }]
+  it('is saved (px per second), and left out when unknown', () => {
+    expect(serializeProject(tracks, [], new Map(), { mode: 'audio', zoom: 2.123456 }).state.zoom).toBe(2.1235)
+    expect('zoom' in serializeProject(tracks, [], new Map(), { mode: 'audio', zoom: null }).state).toBe(false)
+    expect('zoom' in serializeProject(tracks, [], new Map(), { mode: 'audio', zoom: 0 }).state).toBe(false)
+  })
+})
+
