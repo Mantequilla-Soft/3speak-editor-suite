@@ -22,3 +22,9 @@ jobs:
         working-directory: backend
       - run: npm test
         working-directory: backend
+  # the production deploy script (deploy/editor-deploy) against a sandbox with stand-in docker/curl
+  deploy-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash deploy/tests/run.sh

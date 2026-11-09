@@ -1,0 +1,231 @@
+#!/usr/bin/env bash
+# Deploy one commit of Mantequilla-Soft/3speak-editor-suite `main` to the editor on THIS box.
+# Installed root-owned at /usr/local/sbin/editor-deploy; the GitHub Action reaches it only
+# through the `deploy-editor` SSH user's forced command (editor-deploy-entry).
+#
+#   editor-deploy check  <40-hex sha>   verify everything, change nothing
+#   editor-deploy deploy <40-hex sha>   fast-forward to <sha>, rebuild what changed, swap,
+#                                       smoke test, roll back on any failure
+#
+# Box settings: /etc/editor-deploy.conf (root-owned, parsed as KEY=VALUE, never sourced):
+#   NAME=a|b                     which box (for the log)
+#   REPO=<checkout>              the editor checkout docker compose runs from
+#   REMOTE=<git remote>          the remote whose `main` is Mantequilla-Soft/3speak-editor-suite
+#   SERVICES="gateway backend frontend"   the compose services THIS box runs
+#   BACKEND_URL=http://127.0.0.1:3102     (when backend is in SERVICES)
+#   FRONTEND_URL=http://127.0.0.1:8089    (when frontend is in SERVICES)
+#   GATEWAY_URL=http://127.0.0.1:3200     (when gateway is in SERVICES)
+#   ALLOWED_LOCAL="docker-compose.yml"    tracked files that carry this box's own settings
+#   FORBID_IN_BUNDLE="deveditor localhost:"  strings the built frontend must not contain
+#   PROJECT=<compose project>    image names are <PROJECT>-<service> (default: REPO's folder name)
+#   RUN_AS=<user>                who runs git (default root)
+#
+# Rules:
+# - <sha> must be on <REMOTE>/main. Exactly <sha> is deployed, never a newer, untested tip.
+# - Never goes backwards: a <sha> already in the running commit only re-checks health.
+# - ALLOWED_LOCAL files keep their local edits. If upstream changed one, the deploy refuses:
+#   a human merges it by hand. Any other local edit to a tracked file: refused.
+# - Only services whose code changed are rebuilt. Images are built while the old containers
+#   keep serving; the previous image is kept as <image>:rollback.
+# - A backend is swapped only when it runs no render job (activeJobs 0, waits up to 30 min).
+# - Swap order: gateway, backend, frontend (a new frontend never meets an old backend here).
+# - Any failed smoke test rolls the swapped services back to their previous images.
+set -euo pipefail
+umask 022
+
+CONF=/etc/editor-deploy.conf
+STATE_DIR=/var/lib/editor-deploy
+LOG=/var/log/editor-deploy.log
+LOCK=/run/lock/editor-deploy.lock
+SYS_PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+LOCK_WAIT_SECONDS=1800
+IDLE_WAIT_SECONDS=1800
+BOOT_WAIT_SECONDS=180
+STABLE_SECONDS=15
+
+verb="${1:-}"; sha="${2:-}"
+[[ "$verb" =~ ^(check|deploy)$ ]] || { echo "usage: editor-deploy check|deploy <40-hex sha>" >&2; exit 2; }
+[[ "$sha" =~ ^[0-9a-f]{40}$ ]] || { echo "sha must be 40 lowercase hex characters" >&2; exit 2; }
+
+NAME= REPO= REMOTE= SERVICES= BACKEND_URL= FRONTEND_URL= GATEWAY_URL= ALLOWED_LOCAL= FORBID_IN_BUNDLE= PROJECT= RUN_AS=
+[ -f "$CONF" ] || { echo "missing $CONF" >&2; exit 2; }
+while IFS='=' read -r k v; do
+  [[ "$k" =~ ^[A-Z_]+$ ]] || continue
+  v="${v%\"}"; v="${v#\"}"
+  case "$k" in
+    NAME|REPO|REMOTE|SERVICES|BACKEND_URL|FRONTEND_URL|GATEWAY_URL|ALLOWED_LOCAL|FORBID_IN_BUNDLE|PROJECT|RUN_AS) printf -v "$k" '%s' "$v" ;;
+  esac
+done < <(grep -E '^[A-Z_]+=' "$CONF")
+for k in NAME REPO REMOTE SERVICES; do [ -n "${!k}" ] || { echo "$CONF: $k is not set" >&2; exit 2; }; done
+has() { [[ " $SERVICES " == *" $1 "* ]]; }
+for s in $SERVICES; do [[ "$s" =~ ^(gateway|backend|frontend)$ ]] || { echo "$CONF: unknown service $s" >&2; exit 2; }; done
+if has backend; then [ -n "$BACKEND_URL" ] || { echo "$CONF: BACKEND_URL is not set" >&2; exit 2; }; fi
+if has frontend; then [ -n "$FRONTEND_URL" ] || { echo "$CONF: FRONTEND_URL is not set" >&2; exit 2; }; fi
+if has gateway; then [ -n "$GATEWAY_URL" ] || { echo "$CONF: GATEWAY_URL is not set" >&2; exit 2; }; fi
+PROJECT="${PROJECT:-$(basename "$REPO")}"
+RUN_AS="${RUN_AS:-root}"
+
+export PATH="$SYS_PATH"
+mkdir -p "$STATE_DIR"
+exec 9>"$LOCK"
+if ! flock -w "$LOCK_WAIT_SECONDS" 9; then echo "another deploy holds the lock" >&2; exit 3; fi
+
+log() { printf '%s [%s %s %s] %s\n' "$(date -u +%FT%TZ)" "$NAME" "$verb" "${sha:0:8}" "$*" | tee -a "$LOG" >&2; }
+die() { log "FAILED: $*"; exit 1; }
+g() {
+  if [ "$RUN_AS" = root ]; then git -C "$REPO" "$@"
+  else runuser -u "$RUN_AS" -- env HOME="$(getent passwd "$RUN_AS" | cut -d: -f6)" PATH="$PATH" git -C "$REPO" "$@"; fi
+}
+dc() { (cd "$REPO" && docker compose "$@"); }
+code_of() { curl -s -o /dev/null --max-time 15 -w '%{http_code}' "$@" || true; }
+
+# ── smoke tests, one per service; each prints its first failure ──────────────────────
+smoke_backend() {
+  local body code
+  body=$(curl -s --max-time 15 "$BACKEND_URL/api/health" || true)
+  grep -q '"status":"ok"' <<<"$body" || { echo "backend /api/health: ${body:0:200}"; return 1; }
+  code=$(code_of -X POST "$BACKEND_URL/api/upload")
+  [ "$code" = 401 ] || { echo "backend: anonymous upload answered $code, expected 401"; return 1; }
+  code=$(code_of -X POST "$BACKEND_URL/api/render")
+  [ "$code" = 401 ] || { echo "backend: anonymous render answered $code, expected 401"; return 1; }
+}
+smoke_gateway() {
+  local code; code=$(code_of "$GATEWAY_URL/health")
+  [ "$code" = 200 ] || { echo "gateway /health -> $code"; return 1; }
+}
+smoke_frontend() {
+  local page js s n
+  page=$(curl -s --max-time 15 "$FRONTEND_URL/" || true)
+  js=$(grep -oE 'assets/index-[A-Za-z0-9_-]+\.js' <<<"$page" | head -1)
+  [ -n "$js" ] || { echo "frontend: no entry script on /"; return 1; }
+  [ "$(code_of "$FRONTEND_URL/$js")" = 200 ] || { echo "frontend: $js not served"; return 1; }
+  for s in $FORBID_IN_BUNDLE; do
+    n=$(curl -s --max-time 30 "$FRONTEND_URL/$js" | grep -c -F "$s" || true)
+    [ "$n" = 0 ] || { echo "frontend bundle contains '$s' (built with the wrong settings?)"; return 1; }
+  done
+}
+smoke() { local s; for s in $SERVICES; do "smoke_$s" || return 1; done; }
+wait_healthy() { # <service>
+  local deadline=$((SECONDS + BOOT_WAIT_SECONDS)) out started
+  while :; do
+    out=$("smoke_$1") && break
+    [ $SECONDS -ge $deadline ] && { log "$1 not healthy after ${BOOT_WAIT_SECONDS}s: $out"; return 1; }
+    sleep 3
+  done
+  started=$(docker inspect -f '{{.State.StartedAt}}' "$(dc ps -q "$1")" 2>/dev/null || true)
+  sleep "$STABLE_SECONDS"
+  [ "$(docker inspect -f '{{.State.StartedAt}}' "$(dc ps -q "$1")" 2>/dev/null || true)" = "$started" ] \
+    || { log "$1 restarted within ${STABLE_SECONDS}s of answering"; return 1; }
+  out=$("smoke_$1") || { log "$1 second smoke failed: $out"; return 1; }
+}
+active_jobs() { curl -s --max-time 15 "$BACKEND_URL/api/health" | grep -oE '"activeJobs":[0-9]+' | cut -d: -f2; }
+wait_idle() {
+  local deadline=$((SECONDS + IDLE_WAIT_SECONDS)) n
+  while :; do
+    n=$(active_jobs || true)
+    [ "$n" = 0 ] && return 0
+    [ $SECONDS -ge $deadline ] && { log "backend still busy (activeJobs ${n:-?}) after ${IDLE_WAIT_SECONDS}s"; return 1; }
+    sleep 5
+  done
+}
+
+# Which services a list of changed paths touches (only those this box runs).
+services_for() {
+  local f need_b=no need_g=no need_f=no
+  while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    case "$f" in
+      *.md|LICENSE|.github/*|deploy/*|e2e/*|tests/*|backend/test/*|docs/*|docker-compose.override.example.yml|vitest.config.js) ;;
+      docker-compose.yml) need_b=yes; need_g=yes; need_f=yes ;;
+      backend/*) need_b=yes ;;
+      gateway/*) need_g=yes ;;
+      *) need_f=yes ;;
+    esac
+  done
+  local out=""
+  has gateway && [ $need_g = yes ] && out="$out gateway"
+  has backend && [ $need_b = yes ] && out="$out backend"
+  has frontend && [ $need_f = yes ] && out="$out frontend"
+  echo "${out# }"
+}
+
+# ── checks (both verbs) ─────────────────────────────────────────────────────────────
+log "start"
+[ -d "$REPO/.git" ] || die "$REPO is not a git checkout"
+g fetch -q "$REMOTE" main || die "git fetch $REMOTE main failed"
+g cat-file -e "$sha^{commit}" 2>/dev/null || die "$sha is unknown after fetching $REMOTE/main"
+g merge-base --is-ancestor "$sha" "$REMOTE/main" || die "$sha is not on $REMOTE/main"
+
+old=$(g rev-parse HEAD)
+if [ "$old" = "$sha" ] || g merge-base --is-ancestor "$sha" "$old"; then
+  log "already deployed (running ${old:0:8} contains ${sha:0:8}), nothing to do"
+  out=$(smoke) || die "running editor unhealthy: $out"
+  log "running editor healthy"
+  exit 0
+fi
+g merge-base --is-ancestor "$old" "$sha" || die "running ${old:0:8} is not an ancestor of ${sha:0:8} (history diverged): fix by hand"
+
+changed=$(g diff --name-only "$old" "$sha")
+local_mod=$(g diff --name-only HEAD)
+staged=$(g diff --cached --name-only)
+[ -z "$staged" ] || die "staged changes in $REPO: $staged"
+for f in $local_mod; do
+  allowed=no
+  for a in $ALLOWED_LOCAL; do [ "$f" = "$a" ] && allowed=yes; done
+  [ "$allowed" = yes ] || die "local edit to tracked file $f (only ALLOWED_LOCAL may carry local settings)"
+  grep -qxF "$f" <<<"$changed" && die "upstream changed $f, which carries this box's own settings: merge it by hand, then re-run"
+done
+
+rebuild=$(services_for <<<"$changed")
+n=$(grep -c . <<<"$changed" || true)
+log "plan: ${old:0:8} -> ${sha:0:8}, $n file(s) changed, rebuild: ${rebuild:-nothing}, local settings kept: ${local_mod:-none}"
+
+if [ "$verb" = check ]; then
+  out=$(smoke) || die "running editor unhealthy: $out"
+  log "check ok: running editor healthy, deploy would apply cleanly"
+  exit 0
+fi
+
+# ── deploy ──────────────────────────────────────────────────────────────────────────
+swapped=""
+rollback() {
+  log "rolling back to ${old:0:8} (services swapped: ${swapped:-none})"
+  g reset -q --keep "$old" || log "ROLLBACK: git reset --keep $old failed. Fix the checkout by hand."
+  local s
+  # Every rebuilt image gets its old tag back (also those built but not swapped yet, so a
+  # later restart cannot pick up a half-deployed image); swapped ones are restarted on it.
+  for s in $rebuild; do
+    docker image inspect "$PROJECT-$s:rollback" >/dev/null 2>&1 || continue
+    docker image tag "$PROJECT-$s:rollback" "$PROJECT-$s:latest"
+    [[ " $swapped " == *" $s "* ]] || continue
+    dc up -d --no-deps --no-build "$s" >/dev/null 2>&1 || log "ROLLBACK: could not restart $s"
+    if wait_healthy "$s"; then log "$s back on ${old:0:8}"; else log "ROLLBACK UNHEALTHY: check $s by hand"; fi
+  done
+  printf '%s\n' "$old" > "$STATE_DIR/deployed_sha"
+  exit 1
+}
+
+for s in $rebuild; do
+  if docker image inspect "$PROJECT-$s:latest" >/dev/null 2>&1; then docker image tag "$PROJECT-$s:latest" "$PROJECT-$s:rollback"; fi
+done
+g merge -q --ff-only "$sha" || die "fast-forward to $sha failed"
+
+# Build everything first: the old containers keep serving while images build.
+for s in $rebuild; do
+  log "building $s"
+  dc build -q "$s" >/dev/null 2>&1 || { log "build of $s failed"; rollback; }
+done
+
+# Swap: gateway, backend (when it runs no render), frontend
+for s in gateway backend frontend; do
+  [[ " $rebuild " == *" $s "* ]] || continue
+  if [ "$s" = backend ]; then wait_idle || rollback; fi
+  log "swapping $s"
+  swapped="$swapped $s"
+  dc up -d --no-deps --no-build "$s" >/dev/null 2>&1 || { log "starting $s failed"; rollback; }
+  wait_healthy "$s" || rollback
+done
+
+out=$(smoke) || { log "final smoke failed: $out"; rollback; }
+printf '%s\n' "$sha" > "$STATE_DIR/deployed_sha"
+log "deployed ${sha:0:8} OK (rebuilt: ${rebuild:-nothing})"
