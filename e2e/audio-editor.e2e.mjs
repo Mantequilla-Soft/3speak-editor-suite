@@ -627,6 +627,18 @@ try {
     await p.page.mouse.up()
     const small = await logo.boundingBox()
     assert.ok(small.height >= 120 * PX - 1, `the logo stays at least 120 px high (${small.height / PX})`)
+    // and it grows with its box: pulled big, the drawn logo fills it
+    const c2 = await logo.locator('[data-corner="se"]').boundingBox()
+    await p.page.mouse.move(c2.x + 3, c2.y + 3)
+    await p.page.mouse.down()
+    await p.page.mouse.move(c2.x + 120, c2.y + 120, { steps: 6 })
+    await p.page.mouse.up()
+    const big = await logo.boundingBox()
+    assert.ok(big.height > 300 * PX, `the logo box grew (${big.height / PX})`)
+    await until(async () => {
+      const m = await f.frameLocator('iframe[title="Audiogram preview"]').locator('#l-logo').evaluate(el => ({ box: el.clientHeight, drawn: el.firstElementChild.offsetHeight }))
+      return m.drawn >= m.box * 0.85
+    }, 'the drawn logo as big as its box', 10000)
     // the logo can not be hidden
     assert.equal(await ag.getByRole('button', { name: 'Hide 3Speak logo' }).count(), 0)
     assert.equal(await ag.getByRole('radio', { name: 'Square' }).count(), 0, 'no square: Shorts are vertical')

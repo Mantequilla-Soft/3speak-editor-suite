@@ -243,6 +243,29 @@ test('stills: the layers over the waveform go on a transparent second still', { 
   assert.ok(r2.above, 'the logo is always over the waveform')
 })
 
+test('the logo grows with its box, in both styles, turned too', { skip: !hasChromium }, async () => {
+  const { chromium } = await import('playwright-core')
+  const { chromiumPath } = await import('../src/services/audiogramPage.js')
+  const b = await chromium.launch({ executablePath: chromiumPath(), headless: false, args: ['--headless=new', '--no-sandbox'] })
+  try {
+    const page = await b.newPage({ viewport: { width: 1080, height: 1920 } })
+    await page.setContent(audiogramPageHtml())
+    for (const [logo, box] of [['full', { x: 40, y: 200, w: 1000, h: 200 }], ['mark', { x: 140, y: 200, w: 690, h: 600 }], ['full', { x: 40, y: 200, w: 1000, h: 200, r: 30 }]]) {
+      const style = cleanAudiogramStyle({ logo, layouts: { vertical: { logo: box } } })
+      const st = pageState({ format: 'vertical', title: 'T', style, image: null })
+      const m = await page.evaluate((s) => {
+        window.applyAudiogram(s, 'all')
+        const el = document.getElementById('l-logo')
+        return { boxW: el.clientWidth, boxH: el.clientHeight, w: el.firstElementChild.offsetWidth, h: el.firstElementChild.offsetHeight }
+      }, st)
+      assert.ok(m.w >= m.boxW * 0.9 && m.w <= m.boxW + 1, `${logo} ${JSON.stringify(m)}: as wide as its box`)
+      assert.ok(m.h >= m.boxH * 0.85, `${logo} ${JSON.stringify(m)}: about as high as its box`)
+    }
+  } finally {
+    await b.close()
+  }
+})
+
 test('the route renders an MP4 of the asked piece from our own export', { skip: !canRender }, async () => {
   const [status, { jobId }] = await post({ url: 'https://elsewhere.example/rendered/episode.mp3?x=1', start: 4, duration: 6, style: { wave: { type: 'circle' }, layouts: { vertical: { wave: { x: 240, y: 1000, w: 600, h: 600, r: 15 } } } }, title: 'Episode: "quotes", <b>tags</b> and \\ backslashes' })
   assert.equal(status, 200)

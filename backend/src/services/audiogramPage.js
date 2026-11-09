@@ -172,9 +172,9 @@ html,body{overflow:hidden;background:transparent;font-family:Roboto,'Noto Sans',
 .glow{position:absolute;inset:0}
 .layer{position:absolute;display:flex;align-items:center;justify-content:center;text-align:center;transform-origin:50% 50%}
 .txt{display:block;max-width:100%}
-.logo{gap:.28em;white-space:nowrap}
-.logo svg{height:1em;width:auto;flex:none}
-.logo span{font-weight:700;font-size:.86em;letter-spacing:-.015em;line-height:1}
+.logo-in{display:inline-flex;align-items:center;gap:.28em;white-space:nowrap;line-height:1}
+.logo-in svg{height:1em;width:auto;flex:none}
+.logo-in>span{font-weight:700;font-size:.86em;letter-spacing:-.015em;line-height:1}
 .cover{overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.55)}
 .cover img{width:100%;height:100%;object-fit:cover;display:block}
 .title{font-weight:700;line-height:1.08;letter-spacing:-.015em;overflow-wrap:anywhere;text-shadow:0 2px 12px rgba(0,0,0,.35)}
@@ -273,7 +273,7 @@ window.applyAudiogram = function (state, part = 'all') {
   for (const id of ['logo', 'cover', 'title', 'line', 'wave']) {
     if (!shows(id)) continue;
     const l = L[id];
-    if (id === 'logo') html += '<div class="layer logo" id="l-logo" style="' + box(l, id) + '">' + MARK + (state.logo === 'mark' ? '' : '<span>3Speak</span>') + '</div>';
+    if (id === 'logo') html += '<div class="layer logo" id="l-logo" style="' + box(l, id) + '"><span class="logo-in">' + MARK + (state.logo === 'mark' ? '' : '<span>3Speak</span>') + '</span></div>';
     if (id === 'cover') html += '<div class="layer cover" style="' + box(l, id) + ';border-radius:' + Math.round(Math.min(l.w, l.h) * 0.055) + 'px"><img src="' + esc(image) + '" alt=""></div>';
     // the text in one inline box: as flex items the spaces next to the red words would go
     if (id === 'title' && state.title) html += '<div class="layer title" id="l-title" style="' + box(l, id) + '"><span class="txt">' + esc(state.title) + '</span></div>';
@@ -283,11 +283,12 @@ window.applyAudiogram = function (state, part = 'all') {
   frame.innerHTML = html;
   const logo = document.getElementById('l-logo');
   if (logo) {
-    // the mark and the name as big as the box allows
-    logo.style.fontSize = '100px';
-    const k = Math.min(logo.clientWidth / logo.scrollWidth, logo.clientHeight / 100);
-    logo.style.fontSize = Math.max(8, Math.floor(100 * Math.min(1, k) * 0.98)) + 'px';
-    if (logo.scrollWidth > logo.clientWidth) logo.style.fontSize = Math.floor(parseFloat(logo.style.fontSize) * logo.clientWidth / logo.scrollWidth) + 'px';
+    // the mark (and the name) as big as the box: its height, less if that is too wide
+    const inner = logo.firstElementChild;
+    const h = logo.clientHeight;
+    logo.style.fontSize = h + 'px';
+    const w = inner.offsetWidth; // its own width (a turned box would make the screen box wider)
+    if (w > logo.clientWidth) logo.style.fontSize = Math.max(8, Math.floor(h * logo.clientWidth / w * 0.99)) + 'px';
   }
   const t = document.getElementById('l-title'); if (t) fit(t, Math.min(140, L.title.h));
   const ln = document.getElementById('l-line'); if (ln) fit(ln, Math.min(60, L.line.h));
