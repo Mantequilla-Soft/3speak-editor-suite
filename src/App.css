@@ -3031,6 +3031,40 @@ body {
   visibility: hidden;
 }
 
+/* Teleprompter button next to Start Recording, and the 3-2-1 before a take
+   with a script */
+.record-tp-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.record-tp-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.record-tp-btn.active {
+  color: var(--accent-primary, #e53935);
+  border-color: var(--accent-primary, #e53935);
+}
+
+.record-countdown {
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
 .record-audio-indicator .recording-pulse {
   animation: mic-pulse 1s ease-in-out infinite;
   color: #ef4444;

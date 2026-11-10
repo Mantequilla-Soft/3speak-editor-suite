@@ -1,8 +1,9 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { X, Circle, Square, RotateCcw, Check, Loader2 } from 'lucide-react'
+import { X, Circle, Square, RotateCcw, Check, Loader2, ScrollText } from 'lucide-react'
 import fixWebmDuration from 'fix-webm-duration'
 import { finiteDuration, pickRecorderType, recordingExtension } from '../utils/mediaDuration'
 import { rmsLevel, levelHistory, drawLevels } from '../utils/voiceGraph'
+import Teleprompter from './Teleprompter/Teleprompter'
 
 // Level samples per second for the graph (and the take's shape afterwards)
 const LEVEL_RATE = 20
@@ -23,8 +24,15 @@ function RecordAudio({ onRecorded, onClose }) {
   const startedAtRef = useRef(0)
   const durationRef = useRef(0)
   const phaseRef = useRef('starting')
+  // Teleprompter: the same script overlay as the camera recorder (DOM only).
+  // With a script on, a take starts with a 3-2-1 countdown, which the
+  // teleprompter uses to get speech-to-text ready.
+  const tpRef = useRef(null)
+  const countdownRef = useRef(null)
+  const [tpActive, setTpActive] = useState(false)
+  const [countdown, setCountdown] = useState(0)
 
-  const [phase, setPhase] = useState('starting') // starting | ready | recording | preparing | done
+  const [phase, setPhase] = useState('starting') // starting | ready | countdown | recording | preparing | done
   const [adding, setAdding] = useState(false)
   const [recordedBlob, setRecordedBlob] = useState(null)
   const [elapsed, setElapsed] = useState(0)
@@ -75,6 +83,10 @@ function RecordAudio({ onRecorded, onClose }) {
   }, [stopGraph])
 
   const stopEverything = useCallback(() => {
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current)
+      countdownRef.current = null
+    }
     if (timerRef.current) {
       clearInterval(timerRef.current)
       timerRef.current = null
@@ -113,8 +125,9 @@ function RecordAudio({ onRecorded, onClose }) {
 
   const startRecording = useCallback(() => {
     if (!streamRef.current) return
-    // An AudioContext made before the first click can start suspended
-    audioCtxRef.current?.resume?.().catch(() => {})
+    // The teleprompter may have handed the mic to speech recognition and back
+    // (a new track in the same stream): the graph follows the stream's track now
+    startGraph(streamRef.current)
 
     chunksRef.current = []
     levelsRef.current = levelHistory()
@@ -156,7 +169,29 @@ function RecordAudio({ onRecorded, onClose }) {
     timerRef.current = setInterval(() => {
       setElapsed(Math.floor((performance.now() - startedAtRef.current) / 1000))
     }, 500)
-  }, [])
+  }, [startGraph])
+
+  // With a script: 3-2-1, while the teleprompter gets the mic and the
+  // speech-to-text token ready (capped, so a slow server never holds the take)
+  const startWithCountdown = useCallback(() => {
+    setPhase('countdown')
+    setCountdown(3)
+    const tpReady = Promise.race([
+      Promise.resolve(tpRef.current?.prepare?.()).catch(() => {}),
+      new Promise(r => setTimeout(r, 4500))
+    ])
+    let n = 3
+    countdownRef.current = setInterval(() => {
+      n -= 1
+      if (n > 0) {
+        setCountdown(n)
+        return
+      }
+      clearInterval(countdownRef.current)
+      countdownRef.current = null
+      tpReady.then(() => { if (streamRef.current && phaseRef.current === 'countdown') startRecording() })
+    }, 1000)
+  }, [startRecording])
 
   const stopRecording = useCallback(() => {
     stopEverything()
@@ -229,6 +264,10 @@ function RecordAudio({ onRecorded, onClose }) {
     drawLevels(canvasRef.current, levelsRef.current, { align: 'fit' })
   }, [phase])
 
+  const tpRecState = phase === 'countdown' ? 'countdown'
+    : phase === 'recording' ? 'recording'
+    : (phase === 'preparing' || phase === 'done') ? 'done' : 'idle'
+
   const formatTime = (secs) => {
     const m = Math.floor(secs / 60)
     const s = secs % 60
@@ -256,6 +295,9 @@ function RecordAudio({ onRecorded, onClose }) {
                 aria-label={phase === 'done' ? 'Your recording' : 'Microphone level'}
                 role="img"
               />
+              {phase === 'countdown' && (
+                <div className="record-countdown" role="status">{countdown}</div>
+              )}
               {phase === 'recording' && (
                 <div className="record-timer">
                   <span className="record-dot" />
@@ -283,10 +325,20 @@ function RecordAudio({ onRecorded, onClose }) {
 
         <div className="record-controls">
           {phase === 'ready' && (
-            <button className="record-start-btn" onClick={startRecording}>
-              <Circle size={16} />
-              <span>Start Recording</span>
-            </button>
+            <>
+              <button
+                className={`record-tp-btn${tpActive ? ' active' : ''}`}
+                onClick={() => tpRef.current?.openEditor()}
+                title={tpActive ? 'Edit teleprompter text' : 'Add teleprompter text'}
+              >
+                <ScrollText size={14} />
+                <span>Teleprompter</span>
+              </button>
+              <button className="record-start-btn" onClick={tpActive ? startWithCountdown : startRecording}>
+                <Circle size={16} />
+                <span>Start Recording</span>
+              </button>
+            </>
           )}
 
           {phase === 'recording' && (
@@ -309,6 +361,9 @@ function RecordAudio({ onRecorded, onClose }) {
             </>
           )}
         </div>
+        {/* Inside the modal (not beside it): clicks on the teleprompter must not
+            reach the backdrop, which closes the recorder */}
+        <Teleprompter ref={tpRef} recState={tpRecState} streamRef={streamRef} onActiveChange={setTpActive} showLabel="Use this script" />
       </div>
     </div>
   )

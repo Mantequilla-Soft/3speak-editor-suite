@@ -793,6 +793,45 @@ try {
     await r.ctx.close()
   })
 
+  await step('teleprompter in the voice recorder: script, 3-2-1, the script shows while recording, the take keeps its sound', async () => {
+    if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
+    const r = await openEditor({ file: null })
+    const f = r.frame
+    await f.locator('.empty-timeline-actions').getByRole('button', { name: 'Record', exact: true }).click()
+    await f.locator('.record-start-btn').waitFor({ timeout: 15000 })
+    await f.locator('.record-tp-btn').click()
+    await f.locator('.tp-script-full').fill('Hello and welcome to the show. Today we talk about recording podcasts in the browser.')
+    await f.getByRole('button', { name: 'Use this script' }).click()
+    await f.locator('.record-tp-btn.active').waitFor({ timeout: 5000 })
+    // clicks on the teleprompter must not close the recorder (its backdrop does)
+    await f.locator('.tp-box').click()
+    assert.equal(await f.locator('.record-audio-modal').count(), 1, 'recorder still open')
+    await f.locator('.record-start-btn').click()
+    await f.locator('.record-countdown').waitFor({ timeout: 3000 })
+    await f.locator('.record-stop-btn').waitFor({ timeout: 10000 })
+    assert.ok(await f.locator('.tp-box .tp-word').count() > 10, 'the script is on screen while recording')
+    await new Promise(res => setTimeout(res, 4000))
+    await f.locator('.record-stop-btn').click()
+    const audio = f.locator('.record-audio-indicator audio:not(.record-audio-loading)')
+    await audio.waitFor({ timeout: 15000 })
+    const shown = await audio.evaluate(el => el.duration)
+    assert.ok(Number.isFinite(shown) && shown > 3.3 && shown < 5.5, `take length ${shown}`)
+    // the take has sound: the (fake) mic was still recorded with the teleprompter on
+    const loud = await audio.evaluate(async (el) => {
+      const buf = await (await fetch(el.src)).arrayBuffer()
+      const ctx = new OfflineAudioContext(1, 1, 16000)
+      const dec = await ctx.decodeAudioData(buf)
+      const d = dec.getChannelData(0)
+      let peak = 0
+      for (let i = 0; i < d.length; i++) peak = Math.max(peak, Math.abs(d[i]))
+      return peak
+    })
+    assert.ok(loud > 0.01, `the take is not silent (peak ${loud})`)
+    // the script hides with the take done
+    assert.equal(await f.locator('.tp-box').count(), 0, 'no script over the finished take')
+    await r.ctx.close()
+  })
+
   await step('Cut silences works clip by clip on any track: a voice on the Music track is cut on its own; the last Voice track stays', async () => {
     if (fs.existsSync(projectsDir)) for (const file of fs.readdirSync(projectsDir)) fs.rmSync(path.join(projectsDir, file), { force: true })
     const r = await openEditor({ file: null })
