@@ -187,7 +187,8 @@ const shieldProps = {
   onContextMenu: stopProp
 }
 
-const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', streamRef, onActiveChange }, ref) {
+// `showLabel`: the script editor's main button (the audio recorder has no camera).
+const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', streamRef, onActiveChange, showLabel = 'Show on camera' }, ref) {
   const [script, setScript] = useState(loadScript)
   const [enabled, setEnabled] = useState(false)
   const [editorOpen, setEditorOpen] = useState(false)
@@ -458,7 +459,10 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
         setVoiceFailed(true)
         try { audio = await reopen() } catch { audio = null }
       }
-      const stillLive = L.streamRef?.current === stream && stream.getVideoTracks().some((t) => t.readyState === 'live')
+      // Still the recorder's stream (and, for a camera, the camera still on).
+      // The audio recorder's stream has no video at all.
+      const hadVideo = stream.getVideoTracks().length > 0
+      const stillLive = L.streamRef?.current === stream && (!hadVideo || stream.getVideoTracks().some((t) => t.readyState === 'live'))
       if (!audio) {
         setNotice('Recording without a microphone (mic unavailable).')
         return
@@ -837,7 +841,7 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
               </button>
             )}
             <button type="button" className="tp-btn tp-btn--accent" onClick={showOnCamera} disabled={!script.trim()}>
-              Show on camera
+              {showLabel}
             </button>
           </div>
         </div>
