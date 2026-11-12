@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
+import { openCamera, mediaErrorMessage } from '../utils/mediaAccess'
 import { X, Circle, Square, RotateCcw, Check } from './icons'
 
 function RecordVideo({ onRecorded, onClose }) {
@@ -21,10 +22,7 @@ function RecordVideo({ onRecorded, onClose }) {
 
     async function startCamera() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user' },
-          audio: true
-        })
+        const stream = await openCamera()
         if (cancelled) {
           stream.getTracks().forEach(t => t.stop())
           return
@@ -36,7 +34,8 @@ function RecordVideo({ onRecorded, onClose }) {
         setPhase('previewing')
       } catch (err) {
         if (!cancelled) {
-          setError('Could not access camera. Please allow camera permissions.')
+          console.warn('[recorder] camera failed:', err?.name, err?.message)
+          setError(mediaErrorMessage(err))
         }
       }
     }
@@ -132,17 +131,15 @@ function RecordVideo({ onRecorded, onClose }) {
     setPhase('starting')
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user' },
-        audio: true
-      })
+      const stream = await openCamera()
       streamRef.current = stream
       if (liveVideoRef.current) {
         liveVideoRef.current.srcObject = stream
       }
       setPhase('previewing')
-    } catch {
-      setError('Could not access camera.')
+    } catch (err) {
+      console.warn('[recorder] camera failed:', err?.name, err?.message)
+      setError(mediaErrorMessage(err))
     }
   }, [])
 

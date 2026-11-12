@@ -3297,7 +3297,35 @@ body {
 }
 
 .pip-error {
-  color: var(--accent);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px 14px;
+  color: var(--on-media);
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.pip-error p {
+  margin: 0;
+}
+
+.pip-error-retry {
+  height: 32px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.pip-error-retry:hover {
+  filter: brightness(1.08);
 }
 
 .pip-controls {

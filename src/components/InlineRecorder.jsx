@@ -5,6 +5,7 @@ import { authHeaders } from '../utils/editorAuth'
 import { layoutPan, layoutZoom } from '../utils/remixLayout'
 import { defaultChromaKey, normalizeChromaKey, captureSteadyPlate, canvasToBlobUrl, KEY_RANGES } from '../utils/chromaKey'
 import { lockCamera, unlockCamera, applyCameraLock, describeCameraLock } from '../utils/cameraLock'
+import { openCamera, mediaErrorMessage } from '../utils/mediaAccess'
 import ChromaKeyCanvas from './ChromaKeyCanvas'
 import Teleprompter from './Teleprompter/Teleprompter'
 
@@ -118,16 +119,14 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
   const tpRef = useRef(null)
   const [tpActive, setTpActive] = useState(false)
 
-  // Start camera on mount
+  // Start camera on mount (and again after "Try again")
+  const [cameraTry, setCameraTry] = useState(0)
   useEffect(() => {
     let cancelled = false
 
     async function startCamera() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user' },
-          audio: true
-        })
+        const stream = await openCamera()
         if (cancelled) {
           stream.getTracks().forEach(t => t.stop())
           return
@@ -139,7 +138,8 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
         setPhase('previewing')
       } catch (err) {
         if (!cancelled) {
-          setError('Camera access denied')
+          console.warn('[recorder] camera failed:', err?.name, err?.message)
+          setError(mediaErrorMessage(err))
         }
       }
     }
@@ -150,7 +150,7 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
       cancelled = true
       stopEverything()
     }
-  }, [])
+  }, [cameraTry]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const stopEverything = useCallback(() => {
     if (countdownRef.current) {
@@ -275,17 +275,15 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
     setPhase('starting')
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user' },
-        audio: true
-      })
+      const stream = await openCamera()
       streamRef.current = stream
       if (liveVideoRef.current) {
         liveVideoRef.current.srcObject = stream
       }
       setPhase('previewing')
-    } catch {
-      setError('Camera access denied')
+    } catch (err) {
+      console.warn('[recorder] camera failed:', err?.name, err?.message)
+      setError(mediaErrorMessage(err))
     }
   }, [playbackUrl])
 
@@ -536,7 +534,18 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
         onContextMenu={isStage ? (e) => e.preventDefault() : undefined}
       >
         {error ? (
-          <div className="pip-error">{error}</div>
+          <div className="pip-error" role="alert">
+            <p>{error}</p>
+            <button
+              type="button"
+              className="pip-error-retry"
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              onClick={() => { setError(null); setPhase('starting'); setCameraTry(n => n + 1) }}
+            >
+              Try again
+            </button>
+          </div>
         ) : (
           <>
             <video
