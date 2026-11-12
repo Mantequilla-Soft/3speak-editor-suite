@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, Clock, Check, Loader2, AlertCircle, LogIn, FolderOpen, Crown, ExternalLink } from 'lucide-react'
+import { X, Clock, Check, Loader2, AlertCircle, LogIn, FolderOpen, Crown, ExternalLink } from './icons'
 import { formatUntil, formatKeep, formatAgo } from '../hooks/useDrafts'
 import { formatLength } from '../utils/limits'
 

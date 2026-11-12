@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { X, Circle, Square, RotateCcw, Check, Loader2, ScrollText } from 'lucide-react'
+import { X, Circle, Square, RotateCcw, Check, Loader2, ScrollText } from './icons'
 import fixWebmDuration from 'fix-webm-duration'
 import { finiteDuration, pickRecorderType, recordingExtension } from '../utils/mediaDuration'
 import { rmsLevel, levelHistory, drawLevels } from '../utils/voiceGraph'

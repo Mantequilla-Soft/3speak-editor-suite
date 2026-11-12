@@ -157,10 +157,11 @@ function generateGroupId() {
   return `group_${++groupIdCounter}_${Date.now()}`
 }
 
-// Deterministic group colors based on groupId hash
+// Deterministic group colors based on groupId hash. CSS values from the 3Speak
+// v2 tokens (red is kept for the selection outline, so groups never use it).
 const GROUP_COLORS = [
-  '#4a9eff', '#ff6b6b', '#51cf66', '#fcc419', '#cc5de8',
-  '#ff922b', '#20c997', '#f06595', '#748ffc', '#63e6be'
+  'var(--cyan)', 'var(--text)', 'var(--muted)',
+  'color-mix(in srgb, var(--cyan) 50%, var(--text))'
 ]
 
 function getGroupColor(groupId) {

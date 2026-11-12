@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { X, Search, Sticker } from 'lucide-react'
+import { X, Search, Sticker } from './icons'
 import { TEXT_PRESETS, presetPreviewStyle } from '../utils/stickerPresets'
 
 // Image stickers (emojis, badges, shapes, branding): library.json files built

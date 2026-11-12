@@ -8,7 +8,9 @@ import { anchorAt, anchorPosition } from './chapters'
 
 export const MAX_FLAGS = 100
 // Flag 1, 2, 3, ... (then the colours come round again)
-export const FLAG_COLORS = ['#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#ec4899', '#14b8a6', '#eab308']
+// 3Speak v2 has no hues beyond red and cyan, so flags cycle through the tokens
+// (CSS values, used as --flag-color); the number on each flag tells them apart.
+export const FLAG_COLORS = ['var(--accent)', 'var(--cyan)', 'var(--text)', 'var(--muted)']
 export const flagColor = (n) => FLAG_COLORS[(Math.max(1, n) - 1) % FLAG_COLORS.length]
 
 const round3 = (t) => Math.round(Math.max(0, +t || 0) * 1000) / 1000

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { X, Film, Download, Loader2, Eye, EyeOff, ChevronUp, ChevronDown, Upload, Trash2, Scissors, RotateCcw, Lock, HelpCircle, PenLine, Check } from 'lucide-react'
+import { X, Film, Download, Loader2, Eye, EyeOff, ChevronUp, ChevronDown, Upload, Trash2, Scissors, RotateCcw, Lock, HelpCircle, PenLine, Check } from './icons'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
 import { chapterTime } from '../utils/chapters'

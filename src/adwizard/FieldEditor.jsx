@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Plus, Trash2, ChevronUp, ChevronDown, Upload, X, RotateCcw, ClipboardPaste } from 'lucide-react'
+import { Plus, Trash2, ChevronUp, ChevronDown, Upload, X, RotateCcw, ClipboardPaste } from '../components/icons'
 import { uploadFile, absUrl } from './engine'
 
 // Forms generated from the scene engine's schema (lib/scene-meta.js): one field editor per field kind. Text stops at

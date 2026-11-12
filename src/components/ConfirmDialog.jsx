@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle } from './icons'
 
 /**
  * The editor's own "are you sure?" box. window.confirm() is not used: once a

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
-import { Play, Pause, SkipBack, Plus, Copy, Trash2, ChevronUp, ChevronDown, Upload, Music, AudioLines, Download, X, Check, Loader2, Search, FolderOpen, Cloud, CloudOff, FilePlus2 } from 'lucide-react'
+import { Play, Pause, SkipBack, Plus, Copy, Trash2, ChevronUp, ChevronDown, Upload, Music, AudioLines, Download, X, Check, Loader2, Search, FolderOpen, Cloud, CloudOff, FilePlus2 } from '../components/icons'
 import { selectBackend, api } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
 import logo3speak from '../assets/3speak.png'

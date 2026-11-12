@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { Music, X } from 'lucide-react'
+import { Music, X } from './icons'
 
 function AudioTrack({ backgroundMusic, onAudioAdded, onRemove }) {
   const inputRef = useRef(null)

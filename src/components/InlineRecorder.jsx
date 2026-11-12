@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { X, Circle, Square, RotateCcw, Check, Maximize2, Minimize2, ScrollText } from 'lucide-react'
+import { X, Circle, Square, RotateCcw, Check, Maximize2, Minimize2, ScrollText } from './icons'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authHeaders } from '../utils/editorAuth'
 import { layoutPan, layoutZoom } from '../utils/remixLayout'

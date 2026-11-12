@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { X, Circle, Square, RotateCcw, Check } from 'lucide-react'
+import { X, Circle, Square, RotateCcw, Check } from './icons'
 
 function RecordVideo({ onRecorded, onClose }) {
   const liveVideoRef = useRef(null)

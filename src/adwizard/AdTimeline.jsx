@@ -1,5 +1,5 @@
 import { useRef, useLayoutEffect, useState } from 'react'
-import { Music, AudioLines, Film } from 'lucide-react'
+import { Music, AudioLines, Film } from '../components/icons'
 
 // The ad's timeline: scenes (drag the right edge to change a scene's length), music, sound effects
 // (drag to move, click to select), playhead (click or drag anywhere to seek).
