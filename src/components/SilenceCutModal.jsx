@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { X, Wand2, Play, Pause } from 'lucide-react'
+import { X, Wand2, Play, Pause } from './icons'
 import { loadLoudness, planCuts, planSceneCuts, suggestThreshold } from '../utils/silenceDetect'
 import { api } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'

@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
+import './styles/tokens.css'
 import './App.css'
 import './utils/editorAuth' // listens for the 3Speak sign-in from the first message on
 

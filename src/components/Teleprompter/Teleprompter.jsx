@@ -1,6 +1,6 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { X, Mic, GripHorizontal, Sliders, ChevronDown, ChevronUp, Pencil, Pause, Play, EyeOff, Info, Minus, Plus } from 'lucide-react'
+import { X, Mic, GripHorizontal, Sliders, ChevronDown, ChevronUp, Pencil, Pause, Play, EyeOff, Info, Minus, Plus } from '../icons'
 import { useVoiceTeleprompter } from '../../hooks/useVoiceTeleprompter'
 import { useTimedTeleprompter } from '../../hooks/useTimedTeleprompter'
 import { detectScriptLang, modelIdToTag } from '../../utils/detectLang'

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronLeft, X } from 'lucide-react'
+import { ChevronLeft, X } from './icons'
 
 // Mini 9:16 diagrams of each arrangement. "S" = the original, "R" = your recording.
 function Frame({ children, dashed }) {

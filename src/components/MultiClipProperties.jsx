@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Loader2, Volume2, RotateCcw, Trash2 } from 'lucide-react'
+import { Loader2, Volume2, RotateCcw, Trash2 } from './icons'
 import { MAX_CLIP_VOLUME } from '../utils/audioGain'
 import { AUDIO_NOISE_LEVELS, recordingSource, canCleanClip, cleanVoiceChanges } from './ClipProperties'
 import { useCleaningStatus, cleaningText } from '../utils/cleaningStatus'

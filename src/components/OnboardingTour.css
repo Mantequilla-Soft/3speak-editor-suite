@@ -18,11 +18,11 @@
   position: fixed;
   z-index: 5001;
   pointer-events: auto;
-  background: var(--bg-elevated, #2a2a2a);
-  border: 1px solid var(--border-color, #444);
-  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
   padding: 16px;
-  color: var(--text-primary, #fff);
+  color: var(--text-primary);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   animation: tour-fade-in 0.25s ease;
 }
@@ -33,16 +33,16 @@
 }
 
 .tour-tooltip-title {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   margin-bottom: 6px;
-  color: var(--accent-primary, #ff5252);
+  color: var(--text);
 }
 
 .tour-tooltip-text {
   font-size: 13px;
   line-height: 1.5;
-  color: var(--text-secondary, #ccc);
+  color: var(--muted);
   margin-bottom: 14px;
 }
 
@@ -61,14 +61,14 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--text-muted, #666);
+  background: var(--surface-2);
   transition: background 0.2s;
 }
 
 .tour-dot.active {
-  background: var(--accent-primary, #ff5252);
+  background: var(--accent-primary);
   width: 16px;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 .tour-buttons {
@@ -79,30 +79,34 @@
 .tour-skip-btn {
   background: none;
   border: none;
-  color: var(--text-muted, #888);
+  color: var(--text-muted);
   font-size: 12px;
   cursor: pointer;
   padding: 6px 10px;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 .tour-skip-btn:hover {
-  color: var(--text-primary, #fff);
-  background: var(--bg-tertiary, #333);
+  color: var(--text-primary);
+  background: var(--bg-hover);
 }
 
 .tour-next-btn {
-  background: transparent;
-  color: var(--accent-primary, #ff5252);
-  border: 1px solid var(--accent-primary, #ff5252);
-  font-size: 12px;
-  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 14px;
+  background: var(--accent);
+  color: var(--on-accent);
+  border: none;
+  font-size: 13px;
+  font-weight: 900;
   cursor: pointer;
-  padding: 6px 16px;
-  border-radius: 6px;
-  transition: background 0.15s;
+  border-radius: 12px;
+  transition: filter var(--t-fast) var(--ease);
 }
 
 .tour-next-btn:hover {
-  background: var(--accent-light, rgba(255, 82, 82, 0.15));
+  filter: brightness(1.08);
 }

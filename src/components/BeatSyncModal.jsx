@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { X, Music2 } from 'lucide-react'
+import { X, Music2 } from './icons'
 import { detectBeats } from '../utils/beatDetect'
 
 const EVERY = [1, 2, 4, 8]

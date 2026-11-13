@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { X, Plus, Trash2, Crosshair, Copy, Check } from 'lucide-react'
+import { X, Plus, Trash2, Crosshair, Copy, Check } from './icons'
 import { chapterTime, chaptersText, MAX_CHAPTERS, MAX_CHAPTER_TITLE } from '../utils/chapters'
 
 /**

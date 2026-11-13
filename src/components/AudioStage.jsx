@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Mic } from 'lucide-react'
+import { Mic } from './icons'
 import { getPeaks, peaksForRange } from '../utils/peakCache'
 import { formatLength } from '../utils/limits'
 import { duckGainAt } from '../utils/duck'
@@ -11,9 +11,18 @@ import { duckGainAt } from '../utils/duck'
 const LANE_GAP = 6
 const BAR_PX = 3
 
+// A CSS custom property as a colour the canvas can use. The v2 tokens are
+// var() and color-mix() chains, so let the browser resolve it to rgb() first.
 function cssVar(el, name, fallback) {
   const v = el ? getComputedStyle(el).getPropertyValue(name).trim() : ''
-  return v || fallback
+  if (!v) return fallback
+  const probe = document.createElement('span')
+  probe.style.display = 'none'
+  probe.style.color = v
+  el.appendChild(probe)
+  const rgb = getComputedStyle(probe).color
+  probe.remove()
+  return rgb || fallback
 }
 
 export default function AudioStage({ tracks, playheadPosition, totalDuration, onSeek, nowPlaying, emptyActions, duck = null, chapters = null }) {
@@ -65,9 +74,9 @@ export default function AudioStage({ tracks, playheadPosition, totalDuration, on
     g.setTransform(dpr, 0, 0, dpr, 0, 0)
     g.clearRect(0, 0, size.w, size.h)
     const root = wrapRef.current
-    const voiceColor = cssVar(root, '--audio-stage-voice', '#60a5fa')
-    const musicColor = cssVar(root, '--audio-stage-music', '#a78bfa')
-    const templateColor = cssVar(root, '--audio-stage-template', '#34d399')
+    const voiceColor = cssVar(root, '--audio-stage-voice', '#22d3ee')
+    const musicColor = cssVar(root, '--audio-stage-music', '#a3a3a3')
+    const templateColor = cssVar(root, '--audio-stage-template', '#f1f1f1')
     const laneBg = cssVar(root, '--audio-stage-lane', 'rgba(148,163,184,0.10)')
     const count = Math.max(1, lanes.length)
     const laneH = (size.h - LANE_GAP * (count + 1)) / count

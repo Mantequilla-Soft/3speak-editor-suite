@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useMemo, useState } from 'react'
-import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, HelpCircle, Maximize, Minimize, Scissors, Play, Pause } from 'lucide-react'
+import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, HelpCircle, Maximize, Minimize, Scissors, Play, Pause, MousePointerClick } from './components/icons'
 import { useFFmpeg } from './hooks/useFFmpeg'
 import { useCanvasExport } from './hooks/useCanvasExport'
 import { useTimeline } from './hooks/useTimeline'
@@ -1477,7 +1477,11 @@ function App() {
   const sidePanel = (
     <aside className="compact-side">
       {multiPanel || (sideClip ? compactPropertiesPanel : (
-        <p className="compact-side-empty">Select a clip on the timeline to see its settings. Drag a box over several clips to change them together.</p>
+        <div className="compact-side-empty">
+          <MousePointerClick size={28} />
+          <strong>No clip selected</strong>
+          <p>Select a clip on the timeline to see its settings. Drag a box over several clips to change them together.</p>
+        </div>
       ))}
     </aside>
   )

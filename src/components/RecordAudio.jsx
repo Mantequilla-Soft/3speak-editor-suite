@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
-import { X, Circle, Square, RotateCcw, Check, Loader2, ScrollText } from 'lucide-react'
+import { openMicrophone, mediaErrorMessage } from '../utils/mediaAccess'
+import { X, Circle, Square, RotateCcw, Check, Loader2, ScrollText } from './icons'
 import fixWebmDuration from 'fix-webm-duration'
 import { finiteDuration, pickRecorderType, recordingExtension } from '../utils/mediaDuration'
 import { rmsLevel, levelHistory, drawLevels } from '../utils/voiceGraph'
@@ -102,7 +103,7 @@ function RecordAudio({ onRecorded, onClose }) {
   }, [stopGraph])
 
   const openMic = useCallback(async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    const stream = await openMicrophone()
     streamRef.current = stream
     startGraph(stream)
     return stream
@@ -114,8 +115,11 @@ function RecordAudio({ onRecorded, onClose }) {
     openMic().then(() => {
       if (cancelled) stopEverything()
       else setPhase('ready')
-    }, () => {
-      if (!cancelled) setError('Could not access microphone. Please allow microphone permissions.')
+    }, (err) => {
+      if (!cancelled) {
+        console.warn('[recorder] microphone failed:', err?.name, err?.message)
+        setError(mediaErrorMessage(err, 'microphone'))
+      }
     })
     return () => {
       cancelled = true
@@ -204,8 +208,9 @@ function RecordAudio({ onRecorded, onClose }) {
     try {
       await openMic()
       setPhase('ready')
-    } catch {
-      setError('Could not access microphone.')
+    } catch (err) {
+      console.warn('[recorder] microphone failed:', err?.name, err?.message)
+      setError(mediaErrorMessage(err, 'microphone'))
     }
   }, [openMic])
 

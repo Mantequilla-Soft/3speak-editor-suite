@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react'
-import { Music } from 'lucide-react'
+import { Music } from './icons'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 
 function VideoPreview({ clip, isVerticalVideo }) {

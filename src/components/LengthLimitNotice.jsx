@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { X } from './icons'
 import { MAX_TIMELINE_SECONDS, MAX_TIMELINE_TEXT, formatLength } from '../utils/limits'
 import { isAudioMode } from '../utils/editorMode'
 

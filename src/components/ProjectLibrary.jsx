@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Film, Music, Image, X, Plus, Upload, Download } from 'lucide-react'
+import { Film, Music, Image, X, Plus, Upload, Download } from './icons'
 
 function formatDuration(seconds) {
   const mins = Math.floor(seconds / 60)

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Download, Settings, X, Send, ExternalLink } from 'lucide-react'
+import { Download, Settings, X, Send, ExternalLink } from './icons'
 import { MAX_TIMELINE_TEXT, formatLength } from '../utils/limits'
 
 // Quality presets mapped to CRF values (lower CRF = higher quality, larger file)
@@ -202,7 +202,7 @@ function ExportButton({
           </a>
           <button
             onClick={onClearRenderStatus}
-            style={{ marginLeft: '0.5rem', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '0.8rem' }}
+            style={{ marginLeft: '0.5rem', background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '12px' }}
           >
             Dismiss
           </button>
@@ -212,12 +212,12 @@ function ExportButton({
       {/* Backend render failed */}
       {renderStatus && renderStatus.status === 'failed' && (
         <div style={{ marginTop: '0.5rem' }}>
-          <div className="export-error" style={{ color: '#f87171', fontSize: '0.9rem' }}>
+          <div className="export-error" style={{ color: 'var(--accent)', fontSize: '14px' }}>
             Render failed: {renderStatus.error}
           </div>
           <button
             onClick={onClearRenderStatus}
-            style={{ marginTop: '0.25rem', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '0.8rem' }}
+            style={{ marginTop: '0.25rem', background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '12px' }}
           >
             Dismiss
           </button>
@@ -225,19 +225,19 @@ function ExportButton({
       )}
 
       {error && (
-        <div className="export-error" style={{ color: '#f87171', marginTop: '0.5rem', fontSize: '0.9rem' }}>
+        <div className="export-error" style={{ color: 'var(--accent)', marginTop: '0.5rem', fontSize: '14px' }}>
           {error}
         </div>
       )}
 
       {!ffmpegLoaded && !isIframe && (
-        <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#94a3b8' }}>
+        <div style={{ marginTop: '0.5rem', fontSize: '12px', color: 'var(--muted)' }}>
           {ffmpegLoading ? 'Loading FFmpeg...' : 'FFmpeg not loaded'}
         </div>
       )}
 
       {(isIframe ? true : ffmpegLoaded) && clips.length === 0 && (
-        <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#94a3b8' }}>
+        <div style={{ marginTop: '0.5rem', fontSize: '12px', color: 'var(--muted)' }}>
           Add clips to the timeline to export
         </div>
       )}

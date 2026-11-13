@@ -1,5 +1,5 @@
 import { useRef, useEffect, useLayoutEffect, useState, useMemo, useCallback, Fragment } from 'react'
-import { Play, Pause, SkipBack, Minus, Plus, Maximize, Minimize2, Repeat } from 'lucide-react'
+import { Play, Pause, SkipBack, Minus, Plus, Maximize, Minimize2, Repeat } from './icons'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 
 function formatTime(seconds) {

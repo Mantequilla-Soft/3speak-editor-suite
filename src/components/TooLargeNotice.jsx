@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { X } from './icons'
 import { MAX_IMPORT_BYTES, formatBytes } from '../utils/limits'
 
 /** Files refused at import because they are over the editor's size limit. */

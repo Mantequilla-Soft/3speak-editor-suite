@@ -9,7 +9,7 @@
   inset: 0;
   z-index: 2600;
   pointer-events: none;
-  color: #fff;
+  color: var(--on-media);
   font-family: inherit;
 }
 
@@ -41,13 +41,13 @@
   touch-action: none; /* only the grip disables touch scrolling */
   color: rgba(255, 255, 255, 0.6);
   background: rgba(0, 0, 0, 0.22);
-  border-bottom-left-radius: 10px;
+  border-bottom-left-radius: 12px;
   user-select: none;
 }
 
 .tp-box .tp-grip:active {
   cursor: grabbing;
-  color: #fff;
+  color: var(--on-media);
 }
 
 .tp-box .tp-scroll {
@@ -59,7 +59,7 @@
      Keep in sync with SCROLL_PAD_Y (8 + 16) and LINE_HEIGHT in the component. */
   padding: 8px 14px 16px;
   line-height: 1.7;
-  font-weight: 600;
+  font-weight: 700;
   text-align: left;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
   overflow-wrap: anywhere;
@@ -82,7 +82,7 @@
 
 .tp-box .tp-word--current {
   opacity: 1;
-  font-weight: 800;
+  font-weight: 900;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -110,7 +110,7 @@
   padding: 5px 10px;
   border-radius: 20px;
   background: rgba(0, 0, 0, 0.62);
-  font-size: 0.78rem;
+  font-size: 12px;
   text-align: center;
   box-sizing: border-box;
   pointer-events: none;
@@ -125,23 +125,23 @@
 }
 
 .tp-status--warn {
-  color: #ffd27a;
+  color: var(--accent);
   background: rgba(60, 40, 0, 0.78);
 }
 
 .tp-status .tp-pill {
   flex-shrink: 0;
   padding: 1px 8px;
-  border-radius: 10px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.12);
-  font-weight: 600;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   opacity: 0.75;
 }
 
 .tp-status .tp-pill--on {
   opacity: 1;
-  color: #7cfc9b;
+  color: var(--cyan);
 }
 
 /* ---- "Text style" gear button ---- */
@@ -153,17 +153,17 @@
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.22);
   background: rgba(255, 255, 255, 0.06);
-  color: #fff;
-  font-size: 0.82rem;
-  font-weight: 600;
+  color: var(--on-media);
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
 }
 
 /* Selected = accent outline, never a red fill */
 .tp-gear.is-on {
   background: rgba(0, 0, 0, 0.6);
-  border-color: var(--accent-primary, #e53935);
-  color: var(--accent-primary, #e53935);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
 }
 
 /* ---- floating, collapsible, draggable menu ---- */
@@ -188,7 +188,7 @@
   cursor: grab;
   touch-action: none;
   user-select: none;
-  font-size: 0.75rem;
+  font-size: 12px;
 }
 
 .tp-menu .tp-menu-head:active {
@@ -197,13 +197,13 @@
 
 .tp-menu .tp-menu-title {
   flex: 1;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .tp-menu .tp-menu-collapse {
   background: none;
   border: none;
-  color: #fff;
+  color: var(--on-media);
   cursor: pointer;
   display: grid;
   place-items: center;
@@ -224,15 +224,15 @@
   padding: 8px 10px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  color: var(--on-media);
   border: none;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
 }
 
 .tp-menu .tp-menu-btn.is-on {
-  color: #7cfc9b;
+  color: var(--cyan);
 }
 
 /* ---- movable, compact settings popup ---- */
@@ -244,7 +244,7 @@
   max-height: calc(100vh - 24px);
   display: flex;
   flex-direction: column;
-  background: #161616;
+  background: var(--media-surface);
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
@@ -260,7 +260,7 @@
   cursor: grab;
   touch-action: none; /* header only, so body sliders still respond to touch */
   user-select: none;
-  font-size: 0.78rem;
+  font-size: 12px;
   flex-shrink: 0;
 }
 
@@ -270,13 +270,13 @@
 
 .tp-settings-pop .tp-pop-title {
   flex: 1;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .tp-settings-pop .tp-pop-close {
   background: none;
   border: none;
-  color: #fff;
+  color: var(--on-media);
   cursor: pointer;
   display: grid;
   place-items: center;
@@ -288,7 +288,7 @@
   display: flex;
   flex-direction: column;
   gap: 9px;
-  font-size: 0.78rem;
+  font-size: 12px;
   overflow-y: auto;
 }
 
@@ -304,17 +304,17 @@
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.07);
-  color: #fff;
-  font-size: 0.7rem;
-  font-weight: 600;
+  color: var(--on-media);
+  font-size: 11px;
+  font-weight: 700;
   line-height: 1.15;
   cursor: pointer;
 }
 
 .tp-presets button:active {
   background: rgba(0, 0, 0, 0.6);
-  color: var(--accent-primary, #e53935);
-  border-color: var(--accent-primary, #e53935);
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
 }
 
 .tp-set-row {
@@ -331,7 +331,7 @@
 .tp-set-row input[type="range"] {
   flex: 1;
   min-width: 0;
-  accent-color: var(--accent-primary, #e53935);
+  accent-color: var(--accent-primary);
 }
 
 .tp-set-val {
@@ -363,7 +363,7 @@
   height: 24px;
   padding: 0;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 5px;
+  border-radius: 4px;
   background: none;
   cursor: pointer;
 }
@@ -380,11 +380,11 @@
 }
 
 .tp-set-check input {
-  accent-color: var(--accent-primary, #e53935);
+  accent-color: var(--accent-primary);
 }
 
 .tp-set-note {
-  font-size: 0.72rem;
+  font-size: 12px;
   opacity: 0.7;
   line-height: 1.35;
 }
@@ -392,16 +392,17 @@
 .tp-lang-select {
   flex: 1;
   min-width: 0;
-  background: #0d0d0d;
-  color: #fff;
+  background: var(--media-bg);
+  color: var(--on-media);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 7px;
+  border-radius: 8px;
   padding: 5px 7px;
-  font-size: 0.78rem;
+  font-size: 12px;
 }
 
 .tp-lang-select option {
-  color: #000;
+  background: var(--surface);
+  color: var(--text);
 }
 
 /* Voice / Timed segmented switch */
@@ -419,15 +420,15 @@
   color: rgba(255, 255, 255, 0.7);
   border: none;
   padding: 6px 8px;
-  font-size: 0.74rem;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
 }
 
 .tp-seg button.is-on {
   background: rgba(0, 0, 0, 0.6);
-  box-shadow: inset 0 0 0 1px var(--accent-primary, #e53935);
-  color: var(--accent-primary, #e53935);
+  box-shadow: inset 0 0 0 1px var(--accent-primary);
+  color: var(--accent-primary);
 }
 
 .tp-seg button:disabled {
@@ -444,8 +445,8 @@
   padding: 14px 18px;
   border-radius: 12px;
   border: none;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   cursor: pointer;
   transition: filter 0.2s ease, opacity 0.2s ease;
 }
@@ -458,8 +459,8 @@
 /* Accent = outline (text + border), never a red background */
 .tp-btn--accent {
   background: rgba(0, 0, 0, 0.6);
-  border: 1px solid var(--accent-primary, #e53935);
-  color: var(--accent-primary, #e53935);
+  border: 1px solid var(--accent-primary);
+  color: var(--accent-primary);
 }
 
 .tp-btn--accent:not(:disabled):hover {
@@ -468,7 +469,7 @@
 
 .tp-btn--ghost {
   background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  color: var(--on-media);
 }
 
 /* ---- fullscreen script editor ---- */
@@ -477,7 +478,7 @@
   inset: 0;
   display: flex;
   flex-direction: column;
-  background: #000;
+  background: var(--media-bg);
 }
 
 .tp-script-head {
@@ -489,7 +490,7 @@
 
 .tp-script-head .tp-title {
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 16px;
 }
 
 .tp-icon-btn {
@@ -498,7 +499,7 @@
   border-radius: 50%;
   border: none;
   background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  color: var(--on-media);
   display: grid;
   place-items: center;
   cursor: pointer;
@@ -511,10 +512,10 @@
   box-sizing: border-box;
   resize: none;
   border: none;
-  background: #0b0b0b;
-  color: #fff;
+  background: var(--media-bg);
+  color: var(--on-media);
   padding: 14px 16px;
-  font-size: 1.1rem;
+  font-size: 18px;
   line-height: 1.5;
   font-family: inherit;
   outline: none;
@@ -531,12 +532,12 @@
   justify-content: space-between;
   gap: 12px;
   padding: 10px 16px;
-  background: #111;
+  background: var(--media-bg);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .tp-script-mode {
-  font-size: 0.8rem;
+  font-size: 13px;
   opacity: 0.75;
   min-width: 0;
   overflow: hidden;
@@ -549,7 +550,7 @@
   display: flex;
   gap: 10px;
   padding: 12px 16px calc(env(safe-area-inset-bottom) + 14px);
-  background: #0b0b0b;
+  background: var(--media-bg);
 }
 
 .tp-script-controls .tp-btn--accent {
@@ -565,11 +566,11 @@
   height: 28px;
   padding: 0 10px;
   border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 14px;
+  border-radius: 16px;
   background: rgba(0, 0, 0, 0.35);
   color: rgba(255, 255, 255, 0.9);
-  font-size: 0.6rem;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -577,12 +578,12 @@
 
 .pip-tp-btn:hover {
   border-color: rgba(255, 255, 255, 0.6);
-  color: #fff;
+  color: var(--on-media);
 }
 
 .pip-tp-btn.active {
-  border-color: var(--accent-primary, #e53935);
-  color: var(--accent-primary, #e53935);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
 }
 
 /* The small desktop PiP is narrow: icon only (the title says what it does) */
@@ -600,14 +601,13 @@
 .remix-stage .inline-recorder-pip .pip-tp-btn {
   height: 44px;
   padding: 0 14px;
-  border-radius: 22px;
+  border-radius: 24px;
   background: rgba(0, 0, 0, 0.55);
-  font-size: 0.75rem;
+  font-size: 12px;
 }
 
-.remix-stage .inline-recorder-pip .pip-tp-btn svg {
-  width: 16px;
-  height: 16px;
+.remix-stage .inline-recorder-pip .pip-tp-btn .ms-icon {
+  font-size: 16px !important;
 }
 
 /* "Voice following only works in Chromium browsers" (non-Chromium only). Meant
@@ -619,16 +619,16 @@
   margin: 8px 12px;
   padding: 10px 12px;
   border: 1px solid rgba(255, 196, 0, 0.6);
-  border-radius: 10px;
+  border-radius: 12px;
   background: rgba(255, 196, 0, 0.12);
-  color: #fff;
-  font-size: 0.9rem;
+  color: var(--on-media);
+  font-size: 14px;
   line-height: 1.4;
 }
-.tp-speech-notice svg {
+.tp-speech-notice .ms-icon {
   flex-shrink: 0;
   margin-top: 2px;
-  color: #ffc400;
+  color: var(--accent);
 }
 .tp-speech-notice strong {
   display: block;
@@ -648,10 +648,10 @@
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.4);
   background: transparent;
-  color: #fff;
+  color: var(--on-media);
   cursor: pointer;
 }
-.tp-sb-btn:hover:not(:disabled) { border-color: #fff; background: rgba(255, 255, 255, 0.08); }
+.tp-sb-btn:hover:not(:disabled) { border-color: var(--on-media); background: rgba(255, 255, 255, 0.08); }
 .tp-sb-btn:disabled { opacity: 0.35; cursor: default; }
 .tp-sb-speed {
   display: flex;
@@ -660,8 +660,8 @@
   min-width: 64px;
   line-height: 1.1;
 }
-.tp-sb-speed strong { font-size: 1.3rem; font-variant-numeric: tabular-nums; }
-.tp-sb-speed small { font-size: 0.68rem; opacity: 0.75; }
+.tp-sb-speed strong { font-size: 20px; font-variant-numeric: tabular-nums; }
+.tp-sb-speed small { font-size: 11px; opacity: 0.75; }
 
 /* Scroll speed inside the Teleprompter menu (timed scrolling). */
 .tp-menu-speed {
@@ -671,11 +671,11 @@
   gap: 4px;
   padding: 6px 8px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
+  border-radius: 12px;
 }
 .tp-menu-speed-label {
   align-self: flex-start;
-  font-size: 0.75rem;
+  font-size: 12px;
   opacity: 0.75;
 }
 .tp-menu-speed-row {

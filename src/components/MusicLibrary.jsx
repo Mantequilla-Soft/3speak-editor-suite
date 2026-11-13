@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
-import { X, Play, Pause, Plus, Search, Music, AudioLines } from 'lucide-react'
+import { X, Play, Pause, Plus, Search, Music, AudioLines } from './icons'
 
 // Where the song lists come from: comma separated URLs of library.json files
 // ({ moods: [{ id, label }], tracks: [...] }), relative to the editor's origin.

@@ -22,10 +22,20 @@ The editor can also run in **iframe mode** -- a parent page (e.g. 3Speak TV) emb
 
 | Layer | Technologies |
 |-------|-------------|
-| Frontend | React 18, Vite 5, FFmpeg.wasm, HLS.js, Lucide React |
+| Frontend | React 18, Vite 5, FFmpeg.wasm, HLS.js, Material Symbols Rounded (icons) |
 | Backend | Node.js 18, Express 4, FFmpeg (system), Multer |
 | Gateway | Node.js 18, Express 4, MongoDB |
 | Infra | Docker Compose, Nginx, SharedArrayBuffer (COOP/COEP) |
+
+## Look and feel
+
+The editor follows 3Speak's v2 design (the `design_handoff_3speak_v2` package in the 3speak.tv repo, STYLE_GUIDE.md there), so it looks like the page around it:
+
+- **Tokens:** `src/styles/tokens.css` holds the colours, type sizes, spacing, radii and motion, light (`:root`) and dark (`[data-theme="dark"]`, sent by 3Speak with `set-theme`). The editor's older names (`--bg-primary`, `--accent-primary`...) are aliases there. No hex values in components; tints come from `color-mix()`.
+- **Scales:** type 10 11 12 13 14 16 18 20 24 28 32..., weights 400 500 700 900, control radius follows height (up to 28: 8, 32-40: 12, 44-52: 16), cards 24, dialogs 28.
+- **Colour use:** red (`--accent`) is the one primary action per view (Render / Export, Use, Start recording), the playhead, live and errors; cyan (`--cyan`) is selected-but-not-primary, info and voice/sound on the timeline. No other hues in the interface (content colours a user picks are fine).
+- **Icons:** `src/components/icons.jsx`, Material Symbols Rounded from Google Fonts. Only the listed glyphs are downloaded (`icon_names=` in `index.html`); `tests/icons.test.js` keeps the two in step.
+- **Dialogs:** one shell (`.remix-picker-overlay` > `.remix-picker`), a bottom sheet under 768 px. Small notices are an island at the top centre, never a corner toast.
 
 ## Features
 

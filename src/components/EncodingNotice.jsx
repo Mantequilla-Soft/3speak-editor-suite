@@ -1,4 +1,4 @@
-import { Loader2, X, Check } from 'lucide-react'
+import { Loader2, X, Check } from './icons'
 
 const pct = (p) => `${Math.round((p || 0) * 100)}%`
 

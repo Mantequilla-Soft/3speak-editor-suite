@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { X, Upload, Scissors, Trash2, Loader2, LogIn, Wand2, Check } from 'lucide-react'
+import { X, Upload, Scissors, Trash2, Loader2, LogIn, Wand2, Check } from './icons'
 import { slotFromClip, slotLength, BED_DEFAULT_VOLUME, TEMPLATE_ROLES } from '../utils/audioTemplate'
 import { formatLength } from '../utils/limits'
 
