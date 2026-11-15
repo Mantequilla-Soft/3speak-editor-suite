@@ -3,6 +3,8 @@ import crypto from 'crypto'
 import path from 'path'
 import fs from 'fs/promises'
 import { RENDER_CACHE_DIR } from './ffmpeg.js'
+import { ffmpegAudioTiming } from '../utils/clipSpeed.js'
+import { ffmpegVolumeFilter, hasVolumeKeyframes } from '../utils/keyframes.js'
 
 /**
  * Audio mode render (podcasts, music, voice): the timeline's audio tracks
@@ -98,12 +100,18 @@ export function laneEntries(lane) {
 export function segmentFilter(clip) {
   const duration = clipLength(clip)
   const parts = []
+  // Speed / ramp first (utils/clipSpeed.js): what follows is in timeline time
+  const timing = ffmpegAudioTiming(clip)
+  if (timing?.filter) parts.push(timing.filter)
   const fi = Math.min(duration, Math.max(0, +clip.fadeIn || 0))
   const fo = Math.min(duration, Math.max(0, +clip.fadeOut || 0))
   if (fi > 0) parts.push(`afade=t=in:st=0:d=${fi.toFixed(3)}`)
   if (fo > 0) parts.push(`afade=t=out:st=${Math.max(0, duration - fo).toFixed(3)}:d=${fo.toFixed(3)}`)
-  const vol = clipVolume(clip)
+  const vol = hasVolumeKeyframes(clip) ? 1 : clipVolume(clip)
   if (Math.abs(vol - 1) > 0.0001) parts.push(`volume=${vol.toFixed(3)}`)
+  // Animated volume (utils/keyframes.js: then the clip's own volume is 100)
+  const kfVolume = ffmpegVolumeFilter(clip)
+  if (kfVolume) parts.push(kfVolume)
   // The clip's own auto-duck (its sidechain source's spans, in clip seconds)
   const duck = cleanClipDuck(clip.duckPlan)
   if (duck) parts.push(duckFilter(duck))
@@ -125,7 +133,9 @@ function segmentKey(clip, inputFile, samples, channels) {
 export function segmentArgs(clip, inputFile, samples, outPath, { hasAudio = true, channels = 2 } = {}) {
   if (!hasAudio) return silenceArgs(samples, outPath)
   const args = ['-hide_banner', '-loglevel', 'error']
-  const start = Math.max(0, +clip.startTime || 0)
+  const timing = ffmpegAudioTiming(clip)
+  if (timing?.silent) return silenceArgs(samples, outPath)
+  const start = Math.max(0, timing ? timing.seek : (+clip.startTime || 0))
   if (start > 0) args.push('-ss', start.toFixed(6))
   args.push('-i', inputFile, '-vn')
   // Resample first so the fades and the sample count are in the segment's own rate;

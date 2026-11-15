@@ -12,6 +12,7 @@ import Timeline from './components/Timeline'
 import VideoPreview from './components/VideoPreview'
 import GlobalPreview from './components/GlobalPreview'
 import ClipProperties from './components/ClipProperties'
+import { routeAnimatedEdits, mediaView, mediaPartsToClip } from './utils/motionEdits'
 import ExportButton from './components/ExportButton'
 import RecordVideo from './components/RecordVideo'
 import RecordAudio from './components/RecordAudio'
@@ -116,7 +117,7 @@ function App() {
     updateTrack,
     removeTrack,
     removeClip,
-    updateClip,
+    updateClip: updateClipPlain,
     selectClip,
     duplicateClip,
     splitClip,
@@ -151,6 +152,12 @@ function App() {
     rejectedFiles,
     dismissRejectedFiles
   } = useTimeline()
+  // An edit of an animated property (slider, drag on the preview) goes to its
+  // keyframe at the playhead (utils/motionEdits.js); anything else as it is
+  const updateClip = useCallback((clipId, updates) => {
+    const clip = tracks.flatMap(t => t.clips).find(c => c.id === clipId)
+    updateClipPlain(clipId, routeAnimatedEdits(clip, updates, playheadPosition))
+  }, [tracks, playheadPosition, updateClipPlain])
 
   // Auto cut popup: the clip it was opened for
   const [autoCutClipId, setAutoCutClipId] = useState(null)
@@ -183,10 +190,10 @@ function App() {
   }, [autoCutClip, tracks, fileStoreRef])
   const handleAutoCutApply = useCallback((parts, options) => {
     if (autoCutGroup) applyGroupSilenceCut(autoCutGroup.map(m => m.clip.id), parts, options)
-    else applySilenceCut(autoCutClipId, parts, options)
+    else applySilenceCut(autoCutClipId, mediaPartsToClip(autoCutClip, parts), options) // parts are in media seconds
     setAutoCutClipId(null)
     refitTemplateRef.current?.()
-  }, [applySilenceCut, applyGroupSilenceCut, autoCutClipId, autoCutGroup])
+  }, [applySilenceCut, applyGroupSilenceCut, autoCutClipId, autoCutGroup, autoCutClip])
   // (refitTemplate is defined further down, with the template)
   const refitTemplateRef = useRef(null)
 
@@ -1467,6 +1474,11 @@ function App() {
             />
           </div>
   ) : null
+  // Speed, freeze frames and keyframes in the clip settings (SpeedControls, KeyframeControls)
+  const retimeCaptions = useCallback((map) => setCaptions(c => (c?.words?.length
+    ? { ...c, words: c.words.map(w => ({ ...w, start: map(w.start), end: Math.max(map(w.start), map(w.end)) })) }
+    : c)), [])
+  const motionKit = { tracks, applyTracks, fileStoreRef, retimeCaptions, setPlayhead: setPlayheadPosition, captions }
   const compactPropertiesPanel = sideClip ? (
           <div className="compact-properties-panel">
             <div className="compact-properties-header">
@@ -1490,6 +1502,7 @@ function App() {
               duckInfo={audioMode ? duckInfoFor(sideClip) : null}
               playheadPosition={playheadPosition}
               tabbed={!isDesktop}
+              motionKit={audioMode ? null : motionKit}
             />
           </div>
   ) : null
@@ -1959,7 +1972,7 @@ function App() {
         {autoCutClip && (
           <SilenceCutModal
             key={autoCutClip.id}
-            clip={autoCutClip}
+            clip={mediaView(autoCutClip)}
             source={autoCutSource}
             analysisUrl={autoCutClip.serverUrl || null}
             unavailable={autoCutSource || autoCutClip.serverUrl ? null : autoCutUnavailable}
@@ -2391,6 +2404,7 @@ function App() {
                     onUpdateClip={(updates) => selectedClipId && updateClip(selectedClipId, updates)}
                     onSplit={(time) => selectedClipId && splitClip(selectedClipId, time)}
                     playheadPosition={playheadPosition}
+                    motionKit={audioMode ? null : motionKit}
                   />
                 </div>
               )}
@@ -2444,7 +2458,7 @@ function App() {
       {autoCutClip && (
         <SilenceCutModal
           key={autoCutClip.id}
-          clip={autoCutClip}
+          clip={mediaView(autoCutClip)}
           source={autoCutSource}
           unavailable={autoCutUnavailable}
           onApply={handleAutoCutApply}

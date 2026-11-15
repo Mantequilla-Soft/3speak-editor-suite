@@ -5,6 +5,7 @@ import { hasLayout } from '../utils/remixLayout'
 import { getClipChromaKey } from '../utils/chromaKey'
 import { normalizeColor } from '../utils/clipColor'
 import { normalizeMotion } from '../utils/stickerMotion'
+import { motionFields } from '../utils/motionEdits'
 import { duckPlans, localDuckPlan } from '../utils/duck'
 import { outputSize } from '../utils/outputSize'
 import { normalizeCaptions } from '../utils/captions'
@@ -387,6 +388,9 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
         // Sticker motion (utils/stickerMotion.js), image and text clips
         const motion = (clip.type === 'image' || clip.type === 'text') ? normalizeMotion(clip.motion) : null
         if (motion) baseClip.motion = motion
+
+        // Speed, ramp or still (utils/clipSpeed.js) and keyframes (utils/keyframes.js)
+        Object.assign(baseClip, motionFields(clip))
 
         // Green screen: keyed out in the render, over the tracks below
         const key = getClipChromaKey(clip)
