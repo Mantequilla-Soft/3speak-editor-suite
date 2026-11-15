@@ -180,19 +180,19 @@ const LOUDNESS = 'aeval=abs(val(0)):c=mono,aformat=sample_fmts=s16:channel_layou
 /**
  * The moving waveform of a type, w x h, in a colour, on transparent. For the
  * round ones (w = h = the circle) this is the straight strip that circleMaps
- * bends round.
+ * bends round. `fps`: the video's frame rate (the video podcast runs slower).
  */
-export function waveFilter(type, w, h, color) {
+export function waveFilter(type, w, h, color, fps = FPS) {
   const c = hex(color)
   if (type === 'circle') {
     // bars standing out from the inner ring: the top half of centred bars
     const g = circleGeometry(type, w)
-    return `${LOUDNESS},showwaves=s=${g.cols}x${g.rows * 2}:mode=cline:rate=${FPS}:colors=${c}:scale=sqrt:draw=full,crop=${g.cols}:${g.rows}:0:0,format=rgba`
+    return `${LOUDNESS},showwaves=s=${g.cols}x${g.rows * 2}:mode=cline:rate=${fps}:colors=${c}:scale=sqrt:draw=full,crop=${g.cols}:${g.rows}:0:0,format=rgba`
   }
   if (type === 'ring') {
     const g = circleGeometry(type, w)
     // a wavy line: the sound without its highs, so it swings instead of buzzing
-    return `lowpass=f=420,lowpass=f=420,showwaves=s=${g.cols}x${g.rows}:mode=p2p:rate=${FPS}:colors=${c}:scale=sqrt:draw=full,format=rgba`
+    return `lowpass=f=420,lowpass=f=420,showwaves=s=${g.cols}x${g.rows}:mode=p2p:rate=${fps}:colors=${c}:scale=sqrt:draw=full,format=rgba`
   }
   if (type === 'bars') {
     // Bars: a narrow centred waveform of the loudness, blown up without
@@ -201,11 +201,11 @@ export function waveFilter(type, w, h, color) {
     const n = Math.max(12, Math.round(w / 24))
     const step = Math.max(4, Math.floor(w / n))
     return `${LOUDNESS},` +
-      `showwaves=s=${n}x${h}:mode=cline:rate=${FPS}:colors=${c}:scale=sqrt:draw=full,scale=${n * step}:${h}:flags=neighbor,` +
+      `showwaves=s=${n}x${h}:mode=cline:rate=${fps}:colors=${c}:scale=sqrt:draw=full,scale=${n * step}:${h}:flags=neighbor,` +
       `format=rgba,drawgrid=w=${step}:h=${h + 2}:t=${Math.max(2, Math.round(step / 4))}:c=0x000000@1,colorkey=0x000000:0.02:0,pad=${w}:${h}:(ow-iw)/2:0:color=0x00000000`
   }
   const mode = type === 'line' ? 'line' : type === 'dots' ? 'p2p' : 'cline'
-  return `showwaves=s=${w}x${h}:mode=${mode}:rate=${FPS}:colors=${c}:scale=sqrt:draw=full,format=rgba`
+  return `showwaves=s=${w}x${h}:mode=${mode}:rate=${fps}:colors=${c}:scale=sqrt:draw=full,format=rgba`
 }
 
 /**

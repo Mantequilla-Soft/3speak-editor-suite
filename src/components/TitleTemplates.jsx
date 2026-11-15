@@ -8,8 +8,11 @@ import './TitleTemplates.css'
 
 const PREVIEW_FRAME = { width: 1080, height: 1920 }
 
-// The preview canvas's height in px (title positions are in preview px)
-const previewHeight = () => document.querySelector('.preview-layer-container')?.clientHeight || 640
+// The preview canvas in px (title positions are in preview px)
+const previewBox = () => {
+  const el = document.querySelector('.preview-layer-container')
+  return el ? { previewW: el.clientWidth, previewH: el.clientHeight } : {}
+}
 
 /**
  * Titles for a Short (utils/titleScenes.js): lower thirds and titles over the
@@ -53,7 +56,7 @@ export default function TitleTemplates({ onAdd, onClose, frame = PREVIEW_FRAME }
   }, [draft])
 
   const add = () => {
-    const c = titleClip(template.id, { values, colors: style.colors, font: style.font, previewH: previewHeight() })
+    const c = titleClip(template.id, { values, colors: style.colors, font: style.font, ...previewBox() })
     onAdd(c)
     onClose()
   }
@@ -87,7 +90,7 @@ export default function TitleTemplates({ onAdd, onClose, frame = PREVIEW_FRAME }
 
         {template && draft && (
           <div className="title-editor">
-            <div className={`title-stage${draft.transparent ? ' over-video' : ''}`}>
+            <div className={`title-stage${draft.transparent ? ' over-video' : ''}`} style={{ aspectRatio: `${frame.width} / ${frame.height}` }}>
               <SceneLayer
                 clip={draft}
                 time={0}

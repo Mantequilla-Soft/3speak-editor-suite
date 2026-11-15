@@ -2,13 +2,16 @@
 // GlobalPreview's clip lists get the overlap, its layers the CSS for the
 // moment, its audio the crossfade ramps and pieces. Same states as the render.
 import { transitionPlan, clipExtent, heldMediaTime, transitionState, transitionAudio, videoFades, rampGain } from './transitions'
+import { sourceAt } from './clipSpeed'
+import { mediaTimeAt as playMediaTimeAt } from './keyframePreview'
 
 const hasFades = (clip) => { const f = videoFades(clip); return f.fadeIn > 0 || f.fadeOut > 0 }
 
 /**
  * Video track clips (GlobalPreview's list, with timelineStart / timelineEnd):
  * a clip in a transition shows a little before its start / after its end.
- * Adds mediaStart (where its media time counts from) and xEntry (its part).
+ * Adds mediaStart (where its clip time counts from: keyframePreview's
+ * clipTimeOf reads it) and xEntry (its part).
  */
 export function withTransitions(videoClips, tracks) {
   const plan = transitionPlan(tracks)
@@ -21,14 +24,14 @@ export function withTransitions(videoClips, tracks) {
   }).sort((a, b) => a.timelineStart - b.timelineStart)
 }
 
-// The media time a clip's video shows at a timeline moment (held on its first /
-// last frame in a transition's overlap)
+// The media time a clip's video shows at a timeline moment, through its speed
+// (keyframePreview.js), held on its first / last frame in a transition's overlap
 export function mediaTimeAt(clip, position) {
   if (clip.xEntry) {
     const held = heldMediaTime(clip, clip.xEntry, position)
-    if (held != null) return held
+    if (held != null) return sourceAt(clip, held)
   }
-  return clip.startTime + (position - (clip.mediaStart ?? clip.timelineStart))
+  return playMediaTimeAt(clip, position)
 }
 
 /**
@@ -37,8 +40,9 @@ export function mediaTimeAt(clip, position) {
  */
 export function holdTransitionFrame(clip, el, position) {
   if (!clip.xEntry || !el) return false
-  const held = heldMediaTime(clip, clip.xEntry, position)
-  if (held == null) return false
+  const clipHeld = heldMediaTime(clip, clip.xEntry, position)
+  if (clipHeld == null) return false
+  const held = sourceAt(clip, clipHeld)
   if (!el.paused) el.pause()
   if (el.readyState >= 1 && !el.seeking && Math.abs(el.currentTime - held) > 0.05) el.currentTime = held
   return true
@@ -70,12 +74,18 @@ export function transitionLayerProps(clip, style, t, frameH, canvas, registry) {
   return { 'data-trans-id': clip.id }
 }
 
-// Every frame while playing: the layers in transitions or fades
+// Every frame while playing: the layers in transitions or fades. A layer that
+// keyframes or sticker motion moved this frame (their loops run first) takes
+// the transition on top of where they put it: slide in front, zoom after.
 export function applyTransitionFrames(container, t, frameH, canvas, registry) {
   container?.querySelectorAll('[data-trans-id]').forEach(el => {
     const r = registry[el.dataset.transId]
     if (!r) return
-    const css = transitionCss(r.clip, t, frameH, r.base, canvas)
+    const moved = el.dataset.kfId || el.dataset.motionId
+    const base = moved
+      ? { transform: el.style.transform || '', filter: r.base.filter, opacity: el.style.opacity === '' ? 1 : +el.style.opacity }
+      : r.base
+    const css = transitionCss(r.clip, t, frameH, base, canvas)
     el.style.transform = css.transform || ''
     el.style.filter = css.filter || ''
     el.style.opacity = String(css.opacity)

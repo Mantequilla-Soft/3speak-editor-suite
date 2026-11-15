@@ -3,7 +3,7 @@ import { getActiveBackends } from './backends.js'
 const HEALTH_CHECK_INTERVAL = parseInt(process.env.HEALTH_CHECK_INTERVAL || '15000', 10)
 const HEALTH_CHECK_TIMEOUT = parseInt(process.env.HEALTH_CHECK_TIMEOUT || '5000', 10)
 
-// Cache: apiEndpoint -> { healthy, activeJobs, maxConcurrentJobs, lastChecked, error }
+// Cache: apiEndpoint -> { healthy, activeJobs, maxConcurrentJobs, queuedJobs?, maxQueuedJobs?, lastChecked, error }
 const healthCache = new Map()
 
 export function getHealthCache() {
@@ -41,6 +41,9 @@ async function checkBackendHealth(apiEndpoint) {
       healthy: data.status === 'ok',
       activeJobs: data.activeJobs || 0,
       maxConcurrentJobs: data.maxConcurrentJobs || 0,
+      // backends with the render queue: how many wait, how many may (absent on older ones)
+      ...(Number.isFinite(data.queuedJobs) ? { queuedJobs: data.queuedJobs } : {}),
+      ...(Number.isFinite(data.maxQueuedJobs) ? { maxQueuedJobs: data.maxQueuedJobs } : {}),
       lastChecked: new Date(),
       error: null
     })

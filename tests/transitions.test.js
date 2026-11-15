@@ -211,3 +211,32 @@ it('the preview and the render use the same transitions file', () => {
   const read = (f) => readFileSync(new URL(`../${f}`, import.meta.url), 'utf8')
   expect(read('backend/src/utils/transitions.js')).toBe(read('src/utils/transitions.js'))
 })
+
+describe('transitions with speed (clipSpeed.js)', () => {
+  const fast = () => [
+    { id: 'v1', type: 'video', clips: [
+      { id: 'a', type: 'video', startTime: 1, endTime: 3, duration: 8, speed: 2, timelinePosition: 0, groupId: 'ga', transition: { type: 'crossfade', duration: 1, to: 'b' } },
+      { id: 'b', type: 'video', startTime: 2, endTime: 4, duration: 20, timelinePosition: 2, groupId: 'gb' }] },
+    { id: 'a1', type: 'audio', clips: [
+      { id: 'aa', type: 'audio', startTime: 1, endTime: 3, duration: 8, speed: 2, timelinePosition: 0, groupId: 'ga' },
+      { id: 'ab', type: 'audio', startTime: 2, endTime: 4, duration: 20, timelinePosition: 2, groupId: 'gb' }] }
+  ]
+  const list = (tracks) => tracks[0].clips.map(c => ({ ...c, timelineStart: c.timelinePosition, timelineEnd: c.timelinePosition + c.endTime - c.startTime }))
+  it('a 2x clip plays and holds its own media frames', () => {
+    const tracks = fast()
+    const [a] = withTransitions(list(tracks), tracks)
+    expect(mediaTimeAt(a, 1)).toBe(4) // clip time 2 -> media 4 at 2x
+    expect(mediaTimeAt(a, 2.3)).toBeCloseTo((3 - 1 / 30) * 2) // held on its last frame, in media seconds
+  })
+  it('the sound past the cut is what is left of the file in clip time', () => {
+    const { pieces } = transitionAudio(fast())
+    // 8 s of media at 2x = clip time 4; the clip ends at 3: half the length (0.5) fits
+    expect(pieces.find(p => p.of === 'aa')).toMatchObject({ startTime: 3, endTime: 3.5 })
+    const short = fast()
+    short[1].clips[0].duration = 6.4 // clip time 3.2: only 0.2 s left
+    expect(transitionAudio(short).pieces.find(p => p.of === 'aa').endTime).toBeCloseTo(3.2)
+    const still = fast()
+    still[1].clips[0].freezeAt = 2
+    expect(transitionAudio(still).pieces.some(p => p.of === 'aa')).toBe(false)
+  })
+})

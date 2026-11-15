@@ -16,7 +16,9 @@ do nothing else. The script:
   keep serving
 - keeps each box's own `docker-compose.yml`; a PR that changes it stops the deploy so a
   human merges the settings by hand
-- swaps a backend only when it renders nothing (`activeJobs` 0, waits up to 30 minutes)
+- swaps a backend only when it renders nothing and nothing waits in its render queue
+  (`activeJobs` and `queuedJobs` 0 in `/api/health`, waits up to 30 minutes); queued jobs
+  are kept on disk anyway (`RENDER_JOBS_DIR`), so a restart would not lose them
 - smoke tests every swapped service (health, anonymous upload/render refused, the frontend
   bundle has no dev editor URLs) and rolls back to the previous images on any failure
 

@@ -95,3 +95,31 @@ test('fade in and out of a video clip', { skip: !hasFfmpeg, timeout: 60000 }, as
   assert.ok(at(out, 0.6).r > 230, 'full after the fade')
   assert.ok(at(out, 1.95).b < 60, 'dark at the end')
 })
+
+test('a crossfade from a 2x clip into a normal one: the fast clip plays its media at double speed and holds its own last frame', { skip: !hasFfmpeg, timeout: 120000 }, async () => {
+  // red for 1.5 s of media, then green: at 2x that change shows at 0.75 s on the timeline
+  const redGreen = path.join(dir, 'redgreen.mp4')
+  ff('-f', 'lavfi', '-i', `color=c=red:s=${W}x${H}:r=30:d=1.5`, '-f', 'lavfi', '-i', `color=c=0x00ff00:s=${W}x${H}:r=30:d=1.5`, '-f', 'lavfi', '-i', 'sine=f=440:d=3',
+    '-filter_complex', '[0:v][1:v]concat=n=2:v=1:a=0[v]', '-map', '[v]', '-map', '2:a', '-shortest', '-c:v', 'libx264', '-preset', 'ultrafast', '-pix_fmt', 'yuv420p', '-c:a', 'aac', redGreen)
+  const tracks = [
+    { id: 'v', type: 'video', clips: [
+      { id: 'a', type: 'video', url: 'x', startTime: 0, endTime: 1, duration: 3, speed: 2, timelinePosition: 0, audioEnabled: false, groupId: 'g1', transition: { type: 'crossfade', duration: 0.4, to: 'b' } },
+      { id: 'b', type: 'video', url: 'x', startTime: 1, endTime: 2, duration: 3, timelinePosition: 1, audioEnabled: false, groupId: 'g2' }] },
+    { id: 'au', type: 'audio', clips: [
+      { id: 'aa', type: 'audio', url: 'x', startTime: 0, endTime: 1, duration: 3, speed: 2, timelinePosition: 0, groupId: 'g1' },
+      { id: 'ba', type: 'audio', url: 'x', startTime: 1, endTime: 2, duration: 3, timelinePosition: 1, groupId: 'g2' }] }
+  ]
+  const jobDir = path.join(dir, 'fast'); fs.mkdirSync(jobDir, { recursive: true })
+  const out = path.join(dir, 'fast.mp4')
+  await buildAndRunFFmpeg({ timeline: { outputWidth: W, outputHeight: H, previewWidth: W, previewHeight: H, fps: 30, tracks },
+    downloadedFiles: new Map([['a', redGreen], ['b', blue], ['aa', redGreen], ['ba', blue]]), outputPath: out, jobDir, onProgress: () => {} })
+  const early = at(out, 0.4), late = at(out, 0.78)
+  assert.ok(early.r > 200 && early.g < 60, `red early: ${JSON.stringify(early)}`)
+  assert.ok(late.g > 200 && late.r < 60, `green from 0.75 s of media at 2x: ${JSON.stringify(late)}`)
+  // after the cut the fast clip is held on its last frame (green) under the incoming blue
+  const mid = at(out, 1.1)
+  assert.ok(mid.g > 60 && mid.b > 60 && mid.r < 60, `green and blue mixed after the cut: ${JSON.stringify(mid)}`)
+  // its sound goes on past the cut (the piece past the cut at 2x)
+  assert.ok(tone(out, 440, 1.05) > -60, 'fast clip\'s tone after the cut')
+  assert.ok(fs.readdirSync(jobDir).some(f => /xfade_aa/.test(f)), 'a piece of the fast clip\'s sound past the cut')
+})

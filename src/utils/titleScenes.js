@@ -141,14 +141,15 @@ export const sceneLength = (clip) => {
 
 /**
  * A new title clip's own fields (the timeline adds id, position and track):
- * previewH: the preview canvas height in px (positions are in preview px).
+ * previewH / previewW: the preview canvas in px (positions are in preview px;
+ * without previewW it is taken as 9:16).
  */
-export function titleClip(templateId, { values = null, colors = null, font = null, previewH = 640 } = {}) {
+export function titleClip(templateId, { values = null, colors = null, font = null, previewH = 640, previewW = null } = {}) {
   const t = templateOf(templateId)
   if (!t) return null
   const duration = t.duration
   const lower = t.placement === 'lower'
-  const previewW = previewH * 9 / 16
+  const width = previewW || previewH * 9 / 16
   return {
     type: 'scene',
     name: t.label,
@@ -160,7 +161,7 @@ export function titleClip(templateId, { values = null, colors = null, font = nul
     duration,
     zoom: lower ? LOWER.zoom : 100,
     // CSS scale(zoom) then translate(position): the shift is in unzoomed preview px
-    positionX: lower ? Math.round((LOWER.x * previewW) / (LOWER.zoom / 100)) : 0,
+    positionX: lower ? Math.round((LOWER.x * width) / (LOWER.zoom / 100)) : 0,
     positionY: lower ? Math.round((LOWER.y * previewH) / (LOWER.zoom / 100)) : 0
   }
 }

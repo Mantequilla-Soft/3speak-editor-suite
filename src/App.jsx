@@ -1,32 +1,27 @@
 import { useCallback, useEffect, useRef, useMemo, useState } from 'react'
-import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, HelpCircle, Maximize, Minimize, Scissors, Play, Pause, MousePointerClick } from './components/icons'
+import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, HelpCircle, Maximize, Minimize, Scissors, Play, Pause, MousePointerClick, Keyboard } from './components/icons'
 import { useFFmpeg } from './hooks/useFFmpeg'
 import { useCanvasExport } from './hooks/useCanvasExport'
 import { useTimeline } from './hooks/useTimeline'
+import { useUndoableState } from './hooks/useHistory'
 import { useIframeApi } from './hooks/useIframeApi'
 import { isHlsUrl } from './utils/hlsHelper'
 import { reverseClipOnBackend } from './utils/reverseClip'
 import { selectBackend, getBackendUrl, api } from './utils/backendSelector'
-import ProjectLibrary from './components/ProjectLibrary'
 import Timeline from './components/Timeline'
-import VideoPreview from './components/VideoPreview'
 import GlobalPreview from './components/GlobalPreview'
+// opened on demand, each its own chunk (components/lazyPanels.jsx)
+import { ProjectLibrary, VideoPreview, ExportButton, RecordVideo, RecordAudio, RemixModePicker, MusicLibrary, AudioTemplateDialog, ChaptersDialog, AudiogramDialog, BeatSyncModal, StickerPicker, CaptionsPanel, ShortcutSheet, TitleTemplates } from './components/lazyPanels'
 import ClipProperties from './components/ClipProperties'
-import ExportButton from './components/ExportButton'
-import RecordVideo from './components/RecordVideo'
-import RecordAudio from './components/RecordAudio'
+import { routeAnimatedEdits, mediaView, mediaPartsToClip } from './utils/motionEdits'
 import OnboardingTour, { AUDIO_TOUR_STEPS, RANGE_PICK_TOUR_STEPS, useFirstTimeTour } from './components/OnboardingTour'
 import MultiClipProperties from './components/MultiClipProperties'
 import { soundTargets } from './utils/multiSelect'
-import RemixModePicker from './components/RemixModePicker'
-import MusicLibrary from './components/MusicLibrary'
 import { REMIX_LAYOUTS, hasLayout, clampLayout } from './utils/remixLayout'
 import { MAX_TIMELINE_SECONDS, MAX_TIMELINE_ADJ, MAX_TIMELINE_TEXT, getTimelineEnd } from './utils/limits'
 import LengthLimitNotice from './components/LengthLimitNotice'
 import TooLargeNotice from './components/TooLargeNotice'
 import SilenceCutModal, { loadSettings as loadAutoCutSettings } from './components/SilenceCutModal'
-import AudioTemplateDialog from './components/AudioTemplateDialog'
-import ChaptersDialog from './components/ChaptersDialog'
 import { newChapter, moveChapter, resolveChapters, chapterSpans, chapterTime, MAX_CHAPTERS } from './utils/chapters'
 import { duckPlans, clipDuckSetting, applyMasterDuck, DUCK_DEPTHS, DUCK_DEFAULT_DB } from './utils/duck'
 import { trackNumbers, trackLabel } from './utils/trackNumbers'
@@ -36,25 +31,27 @@ import { applyAudioTemplate, removeAudioTemplate, appliedRoles, hasSlots } from 
 import { loadLoudness, planCuts } from './utils/silenceDetect'
 import { combineLoudness, groupSpan, overlappingVoices } from './utils/groupSilence'
 import { isAudioMode } from './utils/editorMode'
-import AudiogramDialog from './components/AudiogramDialog'
 import { audiogramsToPost } from './utils/audiogramLayers'
 import { audioFileName } from './utils/audioTemplate'
-import BeatSyncModal from './components/BeatSyncModal'
-import StickerPicker from './components/StickerPicker'
-import TitleTemplates from './components/TitleTemplates'
 import EncodingNotice from './components/EncodingNotice'
 import ClipColorFilters from './components/ClipColorFilters'
 import { outputSize } from './utils/outputSize'
 import { DraftsPrompt, DraftLimitPicker, CloseDialog, DraftStatus } from './components/DraftsDialogs'
 import { useDrafts, savedPlayhead } from './hooks/useDrafts'
 import { useAutoCaptions } from './hooks/useAutoCaptions'
-import CaptionsPanel from './components/CaptionsPanel'
 import { normalizeCaptions, suggestEmojis, DEFAULT_CAPTION_STYLE } from './utils/captions'
 import { voiceTracksOf } from './utils/captionSources'
 import ConfirmDialog from './components/ConfirmDialog'
 import { useCleaningStatus, cleaningText } from './utils/cleaningStatus'
 import { isTypingTarget } from './utils/keyboard'
+import { isRenderActive } from './utils/renderQueue'
+import { useShortcuts } from './hooks/useShortcuts'
 import logo3speak from './assets/3speak.png'
+import ProjectFormat from './components/ProjectFormat'
+import FormatsPanel from './components/FormatsPanel'
+import VideoPodcastDialog from './components/VideoPodcastDialog'
+import { useProjectFormat } from './hooks/useProjectFormat'
+import { postFormat } from './utils/projectFormat'
 
 // Audio editor: the talking = clips on audio tracks that are not music and not template parts
 function voiceClipsOf(list) {
@@ -118,7 +115,7 @@ function App() {
     updateTrack,
     removeTrack,
     removeClip,
-    updateClip,
+    updateClip: updateClipPlain,
     selectClip,
     duplicateClip,
     splitClip,
@@ -148,11 +145,18 @@ function App() {
     redo,
     canUndo,
     canRedo,
+    history,
     lengthNotice,
     dismissLengthNotice,
     rejectedFiles,
     dismissRejectedFiles
   } = useTimeline()
+  // An edit of an animated property (slider, drag on the preview) goes to its
+  // keyframe at the playhead (utils/motionEdits.js); anything else as it is
+  const updateClip = useCallback((clipId, updates) => {
+    const clip = tracks.flatMap(t => t.clips).find(c => c.id === clipId)
+    updateClipPlain(clipId, routeAnimatedEdits(clip, updates, playheadPosition))
+  }, [tracks, playheadPosition, updateClipPlain])
 
   // Auto cut popup: the clip it was opened for
   const [autoCutClipId, setAutoCutClipId] = useState(null)
@@ -185,10 +189,10 @@ function App() {
   }, [autoCutClip, tracks, fileStoreRef])
   const handleAutoCutApply = useCallback((parts, options) => {
     if (autoCutGroup) applyGroupSilenceCut(autoCutGroup.map(m => m.clip.id), parts, options)
-    else applySilenceCut(autoCutClipId, parts, options)
+    else applySilenceCut(autoCutClipId, mediaPartsToClip(autoCutClip, parts), options) // parts are in media seconds
     setAutoCutClipId(null)
     refitTemplateRef.current?.()
-  }, [applySilenceCut, applyGroupSilenceCut, autoCutClipId, autoCutGroup])
+  }, [applySilenceCut, applyGroupSilenceCut, autoCutClipId, autoCutGroup, autoCutClip])
   // (refitTemplate is defined further down, with the template)
   const refitTemplateRef = useRef(null)
 
@@ -214,9 +218,10 @@ function App() {
   const audioMode = isAudioMode
   // Finishing settings of the audio editor (sent with the render, kept in drafts
   // and in the template): loudness levelling, music ducked under the voices
-  const [master, setMaster] = useState(() => masterOf(null))
+  // (these and the tracks are under undo: hooks/useHistory.js)
+  const [master, setMaster, setMasterSilently] = useUndoableState(history, 'master', () => masterOf(null))
   // Chapters (utils/chapters.js): pinned to the recording, resolved to where they are now
-  const [chapters, setChapters] = useState([])
+  const [chapters, setChapters, setChaptersSilently] = useUndoableState(history, 'chapters', [])
   // The preview is playing (the timeline then keeps the playhead in the middle)
   const [previewPlaying, setPreviewPlaying] = useState(false)
   // The timeline's zoom (px per second): saved with the draft, and handed back
@@ -225,7 +230,7 @@ function App() {
   const [restoreZoom, setRestoreZoom] = useState(null)
   const resolvedChapters = useMemo(() => (audioMode ? resolveChapters(tracks, chapters, timelineEnd) : []), [audioMode, tracks, chapters, timelineEnd])
   // Flags: the creator's own numbered markers (utils/flags.js), kept with the draft
-  const [flags, setFlags] = useState([])
+  const [flags, setFlags, setFlagsSilently] = useUndoableState(history, 'flags', [])
   const resolvedFlags = useMemo(() => resolveFlags(tracks, flags, Math.max(timelineEnd, 0)), [tracks, flags, timelineEnd])
   const tracksNowRef = useRef(tracks)
   tracksNowRef.current = tracks
@@ -243,13 +248,19 @@ function App() {
     return first ? String(first.name || '').replace(/^Part \d+ · /, '').replace(/\.[a-z0-9]{2,4}$/i, '').trim() || null : null
   }, [audioMode, tracks])
 
-  // Locked to 9:16 for shorts
-  const activeAspectRatio = '9:16'
-  const isVerticalVideo = true
+  // The project's shape (utils/projectFormat.js): a Short (9:16, up to 2 minutes)
+  // or a 16:9, 4:3 or 1:1 video (up to 10). The audio editor keeps the old frame.
+  const projectFormat = useProjectFormat()
+  const activeAspectRatio = audioMode ? '9:16' : projectFormat.aspect
+  const isVerticalVideo = activeAspectRatio === '9:16'
+  // Export as (FormatsPanel): the preview may show the project in another shape, reframed
+  const [formatsOpen, setFormatsOpen] = useState(false)
+  const [viewAspect, setViewAspect] = useState(null)
+  const shownAspect = (formatsOpen && viewAspect) || activeAspectRatio
   const [orientationOverride, setOrientationOverride] = useState(null)
 
   // Auto captions of a Short (utils/captions.js): { words, language, style, burn } or null
-  const [captions, setCaptions] = useState(null)
+  const [captions, setCaptions, setCaptionsSilently] = useUndoableState(history, 'captions', null)
   const [captionsOpen, setCaptionsOpen] = useState(false)
 
   // Imperative handle into GlobalPreview: { togglePlay, pause, playFromStart }
@@ -478,11 +489,10 @@ function App() {
     return () => window.removeEventListener('beforeunload', handler)
   }, [])
 
-  // Auto-load FFmpeg on mount
-  useEffect(() => {
-    loadFFmpeg()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // FFmpeg.wasm is for the legacy layout's exports and whole-HLS downloads
+  // only: loaded when one of them needs it, never on open (hooks/useFFmpeg.js)
+  const legacyLayout = !compactMode && !audioMode
+  useEffect(() => { if (legacyLayout) loadFFmpeg() }, [legacyLayout, loadFFmpeg])
 
   // Auto-download HLS streams when new HLS library items appear
   // If clipStart/clipEnd are set → backend prepares the clip (no FFmpeg needed client-side)
@@ -499,14 +509,14 @@ function App() {
           // Backend path: download 480p + trim on server
           downloadedHlsRef.current.add(item.id)
           startBackendClipPreparation(item.id, item.url, item.clipStart, item.clipEnd)
-        } else if (loaded && ffmpeg) {
-          // Client-side path: download full HLS in browser
+        } else {
+          // Client-side path: download full HLS in browser (FFmpeg.wasm loads for it)
           downloadedHlsRef.current.add(item.id)
-          startHlsDownload(item.id, item.url, ffmpeg)
+          loadFFmpeg().then(ff => { if (ff) startHlsDownload(item.id, item.url, ff) })
         }
       }
     }
-  }, [library, loaded, ffmpeg, hlsDownloads, startHlsDownload, startBackendClipPreparation])
+  }, [library, hlsDownloads, loadFFmpeg, startHlsDownload, startBackendClipPreparation])
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -637,12 +647,13 @@ function App() {
       const PLAYHEAD_STEP_LARGE = 1 // 1 second when holding shift
       const step = e.shiftKey ? PLAYHEAD_STEP_LARGE : PLAYHEAD_STEP
 
-      if (e.key === 'ArrowLeft') {
+      // (Alt+arrows move between clips: hooks/useShortcuts.js)
+      if (e.key === 'ArrowLeft' && !e.altKey) {
         e.preventDefault()
         setPlayheadPosition(prev => Math.max(0, prev - step))
       }
 
-      if (e.key === 'ArrowRight') {
+      if (e.key === 'ArrowRight' && !e.altKey) {
         e.preventDefault()
         setPlayheadPosition(prev => prev + step)
       }
@@ -1060,17 +1071,20 @@ function App() {
     // Back where the playhead was when the draft was saved, at the zoom it had
     setPlayheadPosition(savedPlayhead(state))
     if (Number.isFinite(+state?.zoom) && +state.zoom > 0) setRestoreZoom({ value: +state.zoom, key: Date.now() })
-    if (state?.master) setMaster(masterOf(state.master))
-    setChapters(Array.isArray(state?.chapters) ? state.chapters.slice(0, MAX_CHAPTERS) : [])
-    setFlags(cleanFlags(state?.flags))
-    setCaptions(normalizeCaptions(state?.captions) ? { ...state.captions, ...normalizeCaptions(state.captions) } : null)
+    // (silently: the opened draft is the first undo step, see loadProjectState)
+    if (state?.master) setMasterSilently(masterOf(state.master))
+    setChaptersSilently(Array.isArray(state?.chapters) ? state.chapters.slice(0, MAX_CHAPTERS) : [])
+    setFlagsSilently(cleanFlags(state?.flags))
+    setCaptionsSilently(normalizeCaptions(state?.captions) ? { ...state.captions, ...normalizeCaptions(state.captions) } : null)
+    // the video project's shape (a draft from before shapes is a Short)
+    if (!audioMode) { projectFormat.setAspect(state?.aspect); setViewAspect(null) }
     // a remix draft: its export posts under the original again
     restoreRemixSource(state?.remix || null)
     // and the clip(s) that were selected (those still on the timeline)
     const ids = new Set((state?.tracks || []).flatMap(t => (t.clips || []).map(c => c.id)))
     const sel = Array.isArray(state?.selected) ? state.selected.filter(id => ids.has(id)) : []
     if (sel.length) selectClips(sel)
-  }, [loadProjectState, setPlayheadPosition, selectClips, restoreRemixSource])
+  }, [loadProjectState, setPlayheadPosition, selectClips, restoreRemixSource, setMasterSilently, setChaptersSilently, setFlagsSilently, setCaptionsSilently, audioMode, projectFormat.setAspect]) // eslint-disable-line react-hooks/exhaustive-deps
   const drafts = useDrafts({
     session: draftSession,
     hasMedia: draftContext.hasMedia,
@@ -1087,7 +1101,8 @@ function App() {
     flags,
     selected: selectedClipIds.length ? selectedClipIds : (selectedClipId ? [selectedClipId] : []),
     remix: remixing ? remixSource : null,
-    captions: audioMode ? null : captions
+    captions: audioMode ? null : captions,
+    aspect: audioMode ? null : activeAspectRatio
   })
   const canDraftSignIn = isIframe && !draftSession && ['sign-in-needed', 'sign-in-failed', 'signing-in'].includes(draftContext.reason)
 
@@ -1224,6 +1239,8 @@ function App() {
   // Audiograms (after an export): the ones made, the piece of the timeline
   // they are made from, and picking that piece on the timeline
   const [audiogramOpen, setAudiogramOpen] = useState(false)
+  // Video podcast: the whole episode as a 16:9 video (VideoPodcastDialog)
+  const [videoPodcastOpen, setVideoPodcastOpen] = useState(false)
   const [audiograms, setAudiograms] = useState([])
   const [audiogramRange, setAudiogramRange] = useState(null)
   const [pickingRange, setPickingRange] = useState(false)
@@ -1318,6 +1335,8 @@ function App() {
     if (!audioMode || !master.duck) return
     applyTracks(ts => applyMasterDuck(ts, master))
     setMaster(m => ({ ...m, duck: false }))
+    // part of the step that brought the Duck (a draft, a template), not one of its own
+    history.amend()
   }, [audioMode, master.duck]) // eslint-disable-line react-hooks/exhaustive-deps
   const [chapterFocus, setChapterFocus] = useState(null)
   const addChapter = useCallback((at) => {
@@ -1365,7 +1384,8 @@ function App() {
     else setCloseDialog('parent')
   }, [closeRequest]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isBackendRendering = renderStatus && (renderStatus.status === 'submitting' || renderStatus.status === 'processing')
+  // waiting in the render queue counts too (utils/renderQueue.js)
+  const isBackendRendering = !!renderStatus && isRenderActive(renderStatus.status)
 
   // Preview modal state — user must preview rendered video before sending
   const [showPreview, setShowPreview] = useState(false)
@@ -1476,6 +1496,11 @@ function App() {
             />
           </div>
   ) : null
+  // Speed, freeze frames and keyframes in the clip settings (SpeedControls, KeyframeControls)
+  const retimeCaptions = useCallback((map) => setCaptions(c => (c?.words?.length
+    ? { ...c, words: c.words.map(w => ({ ...w, start: map(w.start), end: Math.max(map(w.start), map(w.end)) })) }
+    : c)), [])
+  const motionKit = { tracks, applyTracks, fileStoreRef, retimeCaptions, setPlayhead: setPlayheadPosition, captions }
   const compactPropertiesPanel = sideClip ? (
           <div className="compact-properties-panel">
             <div className="compact-properties-header">
@@ -1500,8 +1525,47 @@ function App() {
               duckInfo={audioMode ? duckInfoFor(sideClip) : null}
               playheadPosition={playheadPosition}
               tabbed={!isDesktop}
+              motionKit={audioMode ? null : motionKit}
             />
           </div>
+  ) : null
+
+  // Export as: one of the other shapes, rendered by the panel
+  const sendFormatToHost = ({ outputUrl, aspect, subtitles }) => {
+    if (drafts.hasEdits()) drafts.save().catch(() => {})
+    sendToParent('post-to-3speak', {
+      outputUrl,
+      ...(remixSource && { remixSource }),
+      ...(musicCredits.length > 0 && { musicCredits }),
+      ...(subtitles && { subtitles }),
+      format: postFormat(aspect, timelineEnd)
+    })
+  }
+  const formatsPanel = formatsOpen && !audioMode ? (
+    <div className="compact-properties-panel captions-side">
+      <div className="compact-properties-header">
+        <span className="compact-properties-title">Export as</span>
+        <button className="compact-btn compact-properties-close" onClick={() => { setFormatsOpen(false); setViewAspect(null) }} title="Close Export as">
+          <X size={14} />
+        </button>
+      </div>
+      <FormatsPanel
+        projectAspect={activeAspectRatio}
+        viewAspect={viewAspect}
+        onViewAspect={setViewAspect}
+        tracks={tracks}
+        fileStore={fileStoreRef.current}
+        onUpdateClip={updateClip}
+        selectedClipId={selectedClipId}
+        onSelectClip={selectClip}
+        timelineEnd={timelineEnd}
+        buildPayload={(aspect, onPhase) => buildAndUploadPayload(onPhase, { aspect })}
+        canRender={videoClips.length > 0 && !activeUpload && !isBackendRendering}
+        renderBlocked={activeUpload ? 'Wait for the upload to finish.' : null}
+        canSend={isIframe}
+        onSend={sendFormatToHost}
+      />
+    </div>
   ) : null
 
   // Auto captions (Shorts editor): in the clip settings' place while open, so
@@ -1532,7 +1596,7 @@ function App() {
   const sideBesideStage = isDesktop && audioMode
   const sidePanel = (
     <aside className="compact-side">
-      {captionsPanel || multiPanel || (sideClip ? compactPropertiesPanel : (
+      {formatsPanel || captionsPanel || multiPanel || (sideClip ? compactPropertiesPanel : (
         <div className="compact-side-empty">
           <MousePointerClick size={28} />
           <strong>No clip selected</strong>
@@ -1551,6 +1615,24 @@ function App() {
       <small>Long recordings can take a minute.</small>
     </div>
   ) : null
+
+  // J / K / L, frame steps, moving between clips, the `?` sheet (hooks/useShortcuts.js)
+  const shortcuts = useShortcuts({
+    previewRef: previewControlRef,
+    playing: previewPlaying,
+    tracks,
+    duration: timelineEnd,
+    selectedClipId,
+    selectClip,
+    setPlayheadPosition,
+    openClip: (id) => { if (compactMode || audioMode) setCompactPropertiesClipId(id); else setPropertiesOpen(true) }
+  })
+  const shortcutLayer = (
+    <>
+      {shortcuts.sheetOpen && <ShortcutSheet mode={audioMode ? 'audio' : 'video'} onClose={() => shortcuts.setSheetOpen(false)} />}
+      <div className="editor-sr-only" role="status" aria-live="polite">{shortcuts.announcement}</div>
+    </>
+  )
 
   const confirmDialog = confirmAsk ? (
     <ConfirmDialog message={confirmAsk.message} onConfirm={acceptConfirm} onCancel={closeConfirm} />
@@ -1575,7 +1657,9 @@ function App() {
       ...(remixSource && { remixSource }),
       ...(musicCredits.length > 0 && { musicCredits }),
       // Auto captions as subtitles: { language, vttUrl, srtUrl, cues: [{ start, end, text }] }
-      ...(!audioMode && renderStatus.subtitles && { subtitles: renderStatus.subtitles })
+      ...(!audioMode && renderStatus.subtitles && { subtitles: renderStatus.subtitles }),
+      // The shape: 3Speak posts a 9:16 render as a Short, the others as a normal video
+      ...(!audioMode && { format: postFormat(activeAspectRatio, timelineEnd) })
     })
   }
 
@@ -1594,7 +1678,8 @@ function App() {
         <header className="app-branding">
           <div className="branding-left">
             <img src={logo3speak} alt="3Speak" className="branding-logo" />
-            <span className="branding-text">{audioMode ? 'Audio Editor' : 'Shorts Editor'} <span className="branding-badge">beta</span></span>
+            <span className="branding-text">{audioMode ? 'Audio Editor' : isVerticalVideo ? 'Shorts Editor' : 'Video Editor'} <span className="branding-badge">beta</span></span>
+            {!audioMode && <ProjectFormat aspect={activeAspectRatio} onChange={(a) => { projectFormat.setAspect(a); setViewAspect(null) }} tracks={tracks} />}
             <span className="branding-info" onClick={() => setShowBackendInfo(prev => !prev)}>
               <Info size={14} />
               {showBackendInfo && (
@@ -1604,6 +1689,11 @@ function App() {
             {audioMode && (
               <button className="branding-help-btn" onClick={() => setShowTour(true)} title="Show the tour again" aria-label="Show the tour again">
                 <HelpCircle size={15} />
+              </button>
+            )}
+            {isDesktop && (
+              <button className="branding-help-btn" onClick={() => shortcuts.setSheetOpen(true)} title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts">
+                <Keyboard size={15} />
               </button>
             )}
           </div>
@@ -1654,6 +1744,18 @@ function App() {
               {audioMode ? <AudioWaveform size={14} /> : <Clapperboard size={14} />}
               <span>{isBackendRendering ? (audioMode ? 'Exporting...' : 'Rendering...') : activeUpload ? `Uploading ${Math.round(activeUpload.progress * 100)}%` : renderStatus?.status === 'completed' ? (audioMode ? 'Export again' : 'Re-render') : (audioMode ? 'Export' : 'Render')}</span>
             </button>
+            {!audioMode && (
+              <button
+                className={`compact-download-btn${formatsOpen ? ' active' : ''}`}
+                onClick={() => { setFormatsOpen(o => !o); setViewAspect(null) }}
+                disabled={videoClips.length === 0}
+                aria-pressed={formatsOpen}
+                title="Export as: the same project as a Short, a square or a landscape video, cut around the faces"
+              >
+                <Film size={14} />
+                <span>Export as</span>
+              </button>
+            )}
             {renderStatus?.status === 'completed' && renderStatus.outputUrl && (
               <>
                 <a
@@ -1670,6 +1772,12 @@ function App() {
                   <button className="compact-download-btn" onClick={() => setAudiogramOpen(true)} title="Short videos of pieces of the episode, to share or to post as Shorts with it">
                     <Film size={14} />
                     <span>Audiograms{audiograms.length ? ` (${audiograms.length})` : ''}</span>
+                  </button>
+                )}
+                {audioMode && (
+                  <button className="compact-download-btn" onClick={() => setVideoPodcastOpen(true)} title="The whole episode as a 16:9 video with the cover, a waveform, captions and who is speaking">
+                    <Film size={14} />
+                    <span>Video podcast</span>
                   </button>
                 )}
                 {isIframe && (
@@ -1795,8 +1903,9 @@ function App() {
           tracks={tracks}
           playheadPosition={playheadPosition}
           onSetPlayhead={setPlayheadPosition}
-          isVerticalVideo={isVerticalVideo}
-          activeAspectRatio={activeAspectRatio}
+          isVerticalVideo={shownAspect === '9:16'}
+          activeAspectRatio={shownAspect}
+          reframeView={shownAspect !== activeAspectRatio}
           selectedClipId={selectedClipId}
           onUpdateClip={updateClip}
           onSelectClip={selectClip}
@@ -1909,7 +2018,7 @@ function App() {
           )}
 
           {/* Compact properties panel (phones: over the timeline; desktop: the sidebar) */}
-          {!isDesktop && (captionsPanel || multiPanel || compactPropertiesPanel)}
+          {!isDesktop && (formatsPanel || captionsPanel || multiPanel || compactPropertiesPanel)}
         </div>
         </div>
         {/* Desktop shorts editor: the selected clip's settings beside preview and timeline */}
@@ -1917,6 +2026,7 @@ function App() {
         </div>
 
         {confirmDialog}
+        {shortcutLayer}
         {cleaningNotice}
 
         {/* Onboarding Tour (the shorts editor's, or the audio editor's) */}
@@ -1970,7 +2080,7 @@ function App() {
         {autoCutClip && (
           <SilenceCutModal
             key={autoCutClip.id}
-            clip={autoCutClip}
+            clip={mediaView(autoCutClip)}
             source={autoCutSource}
             analysisUrl={autoCutClip.serverUrl || null}
             unavailable={autoCutSource || autoCutClip.serverUrl ? null : autoCutUnavailable}
@@ -2000,6 +2110,35 @@ function App() {
             onRequestCovers={requestPlaylistCovers}
             onEditText={isIframe ? editTextInHost : undefined}
             onClose={() => setAudiogramOpen(false)}
+          />
+        )}
+
+        {videoPodcastOpen && audioMode && renderStatus?.status === 'completed' && renderStatus.outputUrl && (
+          <VideoPodcastDialog
+            outputUrl={renderStatus.outputUrl}
+            length={timelineEnd}
+            title={audioTitle}
+            tracks={tracks}
+            playlistCovers={playlistCovers}
+            onRequestCovers={requestPlaylistCovers}
+            canSend={isIframe}
+            onSend={(r) => {
+              setVideoPodcastOpen(false)
+              if (drafts.hasEdits()) drafts.save().catch(() => {})
+              // 3Speak posts it as a normal video (format), the chapters in its description
+              sendToParent('post-to-3speak', {
+                mediaType: 'video',
+                outputUrl: r.outputUrl,
+                fileName: audioFileName(audioTitle).replace(/\.mp3$/i, '.mp4'),
+                durationSec: r.durationSec,
+                format: postFormat('16:9', r.durationSec),
+                ...(audioTitle ? { title: String(audioTitle).slice(0, 120) } : {}),
+                ...(chapterList.length > 0 && { chapters: chapterList }),
+                ...(musicCredits.length > 0 && { musicCredits }),
+                ...(r.subtitles && { subtitles: r.subtitles })
+              })
+            }}
+            onClose={() => setVideoPodcastOpen(false)}
           />
         )}
 
@@ -2405,6 +2544,7 @@ function App() {
                     onUpdateClip={(updates) => selectedClipId && updateClip(selectedClipId, updates)}
                     onSplit={(time) => selectedClipId && splitClip(selectedClipId, time)}
                     playheadPosition={playheadPosition}
+                    motionKit={audioMode ? null : motionKit}
                   />
                 </div>
               )}
@@ -2458,7 +2598,7 @@ function App() {
       {autoCutClip && (
         <SilenceCutModal
           key={autoCutClip.id}
-          clip={autoCutClip}
+          clip={mediaView(autoCutClip)}
           source={autoCutSource}
           unavailable={autoCutUnavailable}
           onApply={handleAutoCutApply}
@@ -2514,6 +2654,7 @@ function App() {
       )}
 
       {confirmDialog}
+      {shortcutLayer}
     </div>
   )
 }

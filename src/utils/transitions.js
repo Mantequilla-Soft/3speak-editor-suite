@@ -18,6 +18,12 @@
 // to black before the cut, the incoming one comes from black after it. Linked
 // sound (the clips' own audio) crossfades over the same span, using the media
 // past the cut where the files have it.
+//
+// startTime / endTime are clip time (clipSpeed.js): endTime - startTime is the
+// length on the timeline at any speed, and the held frames and the sound past
+// the cut are in clip time too, mapped to the media by the clip's speed.
+
+import { maxEndTime, isFrozen } from './clipSpeed.js'
 
 export const TRANSITION_TYPES = [
   { id: 'crossfade', label: 'Crossfade' },
@@ -133,8 +139,8 @@ export function clipExtent(entry) {
   return { head: overlap(entry?.in), tail: overlap(entry?.out) }
 }
 
-// The media time a video shows while held (before its start / after its end),
-// or null when it plays normally
+// The clip time a video shows while held (before its start / after its end),
+// or null when it plays normally (clipSpeed.js sourceAt maps it to the media)
 export function heldMediaTime(clip, entry, t) {
   const { head, tail } = clipExtent(entry)
   const start = posOf(clip)
@@ -225,12 +231,13 @@ export function transitionAudio(tracks, { withVideoAudio = false } = {}) {
     const inRamp = { t0, g0: 0, t1, g1: 1 }
     for (const c of partners(a)) {
       ramps.set(c.id, outRamp)
-      const extra = Number.isFinite(+c.duration) ? Math.min(tr.half, +c.duration - c.endTime) : 0
+      // clip time left in the file after the cut (a faster clip has less of it); a still has no sound
+      const extra = !isFrozen(c) && Number.isFinite(+c.duration) ? Math.min(tr.half, maxEndTime(c, +c.duration) - c.endTime) : 0
       if (extra > 0.02) pieces.push({ id: `${c.id}~xfade-tail`, of: c.id, startTime: r3(c.endTime), endTime: r3(c.endTime + extra), timelinePosition: r3(tr.cut), ramp: outRamp })
     }
     for (const c of partners(b)) {
       ramps.set(c.id, inRamp)
-      const extra = Math.min(tr.half, c.startTime || 0)
+      const extra = isFrozen(c) ? 0 : Math.min(tr.half, c.startTime || 0)
       if (extra > 0.02) pieces.push({ id: `${c.id}~xfade-head`, of: c.id, startTime: r3(c.startTime - extra), endTime: r3(c.startTime), timelinePosition: r3(tr.cut - extra), ramp: inRamp })
     }
   }
