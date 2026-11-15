@@ -1,0 +1,232 @@
+{
+  "title": "Ad Wizard",
+  "beta": "베타",
+  "loading": "장면 엔진 불러오는 중…",
+  "untitled": "제목 없는 광고",
+  "seconds": "{{s}}초",
+  "lengthOfMax": "{{length}}초 / 최대 {{max}}초",
+  "maxOnly": "/ 최대 {{max}}초",
+  "steps": {
+    "format": "형식",
+    "brand": "브랜드",
+    "scenes": "장면",
+    "sound": "사운드",
+    "render": "렌더링"
+  },
+  "formats": {
+    "landscape": "가로 16:9",
+    "landscapeSub": "동영상 내 광고, 웹사이트",
+    "portrait": "세로 9:16",
+    "portraitSub": "쇼츠, 스토리, 릴스"
+  },
+  "palettes": {
+    "ember": "엠버",
+    "amber": "앰버",
+    "ocean": "오션",
+    "forest": "포레스트",
+    "berry": "베리",
+    "paper": "페이퍼"
+  },
+  "roles": {
+    "all": "전체",
+    "opener": "오프닝",
+    "middle": "중간",
+    "closer": "엔딩"
+  },
+  "defaults": {
+    "brandName": "내 브랜드",
+    "brandFallback": "브랜드",
+    "adName": "광고"
+  },
+  "errors": {
+    "engineLoad": "{{src}}을(를) 불러올 수 없어요",
+    "uploadFailedStatus": "업로드 실패 ({{status}})",
+    "uploadFailed": "업로드 실패",
+    "notSignedIn": "로그인하지 않았어요",
+    "drafts": "임시저장 {{status}}"
+  },
+  "stage": {
+    "empty": "여기에 광고가 표시돼요.",
+    "addFirst": "첫 번째 장면 추가",
+    "toStart": "처음으로",
+    "playPause": "재생 / 일시정지 (스페이스바)",
+    "time": "{{time}} / {{duration}}초",
+    "tooLong": "광고는 최대 {{max}}초까지 가능해요",
+    "properties": "속성",
+    "propertiesHint": "목록이나 타임라인에서 장면을 고르면 여기서 편집할 수 있어요."
+  },
+  "drafts": {
+    "logInToKeep": "임시저장을 보관하려면 3Speak에 로그인하세요",
+    "inBrowser": "임시저장은 이 브라우저에 보관돼요",
+    "signingIn": "로그인 중…",
+    "saveDrafts": "임시저장 보관",
+    "status": {
+      "saving": "저장 중…",
+      "saved": "저장됨",
+      "error": "저장 안 됨",
+      "limit": "임시저장 한도에 도달했어요",
+      "idle": "임시저장"
+    },
+    "open": "임시저장",
+    "title": "내 임시저장",
+    "listInfo_other": "{{n}} / {{max}} · 마지막 변경 후 각각 {{count}}일 동안 보관",
+    "draftInfo_other": "장면 {{count}}개 · {{saved}} 저장 · {{until}}까지",
+    "isOpen": "열려 있음",
+    "openDraft": "열기",
+    "confirmDelete": "\"{{name}}\"을(를) 삭제할까요?",
+    "empty": "아직 임시저장이 없어요. 작업하는 동안 자동으로 저장돼요.",
+    "newAd": "새 광고",
+    "limitTitle_other": "임시저장이 이미 {{count}}개 있어요",
+    "limitHint": "이 광고로 교체할 항목을 고르거나, 이 창을 닫고 저장하지 않은 채로 계속 작업하세요.",
+    "savedAt": "{{date}} 저장",
+    "replace": "교체"
+  },
+  "format": {
+    "locked": "예약한 광고는 <b>{{format}}</b>, 최대 {{max}}초로 게재돼요.",
+    "where": "광고를 어디에 게재할까요? 나중에 바꿀 수 있어요. 모든 장면은 두 형식 모두에서 작동해요.",
+    "sceneChange": "장면 전환",
+    "tip": "읽기 쉬운 광고: 장면당 약 3초, 전체 15~30초, 첫 문장은 처음 1초 안에 읽을 수 있게.",
+    "confirmNew": "새 광고를 시작할까요? 저장된 임시저장은 그대로 남아요."
+  },
+  "brand": {
+    "name": "이름",
+    "logo": "로고",
+    "logoHint": "정사각형이 가장 좋아요. 없으면 첫 글자를 사용해요",
+    "monogram": "모노그램",
+    "monogramHint": "로고가 없을 때 사용할 글자",
+    "colours": "색상",
+    "colors": {
+      "bg": "배경",
+      "ink": "텍스트",
+      "mute": "보조 텍스트",
+      "accent": "강조색",
+      "accent2": "강조색 2",
+      "accent3": "강조색 3"
+    },
+    "coloursTip": "강조에는 강조색을 사용하세요(텍스트 속 *별표*). 행동 유도 버튼은 외곽선으로 그려져요.",
+    "fonts": "글꼴",
+    "headlines": "헤드라인",
+    "text": "텍스트",
+    "ownFont": "내 글꼴 파일",
+    "fontNamePlaceholder": "글꼴 이름, 예: Acme Display",
+    "fontRights": "이 글꼴을 동영상에 사용할 권리가 있어요",
+    "uploading": "업로드 중…",
+    "uploadFont": "TTF / OTF / WOFF 업로드"
+  },
+  "scenes": {
+    "duplicate": "복제",
+    "add": "장면 추가",
+    "tip": "선택한 장면의 텍스트, 사진, 길이는 오른쪽에 있어요."
+  },
+  "sound": {
+    "music": "음악",
+    "startInSong": "곡의 시작 위치",
+    "volume": "볼륨",
+    "fadeIn": "페이드 인",
+    "fadeOut": "페이드 아웃",
+    "noMusic": "아직 음악이 없어요.",
+    "library": "음악 라이브러리",
+    "uploading": "업로드 중…",
+    "uploadSong": "곡 업로드",
+    "songRights": "업로드하는 곡의 권리나 라이선스를 가지고 있어요",
+    "effects": "효과음",
+    "auto": "자동 사운드 (장면 전환, 단어 등장)",
+    "autoLevel": "자동 사운드 음량",
+    "db": "{{gain}} dB",
+    "restore_other": "삭제한 자동 사운드 {{count}}개 복원",
+    "addAt": "{{time}}초에 사운드 추가",
+    "listen": "듣기",
+    "autoTag": "자동",
+    "tip": "타임라인에서 사운드를 드래그해 옮길 수 있어요. 자동 사운드를 옮기면 내 사운드가 돼요.",
+    "kinds": {
+      "trans": "전환",
+      "whoosh": "휙",
+      "swish": "쉭",
+      "tick": "똑딱",
+      "click": "클릭",
+      "type": "타자",
+      "hit": "쾅"
+    }
+  },
+  "render": {
+    "drawing": "장면 그리는 중…",
+    "mixing": "사운드 믹싱 중…",
+    "sceneRenderFailed": "장면 렌더링: {{status}}",
+    "renderFailed": "렌더링: {{status}}",
+    "scenesLength_other": "장면 {{count}}개, {{length}}초",
+    "scenesLengthTooLong_other": "장면 {{count}}개, {{length}}초 (너무 길어요, 최대 {{max}}초)",
+    "toFill_other": "채워야 할 항목 {{count}}개",
+    "allFilled": "필수 항목을 모두 채웠어요",
+    "music": "음악: {{title}}",
+    "noMusic": "음악 없음 (선택)",
+    "effects_other": "효과음 {{count}}개",
+    "issue": "장면 {{n}}, {{field}}: {{msg}}",
+    "button": "광고 렌더링 ({{size}})",
+    "progress": "{{phase}} {{percent}}",
+    "sent": "캠페인으로 보냈어요",
+    "useForCampaign": "내 캠페인에 사용",
+    "download": "다운로드",
+    "again": "다시 렌더링"
+  },
+  "props": {
+    "length": "길이",
+    "fieldIssue": "{{field}}: {{msg}}",
+    "soundEffect": "효과음",
+    "autoNote": "{{name}} (자동: 옮기거나 바꾸면 내 사운드가 돼요)",
+    "makeMine": "내 것으로 만들기",
+    "at": "위치",
+    "secondsUnit": "초",
+    "volume": "볼륨"
+  },
+  "picker": {
+    "search": "검색",
+    "look": "스타일",
+    "all": "전체",
+    "nothing": "일치하는 항목이 없어요."
+  },
+  "fields": {
+    "optional": "선택",
+    "auto": "자동",
+    "none": "(없음)",
+    "defaultIcon": "기본 ({{icon}})",
+    "clear": "지우기",
+    "accentTip": "단어를 *별표*로 감싸면 강조색, _밑줄_로 감싸면 두 번째 강조색이 돼요.",
+    "up": "위로",
+    "moveUp": "위로 이동",
+    "moveDown": "아래로 이동",
+    "add": "추가",
+    "needsAtLeast": "{{min}}개 이상 필요해요",
+    "needs": "{{min}}개 필요해요",
+    "pairX": "x %",
+    "pairY": "y %"
+  },
+  "image": {
+    "notPicture": "사진이 아니에요.",
+    "noClipboardPicture": "클립보드에 사진이 없어요. 사진을 복사하거나 여기서 Ctrl+V / Cmd+V를 누르세요.",
+    "clipboardBlocked": "브라우저가 클립보드 읽기를 허용하지 않았어요. 여기를 클릭하고 Ctrl+V / Cmd+V를 누르세요.",
+    "dragToPlace": "드래그해서 사진의 보이는 부분 고르기",
+    "zoom": "확대",
+    "zoomTitle": "틀 안에서 사진을 확대해요. 틀의 크기는 그대로예요",
+    "zoomValue": "{{zoom}}x",
+    "resetPlacement": "위치 초기화",
+    "replace": "교체",
+    "pasteTitle": "클립보드에서 붙여넣기",
+    "uploadingPct": "업로드 중 {{pct}}%",
+    "upload": "업로드",
+    "paste": "붙여넣기",
+    "linkPlaceholder": "또는 https:// 링크나 사진을 붙여넣기 (Ctrl+V)"
+  },
+  "timeline": {
+    "tick": "{{s}}초",
+    "scenes": "장면",
+    "blockTitle": "{{type}}: {{length}}초",
+    "dragLength": "드래그해서 길이 변경",
+    "music": "음악",
+    "musicVolume": "{{title}} · {{volume}}",
+    "effects": "효과음",
+    "sfxTitle": "{{at}}초의 {{name}}"
+  },
+  "preview": {
+    "frameTitle": "광고 미리보기"
+  }
+}

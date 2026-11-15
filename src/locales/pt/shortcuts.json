@@ -1,0 +1,53 @@
+{
+  "sheet": {
+    "title": "Atalhos de teclado"
+  },
+  "groups": {
+    "playback": "Reprodução",
+    "clips": "Clipes",
+    "project": "Projeto"
+  },
+  "items": {
+    "playPause": "Reproduzir / pausar",
+    "playForward": "Reproduzir para frente; aperte de novo para 2x, 4x, 8x",
+    "playBackward": "Reproduzir para trás; aperte de novo para acelerar",
+    "stop": "Parar",
+    "frameStep": "Um quadro para trás / para frente (Shift: 10 quadros)",
+    "nudge": "Mover o cursor de reprodução 0,1 s (Shift: 1 s)",
+    "fullscreen": "Ligar / desligar tela cheia",
+    "nextPrevClip": "Selecionar o próximo clipe / o anterior",
+    "clipLeftRight": "Clipe anterior / próximo na mesma faixa",
+    "clipUpDown": "Clipe na faixa de cima / de baixo",
+    "openClip": "Abrir as configurações do clipe selecionado",
+    "selectNone": "Não selecionar nada",
+    "selectAll": "Selecionar todos os clipes",
+    "remove": "Remover os clipes selecionados",
+    "split": "Dividir o clipe selecionado no cursor de reprodução",
+    "duplicate": "Duplicar o clipe selecionado",
+    "ungroup": "Desagrupar clipes",
+    "closeGap": "Fechar o espaço no cursor de reprodução",
+    "addText": "Adicionar texto no cursor de reprodução",
+    "undo": "Desfazer",
+    "redo": "Refazer",
+    "addFlag": "Adicionar uma marca no cursor de reprodução",
+    "addChapter": "Adicionar um capítulo no cursor de reprodução",
+    "zoom": "Aproximar / afastar a linha do tempo",
+    "showSheet": "Mostrar estes atalhos"
+  },
+  "keys": {
+    "space": "Espaço",
+    "tab": "Tab",
+    "shift": "Shift",
+    "alt": "Alt",
+    "ctrl": "Ctrl",
+    "enter": "Enter",
+    "esc": "Esc",
+    "delete": "Del"
+  },
+  "announce": {
+    "selected": "{{clip}} selecionado",
+    "stopped": "Parado",
+    "forward": "Para frente {{speed}}x",
+    "backward": "Para trás {{speed}}x"
+  }
+}

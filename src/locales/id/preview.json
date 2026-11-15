@@ -1,0 +1,29 @@
+{
+  "header": "Pratinjau linimasa",
+  "smaller": "Lebih kecil",
+  "larger": "Lebih besar",
+  "loopOn": "Ulang: Aktif",
+  "loopOff": "Ulang: Mati",
+  "aspect": {
+    "title": "Rasio aspek: {{ratio}}",
+    "titleAuto": "Rasio aspek: Otomatis ({{ratio}})",
+    "auto": "Otomatis"
+  },
+  "fullSize": "Ukuran penuh",
+  "halfSize": "Setengah ukuran",
+  "fullscreen": "Layar penuh",
+  "noClipHere": "Tidak ada klip di posisi ini",
+  "noClips": "Tidak ada klip di linimasa",
+  "source": {
+    "hls": "(stream HLS)",
+    "uploaded": "(diunggah)",
+    "local": "(lokal)",
+    "file": "(file)"
+  },
+  "stageLayout": {
+    "tileTop": "Susun di atas",
+    "tileBottom": "Susun di bawah",
+    "overlay": "Overlay"
+  },
+  "selectClip": "Pilih klip untuk dipratinjau"
+}

@@ -1,0 +1,29 @@
+{
+  "header": "Anteprima della timeline",
+  "smaller": "Più piccola",
+  "larger": "Più grande",
+  "loopOn": "Ciclo: attivo",
+  "loopOff": "Ciclo: disattivo",
+  "aspect": {
+    "title": "Proporzioni: {{ratio}}",
+    "titleAuto": "Proporzioni: automatiche ({{ratio}})",
+    "auto": "Automatica"
+  },
+  "fullSize": "Dimensione intera",
+  "halfSize": "Metà dimensione",
+  "fullscreen": "Schermo intero",
+  "noClipHere": "Nessuna clip in questa posizione",
+  "noClips": "Nessuna clip sulla timeline",
+  "source": {
+    "hls": "(stream HLS)",
+    "uploaded": "(caricato)",
+    "local": "(locale)",
+    "file": "(file)"
+  },
+  "stageLayout": {
+    "tileTop": "Riquadro sopra",
+    "tileBottom": "Riquadro sotto",
+    "overlay": "Sovrapposizione"
+  },
+  "selectClip": "Seleziona una clip per l'anteprima"
+}

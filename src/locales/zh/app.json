@@ -1,0 +1,143 @@
+{
+  "dismiss": "关闭",
+  "branding": {
+    "audioEditor": "音频编辑器",
+    "shortsEditor": "短视频编辑器",
+    "videoEditor": "视频编辑器",
+    "beta": "测试版",
+    "backend": "后端：{{url}}",
+    "backendSelecting": "后端：正在选择...",
+    "showTour": "再看一遍导览",
+    "shortcuts": "键盘快捷键（?）",
+    "shortcutsLabel": "键盘快捷键",
+    "fullscreen": "全屏（F）",
+    "fullscreenLabel": "全屏",
+    "leaveFullscreen": "退出全屏（F）",
+    "leaveFullscreenLabel": "退出全屏",
+    "closeEditor": "关闭编辑器"
+  },
+  "backendDown": "无法连接后端服务器。录像上传、渲染和媒体处理将无法使用。",
+  "menu": {
+    "undo": "撤销 (Ctrl+Z)",
+    "redo": "重做 (Ctrl+Shift+Z)"
+  },
+  "audioTools": {
+    "cutSilences": "剪掉静音",
+    "cutSilencesTitle": "剪掉所选片段（或其分组）中的静音：找出停顿、剪掉它们并合拢空隙",
+    "template": "模板",
+    "templateTitle": "你的模板：每段录音都用的片头、片尾和背景音乐",
+    "normalizeLabel": "响度标准化",
+    "normalizeOn": "标准化：开",
+    "normalizeOff": "标准化：关",
+    "normalizeOnTitle": "标准化已开启：导出的音频会统一调整到 -16 LUFS（播客标准）",
+    "normalizeOffTitle": "标准化已关闭：导出时保持你原来的音量",
+    "chapters": "章节",
+    "chaptersCount": "章节（{{n}}）",
+    "chaptersTitle": "章节：标记每一部分的开始位置（按 M 在播放头处添加）",
+    "transcript": "文字稿",
+    "transcriptTitle": "文字稿：通过文字编辑节目，删除文字即可剪掉对应内容",
+    "fillersLabel": "去除语气词",
+    "fillers": "语气词",
+    "fillersTitle": "去除语气词：找出“嗯”“呃”“那个”和长时间停顿，检查后剪掉"
+  },
+  "cutSilences": {
+    "progress": "正在剪掉静音：第 {{done}} / {{total}} 个片段",
+    "failed_other": "有 {{count}} 个片段无法读取，其他片段已剪好。",
+    "failedUploading_other": "有 {{count}} 个片段暂时无法读取：请在上传完成后再试。其他片段已剪好。"
+  },
+  "group": {
+    "nothing": "其他语音轨道上没有同时播放的内容。请先把另一个人的声音放到单独的轨道上。",
+    "done_other": "已将 {{count}} 个声音编为一组：它们现在会一起移动、修剪和剪掉静音。"
+  },
+  "template": {
+    "applied": "已应用模板：{{parts}}。",
+    "intro": "片头",
+    "outro": "片尾",
+    "bed": "背景音乐",
+    "takeOff": "移除"
+  },
+  "rangePick": {
+    "hint": "先点击音频波形视频片段的开始位置，再点击结束位置（最长 2 分钟）。拖动边缘可以调整。",
+    "from": "从 {{start}} 开始：现在点击结束位置",
+    "span": "{{start}} – {{end}} · {{seconds}} 秒",
+    "listenTitle": "只听这一段（空格）",
+    "stop": "停止",
+    "play": "播放这一段",
+    "use": "使用这一段"
+  },
+  "empty": {
+    "addVideo": "添加视频",
+    "addImage": "添加图片",
+    "addAudio": "添加音频",
+    "addRecording": "添加录音",
+    "record": "录制",
+    "music": "音乐"
+  },
+  "confirm": {
+    "removeClip": "要从时间线中移除这个片段吗？",
+    "removeClips_other": "要从时间线中移除这 {{count}} 个片段吗？",
+    "removeLibraryItem": "要从项目素材库中移除这一项吗？",
+    "removeTrack": "要移除这条轨道及其所有片段吗？"
+  },
+  "clipStreaming": "这个片段仍在从 3Speak 流式加载。请等下载完成后再试。",
+  "reverse": {
+    "title": "正在倒放片段...",
+    "body": "服务器正在处理，请稍候。",
+    "failed": "片段倒放失败：{{error}}"
+  },
+  "remix": {
+    "stitch": "拼接",
+    "stitchHintBefore": "最多录制 {{seconds}} 秒，它会在原视频之前播放。",
+    "stitchHintAfter": "最多录制 {{seconds}} 秒，它会在原视频之后播放。",
+    "reaction": "回应",
+    "reactionHint": "录制时原视频会从头开始播放。请戴上耳机，以免声音传进麦克风产生回声。",
+    "originalFillsLimit": "原视频已经达到 {{limit}} 的上限。请先在时间线上修剪它，再用摄像头按钮录制你的拼接内容。"
+  },
+  "chapters": {
+    "intro": "开场",
+    "numbered": "第 {{n}} 章"
+  },
+  "duck": {
+    "allVoices": "所有语音轨道"
+  },
+  "media": "媒体",
+  "importedMedia": "已导入的媒体",
+  "files_other": "{{count}} 个文件",
+  "side": {
+    "clipsSelected_other": "已选择 {{count}} 个片段",
+    "clearSelection": "清除选择",
+    "closeProperties": "关闭属性",
+    "captions": "字幕",
+    "closeCaptions": "关闭字幕",
+    "noClip": "未选择片段",
+    "noClipHint": "在时间线上选择一个片段即可查看它的设置。框选多个片段可以一起修改。"
+  },
+  "cleaningHint": "较长的录音可能需要一分钟左右。",
+  "hlsDownload": {
+    "title": "正在下载媒体",
+    "hint": "正在准备媒体，请稍候..."
+  },
+  "sendPreview": {
+    "titleAudio": "使用前先听一听",
+    "titleVideo": "预览你的视频",
+    "back": "返回编辑器",
+    "askTitle": "要为短视频制作音频波形视频吗？",
+    "askBody": "把这段音频中最精彩的部分做成短视频，与音频一起作为 3Speak 短视频发布，每条都会链接回原音频。",
+    "askNo": "不用，直接使用音频",
+    "askMake": "制作音频波形视频"
+  },
+  "legacy": {
+    "projectLibrary": "项目素材库",
+    "loadingFfmpeg": "正在加载 FFmpeg... {{percent}}",
+    "properties": "属性",
+    "propertiesOf": "属性：{{name}}",
+    "addMedia": "添加媒体",
+    "addMediaTitle": "将媒体添加到素材库",
+    "record": "录制",
+    "recordTitle": "用摄像头录制视频"
+  },
+  "drafts": {
+    "episode": "单集",
+    "project": "项目"
+  }
+}

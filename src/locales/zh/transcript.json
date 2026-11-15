@@ -1,0 +1,72 @@
+{
+  "language": {
+    "label": "语音语言",
+    "auto": "自动检测"
+  },
+  "intro": {
+    "title": "通过文字编辑",
+    "text": "把所说的话转成文字，并标出每个说话人的名字，然后像编辑文档一样编辑录音：选中文字并按 Delete 即可剪掉。",
+    "checking": "正在检查服务器...",
+    "unavailable": "此编辑器服务器暂时无法提供文字稿。",
+    "noSpeech": "请先添加一段有语音的录音。",
+    "transcribeSeconds": "转写（录音 {{n}} 秒）",
+    "transcribeMinutes": "转写（录音 {{n}} 分钟）",
+    "longShow": "较长的节目需要一些时间：文字会一部分一部分地出现，你可以先开始编辑前面的内容。"
+  },
+  "listening": "正在聆听...",
+  "stop": "停止",
+  "goThere": "跳转到这里",
+  "search": {
+    "placeholder": "查找文字",
+    "label": "在文字稿中查找文字",
+    "previous": "上一个",
+    "previousLabel": "上一个匹配项",
+    "next": "下一个",
+    "nextLabel": "下一个匹配项"
+  },
+  "selection": {
+    "count_other": "{{count}} 个词 · {{seconds}} 秒",
+    "cut": "剪掉",
+    "cutTitle": "从录音中剪掉所选文字（Delete）",
+    "clearTitle": "清除选择（Esc）",
+    "clearLabel": "清除选择"
+  },
+  "found": {
+    "cutAll_other": "全部剪掉（{{count}}）",
+    "cutAllTitle": "从录音中剪掉找到的所有位置"
+  },
+  "fillers": "语气词",
+  "fillersTitle": "找出“嗯”“呃”“那个”和长时间停顿",
+  "copy": "复制文字稿",
+  "speakers": "说话人",
+  "missing": {
+    "seconds": "有 {{n}} 秒录音还没有文字。",
+    "minutes": "有 {{n}} 分钟录音还没有文字。",
+    "transcribe": "转写"
+  },
+  "scrollLabel": "文字稿：点击某个词即可跳转，拖动选中文字，按 Delete 剪掉",
+  "hint_other": "共 {{count}} 个词。点击某个词即可跳转；拖动或按住 Shift 点击来选择；按 Delete 剪掉。撤销即可恢复。",
+  "speaker": {
+    "default": "语音",
+    "numbered": "语音 {{n}}"
+  },
+  "job": {
+    "starting": "正在开始...",
+    "preparing": "正在准备录音...",
+    "listening": "正在聆听...",
+    "signIn": "登录 3Speak 即可生成文字稿。",
+    "uploadFailed": "无法上传录音：{{message}}",
+    "notUploaded": "录音还没有上传到服务器。请在上传完成后再试。",
+    "serverAnswered": "服务器返回 {{status}}",
+    "lost": "文字稿任务丢失了（服务器重启了？）",
+    "failed": "语音识别失败"
+  },
+  "stt": {
+    "audioUnavailable": "音频不可用",
+    "serverError": "服务器错误",
+    "connectionFailed": "连接失败",
+    "unauthorized": "未授权",
+    "closed": "已关闭",
+    "initFailed": "语音转文字初始化失败"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "cleaning": {
+    "voice_one": "Очищаем голос в {{count}} клипе…",
+    "voice_few": "Очищаем голос в {{count}} клипах…",
+    "voice_many": "Очищаем голос в {{count}} клипах…",
+    "voice_other": "Очищаем голос в {{count}} клипа…",
+    "voiceRecording_one": "Очищаем голос в {{count}} клипе · запись {{at}} из {{total}}",
+    "voiceRecording_few": "Очищаем голос в {{count}} клипах · запись {{at}} из {{total}}",
+    "voiceRecording_many": "Очищаем голос в {{count}} клипах · запись {{at}} из {{total}}",
+    "voiceRecording_other": "Очищаем голос в {{count}} клипа · запись {{at}} из {{total}}",
+    "back_one": "Возвращаем {{count}} клип…",
+    "back_few": "Возвращаем {{count}} клипа…",
+    "back_many": "Возвращаем {{count}} клипов…",
+    "back_other": "Возвращаем {{count}} клипа…",
+    "backRecording_one": "Возвращаем {{count}} клип · запись {{at}} из {{total}}",
+    "backRecording_few": "Возвращаем {{count}} клипа · запись {{at}} из {{total}}",
+    "backRecording_many": "Возвращаем {{count}} клипов · запись {{at}} из {{total}}",
+    "backRecording_other": "Возвращаем {{count}} клипа · запись {{at}} из {{total}}"
+  }
+}

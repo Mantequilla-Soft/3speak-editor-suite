@@ -1,0 +1,26 @@
+{
+  "music": {
+    "title": "音乐",
+    "search": "搜索歌曲",
+    "loading": "正在加载歌曲...",
+    "failed": "无法加载音乐库。",
+    "none": "没有匹配的歌曲。",
+    "note": "歌曲署名会自动添加到你的帖子中。选用 3Speak 创作者的声音，会让他们获得帖子奖励的 5%。",
+    "addTitle": "添加到视频"
+  },
+  "sfx": {
+    "title": "音效",
+    "search": "搜索声音",
+    "loading": "正在加载声音...",
+    "failed": "无法加载音效。",
+    "none": "没有匹配的声音。",
+    "note": "声音会添加在播放头处。可免费使用（CC0，Kenney.nl），无需署名。",
+    "addTitle": "添加到播放头处"
+  },
+  "all": "全部",
+  "timeline": "时间线：{{title}}",
+  "seconds": "{{seconds}} 秒",
+  "stop": "停止",
+  "listen": "试听",
+  "add": "添加"
+}

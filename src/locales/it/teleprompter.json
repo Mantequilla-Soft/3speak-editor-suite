@@ -1,0 +1,88 @@
+{
+  "title": "Gobbo",
+  "showOnCamera": "Mostra sulla fotocamera",
+  "speechNotice": {
+    "title": "Per ora seguire la voce funziona solo nei browser Chromium.",
+    "body": "Usa Chrome, Edge, Brave o Opera per far scorrere il copione mentre parli. In questo browser scorre a una velocità costante che puoi impostare."
+  },
+  "speechErrors": {
+    "network": "Servizio vocale non raggiungibile. Il riconoscimento richiede una connessione a Internet (Chrome invia l'audio a Google per trascriverlo).",
+    "audioCapture": "Nessun audio è arrivato al riconoscimento. Il microfono potrebbe essere occupato, prova delle cuffie con microfono.",
+    "notAllowed": "L'autorizzazione al microfono è bloccata per il riconoscimento vocale.",
+    "unsupported": "Questo browser non ha il riconoscimento vocale.",
+    "generic": "Errore del riconoscimento vocale: {{err}}"
+  },
+  "noMic": "Registrazione senza microfono (microfono non disponibile).",
+  "autoDetect": "Rilevamento automatico ({{lang}})",
+  "presets": {
+    "frontcam": "Fotocamera frontale",
+    "frontcamTitle": "Piccola striscia sotto l'obiettivo selfie, si nota meno che stai leggendo",
+    "max": "Dimensione max",
+    "maxTitle": "Testo grande per leggere da lontano",
+    "top": "Righe in alto",
+    "topTitle": "Diverse righe nella parte superiore"
+  },
+  "scroll": {
+    "label": "Scorrimento",
+    "modeAria": "Modalità di scorrimento",
+    "followVoice": "Segui la voce",
+    "followVoiceTitle": "Scorre mentre leggi il copione ad alta voce",
+    "needsChromium": "Richiede Chrome, Edge o un altro browser Chromium",
+    "timed": "A tempo",
+    "timedTitle": "Scorre a velocità costante",
+    "voiceForcedMissing": "Seguire la voce non è disponibile qui, si usa lo scorrimento a tempo.",
+    "voiceUnavailable": "Seguire la voce non è disponibile in questo browser."
+  },
+  "style": {
+    "title": "Stile del testo",
+    "fontSize": "Dimensione testo",
+    "fontSizeValue": "{{size}} px",
+    "text": "Testo",
+    "background": "Sfondo",
+    "bgOpacity": "Opacità sfondo",
+    "mirrorText": "Testo a specchio (per uno specchio da gobbo)",
+    "voiceLanguage": "Lingua della voce"
+  },
+  "status": {
+    "serverErrorSwitched": "Errore del server vocale ({{reason}}). Passato allo scorrimento a tempo.",
+    "voiceErrorSwitched": "{{error}} Passato allo scorrimento a tempo.",
+    "voiceStoppedSwitched": "Il riconoscimento della voce si è fermato. Passato allo scorrimento a tempo.",
+    "serverError": "Errore del server vocale ({{reason}}).",
+    "listeningServer": "In ascolto (server)… inizia a leggere",
+    "connectingServer": "Connessione al server vocale…",
+    "listening": "In ascolto… inizia a leggere ad alta voce",
+    "startingMic": "Avvio del microfono…",
+    "scrollPaused": "Scorrimento in pausa",
+    "timedScroll": "Scorrimento a tempo, {{wpm}} parole/min",
+    "scrollTest": "Prova di scorrimento, {{wpm}} parole/min"
+  },
+  "sttReason": {
+    "unreachable": "non raggiungibile",
+    "noMic": "nessun microfono",
+    "audioUnavailable": "audio non disponibile",
+    "connectionFailed": "connessione non riuscita",
+    "unauthorized": "non autorizzato",
+    "closed": "chiuso",
+    "serverError": "errore del server"
+  },
+  "scriptPlaceholder": "Scrivi o incolla qui il tuo copione. Mentre registri scorre man mano che lo leggi ad alta voce, oppure a velocità costante in modalità a tempo.",
+  "scriptModeVoice": "Scorrimento: segue la tua voce",
+  "scriptModeTimed": "Scorrimento: a tempo, {{wpm}} parole/min",
+  "hide": "Nascondi",
+  "dragToMove": "Trascina per spostare",
+  "dragToResize": "Trascina per ridimensionare",
+  "expandMenu": "Espandi il menu",
+  "collapseMenu": "Comprimi menu",
+  "editScript": "Modifica copione",
+  "testVoice": "Testa la voce",
+  "stopVoiceTest": "Ferma il test",
+  "scrollSpeed": "Velocità di scorrimento",
+  "slower": "Più lento",
+  "faster": "Più veloce",
+  "wordsPerMin": "parole/min",
+  "testScroll": "Prova lo scorrimento",
+  "stopScrollTest": "Ferma la prova di scorrimento",
+  "pauseScroll": "Metti in pausa lo scorrimento",
+  "resumeScroll": "Riprendi lo scorrimento",
+  "hideTeleprompter": "Nascondi il gobbo"
+}

@@ -1,0 +1,304 @@
+{
+  "empty": "Chọn một clip để xem thuộc tính",
+  "types": {
+    "video": "video",
+    "audio": "âm thanh",
+    "image": "hình ảnh",
+    "text": "văn bản",
+    "color": "màu",
+    "scene": "cảnh"
+  },
+  "sections": {
+    "content": "Nội dung",
+    "color": "Màu",
+    "audio": "Âm thanh",
+    "layout": "Bố cục",
+    "transform": "Biến đổi",
+    "timing": "Thời gian",
+    "motion": "Chuyển động",
+    "greenScreen": "Phông xanh"
+  },
+  "doubleClickReset": "Nhấp đúp để đặt lại",
+  "text": {
+    "label": "Văn bản",
+    "placeholder": "Nhập văn bản tại đây...",
+    "font": "Phông chữ",
+    "resetFont": "Đặt lại phông chữ",
+    "fontGroups": {
+      "sansSerif": "Không chân",
+      "serif": "Có chân",
+      "display": "Tiêu đề",
+      "handwriting": "Viết tay",
+      "monospace": "Đơn cách"
+    },
+    "weight": {
+      "normal": "Bình thường",
+      "bold": "Đậm"
+    },
+    "style": "Kiểu",
+    "resetStyle": "Đặt lại kiểu",
+    "size": "Cỡ chữ",
+    "alignment": "Căn lề",
+    "resetAlignment": "Đặt lại căn lề",
+    "align": {
+      "left": "Căn trái",
+      "center": "Căn giữa",
+      "right": "Căn phải"
+    },
+    "box": "Hộp nền",
+    "fill": "Tô đầy",
+    "opacity": "Độ mờ đục",
+    "padding": "Khoảng đệm",
+    "radius": "Bo góc",
+    "border": "Viền",
+    "width": "Độ rộng"
+  },
+  "colorClip": {
+    "background": "Màu nền",
+    "gradient": "Chuyển màu",
+    "enabled": "Bật",
+    "disabled": "Tắt",
+    "endColor": "Màu kết thúc",
+    "angle": "Góc",
+    "resetAngle": "Đặt lại góc"
+  },
+  "volume": {
+    "label": "Âm lượng",
+    "reset": "Đặt lại âm lượng",
+    "mute": "Tắt tiếng",
+    "unmute": "Bật tiếng"
+  },
+  "fades": {
+    "label": "Hiện dần / mờ dần",
+    "none": "Không hiện/mờ dần",
+    "in": "Vào",
+    "out": "Ra",
+    "inSeconds": "Vào (giây)",
+    "outSeconds": "Ra (giây)"
+  },
+  "noise": {
+    "reduce": "Giảm tạp âm nền",
+    "cleanVoice": "Làm sạch giọng nói",
+    "group": "Giảm tạp âm",
+    "working": "Đang xử lý",
+    "workingDots": "Đang xử lý…",
+    "afterUpload": "Có thể dùng khi clip này tải lên xong.",
+    "appliesGroup_other": "Áp dụng cho clip này và nhóm của nó ({{count}} clip).",
+    "appliesOne": "Chỉ áp dụng cho clip này.",
+    "failed": "Giảm tạp âm thất bại. Hãy thử lại.",
+    "levels": {
+      "light": "Nhẹ",
+      "medium": "Vừa",
+      "strong": "Mạnh"
+    },
+    "studioTitle": "Mạnh: ít tạp âm hơn, không tiếng ù, rõ và đều hơn, âm \"s\" mềm hơn"
+  },
+  "duck": {
+    "label": "Tự giảm âm",
+    "group": "Tự giảm âm clip này",
+    "depth": "{{db}} dB",
+    "source": "<lead>Nhỏ lại khi</lead><pick/><tail>phát</tail>",
+    "sourceLabel": "Nguồn kích hoạt giảm âm",
+    "hint": "Clip này nhỏ lại khi rãnh đã chọn phát, và to lên lại ở các chỗ ngừng."
+  },
+  "greenScreen": {
+    "removeBackground": "Xóa phông nền",
+    "modes": {
+      "green": "Xanh lá",
+      "blue": "Xanh dương",
+      "person": "Người",
+      "static": "Tĩnh (thử nghiệm)"
+    },
+    "modeTitles": {
+      "green": "Phông xanh lá",
+      "blue": "Phông xanh dương",
+      "person": "Không cần phông xanh: tìm bạn trong khung hình và xóa phần còn lại",
+      "static": "Phông nền tĩnh (thử nghiệm): xóa mọi thứ khớp với một khung hình của phông nền trống"
+    },
+    "staticHint": "Xóa mọi thứ trông giống vài khung hình của phông nền trống. Thay đổi nhỏ (nhiễu, ánh sáng, lấy nét) được bỏ qua, và những phần trên người bạn giống bức tường vẫn được giữ trong đường viền của bạn. Cần camera không di chuyển; bóng bạn đổ xuống vẫn hiển thị. Nếu một phần căn phòng vẫn hiện ra, hãy tăng Ngưỡng.",
+    "hint": {
+      "green": "Xóa phông xanh lá để các clip ở rãnh bên dưới hiện ra.",
+      "blue": "Xóa phông xanh dương để các clip ở rãnh bên dưới hiện ra.",
+      "person": "Không cần phông xanh: trình chỉnh sửa tìm người trong từng khung hình và xóa phần còn lại. Hoạt động tốt nhất với một người, đủ sáng, đứng trước camera."
+    },
+    "plate": "Khung hình phông nền trống",
+    "plateAlt": "Phông nền trống",
+    "plateHint": "Di chuyển đầu phát đến lúc chỉ có phông nền, không có bạn. Nửa giây của đoạn đó sẽ được dùng.",
+    "grabbing": "Đang lấy khung hình...",
+    "useFrame": "Dùng khung hình tại đầu phát",
+    "useFrameInstead": "Dùng khung hình tại đầu phát thay thế",
+    "grabFailed": "Không lấy được khung hình đó. Hãy thử lại, hoặc chọn thời điểm khác.",
+    "threshold": "Ngưỡng",
+    "thresholdStaticTitle": "Dung sai: cao hơn thì bỏ qua nhiều thay đổi của phông nền hơn (nhiễu, ánh sáng, lấy nét) nhưng có thể bắt đầu xóa cả một phần của bạn",
+    "thresholdTitle": "Cao hơn thì xóa nhiều màu phông hơn",
+    "resetThreshold": "Đặt lại ngưỡng",
+    "softness": "Độ mềm cạnh",
+    "resetSoftness": "Đặt lại độ mềm",
+    "despill": "Khử loang màu",
+    "despillStaticTitle": "Xóa màu tường khỏi các cạnh",
+    "despillTitle": {
+      "green": "Xóa ánh xanh lá khỏi các cạnh",
+      "blue": "Xóa ánh xanh dương khỏi các cạnh"
+    },
+    "resetDespill": "Đặt lại khử loang màu",
+    "cameraLock": {
+      "allLocked": "Đã khóa lấy nét, phơi sáng và cả cân bằng trắng của camera.",
+      "focusExposureLocked": "Đã khóa lấy nét và phơi sáng của camera.",
+      "noFocus": "Camera của bạn không cho phép khóa lấy nét; tránh tiến lại gần hoặc lùi ra xa.",
+      "lockedList": "Đã khóa: {{list}}.",
+      "noExposure": "Đã khóa lấy nét. Camera này không khóa được phơi sáng; hãy giữ ánh sáng ổn định.",
+      "names": {
+        "focus": "lấy nét",
+        "exposure": "phơi sáng",
+        "whiteBalance": "cân bằng trắng"
+      }
+    }
+  },
+  "layout": {
+    "boxSize": "Kích thước khung",
+    "smaller": "Nhỏ hơn",
+    "larger": "Lớn hơn",
+    "zoom": "Thu phóng",
+    "resetZoom": "Đặt lại thu phóng",
+    "hint": "Kéo clip để di chuyển. Nhấn giữ rồi kéo để di chuyển video bên trong khung. Chụm hai ngón để thu phóng trên màn hình cảm ứng.",
+    "freeTransform": "Chuyển sang biến đổi tự do"
+  },
+  "transform": {
+    "scale": "Tỉ lệ",
+    "resetScale": "Đặt lại tỉ lệ",
+    "rotation": "Xoay",
+    "resetRotation": "Đặt lại góc xoay",
+    "position": "Vị trí",
+    "resetPosition": "Đặt lại vị trí",
+    "dragToMove": "Kéo để đổi vị trí",
+    "crop": "Cắt khung",
+    "resetCrop": "Đặt lại cắt khung",
+    "cropWidth": "R",
+    "cropHeight": "C",
+    "opacity": "Độ mờ đục",
+    "resetOpacity": "Đặt lại độ mờ đục"
+  },
+  "timing": {
+    "duration": "Thời lượng",
+    "seconds": "Giây",
+    "in": "Vào:",
+    "out": "Ra:",
+    "durationColon": "Thời lượng:",
+    "position": "Vị trí:"
+  },
+  "color": {
+    "measuring": "Đang đo…",
+    "autoTitle": "Sửa mức sáng, tông trung và cân bằng trắng dựa trên các khung hình của clip này",
+    "resetAll": "Đặt lại mọi điều chỉnh màu",
+    "failed": "Không đọc được hình ảnh của clip này.",
+    "sliders": {
+      "brightness": "Độ sáng",
+      "contrast": "Độ tương phản",
+      "midtones": "Tông trung",
+      "saturation": "Độ bão hòa",
+      "warmth": "Độ ấm",
+      "tint": "Sắc độ"
+    }
+  },
+  "effects": {
+    "hiddenName": "{{name}} (đã ẩn)",
+    "show": "Hiện lại hiệu ứng này",
+    "hide": "Ẩn hiệu ứng này (vẫn giữ, nhưng không áp dụng)",
+    "remove": "Gỡ hiệu ứng này",
+    "comesFrom": "Đi vào từ",
+    "goesTo": "Đi ra về",
+    "from": "Từ",
+    "to": "Đến",
+    "speed": "Tốc độ",
+    "amount": {
+      "amplitude": "Biên độ",
+      "bounce": "Độ nảy",
+      "distance": "Khoảng cách"
+    },
+    "addFirst": "Thêm hiệu ứng…",
+    "addAnother": "Thêm hiệu ứng khác…",
+    "groups": {
+      "loop": "Lặp",
+      "in": "Xuất hiện",
+      "out": "Biến mất"
+    },
+    "effect": {
+      "pulse": "Nhịp đập",
+      "wobble": "Lắc lư",
+      "bob": "Nhấp nhô",
+      "sway": "Đung đưa",
+      "spin": "Xoay",
+      "pop": "Bật vào",
+      "slideIn": "Trượt vào",
+      "fadeIn": "Hiện dần",
+      "popOut": "Bật ra",
+      "slideOut": "Trượt ra",
+      "fadeOut": "Mờ dần"
+    },
+    "direction": {
+      "left": "trái",
+      "right": "phải",
+      "top": "trên",
+      "bottom": "dưới"
+    },
+    "pivot": "Tâm xoay",
+    "pivotPoint": "Điểm tâm xoay",
+    "pivotName": {
+      "topLeft": "trên trái",
+      "top": "trên",
+      "topRight": "trên phải",
+      "left": "trái",
+      "centre": "giữa",
+      "right": "phải",
+      "bottomLeft": "dưới trái",
+      "bottom": "dưới",
+      "bottomRight": "dưới phải",
+      "custom": "tùy chỉnh"
+    }
+  },
+  "multi": {
+    "volume": "Âm lượng",
+    "volumeMixed": "Âm lượng (khác nhau)",
+    "volumeAll": "Âm lượng của mọi clip đã chọn",
+    "muteAll": "Tắt tiếng tất cả",
+    "unmuteAll": "Bật tiếng tất cả",
+    "cleanVoice": "Làm sạch giọng nói",
+    "cleanGroup": "Làm sạch giọng cho mọi clip đã chọn",
+    "afterUpload": "Có thể dùng khi các clip này tải lên xong.",
+    "failed": "Làm sạch giọng nói thất bại. Hãy thử lại.",
+    "applies_other": "Áp dụng cho {{count}} clip đã chọn.",
+    "appliesWithGroups_other": "Áp dụng cho {{selected}} clip đã chọn và {{count}} clip khác trong nhóm của chúng.",
+    "stillUploading": "Các clip còn đang tải lên được giữ nguyên.",
+    "remove_other": "Gỡ {{count}} clip"
+  },
+  "trim": {
+    "title": "Cắt gọt: {{name}}",
+    "start": "Điểm bắt đầu",
+    "end": "Điểm kết thúc",
+    "trimmed": "Thời lượng sau khi cắt"
+  },
+  "reframe": {
+    "readFailed": "Không đọc được video ở đây",
+    "openFailed": "Không mở được video để theo dõi khuôn mặt"
+  },
+  "personKey": {
+    "ready": "Đã sẵn sàng: bạn đã được tách ra trong mọi khung hình. Bản kết xuất trông giống bản xem trước.",
+    "failed": "Không tìm thấy người trong clip này ({{error}}).",
+    "finding": "Đang tìm bạn trong từng khung hình... Trong lúc đó bản xem trước đã hiển thị trực tiếp.",
+    "findingProgress": "Đang tìm bạn trong từng khung hình: {{percent}} Trong lúc đó bản xem trước đã hiển thị trực tiếp.",
+    "behind": "Phía sau bạn",
+    "backgrounds": {
+      "none": "Trong suốt",
+      "noneTitle": "Các clip ở rãnh bên dưới hiện phía sau bạn",
+      "blur": "Làm mờ",
+      "blurTitle": "Phông nền của chính bạn, được làm mờ",
+      "color": "Màu",
+      "colorTitle": "Một màu trơn phía sau bạn"
+    },
+    "pickStock": "Đặt một ảnh hoặc video có sẵn phía sau",
+    "colour": "Màu",
+    "blur": "Làm mờ",
+    "resetBlur": "Đặt lại độ mờ",
+    "thresholdTitle": "Cao hơn thì giữ lại ít xung quanh bạn hơn, thấp hơn thì giữ lại nhiều hơn"
+  }
+}

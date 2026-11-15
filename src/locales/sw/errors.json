@@ -1,0 +1,28 @@
+{
+  "render": {
+    "unreachable": "Seva ya utengenezaji haifikiki. Angalia muunganisho wako na utengeneze tena.",
+    "stillBusy": "Seva za utengenezaji bado zina shughuli nyingi. Tafadhali tengeneza tena baada ya dakika chache.",
+    "unknownJob": "Seva ya utengenezaji haitambui tena kazi hii (huenda ilianzishwa upya). Tafadhali tengeneza tena.",
+    "lostContact": "Mawasiliano na seva ya utengenezaji yamepotea. Tafadhali tengeneza tena.",
+    "serverStatus": "Seva ilijibu {{status}}"
+  },
+  "uploadFailed": "Upakiaji umeshindwa: {{status}}",
+  "signIn": {
+    "loggedOut": "Ingia kwenye 3Speak ili kutumia kihariri.",
+    "failed": "Ingia kwenye 3Speak ili kupakia na kutengeneza (kuingia kulighairiwa au hakukufanya kazi)."
+  },
+  "export": {
+    "failed": "Kuhamisha kumeshindwa",
+    "ffmpegNotLoaded": "FFmpeg haijapakiwa",
+    "noClips": "Hakuna klipu za kuhamisha",
+    "noCodec": "Hakuna kodeki ya video inayoungwa mkono na MediaRecorder",
+    "cancelled": "Kuhamisha kumeghairiwa",
+    "noSource": "Hakuna chanzo halali cha faili kwa klipu: {{name}}",
+    "ffmpegFailed": "Amri ya FFmpeg imeshindwa kwa msimbo wa kutoka {{code}}"
+  },
+  "reverse": {
+    "failed": "Uchakataji wa kugeuza kinyume umeshindwa",
+    "timedOut": "Muda wa uchakataji wa kugeuza kinyume umeisha",
+    "statusCheck": "Ukaguzi wa hali umeshindwa: {{status}}"
+  }
+}

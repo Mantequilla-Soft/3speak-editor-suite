@@ -1,0 +1,81 @@
+{
+  "language": {
+    "label": "Język mowy",
+    "auto": "Wykryj automatycznie"
+  },
+  "intro": {
+    "title": "Edycja przez tekst",
+    "text": "Zamień to, co jest mówione, w tekst z podpisanym każdym głosem, a potem edytuj nagranie jak dokument: zaznacz słowa i naciśnij Delete, aby je wyciąć.",
+    "checking": "Sprawdzanie serwera...",
+    "unavailable": "Transkrypcje nie są teraz dostępne na tym serwerze edytora.",
+    "noSpeech": "Najpierw dodaj nagranie z mową.",
+    "transcribeSeconds": "Transkrybuj ({{n}} s nagrania)",
+    "transcribeMinutes": "Transkrybuj ({{n}} min nagrania)",
+    "longShow": "Długa audycja chwilę potrwa: słowa pojawiają się częściami, a pierwsze możesz już edytować."
+  },
+  "listening": "Słucham...",
+  "stop": "Stop",
+  "goThere": "Przejdź tam",
+  "search": {
+    "placeholder": "Znajdź słowa",
+    "label": "Znajdź słowa w transkrypcji",
+    "previous": "Poprzedni",
+    "previousLabel": "Poprzednie wystąpienie",
+    "next": "Następny",
+    "nextLabel": "Następne wystąpienie"
+  },
+  "selection": {
+    "count_one": "{{count}} słowo · {{seconds}} s",
+    "count_few": "{{count}} słowa · {{seconds}} s",
+    "count_many": "{{count}} słów · {{seconds}} s",
+    "count_other": "{{count}} słowa · {{seconds}} s",
+    "cut": "Wytnij",
+    "cutTitle": "Wytnij zaznaczone słowa z nagrania (Delete)",
+    "clearTitle": "Wyczyść zaznaczenie (Esc)",
+    "clearLabel": "Wyczyść zaznaczenie"
+  },
+  "found": {
+    "cutAll_one": "Wytnij wszystkie ({{count}})",
+    "cutAll_few": "Wytnij wszystkie ({{count}})",
+    "cutAll_many": "Wytnij wszystkie ({{count}})",
+    "cutAll_other": "Wytnij wszystkie ({{count}})",
+    "cutAllTitle": "Wytnij z nagrania każde znalezione miejsce"
+  },
+  "fillers": "Wtrącenia",
+  "fillersTitle": "Znajdź „yyy”, „eee”, „no wiesz” i długie pauzy",
+  "copy": "Kopiuj transkrypcję",
+  "speakers": "Mówcy",
+  "missing": {
+    "seconds": "{{n}} s nagrania nie ma jeszcze tekstu.",
+    "minutes": "{{n}} min nagrania nie ma jeszcze tekstu.",
+    "transcribe": "Transkrybuj"
+  },
+  "scrollLabel": "Transkrypcja: kliknij słowo, aby tam przejść, przeciągnij po słowach, aby je zaznaczyć, Delete je wycina",
+  "hint_one": "{{count}} słowo. Kliknij słowo, aby tam przejść; przeciągnij lub Shift+kliknięcie, aby zaznaczyć; Delete wycina. Cofnij przywraca.",
+  "hint_few": "{{count}} słowa. Kliknij słowo, aby tam przejść; przeciągnij lub Shift+kliknięcie, aby zaznaczyć; Delete wycina. Cofnij przywraca.",
+  "hint_many": "{{count}} słów. Kliknij słowo, aby tam przejść; przeciągnij lub Shift+kliknięcie, aby zaznaczyć; Delete wycina. Cofnij przywraca.",
+  "hint_other": "{{count}} słowa. Kliknij słowo, aby tam przejść; przeciągnij lub Shift+kliknięcie, aby zaznaczyć; Delete wycina. Cofnij przywraca.",
+  "speaker": {
+    "default": "Głos",
+    "numbered": "Głos {{n}}"
+  },
+  "job": {
+    "starting": "Rozpoczynanie...",
+    "preparing": "Przygotowywanie nagrań...",
+    "listening": "Słucham...",
+    "signIn": "Zaloguj się w 3Speak, aby utworzyć transkrypcję.",
+    "uploadFailed": "Nie udało się przesłać nagrań: {{message}}",
+    "notUploaded": "Nagrań nie ma jeszcze na serwerze. Spróbuj ponownie, gdy się prześlą.",
+    "serverAnswered": "Serwer odpowiedział {{status}}",
+    "lost": "Zadanie transkrypcji zostało utracone (serwer się zrestartował?)",
+    "failed": "Rozpoznawanie mowy nie powiodło się"
+  },
+  "stt": {
+    "audioUnavailable": "dźwięk niedostępny",
+    "serverError": "błąd serwera",
+    "connectionFailed": "połączenie nieudane",
+    "unauthorized": "brak autoryzacji",
+    "closed": "zamknięte",
+    "initFailed": "nie udało się uruchomić rozpoznawania mowy"
+  }
+}

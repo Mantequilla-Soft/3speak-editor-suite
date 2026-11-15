@@ -1,0 +1,108 @@
+{
+  "speed": {
+    "title": "Vitesse",
+    "stillFrame": "Image figée",
+    "holds": "Fige l'image à {{time}} de la vidéo. Coupez-la sur la chronologie ou choisissez une durée :",
+    "seconds": "{{value}} s",
+    "speed": "Vitesse",
+    "ramp": "Rampe de vitesse",
+    "ramps": {
+      "montage": "Montage",
+      "hero": "Héros",
+      "speedUp": "Accélérer",
+      "slowDown": "Ralentir"
+    },
+    "rampHint": "L'aperçu suit la rampe de près, le rendu est exact. Le son garde sa hauteur.",
+    "freeze": "Arrêt sur image",
+    "freezeLength": "Durée de l'arrêt",
+    "freezeTitle": "Figer l'image sous la tête de lecture",
+    "freezeMoveFirst": "Placez d'abord la tête de lecture sur ce clip",
+    "freezeAt": "Figer à la tête de lecture",
+    "stillName": "Image figée · {{name}}",
+    "stillNameFallback": "clip"
+  },
+  "badge": {
+    "still": "Figée",
+    "ramp": "Rampe",
+    "stillTitle": "Image figée",
+    "speedTitle": "Vitesse {{speed}}",
+    "rampTitle": "Rampe de vitesse"
+  },
+  "keyframes": {
+    "title": "Images clés",
+    "moveHere": "Placez la tête de lecture sur ce clip pour ajouter des images clés.",
+    "props": {
+      "x": "Position X",
+      "y": "Position Y",
+      "scale": "Échelle",
+      "rotation": "Rotation",
+      "opacity": "Opacité",
+      "volume": "Volume"
+    },
+    "aria": {
+      "x": {
+        "prev": "Image clé Position X précédente",
+        "next": "Image clé Position X suivante",
+        "add": "Ajouter une image clé Position X",
+        "remove": "Retirer l'image clé Position X"
+      },
+      "y": {
+        "prev": "Image clé Position Y précédente",
+        "next": "Image clé Position Y suivante",
+        "add": "Ajouter une image clé Position Y",
+        "remove": "Retirer l'image clé Position Y"
+      },
+      "scale": {
+        "prev": "Image clé Échelle précédente",
+        "next": "Image clé Échelle suivante",
+        "add": "Ajouter une image clé Échelle",
+        "remove": "Retirer l'image clé Échelle"
+      },
+      "rotation": {
+        "prev": "Image clé Rotation précédente",
+        "next": "Image clé Rotation suivante",
+        "add": "Ajouter une image clé Rotation",
+        "remove": "Retirer l'image clé Rotation"
+      },
+      "opacity": {
+        "prev": "Image clé Opacité précédente",
+        "next": "Image clé Opacité suivante",
+        "add": "Ajouter une image clé Opacité",
+        "remove": "Retirer l'image clé Opacité"
+      },
+      "volume": {
+        "prev": "Image clé Volume précédente",
+        "next": "Image clé Volume suivante",
+        "add": "Ajouter une image clé Volume",
+        "remove": "Retirer l'image clé Volume"
+      }
+    },
+    "prev": "Image clé précédente",
+    "next": "Image clé suivante",
+    "add": "Ajouter une image clé à la tête de lecture",
+    "remove": "Retirer l'image clé à la tête de lecture",
+    "ease": "Adoucir d'ici jusqu'à l'image clé suivante",
+    "removeAll": "Retirer toutes les images clés"
+  },
+  "kenBurns": {
+    "title": "Ken Burns",
+    "in": "Zoom avant lent",
+    "out": "Zoom arrière lent",
+    "pan": "Panoramique lent"
+  },
+  "punch": {
+    "title": "Zooms rapides",
+    "hint": "De petits zooms rapides au début des phrases et sur les mots forts, d'après les sous-titres s'il y en a, sinon d'après le son.",
+    "listening": "Écoute...",
+    "auto": "Zooms rapides auto",
+    "remove": "Retirer les zooms rapides",
+    "noMoments": "Aucun début de phrase ni mot fort trouvé dans ce clip.",
+    "noSound": "Le son de ce clip n'a pas pu être lu. Ajoutez d'abord des sous-titres auto, puis réessayez.",
+    "addedCaptions_one": "{{count}} zoom rapide ajouté, d'après les sous-titres. Ce sont des images clés ordinaires sur Échelle.",
+    "addedCaptions_many": "{{count}} zooms rapides ajoutés, d'après les sous-titres. Ce sont des images clés ordinaires sur Échelle.",
+    "addedCaptions_other": "{{count}} zooms rapides ajoutés, d'après les sous-titres. Ce sont des images clés ordinaires sur Échelle.",
+    "addedSound_one": "{{count}} zoom rapide ajouté, d'après le son. Ce sont des images clés ordinaires sur Échelle.",
+    "addedSound_many": "{{count}} zooms rapides ajoutés, d'après le son. Ce sont des images clés ordinaires sur Échelle.",
+    "addedSound_other": "{{count}} zooms rapides ajoutés, d'après le son. Ce sont des images clés ordinaires sur Échelle."
+  }
+}

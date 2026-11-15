@@ -1,0 +1,53 @@
+{
+  "title": "लुक",
+  "noEffects": "कोई इफ़ेक्ट नहीं",
+  "presetsLabel": "लुक प्रीसेट",
+  "doubleClickReset": "रीसेट करने के लिए डबल-क्लिक करें",
+  "presets": {
+    "original": "ओरिजिनल",
+    "warm": "गर्म",
+    "cool": "ठंडा",
+    "vivid": "तेज़",
+    "matte": "मैट",
+    "bw": "ब्लैक एंड व्हाइट",
+    "vintage": "विंटेज",
+    "tealorange": "टील और ऑरेंज",
+    "fade": "फ़ीका",
+    "noir": "न्वार",
+    "sunset": "सूर्यास्त"
+  },
+  "sliders": {
+    "blur": "ब्लर",
+    "vignette": "विनेट",
+    "sharpen": "शार्प करें",
+    "split": "टील और ऑरेंज"
+  },
+  "transition": {
+    "title": "ट्रांज़िशन",
+    "none": "कोई नहीं",
+    "types": {
+      "crossfade": "क्रॉसफ़ेड",
+      "dissolve": "काले में डूबना",
+      "slideleft": "बाएँ स्लाइड",
+      "slideright": "दाएँ स्लाइड",
+      "slideup": "ऊपर स्लाइड",
+      "zoom": "ज़ूम",
+      "whip": "व्हिप"
+    },
+    "length": "ट्रांज़िशन की लंबाई (सेकंड)",
+    "fades": "फ़ेड",
+    "noFades": "कोई फ़ेड नहीं",
+    "in": "इन",
+    "out": "आउट",
+    "fadeInSeconds": "फ़ेड इन (सेकंड)",
+    "fadeOutSeconds": "फ़ेड आउट (सेकंड)",
+    "intoNext": "अगली क्लिप में",
+    "needNext": "ट्रांज़िशन जोड़ने के लिए इसी ट्रैक पर इसके ठीक बाद एक क्लिप रखें।",
+    "fromTo": "{{from}} से {{to}} में",
+    "fromUnnamed": "क्लिप से {{to}} में",
+    "toUnnamed": "{{from}} से अगली क्लिप में",
+    "bothUnnamed": "क्लिप से अगली क्लिप में",
+    "add": "ट्रांज़िशन जोड़ें",
+    "cutLabel": "{{type}}, {{seconds}} से."
+  }
+}

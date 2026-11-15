@@ -1,0 +1,36 @@
+{
+  "cancel": "Hủy",
+  "close": "Đóng",
+  "ok": "OK",
+  "gotIt": "Đã hiểu",
+  "done": "Xong",
+  "save": "Lưu",
+  "delete": "Xóa",
+  "remove": "Gỡ bỏ",
+  "back": "Quay lại",
+  "next": "Tiếp",
+  "skip": "Bỏ qua",
+  "retry": "Thử lại",
+  "reset": "Đặt lại",
+  "none": "Không có",
+  "off": "Tắt",
+  "auto": "Tự động",
+  "play": "Phát",
+  "pause": "Tạm dừng",
+  "undo": "Hoàn tác",
+  "preview": "Xem trước",
+  "render": "Kết xuất",
+  "export": "Xuất",
+  "duration": {
+    "seconds_other": "{{count}} giây",
+    "minutes_other": "{{count}} phút",
+    "hours_other": "{{count}} giờ"
+  },
+  "limits": {
+    "atMost": {
+      "short": "Một Short dài tối đa {{limit}}.",
+      "video": "Một video dài tối đa {{limit}}.",
+      "audio": "Một bản xuất dài tối đa {{limit}}."
+    }
+  }
+}

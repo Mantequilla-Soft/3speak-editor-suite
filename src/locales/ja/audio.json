@@ -1,0 +1,8 @@
+{
+  "cleaning": {
+    "voice_other": "{{count}} 個のクリップの音声をクリーンアップ中…",
+    "voiceRecording_other": "{{count}} 個のクリップの音声をクリーンアップ中 · 録音 {{at}} / {{total}}",
+    "back_other": "{{count}} 個のクリップを元に戻し中…",
+    "backRecording_other": "{{count}} 個のクリップを元に戻し中 · 録音 {{at}} / {{total}}"
+  }
+}

@@ -1,0 +1,308 @@
+{
+  "empty": "Pumili ng clip para makita ang mga property",
+  "types": {
+    "video": "video",
+    "audio": "audio",
+    "image": "larawan",
+    "text": "text",
+    "color": "kulay",
+    "scene": "eksena"
+  },
+  "sections": {
+    "content": "Nilalaman",
+    "color": "Kulay",
+    "audio": "Audio",
+    "layout": "Layout",
+    "transform": "Transform",
+    "timing": "Oras",
+    "motion": "Galaw",
+    "greenScreen": "Green screen"
+  },
+  "doubleClickReset": "I-double-click para i-reset",
+  "text": {
+    "label": "Text",
+    "placeholder": "Ilagay ang text dito...",
+    "font": "Font",
+    "resetFont": "I-reset ang font",
+    "fontGroups": {
+      "sansSerif": "Sans Serif",
+      "serif": "Serif",
+      "display": "Display",
+      "handwriting": "Sulat-kamay",
+      "monospace": "Monospace"
+    },
+    "weight": {
+      "normal": "Normal",
+      "bold": "Makapal"
+    },
+    "style": "Istilo",
+    "resetStyle": "I-reset ang istilo",
+    "size": "Laki",
+    "alignment": "Pagkakahanay",
+    "resetAlignment": "I-reset ang pagkakahanay",
+    "align": {
+      "left": "Ihanay sa kaliwa",
+      "center": "Ihanay sa gitna",
+      "right": "Ihanay sa kanan"
+    },
+    "box": "Kahon sa likod",
+    "fill": "Fill",
+    "opacity": "Opacity",
+    "padding": "Padding",
+    "radius": "Radius ng kanto",
+    "border": "Border",
+    "width": "Lapad"
+  },
+  "colorClip": {
+    "background": "Kulay ng background",
+    "gradient": "Gradient",
+    "enabled": "Naka-on",
+    "disabled": "Naka-off",
+    "endColor": "Huling kulay",
+    "angle": "Anggulo",
+    "resetAngle": "I-reset ang anggulo"
+  },
+  "volume": {
+    "label": "Volume",
+    "reset": "I-reset ang volume",
+    "mute": "I-mute",
+    "unmute": "I-unmute"
+  },
+  "fades": {
+    "label": "Mga fade",
+    "none": "Walang fade",
+    "in": "Papasok",
+    "out": "Palabas",
+    "inSeconds": "Papasok (segundo)",
+    "outSeconds": "Palabas (segundo)"
+  },
+  "noise": {
+    "reduce": "Bawasan ang ingay sa background",
+    "cleanVoice": "Linisin ang boses",
+    "group": "Pagbawas ng ingay",
+    "working": "Ginagawa",
+    "workingDots": "Ginagawa…",
+    "afterUpload": "Magagamit kapag tapos nang ma-upload ang clip na ito.",
+    "appliesGroup_one": "Nalalapat sa clip na ito at sa grupo nito ({{count}} clip).",
+    "appliesGroup_other": "Nalalapat sa clip na ito at sa grupo nito ({{count}} clip).",
+    "appliesOne": "Nalalapat sa clip na ito lang.",
+    "failed": "Pumalya ang pagbawas ng ingay. Subukan ulit.",
+    "levels": {
+      "light": "Mahina",
+      "medium": "Katamtaman",
+      "strong": "Malakas"
+    },
+    "studioTitle": "Malakas: mas kaunting ingay, walang ugong, mas malinaw at mas pantay, mas malambot na tunog ng S"
+  },
+  "duck": {
+    "label": "Duck",
+    "group": "I-duck ang clip na ito",
+    "depth": "{{db}} dB",
+    "source": "<lead>Humihina habang</lead><pick/><tail>tumutugtog</tail>",
+    "sourceLabel": "Pinagmulan ng duck",
+    "hint": "Humihina ang clip na ito habang tumutugtog ang napiling track, at lumalakas ulit sa mga hinto."
+  },
+  "greenScreen": {
+    "removeBackground": "Alisin ang background",
+    "modes": {
+      "green": "Berde",
+      "blue": "Asul",
+      "person": "Tao",
+      "static": "Static (eksperimental)"
+    },
+    "modeTitles": {
+      "green": "Green screen",
+      "blue": "Blue screen",
+      "person": "Hindi kailangan ng green screen: hinahanap ka sa larawan at inaalis ang iba",
+      "static": "Static na background (eksperimental): inaalis ang anumang tugma sa isang frame ng walang lamang background"
+    },
+    "staticHint": "Inaalis ang lahat ng kamukha ng ilang frame ng walang lamang background. Hindi pinapansin ang maliliit na pagbabago (ingay, liwanag, focus) at nananatili sa loob ng outline mo ang mga bahagi mong kamukha ng pader. Kailangan ng camera na hindi gumagalaw; nananatiling kita ang anino mo. Kung may bahagi pa ng kuwarto na nakikita, taasan ang Threshold.",
+    "hint": {
+      "green": "Inaalis ang berdeng backdrop para makita ang mga clip sa mga track sa ibaba.",
+      "blue": "Inaalis ang asul na backdrop para makita ang mga clip sa mga track sa ibaba.",
+      "person": "Hindi kailangan ng green screen: hinahanap ng editor ang tao sa bawat frame at inaalis ang iba. Pinakamaganda kapag isang tao, maliwanag, sa harap ng camera."
+    },
+    "plate": "Frame ng walang lamang background",
+    "plateAlt": "Walang lamang background",
+    "plateHint": "Ilipat ang playhead sa sandaling background lang ang nakikita, nang wala ka. Kalahating segundo nito ang gagamitin.",
+    "grabbing": "Kinukuha ang frame...",
+    "useFrame": "Gamitin ang frame sa playhead",
+    "useFrameInstead": "Gamitin na lang ang frame sa playhead",
+    "grabFailed": "Hindi makuha ang frame na iyon. Subukan ulit, o pumili ng ibang sandali.",
+    "threshold": "Threshold",
+    "thresholdStaticTitle": "Tolerance: mas mataas, mas maraming pagbabago sa background ang hindi pinapansin (ingay, liwanag, focus) pero puwedeng magsimulang maalis ang mga bahagi mo",
+    "thresholdTitle": "Mas mataas, mas maraming kulay ng screen ang inaalis",
+    "resetThreshold": "I-reset ang threshold",
+    "softness": "Lambot ng gilid",
+    "resetSoftness": "I-reset ang lambot",
+    "despill": "Despill",
+    "despillStaticTitle": "Inaalis ang kulay ng pader sa mga gilid",
+    "despillTitle": {
+      "green": "Inaalis ang berdeng tint sa mga gilid",
+      "blue": "Inaalis ang asul na tint sa mga gilid"
+    },
+    "resetDespill": "I-reset ang despill",
+    "cameraLock": {
+      "allLocked": "Naka-lock ang focus at exposure ng camera, pati ang white balance.",
+      "focusExposureLocked": "Naka-lock ang focus at exposure ng camera.",
+      "noFocus": "Hindi pinapayagan ng camera mo ang pag-lock ng focus; iwasang lumapit o lumayo.",
+      "lockedList": "Naka-lock: {{list}}.",
+      "noExposure": "Naka-lock ang focus. Hindi ma-lock ang exposure sa camera na ito; panatilihing pare-pareho ang liwanag.",
+      "names": {
+        "focus": "focus",
+        "exposure": "exposure",
+        "whiteBalance": "white balance"
+      }
+    }
+  },
+  "layout": {
+    "boxSize": "Laki ng kahon",
+    "smaller": "Mas maliit",
+    "larger": "Mas malaki",
+    "zoom": "Zoom",
+    "resetZoom": "I-reset ang zoom",
+    "hint": "I-drag ang clip para ilipat ito. Pindutin nang matagal, tapos i-drag, para ilipat ang video sa loob ng kahon nito. Mag-pinch para mag-zoom sa touch screen.",
+    "freeTransform": "Lumipat sa free transform"
+  },
+  "transform": {
+    "scale": "Scale",
+    "resetScale": "I-reset ang scale",
+    "rotation": "Pag-ikot",
+    "resetRotation": "I-reset ang pag-ikot",
+    "position": "Posisyon",
+    "resetPosition": "I-reset ang posisyon",
+    "dragToMove": "I-drag para ilipat",
+    "crop": "I-crop",
+    "resetCrop": "I-reset ang crop",
+    "cropWidth": "L",
+    "cropHeight": "T",
+    "opacity": "Opacity",
+    "resetOpacity": "I-reset ang opacity"
+  },
+  "timing": {
+    "duration": "Tagal",
+    "seconds": "Seg",
+    "in": "Simula:",
+    "out": "Dulo:",
+    "durationColon": "Tagal:",
+    "position": "Posisyon:"
+  },
+  "color": {
+    "measuring": "Sinusukat…",
+    "autoTitle": "Ayusin ang mga level, midtone at white balance mula sa mga frame ng clip na ito",
+    "resetAll": "I-reset ang lahat ng pag-aayos ng kulay",
+    "failed": "Hindi mabasa ang larawan ng clip na ito.",
+    "sliders": {
+      "brightness": "Liwanag",
+      "contrast": "Contrast",
+      "midtones": "Mga midtone",
+      "saturation": "Saturation",
+      "warmth": "Init",
+      "tint": "Tint"
+    }
+  },
+  "effects": {
+    "hiddenName": "{{name}} (nakatago)",
+    "show": "Ipakita ulit ang effect na ito",
+    "hide": "Itago ang effect na ito (nakatabi, pero hindi inilalapat)",
+    "remove": "Alisin ang effect na ito",
+    "comesFrom": "Galing sa",
+    "goesTo": "Papunta sa",
+    "from": "Mula",
+    "to": "Hanggang",
+    "speed": "Bilis",
+    "amount": {
+      "amplitude": "Amplitude",
+      "bounce": "Talbog",
+      "distance": "Layo"
+    },
+    "addFirst": "Magdagdag ng effect…",
+    "addAnother": "Magdagdag ng isa pang effect…",
+    "groups": {
+      "loop": "Mga loop",
+      "in": "Mga pasok",
+      "out": "Mga labas"
+    },
+    "effect": {
+      "pulse": "Pulso",
+      "wobble": "Gewang",
+      "bob": "Taas-baba",
+      "sway": "Ugoy",
+      "spin": "Ikot",
+      "pop": "Biglang pasok",
+      "slideIn": "Dausdos papasok",
+      "fadeIn": "Fade in",
+      "popOut": "Biglang labas",
+      "slideOut": "Dausdos palabas",
+      "fadeOut": "Fade out"
+    },
+    "direction": {
+      "left": "kaliwa",
+      "right": "kanan",
+      "top": "itaas",
+      "bottom": "ibaba"
+    },
+    "pivot": "Pivot",
+    "pivotPoint": "Pivot point",
+    "pivotName": {
+      "topLeft": "kaliwa sa itaas",
+      "top": "itaas",
+      "topRight": "kanan sa itaas",
+      "left": "kaliwa",
+      "centre": "gitna",
+      "right": "kanan",
+      "bottomLeft": "kaliwa sa ibaba",
+      "bottom": "ibaba",
+      "bottomRight": "kanan sa ibaba",
+      "custom": "pasadya"
+    }
+  },
+  "multi": {
+    "volume": "Volume",
+    "volumeMixed": "Volume (halo-halo)",
+    "volumeAll": "Volume ng lahat ng napiling clip",
+    "muteAll": "I-mute lahat",
+    "unmuteAll": "I-unmute lahat",
+    "cleanVoice": "Linisin ang boses",
+    "cleanGroup": "Paglinis ng boses para sa lahat ng napiling clip",
+    "afterUpload": "Magagamit kapag tapos nang ma-upload ang mga clip na ito.",
+    "failed": "Pumalya ang paglinis ng boses. Subukan ulit.",
+    "applies_one": "Nalalapat sa {{count}} napiling clip.",
+    "applies_other": "Nalalapat sa {{count}} napiling clip.",
+    "appliesWithGroups_one": "Nalalapat sa {{selected}} napiling clip at sa {{count}} pang clip sa kanilang mga grupo.",
+    "appliesWithGroups_other": "Nalalapat sa {{selected}} napiling clip at sa {{count}} pang clip sa kanilang mga grupo.",
+    "stillUploading": "Hindi gagalawin ang mga clip na ina-upload pa.",
+    "remove_one": "Alisin ang {{count}} clip",
+    "remove_other": "Alisin ang {{count}} clip"
+  },
+  "trim": {
+    "title": "I-trim: {{name}}",
+    "start": "Simula",
+    "end": "Dulo",
+    "trimmed": "Tagal pagkatapos i-trim"
+  },
+  "reframe": {
+    "readFailed": "Hindi mabasa rito ang video",
+    "openFailed": "Hindi mabuksan ang video para sa face tracking"
+  },
+  "personKey": {
+    "ready": "Handa na: naka-cut out ka sa bawat frame. Kamukha ng preview ang render.",
+    "failed": "Walang nakitang tao sa clip na ito ({{error}}).",
+    "finding": "Hinahanap ka sa bawat frame... Live na itong ipinapakita ng preview habang naghihintay.",
+    "findingProgress": "Hinahanap ka sa bawat frame: {{percent}} Live na itong ipinapakita ng preview habang naghihintay.",
+    "behind": "Sa likod mo",
+    "backgrounds": {
+      "none": "Tagusan",
+      "noneTitle": "Makikita sa likod mo ang mga clip sa mga track sa ibaba",
+      "blur": "Blur",
+      "blurTitle": "Ang sarili mong background, naka-blur",
+      "color": "Kulay",
+      "colorTitle": "Payak na kulay sa likod mo"
+    },
+    "pickStock": "Maglagay ng stock na larawan o video sa likod",
+    "colour": "Kulay",
+    "blur": "Blur",
+    "resetBlur": "I-reset ang blur",
+    "thresholdTitle": "Mas mataas, mas kaunti ang natitira sa paligid mo; mas mababa, mas marami"
+  }
+}

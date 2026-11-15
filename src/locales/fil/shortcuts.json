@@ -1,0 +1,53 @@
+{
+  "sheet": {
+    "title": "Mga keyboard shortcut"
+  },
+  "groups": {
+    "playback": "Playback",
+    "clips": "Mga clip",
+    "project": "Proyekto"
+  },
+  "items": {
+    "playPause": "I-play / i-pause",
+    "playForward": "I-play pasulong; pindutin ulit para sa 2x, 4x, 8x",
+    "playBackward": "I-play paatras; pindutin ulit para bumilis",
+    "stop": "Itigil",
+    "frameStep": "Isang frame paatras / pasulong (Shift: 10 frame)",
+    "nudge": "Iusog ang playhead nang 0.1 seg (Shift: 1 seg)",
+    "fullscreen": "Full screen on / off",
+    "nextPrevClip": "Piliin ang susunod / nakaraang clip",
+    "clipLeftRight": "Nakaraan / susunod na clip sa parehong track",
+    "clipUpDown": "Clip sa track sa itaas / ibaba",
+    "openClip": "Buksan ang mga setting ng napiling clip",
+    "selectNone": "Walang piliin",
+    "selectAll": "Piliin ang lahat ng clip",
+    "remove": "Alisin ang (mga) napiling clip",
+    "split": "Hatiin ang napiling clip sa playhead",
+    "duplicate": "Doblehin ang napiling clip",
+    "ungroup": "I-ungroup ang mga clip",
+    "closeGap": "Isara ang puwang sa playhead",
+    "addText": "Magdagdag ng text sa playhead",
+    "undo": "I-undo",
+    "redo": "I-redo",
+    "addFlag": "Magdagdag ng flag sa playhead",
+    "addChapter": "Magdagdag ng kabanata sa playhead",
+    "zoom": "I-zoom in / out ang timeline",
+    "showSheet": "Ipakita ang mga shortcut na ito"
+  },
+  "keys": {
+    "space": "Space",
+    "tab": "Tab",
+    "shift": "Shift",
+    "alt": "Alt",
+    "ctrl": "Ctrl",
+    "enter": "Enter",
+    "esc": "Esc",
+    "delete": "Delete"
+  },
+  "announce": {
+    "selected": "Napili ang {{clip}}",
+    "stopped": "Itinigil",
+    "forward": "Pasulong {{speed}}x",
+    "backward": "Paatras {{speed}}x"
+  }
+}

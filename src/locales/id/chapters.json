@@ -1,0 +1,41 @@
+{
+  "title": "Bab",
+  "intro": "Tandai di mana tiap bagian episode dimulai. Aplikasi podcast menampilkannya, dan 3Speak mencantumkannya di deskripsi. Bab tetap bersama rekamanmu saat kamu memotongnya. Pintasan: <kbd>M</kbd> menambah satu di playhead.",
+  "empty": "Belum ada bab. Pindahkan playhead ke awal sebuah bagian lalu tambahkan satu.",
+  "goThere": "Ke sana",
+  "nameLabel": "Nama bab {{n}}",
+  "moveHere": "Pindahkan ke playhead",
+  "moveLabel": "Pindahkan bab {{n}} ke playhead",
+  "removeLabel": "Hapus bab {{n}}",
+  "leftOut": "Bab yang jaraknya kurang dari satu detik, atau tepat di akhir, tidak diikutkan dalam ekspor.",
+  "tipZero": "Tips: banyak aplikasi mengharapkan bab pertama di 0:00.",
+  "addAt": "Tambah di {{time}}",
+  "copyTitle": "Salin daftar (untuk deskripsi)",
+  "copied": "Tersalin",
+  "copy": "Salin daftar",
+  "defaultTitle": "Bab",
+  "suggest": {
+    "title": "Saran",
+    "findTitle": "Temukan kemungkinan awal bagian: topik baru, jeda panjang, pergantian adegan",
+    "again": "Cari lagi",
+    "suggest": "Sarankan bab",
+    "addAll": "Tambah semua {{n}}",
+    "withTranscript": "Dengan transkrip (tombol Transkrip), saran juga mengikuti topik dan mendapat judul dari apa yang diucapkan.",
+    "none": "Tidak ditemukan titik yang jelas. Acaranya mungkin pendek, atau bagian-bagiannya saling menyambung.",
+    "stop": "Berhenti",
+    "listen": "Dengarkan dari sini",
+    "titleLabel": "Saran bab di {{time}}",
+    "add": "Tambahkan bab ini",
+    "addLabel": "Tambahkan bab di {{time}}",
+    "drop": "Bukan yang ini",
+    "dropLabel": "Buang saran di {{time}}",
+    "reason": {
+      "start": "Awal",
+      "topic": "Topik baru",
+      "pause": "Jeda panjang",
+      "scene": "Pergantian adegan"
+    },
+    "intro": "Intro",
+    "part": "Bagian {{n}}"
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "shorts": {
+    "welcome": {
+      "title": "Merhaba!",
+      "text": "3Speak Shorts Düzenleyici bu. Temel özelliklere kısaca bir göz atalım."
+    },
+    "preview": {
+      "title": "Önizleme",
+      "text": "Bu, videonun önizlemesi. Klipleri yeniden konumlandırmak için sürükleyebilir, yakınlaştırmak için iki parmakla sıkıştırabilirsin."
+    },
+    "timeline": {
+      "title": "Zaman çizelgesi",
+      "text": "Kliplerini burada düzenle. Sıralamak için sürükle, kırpmak için kenarlarını çek."
+    },
+    "addMedia": {
+      "title": "Medya Ekle",
+      "text": "Kanallarına video, görsel, metin, ses ya da renk klibi eklemek için + simgesine dokun."
+    },
+    "clipSettings": {
+      "title": "Klip Ayarları",
+      "text": "Bir klip seç ve ölçek, konum, opaklık gibi özelliklerini düzenlemek için dişli simgesine dokun."
+    },
+    "render": {
+      "title": "İşle",
+      "text": "Düzenlemeyi bitirince videonu dışa aktarmak için İşle'ye bas. Sonra indirebilir ya da gönderebilirsin."
+    }
+  },
+  "audio": {
+    "welcome": {
+      "title": "Ses Düzenleyici",
+      "text": "Bir podcast'i, şarkıyı ya da sesli notu kes, temizle ve seviyesini ayarla, sonra 3Speak'te paylaş. Neler yapabildiğine kısaca bakalım."
+    },
+    "addAudio": {
+      "title": "Sesini ekle",
+      "text": "Bir kayıt ekle, hemen burada kaydet ya da kitaplıktan müzik seç. Video dosyaları da olur: düzenleyici yalnızca sesi alır. En fazla 3 saat."
+    },
+    "tracks": {
+      "title": "Konuşma ve müzik kanalları",
+      "text": "Kayıtlar konuşma kanallarına, müzik kendi kanalına gider. Taşımak için bir klibi sürükle, kırpmak için kenarlarını çek. Kaydırıcıyla yakınlaştır ya da tamamını görmek için Sığdır'a dokun."
+    },
+    "clipSettings": {
+      "title": "Klip ayarları",
+      "text": "Ayarlarını görmek için bir klip seç. Sesi temizle (Güçlü, gürültüyü ve uğultuyu giderir, sesi daha net ve dengeli yapar) ve Kısma: başka bir kanal çalarken klibin sesi kısılır. Birlikte kaydedilen sesleri senkronize tutmak için grupla."
+    },
+    "cutSilences": {
+      "title": "Sessizlikleri kes",
+      "text": "Konuşma kanallarındaki duraklamaları bulur, keser ve boşlukları kapatır. Gruplanmış sesler yalnızca herkesin sessiz olduğu yerlerde kesilir."
+    },
+    "template": {
+      "title": "Şablonun",
+      "text": "Bir giriş, bir kapanış ve bir fon müziğini bir kez ayarla. Her yeni kayda eklenirler ve şablonun kalıcı olarak saklanır."
+    },
+    "normalize": {
+      "title": "Dengele",
+      "text": "Dışa aktarılan dosyayı eşit bir podcast ses yüksekliğine (-16 LUFS) getirir, böylece her bölüm bir öncekiyle aynı yükseklikte duyulur. Kendi düzeylerini korumak için kapat."
+    },
+    "chapters": {
+      "title": "Kısımlar",
+      "text": "Her kısmın nerede başladığını işaretle (oynatma kafasına eklemek için M'ye bas). Kısımlar MP3 dosyasına ve bölümünün açıklamasına eklenir."
+    },
+    "export": {
+      "title": "Dışa aktar",
+      "text": "Dışa aktar bir MP3 oluşturur. Dinle, sonra yüklemen için kullan ya da indir. Oturum açtıysan projen sen çalışırken taslak olarak saklanır."
+    }
+  },
+  "audiogram": {
+    "intro": {
+      "title": "Audiogramlar",
+      "text": "Bölümünün bir parçasından kısa videolar: hareketli dalga formu, başlığın ve görselin, 3Speak görünümüyle. Bölümle birlikte 3Speak Shorts olarak paylaşılırlar."
+    },
+    "piece": {
+      "title": "Parçan",
+      "text": "Zaman çizelgesinde seçtiğin parça, en fazla 2 dakika. İstediğin zaman burada değiştir."
+    },
+    "arrange": {
+      "title": "Kendine göre yerleştir",
+      "text": "Taşımak için herhangi bir öğeyi sürükle, boyutlandırmak için bir köşeyi çek (Shift şekli korur) ve altındaki yuvarlak tutamaçla döndür. 3Speak logosu her zaman kalır, 3S ya da tam logo olarak."
+    },
+    "picture": {
+      "title": "Bir görsel",
+      "text": "Bir görsel yükle ya da oynatma listelerinden birinin kapağını al. Diğer öğeler gibi taşıyıp boyutlandırabileceğin bir kart olarak görünür."
+    },
+    "waveform": {
+      "title": "Dalga formu",
+      "text": "Çubuklar, çizgiler, daire ya da daire dalgası; 3Speak kırmızısıyla ya da istediğin renkte."
+    },
+    "parts": {
+      "title": "Öğeler",
+      "text": "Öğeler üst üste geldiğinde bir öğeyi gizle, öne getir ya da arkaya gönder."
+    },
+    "make": {
+      "title": "Yap",
+      "text": "İstediğin kadar yap: her biri bölümle birlikte kendi metni ve bölüme bağlantısıyla bir Short olarak paylaşılır. Son görünümün bir sonraki için şablon olarak saklanır."
+    }
+  },
+  "rangePick": {
+    "startEnd": {
+      "title": "Önce başlangıca, sonra bitişe tıkla",
+      "text": "Parçanın başlayacağı yere, sonra bittiği yere tıkla: en fazla 2 dakika. Ayarlamak için kenarlarını çek ya da tüm parçayı çizmek için kanallar üzerinde sürükle. Yeni bir tıklama baştan başlatır."
+    },
+    "moveAround": {
+      "title": "Gezin",
+      "text": "Bölüm boyunca ilerlemek için cetveli sürükle ya da kaydır. Kesin bir başlangıç için kaydırıcıyla yakınlaştır ya da tüm bölümü görmek için Sığdır'a dokun."
+    },
+    "listen": {
+      "title": "Dinle",
+      "text": "Parçayı oynat (ya da Boşluk) yalnızca seçtiğin kısmı çalar, sonra başına döner."
+    },
+    "use": {
+      "title": "Kullan",
+      "text": "Bu parçayı kullan (ya da Enter) onu audiograma götürür, İptal (ya da Escape) eskisini korur. O zamana kadar düzenleyicinin geri kalanı kilitlidir, böylece yanlışlıkla hiçbir şey değişmez."
+    }
+  },
+  "buttons": {
+    "done": "Anladım!"
+  }
+}

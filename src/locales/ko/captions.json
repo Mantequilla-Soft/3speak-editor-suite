@@ -1,0 +1,67 @@
+{
+  "language": {
+    "label": "말하는 언어",
+    "auto": "자동 감지"
+  },
+  "intro": {
+    "title": "자동 자막",
+    "text": "말한 내용을 단어마다 따라가는 자막으로 만들어요. 쇼츠에 입혀지고 3Speak에도 자막으로 전송돼요.",
+    "checking": "서버 확인 중...",
+    "unavailable": "지금은 이 편집기 서버에서 자동 자막을 사용할 수 없어요. 쇼츠는 자막 없이 평소처럼 렌더링돼요.",
+    "go": "자동 자막"
+  },
+  "presets": {
+    "karaoke": "노래방",
+    "pop": "팝",
+    "plain": "자막"
+  },
+  "presetHints": {
+    "karaoke": "몇 단어씩 표시하고, 말하는 단어는 강조 색상으로",
+    "pop": "한 단어(또는 몇 단어)씩 톡 튀어나오게",
+    "plain": "어두운 상자 위의 일반 자막 줄"
+  },
+  "style": {
+    "title": "스타일",
+    "presetsLabel": "자막 스타일",
+    "wordsAtATime": "한 번에 표시할 단어 수",
+    "font": "글꼴",
+    "size": "크기",
+    "sizeLabel": "자막 크기",
+    "position": "위치",
+    "positionLabel": "화면 속 자막 높이",
+    "top": "위",
+    "middle": "가운데",
+    "low": "아래",
+    "textColour": "글자 색상",
+    "highlight": "강조",
+    "highlightLabel": "강조 색상",
+    "uppercase": "대문자",
+    "emoji": "이모지 강조 (\"불\"이나 \"사랑\" 같은 단어 위에)",
+    "burn": "동영상에 표시 (끄면: 3Speak 자막으로만)"
+  },
+  "words": {
+    "title": "단어 ({{n}})",
+    "hint": "잘못 들은 단어를 고치고, 단어를 비우면 빠져요. 클립을 옮기거나 잘랐나요? 자동 자막을 다시 실행하세요.",
+    "goThere": "이동",
+    "word": "단어 {{n}}",
+    "changeEmoji": "이모지 바꾸기 또는 제거",
+    "addEmoji": "이모지 추가",
+    "remove": "이 단어 제거",
+    "removeNamed": "{{word}} 제거"
+  },
+  "actions": {
+    "again": "다시",
+    "againTitle": "다시 듣기 (단어가 교체돼요)",
+    "remove": "자막 제거"
+  },
+  "videoSound": "동영상 소리",
+  "job": {
+    "preparing": "소리 준비 중...",
+    "listening": "듣는 중...",
+    "noTracks": "자막을 만들 말소리가 없어요: 먼저 소리가 있는 클립을 추가하세요.",
+    "serverAnswered": "서버 응답: {{status}}",
+    "lost": "자막 작업이 사라졌어요 (서버가 다시 시작됐을 수 있어요)",
+    "noSpeech": "말소리를 찾지 못했어요. 목소리가 음소거되지 않은 오디오 트랙에 있나요? (음악 트랙은 제외돼요)",
+    "failed": "음성 인식에 실패했어요"
+  }
+}

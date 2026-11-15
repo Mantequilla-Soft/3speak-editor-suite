@@ -1,0 +1,53 @@
+{
+  "sheet": {
+    "title": "Scorciatoie da tastiera"
+  },
+  "groups": {
+    "playback": "Riproduzione",
+    "clips": "Clip",
+    "project": "Progetto"
+  },
+  "items": {
+    "playPause": "Riproduci / pausa",
+    "playForward": "Riproduci in avanti; premi di nuovo per 2x, 4x, 8x",
+    "playBackward": "Riproduci all'indietro; premi di nuovo per andare più veloce",
+    "stop": "Stop",
+    "frameStep": "Un fotogramma indietro / avanti (Maiusc: 10 fotogrammi)",
+    "nudge": "Sposta la testina di 0,1 s (Maiusc: 1 s)",
+    "fullscreen": "Schermo intero sì / no",
+    "nextPrevClip": "Seleziona la clip successiva / precedente",
+    "clipLeftRight": "Clip precedente / successiva sulla stessa traccia",
+    "clipUpDown": "Clip sulla traccia sopra / sotto",
+    "openClip": "Apri le impostazioni della clip selezionata",
+    "selectNone": "Deseleziona tutto",
+    "selectAll": "Seleziona tutte le clip",
+    "remove": "Rimuovi le clip selezionate",
+    "split": "Dividi la clip selezionata alla testina",
+    "duplicate": "Duplica la clip selezionata",
+    "ungroup": "Separa le clip",
+    "closeGap": "Chiudi il vuoto alla testina",
+    "addText": "Aggiungi testo alla testina",
+    "undo": "Annulla",
+    "redo": "Ripristina",
+    "addFlag": "Aggiungi un segnaposto alla testina",
+    "addChapter": "Aggiungi un capitolo alla testina",
+    "zoom": "Ingrandisci / riduci la timeline",
+    "showSheet": "Mostra queste scorciatoie"
+  },
+  "keys": {
+    "space": "Spazio",
+    "tab": "Tab",
+    "shift": "Maiusc",
+    "alt": "Alt",
+    "ctrl": "Ctrl",
+    "enter": "Invio",
+    "esc": "Esc",
+    "delete": "Canc"
+  },
+  "announce": {
+    "selected": "Selezionata: {{clip}}",
+    "stopped": "Interrotto",
+    "forward": "Avanti {{speed}}x",
+    "backward": "Indietro {{speed}}x"
+  }
+}

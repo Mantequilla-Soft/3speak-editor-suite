@@ -1,0 +1,28 @@
+{
+  "render": {
+    "unreachable": "Không kết nối được máy chủ kết xuất. Hãy kiểm tra kết nối và kết xuất lại.",
+    "stillBusy": "Các máy chủ kết xuất vẫn đang bận. Vui lòng kết xuất lại sau vài phút.",
+    "unknownJob": "Máy chủ kết xuất không còn nhận ra lượt kết xuất này (có thể nó đã khởi động lại). Vui lòng kết xuất lại.",
+    "lostContact": "Mất kết nối với máy chủ kết xuất. Vui lòng kết xuất lại.",
+    "serverStatus": "Máy chủ phản hồi {{status}}"
+  },
+  "uploadFailed": "Tải lên thất bại: {{status}}",
+  "signIn": {
+    "loggedOut": "Hãy đăng nhập 3Speak để dùng trình chỉnh sửa.",
+    "failed": "Hãy đăng nhập 3Speak để tải lên và kết xuất (lượt đăng nhập đã bị hủy hoặc không thành công)."
+  },
+  "export": {
+    "failed": "Xuất thất bại",
+    "ffmpegNotLoaded": "Chưa tải FFmpeg",
+    "noClips": "Không có clip nào để xuất",
+    "noCodec": "Không tìm thấy codec video nào được MediaRecorder hỗ trợ",
+    "cancelled": "Đã hủy xuất",
+    "noSource": "Clip không có nguồn tệp hợp lệ: {{name}}",
+    "ffmpegFailed": "Lệnh FFmpeg thất bại với mã thoát {{code}}"
+  },
+  "reverse": {
+    "failed": "Xử lý đảo ngược thất bại",
+    "timedOut": "Xử lý đảo ngược quá thời gian",
+    "statusCheck": "Kiểm tra trạng thái thất bại: {{status}}"
+  }
+}

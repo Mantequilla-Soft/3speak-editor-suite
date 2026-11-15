@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "line": "{{clips}} · {{length}} · {{edited}}",
+    "audioLine": "音声 · {{clips}} · {{length}} · {{edited}}",
+    "clips_other": "{{count}} クリップ",
+    "edited": {
+      "justNow": "たった今編集",
+      "minutes_other": "{{count}} 分前に編集",
+      "hours_other": "{{count}} 時間前に編集",
+      "days_other": "{{count}} 日前に編集"
+    }
+  },
+  "prompt": {
+    "titleOne": "下書きの続きを編集しますか？",
+    "titleMany": "下書きの続きを編集しますか？",
+    "keptUntil": "{{date}} まで保存",
+    "open": "開く",
+    "startNew": "新しいプロジェクトを始める",
+    "singleNote": "下書きは1件まで保存できます。新しいプロジェクトを始めると、編集した時点でこの下書きは置き換えられます。3Speak Pro なら3件を30日間保存できます。"
+  },
+  "limit": {
+    "titleOne": "保存済みの下書きを置き換えますか？",
+    "titleMany": "保存済みのプロジェクトがすでに {{n}} 件あります",
+    "skipTitle": "このプロジェクトを保存しない",
+    "noteOne": "下書きは1件まで保存できます。このプロジェクトを保存すると、下の下書きが置き換えられます。",
+    "noteMany": "最大 {{n}} 件まで保存できます。このプロジェクトで置き換えるものを選んでください：",
+    "replace": "差し替え",
+    "skip": "このプロジェクトを保存しない"
+  },
+  "close": {
+    "saveTitle": "プロジェクトを保存しますか？",
+    "closeTitle": "エディターを閉じますか？",
+    "keepEditing": "編集を続ける",
+    "signInFailed": "うまくいきませんでした。ウォレットでログインのリクエストを承認してもう一度試すか、3Speak からログアウトして再度ログインしてください。",
+    "signInToKeep": "一度ログインすると、このプロジェクトを下書きとして残し、あとで続きを編集できます。",
+    "signedOutLost": "編集内容は失われます。プロジェクトの下書きを残すには 3Speak にログインしてください。",
+    "lost": "編集内容は失われます。",
+    "signingIn": "ログイン中…",
+    "signInToSave": "ログインして保存",
+    "withoutSaving": "保存せずに閉じる",
+    "keepTitle": "このプロジェクトを残しますか？",
+    "keepDays_other": "{{count}} 日間保存します",
+    "keepHours_other": "{{count}} 時間保存します",
+    "until": "{{date}} まで",
+    "uploadingOne": "{{name}} はまだアップロード中です（{{percent}}）。完了すると保存できます。",
+    "uploadingFiles_other": "{{count}} 個のファイルがまだアップロード中です（{{percent}}）。完了すると保存できます。",
+    "name": "プロジェクト名",
+    "namePlaceholder": "無題のプロジェクト",
+    "saveError": "保存できませんでした。接続を確認してもう一度お試しください。",
+    "saveAndClose": "保存して閉じる",
+    "afterUpload": "アップロードが完了すると使えます",
+    "deleteAndClose": "削除して閉じる"
+  },
+  "pro": {
+    "title": "3Speak Pro でもっと便利に",
+    "text": "1件を7日間ではなく、最大3件のプロジェクトをそれぞれ30日間保存できます。",
+    "get": "Pro を入手"
+  },
+  "status": {
+    "signingIn": "ログイン中… ウォレットを確認してください",
+    "signInTitle": "一度ログインすると、プロジェクトを下書きとして保存できます",
+    "signInFailed": "ログインに失敗しました · もう一度お試しください",
+    "saveDrafts": "下書きを保存",
+    "notSavedTitle": "このプロジェクトはまだ保存されていません",
+    "chooseSlot": "未保存：保存先を選んでください",
+    "saving": "保存中…",
+    "notSaved": "下書きは保存されていません",
+    "keptUntil": "下書きは {{date}} まで保存",
+    "savedUntil": "下書きを保存しました · {{date}} まで"
+  },
+  "library": {
+    "title": "プロジェクトライブラリ",
+    "addFiles": "ファイルを追加",
+    "groups": {
+      "videos": "動画",
+      "images": "画像",
+      "sounds": "サウンド"
+    },
+    "empty": {
+      "videos": "動画なし",
+      "images": "画像なし",
+      "sounds": "サウンドなし"
+    },
+    "dropToAdd": "ドロップしてファイルを追加",
+    "hint": "ここにファイルをドロップするか、項目をタイムラインにドラッグ",
+    "downloading": "ダウンロード中... {{percent}}",
+    "downloaded": "ローカルにダウンロード済み",
+    "local": "ローカル",
+    "uploadingTitle": "バックグラウンドでアップロード中です。完了するまでレンダリングは待機します。",
+    "converting": "変換中",
+    "convertingTitle": "このブラウザではこの動画の形式を表示できません。準備ができ次第、プレビューは 480p のコピーに切り替わります。",
+    "noPreview": "プレビューなし",
+    "noPreviewTitle": "再生可能なコピーを作れませんでした。プレビューは黒いままかもしれませんが、レンダリングは機能します。",
+    "encodedTitle": "サーバーで 480p にエンコード済み",
+    "encoding": "エンコード中...",
+    "addToTimeline": "タイムラインに追加",
+    "remove": "ライブラリから削除"
+  }
+}

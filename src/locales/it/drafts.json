@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "line": "{{clips}} · {{length}} · {{edited}}",
+    "audioLine": "Audio · {{clips}} · {{length}} · {{edited}}",
+    "clips_one": "{{count}} clip",
+    "clips_many": "{{count}} clip",
+    "clips_other": "{{count}} clip",
+    "edited": {
+      "justNow": "modificato ora",
+      "minutes_one": "modificato {{count}} min fa",
+      "minutes_many": "modificato {{count}} min fa",
+      "minutes_other": "modificato {{count}} min fa",
+      "hours_one": "modificato {{count}} h fa",
+      "hours_many": "modificato {{count}} h fa",
+      "hours_other": "modificato {{count}} h fa",
+      "days_one": "modificato {{count}} giorno fa",
+      "days_many": "modificato {{count}} giorni fa",
+      "days_other": "modificato {{count}} giorni fa"
+    }
+  },
+  "prompt": {
+    "titleOne": "Continuare la tua bozza?",
+    "titleMany": "Continuare una bozza?",
+    "keptUntil": "Conservata fino al {{date}}",
+    "open": "Apri",
+    "startNew": "Inizia un nuovo progetto",
+    "singleNote": "Puoi conservare una bozza. Iniziare un nuovo progetto sostituisce questa appena fai una modifica. 3Speak Pro conserva 3 bozze per 30 giorni."
+  },
+  "limit": {
+    "titleOne": "Sostituire la bozza salvata?",
+    "titleMany": "Hai già {{n}} progetti salvati",
+    "skipTitle": "Non salvare questo progetto",
+    "noteOne": "Puoi conservare una bozza. Salvare questo progetto sostituisce quella qui sotto.",
+    "noteMany": "Puoi conservarne fino a {{n}}. Scegli quale sostituire con questo progetto:",
+    "replace": "Sostituisci",
+    "skip": "Non salvare questo progetto"
+  },
+  "close": {
+    "saveTitle": "Salvare il progetto?",
+    "closeTitle": "Chiudere l'editor?",
+    "keepEditing": "Continua a modificare",
+    "signInFailed": "Non ha funzionato. Approva la richiesta di accesso nel tuo wallet e riprova, oppure esci da 3Speak e accedi di nuovo.",
+    "signInToKeep": "Accedi una volta per conservare questo progetto come bozza e continuarlo più tardi.",
+    "signedOutLost": "Le tue modifiche andranno perse. Accedi a 3Speak per conservare le bozze dei tuoi progetti.",
+    "lost": "Le tue modifiche andranno perse.",
+    "signingIn": "Accesso in corso…",
+    "signInToSave": "Accedi per salvare",
+    "withoutSaving": "Chiudi senza salvare",
+    "keepTitle": "Conservare questo progetto?",
+    "keepDays_one": "Lo conserviamo per {{count}} giorno",
+    "keepDays_many": "Lo conserviamo per {{count}} giorni",
+    "keepDays_other": "Lo conserviamo per {{count}} giorni",
+    "keepHours_one": "Lo conserviamo per {{count}} ora",
+    "keepHours_many": "Lo conserviamo per {{count}} ore",
+    "keepHours_other": "Lo conserviamo per {{count}} ore",
+    "until": "fino al {{date}}",
+    "uploadingOne": "{{name}} è ancora in caricamento ({{percent}}). Potrai salvare quando avrà finito.",
+    "uploadingFiles_one": "{{count}} file è ancora in caricamento ({{percent}}). Potrai salvare quando avrà finito.",
+    "uploadingFiles_many": "{{count}} file sono ancora in caricamento ({{percent}}). Potrai salvare quando avranno finito.",
+    "uploadingFiles_other": "{{count}} file sono ancora in caricamento ({{percent}}). Potrai salvare quando avranno finito.",
+    "name": "Nome del progetto",
+    "namePlaceholder": "Progetto senza titolo",
+    "saveError": "Impossibile salvare. Controlla la connessione e riprova.",
+    "saveAndClose": "Salva e chiudi",
+    "afterUpload": "Disponibile quando il caricamento è finito",
+    "deleteAndClose": "Eliminalo e chiudi"
+  },
+  "pro": {
+    "title": "Di più con 3Speak Pro",
+    "text": "Conserva fino a 3 progetti per 30 giorni ciascuno, invece di 1 per 7 giorni.",
+    "get": "Passa a Pro"
+  },
+  "status": {
+    "signingIn": "Accesso in corso… controlla il tuo wallet",
+    "signInTitle": "Accedi una volta per salvare il progetto come bozza",
+    "signInFailed": "Accesso non riuscito · riprova",
+    "saveDrafts": "Salva le bozze",
+    "notSavedTitle": "Questo progetto non è ancora salvato",
+    "chooseSlot": "Non salvato: scegli uno spazio",
+    "saving": "Salvataggio…",
+    "notSaved": "Bozza non salvata",
+    "keptUntil": "Bozza conservata fino al {{date}}",
+    "savedUntil": "Bozza salvata · fino al {{date}}"
+  },
+  "library": {
+    "title": "Libreria del progetto",
+    "addFiles": "Aggiungi file",
+    "groups": {
+      "videos": "Video",
+      "images": "Immagini",
+      "sounds": "Suoni"
+    },
+    "empty": {
+      "videos": "Nessun video",
+      "images": "Nessuna immagine",
+      "sounds": "Nessun suono"
+    },
+    "dropToAdd": "Rilascia i file per aggiungerli",
+    "hint": "Rilascia i file qui o trascina gli elementi sulla timeline",
+    "downloading": "Download... {{percent}}",
+    "downloaded": "Scaricato in locale",
+    "local": "locale",
+    "uploadingTitle": "Caricamento in background. Il rendering aspetta che sia finito.",
+    "converting": "conversione",
+    "convertingTitle": "Questo browser non può mostrare il formato di questo video. L'anteprima passa a una copia 480p appena è pronta.",
+    "noPreview": "nessuna anteprima",
+    "noPreviewTitle": "Impossibile creare una copia riproducibile. L'anteprima può restare nera, ma il rendering funziona comunque.",
+    "encodedTitle": "Codificato a 480p sul server",
+    "encoding": "Codifica...",
+    "addToTimeline": "Aggiungi alla timeline",
+    "remove": "Rimuovi dalla libreria"
+  }
+}

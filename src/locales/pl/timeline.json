@@ -1,0 +1,183 @@
+{
+  "aria": {
+    "timeline": "Oś czasu",
+    "ruler": "Linijka czasu: kliknij, aby przesunąć głowicę",
+    "playhead": "Głowica",
+    "zoom": "Powiększenie"
+  },
+  "split": {
+    "title": "Podziel klip w miejscu głowicy (Ctrl+R)",
+    "label": "Podziel"
+  },
+  "toolbar": {
+    "add": {
+      "title": "Dodaj ścieżkę lub klip",
+      "videoTrack": "Ścieżka wideo",
+      "audioTrack": "Ścieżka audio",
+      "musicLibrary": "Biblioteka muzyki",
+      "soundEffects": "Efekty dźwiękowe",
+      "stickers": "Naklejki",
+      "titles": "Tytuły",
+      "stock": "Bank multimediów"
+    },
+    "zoomTitle": "Powiększenie: {{value}} px/s",
+    "fit": {
+      "title": "Pokaż całą oś czasu",
+      "label": "Dopasuj"
+    },
+    "select": {
+      "titleStart": "Zaznacz kilka klipów: dotknij każdego",
+      "titleDone": "Zakończ zaznaczanie",
+      "label": "Zaznacz"
+    },
+    "ripple": {
+      "titleTrack": "Zamknij przerwę w miejscu głowicy na ścieżce {{number}} (G). Inne ścieżki zostają bez zmian.",
+      "titleNoGap": "Brak przerwy w miejscu głowicy na ścieżce wybranego klipu",
+      "title": "Usuń przerwę w miejscu głowicy (G)",
+      "label": "Domknij"
+    },
+    "captions": {
+      "title": "Napisy: zamień to, co jest mówione, w napisy słowo po słowie",
+      "label": "Napisy"
+    },
+    "transcript": {
+      "title": "Transkrypcja: edytuj przez tekst, usuwaj słowa, aby je wyciąć",
+      "label": "Transkrypcja"
+    },
+    "flag": {
+      "title": "Postaw znacznik w miejscu głowicy (B): twój własny, numerowany i kolorowy, nigdy nie eksportowany",
+      "label": "Znacznik"
+    },
+    "autoCut": {
+      "title": "Znajdź pauzy i tam przetnij",
+      "label": "Auto cięcie"
+    },
+    "beats": {
+      "title": "Znajdź rytm: przyciągaj do niego, układaj na nim klipy",
+      "label": "Rytm"
+    },
+    "delete": {
+      "title": "Usuń wybrany klip (Del)",
+      "titleMany": "Usuń wybrane klipy (Del)",
+      "labelMany": "Usuń {{number}}"
+    },
+    "options": "Opcje",
+    "ungroup": {
+      "titleOne": "Rozgrupuj: jej klipy znów przesuwają się i przycinają osobno",
+      "titleMany": "Rozgrupuj: te klipy znów przesuwają się i przycinają osobno",
+      "label": "Rozgrupuj"
+    },
+    "group": {
+      "title": "Grupuj: te klipy przesuwają się i przycinają razem",
+      "label": "Grupuj {{number}}"
+    },
+    "more": {
+      "title": "Więcej działań na klipie",
+      "duplicate": "Duplikuj",
+      "groupVoicesTitle": "Grupuj z tym, co gra w tym samym czasie na innych ścieżkach głosu: przesuwają się, przycinają i mają wycinaną ciszę razem",
+      "groupVoices": "Grupuj z innymi głosami",
+      "reverse": "Odwróć",
+      "unreverse": "Cofnij odwrócenie",
+      "snapOn": "Przyciąganie wł.",
+      "snapOff": "Przyciąganie wył."
+    }
+  },
+  "selectHint": {
+    "count_one": "Wybrano {{count}} klip: dotknij kolejnych lub Gotowe",
+    "count_few": "Wybrano {{count}} klipy: dotknij kolejnych lub Gotowe",
+    "count_many": "Wybrano {{count}} klipów: dotknij kolejnych lub Gotowe",
+    "count_other": "Wybrano {{count}} klipu: dotknij kolejnych lub Gotowe",
+    "none": "Dotknij każdego klipu, który chcesz zaznaczyć",
+    "clear": "Wyczyść"
+  },
+  "clip": {
+    "settings": "Ustawienia klipu",
+    "textFallback": "Tekst",
+    "layer": "W{{number}}",
+    "kind": {
+      "video": "Klip wideo",
+      "audio": "Klip dźwiękowy",
+      "image": "Obraz",
+      "text": "Tekst",
+      "color": "Kolor",
+      "other": "Klip"
+    },
+    "aria": {
+      "plain": "{{kind}}, od {{from}} do {{to}}",
+      "named": "{{kind}} {{name}}, od {{from}} do {{to}}",
+      "onTrack": "{{kind}} na ścieżce {{track}}, od {{from}} do {{to}}",
+      "namedOnTrack": "{{kind}} {{name}} na ścieżce {{track}}, od {{from}} do {{to}}"
+    }
+  },
+  "track": {
+    "show": "Pokaż ścieżkę",
+    "hide": "Ukryj ścieżkę",
+    "mute": "Wycisz ścieżkę",
+    "unmute": "Wyłącz wyciszenie ścieżki",
+    "remove": "Usuń ścieżkę",
+    "addVisual": "Dodaj wideo, obraz lub tekst",
+    "addAudio": "Dodaj audio",
+    "addFile": "Dodaj plik",
+    "addText": "Dodaj tekst",
+    "addColor": "Dodaj kolor",
+    "recordVideo": "Nagraj film",
+    "addAudioFile": "Dodaj plik audio",
+    "recordAudio": "Nagraj audio",
+    "resize": {
+      "aria": "Wysokość: {{name}}",
+      "ariaUnnamed": "Wysokość tej ścieżki",
+      "title": "Przeciągnij, aby zwiększyć lub zmniejszyć wysokość ścieżki (dwuklik: domyślna)"
+    },
+    "aria": {
+      "named": {
+        "video": "{{name}} (ścieżka wideo)",
+        "audio": "{{name}} (ścieżka audio)",
+        "music": "{{name}} (ścieżka muzyczna)"
+      },
+      "numbered": {
+        "video": "Ścieżka wideo {{number}}",
+        "audio": "Ścieżka audio {{number}}",
+        "music": "Ścieżka muzyczna {{number}}"
+      }
+    }
+  },
+  "trackName": {
+    "voice": "Głos",
+    "voiceNumbered": "Głos {{number}}",
+    "music": "Muzyka",
+    "musicNumbered": "Muzyka {{number}}",
+    "video": "Wideo",
+    "videoNumbered": "Wideo {{number}}",
+    "audioNumbered": "Audio {{number}}",
+    "stickers": "Naklejki",
+    "stickersNumbered": "Naklejki {{number}}",
+    "sfx": "Efekty",
+    "sfxNumbered": "Efekty {{number}}"
+  },
+  "clipName": {
+    "text": "Warstwa tekstu",
+    "color": "Kolor",
+    "imported": "Zaimportowane media",
+    "linkedAudio": "{{name}} (audio)"
+  },
+  "textClip": {
+    "defaultText": "Wpisz tekst tutaj"
+  },
+  "flag": {
+    "aria": "Znacznik {{number}} w {{time}}",
+    "title": "Znacznik {{number}} · {{time}}: kliknij, aby przejść, przeciągnij, aby przesunąć, kliknij prawym przyciskiem, aby usunąć"
+  },
+  "range": {
+    "label": "{{from}} – {{to}} · {{seconds}} s",
+    "startOnly": "{{time}} · kliknij, gdzie się kończy",
+    "dragStart": "Przeciągnij, aby przesunąć początek",
+    "dragEnd": "Przeciągnij, aby przesunąć koniec"
+  },
+  "pastLimit": "Poza limitem renderowania",
+  "backgroundMusic": {
+    "title": "Muzyka w tle",
+    "add": "Dodaj muzykę w tle",
+    "remove": "Usuń muzykę"
+  },
+  "partName": "Część {{n}} · {{name}}"
+}

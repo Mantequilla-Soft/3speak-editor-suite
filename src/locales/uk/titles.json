@@ -1,0 +1,111 @@
+{
+  "textFx": {
+    "title": "Текстові ефекти",
+    "outline": "Контур",
+    "outlineColour": "Колір контуру",
+    "outlineWidth": "Товщина контуру",
+    "wordsComeIn": "Поява слів",
+    "allAtOnce": "Усі одразу",
+    "atOnce": "Одразу",
+    "anims": {
+      "pop": "Вискакування",
+      "fadeUp": "Спливання",
+      "typewriter": "Друкарська машинка",
+      "slide": "Зсув"
+    },
+    "gap": "Інтервал",
+    "gapSeconds": "Час між словами (секунди)",
+    "defaultText": "Текст"
+  },
+  "templates": {
+    "dialogTitle": "Титри",
+    "allTitles": "Усі титри",
+    "overVideo": "Поверх відео",
+    "ownBackground": "Власний фон",
+    "starsHint": "Візьміть слово в *зірочки*, щоб виділити його кольором.",
+    "addTitle": "Додати титр",
+    "groups": {
+      "lower": "Плашки внизу кадру",
+      "title": "Титри поверх відео",
+      "card": "Заставки для початку й кінця"
+    },
+    "fields": {
+      "name": "Ім’я",
+      "role": "Роль",
+      "lines": "Рядки",
+      "words": "Слова",
+      "lineUnder": "Рядок під ними",
+      "lineInFront": "Рядок попереду",
+      "rows": "Ряди",
+      "headline": "Заголовок",
+      "lineUnderIt": "Рядок під ним",
+      "tagline": "Слоган",
+      "cta": "Заклик до дії",
+      "smallPrint": "Дрібний шрифт"
+    },
+    "items": {
+      "lowerName": {
+        "label": "Ім’я та роль",
+        "sub": "Автор на 3Speak"
+      },
+      "lowerStatement": {
+        "label": "Коротка заява",
+        "lines": "Три речі, які\nя *дізнався* сьогодні"
+      },
+      "titleWords": {
+        "label": "По одному слову",
+        "words": "План.\nЗйомка.\n*Допис.*",
+        "line": "Мій тиждень на 3Speak"
+      },
+      "titleKinetic": {
+        "label": "Слова влітають",
+        "words": "Швидко\nПросто\nТвоє",
+        "line": "Зроблено на *3Speak*"
+      },
+      "titlePoster": {
+        "label": "Гігантські слова одне над одним",
+        "words": "День\nперший.",
+        "sub": "Починаю з нуля"
+      },
+      "titleMarquee": {
+        "label": "Біжучі ряди",
+        "rows": "План\nЗйомка\nДопис\nПовтор",
+        "line": "Кожного *тижня*"
+      },
+      "cardHook": {
+        "label": "Початок: вступна фраза",
+        "lines": "Як я\nмонтую\n*Shorts*",
+        "sub": "Менш ніж за хвилину"
+      },
+      "cardEnd": {
+        "label": "Кінець: підпишіться",
+        "tagline": "Нові Shorts *щотижня*",
+        "cta": "Підпишіться на 3Speak"
+      },
+      "cardPoster": {
+        "label": "Кінець: гігантські слова",
+        "words": "До\nскорої\n*зустрічі.*",
+        "cta": "Підпишіться на 3Speak"
+      }
+    }
+  },
+  "scene": {
+    "title": "Назва",
+    "onePerLine": "По одному в рядку",
+    "colours": "Кольори",
+    "font": "Шрифт",
+    "overVideo": "Поверх відео",
+    "length": "Тривалість",
+    "lengthSeconds": "Тривалість (секунди)",
+    "defaultName": "Я",
+    "layerTitle": "Назва"
+  },
+  "colors": {
+    "ember": "Жар",
+    "amber": "Бурштин",
+    "ocean": "Океан",
+    "forest": "Ліс",
+    "berry": "Ягоди",
+    "paper": "Папір"
+  }
+}

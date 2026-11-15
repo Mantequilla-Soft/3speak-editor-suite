@@ -1,0 +1,63 @@
+{
+  "panel": {
+    "title": "Transcription",
+    "close": "Fermer la transcription"
+  },
+  "cutNotice": {
+    "plain": "Coupé : {{seconds}} s de moins.",
+    "words_one": "{{count}} mot coupé : {{seconds}} s de moins.",
+    "words_many": "{{count}} mots coupés : {{seconds}} s de moins.",
+    "words_other": "{{count}} mots coupés : {{seconds}} s de moins.",
+    "found_one": "{{count}} résultat coupé : {{seconds}} s de moins.",
+    "found_many": "{{count}} résultats coupés : {{seconds}} s de moins.",
+    "found_other": "{{count}} résultats coupés : {{seconds}} s de moins.",
+    "fillers": "Coupé : {{fillers}}, {{pauses}} : {{seconds}} s de moins.",
+    "dismiss": "Fermer"
+  },
+  "fillers": {
+    "title": "Supprimer les mots parasites et les pauses",
+    "emptyHint": "Cela fonctionne à partir de la transcription : ça trouve les euh, hum, tu vois et compagnie dans la langue de l'émission, ainsi que les longues pauses.",
+    "listening": "Écoute...",
+    "transcribeFirst": "Transcrivez d'abord l'émission",
+    "checking": "Vérification du serveur...",
+    "unavailable": "Les transcriptions ne sont pas disponibles sur ce serveur d'édition pour le moment.",
+    "intro": "Mots parasites en {{language}}. Écoutez chacun, décochez ce qui doit rester.",
+    "introNoList": "Mots parasites en {{language}} (seulement euh, hum et similaires : pas encore de liste pour cette langue). Écoutez chacun, décochez ce qui doit rester.",
+    "stillTranscribing": "Le reste de l'émission est encore en cours de transcription.",
+    "fillerWords": "Mots parasites",
+    "longPauses": "Longues pauses",
+    "minPause": "Pause de plus de <strong>{{seconds}} s</strong>",
+    "keepPause": "Raccourcir les pauses à <strong>{{seconds}} s</strong>",
+    "keepPauseTitle": "Ce qui reste d'une longue pause après la coupe",
+    "fillerCount_one": "{{count}} mot parasite",
+    "fillerCount_many": "{{count}} mots parasites",
+    "fillerCount_other": "{{count}} mots parasites",
+    "pauseCount_one": "{{count}} pause",
+    "pauseCount_many": "{{count}} pauses",
+    "pauseCount_other": "{{count}} pauses",
+    "summary": "{{fillers}}, {{pauses}} cochés · coupe {{seconds}} s",
+    "nothingFound": "Rien trouvé avec ces réglages.",
+    "tickAllFillers": "Cocher tous les mots parasites",
+    "untickAllFillers": "Décocher tous les mots parasites",
+    "tickAllPauses": "Cocher toutes les pauses",
+    "untickAllPauses": "Décocher toutes les pauses",
+    "listLabel": "Ce qui serait coupé",
+    "item": {
+      "keepPause": "Garder cette pause",
+      "cutPause": "Couper cette pause",
+      "keepFiller": "Garder {{text}}",
+      "cutFiller": "Couper {{text}}",
+      "stop": "Arrêter",
+      "listenTitle": "Écouter (avec une seconde autour)",
+      "listenAt": "Écouter à {{time}}",
+      "pause": "Pause",
+      "pauseLength": "{{length}} s → {{kept}} s",
+      "filler": "Mot parasite",
+      "fillerTitle": "Un son d'hésitation",
+      "maybe": "Peut-être",
+      "maybeTitle": "Un mot parasite ici (entouré de pauses ou de virgules) : écoutez d'abord"
+    },
+    "cut": "Couper",
+    "cutCount": "Couper {{n}} ({{seconds}} s)"
+  }
+}

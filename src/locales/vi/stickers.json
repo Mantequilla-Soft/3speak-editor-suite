@@ -1,0 +1,64 @@
+{
+  "title": "Nhãn dán",
+  "search": "Tìm nhãn dán",
+  "textBoxes": "Hộp chữ",
+  "loading": "Đang tải nhãn dán...",
+  "noMatch": "Không có nhãn dán phù hợp.",
+  "tileTitle": "{{name}} (thêm tại đầu phát)",
+  "note": "Nhãn dán được thêm tại đầu phát trong 3 giây. Kéo, đổi kích thước hoặc cắt gọt chúng như mọi clip; hộp chữ vẫn chỉnh sửa được.",
+  "categories": {
+    "emoji": "Emoji",
+    "badges": "Huy hiệu",
+    "shapes": "Mũi tên & hình",
+    "branding": "Thương hiệu"
+  },
+  "presets": {
+    "caption": {
+      "title": "Chú thích",
+      "text": "Chú thích của bạn ở đây"
+    },
+    "highlight": {
+      "title": "Tô sáng",
+      "text": "Phải xem!"
+    },
+    "brand": {
+      "title": "Đỏ 3Speak",
+      "text": "Video mới"
+    },
+    "bubble": {
+      "title": "Bong bóng",
+      "text": "Chào bạn!"
+    },
+    "outline": {
+      "title": "Viền ngoài",
+      "text": "Nhìn này"
+    },
+    "neon": {
+      "title": "Neon",
+      "text": "TỐI NAY"
+    },
+    "title": {
+      "title": "Tiêu đề lớn",
+      "text": "TIN NÓNG"
+    },
+    "comic": {
+      "title": "Truyện tranh",
+      "text": "BÙM!"
+    },
+    "marker": {
+      "title": "Bút dạ",
+      "text": "thủ công"
+    },
+    "quote": {
+      "title": "Trích dẫn",
+      "text": "“Nói sao cho hay.”"
+    },
+    "tag": {
+      "title": "Hashtag"
+    },
+    "minimal": {
+      "title": "Tối giản",
+      "text": "đơn giản và gọn gàng"
+    }
+  }
+}

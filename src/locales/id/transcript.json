@@ -1,0 +1,72 @@
+{
+  "language": {
+    "label": "Bahasa yang diucapkan",
+    "auto": "Deteksi otomatis"
+  },
+  "intro": {
+    "title": "Edit lewat teks",
+    "text": "Ubah ucapan menjadi teks dengan nama setiap suara, lalu edit rekaman seperti dokumen: pilih kata lalu tekan Delete untuk membuangnya.",
+    "checking": "Memeriksa server...",
+    "unavailable": "Transkrip saat ini tidak tersedia di server editor ini.",
+    "noSpeech": "Tambahkan rekaman berisi ucapan terlebih dahulu.",
+    "transcribeSeconds": "Transkripsikan ({{n}} dtk rekaman)",
+    "transcribeMinutes": "Transkripsikan ({{n}} mnt rekaman)",
+    "longShow": "Acara yang panjang butuh waktu: kata-kata muncul bagian demi bagian, dan kamu bisa mulai mengedit yang pertama."
+  },
+  "listening": "Mendengarkan...",
+  "stop": "Berhenti",
+  "goThere": "Ke sana",
+  "search": {
+    "placeholder": "Cari kata",
+    "label": "Cari kata di transkrip",
+    "previous": "Sebelumnya",
+    "previousLabel": "Hasil sebelumnya",
+    "next": "Berikutnya",
+    "nextLabel": "Hasil berikutnya"
+  },
+  "selection": {
+    "count_other": "{{count}} kata · {{seconds}} dtk",
+    "cut": "Potong",
+    "cutTitle": "Buang kata-kata terpilih dari rekaman (Delete)",
+    "clearTitle": "Hapus pilihan (Esc)",
+    "clearLabel": "Hapus pilihan"
+  },
+  "found": {
+    "cutAll_other": "Potong semua {{count}}",
+    "cutAllTitle": "Buang setiap tempat yang ditemukan dari rekaman"
+  },
+  "fillers": "Pengisi",
+  "fillersTitle": "Cari em, eh, gitu, dan jeda panjang",
+  "copy": "Salin transkrip",
+  "speakers": "Pembicara",
+  "missing": {
+    "seconds": "{{n}} dtk rekaman belum punya teks.",
+    "minutes": "{{n}} mnt rekaman belum punya teks.",
+    "transcribe": "Transkripsikan"
+  },
+  "scrollLabel": "Transkrip: klik kata untuk ke sana, seret di atas kata untuk memilihnya, Delete membuangnya",
+  "hint_other": "{{count}} kata. Klik kata untuk ke sana; seret atau Shift+klik untuk memilih; Delete membuang. Urungkan mengembalikannya.",
+  "speaker": {
+    "default": "Suara",
+    "numbered": "Suara {{n}}"
+  },
+  "job": {
+    "starting": "Memulai...",
+    "preparing": "Menyiapkan rekaman...",
+    "listening": "Mendengarkan...",
+    "signIn": "Masuk di 3Speak untuk membuat transkrip.",
+    "uploadFailed": "Rekaman tidak dapat diunggah: {{message}}",
+    "notUploaded": "Rekaman belum ada di server. Coba lagi setelah selesai diunggah.",
+    "serverAnswered": "Server menjawab {{status}}",
+    "lost": "Tugas transkrip hilang (server dimulai ulang?)",
+    "failed": "Pengenalan ucapan gagal"
+  },
+  "stt": {
+    "audioUnavailable": "audio tidak tersedia",
+    "serverError": "kesalahan server",
+    "connectionFailed": "koneksi gagal",
+    "unauthorized": "tidak diizinkan",
+    "closed": "ditutup",
+    "initFailed": "inisialisasi STT gagal"
+  }
+}

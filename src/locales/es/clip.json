@@ -1,0 +1,312 @@
+{
+  "empty": "Selecciona un clip para ver sus propiedades",
+  "types": {
+    "video": "video",
+    "audio": "audio",
+    "image": "imagen",
+    "text": "texto",
+    "color": "color",
+    "scene": "escena"
+  },
+  "sections": {
+    "content": "Contenido",
+    "color": "Color",
+    "audio": "Audio",
+    "layout": "Diseño",
+    "transform": "Transformar",
+    "timing": "Tiempo",
+    "motion": "Movimiento",
+    "greenScreen": "Pantalla verde"
+  },
+  "doubleClickReset": "Doble clic para restablecer",
+  "text": {
+    "label": "Texto",
+    "placeholder": "Escribe el texto aquí...",
+    "font": "Fuente",
+    "resetFont": "Restablecer fuente",
+    "fontGroups": {
+      "sansSerif": "Sin serifa",
+      "serif": "Con serifa",
+      "display": "Decorativa",
+      "handwriting": "Manuscrita",
+      "monospace": "Monoespaciada"
+    },
+    "weight": {
+      "normal": "Normal",
+      "bold": "Negrita"
+    },
+    "style": "Estilo",
+    "resetStyle": "Restablecer estilo",
+    "size": "Tamaño",
+    "alignment": "Alineación",
+    "resetAlignment": "Restablecer alineación",
+    "align": {
+      "left": "Alinear a la izquierda",
+      "center": "Centrar",
+      "right": "Alinear a la derecha"
+    },
+    "box": "Recuadro de fondo",
+    "fill": "Relleno",
+    "opacity": "Opacidad",
+    "padding": "Margen interior",
+    "radius": "Radio",
+    "border": "Borde",
+    "width": "Ancho"
+  },
+  "colorClip": {
+    "background": "Color de fondo",
+    "gradient": "Degradado",
+    "enabled": "Activado",
+    "disabled": "Desactivado",
+    "endColor": "Color final",
+    "angle": "Ángulo",
+    "resetAngle": "Restablecer ángulo"
+  },
+  "volume": {
+    "label": "Volumen",
+    "reset": "Restablecer volumen",
+    "mute": "Silenciar",
+    "unmute": "Activar sonido"
+  },
+  "fades": {
+    "label": "Fundidos",
+    "none": "Sin fundidos",
+    "in": "Entrada",
+    "out": "Salida",
+    "inSeconds": "Entrada (segundos)",
+    "outSeconds": "Salida (segundos)"
+  },
+  "noise": {
+    "reduce": "Reducir el ruido de fondo",
+    "cleanVoice": "Limpiar la voz",
+    "group": "Reducción de ruido",
+    "working": "Procesando",
+    "workingDots": "Procesando…",
+    "afterUpload": "Disponible cuando este clip termine de subirse.",
+    "appliesGroup_one": "Se aplica a este clip y a su grupo ({{count}} clip).",
+    "appliesGroup_many": "Se aplica a este clip y a su grupo ({{count}} de clips).",
+    "appliesGroup_other": "Se aplica a este clip y a su grupo ({{count}} clips).",
+    "appliesOne": "Se aplica solo a este clip.",
+    "failed": "Falló la reducción de ruido. Vuelve a intentarlo.",
+    "levels": {
+      "light": "Suave",
+      "medium": "Media",
+      "strong": "Fuerte"
+    },
+    "studioTitle": "Fuerte: menos ruido, sin zumbidos, más clara y uniforme, eses más suaves"
+  },
+  "duck": {
+    "label": "Atenuar",
+    "group": "Atenuar este clip",
+    "depth": "{{db}} dB",
+    "source": "<lead>Baja mientras</lead><pick/><tail>suena</tail>",
+    "sourceLabel": "Fuente de la atenuación",
+    "hint": "Este clip baja de volumen mientras suena la pista elegida y vuelve a subir en las pausas."
+  },
+  "greenScreen": {
+    "removeBackground": "Quitar el fondo",
+    "modes": {
+      "green": "Verde",
+      "blue": "Azul",
+      "person": "Persona",
+      "static": "Estático (experimental)"
+    },
+    "modeTitles": {
+      "green": "Pantalla verde",
+      "blue": "Pantalla azul",
+      "person": "No hace falta pantalla verde: te detecta en la imagen y quita el resto",
+      "static": "Fondo estático (experimental): quita todo lo que coincide con un fotograma del fondo vacío"
+    },
+    "staticHint": "Quita todo lo que se parece a unos fotogramas del fondo vacío. Los cambios pequeños (ruido, luz, enfoque) se ignoran y las partes de ti que coinciden con la pared se mantienen dentro de tu silueta. Necesita una cámara que no se mueva; las sombras que proyectas siguen visibles. Si siguen viéndose partes de la habitación, sube el Umbral.",
+    "hint": {
+      "green": "Quita el fondo verde para que se vean los clips de las pistas de abajo.",
+      "blue": "Quita el fondo azul para que se vean los clips de las pistas de abajo.",
+      "person": "No hace falta pantalla verde: el editor detecta a la persona en cada fotograma y quita el resto. Funciona mejor con una sola persona, bien iluminada, delante de la cámara."
+    },
+    "plate": "Fotograma del fondo vacío",
+    "plateAlt": "Fondo vacío",
+    "plateHint": "Mueve el cabezal a un momento en el que solo se vea el fondo, sin ti. Se usa medio segundo de ese momento.",
+    "grabbing": "Capturando el fotograma...",
+    "useFrame": "Usar el fotograma del cabezal",
+    "useFrameInstead": "Usar en su lugar el fotograma del cabezal",
+    "grabFailed": "No se pudo capturar ese fotograma. Vuelve a intentarlo o elige otro momento.",
+    "threshold": "Umbral",
+    "thresholdStaticTitle": "Tolerancia: más alta ignora más cambios en el fondo (ruido, luz, enfoque), pero puede empezar a quitar partes de ti",
+    "thresholdTitle": "Más alto quita más del color de la pantalla",
+    "resetThreshold": "Restablecer umbral",
+    "softness": "Suavizado del borde",
+    "resetSoftness": "Restablecer suavizado",
+    "despill": "Quitar reflejo",
+    "despillStaticTitle": "Quita el color de la pared de los bordes",
+    "despillTitle": {
+      "green": "Quita el tono verde de los bordes",
+      "blue": "Quita el tono azul de los bordes"
+    },
+    "resetDespill": "Restablecer quitar reflejo",
+    "cameraLock": {
+      "allLocked": "Enfoque y exposición de la cámara bloqueados, también el balance de blancos.",
+      "focusExposureLocked": "Enfoque y exposición de la cámara bloqueados.",
+      "noFocus": "Tu cámara no permite bloquear el enfoque; evita acercarte o alejarte.",
+      "lockedList": "Bloqueado: {{list}}.",
+      "noExposure": "Enfoque bloqueado. La exposición no se puede bloquear en esta cámara; mantén la luz estable.",
+      "names": {
+        "focus": "enfoque",
+        "exposure": "exposición",
+        "whiteBalance": "balance de blancos"
+      }
+    }
+  },
+  "layout": {
+    "boxSize": "Tamaño del recuadro",
+    "smaller": "Más pequeño",
+    "larger": "Más grande",
+    "zoom": "Zoom",
+    "resetZoom": "Restablecer zoom",
+    "hint": "Arrastra el clip para moverlo. Mantén pulsado y arrastra para mover el video dentro de su recuadro. Pellizca para hacer zoom en pantallas táctiles.",
+    "freeTransform": "Cambiar a transformación libre"
+  },
+  "transform": {
+    "scale": "Escala",
+    "resetScale": "Restablecer escala",
+    "rotation": "Rotación",
+    "resetRotation": "Restablecer rotación",
+    "position": "Posición",
+    "resetPosition": "Restablecer posición",
+    "dragToMove": "Arrastra para recolocar",
+    "crop": "Recortar",
+    "resetCrop": "Restablecer recorte",
+    "cropWidth": "An",
+    "cropHeight": "Al",
+    "opacity": "Opacidad",
+    "resetOpacity": "Restablecer opacidad"
+  },
+  "timing": {
+    "duration": "Duración",
+    "seconds": "Seg",
+    "in": "Entrada:",
+    "out": "Salida:",
+    "durationColon": "Duración:",
+    "position": "Posición:"
+  },
+  "color": {
+    "measuring": "Midiendo…",
+    "autoTitle": "Corregir niveles, tonos medios y balance de blancos a partir de los fotogramas de este clip",
+    "resetAll": "Restablecer todos los ajustes de color",
+    "failed": "No se pudo leer la imagen de este clip.",
+    "sliders": {
+      "brightness": "Brillo",
+      "contrast": "Contraste",
+      "midtones": "Tonos medios",
+      "saturation": "Saturación",
+      "warmth": "Calidez",
+      "tint": "Matiz"
+    }
+  },
+  "effects": {
+    "hiddenName": "{{name}} (oculto)",
+    "show": "Volver a mostrar este efecto",
+    "hide": "Ocultar este efecto (se conserva, pero no se aplica)",
+    "remove": "Quitar este efecto",
+    "comesFrom": "Viene de",
+    "goesTo": "Va hacia",
+    "from": "Desde",
+    "to": "Hasta",
+    "speed": "Velocidad",
+    "amount": {
+      "amplitude": "Amplitud",
+      "bounce": "Rebote",
+      "distance": "Distancia"
+    },
+    "addFirst": "Añadir un efecto…",
+    "addAnother": "Añadir otro efecto…",
+    "groups": {
+      "loop": "Bucles",
+      "in": "Entradas",
+      "out": "Salidas"
+    },
+    "effect": {
+      "pulse": "Pulso",
+      "wobble": "Tambalear",
+      "bob": "Flotar",
+      "sway": "Balancear",
+      "spin": "Girar",
+      "pop": "Aparecer de golpe",
+      "slideIn": "Entrar deslizando",
+      "fadeIn": "Aparecer gradualmente",
+      "popOut": "Desaparecer de golpe",
+      "slideOut": "Salir deslizando",
+      "fadeOut": "Desvanecer"
+    },
+    "direction": {
+      "left": "izquierda",
+      "right": "derecha",
+      "top": "arriba",
+      "bottom": "abajo"
+    },
+    "pivot": "Pivote",
+    "pivotPoint": "Punto de pivote",
+    "pivotName": {
+      "topLeft": "arriba a la izquierda",
+      "top": "arriba",
+      "topRight": "arriba a la derecha",
+      "left": "izquierda",
+      "centre": "centro",
+      "right": "derecha",
+      "bottomLeft": "abajo a la izquierda",
+      "bottom": "abajo",
+      "bottomRight": "abajo a la derecha",
+      "custom": "personalizado"
+    }
+  },
+  "multi": {
+    "volume": "Volumen",
+    "volumeMixed": "Volumen (mixto)",
+    "volumeAll": "Volumen de todos los clips seleccionados",
+    "muteAll": "Silenciar todo",
+    "unmuteAll": "Activar sonido de todo",
+    "cleanVoice": "Limpiar la voz",
+    "cleanGroup": "Limpieza de voz para todos los clips seleccionados",
+    "afterUpload": "Disponible cuando estos clips terminen de subirse.",
+    "failed": "Falló la limpieza de la voz. Vuelve a intentarlo.",
+    "applies_one": "Se aplica al clip seleccionado.",
+    "applies_many": "Se aplica a los {{count}} de clips seleccionados.",
+    "applies_other": "Se aplica a los {{count}} clips seleccionados.",
+    "appliesWithGroups_one": "Se aplica a los {{selected}} clips seleccionados y a {{count}} clip más de sus grupos.",
+    "appliesWithGroups_many": "Se aplica a los {{selected}} clips seleccionados y a {{count}} de clips más de sus grupos.",
+    "appliesWithGroups_other": "Se aplica a los {{selected}} clips seleccionados y a {{count}} clips más de sus grupos.",
+    "stillUploading": "Los clips que todavía se están subiendo se quedan como están.",
+    "remove_one": "Quitar {{count}} clip",
+    "remove_many": "Quitar {{count}} de clips",
+    "remove_other": "Quitar {{count}} clips"
+  },
+  "trim": {
+    "title": "Recortar: {{name}}",
+    "start": "Punto de inicio",
+    "end": "Punto final",
+    "trimmed": "Duración recortada"
+  },
+  "reframe": {
+    "readFailed": "No se pudo leer el video aquí",
+    "openFailed": "No se pudo abrir el video para el seguimiento de caras"
+  },
+  "personKey": {
+    "ready": "Listo: quedas recortado en cada fotograma. El renderizado se ve como la vista previa.",
+    "failed": "No se encontró a ninguna persona en este clip ({{error}}).",
+    "finding": "Detectándote en cada fotograma... Mientras tanto, la vista previa ya lo muestra en vivo.",
+    "findingProgress": "Detectándote en cada fotograma: {{percent}} Mientras tanto, la vista previa ya lo muestra en vivo.",
+    "behind": "Detrás de ti",
+    "backgrounds": {
+      "none": "Transparente",
+      "noneTitle": "Los clips de las pistas de abajo se ven detrás de ti",
+      "blur": "Desenfoque",
+      "blurTitle": "Tu propio fondo, desenfocado",
+      "color": "Color",
+      "colorTitle": "Un color liso detrás de ti"
+    },
+    "pickStock": "Poner detrás una imagen o un video de stock",
+    "colour": "Color",
+    "blur": "Desenfoque",
+    "resetBlur": "Restablecer desenfoque",
+    "thresholdTitle": "Más alto conserva menos a tu alrededor, más bajo conserva más"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "cleaning": {
+    "voice_other": "Membersihkan suara {{count}} klip…",
+    "voiceRecording_other": "Membersihkan suara {{count}} klip · rekaman {{at}} dari {{total}}",
+    "back_other": "Mengembalikan {{count}} klip…",
+    "backRecording_other": "Mengembalikan {{count}} klip · rekaman {{at}} dari {{total}}"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "panel": {
+    "title": "Bản ghi lời",
+    "close": "Đóng bản ghi lời"
+  },
+  "cutNotice": {
+    "plain": "Đã cắt, ngắn hơn {{seconds}} giây.",
+    "words_other": "Đã cắt {{count}} từ: ngắn hơn {{seconds}} giây.",
+    "found_other": "Đã cắt {{count}} vị trí tìm thấy: ngắn hơn {{seconds}} giây.",
+    "fillers": "Đã cắt {{fillers}}, {{pauses}}: ngắn hơn {{seconds}} giây.",
+    "dismiss": "Bỏ qua"
+  },
+  "fillers": {
+    "title": "Bỏ từ đệm và chỗ ngừng",
+    "emptyHint": "Tính năng này dựa trên bản ghi lời: nó tìm \"ừm\", \"à\", \"kiểu như\" và những từ tương tự trong ngôn ngữ của chương trình, cùng các chỗ ngừng dài.",
+    "listening": "Đang nghe...",
+    "transcribeFirst": "Chép lời chương trình trước",
+    "checking": "Đang kiểm tra máy chủ...",
+    "unavailable": "Bản ghi lời hiện không khả dụng trên máy chủ chỉnh sửa này.",
+    "intro": "Từ đệm trong {{language}}. Nghe từng cái, bỏ đánh dấu những gì cần giữ.",
+    "introNoList": "Từ đệm trong {{language}} (chỉ \"ừm\", \"à\" và tương tự: chưa có danh sách cho ngôn ngữ này). Nghe từng cái, bỏ đánh dấu những gì cần giữ.",
+    "stillTranscribing": "Phần còn lại của chương trình vẫn đang được chép lời.",
+    "fillerWords": "Từ đệm",
+    "longPauses": "Chỗ ngừng dài",
+    "minPause": "Chỗ ngừng dài hơn <strong>{{seconds}} giây</strong>",
+    "keepPause": "Rút ngắn chỗ ngừng còn <strong>{{seconds}} giây</strong>",
+    "keepPauseTitle": "Phần còn lại của một chỗ ngừng dài sau khi cắt",
+    "fillerCount_other": "{{count}} từ đệm",
+    "pauseCount_other": "{{count}} chỗ ngừng",
+    "summary": "Đã đánh dấu {{fillers}}, {{pauses}} · cắt {{seconds}} giây",
+    "nothingFound": "Không tìm thấy gì với các cài đặt này.",
+    "tickAllFillers": "Đánh dấu tất cả từ đệm",
+    "untickAllFillers": "Bỏ đánh dấu tất cả từ đệm",
+    "tickAllPauses": "Đánh dấu tất cả chỗ ngừng",
+    "untickAllPauses": "Bỏ đánh dấu tất cả chỗ ngừng",
+    "listLabel": "Những gì sẽ bị cắt",
+    "item": {
+      "keepPause": "Giữ chỗ ngừng này",
+      "cutPause": "Cắt chỗ ngừng này",
+      "keepFiller": "Giữ {{text}}",
+      "cutFiller": "Cắt {{text}}",
+      "stop": "Dừng",
+      "listenTitle": "Nghe (kèm một giây xung quanh)",
+      "listenAt": "Nghe tại {{time}}",
+      "pause": "Chỗ ngừng",
+      "pauseLength": "{{length}} giây → {{kept}} giây",
+      "filler": "Từ đệm",
+      "fillerTitle": "Âm thanh ngập ngừng",
+      "maybe": "Có thể",
+      "maybeTitle": "Có thể là từ đệm ở đây (tách bởi chỗ ngừng hoặc dấu phẩy): hãy nghe trước"
+    },
+    "cut": "Cắt",
+    "cutCount": "Cắt {{n}} ({{seconds}} giây)"
+  }
+}

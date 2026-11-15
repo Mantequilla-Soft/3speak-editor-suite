@@ -1,0 +1,53 @@
+{
+  "title": "ストック素材",
+  "titleBackground": "背景を選ぶ",
+  "search": "動画、写真、GIF を検索",
+  "searchProvider": "{{provider}} を検索",
+  "searchProviderTitle": "{{provider}} を検索（無料で使えます。選ぶと 3Speak のサーバーにコピーされます）",
+  "kind": "種類",
+  "category": "カテゴリー",
+  "everything": "すべて",
+  "types": {
+    "all": "すべて",
+    "video": "動画",
+    "image": "写真",
+    "gif": "GIF"
+  },
+  "categories": {
+    "nature": "自然",
+    "city": "都市",
+    "people": "人物",
+    "animals": "動物",
+    "food": "食べ物",
+    "tech": "テクノロジー",
+    "sports": "スポーツ",
+    "space": "宇宙",
+    "abstract": "抽象",
+    "backgrounds": "背景"
+  },
+  "loading": "ライブラリを読み込み中...",
+  "typeToSearch": "探しているものを入力して {{provider}} を検索してください。",
+  "nothingFound": "見つかりませんでした。",
+  "searching": "検索中...",
+  "loadFailed": "ストック素材のライブラリを読み込めませんでした。",
+  "nothingMatches": "一致するものがありません。",
+  "adding": "追加中...",
+  "byAuthor": "{{title}}（{{author}}）",
+  "licenceOnline": "{{provider}} から：商用でも無料で使え、クレジット表記は不要です。選ぶとファイルが 3Speak のサーバーにコピーされます。",
+  "licence": "商用でも無料で使え、クレジット表記は不要です（Wikimedia Commons の CC0 / パブリックドメイン）。",
+  "placeBackground": "あなたの背後に、専用のトラックで、クリップと同じ長さで配置されます。",
+  "placeAdd": "再生ヘッドの位置に入ります：タイムラインが空なら動画として、そうでなければ B ロールとして上に重ねます。",
+  "errors": {
+    "notCopied": "そのファイルをコピーできませんでした。",
+    "notAdded": "そのファイルを追加できませんでした。",
+    "tooMany": "検索が多すぎます。少しお待ちください。",
+    "searchFailed": "検索がうまくいきませんでした。もう一度お試しください。",
+    "copyFailed": "そのファイルをサーバーにコピーできませんでした。"
+  },
+  "trackName": {
+    "background": "背景",
+    "backgroundNumbered": "背景 {{number}}",
+    "broll": "B ロール",
+    "brollNumbered": "B ロール {{number}}"
+  }
+}

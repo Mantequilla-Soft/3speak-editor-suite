@@ -1,0 +1,83 @@
+{
+  "button": {
+    "rendering": "İşleniyor...",
+    "exporting": "Dışa aktarılıyor...",
+    "uploading": "Yükleniyor {{percent}}",
+    "reRender": "Yeniden işle",
+    "exportAgain": "Yeniden dışa aktar",
+    "trimToRender": "İşlemek için zaman çizelgesini {{limit}} ya da daha kısa olacak şekilde kırp",
+    "trimToExport": "Dışa aktarmak için zaman çizelgesini {{limit}} ya da daha kısa olacak şekilde kırp"
+  },
+  "exportAs": {
+    "button": "Farklı dışa aktar",
+    "title": "Farklı dışa aktar: aynı proje Short, kare ya da yatay video olarak, yüzlerin çevresinden kırpılmış",
+    "close": "Farklı dışa aktar'ı kapat",
+    "waitUpload": "Yüklemenin bitmesini bekle."
+  },
+  "done": {
+    "download": "İndir",
+    "audiograms": "Audiogramlar",
+    "audiogramsCount": "Audiogramlar ({{n}})",
+    "audiogramsTitle": "Bölümün parçalarından kısa videolar; paylaşmak ya da bölümle birlikte Shorts olarak yayınlamak için",
+    "videoPodcast": "Video podcast",
+    "videoPodcastTitle": "Tüm bölüm; kapak, dalga formu, altyazılar ve kimin konuştuğuyla 16:9 video olarak",
+    "useAudio": "Bu sesi kullan",
+    "sendVideo": "Videoyu Gönder"
+  },
+  "failed": "İşleme başarısız: {{error}}",
+  "phase": {
+    "preparing": "Dosyalar hazırlanıyor...",
+    "submitting": "İşleme işi gönderiliyor...",
+    "busyRetry": "İşleme sunucuları meşgul. {{seconds}} sn sonra yeniden deneniyor...",
+    "offlineRetry": "İşleme sunucusuyla bağlantı yok. {{seconds}} sn sonra yeniden deneniyor...",
+    "starting": "Başlatılıyor...",
+    "reconnecting": "İşleme sunucusuna yeniden bağlanılıyor...",
+    "uploadingFile": "{{name}} yükleniyor ({{index}}/{{total}})...",
+    "uploadingUnnamed": "Dosya yükleniyor ({{index}}/{{total}})...",
+    "uploadingPlate": "{{name}} için arka plan karesi yükleniyor...",
+    "uploadingPlateUnnamed": "Klip için arka plan karesi yükleniyor..."
+  },
+  "queue": {
+    "next": "Sıradaki sensin",
+    "inLine": {
+      "one": "Sırada {{n}}. kişisin",
+      "two": "Sırada {{n}}. kişisin",
+      "few": "Sırada {{n}}. kişisin",
+      "other": "Sırada {{n}}. kişisin"
+    },
+    "waiting": "Boş bir işleme yeri bekleniyor..."
+  },
+  "legacy": {
+    "exportVideo": "Videoyu Dışa Aktar",
+    "cancelTitle": "Dışa aktarmayı iptal et",
+    "settingsTitle": "Dışa aktarma ayarları",
+    "uploadingRender": "{{name}} yükleniyor ({{percent}}). Düzenlemeye devam et; bitince İşle açılır.",
+    "uploadingExport": "{{name}} yükleniyor ({{percent}}). Düzenlemeye devam et; bitince Dışa aktar açılır.",
+    "lengthRender": "Zaman çizelgesi {{length}}. İşlemek için {{limit}} ya da daha kısa olacak şekilde kırp.",
+    "lengthExport": "Zaman çizelgesi {{length}}. Dışa aktarmak için {{limit}} ya da daha kısa olacak şekilde kırp.",
+    "method": "Dışa Aktarma Yöntemi",
+    "methodCanvas": "Canvas (WYSIWYG)",
+    "methodFast": "Hızlı (efektsiz)",
+    "canvasHint": "Tüm görsel efektleri tam olarak önizlemedeki gibi yakalar",
+    "fastHint": "Daha hızlı dışa aktarma, ama yakınlaştırma, konum, kırpma ve metin katmanlarını yok sayar",
+    "quality": "Kalite",
+    "qualityHigh": "Yüksek (daha büyük dosya)",
+    "qualityMedium": "Orta (önerilen)",
+    "qualityLow": "Düşük (daha küçük dosya)",
+    "processing": "İşleniyor... {{percent}}",
+    "renderingPercent": "İşleniyor... {{percent}}",
+    "downloadRendered": "İşlenmiş Videoyu İndir",
+    "ffmpegLoading": "FFmpeg yükleniyor...",
+    "ffmpegNotLoaded": "FFmpeg yüklenmedi",
+    "addClips": "Dışa aktarmak için zaman çizelgesine klip ekle"
+  },
+  "canvas": {
+    "loadingMedia": "Medya yükleniyor...",
+    "renderingFrames": "Kareler işleniyor...",
+    "encodingVideo": "Video kodlanıyor...",
+    "processingAudio": "Ses işleniyor...",
+    "convertingMp4": "MP4'e dönüştürülüyor...",
+    "preparingDownload": "İndirme hazırlanıyor...",
+    "complete": "Tamamlandı!"
+  }
+}

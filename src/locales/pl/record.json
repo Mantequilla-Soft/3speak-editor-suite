@@ -1,0 +1,109 @@
+{
+  "media": {
+    "blocked": {
+      "camera": "Kamera lub mikrofon są zablokowane dla tej strony. Zezwól na nie ikoną na pasku adresu i spróbuj ponownie. Jeśli nigdy nie odmawiałeś, przeglądarkę mogą blokować ustawienia prywatności komputera.",
+      "microphone": "Mikrofon jest zablokowany dla tej strony. Zezwól na niego ikoną na pasku adresu i spróbuj ponownie. Jeśli nigdy nie odmawiałeś, przeglądarkę mogą blokować ustawienia prywatności komputera."
+    },
+    "notAllowed": {
+      "camera": "Ta strona nie może używać kamery ani mikrofonu. Wczytaj 3Speak ponownie i spróbuj jeszcze raz.",
+      "microphone": "Ta strona nie może używać mikrofonu. Wczytaj 3Speak ponownie i spróbuj jeszcze raz."
+    },
+    "busy": {
+      "camera": "Kamera lub mikrofon są zajęte przez inną aplikację lub kartę (rozmowa wideo, inny rejestrator). Zamknij je tam i spróbuj ponownie.",
+      "microphone": "Mikrofon jest zajęty przez inną aplikację lub kartę (rozmowa wideo, inny rejestrator). Zamknij go tam i spróbuj ponownie."
+    },
+    "notFound": {
+      "camera": "Nie znaleziono kamery ani mikrofonu. Podłącz je i spróbuj ponownie.",
+      "microphone": "Nie znaleziono mikrofonu. Podłącz go i spróbuj ponownie."
+    },
+    "noDevices": {
+      "camera": "Ta przeglądarka nie może tu używać kamery ani mikrofonu.",
+      "microphone": "Ta przeglądarka nie może tu używać mikrofonu."
+    },
+    "failed": {
+      "camera": "Nie udało się uruchomić kamery lub mikrofonu. Spróbuj ponownie.",
+      "microphone": "Nie udało się uruchomić mikrofonu. Spróbuj ponownie."
+    },
+    "failedNamed": {
+      "camera": "Nie udało się uruchomić kamery lub mikrofonu ({{name}}). Spróbuj ponownie.",
+      "microphone": "Nie udało się uruchomić mikrofonu ({{name}}). Spróbuj ponownie."
+    }
+  },
+  "inline": {
+    "camera": "Kamera",
+    "expand": "Powiększ",
+    "shrink": "Zmniejsz",
+    "uploading": "Przesyłanie...",
+    "uploadingPct": "Przesyłanie... {{pct}}%",
+    "converting": "Konwertowanie...",
+    "rec": "NAGR.",
+    "starting": "Rozpoczynanie...",
+    "plateStepOut": "Wyjdź z kadru",
+    "plateShooting": "Nagrywanie tła, nie wchodź w kadr...",
+    "gestures": "Przytrzymaj i przeciągnij obraz, aby zmienić kadr, zsuń palce, aby powiększyć.",
+    "gesturesOverlay": "Przytrzymaj i przeciągnij obraz, aby zmienić kadr, zsuń palce, aby powiększyć, przeciągnij okno kamery, aby je przesunąć.",
+    "greenScreen": {
+      "label": "Green screen",
+      "off": "Wył.",
+      "green": "Zielone",
+      "blue": "Niebieskie",
+      "person": "Osoba",
+      "static": "Statyczne",
+      "staticTitle": "Statyczne tło (eksperymentalne): usuwa wszystko, co pasuje do ujęcia pustego tła",
+      "personTitle": "Bez green screenu: znajduje cię w obrazie",
+      "threshold": "Próg",
+      "thresholdStaticTitle": "Tolerancja: wyższa ignoruje więcej zmian w tle (szum, światło, ostrość), ale może zacząć usuwać części ciebie",
+      "thresholdTitle": "Wyższy usuwa więcej koloru tła",
+      "despill": "Usuwanie przebarwień",
+      "despillStaticTitle": "Usuwa kolor ściany z krawędzi",
+      "despillGreenTitle": "Usuwa zielony odcień z krawędzi",
+      "despillBlueTitle": "Usuwa niebieski odcień z krawędzi",
+      "retakePlate": "Nagraj puste tło ponownie",
+      "shootPlate": "Nagraj puste tło",
+      "plateKeep": "Eksperymentalne. Nie zmieniaj ustawienia kamery ani światła.",
+      "plateHowTo": "Eksperymentalne. Ustaw kamerę nieruchomo, naciśnij przycisk i wyjdź z kadru.",
+      "keyFailed": "Kluczowanie na żywo nie jest tu dostępne. Klip i tak dostanie ustawienie green screenu.",
+      "personHowTo": "Bez green screenu: edytor znajduje cię w obrazie. Ujęcie jest nagrywane bez zmian i wycinane na osi czasu, gdzie wybierasz, co ma być za tobą."
+    },
+    "tpEdit": "Edytuj tekst promptera",
+    "tpAdd": "Dodaj tekst promptera",
+    "teleprompter": "Prompter",
+    "recordOnly": "Tylko nagrywanie",
+    "recordAndPlay": "Nagrywanie + odtwarzanie filmu",
+    "plusPlay": "+ Odtwarzanie",
+    "recordReactionTitle": "Nagrywaj, gdy odtwarza się oryginał",
+    "recordReaction": "Nagraj reakcję",
+    "record": "Nagraj",
+    "stop": "Stop",
+    "retake": "Powtórz",
+    "useClip": "Użyj klipu"
+  },
+  "video": {
+    "title": "Nagraj film",
+    "startingCamera": "Uruchamianie kamery...",
+    "start": "Rozpocznij nagrywanie",
+    "stop": "Stop",
+    "retake": "Powtórz",
+    "useClip": "Użyj klipu"
+  },
+  "audio": {
+    "title": "Nagraj audio",
+    "cannotRecord": "Ta przeglądarka nie może tu nagrywać audio.",
+    "addFailed": "Nie udało się dodać nagrania. Spróbuj ponownie.",
+    "yourRecording": "Twoje nagranie",
+    "micLevel": "Poziom mikrofonu",
+    "accessingMic": "Uzyskiwanie dostępu do mikrofonu...",
+    "ready": "Gotowe do nagrywania: powiedz coś, aby sprawdzić poziom",
+    "preparing": "Przygotowywanie nagrania...",
+    "adding": "Dodawanie do ścieżek...",
+    "tpEdit": "Edytuj tekst promptera",
+    "tpAdd": "Dodaj tekst promptera",
+    "teleprompter": "Prompter",
+    "start": "Rozpocznij nagrywanie",
+    "stop": "Stop",
+    "retake": "Powtórz",
+    "addingShort": "Dodawanie...",
+    "useRecording": "Użyj nagrania",
+    "useScript": "Użyj tego scenariusza"
+  }
+}

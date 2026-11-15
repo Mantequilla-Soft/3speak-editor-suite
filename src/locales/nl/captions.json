@@ -1,0 +1,67 @@
+{
+  "language": {
+    "label": "Gesproken taal",
+    "auto": "Automatisch herkennen"
+  },
+  "intro": {
+    "title": "Automatische ondertitels",
+    "text": "Zet wat er wordt gezegd om in ondertitels die elk woord volgen, ingebrand in je Short en ook als ondertitels naar 3Speak gestuurd.",
+    "checking": "Server controleren...",
+    "unavailable": "Automatische ondertitels zijn nu niet beschikbaar op deze editorserver. Je Short wordt gewoon zonder gerenderd.",
+    "go": "Automatische ondertitels"
+  },
+  "presets": {
+    "karaoke": "Karaoke",
+    "pop": "Pop",
+    "plain": "Ondertitels"
+  },
+  "presetHints": {
+    "karaoke": "Een paar woorden tegelijk, het uitgesproken woord in de markeerkleur",
+    "pop": "Eén woord (of een paar) tegelijk, dat tevoorschijn springt",
+    "plain": "Klassieke ondertitelregels op een donker vak"
+  },
+  "style": {
+    "title": "Stijl",
+    "presetsLabel": "Stijl van de ondertitels",
+    "wordsAtATime": "Woorden tegelijk",
+    "font": "Lettertype",
+    "size": "Grootte",
+    "sizeLabel": "Grootte van de ondertitels",
+    "position": "Positie",
+    "positionLabel": "Hoogte van de ondertitels in het beeld",
+    "top": "Boven",
+    "middle": "Midden",
+    "low": "Laag",
+    "textColour": "Tekstkleur",
+    "highlight": "Markeren",
+    "highlightLabel": "Markeerkleur",
+    "uppercase": "Hoofdletters",
+    "emoji": "Emoji-accenten (boven woorden als \"vuur\" of \"liefde\")",
+    "burn": "Tonen in de video (uit: alleen als ondertitels op 3Speak)"
+  },
+  "words": {
+    "title": "Woorden ({{n}})",
+    "hint": "Verbeter wat verkeerd is verstaan; maak een woord leeg om het te laten vallen. Clips verplaatst of geknipt? Start de automatische ondertitels opnieuw.",
+    "goThere": "Ga ernaartoe",
+    "word": "Woord {{n}}",
+    "changeEmoji": "Emoji wijzigen of verwijderen",
+    "addEmoji": "Emoji toevoegen",
+    "remove": "Dit woord verwijderen",
+    "removeNamed": "{{word}} verwijderen"
+  },
+  "actions": {
+    "again": "Opnieuw",
+    "againTitle": "Opnieuw luisteren (vervangt de woorden)",
+    "remove": "Ondertitels verwijderen"
+  },
+  "videoSound": "Videogeluid",
+  "job": {
+    "preparing": "Geluid voorbereiden...",
+    "listening": "Luisteren...",
+    "noTracks": "Er is geen spraak om te ondertitelen: voeg eerst een clip met geluid toe.",
+    "serverAnswered": "De server antwoordde {{status}}",
+    "lost": "De ondertiteltaak is verloren gegaan (is de server herstart?)",
+    "noSpeech": "Geen spraak gevonden. Staat de stem op een audiospoor dat niet gedempt is (muzieksporen worden overgeslagen)?",
+    "failed": "Spraakherkenning mislukt"
+  }
+}

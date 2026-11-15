@@ -1,0 +1,53 @@
+{
+  "title": "Style",
+  "noEffects": "Aucun effet",
+  "presetsLabel": "Préréglages de style",
+  "doubleClickReset": "Double-cliquez pour réinitialiser",
+  "presets": {
+    "original": "Original",
+    "warm": "Chaud",
+    "cool": "Froid",
+    "vivid": "Vif",
+    "matte": "Mat",
+    "bw": "N&B",
+    "vintage": "Vintage",
+    "tealorange": "Bleu & orange",
+    "fade": "Délavé",
+    "noir": "Noir",
+    "sunset": "Coucher de soleil"
+  },
+  "sliders": {
+    "blur": "Flou",
+    "vignette": "Vignettage",
+    "sharpen": "Netteté",
+    "split": "Bleu & orange"
+  },
+  "transition": {
+    "title": "Transition",
+    "none": "Aucune",
+    "types": {
+      "crossfade": "Fondu enchaîné",
+      "dissolve": "Fondu au noir",
+      "slideleft": "Glisser à gauche",
+      "slideright": "Glisser à droite",
+      "slideup": "Glisser vers le haut",
+      "zoom": "Zoom",
+      "whip": "Filé"
+    },
+    "length": "Durée de la transition (secondes)",
+    "fades": "Fondus",
+    "noFades": "Sans fondu",
+    "in": "Entrée",
+    "out": "Sortie",
+    "fadeInSeconds": "Fondu d'entrée (secondes)",
+    "fadeOutSeconds": "Fondu de sortie (secondes)",
+    "intoNext": "Vers le clip suivant",
+    "needNext": "Placez un clip juste après celui-ci sur la même piste pour ajouter une transition.",
+    "fromTo": "{{from}} vers {{to}}",
+    "fromUnnamed": "Clip vers {{to}}",
+    "toUnnamed": "{{from}} vers le clip suivant",
+    "bothUnnamed": "Clip vers le clip suivant",
+    "add": "Ajouter une transition",
+    "cutLabel": "{{type}}, {{seconds}} s"
+  }
+}

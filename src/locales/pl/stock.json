@@ -1,0 +1,53 @@
+{
+  "title": "Bank multimediów",
+  "titleBackground": "Wybierz tło",
+  "search": "Szukaj filmów, zdjęć i GIF-ów",
+  "searchProvider": "Szukaj w {{provider}}",
+  "searchProviderTitle": "Szukaj w {{provider}} (do darmowego użytku, kopiowane na nasz serwer po wybraniu)",
+  "kind": "Rodzaj",
+  "category": "Kategoria",
+  "everything": "Wszystko",
+  "types": {
+    "all": "Wszystko",
+    "video": "Filmy",
+    "image": "Zdjęcia",
+    "gif": "GIF-y"
+  },
+  "categories": {
+    "nature": "Przyroda",
+    "city": "Miasto",
+    "people": "Osoby",
+    "animals": "Zwierzęta",
+    "food": "Jedzenie",
+    "tech": "Technologia",
+    "sports": "Sport",
+    "space": "Kosmos",
+    "abstract": "Abstrakcja",
+    "backgrounds": "Tła"
+  },
+  "loading": "Wczytywanie biblioteki...",
+  "typeToSearch": "Wpisz, czego szukasz, aby przeszukać {{provider}}.",
+  "nothingFound": "Nic nie znaleziono.",
+  "searching": "Szukanie...",
+  "loadFailed": "Nie udało się wczytać banku multimediów.",
+  "nothingMatches": "Brak wyników.",
+  "adding": "Dodawanie...",
+  "byAuthor": "{{title}} ({{author}})",
+  "licenceOnline": "Z {{provider}}: do darmowego użytku, także komercyjnego, bez podawania autora. Plik jest kopiowany na serwer 3Speak po wybraniu.",
+  "licence": "Do darmowego użytku, także komercyjnego, bez podawania autora (CC0 / domena publiczna z Wikimedia Commons).",
+  "placeBackground": "Trafia za ciebie, na osobną ścieżkę, na całą długość twojego klipu.",
+  "placeAdd": "Trafia w miejsce głowicy: na pustej osi czasu jako twój film, w przeciwnym razie nad nim jako przebitka.",
+  "errors": {
+    "notCopied": "Nie udało się skopiować tego pliku.",
+    "notAdded": "Nie udało się dodać tego pliku.",
+    "tooMany": "Za dużo wyszukiwań, poczekaj chwilę.",
+    "searchFailed": "Wyszukiwanie nie zadziałało, spróbuj ponownie.",
+    "copyFailed": "Nie udało się skopiować tego pliku na serwer."
+  },
+  "trackName": {
+    "background": "Tło",
+    "backgroundNumbered": "Tło {{number}}",
+    "broll": "Przebitka",
+    "brollNumbered": "Przebitka {{number}}"
+  }
+}

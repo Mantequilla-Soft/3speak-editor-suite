@@ -1,0 +1,42 @@
+{
+  "titles": {
+    "mode": "Hoe wil je remixen?",
+    "stitch": "Waar moet je clip komen?",
+    "reaction": "Waar moet je reactie komen?"
+  },
+  "skip": "Overslaan, vrij bewerken",
+  "options": {
+    "stitch": {
+      "title": "Stitch",
+      "text": "Neem een clip op die voor of na het origineel speelt."
+    },
+    "reaction": {
+      "title": "Reactie",
+      "text": "Neem jezelf op terwijl het origineel speelt."
+    },
+    "free": {
+      "title": "Vrij bewerken",
+      "text": "Open de editor met het origineel op de tijdlijn."
+    },
+    "stitchBefore": {
+      "title": "Voor het origineel",
+      "text": "Eerst je clip, dan het origineel."
+    },
+    "stitchAfter": {
+      "title": "Na het origineel",
+      "text": "Eerst het origineel, dan je clip."
+    },
+    "overlay": {
+      "title": "Overlay",
+      "text": "Je camera in een klein vak boven op het origineel. Sleep het waar je maar wilt."
+    },
+    "tileTop": {
+      "title": "Tegel boven",
+      "text": "Het origineel krimpt naar de onderste helft, jij staat bovenaan."
+    },
+    "tileBottom": {
+      "title": "Tegel onder",
+      "text": "Het origineel krimpt naar de bovenste helft, jij staat onderaan."
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "title": "Mga sticker",
+  "search": "Maghanap ng sticker",
+  "textBoxes": "Mga text box",
+  "loading": "Nilo-load ang mga sticker...",
+  "noMatch": "Walang tugmang sticker.",
+  "tileTitle": "{{name}} (idinadagdag sa playhead)",
+  "note": "Inilalagay ang mga sticker sa playhead nang 3 segundo. I-drag, baguhin ang laki o i-trim ang mga ito gaya ng anumang clip; nae-edit pa rin ang mga text box.",
+  "categories": {
+    "emoji": "Mga emoji",
+    "badges": "Mga Badge",
+    "shapes": "Mga arrow at hugis",
+    "branding": "Branding"
+  },
+  "presets": {
+    "caption": {
+      "title": "Caption",
+      "text": "Ang caption mo rito"
+    },
+    "highlight": {
+      "title": "Highlight",
+      "text": "Dapat makita!"
+    },
+    "brand": {
+      "title": "Pula ng 3Speak",
+      "text": "Bagong video"
+    },
+    "bubble": {
+      "title": "Bubble",
+      "text": "Kumusta!"
+    },
+    "outline": {
+      "title": "Outline",
+      "text": "Tingnan mo ito"
+    },
+    "neon": {
+      "title": "Neon",
+      "text": "MAMAYANG GABI"
+    },
+    "title": {
+      "title": "Malaking pamagat",
+      "text": "MALAKING BALITA"
+    },
+    "comic": {
+      "title": "Komiks",
+      "text": "BUGSH!"
+    },
+    "marker": {
+      "title": "Marker",
+      "text": "gawang-kamay"
+    },
+    "quote": {
+      "title": "Quote",
+      "text": "“Sabihin nang maayos.”"
+    },
+    "tag": {
+      "title": "Hashtag"
+    },
+    "minimal": {
+      "title": "Minimal",
+      "text": "simple at malinis"
+    }
+  }
+}

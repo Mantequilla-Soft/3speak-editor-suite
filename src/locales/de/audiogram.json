@@ -1,0 +1,184 @@
+{
+  "title": "Audiogramme",
+  "tour": {
+    "again": "Tour noch einmal zeigen",
+    "againLabel": "Audiogramm-Tour noch einmal zeigen"
+  },
+  "saveAndClose": "Speichern und schließen",
+  "saveAndCloseTitle": "Deine Audiogramme bleiben bei diesem Audio und gehen mit ihm als Shorts raus",
+  "loadError": "Die Audiogramm-Einstellungen konnten nicht geladen werden: {{error}}",
+  "loadingLook": "Dein Audiogramm-Look wird geladen…",
+  "start": {
+    "title": "Wähle ein Stück der Folge",
+    "text_one": "Ein Audiogramm ist ein kurzes Video aus einem Stück deiner Folge, bis zu {{count}} Minute lang. Es geht zusammen mit dem Audio als 3Speak-Short raus. Markiere zuerst Anfang und Ende in der Zeitleiste.",
+    "text_other": "Ein Audiogramm ist ein kurzes Video aus einem Stück deiner Folge, bis zu {{count}} Minuten lang. Es geht zusammen mit dem Audio als 3Speak-Short raus. Markiere zuerst Anfang und Ende in der Zeitleiste.",
+    "choose": "In der Zeitleiste wählen"
+  },
+  "stage": {
+    "label": "Audiogramm-Vorschau: zieh die Teile, um sie zu verschieben, die Ecken für die Größe, den runden Griff zum Drehen",
+    "frameTitle": "Audiogramm-Vorschau",
+    "turned": "{{name}} · {{angle}}°",
+    "rotate": "Drehen (Umschalt: 15°-Schritte). Doppelklick: gerade",
+    "hint": "Zieh die Teile, zieh an einer Ecke für die Größe (Umschalt behält die Form), am runden Griff zum Drehen. Pfeiltasten verschieben, [ und ] drehen.",
+    "hintTemplate": "Zieh die Teile, zieh an einer Ecke für die Größe (Umschalt behält die Form), am runden Griff zum Drehen. Pfeiltasten verschieben, [ und ] drehen. Dein letztes Audiogramm ist der Ausgangspunkt."
+  },
+  "layer": {
+    "logo": {
+      "name": "3Speak-Logo",
+      "drag": "3Speak-Logo: zum Verschieben ziehen",
+      "dragSelected": "3Speak-Logo: zum Verschieben ziehen, Ecken für die Größe, runder Griff zum Drehen"
+    },
+    "cover": {
+      "name": "Bild",
+      "drag": "Bild: zum Verschieben ziehen",
+      "dragSelected": "Bild: zum Verschieben ziehen, Ecken für die Größe, runder Griff zum Drehen",
+      "hide": "Bild ausblenden",
+      "show": "Bild anzeigen",
+      "forward": "Bild nach vorne",
+      "back": "Bild nach hinten"
+    },
+    "title": {
+      "name": "Titel",
+      "drag": "Titel: zum Verschieben ziehen",
+      "dragSelected": "Titel: zum Verschieben ziehen, Ecken für die Größe, runder Griff zum Drehen",
+      "hide": "Titel ausblenden",
+      "show": "Titel anzeigen",
+      "forward": "Titel nach vorne",
+      "back": "Titel nach hinten"
+    },
+    "line": {
+      "name": "Zeile",
+      "drag": "Zeile: zum Verschieben ziehen",
+      "dragSelected": "Zeile: zum Verschieben ziehen, Ecken für die Größe, runder Griff zum Drehen",
+      "hide": "Zeile ausblenden",
+      "show": "Zeile anzeigen",
+      "forward": "Zeile nach vorne",
+      "back": "Zeile nach hinten"
+    },
+    "wave": {
+      "name": "Wellenform",
+      "drag": "Wellenform: zum Verschieben ziehen",
+      "dragSelected": "Wellenform: zum Verschieben ziehen, Ecken für die Größe, runder Griff zum Drehen",
+      "hide": "Wellenform ausblenden",
+      "show": "Wellenform anzeigen",
+      "forward": "Wellenform nach vorne",
+      "back": "Wellenform nach hinten"
+    }
+  },
+  "piece": {
+    "label": "Stück der Folge",
+    "range": "{{from}} – {{to}} · {{seconds}} s",
+    "inChapter": "in „{{title}}“",
+    "change": "Stück ändern"
+  },
+  "look": {
+    "title": "Titel",
+    "titleLabel": "Titel im Video",
+    "line": "Zeile darunter <small>(*Sternchen* machen es rot)</small>",
+    "lineLabel": "Zeile im Video",
+    "branding": "3Speak-Branding",
+    "logoGroup": "Logo",
+    "picture": "Bild",
+    "waveform": "Wellenform",
+    "waveType": "Art der Wellenform",
+    "waveColour": "Farbe der Wellenform",
+    "colour": "Farbe {{colour}}",
+    "anyColour": "Beliebige Farbe",
+    "anyWaveColour": "Beliebige Farbe für die Wellenform"
+  },
+  "logo": {
+    "mark": "3S-Logo",
+    "full": "3Speak-Logo"
+  },
+  "wave": {
+    "bars": "Balken",
+    "centered": "Zentriert",
+    "line": "Linie",
+    "dots": "Dünn",
+    "circle": "Kreis",
+    "ring": "Kreiswelle"
+  },
+  "picture": {
+    "upload": "Bild hochladen",
+    "yours": "Dein Bild",
+    "coverOf": "Cover von „{{title}}“",
+    "playlistCover": "Playlist-Cover",
+    "noCovers": "Deine Playlists haben noch keine Cover.",
+    "signIn": "Melde dich bei 3Speak an, um ein Bild hinzuzufügen."
+  },
+  "parts": {
+    "title": "Teile <small>(von vorne nach hinten)</small>",
+    "logoLocked": "Das 3Speak-Logo wird immer angezeigt, ganz vorne und nie kleiner als eine feste Größe",
+    "alwaysShown": "Immer sichtbar",
+    "hide": "Ausblenden",
+    "show": "Anzeigen",
+    "forward": "Nach vorne",
+    "back": "Nach hinten",
+    "tidy": "Ordentlich anordnen"
+  },
+  "make": {
+    "starting": "Wird gestartet...",
+    "working": "Wird bearbeitet...",
+    "noWords": "die Wörter dieses Stücks wurden nicht gefunden (schalte die Untertitel aus, um es ohne zu erstellen)",
+    "failedPlain": "fehlgeschlagen",
+    "signIn": "Melde dich bei 3Speak an, um ein Audiogramm zu erstellen.",
+    "failed": "Das Audiogramm konnte nicht erstellt werden: {{error}}",
+    "make": "Audiogramm erstellen",
+    "another": "Noch ein Audiogramm erstellen"
+  },
+  "made": {
+    "title": "Deine Audiogramme",
+    "hint": "Sie gehen zusammen mit dem Audio als 3Speak-Shorts raus, jedes mit einem Link zum Post, Snap oder Kommentar des Audios.",
+    "fallbackTitle": "Audiogramm {{n}}",
+    "length": "{{at}} · {{seconds}} s",
+    "textPlaceholder": "Text für den Short (optional). Ein Link zum Audio wird automatisch ergänzt.",
+    "textLabel": "Text für Short {{n}}",
+    "editText": "Text bearbeiten",
+    "writeText": "Text schreiben",
+    "download": "Herunterladen",
+    "removeLabel": "Audiogramm {{n}} entfernen"
+  },
+  "confirm": {
+    "title": "Schließen, ohne es zu erstellen?",
+    "text": "Deine Änderungen am Look stecken noch in keinem Audiogramm. Sie gehen beim Schließen verloren.",
+    "stays_one": "Das Audiogramm, das du erstellt hast, bleibt bei diesem Audio.",
+    "stays_other": "Die {{count}} Audiogramme, die du erstellt hast, bleiben bei diesem Audio.",
+    "keep": "Weiter bearbeiten"
+  },
+  "captions": {
+    "label": "Untertitel",
+    "drag": "Untertitel: zum Verschieben ziehen",
+    "dragSelected": "Untertitel: zum Verschieben ziehen, an einer Seite ziehen für die Breite",
+    "sample": "Deine Wörter erscheinen hier, während sie gesprochen werden",
+    "show": "Zeigen, was gesagt wird, Wort für Wort",
+    "checking": "Server wird geprüft...",
+    "unavailable": "Untertitel sind auf diesem Editor-Server gerade nicht verfügbar.",
+    "listening": "Hört zu...",
+    "getWords": "Wörter holen",
+    "wordCount_one": "{{count}} Wort in diesem Stück.",
+    "wordCount_other": "{{count}} Wörter in diesem Stück.",
+    "noSpeech": "Keine Sprache in diesem Stück gefunden.",
+    "fix": "Wörter korrigieren",
+    "doneFixing": "Korrektur fertig",
+    "word": "Wort {{n}}",
+    "removeWord": "Dieses Wort entfernen",
+    "removeWordLabel": "{{word}} entfernen",
+    "style": "Untertitel-Stil",
+    "preset": {
+      "karaoke": "Karaoke",
+      "pop": "Pop",
+      "plain": "Untertitel"
+    },
+    "wordsAtATime": "Wörter auf einmal",
+    "perPage_one": "{{count}} Wort auf einmal",
+    "perPage_other": "{{count}} Wörter auf einmal",
+    "font": "Untertitel-Schrift",
+    "size": "Untertitel-Größe",
+    "textColour": "Textfarbe der Untertitel",
+    "textColourSwatch": "Textfarbe {{colour}}",
+    "highlightColour": "Hervorhebungsfarbe",
+    "highlight": "Hervorheben",
+    "highlightSwatch": "Hervorhebung {{colour}}",
+    "capitals": "Großbuchstaben"
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "title": "Teleprompter",
+  "showOnCamera": "Auf der Kamera anzeigen",
+  "speechNotice": {
+    "title": "Stimmverfolgung funktioniert vorerst nur in Chromium-Browsern.",
+    "body": "Nutze Chrome, Edge, Brave oder Opera, damit das Skript beim Sprechen mitscrollt. In diesem Browser scrollt es mit einer festen Geschwindigkeit, die du einstellen kannst."
+  },
+  "speechErrors": {
+    "network": "Sprachdienst nicht erreichbar. Die Erkennung braucht eine Internetverbindung (Chrome sendet das Audio zur Transkription an Google).",
+    "audioCapture": "Bei der Erkennung kam kein Audio an. Das Mikro ist vielleicht belegt, versuch es mit einem Headset.",
+    "notAllowed": "Die Mikrofonberechtigung für die Spracherkennung ist blockiert.",
+    "unsupported": "Dieser Browser hat keine Spracherkennung.",
+    "generic": "Fehler bei der Spracherkennung: {{err}}"
+  },
+  "noMic": "Aufnahme ohne Mikrofon (Mikro nicht verfügbar).",
+  "autoDetect": "Automatisch erkennen ({{lang}})",
+  "presets": {
+    "frontcam": "Frontkamera",
+    "frontcamTitle": "Schmaler Streifen unter der Selfie-Linse, so fällt am wenigsten auf, dass du abliest",
+    "max": "Maximale Größe",
+    "maxTitle": "Große Schrift für Abstand",
+    "top": "Obere Zeilen",
+    "topTitle": "Mehrere Zeilen oben quer"
+  },
+  "scroll": {
+    "label": "Scrollen",
+    "modeAria": "Scroll-Modus",
+    "followVoice": "Stimme folgen",
+    "followVoiceTitle": "Scrollt, während du das Skript laut vorliest",
+    "needsChromium": "Braucht Chrome, Edge oder einen anderen Chromium-Browser",
+    "timed": "Zeitgesteuert",
+    "timedTitle": "Scrollt mit fester Geschwindigkeit",
+    "voiceForcedMissing": "Stimmverfolgung ist hier nicht verfügbar, zeitgesteuertes Scrollen wird verwendet.",
+    "voiceUnavailable": "Stimmverfolgung ist in diesem Browser nicht verfügbar."
+  },
+  "style": {
+    "title": "Textstil",
+    "fontSize": "Schriftgröße",
+    "fontSizeValue": "{{size}} px",
+    "text": "Text",
+    "background": "Hintergrund",
+    "bgOpacity": "Hintergrund-Deckkraft",
+    "mirrorText": "Text spiegeln (für einen Teleprompter-Spiegel)",
+    "voiceLanguage": "Sprache der Stimme"
+  },
+  "status": {
+    "serverErrorSwitched": "Fehler des Sprachservers ({{reason}}). Auf zeitgesteuertes Scrollen umgestellt.",
+    "voiceErrorSwitched": "{{error}} Auf zeitgesteuertes Scrollen umgestellt.",
+    "voiceStoppedSwitched": "Stimmverfolgung gestoppt. Auf zeitgesteuertes Scrollen umgestellt.",
+    "serverError": "Fehler des Sprachservers ({{reason}}).",
+    "listeningServer": "Hört zu (Server)… fang an zu lesen",
+    "connectingServer": "Verbindung zum Sprachserver wird hergestellt…",
+    "listening": "Hört zu… fang an, laut vorzulesen",
+    "startingMic": "Mikro wird gestartet…",
+    "scrollPaused": "Scrollen pausiert",
+    "timedScroll": "Zeitgesteuertes Scrollen, {{wpm}} Wörter/Min.",
+    "scrollTest": "Scroll-Test, {{wpm}} Wörter/Min."
+  },
+  "sttReason": {
+    "unreachable": "nicht erreichbar",
+    "noMic": "kein Mikrofon",
+    "audioUnavailable": "Audio nicht verfügbar",
+    "connectionFailed": "Verbindung fehlgeschlagen",
+    "unauthorized": "nicht autorisiert",
+    "closed": "geschlossen",
+    "serverError": "Serverfehler"
+  },
+  "scriptPlaceholder": "Schreib oder füge dein Skript hier ein. Während der Aufnahme scrollt es mit, wenn du laut vorliest, oder im zeitgesteuerten Modus mit fester Geschwindigkeit.",
+  "scriptModeVoice": "Scrollen: folgt deiner Stimme",
+  "scriptModeTimed": "Scrollen: zeitgesteuert, {{wpm}} Wörter/Min.",
+  "hide": "Ausblenden",
+  "dragToMove": "Zum Verschieben ziehen",
+  "dragToResize": "Zum Ändern der Größe ziehen",
+  "expandMenu": "Menü ausklappen",
+  "collapseMenu": "Menü einklappen",
+  "editScript": "Skript bearbeiten",
+  "testVoice": "Stimme testen",
+  "stopVoiceTest": "Test beenden",
+  "scrollSpeed": "Scroll-Geschwindigkeit",
+  "slower": "Langsamer",
+  "faster": "Schneller",
+  "wordsPerMin": "Wörter/Min.",
+  "testScroll": "Scrollen testen",
+  "stopScrollTest": "Scroll-Test beenden",
+  "pauseScroll": "Scrollen pausieren",
+  "resumeScroll": "Scrollen fortsetzen",
+  "hideTeleprompter": "Teleprompter ausblenden"
+}

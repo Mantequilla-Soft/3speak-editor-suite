@@ -1,0 +1,28 @@
+{
+  "render": {
+    "unreachable": "Hindi maabot ang render server. Tingnan ang koneksyon mo at i-render ulit.",
+    "stillBusy": "Abala pa ang mga render server. Pakii-render ulit pagkalipas ng ilang minuto.",
+    "unknownJob": "Hindi na kilala ng render server ang render na ito (baka nag-restart ito). Pakii-render ulit.",
+    "lostContact": "Naputol ang koneksyon sa render server. Pakii-render ulit.",
+    "serverStatus": "Sumagot ang server ng {{status}}"
+  },
+  "uploadFailed": "Pumalya ang upload: {{status}}",
+  "signIn": {
+    "loggedOut": "Mag-log in sa 3Speak para magamit ang editor.",
+    "failed": "Mag-sign in sa 3Speak para mag-upload at mag-render (kinansela o hindi gumana ang pag-sign in)."
+  },
+  "export": {
+    "failed": "Pumalya ang export",
+    "ffmpegNotLoaded": "Hindi naka-load ang FFmpeg",
+    "noClips": "Walang clip na ie-export",
+    "noCodec": "Walang nakitang suportadong video codec para sa MediaRecorder",
+    "cancelled": "Kinansela ang export",
+    "noSource": "Walang valid na file source para sa clip: {{name}}",
+    "ffmpegFailed": "Pumalya ang FFmpeg command na may exit code {{code}}"
+  },
+  "reverse": {
+    "failed": "Pumalya ang pagbaligtad",
+    "timedOut": "Nag-time out ang pagbaligtad",
+    "statusCheck": "Pumalya ang pag-check ng status: {{status}}"
+  }
+}

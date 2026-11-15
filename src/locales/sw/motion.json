@@ -1,0 +1,106 @@
+{
+  "speed": {
+    "title": "Kasi",
+    "stillFrame": "Fremu tuli",
+    "holds": "Inashikilia fremu kwenye {{time}} ya video. Ipunguze kwenye mfuatano wa muda au chagua urefu:",
+    "seconds": "sek {{value}}",
+    "speed": "Kasi",
+    "ramp": "Mabadiliko ya kasi",
+    "ramps": {
+      "montage": "Montaji",
+      "hero": "Shujaa",
+      "speedUp": "Ongeza kasi",
+      "slowDown": "Punguza kasi"
+    },
+    "rampHint": "Onyesho la awali linafuata mabadiliko kwa karibu, utengenezaji ni sahihi kabisa. Sauti inabaki na kina chake.",
+    "freeze": "Gandisha fremu",
+    "freezeLength": "Urefu wa kugandisha",
+    "freezeTitle": "Shikilia fremu iliyo chini ya kiashiria cha kucheza",
+    "freezeMoveFirst": "Sogeza kiashiria cha kucheza kwenye klipu hii kwanza",
+    "freezeAt": "Gandisha kwenye kiashiria cha kucheza",
+    "stillName": "Tuli · {{name}}",
+    "stillNameFallback": "klipu"
+  },
+  "badge": {
+    "still": "Tuli",
+    "ramp": "Mabadiliko",
+    "stillTitle": "Fremu tuli",
+    "speedTitle": "Kasi {{speed}}",
+    "rampTitle": "Mabadiliko ya kasi"
+  },
+  "keyframes": {
+    "title": "Fremu muhimu",
+    "moveHere": "Sogeza kiashiria cha kucheza kwenye klipu hii ili kuongeza fremu muhimu.",
+    "props": {
+      "x": "Mahali X",
+      "y": "Mahali Y",
+      "scale": "Kipimo",
+      "rotation": "Mzunguko",
+      "opacity": "Uangavu",
+      "volume": "Kiwango cha sauti"
+    },
+    "aria": {
+      "x": {
+        "prev": "Fremu muhimu iliyotangulia ya Mahali X",
+        "next": "Fremu muhimu inayofuata ya Mahali X",
+        "add": "Ongeza fremu muhimu ya Mahali X",
+        "remove": "Ondoa fremu muhimu ya Mahali X"
+      },
+      "y": {
+        "prev": "Fremu muhimu iliyotangulia ya Mahali Y",
+        "next": "Fremu muhimu inayofuata ya Mahali Y",
+        "add": "Ongeza fremu muhimu ya Mahali Y",
+        "remove": "Ondoa fremu muhimu ya Mahali Y"
+      },
+      "scale": {
+        "prev": "Fremu muhimu iliyotangulia ya Kipimo",
+        "next": "Fremu muhimu inayofuata ya Kipimo",
+        "add": "Ongeza fremu muhimu ya Kipimo",
+        "remove": "Ondoa fremu muhimu ya Kipimo"
+      },
+      "rotation": {
+        "prev": "Fremu muhimu iliyotangulia ya Mzunguko",
+        "next": "Fremu muhimu inayofuata ya Mzunguko",
+        "add": "Ongeza fremu muhimu ya Mzunguko",
+        "remove": "Ondoa fremu muhimu ya Mzunguko"
+      },
+      "opacity": {
+        "prev": "Fremu muhimu iliyotangulia ya Uangavu",
+        "next": "Fremu muhimu inayofuata ya Uangavu",
+        "add": "Ongeza fremu muhimu ya Uangavu",
+        "remove": "Ondoa fremu muhimu ya Uangavu"
+      },
+      "volume": {
+        "prev": "Fremu muhimu iliyotangulia ya Kiwango cha sauti",
+        "next": "Fremu muhimu inayofuata ya Kiwango cha sauti",
+        "add": "Ongeza fremu muhimu ya Kiwango cha sauti",
+        "remove": "Ondoa fremu muhimu ya Kiwango cha sauti"
+      }
+    },
+    "prev": "Fremu muhimu iliyotangulia",
+    "next": "Fremu muhimu inayofuata",
+    "add": "Ongeza fremu muhimu kwenye kiashiria cha kucheza",
+    "remove": "Ondoa fremu muhimu iliyo kwenye kiashiria cha kucheza",
+    "ease": "Lainisha kutoka hapa hadi fremu muhimu inayofuata",
+    "removeAll": "Ondoa fremu muhimu zote"
+  },
+  "kenBurns": {
+    "title": "Ken Burns",
+    "in": "Kuza ndani polepole",
+    "out": "Kuza nje polepole",
+    "pan": "Sogeza kando polepole"
+  },
+  "punch": {
+    "title": "Ukuzaji wa ghafla",
+    "hint": "Ukuzaji wa haraka mwanzoni mwa sentensi na kwenye maneno ya sauti ya juu, kutoka kwa manukuu kama yapo, vinginevyo kutoka kwa sauti.",
+    "listening": "Inasikiliza...",
+    "auto": "Ukuzaji wa ghafla wa otomatiki",
+    "remove": "Ondoa ukuzaji wa ghafla",
+    "noMoments": "Hakuna mwanzo wa sentensi wala maneno ya sauti ya juu yaliyopatikana kwenye klipu hii.",
+    "noSound": "Sauti ya klipu hii haikuweza kusomwa. Ongeza manukuu ya otomatiki kwanza, kisha ujaribu tena.",
+    "addedCaptions_one": "Ukuzaji wa ghafla {{count}} umeongezwa, kutoka kwa manukuu. Ni fremu muhimu za kawaida za Kipimo.",
+    "addedCaptions_other": "Ukuzaji wa ghafla {{count}} umeongezwa, kutoka kwa manukuu. Ni fremu muhimu za kawaida za Kipimo.",
+    "addedSound_one": "Ukuzaji wa ghafla {{count}} umeongezwa, kutoka kwa sauti. Ni fremu muhimu za kawaida za Kipimo.",
+    "addedSound_other": "Ukuzaji wa ghafla {{count}} umeongezwa, kutoka kwa sauti. Ni fremu muhimu za kawaida za Kipimo."
+  }
+}

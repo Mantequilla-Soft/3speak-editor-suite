@@ -1,0 +1,104 @@
+{
+  "speed": {
+    "title": "速度",
+    "stillFrame": "静帧",
+    "holds": "定格在视频的 {{time}} 处。可在时间线上修剪它，或选择一个时长：",
+    "seconds": "{{value}} 秒",
+    "speed": "速度",
+    "ramp": "变速曲线",
+    "ramps": {
+      "montage": "蒙太奇",
+      "hero": "英雄时刻",
+      "speedUp": "加速",
+      "slowDown": "减速"
+    },
+    "rampHint": "预览会尽量贴合变速曲线，渲染结果是精确的。声音保持原有音调。",
+    "freeze": "定格画面",
+    "freezeLength": "定格时长",
+    "freezeTitle": "定格播放头处的画面",
+    "freezeMoveFirst": "请先把播放头移到这个片段上",
+    "freezeAt": "在播放头处定格",
+    "stillName": "静帧 · {{name}}",
+    "stillNameFallback": "片段"
+  },
+  "badge": {
+    "still": "静帧",
+    "ramp": "变速",
+    "stillTitle": "静帧",
+    "speedTitle": "速度 {{speed}}",
+    "rampTitle": "变速曲线"
+  },
+  "keyframes": {
+    "title": "关键帧",
+    "moveHere": "把播放头移到这个片段上即可添加关键帧。",
+    "props": {
+      "x": "位置 X",
+      "y": "位置 Y",
+      "scale": "缩放比例",
+      "rotation": "旋转",
+      "opacity": "不透明度",
+      "volume": "音量"
+    },
+    "aria": {
+      "x": {
+        "prev": "上一个位置 X 关键帧",
+        "next": "下一个位置 X 关键帧",
+        "add": "添加位置 X 关键帧",
+        "remove": "移除位置 X 关键帧"
+      },
+      "y": {
+        "prev": "上一个位置 Y 关键帧",
+        "next": "下一个位置 Y 关键帧",
+        "add": "添加位置 Y 关键帧",
+        "remove": "移除位置 Y 关键帧"
+      },
+      "scale": {
+        "prev": "上一个缩放比例关键帧",
+        "next": "下一个缩放比例关键帧",
+        "add": "添加缩放比例关键帧",
+        "remove": "移除缩放比例关键帧"
+      },
+      "rotation": {
+        "prev": "上一个旋转关键帧",
+        "next": "下一个旋转关键帧",
+        "add": "添加旋转关键帧",
+        "remove": "移除旋转关键帧"
+      },
+      "opacity": {
+        "prev": "上一个不透明度关键帧",
+        "next": "下一个不透明度关键帧",
+        "add": "添加不透明度关键帧",
+        "remove": "移除不透明度关键帧"
+      },
+      "volume": {
+        "prev": "上一个音量关键帧",
+        "next": "下一个音量关键帧",
+        "add": "添加音量关键帧",
+        "remove": "移除音量关键帧"
+      }
+    },
+    "prev": "上一个关键帧",
+    "next": "下一个关键帧",
+    "add": "在播放头处添加关键帧",
+    "remove": "移除播放头处的关键帧",
+    "ease": "从这里到下一个关键帧使用缓动",
+    "removeAll": "移除所有关键帧"
+  },
+  "kenBurns": {
+    "title": "Ken Burns 效果",
+    "in": "缓慢放大",
+    "out": "缓慢缩小",
+    "pan": "缓慢平移"
+  },
+  "punch": {
+    "title": "快速推近",
+    "hint": "在句子开头和响亮的词上快速放大画面，有字幕时根据字幕，否则根据声音。",
+    "listening": "正在聆听...",
+    "auto": "自动快速推近",
+    "remove": "移除快速推近",
+    "noMoments": "在这个片段中没有找到句子开头或响亮的词。",
+    "noSound": "无法读取这个片段的声音。请先添加自动字幕，然后再试。",
+    "addedCaptions_other": "已根据字幕添加 {{count}} 处快速推近。它们是普通的缩放比例关键帧。",
+    "addedSound_other": "已根据声音添加 {{count}} 处快速推近。它们是普通的缩放比例关键帧。"
+  }
+}

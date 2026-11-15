@@ -1,0 +1,86 @@
+{
+  "aspect": {
+    "short": {
+      "label": "Short",
+      "hint": "Wima, hadi dakika 2, inachapishwa kama Short"
+    },
+    "landscape": {
+      "label": "Mlalo",
+      "hint": "Video ya skrini pana, hadi dakika 10"
+    },
+    "classic": {
+      "label": "Ya kawaida",
+      "hint": "Video ya 4:3, hadi dakika 10"
+    },
+    "square": {
+      "label": "Mraba",
+      "hint": "Video ya mraba, hadi dakika 10"
+    }
+  },
+  "chip": {
+    "title": "Umbo la mradi huu: {{shape}}. Bofya ili kulibadilisha",
+    "aria": "Umbo la mradi: {{shape}}"
+  },
+  "picker": {
+    "title": "Unatengeneza nini?",
+    "tooLong": "mfuatano wako wa muda ni {{length}}, upunguze hadi {{limit}} ili kutengeneza",
+    "note": "Umbo linaamua jinsi inavyokwenda 3Speak: 9:16 kama Short, mengine kama video ya kawaida. \"Hamisha kama\" inaitengeneza katika maumbo mengine pia."
+  },
+  "preview": {
+    "heading": "Onyesho la awali katika",
+    "yours": "{{aspect}} (yako)",
+    "projectIs": {
+      "short": "Mradi wako ni Short 9:16. Katika umbo jingine, picha inajaza fremu, ikikatwa kuzunguka uso uliomo.",
+      "landscape": "Mradi wako ni Mlalo 16:9. Katika umbo jingine, picha inajaza fremu, ikikatwa kuzunguka uso uliomo.",
+      "classic": "Mradi wako ni wa Kawaida 4:3. Katika umbo jingine, picha inajaza fremu, ikikatwa kuzunguka uso uliomo.",
+      "square": "Mradi wako ni Mraba 1:1. Katika umbo jingine, picha inajaza fremu, ikikatwa kuzunguka uso uliomo."
+    }
+  },
+  "faces": {
+    "heading": "Fuata nyuso",
+    "noFootage": "Bado hakuna picha za video za kupanga upya. Klipu zilizosogezwa au kukuzwa zinabaki na fremu zake.",
+    "hint": "Uso unatafutwa ndani ya kivinjari chako, fremu chache kwa sekunde. Bila uso, katikati inabaki kuonekana.",
+    "found": "Uso umepatikana",
+    "noFace": "Hakuna uso: katikati",
+    "middle": "Katikati",
+    "finding": "Inatafuta nyuso",
+    "findOne": "Tafuta uso",
+    "findMany_one": "Tafuta nyuso katika klipu {{count}}",
+    "findMany_other": "Tafuta nyuso katika klipu {{count}}",
+    "streamNamed": "{{name}} ni mtiririko: inakatwa kuzunguka katikati yake.",
+    "streamUnnamed": "Klipu moja ni mtiririko: inakatwa kuzunguka katikati yake.",
+    "failed": "Ufuatiliaji wa uso haukufanya kazi hapa: {{error}}",
+    "moveWindow": "{{name}}: sogeza dirisha",
+    "left": "Kushoto",
+    "right": "Kulia",
+    "up": "Juu",
+    "down": "Chini",
+    "moveX": "Sogeza dirisha kushoto au kulia",
+    "moveY": "Sogeza dirisha juu au chini",
+    "findAgain": "Tafuta uso tena",
+    "reset": "Katikati, bila kusogeza"
+  },
+  "clipFallback": "Klipu",
+  "stop": "Simamisha",
+  "render": {
+    "heading": "Tengeneza kama",
+    "shortsLimit": "Shorts zina upeo wa {{limit}}: punguza mfuatano wa muda ili kutengeneza ya 9:16.",
+    "button_one": "Tengeneza video {{count}}",
+    "button_other": "Tengeneza video {{count}}",
+    "failed": "Utengenezaji umeshindwa: {{error}}",
+    "download": "Pakua",
+    "postShort": "Chapisha kama Short",
+    "postVideo": "Chapisha kama video"
+  },
+  "job": {
+    "waiting": "Inasubiri...",
+    "preparing": "Inaandaa faili...",
+    "starting": "Inaanza...",
+    "rendering": "Inatengeneza...",
+    "done": "Tayari",
+    "stopped": "Imesimamishwa",
+    "busy": "Seva za utengenezaji zina shughuli nyingi. Inajaribu tena baada ya sek {{seconds}}...",
+    "offline": "Hakuna muunganisho na seva ya utengenezaji. Inajaribu tena baada ya sek {{seconds}}...",
+    "failed": "Utengenezaji umeshindwa"
+  }
+}

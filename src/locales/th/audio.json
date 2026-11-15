@@ -1,0 +1,8 @@
+{
+  "cleaning": {
+    "voice_other": "กำลังทำความสะอาดเสียงพูดของ {{count}} คลิป…",
+    "voiceRecording_other": "กำลังทำความสะอาดเสียงพูดของ {{count}} คลิป · การบันทึก {{at}} จาก {{total}}",
+    "back_other": "กำลังสลับ {{count}} คลิปกลับ…",
+    "backRecording_other": "กำลังสลับ {{count}} คลิปกลับ · การบันทึก {{at}} จาก {{total}}"
+  }
+}

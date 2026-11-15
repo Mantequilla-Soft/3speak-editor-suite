@@ -1,0 +1,117 @@
+{
+  "shorts": {
+    "welcome": {
+      "title": "Boas-vindas!",
+      "text": "Este é o editor de Shorts do 3Speak. Vamos fazer um tour rápido pelos principais recursos."
+    },
+    "preview": {
+      "title": "Prévia",
+      "text": "Esta é a prévia do seu vídeo. Você pode arrastar clipes para reposicioná-los e fazer pinça para dar zoom."
+    },
+    "timeline": {
+      "title": "Linha do tempo",
+      "text": "Organize seus clipes aqui. Arraste para reordenar, puxe as bordas para cortar."
+    },
+    "addMedia": {
+      "title": "Adicionar mídia",
+      "text": "Toque em + para adicionar vídeo, imagens, texto, áudio ou clipes de cor às suas faixas."
+    },
+    "clipSettings": {
+      "title": "Configurações do clipe",
+      "text": "Selecione um clipe e toque no ícone de engrenagem para editar propriedades como escala, posição e opacidade."
+    },
+    "render": {
+      "title": "Renderizar",
+      "text": "Quando terminar de editar, toque em Renderizar para exportar seu vídeo. Depois você pode baixar ou enviar."
+    }
+  },
+  "audio": {
+    "welcome": {
+      "title": "Este é o editor de áudio",
+      "text": "Corte, limpe e nivele um podcast, uma música ou uma nota de voz, e depois publique no 3Speak. Aqui vai uma olhada rápida no que ele faz."
+    },
+    "addAudio": {
+      "title": "Adicione seu áudio",
+      "text": "Adicione uma gravação, grave aqui mesmo ou escolha uma música da biblioteca. Arquivos de vídeo também funcionam: o editor fica só com o som. Até 3 horas."
+    },
+    "tracks": {
+      "title": "Faixas de voz e de música",
+      "text": "As gravações vão nas faixas de voz, a música na própria faixa. Arraste um clipe para movê-lo, puxe as bordas para cortar. Dê zoom com o controle deslizante ou toque em Ajustar para ver tudo."
+    },
+    "clipSettings": {
+      "title": "Configurações do clipe",
+      "text": "Selecione um clipe para ver as configurações. Limpe a voz (Forte tira ruído e zumbido e deixa a voz mais clara e uniforme) e use Atenuar: o clipe abaixa enquanto outra faixa toca. Agrupe vozes gravadas juntas para mantê-las sincronizadas."
+    },
+    "cutSilences": {
+      "title": "Cortar silêncios",
+      "text": "Encontra as pausas nas suas faixas de voz, corta e fecha os espaços. Vozes agrupadas só são cortadas onde todos estão em silêncio."
+    },
+    "template": {
+      "title": "Seu modelo",
+      "text": "Configure uma intro, uma outro e uma música de fundo uma vez. Elas entram em cada gravação nova, e seu modelo fica guardado para sempre."
+    },
+    "normalize": {
+      "title": "Normalizar",
+      "text": "Deixa a exportação num volume de podcast uniforme (-16 LUFS), para que cada episódio soe tão alto quanto o anterior. Desligue para manter seus próprios níveis."
+    },
+    "chapters": {
+      "title": "Capítulos",
+      "text": "Marque onde cada parte começa (aperte M para adicionar um no cursor de reprodução). Os capítulos vão para o MP3 e para a descrição do seu episódio."
+    },
+    "export": {
+      "title": "Exportar",
+      "text": "Exportar cria um MP3. Ouça, depois use no seu envio ou baixe. Com login, seu projeto fica guardado como rascunho enquanto você trabalha."
+    }
+  },
+  "audiogram": {
+    "intro": {
+      "title": "Audiogramas",
+      "text": "Vídeos curtos de um trecho do seu episódio: uma forma de onda em movimento, seu título e sua imagem, com o visual do 3Speak. Eles saem como Shorts do 3Speak junto com o episódio."
+    },
+    "piece": {
+      "title": "Seu trecho",
+      "text": "O trecho que você escolheu na linha do tempo, de até 2 minutos. Mude aqui quando quiser."
+    },
+    "arrange": {
+      "title": "Organize do seu jeito",
+      "text": "Arraste qualquer parte para movê-la, puxe um canto para redimensionar (Shift mantém a forma) e gire com a alça redonda embaixo dela. O logo do 3Speak sempre fica, como 3S ou como logo completo."
+    },
+    "picture": {
+      "title": "Uma imagem",
+      "text": "Envie uma ou use a capa de uma das suas playlists. Ela aparece como um cartão que você pode mover e redimensionar como as outras partes."
+    },
+    "waveform": {
+      "title": "A forma de onda",
+      "text": "Barras, linhas, um círculo ou uma onda circular, no vermelho do 3Speak ou na cor que você quiser."
+    },
+    "parts": {
+      "title": "Partes",
+      "text": "Oculte uma parte, ou traga para frente ou envie para trás quando as partes se sobrepõem."
+    },
+    "make": {
+      "title": "Crie",
+      "text": "Crie quantos quiser: cada um sai como um Short com o episódio, com texto próprio e um link para ele. Seu último visual fica guardado como modelo para o próximo."
+    }
+  },
+  "rangePick": {
+    "startEnd": {
+      "title": "Clique no início, depois no fim",
+      "text": "Clique onde o trecho deve começar e depois onde termina: até 2 minutos. Puxe as bordas para ajustar, ou arraste sobre as faixas para desenhar um trecho inteiro. Um novo clique recomeça."
+    },
+    "moveAround": {
+      "title": "Navegue",
+      "text": "Arraste a régua ou role para se mover pelo episódio. Dê zoom com o controle deslizante para um início preciso, ou toque em Ajustar para ver o episódio inteiro."
+    },
+    "listen": {
+      "title": "Ouça",
+      "text": "Tocar o trecho (ou Espaço) toca só a parte que você escolheu e depois volta ao início dela."
+    },
+    "use": {
+      "title": "Use",
+      "text": "Usar este trecho (ou Enter) leva o trecho para o seu audiograma, Cancelar (ou Esc) mantém o anterior. Até lá o resto do editor fica bloqueado, para nada mudar por acidente."
+    }
+  },
+  "buttons": {
+    "done": "Entendi!"
+  }
+}

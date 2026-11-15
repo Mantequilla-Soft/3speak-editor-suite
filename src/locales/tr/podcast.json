@@ -1,0 +1,86 @@
+{
+  "video": {
+    "title": "Video podcast",
+    "intro": "Tüm bölüm ({{length}}) 16:9 video olarak: görsel, hareketli dalga formu, altyazılar ve kimin konuştuğu. 3Speak, YouTube ve Spotify video podcastleri için.",
+    "unavailable": "Bu düzenleyici sunucusu henüz video podcast yapamıyor.",
+    "tooLong": "Video podcastler en fazla {{length}} uzunluğunda olabilir.",
+    "preview": "Video podcast önizlemesi",
+    "sampleCaption": "<b>Sözlerin</b> burada görünür",
+    "stageHint": "Dalga formu sesle birlikte hareket eder, altyazılar ve isim bölümü takip eder.",
+    "defaultLine": "*3speak.tv* üzerinde izle ve dinle",
+    "captions": "Altyazılar",
+    "captionsTranscript": "Dökümündeki kelimeler.",
+    "captionsNoStt": "Konuşmayı metne dönüştürme bu sunucuda kullanılamıyor.",
+    "captionsStt": "Sunucudaki konuşmayı metne dönüştürme ile bulunan kelimeler. Uzun bölümler biraz zaman alır.",
+    "whoSpeaks": "Kim konuşuyor",
+    "noVoices": "İsimlerin alınacağı konuşma kanalı yok.",
+    "speaker": "Konuşmacı {{n}}",
+    "speakerLabel": "Konuşma kanalı {{n}} için isim",
+    "loudest": "Her ses kendi kanalında: en yüksek sesin ismi gösterilir.",
+    "frameRate": "Kare hızı",
+    "fps15": "15 fps (daha küçük, daha hızlı)",
+    "fps24": "24 fps (daha akıcı)",
+    "finding": "Kimin ne zaman konuştuğu bulunuyor...",
+    "sending": "Gönderiliyor...",
+    "working": "Çalışılıyor...",
+    "serverAnswered": "Sunucunun yanıtı: {{status}}",
+    "lost": "İş kayboldu (sunucu yeniden mi başladı?)",
+    "stopped": "Durduruldu",
+    "signIn": "Video podcast yapmak için 3Speak'te oturum aç.",
+    "failed": "Video podcast yapılamadı: {{error}}",
+    "stop": "Durdur",
+    "make": "Video podcast yap",
+    "again": "Yeniden yap",
+    "download": "MP4 indir",
+    "subtitles": "Altyazılar (SRT)",
+    "post": "3Speak'te video olarak paylaş"
+  },
+  "template": {
+    "title": "Şablonun",
+    "signedOutIntro": "Girişini, kapanışını ve fon müziğini bir kez kaydet; her yeni kayıt tek tıkla bunları alsın. Şablonun kalıcı olarak saklanır, bu yüzden 3Speak oturumun gerekir.",
+    "signIn": "Şablon kullanmak için oturum aç",
+    "logIn": "Şablon kullanmak için 3Speak'te oturum aç.",
+    "intro": "Tek şablon, kalıcı olarak saklanır. Kaydetmek eskisinin yerini alır.",
+    "role": {
+      "intro": {
+        "title": "Giriş",
+        "hint": "İlk olarak, kaydından önce çalar.",
+        "clear": "Giriş yok"
+      },
+      "outro": {
+        "title": "Kapanış",
+        "hint": "Kaydın bittikten hemen sonra çalar.",
+        "clear": "Kapanış yok"
+      },
+      "bed": {
+        "title": "Fon müziği",
+        "hint": "Tüm kaydın altında hafif müzik; uzunluğa göre döngüye alınır, sonda kısılır.",
+        "clear": "Fon müziği yok"
+      }
+    },
+    "useSelected": "\"{{name}}\" kullan (kırptığın kısım)",
+    "selectFirst": "Önce zaman çizelgesinde yüklenmiş bir ses klibi seç",
+    "selectedClip": "Seçili klip",
+    "file": "Dosya",
+    "volume": "Ses düzeyi",
+    "bedVolume": "Fon müziği ses düzeyi",
+    "loop": "Tüm kaydı dolduracak şekilde döngüye al",
+    "cutSilences": "Her yeni kayıttaki sessizlikleri kes <small>(Sessizlikleri kes ayarlarınla)</small>",
+    "loudness": "Ses yüksekliğini podcastler için dengele <small>(-16 LUFS, dışa aktarırken uygulanır)</small>",
+    "duck": "Biri konuşurken müziği kıs <small>(fon müziğinde {{db}} dB; klibin ayarlarından değiştir)</small>",
+    "autoApply": "Bir kayıt açtığımda kendiliğinden uygula",
+    "signInUpload": "Yüklemek için 3Speak'te oturum aç.",
+    "uploadFailed": "Bu dosya yüklenemedi. Başka birini dene.",
+    "deleteForGood": "Kalıcı olarak sil",
+    "delete": "Şablonu sil",
+    "saveApply": "Kaydet ve uygula",
+    "voiceTrack": "Konuşma",
+    "bedTrack": "Fon müziği"
+  },
+  "stage": {
+    "empty": "Başlamak için bir kayıt ekle, kayıt yap ya da müzik seç.",
+    "chapter": "Kısım",
+    "position": "Programdaki konum",
+    "positionText": "{{at}} / {{total}}"
+  }
+}

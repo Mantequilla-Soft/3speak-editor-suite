@@ -1,0 +1,108 @@
+{
+  "speed": {
+    "title": "Velocidad",
+    "stillFrame": "Imagen fija",
+    "holds": "Congela el fotograma en {{time}} del video. Recórtalo en la línea de tiempo o elige una duración:",
+    "seconds": "{{value}} s",
+    "speed": "Velocidad",
+    "ramp": "Rampa de velocidad",
+    "ramps": {
+      "montage": "Montaje",
+      "hero": "Héroe",
+      "speedUp": "Acelerar",
+      "slowDown": "Ralentizar"
+    },
+    "rampHint": "La vista previa sigue la rampa de cerca, el renderizado es exacto. El sonido mantiene su tono.",
+    "freeze": "Congelar imagen",
+    "freezeLength": "Duración de la congelación",
+    "freezeTitle": "Congelar el fotograma bajo el cabezal",
+    "freezeMoveFirst": "Primero mueve el cabezal sobre este clip",
+    "freezeAt": "Congelar en el cabezal",
+    "stillName": "Fija · {{name}}",
+    "stillNameFallback": "clip"
+  },
+  "badge": {
+    "still": "Fija",
+    "ramp": "Rampa",
+    "stillTitle": "Imagen fija",
+    "speedTitle": "Velocidad {{speed}}",
+    "rampTitle": "Rampa de velocidad"
+  },
+  "keyframes": {
+    "title": "Fotogramas clave",
+    "moveHere": "Mueve el cabezal sobre este clip para añadir fotogramas clave.",
+    "props": {
+      "x": "Posición X",
+      "y": "Posición Y",
+      "scale": "Escala",
+      "rotation": "Rotación",
+      "opacity": "Opacidad",
+      "volume": "Volumen"
+    },
+    "aria": {
+      "x": {
+        "prev": "Fotograma clave anterior de Posición X",
+        "next": "Fotograma clave siguiente de Posición X",
+        "add": "Añadir fotograma clave de Posición X",
+        "remove": "Quitar fotograma clave de Posición X"
+      },
+      "y": {
+        "prev": "Fotograma clave anterior de Posición Y",
+        "next": "Fotograma clave siguiente de Posición Y",
+        "add": "Añadir fotograma clave de Posición Y",
+        "remove": "Quitar fotograma clave de Posición Y"
+      },
+      "scale": {
+        "prev": "Fotograma clave anterior de Escala",
+        "next": "Fotograma clave siguiente de Escala",
+        "add": "Añadir fotograma clave de Escala",
+        "remove": "Quitar fotograma clave de Escala"
+      },
+      "rotation": {
+        "prev": "Fotograma clave anterior de Rotación",
+        "next": "Fotograma clave siguiente de Rotación",
+        "add": "Añadir fotograma clave de Rotación",
+        "remove": "Quitar fotograma clave de Rotación"
+      },
+      "opacity": {
+        "prev": "Fotograma clave anterior de Opacidad",
+        "next": "Fotograma clave siguiente de Opacidad",
+        "add": "Añadir fotograma clave de Opacidad",
+        "remove": "Quitar fotograma clave de Opacidad"
+      },
+      "volume": {
+        "prev": "Fotograma clave anterior de Volumen",
+        "next": "Fotograma clave siguiente de Volumen",
+        "add": "Añadir fotograma clave de Volumen",
+        "remove": "Quitar fotograma clave de Volumen"
+      }
+    },
+    "prev": "Fotograma clave anterior",
+    "next": "Fotograma clave siguiente",
+    "add": "Añadir un fotograma clave en el cabezal",
+    "remove": "Quitar el fotograma clave del cabezal",
+    "ease": "Suavizar desde aquí hasta el siguiente fotograma clave",
+    "removeAll": "Quitar todos los fotogramas clave"
+  },
+  "kenBurns": {
+    "title": "Ken Burns",
+    "in": "Zoom lento hacia dentro",
+    "out": "Zoom lento hacia fuera",
+    "pan": "Paneo lento"
+  },
+  "punch": {
+    "title": "Zooms rápidos",
+    "hint": "Acercamientos rápidos al inicio de las frases y en las palabras fuertes, a partir de los subtítulos si los hay, si no, a partir del sonido.",
+    "listening": "Escuchando...",
+    "auto": "Zooms rápidos automáticos",
+    "remove": "Quitar zooms rápidos",
+    "noMoments": "No se encontraron inicios de frase ni palabras fuertes en este clip.",
+    "noSound": "No se pudo leer el sonido de este clip. Primero añade subtítulos automáticos y vuelve a intentarlo.",
+    "addedCaptions_one": "Se añadió {{count}} zoom rápido a partir de los subtítulos. Son fotogramas clave normales de Escala.",
+    "addedCaptions_many": "Se añadieron {{count}} de zooms rápidos a partir de los subtítulos. Son fotogramas clave normales de Escala.",
+    "addedCaptions_other": "Se añadieron {{count}} zooms rápidos a partir de los subtítulos. Son fotogramas clave normales de Escala.",
+    "addedSound_one": "Se añadió {{count}} zoom rápido a partir del sonido. Son fotogramas clave normales de Escala.",
+    "addedSound_many": "Se añadieron {{count}} de zooms rápidos a partir del sonido. Son fotogramas clave normales de Escala.",
+    "addedSound_other": "Se añadieron {{count}} zooms rápidos a partir del sonido. Son fotogramas clave normales de Escala."
+  }
+}

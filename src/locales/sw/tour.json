@@ -1,0 +1,117 @@
+{
+  "shorts": {
+    "welcome": {
+      "title": "Karibu!",
+      "text": "Karibu kwenye Kihariri cha Shorts cha 3Speak. Hebu tuangalie kwa haraka vipengele vikuu."
+    },
+    "preview": {
+      "title": "Onyesho la awali",
+      "text": "Hili ni onyesho la awali la video yako. Unaweza kuburuta klipu ili kuzibadilisha mahali na kubana ili kukuza."
+    },
+    "timeline": {
+      "title": "Mfuatano wa muda",
+      "text": "Panga klipu zako hapa. Buruta ili kupanga upya, badilisha kingo ili kupunguza."
+    },
+    "addMedia": {
+      "title": "Ongeza midia",
+      "text": "Gusa + ili kuongeza klipu za video, picha, maandishi, sauti au rangi kwenye njia zako."
+    },
+    "clipSettings": {
+      "title": "Mipangilio ya klipu",
+      "text": "Chagua klipu na ugusa ikoni ya gia ili kuhariri sifa zake kama kipimo, mahali na uangavu."
+    },
+    "render": {
+      "title": "Tengeneza",
+      "text": "Ukimaliza kuhariri, bonyeza Tengeneza ili kuhamisha video yako. Kisha unaweza kuipakua au kuituma."
+    }
+  },
+  "audio": {
+    "welcome": {
+      "title": "Karibu kwenye Kihariri cha Sauti",
+      "text": "Kata, safisha na sawazisha podikasti, wimbo au ujumbe wa sauti, kisha uichapishe kwenye 3Speak. Hapa kuna mtazamo wa haraka wa kinachoweza kufanya."
+    },
+    "addAudio": {
+      "title": "Ongeza sauti yako",
+      "text": "Ongeza rekodi, rekodi hapa hapa, au chagua muziki kutoka maktaba. Faili za video zinafanya kazi pia: kihariri kinahifadhi sauti pekee. Hadi saa 3."
+    },
+    "tracks": {
+      "title": "Njia za sauti ya mazungumzo na muziki",
+      "text": "Rekodi zinakaa kwenye njia za sauti ya mazungumzo, muziki kwenye njia yake. Buruta klipu ili kuisogeza, vuta kingo zake ili kupunguza. Kuza kwa kitelezi, au gusa Tosha ili kuona yote."
+    },
+    "clipSettings": {
+      "title": "Mipangilio ya klipu",
+      "text": "Chagua klipu ili kuona mipangilio yake. Safisha sauti (Kali inaondoa kelele na mvumo na kuifanya iwe wazi na sawa zaidi), na Fifisha: klipu inashuka wakati njia nyingine inacheza. Weka kwenye kikundi sauti zilizorekodiwa pamoja ili zibaki sambamba."
+    },
+    "cutSilences": {
+      "title": "Kata ukimya",
+      "text": "Inatafuta mapumziko kwenye njia zako za sauti ya mazungumzo, inayakata na kuziba mapengo. Sauti zilizo kwenye kikundi zinakatwa tu pale kila mtu yuko kimya."
+    },
+    "template": {
+      "title": "Kiolezo chako",
+      "text": "Weka utangulizi, hitimisho na muziki wa usuli mara moja. Vinaingia kwenye kila rekodi mpya, na kiolezo chako kinahifadhiwa daima."
+    },
+    "normalize": {
+      "title": "Sawazisha",
+      "text": "Inaleta faili linalohamishwa kwenye kiwango sawa cha sauti ya podikasti (-16 LUFS), ili kila kipindi kisikike kwa sauti sawa na kilichotangulia. Kizime ili kubaki na viwango vyako mwenyewe."
+    },
+    "chapters": {
+      "title": "Sura",
+      "text": "Weka alama mahali kila sehemu inapoanza (bonyeza M ili kuongeza moja kwenye kiashiria cha kucheza). Sura zinaingia kwenye MP3 na kwenye maelezo ya kipindi chako."
+    },
+    "export": {
+      "title": "Hamisha",
+      "text": "Kuhamisha kunatengeneza MP3. Isikilize, kisha uitumie kwa upakiaji wako au uipakue. Ukiwa umeingia, mradi wako unahifadhiwa kama rasimu unapofanya kazi."
+    }
+  },
+  "audiogram": {
+    "intro": {
+      "title": "Audiogramu",
+      "text": "Video fupi za kipande cha kipindi chako: mawimbi ya sauti yanayosogea, kichwa na picha yako, kwa mwonekano wa 3Speak. Zinachapishwa kama Shorts za 3Speak pamoja na kipindi."
+    },
+    "piece": {
+      "title": "Kipande chako",
+      "text": "Kipande ulichochagua kwenye mfuatano wa muda, hadi dakika 2. Kibadilishe hapa wakati wowote."
+    },
+    "arrange": {
+      "title": "Panga upendavyo",
+      "text": "Buruta sehemu yoyote ili kuisogeza, vuta pembe ili kubadilisha ukubwa (Shift inahifadhi umbo), na uizungushe kwa kishikio cha duara kilicho chini yake. Nembo ya 3Speak inabaki kila wakati, kama 3S au nembo kamili."
+    },
+    "picture": {
+      "title": "Picha",
+      "text": "Pakia moja au chukua jalada la mojawapo ya orodha zako za kucheza. Inaonekana kama kadi unayoweza kusogeza na kubadilisha ukubwa kama sehemu nyingine."
+    },
+    "waveform": {
+      "title": "Mawimbi ya sauti",
+      "text": "Pau, mistari, duara au wimbi la duara, kwa nyekundu ya 3Speak au rangi yoyote unayopenda."
+    },
+    "parts": {
+      "title": "Sehemu",
+      "text": "Ficha sehemu, au ilete mbele au uipeleke nyuma sehemu zinapopishana."
+    },
+    "make": {
+      "title": "Itengeneze",
+      "text": "Tengeneza nyingi kadri upendavyo: kila moja inachapishwa kama Short pamoja na kipindi, ikiwa na maandishi yake na kiungo chake. Mwonekano wako wa mwisho unahifadhiwa kama kiolezo cha inayofuata."
+    }
+  },
+  "rangePick": {
+    "startEnd": {
+      "title": "Bofya mwanzo, kisha mwisho",
+      "text": "Bofya mahali kipande kinapopaswa kuanza, kisha mahali kinapoishia: hadi dakika 2. Vuta kingo zake ili kukirekebisha, au buruta kwenye njia ili kuchora kipande kizima. Kubofya upya kunaanza upya."
+    },
+    "moveAround": {
+      "title": "Zunguka",
+      "text": "Buruta rula au sogeza ili kupitia kipindi. Kuza kwa kitelezi ili kupata mwanzo sahihi, au gusa Tosha ili kuona kipindi kizima."
+    },
+    "listen": {
+      "title": "Kisikilize",
+      "text": "Cheza kipande (au nafasi) kinacheza sehemu uliyochagua pekee, kisha kinarudi mwanzo wake."
+    },
+    "use": {
+      "title": "Kitumie",
+      "text": "Tumia kipande hiki (au Enter) kinakirudisha kwenye audiogramu yako, Ghairi (au Escape) kinabaki na cha zamani. Hadi wakati huo sehemu nyingine ya kihariri imefungwa, ili kisibadilike kitu kingine kwa bahati mbaya."
+    }
+  },
+  "buttons": {
+    "done": "Nimeelewa!"
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "textFx": {
+    "title": "텍스트 효과",
+    "outline": "외곽선",
+    "outlineColour": "외곽선 색상",
+    "outlineWidth": "외곽선 두께",
+    "wordsComeIn": "단어 등장",
+    "allAtOnce": "한꺼번에",
+    "atOnce": "한 번에",
+    "anims": {
+      "pop": "팝",
+      "fadeUp": "페이드 업",
+      "typewriter": "타자기",
+      "slide": "슬라이드"
+    },
+    "gap": "간격",
+    "gapSeconds": "단어 사이 시간 (초)",
+    "defaultText": "텍스트"
+  },
+  "templates": {
+    "dialogTitle": "제목",
+    "allTitles": "모든 제목",
+    "overVideo": "동영상 위",
+    "ownBackground": "자체 배경",
+    "starsHint": "단어를 *별표*로 감싸면 색이 입혀져요.",
+    "addTitle": "제목 추가",
+    "groups": {
+      "lower": "하단 자막",
+      "title": "동영상 위의 제목",
+      "card": "인트로와 아웃트로 카드"
+    },
+    "fields": {
+      "name": "이름",
+      "role": "직함",
+      "lines": "줄",
+      "words": "단어",
+      "lineUnder": "그 아래 한 줄",
+      "lineInFront": "앞의 한 줄",
+      "rows": "줄",
+      "headline": "헤드라인",
+      "lineUnderIt": "그 아래 한 줄",
+      "tagline": "태그라인",
+      "cta": "행동 유도 (CTA)",
+      "smallPrint": "작은 글씨"
+    },
+    "items": {
+      "lowerName": {
+        "label": "이름과 직함",
+        "sub": "3Speak 크리에이터"
+      },
+      "lowerStatement": {
+        "label": "짧은 문구",
+        "lines": "오늘 *배운*\n세 가지"
+      },
+      "titleWords": {
+        "label": "한 번에 한 단어",
+        "words": "계획.\n촬영.\n*게시.*",
+        "line": "3Speak에서 보낸 나의 한 주"
+      },
+      "titleKinetic": {
+        "label": "단어가 쾅 들어와요",
+        "words": "빠르게\n간단하게\n나답게",
+        "line": "*3Speak*에서 제작"
+      },
+      "titlePoster": {
+        "label": "거대하게 쌓은 단어",
+        "words": "첫\n날.",
+        "sub": "0부터 시작"
+      },
+      "titleMarquee": {
+        "label": "흐르는 줄",
+        "rows": "계획\n촬영\n게시\n반복",
+        "line": "매*주*"
+      },
+      "cardHook": {
+        "label": "인트로: 첫 문구",
+        "lines": "내가\n*쇼츠*를\n편집하는 법",
+        "sub": "1분 안에"
+      },
+      "cardEnd": {
+        "label": "아웃트로: 팔로우해 주세요",
+        "tagline": "*매주* 새 쇼츠",
+        "cta": "3Speak에서 팔로우"
+      },
+      "cardPoster": {
+        "label": "아웃트로: 거대한 단어",
+        "words": "곧\n또\n*만나요.*",
+        "cta": "3Speak에서 팔로우"
+      }
+    }
+  },
+  "scene": {
+    "title": "제목",
+    "onePerLine": "한 줄에 하나씩",
+    "colours": "색상",
+    "font": "글꼴",
+    "overVideo": "동영상 위",
+    "length": "길이",
+    "lengthSeconds": "길이 (초)",
+    "defaultName": "나",
+    "layerTitle": "제목"
+  },
+  "colors": {
+    "ember": "엠버",
+    "amber": "앰버",
+    "ocean": "오션",
+    "forest": "포레스트",
+    "berry": "베리",
+    "paper": "페이퍼"
+  }
+}

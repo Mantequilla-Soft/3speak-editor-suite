@@ -1,0 +1,64 @@
+{
+  "title": "Stickers",
+  "search": "Buscar stickers",
+  "textBoxes": "Caixas de texto",
+  "loading": "Carregando stickers...",
+  "noMatch": "Nenhum sticker corresponde.",
+  "tileTitle": "{{name}} (entra no cursor de reprodução)",
+  "note": "Os stickers entram no cursor de reprodução por 3 segundos. Arraste, redimensione ou corte como qualquer clipe; as caixas de texto continuam editáveis.",
+  "categories": {
+    "emoji": "Emojis",
+    "badges": "Selos",
+    "shapes": "Setas e formas",
+    "branding": "Marca"
+  },
+  "presets": {
+    "caption": {
+      "title": "Legenda",
+      "text": "Sua legenda aqui"
+    },
+    "highlight": {
+      "title": "Destaque",
+      "text": "Imperdível!"
+    },
+    "brand": {
+      "title": "Vermelho 3Speak",
+      "text": "Vídeo novo"
+    },
+    "bubble": {
+      "title": "Balão",
+      "text": "Oi, tudo bem?"
+    },
+    "outline": {
+      "title": "Contorno",
+      "text": "Olha isso"
+    },
+    "neon": {
+      "title": "Neon",
+      "text": "HOJE À NOITE"
+    },
+    "title": {
+      "title": "Título grande",
+      "text": "GRANDE NOTÍCIA"
+    },
+    "comic": {
+      "title": "Quadrinhos",
+      "text": "BUM!"
+    },
+    "marker": {
+      "title": "Marcador",
+      "text": "feito à mão"
+    },
+    "quote": {
+      "title": "Citação",
+      "text": "“Diga bem.”"
+    },
+    "tag": {
+      "title": "Hashtag"
+    },
+    "minimal": {
+      "title": "Minimalista",
+      "text": "simples e limpo"
+    }
+  }
+}

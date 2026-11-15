@@ -1,0 +1,64 @@
+{
+  "title": "贴纸",
+  "search": "搜索贴纸",
+  "textBoxes": "文本框",
+  "loading": "正在加载贴纸...",
+  "noMatch": "没有匹配的贴纸。",
+  "tileTitle": "{{name}}（添加到播放头处）",
+  "note": "贴纸会添加在播放头处，持续 3 秒。可以像其他片段一样拖动、调整大小或修剪；文本框仍可编辑。",
+  "categories": {
+    "emoji": "表情",
+    "badges": "徽章",
+    "shapes": "箭头和形状",
+    "branding": "品牌"
+  },
+  "presets": {
+    "caption": {
+      "title": "说明文字",
+      "text": "在这里输入说明文字"
+    },
+    "highlight": {
+      "title": "高亮",
+      "text": "必看！"
+    },
+    "brand": {
+      "title": "3Speak 红",
+      "text": "新视频"
+    },
+    "bubble": {
+      "title": "气泡",
+      "text": "你好呀！"
+    },
+    "outline": {
+      "title": "描边",
+      "text": "看这里"
+    },
+    "neon": {
+      "title": "霓虹",
+      "text": "今晚"
+    },
+    "title": {
+      "title": "大标题",
+      "text": "重大消息"
+    },
+    "comic": {
+      "title": "漫画",
+      "text": "砰！"
+    },
+    "marker": {
+      "title": "马克笔",
+      "text": "手工制作"
+    },
+    "quote": {
+      "title": "引用",
+      "text": "“好好说。”"
+    },
+    "tag": {
+      "title": "话题标签"
+    },
+    "minimal": {
+      "title": "极简",
+      "text": "简单干净"
+    }
+  }
+}

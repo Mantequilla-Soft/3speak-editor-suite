@@ -1,0 +1,53 @@
+{
+  "title": "লুক",
+  "noEffects": "কোনো ইফেক্ট নেই",
+  "presetsLabel": "লুক প্রিসেট",
+  "doubleClickReset": "রিসেট করতে ডাবল-ক্লিক করুন",
+  "presets": {
+    "original": "অরিজিনাল",
+    "warm": "উষ্ণ",
+    "cool": "শীতল",
+    "vivid": "উজ্জ্বল",
+    "matte": "ম্যাট",
+    "bw": "সাদাকালো",
+    "vintage": "ভিন্টেজ",
+    "tealorange": "টিল ও কমলা",
+    "fade": "ফিকে",
+    "noir": "নোয়া",
+    "sunset": "সূর্যাস্ত"
+  },
+  "sliders": {
+    "blur": "ব্লার",
+    "vignette": "ভিনিয়েট",
+    "sharpen": "শার্প",
+    "split": "টিল ও কমলা"
+  },
+  "transition": {
+    "title": "ট্রানজিশন",
+    "none": "নেই",
+    "types": {
+      "crossfade": "ক্রসফেড",
+      "dissolve": "কালোয় মিলিয়ে যাওয়া",
+      "slideleft": "বাঁয়ে স্লাইড",
+      "slideright": "ডানে স্লাইড",
+      "slideup": "উপরে স্লাইড",
+      "zoom": "জুম",
+      "whip": "হুইপ"
+    },
+    "length": "ট্রানজিশনের দৈর্ঘ্য (সেকেন্ড)",
+    "fades": "ফেড",
+    "noFades": "কোনো ফেড নেই",
+    "in": "ইন",
+    "out": "আউট",
+    "fadeInSeconds": "ফেড ইন (সেকেন্ড)",
+    "fadeOutSeconds": "ফেড আউট (সেকেন্ড)",
+    "intoNext": "পরের ক্লিপে",
+    "needNext": "ট্রানজিশন যোগ করতে একই ট্র্যাকে এর ঠিক পরে একটি ক্লিপ রাখুন।",
+    "fromTo": "{{from}} থেকে {{to}}-এ",
+    "fromUnnamed": "ক্লিপ থেকে {{to}}-এ",
+    "toUnnamed": "{{from}} থেকে পরের ক্লিপে",
+    "bothUnnamed": "ক্লিপ থেকে পরের ক্লিপে",
+    "add": "ট্রানজিশন যোগ করুন",
+    "cutLabel": "{{type}}, {{seconds}} সে"
+  }
+}

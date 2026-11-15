@@ -1,0 +1,12 @@
+{
+  "cleaning": {
+    "voice_one": "{{count}} क्लिप की आवाज़ साफ़ की जा रही है…",
+    "voice_other": "{{count}} क्लिप की आवाज़ साफ़ की जा रही है…",
+    "voiceRecording_one": "{{count}} क्लिप की आवाज़ साफ़ की जा रही है · {{total}} में से रिकॉर्डिंग {{at}}",
+    "voiceRecording_other": "{{count}} क्लिप की आवाज़ साफ़ की जा रही है · {{total}} में से रिकॉर्डिंग {{at}}",
+    "back_one": "{{count}} क्लिप वापस बदली जा रही है…",
+    "back_other": "{{count}} क्लिप वापस बदली जा रही हैं…",
+    "backRecording_one": "{{count}} क्लिप वापस बदली जा रही है · {{total}} में से रिकॉर्डिंग {{at}}",
+    "backRecording_other": "{{count}} क्लिप वापस बदली जा रही हैं · {{total}} में से रिकॉर्डिंग {{at}}"
+  }
+}

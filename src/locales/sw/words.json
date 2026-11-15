@@ -1,0 +1,59 @@
+{
+  "panel": {
+    "title": "Nakala",
+    "close": "Funga nakala"
+  },
+  "cutNotice": {
+    "plain": "Imekatwa: fupi zaidi kwa sek {{seconds}}.",
+    "words_one": "Neno {{count}} limekatwa: fupi zaidi kwa sek {{seconds}}.",
+    "words_other": "Maneno {{count}} yamekatwa: fupi zaidi kwa sek {{seconds}}.",
+    "found_one": "{{count}} iliyopatikana imekatwa: fupi zaidi kwa sek {{seconds}}.",
+    "found_other": "{{count}} zilizopatikana zimekatwa: fupi zaidi kwa sek {{seconds}}.",
+    "fillers": "{{fillers}}, {{pauses}} zimekatwa: fupi zaidi kwa sek {{seconds}}.",
+    "dismiss": "Funga"
+  },
+  "fillers": {
+    "title": "Ondoa maneno ya kujaza na mapumziko",
+    "emptyHint": "Inafanya kazi kupitia nakala: inatafuta \"aa\", \"mm\", \"unajua\" na mengine kama hayo katika lugha ya kipindi, pamoja na mapumziko marefu.",
+    "listening": "Inasikiliza...",
+    "transcribeFirst": "Andika nakala ya kipindi kwanza",
+    "checking": "Inakagua seva...",
+    "unavailable": "Nakala hazipatikani kwenye seva hii ya kihariri kwa sasa.",
+    "intro": "Maneno ya kujaza katika {{language}}. Sikiliza kila moja, ondoa alama kwa yale yanayopaswa kubaki.",
+    "introNoList": "Maneno ya kujaza katika {{language}} (ni \"aa\", \"mm\" na mengine kama hayo tu: bado hakuna orodha ya lugha hii). Sikiliza kila moja, ondoa alama kwa yale yanayopaswa kubaki.",
+    "stillTranscribing": "Sehemu iliyobaki ya kipindi bado inaandikwa nakala.",
+    "fillerWords": "Maneno ya kujaza",
+    "longPauses": "Mapumziko marefu",
+    "minPause": "Pumziko refu kuliko <strong>sek {{seconds}}</strong>",
+    "keepPause": "Fupisha mapumziko hadi <strong>sek {{seconds}}</strong>",
+    "keepPauseTitle": "Kinachobaki cha pumziko refu baada ya mkato",
+    "fillerCount_one": "neno {{count}} la kujaza",
+    "fillerCount_other": "maneno {{count}} ya kujaza",
+    "pauseCount_one": "pumziko {{count}}",
+    "pauseCount_other": "mapumziko {{count}}",
+    "summary": "{{fillers}}, {{pauses}} zimewekwa alama · inakata sek {{seconds}}",
+    "nothingFound": "Hakuna kilichopatikana kwa mipangilio hii.",
+    "tickAllFillers": "Weka alama maneno yote ya kujaza",
+    "untickAllFillers": "Ondoa alama maneno yote ya kujaza",
+    "tickAllPauses": "Weka alama mapumziko yote",
+    "untickAllPauses": "Ondoa alama mapumziko yote",
+    "listLabel": "Kitakachokatwa",
+    "item": {
+      "keepPause": "Baki na pumziko hili",
+      "cutPause": "Kata pumziko hili",
+      "keepFiller": "Baki na {{text}}",
+      "cutFiller": "Kata {{text}}",
+      "stop": "Simamisha",
+      "listenTitle": "Sikiliza (pamoja na sekunde moja kuzunguka)",
+      "listenAt": "Sikiliza kwenye {{time}}",
+      "pause": "Pumziko",
+      "pauseLength": "sek {{length}} → sek {{kept}}",
+      "filler": "Neno la kujaza",
+      "fillerTitle": "Sauti ya kusita",
+      "maybe": "Huenda",
+      "maybeTitle": "Neno la kujaza hapa (limetengwa kwa mapumziko au koma): sikiliza kwanza"
+    },
+    "cut": "Kata",
+    "cutCount": "Kata {{n}} (sek {{seconds}})"
+  }
+}

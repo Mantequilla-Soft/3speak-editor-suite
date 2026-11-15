@@ -1,0 +1,63 @@
+{
+  "panel": {
+    "title": "Transcripción",
+    "close": "Cerrar la transcripción"
+  },
+  "cutNotice": {
+    "plain": "Cortado: {{seconds}} s más corto.",
+    "words_one": "Se cortó {{count}} palabra: {{seconds}} s más corto.",
+    "words_many": "Se cortaron {{count}} de palabras: {{seconds}} s más corto.",
+    "words_other": "Se cortaron {{count}} palabras: {{seconds}} s más corto.",
+    "found_one": "Se cortó {{count}} coincidencia: {{seconds}} s más corto.",
+    "found_many": "Se cortaron {{count}} de coincidencias: {{seconds}} s más corto.",
+    "found_other": "Se cortaron {{count}} coincidencias: {{seconds}} s más corto.",
+    "fillers": "Se cortaron {{fillers}}, {{pauses}}: {{seconds}} s más corto.",
+    "dismiss": "Descartar"
+  },
+  "fillers": {
+    "title": "Quitar muletillas y pausas",
+    "emptyHint": "Funciona a partir de la transcripción: encuentra \"eh\", \"este\", \"o sea\" y similares en el idioma del programa, y las pausas largas.",
+    "listening": "Escuchando...",
+    "transcribeFirst": "Primero transcribe el programa",
+    "checking": "Comprobando el servidor...",
+    "unavailable": "Las transcripciones no están disponibles en este servidor del editor ahora mismo.",
+    "intro": "Muletillas en {{language}}. Escucha cada una y desmarca lo que debe quedarse.",
+    "introNoList": "Muletillas en {{language}} (solo \"eh\", \"em\" y similares: aún no hay lista para este idioma). Escucha cada una y desmarca lo que debe quedarse.",
+    "stillTranscribing": "El resto del programa todavía se está transcribiendo.",
+    "fillerWords": "Muletillas",
+    "longPauses": "Pausas largas",
+    "minPause": "Pausa de más de <strong>{{seconds}} s</strong>",
+    "keepPause": "Acortar pausas a <strong>{{seconds}} s</strong>",
+    "keepPauseTitle": "Lo que queda de una pausa larga después del corte",
+    "fillerCount_one": "{{count}} muletilla",
+    "fillerCount_many": "{{count}} de muletillas",
+    "fillerCount_other": "{{count}} muletillas",
+    "pauseCount_one": "{{count}} pausa",
+    "pauseCount_many": "{{count}} de pausas",
+    "pauseCount_other": "{{count}} pausas",
+    "summary": "{{fillers}}, {{pauses}} marcadas · corta {{seconds}} s",
+    "nothingFound": "No se encontró nada con estos ajustes.",
+    "tickAllFillers": "Marcar todas las muletillas",
+    "untickAllFillers": "Desmarcar todas las muletillas",
+    "tickAllPauses": "Marcar todas las pausas",
+    "untickAllPauses": "Desmarcar todas las pausas",
+    "listLabel": "Lo que se cortaría",
+    "item": {
+      "keepPause": "Mantener esta pausa",
+      "cutPause": "Cortar esta pausa",
+      "keepFiller": "Mantener {{text}}",
+      "cutFiller": "Cortar {{text}}",
+      "stop": "Detener",
+      "listenTitle": "Escuchar (con un segundo alrededor)",
+      "listenAt": "Escuchar en {{time}}",
+      "pause": "Pausa",
+      "pauseLength": "{{length}} s → {{kept}} s",
+      "filler": "Muletilla",
+      "fillerTitle": "Un sonido de duda",
+      "maybe": "Quizás",
+      "maybeTitle": "Posible muletilla (entre pausas o comas): escucha primero"
+    },
+    "cut": "Cortar",
+    "cutCount": "Cortar {{n}} ({{seconds}} s)"
+  }
+}

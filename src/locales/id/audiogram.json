@@ -1,0 +1,180 @@
+{
+  "title": "Audiogram",
+  "tour": {
+    "again": "Tampilkan tur lagi",
+    "againLabel": "Tampilkan tur audiogram lagi"
+  },
+  "saveAndClose": "Simpan dan tutup",
+  "saveAndCloseTitle": "Audiogrammu tetap bersama audio ini dan ikut terbit sebagai Shorts",
+  "loadError": "Pengaturan audiogram tidak dapat dimuat: {{error}}",
+  "loadingLook": "Memuat tampilan audiogrammu…",
+  "start": {
+    "title": "Pilih potongan dari episode",
+    "text_other": "Audiogram adalah video pendek dari potongan episodemu, hingga {{count}} menit. Ia terbit sebagai Short 3Speak bersama audionya. Mulailah dengan menandai awal dan akhirnya di linimasa.",
+    "choose": "Pilih di linimasa"
+  },
+  "stage": {
+    "label": "Pratinjau audiogram: seret bagian untuk memindahkannya, sudut untuk mengubah ukuran, gagang bulat untuk memutar",
+    "frameTitle": "Pratinjau audiogram",
+    "turned": "{{name}} · {{angle}}°",
+    "rotate": "Putar (Shift: langkah 15°). Klik dua kali: lurus",
+    "hint": "Seret bagian, tarik sudut untuk mengubah ukuran (Shift menjaga bentuk), gagang bulat untuk memutar. Tombol panah menggeser, [ dan ] memutar.",
+    "hintTemplate": "Seret bagian, tarik sudut untuk mengubah ukuran (Shift menjaga bentuk), gagang bulat untuk memutar. Tombol panah menggeser, [ dan ] memutar. Audiogram terakhirmu jadi titik awal."
+  },
+  "layer": {
+    "logo": {
+      "name": "Logo 3Speak",
+      "drag": "Logo 3Speak: seret untuk memindahkan",
+      "dragSelected": "Logo 3Speak: seret untuk memindahkan, sudut untuk mengubah ukuran, gagang bulat untuk memutar"
+    },
+    "cover": {
+      "name": "Gambar",
+      "drag": "Gambar: seret untuk memindahkan",
+      "dragSelected": "Gambar: seret untuk memindahkan, sudut untuk mengubah ukuran, gagang bulat untuk memutar",
+      "hide": "Sembunyikan Gambar",
+      "show": "Tampilkan Gambar",
+      "forward": "Majukan Gambar",
+      "back": "Mundurkan Gambar"
+    },
+    "title": {
+      "name": "Judul",
+      "drag": "Judul: seret untuk memindahkan",
+      "dragSelected": "Judul: seret untuk memindahkan, sudut untuk mengubah ukuran, gagang bulat untuk memutar",
+      "hide": "Sembunyikan Judul",
+      "show": "Tampilkan Judul",
+      "forward": "Majukan Judul",
+      "back": "Mundurkan Judul"
+    },
+    "line": {
+      "name": "Baris",
+      "drag": "Baris: seret untuk memindahkan",
+      "dragSelected": "Baris: seret untuk memindahkan, sudut untuk mengubah ukuran, gagang bulat untuk memutar",
+      "hide": "Sembunyikan Baris",
+      "show": "Tampilkan Baris",
+      "forward": "Majukan Baris",
+      "back": "Mundurkan Baris"
+    },
+    "wave": {
+      "name": "Gelombang suara",
+      "drag": "Gelombang suara: seret untuk memindahkan",
+      "dragSelected": "Gelombang suara: seret untuk memindahkan, sudut untuk mengubah ukuran, gagang bulat untuk memutar",
+      "hide": "Sembunyikan Gelombang suara",
+      "show": "Tampilkan Gelombang suara",
+      "forward": "Majukan Gelombang suara",
+      "back": "Mundurkan Gelombang suara"
+    }
+  },
+  "piece": {
+    "label": "Potongan episode",
+    "range": "{{from}} – {{to}} · {{seconds}} dtk",
+    "inChapter": "di “{{title}}”",
+    "change": "Ganti potongan"
+  },
+  "look": {
+    "title": "Judul",
+    "titleLabel": "Judul di video",
+    "line": "Baris di bawahnya <small>(*bintang* membuatnya merah)</small>",
+    "lineLabel": "Baris di video",
+    "branding": "Branding 3Speak",
+    "logoGroup": "Logo",
+    "picture": "Gambar",
+    "waveform": "Gelombang suara",
+    "waveType": "Jenis gelombang suara",
+    "waveColour": "Warna gelombang suara",
+    "colour": "Warna {{colour}}",
+    "anyColour": "Warna apa saja",
+    "anyWaveColour": "Warna gelombang suara apa saja"
+  },
+  "logo": {
+    "mark": "Logo 3S",
+    "full": "Logo 3Speak"
+  },
+  "wave": {
+    "bars": "Batang",
+    "centered": "Di tengah",
+    "line": "Garis",
+    "dots": "Tipis",
+    "circle": "Lingkaran",
+    "ring": "Gelombang lingkaran"
+  },
+  "picture": {
+    "upload": "Unggah gambar",
+    "yours": "Gambarmu",
+    "coverOf": "Sampul “{{title}}”",
+    "playlistCover": "Sampul playlist",
+    "noCovers": "Playlist-mu belum punya sampul.",
+    "signIn": "Masuk di 3Speak untuk menambahkan gambar."
+  },
+  "parts": {
+    "title": "Bagian <small>(depan ke belakang)</small>",
+    "logoLocked": "Logo 3Speak selalu tampil, di depan, dan tidak pernah lebih kecil dari ukuran tertentu",
+    "alwaysShown": "Selalu tampil",
+    "hide": "Sembunyikan",
+    "show": "Tampilkan",
+    "forward": "Majukan",
+    "back": "Mundurkan",
+    "tidy": "Rapikan susunan"
+  },
+  "make": {
+    "starting": "Memulai...",
+    "working": "Memproses...",
+    "noWords": "kata-kata potongan ini tidak ditemukan (matikan teks untuk membuatnya tanpa teks)",
+    "failedPlain": "gagal",
+    "signIn": "Masuk di 3Speak untuk membuat audiogram.",
+    "failed": "Audiogram tidak dapat dibuat: {{error}}",
+    "make": "Buat audiogram",
+    "another": "Buat audiogram lain"
+  },
+  "made": {
+    "title": "Audiogrammu",
+    "hint": "Semuanya terbit sebagai Shorts 3Speak bersama audionya, masing-masing dengan tautan ke postingan, snap, atau komentar audio tersebut.",
+    "fallbackTitle": "Audiogram {{n}}",
+    "length": "{{at}} · {{seconds}} dtk",
+    "textPlaceholder": "Teks untuk Short (opsional). Tautan ke audio ditambahkan otomatis.",
+    "textLabel": "Teks untuk Short {{n}}",
+    "editText": "Edit teks",
+    "writeText": "Tulis teks",
+    "download": "Unduh",
+    "removeLabel": "Hapus audiogram {{n}}"
+  },
+  "confirm": {
+    "title": "Tutup tanpa membuatnya?",
+    "text": "Perubahan tampilanmu belum masuk ke audiogram. Perubahan itu hilang saat kamu menutup.",
+    "stays_other": "{{count}} audiogram yang kamu buat tetap bersama audio ini.",
+    "keep": "Lanjut mengedit"
+  },
+  "captions": {
+    "label": "Teks",
+    "drag": "Teks: seret untuk memindahkan",
+    "dragSelected": "Teks: seret untuk memindahkan, tarik sisi untuk mengubah lebar",
+    "sample": "Kata-katamu muncul di sini saat diucapkan",
+    "show": "Tampilkan yang diucapkan, kata demi kata",
+    "checking": "Memeriksa server...",
+    "unavailable": "Teks saat ini tidak tersedia di server editor ini.",
+    "listening": "Mendengarkan...",
+    "getWords": "Ambil kata-kata",
+    "wordCount_other": "{{count}} kata di potongan ini.",
+    "noSpeech": "Tidak ada ucapan di potongan ini.",
+    "fix": "Perbaiki kata",
+    "doneFixing": "Selesai memperbaiki",
+    "word": "Kata {{n}}",
+    "removeWord": "Hapus kata ini",
+    "removeWordLabel": "Hapus {{word}}",
+    "style": "Gaya teks",
+    "preset": {
+      "karaoke": "Karaoke",
+      "pop": "Pop",
+      "plain": "Subtitel"
+    },
+    "wordsAtATime": "Kata sekaligus",
+    "perPage_other": "{{count}} kata sekaligus",
+    "font": "Font teks",
+    "size": "Ukuran teks",
+    "textColour": "Warna teks",
+    "textColourSwatch": "Warna teks {{colour}}",
+    "highlightColour": "Warna sorotan",
+    "highlight": "Sorotan",
+    "highlightSwatch": "Sorotan {{colour}}",
+    "capitals": "Huruf kapital"
+  }
+}

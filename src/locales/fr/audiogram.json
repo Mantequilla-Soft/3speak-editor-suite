@@ -1,0 +1,188 @@
+{
+  "title": "Audiogrammes",
+  "tour": {
+    "again": "Revoir la visite guidée",
+    "againLabel": "Revoir la visite guidée des audiogrammes"
+  },
+  "saveAndClose": "Enregistrer et fermer",
+  "saveAndCloseTitle": "Vos audiogrammes restent avec cet audio et sont publiés avec lui en Shorts",
+  "loadError": "Impossible de charger les réglages de l'audiogramme : {{error}}",
+  "loadingLook": "Chargement du style de votre audiogramme…",
+  "start": {
+    "title": "Choisissez un passage de l'épisode",
+    "text_one": "Un audiogramme est une courte vidéo d'un passage de votre épisode, jusqu'à {{count}} minute. Il est publié en Short 3Speak avec l'audio. Commencez par marquer son début et sa fin sur la chronologie.",
+    "text_many": "Un audiogramme est une courte vidéo d'un passage de votre épisode, jusqu'à {{count}} minutes. Il est publié en Short 3Speak avec l'audio. Commencez par marquer son début et sa fin sur la chronologie.",
+    "text_other": "Un audiogramme est une courte vidéo d'un passage de votre épisode, jusqu'à {{count}} minutes. Il est publié en Short 3Speak avec l'audio. Commencez par marquer son début et sa fin sur la chronologie.",
+    "choose": "Choisir sur la chronologie"
+  },
+  "stage": {
+    "label": "Aperçu de l'audiogramme : faites glisser les éléments pour les déplacer, les coins pour redimensionner, la poignée ronde pour pivoter",
+    "frameTitle": "Aperçu de l'audiogramme",
+    "turned": "{{name}} · {{angle}}°",
+    "rotate": "Pivoter (Maj : par pas de 15°). Double-clic : droit",
+    "hint": "Faites glisser les éléments, tirez un coin pour redimensionner (Maj garde les proportions), la poignée ronde pour pivoter. Les flèches déplacent finement, [ et ] font pivoter.",
+    "hintTemplate": "Faites glisser les éléments, tirez un coin pour redimensionner (Maj garde les proportions), la poignée ronde pour pivoter. Les flèches déplacent finement, [ et ] font pivoter. Votre dernier audiogramme sert de point de départ."
+  },
+  "layer": {
+    "logo": {
+      "name": "Logo 3Speak",
+      "drag": "Logo 3Speak : faites glisser pour déplacer",
+      "dragSelected": "Logo 3Speak : faites glisser pour déplacer, les coins pour redimensionner, la poignée ronde pour pivoter"
+    },
+    "cover": {
+      "name": "Image",
+      "drag": "Image : faites glisser pour déplacer",
+      "dragSelected": "Image : faites glisser pour déplacer, les coins pour redimensionner, la poignée ronde pour pivoter",
+      "hide": "Masquer l'image",
+      "show": "Afficher l'image",
+      "forward": "Avancer l'image",
+      "back": "Reculer l'image"
+    },
+    "title": {
+      "name": "Titre",
+      "drag": "Titre : faites glisser pour déplacer",
+      "dragSelected": "Titre : faites glisser pour déplacer, les coins pour redimensionner, la poignée ronde pour pivoter",
+      "hide": "Masquer le titre",
+      "show": "Afficher le titre",
+      "forward": "Avancer le titre",
+      "back": "Reculer le titre"
+    },
+    "line": {
+      "name": "Ligne",
+      "drag": "Ligne : faites glisser pour déplacer",
+      "dragSelected": "Ligne : faites glisser pour déplacer, les coins pour redimensionner, la poignée ronde pour pivoter",
+      "hide": "Masquer la ligne",
+      "show": "Afficher la ligne",
+      "forward": "Avancer la ligne",
+      "back": "Reculer la ligne"
+    },
+    "wave": {
+      "name": "Forme d'onde",
+      "drag": "Forme d'onde : faites glisser pour déplacer",
+      "dragSelected": "Forme d'onde : faites glisser pour déplacer, les coins pour redimensionner, la poignée ronde pour pivoter",
+      "hide": "Masquer la forme d'onde",
+      "show": "Afficher la forme d'onde",
+      "forward": "Avancer la forme d'onde",
+      "back": "Reculer la forme d'onde"
+    }
+  },
+  "piece": {
+    "label": "Passage de l'épisode",
+    "range": "{{from}} – {{to}} · {{seconds}} s",
+    "inChapter": "dans « {{title}} »",
+    "change": "Changer le passage"
+  },
+  "look": {
+    "title": "Titre",
+    "titleLabel": "Titre sur la vidéo",
+    "line": "Ligne en dessous <small>(les *étoiles* la mettent en rouge)</small>",
+    "lineLabel": "Ligne sur la vidéo",
+    "branding": "Marque 3Speak",
+    "logoGroup": "Logo",
+    "picture": "Image",
+    "waveform": "Forme d'onde",
+    "waveType": "Type de forme d'onde",
+    "waveColour": "Couleur de la forme d'onde",
+    "colour": "Couleur {{colour}}",
+    "anyColour": "Autre couleur",
+    "anyWaveColour": "Autre couleur de forme d'onde"
+  },
+  "logo": {
+    "mark": "Logo 3S",
+    "full": "Logo 3Speak"
+  },
+  "wave": {
+    "bars": "Barres",
+    "centered": "Centrée",
+    "line": "Ligne",
+    "dots": "Fine",
+    "circle": "Cercle",
+    "ring": "Onde circulaire"
+  },
+  "picture": {
+    "upload": "Envoyer une image",
+    "yours": "Votre image",
+    "coverOf": "Pochette de « {{title}} »",
+    "playlistCover": "Pochette de la playlist",
+    "noCovers": "Vos playlists n'ont pas encore de pochette.",
+    "signIn": "Connectez-vous sur 3Speak pour ajouter une image."
+  },
+  "parts": {
+    "title": "Éléments <small>(de l'avant vers l'arrière)</small>",
+    "logoLocked": "Le logo 3Speak est toujours affiché, au premier plan, et jamais plus petit qu'une taille fixe",
+    "alwaysShown": "Toujours affiché",
+    "hide": "Masquer",
+    "show": "Afficher",
+    "forward": "Avancer",
+    "back": "Reculer",
+    "tidy": "Ranger la disposition"
+  },
+  "make": {
+    "starting": "Démarrage...",
+    "working": "En cours...",
+    "noWords": "les mots de ce passage sont introuvables (désactivez les sous-titres pour le créer sans)",
+    "failedPlain": "échec",
+    "signIn": "Connectez-vous sur 3Speak pour créer un audiogramme.",
+    "failed": "Impossible de créer l'audiogramme : {{error}}",
+    "make": "Créer l'audiogramme",
+    "another": "Créer un autre audiogramme"
+  },
+  "made": {
+    "title": "Vos audiogrammes",
+    "hint": "Ils sont publiés en Shorts 3Speak avec l'audio, chacun avec un lien vers la publication, le snap ou le commentaire de l'audio.",
+    "fallbackTitle": "Audiogramme {{n}}",
+    "length": "{{at}} · {{seconds}} s",
+    "textPlaceholder": "Texte du Short (facultatif). Un lien vers l'audio est ajouté automatiquement.",
+    "textLabel": "Texte du Short {{n}}",
+    "editText": "Modifier le texte",
+    "writeText": "Écrire un texte",
+    "download": "Télécharger",
+    "removeLabel": "Retirer l'audiogramme {{n}}"
+  },
+  "confirm": {
+    "title": "Fermer sans le créer ?",
+    "text": "Vos modifications du style ne sont pas encore dans un audiogramme. Elles seront perdues si vous fermez.",
+    "stays_one": "L'audiogramme que vous avez créé reste avec cet audio.",
+    "stays_many": "Les {{count}} audiogrammes que vous avez créés restent avec cet audio.",
+    "stays_other": "Les {{count}} audiogrammes que vous avez créés restent avec cet audio.",
+    "keep": "Continuer"
+  },
+  "captions": {
+    "label": "Sous-titres",
+    "drag": "Sous-titres : faites glisser pour déplacer",
+    "dragSelected": "Sous-titres : faites glisser pour déplacer, tirez un côté pour changer la largeur",
+    "sample": "Vos mots s'affichent ici au fil de la parole",
+    "show": "Afficher ce qui est dit, mot par mot",
+    "checking": "Vérification du serveur...",
+    "unavailable": "Les sous-titres ne sont pas disponibles sur ce serveur d'édition pour le moment.",
+    "listening": "Écoute...",
+    "getWords": "Obtenir les mots",
+    "wordCount_one": "{{count}} mot dans ce passage.",
+    "wordCount_many": "{{count}} mots dans ce passage.",
+    "wordCount_other": "{{count}} mots dans ce passage.",
+    "noSpeech": "Aucune parole trouvée dans ce passage.",
+    "fix": "Corriger les mots",
+    "doneFixing": "Correction terminée",
+    "word": "Mot {{n}}",
+    "removeWord": "Retirer ce mot",
+    "removeWordLabel": "Retirer {{word}}",
+    "style": "Style des sous-titres",
+    "preset": {
+      "karaoke": "Karaoké",
+      "pop": "Pop",
+      "plain": "Sous-titres"
+    },
+    "wordsAtATime": "Mots à la fois",
+    "perPage_one": "{{count}} mot à la fois",
+    "perPage_many": "{{count}} mots à la fois",
+    "perPage_other": "{{count}} mots à la fois",
+    "font": "Police des sous-titres",
+    "size": "Taille des sous-titres",
+    "textColour": "Couleur du texte des sous-titres",
+    "textColourSwatch": "Couleur du texte {{colour}}",
+    "highlightColour": "Couleur de surlignage",
+    "highlight": "Surlignage",
+    "highlightSwatch": "Surlignage {{colour}}",
+    "capitals": "Majuscules"
+  }
+}

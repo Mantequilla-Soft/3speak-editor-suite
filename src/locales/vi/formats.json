@@ -1,0 +1,84 @@
+{
+  "aspect": {
+    "short": {
+      "label": "Shorts",
+      "hint": "Dọc, tối đa 2 phút, đăng dưới dạng Short"
+    },
+    "landscape": {
+      "label": "Ngang",
+      "hint": "Video màn hình rộng, tối đa 10 phút"
+    },
+    "classic": {
+      "label": "Cổ điển",
+      "hint": "Video 4:3, tối đa 10 phút"
+    },
+    "square": {
+      "label": "Vuông",
+      "hint": "Video vuông, tối đa 10 phút"
+    }
+  },
+  "chip": {
+    "title": "Khung hình của dự án này: {{shape}}. Nhấp để thay đổi",
+    "aria": "Khung hình dự án: {{shape}}"
+  },
+  "picker": {
+    "title": "Bạn đang làm gì?",
+    "tooLong": "dòng thời gian của bạn dài {{length}}, hãy cắt gọt còn {{limit}} để kết xuất",
+    "note": "Khung hình quyết định cách đăng lên 3Speak: 9:16 thành Short, các khung khác thành video thường. Xuất dưới dạng cũng kết xuất được ở các khung hình khác."
+  },
+  "preview": {
+    "heading": "Xem trước ở",
+    "yours": "{{aspect}} (của bạn)",
+    "projectIs": {
+      "short": "Dự án của bạn là Short 9:16. Ở khung hình khác, cảnh quay sẽ lấp đầy khung, được cắt quanh khuôn mặt trong đó.",
+      "landscape": "Dự án của bạn là Ngang 16:9. Ở khung hình khác, cảnh quay sẽ lấp đầy khung, được cắt quanh khuôn mặt trong đó.",
+      "classic": "Dự án của bạn là Cổ điển 4:3. Ở khung hình khác, cảnh quay sẽ lấp đầy khung, được cắt quanh khuôn mặt trong đó.",
+      "square": "Dự án của bạn là Vuông 1:1. Ở khung hình khác, cảnh quay sẽ lấp đầy khung, được cắt quanh khuôn mặt trong đó."
+    }
+  },
+  "faces": {
+    "heading": "Bám theo khuôn mặt",
+    "noFootage": "Chưa có cảnh quay nào để đổi khung. Các clip đã di chuyển hoặc thu phóng giữ nguyên khung của chúng.",
+    "hint": "Khuôn mặt được tìm ngay trong trình duyệt của bạn, vài khung hình mỗi giây. Nếu không có khuôn mặt, phần giữa sẽ được giữ trong khung.",
+    "found": "Đã tìm thấy khuôn mặt",
+    "noFace": "Không có mặt: giữa",
+    "middle": "Giữa",
+    "finding": "Đang tìm khuôn mặt",
+    "findOne": "Tìm khuôn mặt",
+    "findMany_other": "Tìm khuôn mặt trong {{count}} clip",
+    "streamNamed": "{{name}} là luồng phát: được cắt quanh phần giữa.",
+    "streamUnnamed": "Có một clip là luồng phát: được cắt quanh phần giữa.",
+    "failed": "Theo dõi khuôn mặt không hoạt động ở đây: {{error}}",
+    "moveWindow": "{{name}}: di chuyển khung",
+    "left": "Sang trái",
+    "right": "Sang phải",
+    "up": "Lên",
+    "down": "Xuống",
+    "moveX": "Di chuyển khung sang trái hoặc phải",
+    "moveY": "Di chuyển khung lên hoặc xuống",
+    "findAgain": "Tìm lại khuôn mặt",
+    "reset": "Giữa, không dịch"
+  },
+  "clipFallback": "Clip",
+  "stop": "Dừng",
+  "render": {
+    "heading": "Kết xuất dưới dạng",
+    "shortsLimit": "Shorts dài tối đa {{limit}}: hãy cắt gọt dòng thời gian để kết xuất bản 9:16.",
+    "button_other": "Kết xuất {{count}} video",
+    "failed": "Kết xuất thất bại: {{error}}",
+    "download": "Tải xuống",
+    "postShort": "Đăng dưới dạng Short",
+    "postVideo": "Đăng dưới dạng video"
+  },
+  "job": {
+    "waiting": "Đang chờ...",
+    "preparing": "Đang chuẩn bị tệp...",
+    "starting": "Đang bắt đầu...",
+    "rendering": "Đang kết xuất...",
+    "done": "Xong",
+    "stopped": "Đã dừng",
+    "busy": "Các máy chủ kết xuất đang bận. Thử lại sau {{seconds}} giây...",
+    "offline": "Không có kết nối tới máy chủ kết xuất. Thử lại sau {{seconds}} giây...",
+    "failed": "Kết xuất thất bại"
+  }
+}

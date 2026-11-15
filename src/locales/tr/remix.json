@@ -1,0 +1,42 @@
+{
+  "titles": {
+    "mode": "Nasıl remix yapmak istersin?",
+    "stitch": "Klibin nereye gitsin?",
+    "reaction": "Tepkin nereye gitsin?"
+  },
+  "skip": "Atla, serbest düzenleme",
+  "options": {
+    "stitch": {
+      "title": "Ekleme",
+      "text": "Orijinalden önce ya da sonra oynayan bir klip kaydet."
+    },
+    "reaction": {
+      "title": "Tepki",
+      "text": "Orijinal oynarken kendini kaydet."
+    },
+    "free": {
+      "title": "Serbest düzenleme",
+      "text": "Düzenleyiciyi orijinal zaman çizelgesindeyken aç."
+    },
+    "stitchBefore": {
+      "title": "Orijinalden önce",
+      "text": "Önce senin klibin, sonra orijinal oynar."
+    },
+    "stitchAfter": {
+      "title": "Orijinalden sonra",
+      "text": "Önce orijinal, sonra senin klibin oynar."
+    },
+    "overlay": {
+      "title": "Kaplama",
+      "text": "Kameran, orijinalin üstünde küçük bir kutuda. İstediğin yere sürükle."
+    },
+    "tileTop": {
+      "title": "Üstte döşe",
+      "text": "Orijinal alt yarıya küçülür, sen üsttesin."
+    },
+    "tileBottom": {
+      "title": "Altta döşe",
+      "text": "Orijinal üst yarıya küçülür, sen alttasın."
+    }
+  }
+}

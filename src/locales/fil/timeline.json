@@ -1,0 +1,181 @@
+{
+  "aria": {
+    "timeline": "Timeline",
+    "ruler": "Ruler ng oras: i-click para ilipat ang playhead",
+    "playhead": "Playhead",
+    "zoom": "Zoom"
+  },
+  "split": {
+    "title": "Hatiin ang clip sa playhead (Ctrl+R)",
+    "label": "Hatiin"
+  },
+  "toolbar": {
+    "add": {
+      "title": "Magdagdag ng track o clip",
+      "videoTrack": "Video track",
+      "audioTrack": "Audio track",
+      "musicLibrary": "Library ng musika",
+      "soundEffects": "Mga sound effect",
+      "stickers": "Mga sticker",
+      "titles": "Mga Pamagat",
+      "stock": "Stock media"
+    },
+    "zoomTitle": "Zoom: {{value}}px/seg",
+    "fit": {
+      "title": "Ipakita ang buong timeline",
+      "label": "Ipagkasya"
+    },
+    "select": {
+      "titleStart": "Pumili ng ilang clip: i-tap ang bawat isa",
+      "titleDone": "Tapos nang pumili",
+      "label": "Pumili"
+    },
+    "ripple": {
+      "titleTrack": "Isara ang puwang sa playhead sa track {{number}} (G). Hindi gagalawin ang ibang track.",
+      "titleNoGap": "Walang puwang sa playhead sa track ng napiling clip",
+      "title": "Alisin ang puwang sa playhead (G)",
+      "label": "Ripple"
+    },
+    "captions": {
+      "title": "Captions: gawing captions na salita por salita ang sinasabi",
+      "label": "Captions"
+    },
+    "transcript": {
+      "title": "Transcript: i-edit sa pamamagitan ng text, burahin ang mga salita para putulin",
+      "label": "Transcript"
+    },
+    "flag": {
+      "title": "Maglagay ng flag sa playhead (B): sarili mong marker, may numero at kulay, hindi kailanman ine-export",
+      "label": "Flag"
+    },
+    "autoCut": {
+      "title": "Hanapin ang mga hinto at putulin doon",
+      "label": "Auto cut"
+    },
+    "beats": {
+      "title": "Hanapin ang beat: dumikit dito, ihanay ang mga clip dito",
+      "label": "Mga beat"
+    },
+    "delete": {
+      "title": "Burahin ang napiling clip (Del)",
+      "titleMany": "Burahin ang mga napiling clip (Del)",
+      "labelMany": "Burahin ang {{number}}"
+    },
+    "options": "Mga opsyon",
+    "ungroup": {
+      "titleOne": "I-ungroup: muling gagalaw at mati-trim nang hiwalay ang mga clip nito",
+      "titleMany": "I-ungroup: muling gagalaw at mati-trim nang hiwalay ang mga clip na ito",
+      "label": "I-ungroup"
+    },
+    "group": {
+      "title": "I-grupo: sabay na gagalaw at mati-trim ang mga clip na ito",
+      "label": "I-grupo ang {{number}}"
+    },
+    "more": {
+      "title": "Iba pang aksyon sa clip",
+      "duplicate": "Doblehin",
+      "groupVoicesTitle": "I-grupo kasama ang sabay na tumutugtog sa ibang voice track: sabay silang ililipat, iti-trim at puputulan ng katahimikan",
+      "groupVoices": "I-grupo kasama ang ibang boses",
+      "reverse": "Baligtarin",
+      "unreverse": "Ibalik sa dati",
+      "snapOn": "Snap: naka-on",
+      "snapOff": "Snap: naka-off"
+    }
+  },
+  "selectHint": {
+    "count_one": "{{count}} clip ang napili: mag-tap pa, o Tapos na",
+    "count_other": "{{count}} clip ang napili: mag-tap pa, o Tapos na",
+    "none": "I-tap ang bawat clip na gusto mong piliin",
+    "clear": "I-clear"
+  },
+  "clip": {
+    "settings": "Mga setting ng clip",
+    "textFallback": "Text",
+    "layer": "L{{number}}",
+    "kind": {
+      "video": "Video clip",
+      "audio": "Clip ng tunog",
+      "image": "Larawan",
+      "text": "Text",
+      "color": "Kulay",
+      "other": "Clip"
+    },
+    "aria": {
+      "plain": "{{kind}}, {{from}} hanggang {{to}}",
+      "named": "{{kind}} {{name}}, {{from}} hanggang {{to}}",
+      "onTrack": "{{kind}} sa {{track}}, {{from}} hanggang {{to}}",
+      "namedOnTrack": "{{kind}} {{name}} sa {{track}}, {{from}} hanggang {{to}}"
+    }
+  },
+  "track": {
+    "show": "Ipakita ang track",
+    "hide": "Itago ang track",
+    "mute": "I-mute ang track",
+    "unmute": "I-unmute ang track",
+    "remove": "Alisin ang track",
+    "addVisual": "Magdagdag ng video, larawan o text",
+    "addAudio": "Magdagdag ng audio",
+    "addFile": "Magdagdag ng file",
+    "addText": "Magdagdag ng text",
+    "addColor": "Magdagdag ng kulay",
+    "recordVideo": "Mag-record ng Video",
+    "addAudioFile": "Magdagdag ng audio file",
+    "recordAudio": "Mag-record ng Audio",
+    "resize": {
+      "aria": "Taas ng {{name}}",
+      "ariaUnnamed": "Taas ng track na ito",
+      "title": "I-drag para gawing mas mataas o mas mababa ang track (double-click: balik sa normal)"
+    },
+    "aria": {
+      "named": {
+        "video": "{{name}} (video track)",
+        "audio": "{{name}} (audio track)",
+        "music": "{{name}} (music track)"
+      },
+      "numbered": {
+        "video": "Video track {{number}}",
+        "audio": "Audio track {{number}}",
+        "music": "Music track {{number}}"
+      }
+    }
+  },
+  "trackName": {
+    "voice": "Boses",
+    "voiceNumbered": "Boses {{number}}",
+    "music": "Musika",
+    "musicNumbered": "Musika {{number}}",
+    "video": "Video",
+    "videoNumbered": "Video {{number}}",
+    "audioNumbered": "Audio {{number}}",
+    "stickers": "Mga sticker",
+    "stickersNumbered": "Mga sticker {{number}}",
+    "sfx": "SFX",
+    "sfxNumbered": "SFX {{number}}"
+  },
+  "clipName": {
+    "text": "Text layer",
+    "color": "Kulay",
+    "imported": "Na-import na media",
+    "linkedAudio": "{{name}} (Audio)"
+  },
+  "textClip": {
+    "defaultText": "Ilagay ang text dito"
+  },
+  "flag": {
+    "aria": "Flag {{number}} sa {{time}}",
+    "title": "Flag {{number}} · {{time}}: i-click para tumalon doon, i-drag para ilipat, i-right-click para alisin"
+  },
+  "range": {
+    "label": "{{from}} – {{to}} · {{seconds}} seg",
+    "startOnly": "{{time}} · i-click kung saan ito nagtatapos",
+    "dragStart": "I-drag para ilipat ang simula",
+    "dragEnd": "I-drag para ilipat ang dulo"
+  },
+  "pastLimit": "Lampas sa limit ng render",
+  "backgroundMusic": {
+    "title": "Background music",
+    "add": "Magdagdag ng background music",
+    "remove": "Alisin ang musika"
+  },
+  "partName": "Bahagi {{n}} · {{name}}"
+}

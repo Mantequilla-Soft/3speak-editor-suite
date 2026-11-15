@@ -1,0 +1,78 @@
+{
+  "language": {
+    "label": "Idioma hablado",
+    "auto": "Detectar automáticamente"
+  },
+  "intro": {
+    "title": "Editar por texto",
+    "text": "Convierte lo que se dice en texto, con cada voz por su nombre, y luego edita la grabación como un documento: selecciona palabras y pulsa Supr para cortarlas.",
+    "checking": "Comprobando el servidor...",
+    "unavailable": "Las transcripciones no están disponibles en este servidor del editor ahora mismo.",
+    "noSpeech": "Primero añade una grabación con voz.",
+    "transcribeSeconds": "Transcribir ({{n}} s de grabación)",
+    "transcribeMinutes": "Transcribir ({{n}} min de grabación)",
+    "longShow": "Un programa largo tarda un rato: las palabras aparecen por partes y puedes empezar a editar las primeras."
+  },
+  "listening": "Escuchando...",
+  "stop": "Detener",
+  "goThere": "Ir ahí",
+  "search": {
+    "placeholder": "Buscar palabras",
+    "label": "Buscar palabras en la transcripción",
+    "previous": "Anterior",
+    "previousLabel": "Coincidencia anterior",
+    "next": "Siguiente",
+    "nextLabel": "Coincidencia siguiente"
+  },
+  "selection": {
+    "count_one": "{{count}} palabra · {{seconds}} s",
+    "count_many": "{{count}} de palabras · {{seconds}} s",
+    "count_other": "{{count}} palabras · {{seconds}} s",
+    "cut": "Cortar",
+    "cutTitle": "Cortar las palabras seleccionadas de la grabación (Supr)",
+    "clearTitle": "Borrar la selección (Esc)",
+    "clearLabel": "Borrar la selección"
+  },
+  "found": {
+    "cutAll_one": "Cortar {{count}}",
+    "cutAll_many": "Cortar los {{count}}",
+    "cutAll_other": "Cortar los {{count}}",
+    "cutAllTitle": "Cortar de la grabación todos los lugares encontrados"
+  },
+  "fillers": "Muletillas",
+  "fillersTitle": "Buscar \"eh\", \"este\", \"o sea\" y pausas largas",
+  "copy": "Copiar la transcripción",
+  "speakers": "Hablantes",
+  "missing": {
+    "seconds": "{{n}} s de grabación aún no tienen texto.",
+    "minutes": "{{n}} min de grabación aún no tienen texto.",
+    "transcribe": "Transcribirlo"
+  },
+  "scrollLabel": "Transcripción: haz clic en una palabra para ir ahí, arrastra sobre palabras para seleccionarlas, Supr las corta",
+  "hint_one": "{{count}} palabra. Haz clic en una palabra para ir ahí; arrastra o usa Mayús+clic para seleccionar; Supr corta. Deshacer lo recupera.",
+  "hint_many": "{{count}} de palabras. Haz clic en una palabra para ir ahí; arrastra o usa Mayús+clic para seleccionar; Supr corta. Deshacer lo recupera.",
+  "hint_other": "{{count}} palabras. Haz clic en una palabra para ir ahí; arrastra o usa Mayús+clic para seleccionar; Supr corta. Deshacer lo recupera.",
+  "speaker": {
+    "default": "Voz",
+    "numbered": "Voz {{n}}"
+  },
+  "job": {
+    "starting": "Iniciando...",
+    "preparing": "Preparando las grabaciones...",
+    "listening": "Escuchando...",
+    "signIn": "Inicia sesión en 3Speak para crear una transcripción.",
+    "uploadFailed": "No se pudieron subir las grabaciones: {{message}}",
+    "notUploaded": "Las grabaciones aún no están en el servidor. Inténtalo de nuevo cuando se hayan subido.",
+    "serverAnswered": "El servidor respondió {{status}}",
+    "lost": "Se perdió la tarea de transcripción (¿se reinició el servidor?)",
+    "failed": "Falló el reconocimiento de voz"
+  },
+  "stt": {
+    "audioUnavailable": "audio no disponible",
+    "serverError": "error del servidor",
+    "connectionFailed": "falló la conexión",
+    "unauthorized": "no autorizado",
+    "closed": "cerrado",
+    "initFailed": "no se pudo iniciar el reconocimiento de voz"
+  }
+}

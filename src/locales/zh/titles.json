@@ -1,0 +1,111 @@
+{
+  "textFx": {
+    "title": "文字效果",
+    "outline": "描边",
+    "outlineColour": "描边颜色",
+    "outlineWidth": "描边宽度",
+    "wordsComeIn": "文字入场",
+    "allAtOnce": "全部同时",
+    "atOnce": "同时",
+    "anims": {
+      "pop": "弹出",
+      "fadeUp": "上浮淡入",
+      "typewriter": "打字机",
+      "slide": "滑入"
+    },
+    "gap": "间隔",
+    "gapSeconds": "词与词之间的时间（秒）",
+    "defaultText": "文字"
+  },
+  "templates": {
+    "dialogTitle": "标题",
+    "allTitles": "所有标题",
+    "overVideo": "叠加在视频上",
+    "ownBackground": "自带背景",
+    "starsHint": "用 *星号* 包住某个词即可为它上色。",
+    "addTitle": "添加标题",
+    "groups": {
+      "lower": "下方字幕条",
+      "title": "叠加在视频上的标题",
+      "card": "片头和片尾卡片"
+    },
+    "fields": {
+      "name": "名称",
+      "role": "身份",
+      "lines": "文字行",
+      "words": "词语",
+      "lineUnder": "下方的文字",
+      "lineInFront": "前方的文字",
+      "rows": "行",
+      "headline": "标题",
+      "lineUnderIt": "下方的文字",
+      "tagline": "标语",
+      "cta": "行动号召",
+      "smallPrint": "小字说明"
+    },
+    "items": {
+      "lowerName": {
+        "label": "名字和身份",
+        "sub": "3Speak 创作者"
+      },
+      "lowerStatement": {
+        "label": "简短宣言",
+        "lines": "今天我*学到*的\n三件事"
+      },
+      "titleWords": {
+        "label": "每次一个词",
+        "words": "计划。\n拍摄。\n*发布。*",
+        "line": "我在 3Speak 的一周"
+      },
+      "titleKinetic": {
+        "label": "文字砸入",
+        "words": "快速\n简单\n属于你",
+        "line": "在 *3Speak* 上制作"
+      },
+      "titlePoster": {
+        "label": "巨大的堆叠文字",
+        "words": "第一\n天。",
+        "sub": "从零开始"
+      },
+      "titleMarquee": {
+        "label": "滚动文字行",
+        "rows": "计划\n拍摄\n发布\n重复",
+        "line": "每*周*"
+      },
+      "cardHook": {
+        "label": "片头：开场白",
+        "lines": "我是怎样\n剪辑我的\n*短视频*的",
+        "sub": "一分钟以内"
+      },
+      "cardEnd": {
+        "label": "片尾：关注我",
+        "tagline": "*每周*都有新短视频",
+        "cta": "在 3Speak 上关注"
+      },
+      "cardPoster": {
+        "label": "片尾：巨大文字",
+        "words": "我们\n很快\n*再见。*",
+        "cta": "在 3Speak 上关注"
+      }
+    }
+  },
+  "scene": {
+    "title": "标题",
+    "onePerLine": "每行一个",
+    "colours": "颜色",
+    "font": "字体",
+    "overVideo": "叠加在视频上",
+    "length": "时长",
+    "lengthSeconds": "时长（秒）",
+    "defaultName": "我",
+    "layerTitle": "标题"
+  },
+  "colors": {
+    "ember": "余烬",
+    "amber": "琥珀",
+    "ocean": "海洋",
+    "forest": "森林",
+    "berry": "浆果",
+    "paper": "纸张"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "cancel": "Annuleren",
+  "close": "Sluiten",
+  "ok": "OK",
+  "gotIt": "Begrepen",
+  "done": "Klaar",
+  "save": "Opslaan",
+  "delete": "Verwijderen",
+  "remove": "Verwijderen",
+  "back": "Terug",
+  "next": "Volgende",
+  "skip": "Overslaan",
+  "retry": "Probeer opnieuw",
+  "reset": "Resetten",
+  "none": "Geen",
+  "off": "Uit",
+  "auto": "Auto",
+  "play": "Afspelen",
+  "pause": "Pauzeren",
+  "undo": "Ongedaan maken",
+  "preview": "Voorbeeld",
+  "render": "Renderen",
+  "export": "Exporteren",
+  "duration": {
+    "seconds_one": "{{count}} seconde",
+    "seconds_other": "{{count}} seconden",
+    "minutes_one": "{{count}} minuut",
+    "minutes_other": "{{count}} minuten",
+    "hours_one": "{{count}} uur",
+    "hours_other": "{{count}} uur"
+  },
+  "limits": {
+    "atMost": {
+      "short": "Een Short mag maximaal {{limit}} duren.",
+      "video": "Een video mag maximaal {{limit}} duren.",
+      "audio": "Een export mag maximaal {{limit}} duren."
+    }
+  }
+}

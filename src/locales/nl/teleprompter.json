@@ -1,0 +1,88 @@
+{
+  "title": "Teleprompter",
+  "showOnCamera": "Tonen op camera",
+  "speechNotice": {
+    "title": "Stem volgen werkt voorlopig alleen in Chromium-browsers.",
+    "body": "Gebruik Chrome, Edge, Brave of Opera om het script mee te laten scrollen terwijl je spreekt. In deze browser scrolt het met een vaste snelheid die je kunt instellen."
+  },
+  "speechErrors": {
+    "network": "Spraakdienst niet bereikbaar. Herkenning heeft een internetverbinding nodig (Chrome stuurt audio naar Google om te transcriberen).",
+    "audioCapture": "Er kwam geen audio bij de herkenning aan. De microfoon is misschien bezet, probeer een headset.",
+    "notAllowed": "Microfoontoestemming is geblokkeerd voor spraakherkenning.",
+    "unsupported": "Deze browser heeft geen spraakherkenning.",
+    "generic": "Fout bij spraakherkenning: {{err}}"
+  },
+  "noMic": "Opnemen zonder microfoon (microfoon niet beschikbaar).",
+  "autoDetect": "Automatisch herkennen ({{lang}})",
+  "presets": {
+    "frontcam": "Frontcamera",
+    "frontcamTitle": "Smalle strook onder de selfielens, zo valt het minst op dat je voorleest",
+    "max": "Max. grootte",
+    "maxTitle": "Grote letters voor op afstand",
+    "top": "Bovenste regels",
+    "topTitle": "Meerdere regels bovenaan"
+  },
+  "scroll": {
+    "label": "Scrollen",
+    "modeAria": "Scrollmodus",
+    "followVoice": "Stem volgen",
+    "followVoiceTitle": "Scrolt terwijl je het script hardop voorleest",
+    "needsChromium": "Vereist Chrome, Edge of een andere Chromium-browser",
+    "timed": "Op tijd",
+    "timedTitle": "Scrolt met een vaste snelheid",
+    "voiceForcedMissing": "Stem volgen is hier niet beschikbaar, er wordt op tijd gescrold.",
+    "voiceUnavailable": "Stem volgen is niet beschikbaar in deze browser."
+  },
+  "style": {
+    "title": "Tekststijl",
+    "fontSize": "Lettergrootte",
+    "fontSizeValue": "{{size}} px",
+    "text": "Tekst",
+    "background": "Achtergrond",
+    "bgOpacity": "Dekking achtergrond",
+    "mirrorText": "Tekst spiegelen (voor een teleprompterspiegel)",
+    "voiceLanguage": "Spraaktaal"
+  },
+  "status": {
+    "serverErrorSwitched": "Fout van de spraakserver ({{reason}}). Overgeschakeld op scrollen op tijd.",
+    "voiceErrorSwitched": "{{error}} Overgeschakeld op scrollen op tijd.",
+    "voiceStoppedSwitched": "Stem volgen is gestopt. Overgeschakeld op scrollen op tijd.",
+    "serverError": "Fout van de spraakserver ({{reason}}).",
+    "listeningServer": "Luisteren (server)… begin met lezen",
+    "connectingServer": "Verbinden met spraakserver…",
+    "listening": "Luisteren… begin hardop te lezen",
+    "startingMic": "Microfoon starten…",
+    "scrollPaused": "Scrollen gepauzeerd",
+    "timedScroll": "Scrollen op tijd, {{wpm}} wpm",
+    "scrollTest": "Scrolltest, {{wpm}} wpm"
+  },
+  "sttReason": {
+    "unreachable": "niet bereikbaar",
+    "noMic": "geen microfoon",
+    "audioUnavailable": "audio niet beschikbaar",
+    "connectionFailed": "verbinding mislukt",
+    "unauthorized": "niet gemachtigd",
+    "closed": "gesloten",
+    "serverError": "serverfout"
+  },
+  "scriptPlaceholder": "Schrijf of plak je script hier. Tijdens het opnemen scrolt het mee terwijl je hardop voorleest, of met een vaste snelheid in de modus op tijd.",
+  "scriptModeVoice": "Scrollen: volgt je stem",
+  "scriptModeTimed": "Scrollen: op tijd, {{wpm}} wpm",
+  "hide": "Verbergen",
+  "dragToMove": "Sleep om te verplaatsen",
+  "dragToResize": "Sleep om het formaat te wijzigen",
+  "expandMenu": "Menu uitklappen",
+  "collapseMenu": "Menu inklappen",
+  "editScript": "Script bewerken",
+  "testVoice": "Stem testen",
+  "stopVoiceTest": "Test stoppen",
+  "scrollSpeed": "Scrollsnelheid",
+  "slower": "Langzamer",
+  "faster": "Sneller",
+  "wordsPerMin": "woorden/min",
+  "testScroll": "Scrollen testen",
+  "stopScrollTest": "Scrolltest stoppen",
+  "pauseScroll": "Scrollen pauzeren",
+  "resumeScroll": "Scrollen hervatten",
+  "hideTeleprompter": "Teleprompter verbergen"
+}

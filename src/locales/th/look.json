@@ -1,0 +1,53 @@
+{
+  "title": "โทนภาพ",
+  "noEffects": "ไม่มีเอฟเฟกต์",
+  "presetsLabel": "พรีเซ็ตโทนภาพ",
+  "doubleClickReset": "ดับเบิลคลิกเพื่อรีเซ็ต",
+  "presets": {
+    "original": "ต้นฉบับ",
+    "warm": "อบอุ่น",
+    "cool": "เย็น",
+    "vivid": "สดใส",
+    "matte": "ด้าน",
+    "bw": "ขาวดำ",
+    "vintage": "วินเทจ",
+    "tealorange": "ฟ้าอมเขียวและส้ม",
+    "fade": "ซีด",
+    "noir": "นัวร์",
+    "sunset": "พระอาทิตย์ตก"
+  },
+  "sliders": {
+    "blur": "เบลอ",
+    "vignette": "ขอบมืด",
+    "sharpen": "ความคมชัด",
+    "split": "ฟ้าอมเขียวและส้ม"
+  },
+  "transition": {
+    "title": "ทรานซิชัน",
+    "none": "ไม่มี",
+    "types": {
+      "crossfade": "ครอสเฟด",
+      "dissolve": "จางเป็นสีดำ",
+      "slideleft": "เลื่อนซ้าย",
+      "slideright": "เลื่อนขวา",
+      "slideup": "เลื่อนขึ้น",
+      "zoom": "ซูม",
+      "whip": "สะบัด"
+    },
+    "length": "ความยาวทรานซิชัน (วินาที)",
+    "fades": "เฟด",
+    "noFades": "ไม่มีเฟด",
+    "in": "เข้า",
+    "out": "ออก",
+    "fadeInSeconds": "เฟดเข้า (วินาที)",
+    "fadeOutSeconds": "เฟดออก (วินาที)",
+    "intoNext": "ต่อเข้าคลิปถัดไป",
+    "needNext": "วางคลิปต่อจากคลิปนี้บนแทร็กเดียวกันเพื่อเพิ่มทรานซิชัน",
+    "fromTo": "{{from}} ต่อเข้า {{to}}",
+    "fromUnnamed": "คลิปต่อเข้า {{to}}",
+    "toUnnamed": "{{from}} ต่อเข้าคลิปถัดไป",
+    "bothUnnamed": "คลิปต่อเข้าคลิปถัดไป",
+    "add": "เพิ่มทรานซิชัน",
+    "cutLabel": "{{type}}, {{seconds}} วิ"
+  }
+}

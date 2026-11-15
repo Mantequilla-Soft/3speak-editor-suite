@@ -1,0 +1,26 @@
+{
+  "music": {
+    "title": "Muzyka",
+    "search": "Szukaj utworów",
+    "loading": "Wczytywanie utworów...",
+    "failed": "Nie udało się wczytać biblioteki muzyki.",
+    "none": "Brak pasujących utworów.",
+    "note": "Informacja o utworze zostanie automatycznie dodana do twojego posta. Wybranie dźwięku twórcy z 3Speak daje mu 5% nagród za post.",
+    "addTitle": "Dodaj do filmu"
+  },
+  "sfx": {
+    "title": "Efekty dźwiękowe",
+    "search": "Szukaj dźwięków",
+    "loading": "Wczytywanie dźwięków...",
+    "failed": "Nie udało się wczytać efektów dźwiękowych.",
+    "none": "Brak pasujących dźwięków.",
+    "note": "Dźwięki trafiają w miejsce głowicy. Darmowe (CC0, Kenney.nl), bez podawania autora.",
+    "addTitle": "Dodaj w miejscu głowicy"
+  },
+  "all": "Wszystko",
+  "timeline": "Oś czasu: {{title}}",
+  "seconds": "{{seconds}} s",
+  "stop": "Stop",
+  "listen": "Odsłuchaj",
+  "add": "Dodaj"
+}

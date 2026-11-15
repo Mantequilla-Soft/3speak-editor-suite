@@ -1,0 +1,55 @@
+{
+  "panel": {
+    "title": "Transkrip",
+    "close": "Tutup transkrip"
+  },
+  "cutNotice": {
+    "plain": "Dipotong, {{seconds}} dtk lebih pendek.",
+    "words_other": "{{count}} kata dipotong: {{seconds}} dtk lebih pendek.",
+    "found_other": "{{count}} temuan dipotong: {{seconds}} dtk lebih pendek.",
+    "fillers": "{{fillers}}, {{pauses}} dipotong: {{seconds}} dtk lebih pendek.",
+    "dismiss": "Tutup"
+  },
+  "fillers": {
+    "title": "Hapus kata pengisi dan jeda",
+    "emptyHint": "Ini bekerja dari transkrip: menemukan em, eh, gitu, dan sejenisnya dalam bahasa acara, serta jeda panjang.",
+    "listening": "Mendengarkan...",
+    "transcribeFirst": "Transkripsikan acaranya dulu",
+    "checking": "Memeriksa server...",
+    "unavailable": "Transkrip saat ini tidak tersedia di server editor ini.",
+    "intro": "Kata pengisi dalam {{language}}. Dengarkan masing-masing, hapus centang yang perlu dipertahankan.",
+    "introNoList": "Kata pengisi dalam {{language}} (hanya em, eh, dan sejenisnya: belum ada daftar untuk bahasa ini). Dengarkan masing-masing, hapus centang yang perlu dipertahankan.",
+    "stillTranscribing": "Sisa acara masih ditranskripsi.",
+    "fillerWords": "Kata pengisi",
+    "longPauses": "Jeda panjang",
+    "minPause": "Jeda lebih dari <strong>{{seconds}} dtk</strong>",
+    "keepPause": "Persingkat jeda menjadi <strong>{{seconds}} dtk</strong>",
+    "keepPauseTitle": "Sisa jeda panjang setelah dipotong",
+    "fillerCount_other": "{{count}} kata pengisi",
+    "pauseCount_other": "{{count}} jeda",
+    "summary": "{{fillers}}, {{pauses}} dicentang · memotong {{seconds}} dtk",
+    "nothingFound": "Tidak ada yang ditemukan dengan pengaturan ini.",
+    "tickAllFillers": "Centang semua kata pengisi",
+    "untickAllFillers": "Hapus centang semua kata pengisi",
+    "tickAllPauses": "Centang semua jeda",
+    "untickAllPauses": "Hapus centang semua jeda",
+    "listLabel": "Yang akan dipotong",
+    "item": {
+      "keepPause": "Pertahankan jeda ini",
+      "cutPause": "Potong jeda ini",
+      "keepFiller": "Pertahankan {{text}}",
+      "cutFiller": "Potong {{text}}",
+      "stop": "Berhenti",
+      "listenTitle": "Dengarkan (dengan satu detik di sekitarnya)",
+      "listenAt": "Dengarkan di {{time}}",
+      "pause": "Jeda",
+      "pauseLength": "{{length}} dtk → {{kept}} dtk",
+      "filler": "Pengisi",
+      "fillerTitle": "Bunyi keraguan",
+      "maybe": "Mungkin",
+      "maybeTitle": "Ada kata pengisi di sini (diapit jeda atau koma): dengarkan dulu"
+    },
+    "cut": "Potong",
+    "cutCount": "Potong {{n}} ({{seconds}} dtk)"
+  }
+}

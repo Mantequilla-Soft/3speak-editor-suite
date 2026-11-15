@@ -1,0 +1,41 @@
+{
+  "title": "Rozdziały",
+  "intro": "Zaznacz, gdzie zaczyna się każda część odcinka. Aplikacje do podcastów je pokazują, a 3Speak wypisuje je w opisie. Zostają z nagraniem, gdy je tniesz. Skrót: <kbd>M</kbd> dodaje rozdział w miejscu głowicy.",
+  "empty": "Nie ma jeszcze rozdziałów. Przesuń głowicę tam, gdzie zaczyna się część, i dodaj rozdział.",
+  "goThere": "Przejdź tam",
+  "nameLabel": "Nazwa rozdziału {{n}}",
+  "moveHere": "Przenieś do głowicy",
+  "moveLabel": "Przenieś rozdział {{n}} do głowicy",
+  "removeLabel": "Usuń rozdział {{n}}",
+  "leftOut": "Rozdziały oddalone o mniej niż sekundę lub na samym końcu są pomijane w eksporcie.",
+  "tipZero": "Wskazówka: wiele aplikacji oczekuje pierwszego rozdziału w 0:00.",
+  "addAt": "Dodaj w {{time}}",
+  "copyTitle": "Kopiuj listę (do opisu)",
+  "copied": "Skopiowano",
+  "copy": "Kopiuj listę",
+  "defaultTitle": "Rozdział",
+  "suggest": {
+    "title": "Sugestie",
+    "findTitle": "Znajdź, gdzie prawdopodobnie zaczynają się części: nowe tematy, długie pauzy, zmiany scen",
+    "again": "Szukaj ponownie",
+    "suggest": "Zaproponuj rozdziały",
+    "addAll": "Dodaj wszystkie {{n}}",
+    "withTranscript": "Z transkrypcją (przycisk Transkrypcja) sugestie podążają też za tematami i dostają tytuły z tego, co jest mówione.",
+    "none": "Nie znaleziono wyraźnych miejsc. Audycja może być krótka albo jej części płynnie się przenikają.",
+    "stop": "Stop",
+    "listen": "Słuchaj od tego miejsca",
+    "titleLabel": "Proponowany rozdział w {{time}}",
+    "add": "Dodaj ten rozdział",
+    "addLabel": "Dodaj rozdział w {{time}}",
+    "drop": "Nie ten",
+    "dropLabel": "Odrzuć sugestię w {{time}}",
+    "reason": {
+      "start": "Start",
+      "topic": "Nowy temat",
+      "pause": "Długa pauza",
+      "scene": "Zmiana sceny"
+    },
+    "intro": "Intro",
+    "part": "Część {{n}}"
+  }
+}

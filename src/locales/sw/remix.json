@@ -1,0 +1,42 @@
+{
+  "titles": {
+    "mode": "Unataka ku-remix vipi?",
+    "stitch": "Klipu yako iende wapi?",
+    "reaction": "Mwitikio wako uende wapi?"
+  },
+  "skip": "Ruka, hariri kwa uhuru",
+  "options": {
+    "stitch": {
+      "title": "Unganisha",
+      "text": "Rekodi klipu inayocheza kabla au baada ya asili."
+    },
+    "reaction": {
+      "title": "Mwitikio",
+      "text": "Jirekodi wakati asili inacheza."
+    },
+    "free": {
+      "title": "Hariri kwa uhuru",
+      "text": "Fungua kihariri ukiwa na asili kwenye mfuatano wa muda."
+    },
+    "stitchBefore": {
+      "title": "Kabla ya asili",
+      "text": "Klipu yako inacheza kwanza, kisha asili."
+    },
+    "stitchAfter": {
+      "title": "Baada ya asili",
+      "text": "Asili inacheza kwanza, kisha klipu yako."
+    },
+    "overlay": {
+      "title": "Tabaka",
+      "text": "Kamera yako kwenye kisanduku kidogo juu ya asili. Iburute popote."
+    },
+    "tileTop": {
+      "title": "Kigae juu",
+      "text": "Asili inapungua hadi nusu ya chini, wewe juu."
+    },
+    "tileBottom": {
+      "title": "Kigae chini",
+      "text": "Asili inapungua hadi nusu ya juu, wewe chini."
+    }
+  }
+}

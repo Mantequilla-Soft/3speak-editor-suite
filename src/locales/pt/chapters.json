@@ -1,0 +1,41 @@
+{
+  "title": "Capítulos",
+  "intro": "Marque onde cada parte do episódio começa. Os apps de podcast mostram os capítulos e o 3Speak os lista na descrição. Eles acompanham sua gravação quando você corta. Atalho: <kbd>M</kbd> adiciona um no cursor de reprodução.",
+  "empty": "Ainda não há capítulos. Mova o cursor de reprodução até onde uma parte começa e adicione um.",
+  "goThere": "Ir para lá",
+  "nameLabel": "Nome do capítulo {{n}}",
+  "moveHere": "Mover para o cursor de reprodução",
+  "moveLabel": "Mover o capítulo {{n}} para o cursor de reprodução",
+  "removeLabel": "Remover o capítulo {{n}}",
+  "leftOut": "Capítulos com menos de um segundo de distância, ou bem no final, ficam fora da exportação.",
+  "tipZero": "Dica: muitos apps esperam o primeiro capítulo em 0:00.",
+  "addAt": "Adicionar em {{time}}",
+  "copyTitle": "Copiar a lista (para uma descrição)",
+  "copied": "Copiado",
+  "copy": "Copiar lista",
+  "defaultTitle": "Capítulo",
+  "suggest": {
+    "title": "Sugestões",
+    "findTitle": "Encontra onde as partes provavelmente começam: novos assuntos, pausas longas, mudanças de cena",
+    "again": "Procurar de novo",
+    "suggest": "Sugerir capítulos",
+    "addAll": "Adicionar os {{n}}",
+    "withTranscript": "Com uma transcrição (o botão Transcrição), as sugestões também seguem os assuntos e recebem títulos a partir do que é dito.",
+    "none": "Nenhum ponto claro encontrado. O programa pode ser curto, ou as partes fluem umas nas outras.",
+    "stop": "Parar",
+    "listen": "Ouvir daqui",
+    "titleLabel": "Capítulo sugerido em {{time}}",
+    "add": "Adicionar este capítulo",
+    "addLabel": "Adicionar o capítulo em {{time}}",
+    "drop": "Este não",
+    "dropLabel": "Descartar a sugestão em {{time}}",
+    "reason": {
+      "start": "Início",
+      "topic": "Novo assunto",
+      "pause": "Pausa longa",
+      "scene": "Mudança de cena"
+    },
+    "intro": "Intro",
+    "part": "Parte {{n}}"
+  }
+}

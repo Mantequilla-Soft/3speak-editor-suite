@@ -1,0 +1,53 @@
+{
+  "title": "Kho phương tiện",
+  "titleBackground": "Chọn phông nền",
+  "search": "Tìm video, ảnh và GIF",
+  "searchProvider": "Tìm trên {{provider}}",
+  "searchProviderTitle": "Tìm trên {{provider}} (dùng miễn phí, được sao chép vào máy chủ của chúng tôi khi bạn chọn)",
+  "kind": "Loại",
+  "category": "Danh mục",
+  "everything": "Mọi thứ",
+  "types": {
+    "all": "Tất cả",
+    "video": "Video",
+    "image": "Ảnh",
+    "gif": "GIF"
+  },
+  "categories": {
+    "nature": "Thiên nhiên",
+    "city": "Thành phố",
+    "people": "Người",
+    "animals": "Động vật",
+    "food": "Ẩm thực",
+    "tech": "Công nghệ",
+    "sports": "Thể thao",
+    "space": "Vũ trụ",
+    "abstract": "Trừu tượng",
+    "backgrounds": "Phông nền"
+  },
+  "loading": "Đang tải thư viện...",
+  "typeToSearch": "Nhập thứ bạn đang tìm để tìm trên {{provider}}.",
+  "nothingFound": "Không tìm thấy gì.",
+  "searching": "Đang tìm...",
+  "loadFailed": "Không tải được kho phương tiện.",
+  "nothingMatches": "Không có gì phù hợp.",
+  "adding": "Đang thêm...",
+  "byAuthor": "{{title}} ({{author}})",
+  "licenceOnline": "Từ {{provider}}: dùng miễn phí, kể cả cho mục đích thương mại, không cần ghi nguồn. Tệp được sao chép vào máy chủ của 3Speak khi bạn chọn.",
+  "licence": "Dùng miễn phí, kể cả cho mục đích thương mại, không cần ghi nguồn (CC0 / phạm vi công cộng từ Wikimedia Commons).",
+  "placeBackground": "Nó nằm phía sau bạn, trên rãnh riêng, dài bằng clip của bạn.",
+  "placeAdd": "Nó được thêm tại đầu phát: trên dòng thời gian trống thì thành video của bạn, nếu không thì phủ lên trên làm cảnh phụ.",
+  "errors": {
+    "notCopied": "Không sao chép được tệp đó.",
+    "notAdded": "Không thêm được tệp đó.",
+    "tooMany": "Tìm kiếm quá nhiều, hãy đợi một chút.",
+    "searchFailed": "Tìm kiếm không thành công, hãy thử lại.",
+    "copyFailed": "Không sao chép được tệp đó vào máy chủ."
+  },
+  "trackName": {
+    "background": "Nền",
+    "backgroundNumbered": "Nền {{number}}",
+    "broll": "Cảnh phụ",
+    "brollNumbered": "Cảnh phụ {{number}}"
+  }
+}

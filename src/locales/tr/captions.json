@@ -1,0 +1,67 @@
+{
+  "language": {
+    "label": "Konuşulan dil",
+    "auto": "Otomatik algıla"
+  },
+  "intro": {
+    "title": "Otomatik altyazı",
+    "text": "Söyleneni her kelimeyi takip eden altyazılara dönüştür; Short'una gömülür ve 3Speak'e ayrıca altyazı olarak gönderilir.",
+    "checking": "Sunucu kontrol ediliyor...",
+    "unavailable": "Otomatik altyazı şu anda bu düzenleyici sunucusunda kullanılamıyor. Short'un her zamanki gibi altyazısız işlenir.",
+    "go": "Otomatik altyazı"
+  },
+  "presets": {
+    "karaoke": "Karaoke",
+    "pop": "Pop",
+    "plain": "Altyazılar"
+  },
+  "presetHints": {
+    "karaoke": "Aynı anda birkaç kelime, söylenen kelime vurgu renginde",
+    "pop": "Aynı anda bir (ya da birkaç) kelime, belirerek",
+    "plain": "Koyu kutu üzerinde klasik altyazı satırları"
+  },
+  "style": {
+    "title": "Stil",
+    "presetsLabel": "Altyazı stili",
+    "wordsAtATime": "Aynı anda kelime",
+    "font": "Yazı tipi",
+    "size": "Boyut",
+    "sizeLabel": "Altyazı boyutu",
+    "position": "Konum",
+    "positionLabel": "Altyazının görüntüdeki yüksekliği",
+    "top": "Üst",
+    "middle": "Orta",
+    "low": "Alt",
+    "textColour": "Metin rengi",
+    "highlight": "Vurgu",
+    "highlightLabel": "Vurgu rengi",
+    "uppercase": "Büyük harfler",
+    "emoji": "Emoji vurguları (\"ateş\" ya da \"aşk\" gibi kelimelerin üstünde)",
+    "burn": "Videoda göster (kapalı: yalnızca 3Speak'te altyazı olarak)"
+  },
+  "words": {
+    "title": "Kelimeler ({{n}})",
+    "hint": "Yanlış duyulanı düzelt; çıkarmak için bir kelimeyi sil. Klipleri taşıdın ya da kestin mi? Otomatik altyazıyı yeniden çalıştır.",
+    "goThere": "Oraya git",
+    "word": "Kelime {{n}}",
+    "changeEmoji": "Emojisini değiştir ya da kaldır",
+    "addEmoji": "Emoji ekle",
+    "remove": "Bu kelimeyi kaldır",
+    "removeNamed": "Kaldır: {{word}}"
+  },
+  "actions": {
+    "again": "Yeniden",
+    "againTitle": "Yeniden dinle (kelimelerin yerini alır)",
+    "remove": "Altyazıları kaldır"
+  },
+  "videoSound": "Video sesi",
+  "job": {
+    "preparing": "Ses hazırlanıyor...",
+    "listening": "Dinleniyor...",
+    "noTracks": "Altyazı yapılacak konuşma yok: önce sesli bir klip ekle.",
+    "serverAnswered": "Sunucunun yanıtı: {{status}}",
+    "lost": "Altyazı işi kayboldu (sunucu yeniden mi başladı?)",
+    "noSpeech": "Konuşma bulunamadı. Ses, sessize alınmamış bir ses kanalında mı (müzik kanalları dahil edilmez)?",
+    "failed": "Konuşma tanıma başarısız oldu"
+  }
+}

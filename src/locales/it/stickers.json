@@ -1,0 +1,64 @@
+{
+  "title": "Sticker",
+  "search": "Cerca sticker",
+  "textBoxes": "Riquadri di testo",
+  "loading": "Caricamento degli sticker...",
+  "noMatch": "Nessuno sticker corrisponde.",
+  "tileTitle": "{{name}} (aggiunto alla testina)",
+  "note": "Gli sticker vengono inseriti alla testina per 3 secondi. Trascinali, ridimensionali o rifilali come qualsiasi clip; i riquadri di testo restano modificabili.",
+  "categories": {
+    "emoji": "Emoji",
+    "badges": "Badge",
+    "shapes": "Frecce e forme",
+    "branding": "Brand"
+  },
+  "presets": {
+    "caption": {
+      "title": "Didascalia",
+      "text": "La tua didascalia qui"
+    },
+    "highlight": {
+      "title": "Evidenzia",
+      "text": "Da non perdere!"
+    },
+    "brand": {
+      "title": "Rosso 3Speak",
+      "text": "Nuovo video"
+    },
+    "bubble": {
+      "title": "Fumetto",
+      "text": "Ciao!"
+    },
+    "outline": {
+      "title": "Contorno",
+      "text": "Guarda qui"
+    },
+    "neon": {
+      "title": "Neon",
+      "text": "STASERA"
+    },
+    "title": {
+      "title": "Titolo grande",
+      "text": "GRANDI NOVITÀ"
+    },
+    "comic": {
+      "title": "Fumetto pop",
+      "text": "BOOM!"
+    },
+    "marker": {
+      "title": "Pennarello",
+      "text": "fatto a mano"
+    },
+    "quote": {
+      "title": "Citazione",
+      "text": "“Dillo bene.”"
+    },
+    "tag": {
+      "title": "Hashtag"
+    },
+    "minimal": {
+      "title": "Minimo",
+      "text": "semplice e pulito"
+    }
+  }
+}

@@ -153,7 +153,7 @@ Strings live in `src/locales/<lang>/<area>.json` (`timeline.json` holds `t('time
 Adding or changing a string:
 
 1. Add it to `src/locales/en/<area>.json` (a new feature can get its own area file) and use it: `t('area.key', { name })`. Whole sentences only, never glued from pieces; a changed meaning gets a new key.
-2. `npm run i18n:reuse -- --from ../new-3speak-tv` fills keys whose English text the 3Speak frontend already translates.
+2. `npm run i18n:reuse -- --from ../new-3speak-tv` fills keys whose English text the 3Speak frontend already translates. Look over what it filled (`git diff src/locales`): a one-word label ("Top", "Strong", "Space") can mean something else in the editor than on the site.
 3. `npm run i18n:todo -- --out /tmp/i18n-todo` writes one flat file per language with what is still missing (in that language's plural forms); translate the values, keeping every `{{placeholder}}` and `<tag>`, then `npm run i18n:merge -- --in /tmp/i18n-todo`.
 4. `npm run i18n:check` (also run by `tests/i18n.test.js`): every language has every key, the same placeholders, its own plural forms, and every key is used in `src/`.
 

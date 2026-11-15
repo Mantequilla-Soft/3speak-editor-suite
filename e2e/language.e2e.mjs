@@ -92,15 +92,15 @@ const step = async (name, fn) => {
 const browser = await chromium.launch({ executablePath: CHROME })
 const consoleErrors = []
 const missingKeys = []
-async function open(mode, code) {
-  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, locale: 'en-US' })
+async function open(mode, code, viewport = { width: 1280, height: 900 }) {
+  const ctx = await browser.newContext({ viewport, locale: 'en-US' })
   const page = await ctx.newPage()
   page.on('console', m => {
     if (m.type() === 'error') consoleErrors.push(m.text())
     if (/\[i18n\] missing key/.test(m.text())) missingKeys.push(`${mode}/${code}: ${m.text()}`)
   })
   page.on('pageerror', e => consoleErrors.push(`pageerror: ${e.message}`))
-  await page.addInitScript((origin) => { if (location.href.startsWith(origin)) localStorage.setItem('3speak-tour-done', '1') }, EDITOR)
+  await page.addInitScript((origin) => { if (location.href.startsWith(origin)) { localStorage.setItem('3speak-tour-done', '1'); localStorage.setItem('3speak-audio-tour-done', '1') } }, EDITOR)
   await page.goto(`${HOST}/index.html?editor=${encodeURIComponent(EDITOR)}&mode=${mode}&lang=${code}`)
   const frame = await until(async () => page.frames().find(f => f.url().startsWith(EDITOR)), 'editor frame')
   await until(() => page.evaluate(() => window.__messages.some(m => m.type === 'editor-ready')), 'editor-ready')
@@ -111,6 +111,7 @@ const shows = async (frame, text, what) => {
   assert.ok(text, `no text for ${what}`)
   await frame.getByText(text, { exact: false }).first().waitFor({ timeout: 15000 })
 }
+const shot = async (page, name) => { if (process.env.E2E_SHOTS) await page.screenshot({ path: path.join(process.env.E2E_SHOTS, `language-${name}.png`) }) }
 const noRawKeys = async (frame, what) => {
   const body = await frame.evaluate(() => document.body.innerText)
   const m = body.match(KEY_RE)
@@ -122,10 +123,11 @@ try {
     const { ctx, page, frame } = await open('video', 'de')
     await until(async () => (await htmlLang(frame)) === 'de', 'html lang=de')
     await shows(frame, lang.de['app.empty.addVideo'], 'app.empty.addVideo')
-    await shows(frame, lang.de['app.empty.music'], 'app.empty.music')
+    await shows(frame, lang.de['app.empty.addAudio'], 'app.empty.addAudio')
     assert.notEqual(lang.de['app.empty.addVideo'], lang.en['app.empty.addVideo'])
     assert.equal(await frame.getByText(lang.en['app.empty.addVideo'], { exact: true }).count(), 0, 'English "Add video" still shown')
     await noRawKeys(frame, 'video/de')
+    await shot(page, 'video-de')
 
     // the viewer switches to French on 3Speak while the editor is open
     await page.evaluate(() => window.__send({ type: 'set-language', lang: 'fr' }))
@@ -142,15 +144,17 @@ try {
     const { ctx, frame } = await open('audio', 'ru')
     await until(async () => (await htmlLang(frame)) === 'ru', 'html lang=ru')
     await shows(frame, lang.ru['app.empty.addRecording'], 'app.empty.addRecording')
+    await shows(frame, lang.ru['app.empty.music'], 'app.empty.music')
     await noRawKeys(frame, 'audio/ru')
     await ctx.close()
   })
 
   await step('the Ad Wizard opens in Japanese', async () => {
-    const { ctx, frame } = await open('ads', 'ja')
+    const { ctx, page, frame } = await open('ads', 'ja')
     await until(async () => (await htmlLang(frame)) === 'ja', 'html lang=ja')
     await shows(frame, lang.ja['adwizard.steps.format'], 'adwizard.steps.format')
     await noRawKeys(frame, 'ads/ja')
+    await shot(page, 'ads-ja')
     await ctx.close()
   })
 
@@ -160,6 +164,19 @@ try {
     await shows(frame, lang.en['app.empty.addVideo'], 'en app.empty.addVideo')
     await ctx.close()
   })
+
+  for (const [mode, code] of [['video', 'de'], ['audio', 'ru'], ['ads', 'de']]) {
+    await step(`phone, ${mode} editor in ${code}: no sideways scrolling with the longer words`, async () => {
+      const { ctx, page, frame } = await open(mode, code, { width: 390, height: 844 })
+      await until(async () => (await htmlLang(frame)) === code, `html lang=${code}`)
+      await sleep(500)
+      const { sw, w } = await frame.evaluate(() => ({ sw: document.documentElement.scrollWidth, w: window.innerWidth }))
+      assert.ok(sw <= w + 1, `page is ${sw}px wide in a ${w}px frame`)
+      await noRawKeys(frame, `${mode}/${code} phone`)
+      await shot(page, `phone-${mode}-${code}`)
+      await ctx.close()
+    })
+  }
 
   await step('no missing keys were asked for', async () => {
     assert.deepEqual(missingKeys, [])

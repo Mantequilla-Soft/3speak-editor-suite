@@ -1,0 +1,25 @@
+{
+  "length": {
+    "title": "Je tijdlijn duurt {{length}}",
+    "body": "{{atMost}} Je kunt alles blijven bewerken, maar Renderen blijft uit tot de tijdlijn eindigt bij de gemarkeerde lijn op {{limitAt}}. Kort clips in, splits of verwijder ze om daar te komen.",
+    "bodyAudio": "{{atMost}} Je kunt alles blijven bewerken, maar Exporteren blijft uit tot de tijdlijn eindigt bij de gemarkeerde lijn op {{limitAt}}. Kort clips in, splits of verwijder ze om daar te komen."
+  },
+  "tooLarge": {
+    "title_one": "Dit bestand is te groot",
+    "title_other": "Deze bestanden zijn te groot",
+    "body": "De editor neemt bestanden tot {{size}}. Maak de video eerst korter of comprimeer hem (een telefoon of elke video-app kan een kleinere kopie exporteren) en voeg hem dan opnieuw toe."
+  },
+  "encoding": {
+    "title": "Deze video moet eerst worden omgezet",
+    "videos_one": "{{count}} video",
+    "videos_other": "{{count}} video's",
+    "next": "Volgende",
+    "waiting_one": "Wachten op {{count}} andere video",
+    "waiting_other": "Wachten op {{count}} andere video's",
+    "starting": "Starten…",
+    "upload": "Uploaden",
+    "convert": "Omzetten naar een afspeelbare kopie",
+    "hint": "Deze browser kan het formaat van deze video niet afspelen (HEVC of HDR, gebruikelijk bij telefoons), dus hij blijft zwart tot de afspeelbare kopie klaar is. Het voorbeeld schakelt daarna vanzelf over. Je kunt intussen verder bewerken.",
+    "hide": "Verbergen"
+  }
+}

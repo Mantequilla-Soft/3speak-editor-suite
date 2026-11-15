@@ -1,0 +1,86 @@
+{
+  "video": {
+    "title": "Videocast",
+    "intro": "O episódio inteiro ({{length}}) como vídeo 16:9: a imagem, uma forma de onda em movimento, legendas e quem está falando. Para videocasts no 3Speak, YouTube e Spotify.",
+    "unavailable": "Este servidor do editor ainda não consegue criar videocasts.",
+    "tooLong": "Videocasts podem ter até {{length}}.",
+    "preview": "Prévia do videocast",
+    "sampleCaption": "<b>Suas</b> palavras aparecem aqui",
+    "stageHint": "A forma de onda se move com o som; as legendas e o nome acompanham o episódio.",
+    "defaultLine": "Assista e ouça no *3speak.tv*",
+    "captions": "Legendas",
+    "captionsTranscript": "As palavras da sua transcrição.",
+    "captionsNoStt": "A conversão de fala em texto não está disponível neste servidor.",
+    "captionsStt": "As palavras, encontradas pela conversão de fala em texto no servidor. Episódios longos levam um tempo.",
+    "whoSpeaks": "Quem está falando",
+    "noVoices": "Nenhuma faixa de voz para tirar nomes.",
+    "speaker": "Falante {{n}}",
+    "speakerLabel": "Nome para a faixa de voz {{n}}",
+    "loudest": "Cada voz na própria faixa: aparece o nome da que está mais alta.",
+    "frameRate": "Taxa de quadros",
+    "fps15": "15 fps (menor, mais rápido)",
+    "fps24": "24 fps (mais fluido)",
+    "finding": "Descobrindo quem fala quando...",
+    "sending": "Enviando...",
+    "working": "Processando...",
+    "serverAnswered": "O servidor respondeu {{status}}",
+    "lost": "A tarefa foi perdida (o servidor reiniciou?)",
+    "stopped": "Parado",
+    "signIn": "Entre no 3Speak para criar um videocast.",
+    "failed": "Não foi possível criar o videocast: {{error}}",
+    "stop": "Parar",
+    "make": "Criar videocast",
+    "again": "Criar de novo",
+    "download": "Baixar MP4",
+    "subtitles": "Legendas (SRT)",
+    "post": "Publicar no 3Speak como vídeo"
+  },
+  "template": {
+    "title": "Seu modelo",
+    "signedOutIntro": "Salve sua intro, outro e música de fundo uma vez, e cada gravação nova recebe tudo com um clique. Seu modelo fica guardado para sempre, por isso precisa do seu login no 3Speak.",
+    "signIn": "Entre para usar um modelo",
+    "logIn": "Entre no 3Speak para usar um modelo.",
+    "intro": "Um modelo, guardado para sempre. Salvar substitui o que você tinha.",
+    "role": {
+      "intro": {
+        "title": "Intro",
+        "hint": "Toca primeiro, antes da sua gravação.",
+        "clear": "Sem intro"
+      },
+      "outro": {
+        "title": "Outro",
+        "hint": "Toca logo depois que sua gravação termina.",
+        "clear": "Sem outro"
+      },
+      "bed": {
+        "title": "Música de fundo",
+        "hint": "Música baixa sob toda a gravação, em loop para caber e com fade no final.",
+        "clear": "Sem música de fundo"
+      }
+    },
+    "useSelected": "Usar \"{{name}}\" (a parte em que você cortou)",
+    "selectFirst": "Selecione primeiro um clipe de áudio enviado na linha do tempo",
+    "selectedClip": "Clipe selecionado",
+    "file": "Arquivo",
+    "volume": "Volume",
+    "bedVolume": "Volume da música de fundo",
+    "loop": "Repetir em loop para preencher toda a gravação",
+    "cutSilences": "Cortar os silêncios de cada gravação nova <small>(com suas configurações de Cortar silêncios)</small>",
+    "loudness": "Normalizar o volume para podcasts <small>(-16 LUFS, aplicado ao exportar)</small>",
+    "duck": "Abaixar a música enquanto alguém fala <small>({{db}} dB na música de fundo; altere nas configurações do clipe)</small>",
+    "autoApply": "Aplicar sozinho quando eu abrir uma gravação",
+    "signInUpload": "Entre no 3Speak para enviar.",
+    "uploadFailed": "Não foi possível enviar esse arquivo. Tente outro.",
+    "deleteForGood": "Excluir para sempre",
+    "delete": "Excluir modelo",
+    "saveApply": "Salvar e aplicar",
+    "voiceTrack": "Voz",
+    "bedTrack": "Música de fundo"
+  },
+  "stage": {
+    "empty": "Adicione uma gravação, grave uma ou escolha uma música para começar.",
+    "chapter": "Capítulo",
+    "position": "Posição no programa",
+    "positionText": "{{at}} de {{total}}"
+  }
+}

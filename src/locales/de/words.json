@@ -1,0 +1,59 @@
+{
+  "panel": {
+    "title": "Transkript",
+    "close": "Transkript schließen"
+  },
+  "cutNotice": {
+    "plain": "Geschnitten: {{seconds}} s kürzer.",
+    "words_one": "{{count}} Wort geschnitten: {{seconds}} s kürzer.",
+    "words_other": "{{count}} Wörter geschnitten: {{seconds}} s kürzer.",
+    "found_one": "{{count}} Treffer geschnitten: {{seconds}} s kürzer.",
+    "found_other": "{{count}} Treffer geschnitten: {{seconds}} s kürzer.",
+    "fillers": "{{fillers}}, {{pauses}} geschnitten: {{seconds}} s kürzer.",
+    "dismiss": "Schließen"
+  },
+  "fillers": {
+    "title": "Füllwörter und Pausen entfernen",
+    "emptyHint": "Das funktioniert über das Transkript: es findet ähm, äh, sozusagen und Ähnliches in der Sprache der Sendung, dazu die langen Pausen.",
+    "listening": "Hört zu...",
+    "transcribeFirst": "Transkribiere zuerst die Sendung",
+    "checking": "Server wird geprüft...",
+    "unavailable": "Transkripte sind auf diesem Editor-Server gerade nicht verfügbar.",
+    "intro": "Füllwörter auf {{language}}. Hör dir jedes an und entferne den Haken bei dem, was bleiben soll.",
+    "introNoList": "Füllwörter auf {{language}} (nur ähm, äh und Ähnliches: für diese Sprache gibt es noch keine Liste). Hör dir jedes an und entferne den Haken bei dem, was bleiben soll.",
+    "stillTranscribing": "Der Rest der Sendung wird noch transkribiert.",
+    "fillerWords": "Füllwörter",
+    "longPauses": "Lange Pausen",
+    "minPause": "Pause länger als <strong>{{seconds}} s</strong>",
+    "keepPause": "Pausen kürzen auf <strong>{{seconds}} s</strong>",
+    "keepPauseTitle": "Was von einer langen Pause nach dem Schnitt übrig bleibt",
+    "fillerCount_one": "{{count}} Füllwort",
+    "fillerCount_other": "{{count}} Füllwörter",
+    "pauseCount_one": "{{count}} Pause",
+    "pauseCount_other": "{{count}} Pausen",
+    "summary": "{{fillers}}, {{pauses}} angehakt · schneidet {{seconds}} s",
+    "nothingFound": "Mit diesen Einstellungen wurde nichts gefunden.",
+    "tickAllFillers": "Alle Füllwörter anhaken",
+    "untickAllFillers": "Haken bei allen Füllwörtern entfernen",
+    "tickAllPauses": "Alle Pausen anhaken",
+    "untickAllPauses": "Haken bei allen Pausen entfernen",
+    "listLabel": "Was geschnitten würde",
+    "item": {
+      "keepPause": "Diese Pause behalten",
+      "cutPause": "Diese Pause schneiden",
+      "keepFiller": "{{text}} behalten",
+      "cutFiller": "{{text}} schneiden",
+      "stop": "Stopp",
+      "listenTitle": "Anhören (mit einer Sekunde drumherum)",
+      "listenAt": "Bei {{time}} anhören",
+      "pause": "Pause",
+      "pauseLength": "{{length}} s → {{kept}} s",
+      "filler": "Füllwort",
+      "fillerTitle": "Ein Zögerlaut",
+      "maybe": "Vielleicht",
+      "maybeTitle": "Hier ein Füllwort (durch Pausen oder Kommas abgesetzt): erst anhören"
+    },
+    "cut": "Schneiden",
+    "cutCount": "{{n}} schneiden ({{seconds}} s)"
+  }
+}

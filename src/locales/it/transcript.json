@@ -1,0 +1,78 @@
+{
+  "language": {
+    "label": "Lingua parlata",
+    "auto": "Rileva automaticamente"
+  },
+  "intro": {
+    "title": "Modifica dal testo",
+    "text": "Trasforma ciò che viene detto in testo, con ogni voce per nome, poi modifica la registrazione come un documento: seleziona parole e premi Canc per tagliarle.",
+    "checking": "Verifica del server...",
+    "unavailable": "Le trascrizioni non sono disponibili su questo server dell'editor al momento.",
+    "noSpeech": "Aggiungi prima una registrazione con del parlato.",
+    "transcribeSeconds": "Trascrivi ({{n}} s di registrazione)",
+    "transcribeMinutes": "Trascrivi ({{n}} min di registrazione)",
+    "longShow": "Una puntata lunga richiede tempo: le parole arrivano parte per parte e puoi iniziare a modificare le prime."
+  },
+  "listening": "Ascolto...",
+  "stop": "Stop",
+  "goThere": "Vai lì",
+  "search": {
+    "placeholder": "Trova parole",
+    "label": "Trova parole nella trascrizione",
+    "previous": "Precedente",
+    "previousLabel": "Risultato precedente",
+    "next": "Successivo",
+    "nextLabel": "Risultato successivo"
+  },
+  "selection": {
+    "count_one": "{{count}} parola · {{seconds}} s",
+    "count_many": "{{count}} parole · {{seconds}} s",
+    "count_other": "{{count}} parole · {{seconds}} s",
+    "cut": "Taglia",
+    "cutTitle": "Taglia le parole selezionate dalla registrazione (Canc)",
+    "clearTitle": "Annulla la selezione (Esc)",
+    "clearLabel": "Annulla la selezione"
+  },
+  "found": {
+    "cutAll_one": "Taglia il risultato ({{count}})",
+    "cutAll_many": "Taglia tutti e {{count}}",
+    "cutAll_other": "Taglia tutti e {{count}}",
+    "cutAllTitle": "Taglia dalla registrazione ogni punto trovato"
+  },
+  "fillers": "Intercalari",
+  "fillersTitle": "Trova ehm, uhm, cioè e le pause lunghe",
+  "copy": "Copia la trascrizione",
+  "speakers": "Speaker",
+  "missing": {
+    "seconds": "{{n}} s di registrazione non hanno ancora testo.",
+    "minutes": "{{n}} min di registrazione non hanno ancora testo.",
+    "transcribe": "Trascrivili"
+  },
+  "scrollLabel": "Trascrizione: fai clic su una parola per andarci, trascina sulle parole per selezionarle, Canc le taglia",
+  "hint_one": "{{count}} parola. Fai clic su una parola per andarci; trascina o Maiusc+clic per selezionare; Canc taglia. Annulla la riporta.",
+  "hint_many": "{{count}} parole. Fai clic su una parola per andarci; trascina o Maiusc+clic per selezionare; Canc taglia. Annulla la riporta.",
+  "hint_other": "{{count}} parole. Fai clic su una parola per andarci; trascina o Maiusc+clic per selezionare; Canc taglia. Annulla la riporta.",
+  "speaker": {
+    "default": "Voce",
+    "numbered": "Voce {{n}}"
+  },
+  "job": {
+    "starting": "Avvio...",
+    "preparing": "Preparazione delle registrazioni...",
+    "listening": "Ascolto...",
+    "signIn": "Accedi su 3Speak per creare una trascrizione.",
+    "uploadFailed": "Impossibile caricare le registrazioni: {{message}}",
+    "notUploaded": "Le registrazioni non sono ancora sul server. Riprova quando sono state caricate.",
+    "serverAnswered": "Il server ha risposto {{status}}",
+    "lost": "Il lavoro di trascrizione è andato perso (il server si è riavviato?)",
+    "failed": "Riconoscimento vocale non riuscito"
+  },
+  "stt": {
+    "audioUnavailable": "audio non disponibile",
+    "serverError": "errore del server",
+    "connectionFailed": "connessione non riuscita",
+    "unauthorized": "non autorizzato",
+    "closed": "chiuso",
+    "initFailed": "avvio del riconoscimento vocale non riuscito"
+  }
+}

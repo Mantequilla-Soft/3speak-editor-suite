@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "line": "{{clips}} · {{length}} · {{edited}}",
+    "audioLine": "오디오 · {{clips}} · {{length}} · {{edited}}",
+    "clips_other": "클립 {{count}}개",
+    "edited": {
+      "justNow": "방금 편집",
+      "minutes_other": "{{count}}분 전 편집",
+      "hours_other": "{{count}}시간 전 편집",
+      "days_other": "{{count}}일 전 편집"
+    }
+  },
+  "prompt": {
+    "titleOne": "임시저장한 작업을 이어서 할까요?",
+    "titleMany": "임시저장한 작업을 이어서 할까요?",
+    "keptUntil": "{{date}}까지 보관",
+    "open": "열기",
+    "startNew": "새 프로젝트 시작",
+    "singleNote": "임시저장은 하나만 보관할 수 있어요. 새 프로젝트를 시작하면 편집하는 순간 이 임시저장이 교체돼요. 3Speak Pro는 임시저장 3개를 30일 동안 보관해요."
+  },
+  "limit": {
+    "titleOne": "저장된 임시저장을 교체할까요?",
+    "titleMany": "저장된 프로젝트가 이미 {{n}}개 있어요",
+    "skipTitle": "이 프로젝트 저장 안 함",
+    "noteOne": "임시저장은 하나만 보관할 수 있어요. 이 프로젝트를 저장하면 아래 항목이 교체돼요.",
+    "noteMany": "최대 {{n}}개까지 보관할 수 있어요. 이 프로젝트로 교체할 항목을 고르세요:",
+    "replace": "교체",
+    "skip": "이 프로젝트 저장 안 함"
+  },
+  "close": {
+    "saveTitle": "프로젝트를 저장할까요?",
+    "closeTitle": "편집기를 닫을까요?",
+    "keepEditing": "계속 편집",
+    "signInFailed": "잘 되지 않았어요. 지갑에서 로그인 요청을 승인하고 다시 시도하거나, 3Speak에서 로그아웃한 뒤 다시 로그인하세요.",
+    "signInToKeep": "한 번 로그인하면 이 프로젝트를 임시저장으로 보관하고 나중에 이어서 할 수 있어요.",
+    "signedOutLost": "편집 내용이 사라져요. 프로젝트를 임시저장으로 보관하려면 3Speak에 로그인하세요.",
+    "lost": "편집 내용이 사라져요.",
+    "signingIn": "로그인 중…",
+    "signInToSave": "로그인해서 저장",
+    "withoutSaving": "저장하지 않고 닫기",
+    "keepTitle": "이 프로젝트를 보관할까요?",
+    "keepDays_other": "{{count}}일 동안 보관해요",
+    "keepHours_other": "{{count}}시간 동안 보관해요",
+    "until": "{{date}}까지",
+    "uploadingOne": "{{name}}은(는) 아직 업로드 중이에요 ({{percent}}). 끝나면 저장할 수 있어요.",
+    "uploadingFiles_other": "파일 {{count}}개가 아직 업로드 중이에요 ({{percent}}). 끝나면 저장할 수 있어요.",
+    "name": "프로젝트 이름",
+    "namePlaceholder": "제목 없는 프로젝트",
+    "saveError": "저장하지 못했어요. 연결을 확인하고 다시 시도하세요.",
+    "saveAndClose": "저장하고 닫기",
+    "afterUpload": "업로드가 끝나면 사용할 수 있어요",
+    "deleteAndClose": "삭제하고 닫기"
+  },
+  "pro": {
+    "title": "3Speak Pro로 더 많이",
+    "text": "1개를 7일 동안 대신, 프로젝트를 최대 3개까지 각각 30일 동안 보관하세요.",
+    "get": "Pro 시작하기"
+  },
+  "status": {
+    "signingIn": "로그인 중… 지갑을 확인하세요",
+    "signInTitle": "한 번 로그인하면 프로젝트를 임시저장으로 보관할 수 있어요",
+    "signInFailed": "로그인 실패 · 다시 시도하세요",
+    "saveDrafts": "임시저장 보관",
+    "notSavedTitle": "이 프로젝트는 아직 저장되지 않았어요",
+    "chooseSlot": "저장 안 됨: 저장할 자리를 고르세요",
+    "saving": "저장 중…",
+    "notSaved": "임시저장 안 됨",
+    "keptUntil": "{{date}}까지 임시저장 보관",
+    "savedUntil": "임시저장됨 · {{date}}까지"
+  },
+  "library": {
+    "title": "프로젝트 라이브러리",
+    "addFiles": "파일 추가",
+    "groups": {
+      "videos": "동영상",
+      "images": "이미지",
+      "sounds": "사운드"
+    },
+    "empty": {
+      "videos": "동영상 없음",
+      "images": "이미지 없음",
+      "sounds": "사운드 없음"
+    },
+    "dropToAdd": "파일을 놓아서 추가",
+    "hint": "여기에 파일을 놓거나 항목을 타임라인으로 드래그하세요",
+    "downloading": "다운로드 중... {{percent}}",
+    "downloaded": "로컬에 다운로드됨",
+    "local": "로컬",
+    "uploadingTitle": "백그라운드에서 업로드 중이에요. 끝날 때까지 렌더링은 기다려요.",
+    "converting": "변환 중",
+    "convertingTitle": "이 브라우저는 이 동영상 형식을 표시할 수 없어요. 준비되면 미리보기가 480p 사본으로 바뀌어요.",
+    "noPreview": "미리보기 없음",
+    "noPreviewTitle": "재생 가능한 사본을 만들지 못했어요. 미리보기는 검게 보일 수 있지만 렌더링은 작동해요.",
+    "encodedTitle": "서버에서 480p로 인코딩됨",
+    "encoding": "인코딩 중...",
+    "addToTimeline": "타임라인에 추가",
+    "remove": "라이브러리에서 제거"
+  }
+}

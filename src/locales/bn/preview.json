@@ -1,0 +1,29 @@
+{
+  "header": "টাইমলাইন প্রিভিউ",
+  "smaller": "ছোট",
+  "larger": "বড়",
+  "loopOn": "লুপ: চালু",
+  "loopOff": "লুপ: বন্ধ",
+  "aspect": {
+    "title": "অ্যাসপেক্ট রেশিও: {{ratio}}",
+    "titleAuto": "অ্যাসপেক্ট রেশিও: অটো ({{ratio}})",
+    "auto": "অটো"
+  },
+  "fullSize": "পূর্ণ সাইজ",
+  "halfSize": "অর্ধেক সাইজ",
+  "fullscreen": "ফুলস্ক্রিন",
+  "noClipHere": "এই অবস্থানে কোনো ক্লিপ নেই",
+  "noClips": "টাইমলাইনে কোনো ক্লিপ নেই",
+  "source": {
+    "hls": "(HLS স্ট্রিম)",
+    "uploaded": "(আপলোড করা)",
+    "local": "(লোকাল)",
+    "file": "(ফাইল)"
+  },
+  "stageLayout": {
+    "tileTop": "উপরে টাইল",
+    "tileBottom": "নিচে টাইল",
+    "overlay": "ওভারলে"
+  },
+  "selectClip": "প্রিভিউর জন্য একটি ক্লিপ বাছাই করুন"
+}

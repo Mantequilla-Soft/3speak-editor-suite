@@ -1,0 +1,53 @@
+{
+  "title": "Aspecto",
+  "noEffects": "Sin efectos",
+  "presetsLabel": "Estilos predefinidos",
+  "doubleClickReset": "Doble clic para restablecer",
+  "presets": {
+    "original": "Original",
+    "warm": "Cálido",
+    "cool": "Frío",
+    "vivid": "Vívido",
+    "matte": "Mate",
+    "bw": "B/N",
+    "vintage": "Vintage",
+    "tealorange": "Turquesa y naranja",
+    "fade": "Desvaído",
+    "noir": "Noir",
+    "sunset": "Atardecer"
+  },
+  "sliders": {
+    "blur": "Desenfoque",
+    "vignette": "Viñeta",
+    "sharpen": "Nitidez",
+    "split": "Turquesa y naranja"
+  },
+  "transition": {
+    "title": "Transición",
+    "none": "Ninguna",
+    "types": {
+      "crossfade": "Fundido cruzado",
+      "dissolve": "Fundido a negro",
+      "slideleft": "Deslizar a la izquierda",
+      "slideright": "Deslizar a la derecha",
+      "slideup": "Deslizar hacia arriba",
+      "zoom": "Zoom",
+      "whip": "Barrido"
+    },
+    "length": "Duración de la transición (segundos)",
+    "fades": "Fundidos",
+    "noFades": "Sin fundidos",
+    "in": "Entrada",
+    "out": "Salida",
+    "fadeInSeconds": "Fundido de entrada (segundos)",
+    "fadeOutSeconds": "Fundido de salida (segundos)",
+    "intoNext": "Hacia el clip siguiente",
+    "needNext": "Pon un clip justo después de este en la misma pista para añadir una transición.",
+    "fromTo": "{{from}} hacia {{to}}",
+    "fromUnnamed": "Clip hacia {{to}}",
+    "toUnnamed": "{{from}} hacia el clip siguiente",
+    "bothUnnamed": "Clip hacia el clip siguiente",
+    "add": "Añadir una transición",
+    "cutLabel": "{{type}}, {{seconds}} s"
+  }
+}

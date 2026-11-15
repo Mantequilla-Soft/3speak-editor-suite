@@ -1,0 +1,184 @@
+{
+  "title": "Audiogramu",
+  "tour": {
+    "again": "Onyesha ziara tena",
+    "againLabel": "Onyesha ziara ya audiogramu tena"
+  },
+  "saveAndClose": "Hifadhi na ufunge",
+  "saveAndCloseTitle": "Audiogramu zako zinabaki na sauti hii na zinachapishwa pamoja nayo kama Shorts",
+  "loadError": "Mipangilio ya audiogramu haikuweza kupakiwa: {{error}}",
+  "loadingLook": "Inapakia mwonekano wa audiogramu yako…",
+  "start": {
+    "title": "Chagua kipande cha kipindi",
+    "text_one": "Audiogramu ni video fupi ya kipande cha kipindi chako, hadi dakika {{count}}. Inachapishwa kama Short ya 3Speak pamoja na sauti. Anza kwa kuweka alama ya mwanzo na mwisho wake kwenye mfuatano wa muda.",
+    "text_other": "Audiogramu ni video fupi ya kipande cha kipindi chako, hadi dakika {{count}}. Inachapishwa kama Short ya 3Speak pamoja na sauti. Anza kwa kuweka alama ya mwanzo na mwisho wake kwenye mfuatano wa muda.",
+    "choose": "Chagua kwenye mfuatano wa muda"
+  },
+  "stage": {
+    "label": "Onyesho la awali la audiogramu: buruta sehemu ili kuzisogeza, pembe ili kubadilisha ukubwa, kishikio cha duara ili kuzungusha",
+    "frameTitle": "Onyesho la awali la audiogramu",
+    "turned": "{{name}} · {{angle}}°",
+    "rotate": "Zungusha (Shift: hatua za 15°). Bofya mara mbili: nyoosha",
+    "hint": "Buruta sehemu, vuta pembe ili kubadilisha ukubwa (Shift inahifadhi umbo), kishikio cha duara ili kuzungusha. Vitufe vya mishale vinasogeza kidogo, [ na ] vinazungusha.",
+    "hintTemplate": "Buruta sehemu, vuta pembe ili kubadilisha ukubwa (Shift inahifadhi umbo), kishikio cha duara ili kuzungusha. Vitufe vya mishale vinasogeza kidogo, [ na ] vinazungusha. Audiogramu yako ya mwisho ndiyo mahali pa kuanzia."
+  },
+  "layer": {
+    "logo": {
+      "name": "Nembo ya 3Speak",
+      "drag": "Nembo ya 3Speak: buruta ili kusogeza",
+      "dragSelected": "Nembo ya 3Speak: buruta ili kusogeza, pembe ili kubadilisha ukubwa, kishikio cha duara ili kuzungusha"
+    },
+    "cover": {
+      "name": "Picha",
+      "drag": "Picha: buruta ili kusogeza",
+      "dragSelected": "Picha: buruta ili kusogeza, pembe ili kubadilisha ukubwa, kishikio cha duara ili kuzungusha",
+      "hide": "Ficha picha",
+      "show": "Onyesha picha",
+      "forward": "Leta picha mbele",
+      "back": "Peleka picha nyuma"
+    },
+    "title": {
+      "name": "Kichwa",
+      "drag": "Kichwa: buruta ili kusogeza",
+      "dragSelected": "Kichwa: buruta ili kusogeza, pembe ili kubadilisha ukubwa, kishikio cha duara ili kuzungusha",
+      "hide": "Ficha kichwa",
+      "show": "Onyesha kichwa",
+      "forward": "Leta kichwa mbele",
+      "back": "Peleka kichwa nyuma"
+    },
+    "line": {
+      "name": "Mstari",
+      "drag": "Mstari: buruta ili kusogeza",
+      "dragSelected": "Mstari: buruta ili kusogeza, pembe ili kubadilisha ukubwa, kishikio cha duara ili kuzungusha",
+      "hide": "Ficha mstari",
+      "show": "Onyesha mstari",
+      "forward": "Leta mstari mbele",
+      "back": "Peleka mstari nyuma"
+    },
+    "wave": {
+      "name": "Mawimbi ya sauti",
+      "drag": "Mawimbi ya sauti: buruta ili kusogeza",
+      "dragSelected": "Mawimbi ya sauti: buruta ili kusogeza, pembe ili kubadilisha ukubwa, kishikio cha duara ili kuzungusha",
+      "hide": "Ficha mawimbi ya sauti",
+      "show": "Onyesha mawimbi ya sauti",
+      "forward": "Leta mawimbi ya sauti mbele",
+      "back": "Peleka mawimbi ya sauti nyuma"
+    }
+  },
+  "piece": {
+    "label": "Kipande cha kipindi",
+    "range": "{{from}} – {{to}} · sek {{seconds}}",
+    "inChapter": "katika “{{title}}”",
+    "change": "Badilisha kipande"
+  },
+  "look": {
+    "title": "Kichwa",
+    "titleLabel": "Kichwa kwenye video",
+    "line": "Mstari chini yake <small>(*nyota* zinaufanya mwekundu)</small>",
+    "lineLabel": "Mstari kwenye video",
+    "branding": "Chapa ya 3Speak",
+    "logoGroup": "Nembo",
+    "picture": "Picha",
+    "waveform": "Mawimbi ya sauti",
+    "waveType": "Aina ya mawimbi ya sauti",
+    "waveColour": "Rangi ya mawimbi ya sauti",
+    "colour": "Rangi {{colour}}",
+    "anyColour": "Rangi yoyote",
+    "anyWaveColour": "Rangi yoyote ya mawimbi ya sauti"
+  },
+  "logo": {
+    "mark": "Nembo ya 3S",
+    "full": "Nembo ya 3Speak"
+  },
+  "wave": {
+    "bars": "Pau",
+    "centered": "Katikati",
+    "line": "Mstari",
+    "dots": "Nyembamba",
+    "circle": "Duara",
+    "ring": "Wimbi la duara"
+  },
+  "picture": {
+    "upload": "Pakia picha",
+    "yours": "Picha yako",
+    "coverOf": "Jalada la “{{title}}”",
+    "playlistCover": "Jalada la orodha ya kucheza",
+    "noCovers": "Orodha zako za kucheza bado hazina majalada.",
+    "signIn": "Ingia kwenye 3Speak ili kuongeza picha."
+  },
+  "parts": {
+    "title": "Sehemu <small>(mbele hadi nyuma)</small>",
+    "logoLocked": "Nembo ya 3Speak inaonyeshwa kila wakati, mbele, na kamwe si ndogo kuliko ukubwa uliowekwa",
+    "alwaysShown": "Inaonyeshwa kila wakati",
+    "hide": "Ficha",
+    "show": "Onyesha",
+    "forward": "Mbele",
+    "back": "Nyuma",
+    "tidy": "Panga vizuri"
+  },
+  "make": {
+    "starting": "Inaanza...",
+    "working": "Inafanya kazi...",
+    "noWords": "maneno ya kipande hiki hayakupatikana (zima manukuu ili kuitengeneza bila hayo)",
+    "failedPlain": "imeshindwa",
+    "signIn": "Ingia kwenye 3Speak ili kutengeneza audiogramu.",
+    "failed": "Audiogramu haikuweza kutengenezwa: {{error}}",
+    "make": "Tengeneza audiogramu",
+    "another": "Tengeneza audiogramu nyingine"
+  },
+  "made": {
+    "title": "Audiogramu zako",
+    "hint": "Zinachapishwa kama Shorts za 3Speak pamoja na sauti, kila moja ikiwa na kiungo cha chapisho, snap au maoni ya sauti hiyo.",
+    "fallbackTitle": "Audiogramu {{n}}",
+    "length": "{{at}} · sek {{seconds}}",
+    "textPlaceholder": "Maandishi ya Short (si lazima). Kiungo cha sauti kinaongezwa kiotomatiki.",
+    "textLabel": "Maandishi ya Short {{n}}",
+    "editText": "Hariri maandishi",
+    "writeText": "Andika maandishi",
+    "download": "Pakua",
+    "removeLabel": "Ondoa audiogramu {{n}}"
+  },
+  "confirm": {
+    "title": "Funga bila kuitengeneza?",
+    "text": "Mabadiliko yako ya mwonekano bado hayako kwenye audiogramu. Yatapotea ukifunga.",
+    "stays_one": "Audiogramu {{count}} uliyotengeneza inabaki na sauti hii.",
+    "stays_other": "Audiogramu {{count}} ulizotengeneza zinabaki na sauti hii.",
+    "keep": "Endelea kuhariri"
+  },
+  "captions": {
+    "label": "Manukuu",
+    "drag": "Manukuu: buruta ili kusogeza",
+    "dragSelected": "Manukuu: buruta ili kusogeza, vuta upande ili kubadilisha upana",
+    "sample": "Maneno yako yanaonekana hapa yanapotamkwa",
+    "show": "Onyesha kinachosemwa, neno kwa neno",
+    "checking": "Inakagua seva...",
+    "unavailable": "Manukuu hayapatikani kwenye seva hii ya kihariri kwa sasa.",
+    "listening": "Inasikiliza...",
+    "getWords": "Pata maneno",
+    "wordCount_one": "Neno {{count}} katika kipande hiki.",
+    "wordCount_other": "Maneno {{count}} katika kipande hiki.",
+    "noSpeech": "Hakuna usemi uliopatikana katika kipande hiki.",
+    "fix": "Rekebisha maneno",
+    "doneFixing": "Nimemaliza kurekebisha",
+    "word": "Neno {{n}}",
+    "removeWord": "Ondoa neno hili",
+    "removeWordLabel": "Ondoa {{word}}",
+    "style": "Mtindo wa manukuu",
+    "preset": {
+      "karaoke": "Karaoke",
+      "pop": "Kuibuka",
+      "plain": "Manukuu"
+    },
+    "wordsAtATime": "Maneno kwa wakati mmoja",
+    "perPage_one": "Neno {{count}} kwa wakati mmoja",
+    "perPage_other": "Maneno {{count}} kwa wakati mmoja",
+    "font": "Fonti ya manukuu",
+    "size": "Ukubwa wa manukuu",
+    "textColour": "Rangi ya maandishi ya manukuu",
+    "textColourSwatch": "Rangi ya maandishi {{colour}}",
+    "highlightColour": "Rangi ya kuangazia",
+    "highlight": "Angazia",
+    "highlightSwatch": "Angazia {{colour}}",
+    "capitals": "Herufi kubwa"
+  }
+}

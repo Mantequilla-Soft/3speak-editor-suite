@@ -1,0 +1,41 @@
+{
+  "title": "Chapitres",
+  "intro": "Marquez où chaque partie de l'épisode commence. Les applis de podcast les affichent, et 3Speak les liste dans la description. Ils restent avec votre enregistrement quand vous le coupez. Raccourci : <kbd>M</kbd> en ajoute un à la tête de lecture.",
+  "empty": "Pas encore de chapitres. Placez la tête de lecture là où une partie commence et ajoutez-en un.",
+  "goThere": "Y aller",
+  "nameLabel": "Nom du chapitre {{n}}",
+  "moveHere": "Le déplacer à la tête de lecture",
+  "moveLabel": "Déplacer le chapitre {{n}} à la tête de lecture",
+  "removeLabel": "Retirer le chapitre {{n}}",
+  "leftOut": "Les chapitres à moins d'une seconde d'intervalle, ou tout à la fin, ne sont pas exportés.",
+  "tipZero": "Astuce : beaucoup d'applis attendent le premier chapitre à 0:00.",
+  "addAt": "Ajouter à {{time}}",
+  "copyTitle": "Copier la liste (pour une description)",
+  "copied": "Copié",
+  "copy": "Copier la liste",
+  "defaultTitle": "Chapitre",
+  "suggest": {
+    "title": "Suggestions",
+    "findTitle": "Trouver où les parties commencent probablement : nouveaux sujets, longues pauses, changements de scène",
+    "again": "Chercher à nouveau",
+    "suggest": "Suggérer des chapitres",
+    "addAll": "Ajouter les {{n}}",
+    "withTranscript": "Avec une transcription (le bouton Transcription), les suggestions suivent aussi les sujets et reçoivent des titres tirés de ce qui est dit.",
+    "none": "Aucun endroit clair trouvé. L'émission est peut-être courte, ou ses parties s'enchaînent.",
+    "stop": "Arrêter",
+    "listen": "Écouter à partir d'ici",
+    "titleLabel": "Chapitre suggéré à {{time}}",
+    "add": "Ajouter ce chapitre",
+    "addLabel": "Ajouter le chapitre à {{time}}",
+    "drop": "Pas celui-ci",
+    "dropLabel": "Écarter la suggestion à {{time}}",
+    "reason": {
+      "start": "Début",
+      "topic": "Nouveau sujet",
+      "pause": "Longue pause",
+      "scene": "Changement de scène"
+    },
+    "intro": "Intro",
+    "part": "Partie {{n}}"
+  }
+}

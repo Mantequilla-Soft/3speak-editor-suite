@@ -1,0 +1,53 @@
+{
+  "title": "Stile",
+  "noEffects": "Nessun effetto",
+  "presetsLabel": "Preset di stile",
+  "doubleClickReset": "Doppio clic per reimpostare",
+  "presets": {
+    "original": "Originale",
+    "warm": "Caldo",
+    "cool": "Freddo",
+    "vivid": "Intenso",
+    "matte": "Opaco",
+    "bw": "B/N",
+    "vintage": "Vintage",
+    "tealorange": "Ottanio e arancio",
+    "fade": "Sbiadito",
+    "noir": "Noir",
+    "sunset": "Tramonto"
+  },
+  "sliders": {
+    "blur": "Sfocatura",
+    "vignette": "Vignettatura",
+    "sharpen": "Nitidezza",
+    "split": "Ottanio e arancio"
+  },
+  "transition": {
+    "title": "Transizione",
+    "none": "Nessuna",
+    "types": {
+      "crossfade": "Dissolvenza incrociata",
+      "dissolve": "Dissolvenza al nero",
+      "slideleft": "Scorri a sinistra",
+      "slideright": "Scorri a destra",
+      "slideup": "Scorri in alto",
+      "zoom": "Zoom",
+      "whip": "Frustata"
+    },
+    "length": "Durata della transizione (secondi)",
+    "fades": "Dissolvenze",
+    "noFades": "Nessuna dissolvenza",
+    "in": "Entrata",
+    "out": "Uscita",
+    "fadeInSeconds": "Dissolvenza in entrata (secondi)",
+    "fadeOutSeconds": "Dissolvenza in uscita (secondi)",
+    "intoNext": "Verso la clip successiva",
+    "needNext": "Metti una clip subito dopo questa sulla stessa traccia per aggiungere una transizione.",
+    "fromTo": "{{from}} verso {{to}}",
+    "fromUnnamed": "Clip verso {{to}}",
+    "toUnnamed": "{{from}} verso la clip successiva",
+    "bothUnnamed": "Clip verso la clip successiva",
+    "add": "Aggiungi una transizione",
+    "cutLabel": "{{type}}, {{seconds}} s"
+  }
+}

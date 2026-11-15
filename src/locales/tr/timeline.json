@@ -1,0 +1,181 @@
+{
+  "aria": {
+    "timeline": "Zaman çizelgesi",
+    "ruler": "Zaman cetveli: oynatma kafasını taşımak için tıkla",
+    "playhead": "Oynatma kafası",
+    "zoom": "Yakınlaştır"
+  },
+  "split": {
+    "title": "Klibi oynatma kafasında böl (Ctrl+R)",
+    "label": "Böl"
+  },
+  "toolbar": {
+    "add": {
+      "title": "Kanal ya da klip ekle",
+      "videoTrack": "Video Kanalı",
+      "audioTrack": "Ses Kanalı",
+      "musicLibrary": "Müzik Kitaplığı",
+      "soundEffects": "Ses Efektleri",
+      "stickers": "Çıkartmalar",
+      "titles": "Başlıklar",
+      "stock": "Hazır medya"
+    },
+    "zoomTitle": "Yakınlaştırma: {{value}} px/sn",
+    "fit": {
+      "title": "Tüm zaman çizelgesini göster",
+      "label": "Sığdır"
+    },
+    "select": {
+      "titleStart": "Birkaç klip seç: her birine dokun",
+      "titleDone": "Seçim bitti",
+      "label": "Seç"
+    },
+    "ripple": {
+      "titleTrack": "{{number}}. kanalda oynatma kafasındaki boşluğu kapat (G). Diğer kanallar olduğu gibi kalır.",
+      "titleNoGap": "Seçili klibin kanalında oynatma kafasında boşluk yok",
+      "title": "Oynatma kafasındaki boşluğu kaldır (G)",
+      "label": "Boşluğu kapat"
+    },
+    "captions": {
+      "title": "Altyazılar: söyleneni kelime kelime altyazıya dönüştür",
+      "label": "Altyazılar"
+    },
+    "transcript": {
+      "title": "Döküm: metinle düzenle, kelimeleri silerek kes",
+      "label": "Döküm"
+    },
+    "flag": {
+      "title": "Oynatma kafasına bayrak koy (B): numaralı ve renkli, sana özel bir işaret, asla dışa aktarılmaz",
+      "label": "Bayrak"
+    },
+    "autoCut": {
+      "title": "Duraklamaları bul ve oradan kes",
+      "label": "Otomatik kes"
+    },
+    "beats": {
+      "title": "Ritmi bul: ona yapış, klipleri ona yerleştir",
+      "label": "Ritim"
+    },
+    "delete": {
+      "title": "Seçili klibi sil (Del)",
+      "titleMany": "Seçili klipleri sil (Del)",
+      "labelMany": "Sil ({{number}})"
+    },
+    "options": "Seçenekler",
+    "ungroup": {
+      "titleOne": "Grubu çöz: klipleri yeniden ayrı ayrı taşınır ve kırpılır",
+      "titleMany": "Grubu çöz: bu klipler yeniden ayrı ayrı taşınır ve kırpılır",
+      "label": "Grubu çöz"
+    },
+    "group": {
+      "title": "Grupla: bu klipler birlikte taşınır ve kırpılır",
+      "label": "Grupla ({{number}})"
+    },
+    "more": {
+      "title": "Diğer klip işlemleri",
+      "duplicate": "Çoğalt",
+      "groupVoicesTitle": "Diğer konuşma kanallarında aynı anda çalanlarla grupla: birlikte taşınır, kırpılır ve sessizlikleri birlikte kesilir",
+      "groupVoices": "Diğer seslerle grupla",
+      "reverse": "Ters çevir",
+      "unreverse": "Ters çevirmeyi geri al",
+      "snapOn": "Yapışma Açık",
+      "snapOff": "Yapışma Kapalı"
+    }
+  },
+  "selectHint": {
+    "count_one": "{{count}} klip seçildi: başkalarına dokun ya da Bitti",
+    "count_other": "{{count}} klip seçildi: başkalarına dokun ya da Bitti",
+    "none": "Seçmek istediğin her klibe dokun",
+    "clear": "Temizle"
+  },
+  "clip": {
+    "settings": "Klip ayarları",
+    "textFallback": "Metin",
+    "layer": "K{{number}}",
+    "kind": {
+      "video": "Video klibi",
+      "audio": "Ses klibi",
+      "image": "Görsel",
+      "text": "Metin",
+      "color": "Renk",
+      "other": "Klip"
+    },
+    "aria": {
+      "plain": "{{kind}}, {{from}} - {{to}}",
+      "named": "{{kind}} {{name}}, {{from}} - {{to}}",
+      "onTrack": "{{kind}}, kanal: {{track}}, {{from}} - {{to}}",
+      "namedOnTrack": "{{kind}} {{name}}, kanal: {{track}}, {{from}} - {{to}}"
+    }
+  },
+  "track": {
+    "show": "Kanalı göster",
+    "hide": "Kanalı gizle",
+    "mute": "Kanalın sesini kapat",
+    "unmute": "Kanalın sesini aç",
+    "remove": "Kanalı kaldır",
+    "addVisual": "Video, görsel ya da metin ekle",
+    "addAudio": "Ses ekle",
+    "addFile": "Dosya Ekle",
+    "addText": "Metin Ekle",
+    "addColor": "Renk Ekle",
+    "recordVideo": "Video Kaydet",
+    "addAudioFile": "Ses Dosyası Ekle",
+    "recordAudio": "Ses Kaydet",
+    "resize": {
+      "aria": "Yükseklik: {{name}}",
+      "ariaUnnamed": "Bu kanalın yüksekliği",
+      "title": "Kanalı uzatmak ya da kısaltmak için sürükle (çift tıklama: normale dön)"
+    },
+    "aria": {
+      "named": {
+        "video": "{{name}} (video kanalı)",
+        "audio": "{{name}} (ses kanalı)",
+        "music": "{{name}} (müzik kanalı)"
+      },
+      "numbered": {
+        "video": "Video kanalı {{number}}",
+        "audio": "Ses kanalı {{number}}",
+        "music": "Müzik kanalı {{number}}"
+      }
+    }
+  },
+  "trackName": {
+    "voice": "Konuşma",
+    "voiceNumbered": "Konuşma {{number}}",
+    "music": "Müzik",
+    "musicNumbered": "Müzik {{number}}",
+    "video": "Video",
+    "videoNumbered": "Video {{number}}",
+    "audioNumbered": "Ses {{number}}",
+    "stickers": "Çıkartmalar",
+    "stickersNumbered": "Çıkartmalar {{number}}",
+    "sfx": "Efektler",
+    "sfxNumbered": "Efektler {{number}}"
+  },
+  "clipName": {
+    "text": "Metin Katmanı",
+    "color": "Renk",
+    "imported": "İçe Aktarılan Medya",
+    "linkedAudio": "{{name}} (Ses)"
+  },
+  "textClip": {
+    "defaultText": "Metni buraya gir"
+  },
+  "flag": {
+    "aria": "Bayrak {{number}}, {{time}}",
+    "title": "Bayrak {{number}} · {{time}}: oraya gitmek için tıkla, taşımak için sürükle, kaldırmak için sağ tıkla"
+  },
+  "range": {
+    "label": "{{from}} – {{to}} · {{seconds}} sn",
+    "startOnly": "{{time}} · bittiği yere tıkla",
+    "dragStart": "Başlangıcı taşımak için sürükle",
+    "dragEnd": "Bitişi taşımak için sürükle"
+  },
+  "pastLimit": "İşleme sınırının ötesinde",
+  "backgroundMusic": {
+    "title": "Arka Plan Müziği",
+    "add": "Arka Plan Müziği Ekle",
+    "remove": "Müziği kaldır"
+  },
+  "partName": "Parça {{n}} · {{name}}"
+}

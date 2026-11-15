@@ -1,0 +1,108 @@
+{
+  "speed": {
+    "title": "Velocità",
+    "stillFrame": "Fermo immagine",
+    "holds": "Blocca il fotogramma a {{time}} del video. Rifilalo sulla timeline o scegli una durata:",
+    "seconds": "{{value}} s",
+    "speed": "Velocità",
+    "ramp": "Rampa di velocità",
+    "ramps": {
+      "montage": "Montaggio",
+      "hero": "Eroe",
+      "speedUp": "Accelera",
+      "slowDown": "Rallenta"
+    },
+    "rampHint": "L'anteprima segue da vicino la rampa, il rendering è esatto. L'audio mantiene la sua intonazione.",
+    "freeze": "Fermo immagine",
+    "freezeLength": "Durata del fermo",
+    "freezeTitle": "Blocca il fotogramma sotto la testina",
+    "freezeMoveFirst": "Porta prima la testina su questa clip",
+    "freezeAt": "Ferma alla testina",
+    "stillName": "Fermo · {{name}}",
+    "stillNameFallback": "clip"
+  },
+  "badge": {
+    "still": "Fermo",
+    "ramp": "Rampa",
+    "stillTitle": "Fermo immagine",
+    "speedTitle": "Velocità {{speed}}",
+    "rampTitle": "Rampa di velocità"
+  },
+  "keyframes": {
+    "title": "Fotogrammi chiave",
+    "moveHere": "Porta la testina su questa clip per aggiungere fotogrammi chiave.",
+    "props": {
+      "x": "Posizione X",
+      "y": "Posizione Y",
+      "scale": "Scala",
+      "rotation": "Rotazione",
+      "opacity": "Opacità",
+      "volume": "Volume"
+    },
+    "aria": {
+      "x": {
+        "prev": "Fotogramma chiave Posizione X precedente",
+        "next": "Fotogramma chiave Posizione X successivo",
+        "add": "Aggiungi fotogramma chiave Posizione X",
+        "remove": "Rimuovi fotogramma chiave Posizione X"
+      },
+      "y": {
+        "prev": "Fotogramma chiave Posizione Y precedente",
+        "next": "Fotogramma chiave Posizione Y successivo",
+        "add": "Aggiungi fotogramma chiave Posizione Y",
+        "remove": "Rimuovi fotogramma chiave Posizione Y"
+      },
+      "scale": {
+        "prev": "Fotogramma chiave Scala precedente",
+        "next": "Fotogramma chiave Scala successivo",
+        "add": "Aggiungi fotogramma chiave Scala",
+        "remove": "Rimuovi fotogramma chiave Scala"
+      },
+      "rotation": {
+        "prev": "Fotogramma chiave Rotazione precedente",
+        "next": "Fotogramma chiave Rotazione successivo",
+        "add": "Aggiungi fotogramma chiave Rotazione",
+        "remove": "Rimuovi fotogramma chiave Rotazione"
+      },
+      "opacity": {
+        "prev": "Fotogramma chiave Opacità precedente",
+        "next": "Fotogramma chiave Opacità successivo",
+        "add": "Aggiungi fotogramma chiave Opacità",
+        "remove": "Rimuovi fotogramma chiave Opacità"
+      },
+      "volume": {
+        "prev": "Fotogramma chiave Volume precedente",
+        "next": "Fotogramma chiave Volume successivo",
+        "add": "Aggiungi fotogramma chiave Volume",
+        "remove": "Rimuovi fotogramma chiave Volume"
+      }
+    },
+    "prev": "Fotogramma chiave precedente",
+    "next": "Fotogramma chiave successivo",
+    "add": "Aggiungi un fotogramma chiave alla testina",
+    "remove": "Rimuovi il fotogramma chiave alla testina",
+    "ease": "Ammorbidisci da qui al fotogramma chiave successivo",
+    "removeAll": "Rimuovi tutti i fotogrammi chiave"
+  },
+  "kenBurns": {
+    "title": "Ken Burns",
+    "in": "Zoom in lento",
+    "out": "Zoom out lento",
+    "pan": "Panoramica lenta"
+  },
+  "punch": {
+    "title": "Zoom rapidi",
+    "hint": "Brevi zoom rapidi all'inizio delle frasi e sulle parole forti, dai sottotitoli se ci sono, altrimenti dall'audio.",
+    "listening": "Ascolto...",
+    "auto": "Zoom rapidi automatici",
+    "remove": "Rimuovi gli zoom rapidi",
+    "noMoments": "Nessun inizio di frase o parola forte trovato in questa clip.",
+    "noSound": "Impossibile leggere l'audio di questa clip. Aggiungi prima i sottotitoli automatici, poi riprova.",
+    "addedCaptions_one": "{{count}} zoom rapido aggiunto, dai sottotitoli. Sono normali fotogrammi chiave su Scala.",
+    "addedCaptions_many": "{{count}} zoom rapidi aggiunti, dai sottotitoli. Sono normali fotogrammi chiave su Scala.",
+    "addedCaptions_other": "{{count}} zoom rapidi aggiunti, dai sottotitoli. Sono normali fotogrammi chiave su Scala.",
+    "addedSound_one": "{{count}} zoom rapido aggiunto, dall'audio. Sono normali fotogrammi chiave su Scala.",
+    "addedSound_many": "{{count}} zoom rapidi aggiunti, dall'audio. Sono normali fotogrammi chiave su Scala.",
+    "addedSound_other": "{{count}} zoom rapidi aggiunti, dall'audio. Sono normali fotogrammi chiave su Scala."
+  }
+}

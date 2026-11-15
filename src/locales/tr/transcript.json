@@ -1,0 +1,75 @@
+{
+  "language": {
+    "label": "Konuşulan dil",
+    "auto": "Otomatik algıla"
+  },
+  "intro": {
+    "title": "Metinle düzenle",
+    "text": "Söyleneni, her sesin adıyla birlikte metne dönüştür, sonra kaydı bir belge gibi düzenle: kelimeleri seç ve kesmek için Delete'e bas.",
+    "checking": "Sunucu kontrol ediliyor...",
+    "unavailable": "Dökümler şu anda bu düzenleyici sunucusunda kullanılamıyor.",
+    "noSpeech": "Önce konuşma içeren bir kayıt ekle.",
+    "transcribeSeconds": "Dökümünü çıkar ({{n}} sn kayıt)",
+    "transcribeMinutes": "Dökümünü çıkar ({{n}} dk kayıt)",
+    "longShow": "Uzun bir program biraz zaman alır: kelimeler parça parça görünür ve ilklerini düzenlemeye başlayabilirsin."
+  },
+  "listening": "Dinleniyor...",
+  "stop": "Durdur",
+  "goThere": "Oraya git",
+  "search": {
+    "placeholder": "Kelime bul",
+    "label": "Dökümde kelime bul",
+    "previous": "Önceki",
+    "previousLabel": "Önceki eşleşme",
+    "next": "Sonraki",
+    "nextLabel": "Sonraki eşleşme"
+  },
+  "selection": {
+    "count_one": "{{count}} kelime · {{seconds}} sn",
+    "count_other": "{{count}} kelime · {{seconds}} sn",
+    "cut": "Kes",
+    "cutTitle": "Seçili kelimeleri kayıttan kes (Delete)",
+    "clearTitle": "Seçimi temizle (Esc)",
+    "clearLabel": "Seçimi temizle"
+  },
+  "found": {
+    "cutAll_one": "Tümünü kes ({{count}})",
+    "cutAll_other": "Tümünü kes ({{count}})",
+    "cutAllTitle": "Bulunan her yeri kayıttan kes"
+  },
+  "fillers": "Dolgu sesleri",
+  "fillersTitle": "ıı, eee, yani gibi sesleri ve uzun duraklamaları bul",
+  "copy": "Dökümü kopyala",
+  "speakers": "Konuşmacılar",
+  "missing": {
+    "seconds": "Kaydın {{n}} saniyesinin henüz metni yok.",
+    "minutes": "Kaydın {{n}} dakikasının henüz metni yok.",
+    "transcribe": "Dökümünü çıkar"
+  },
+  "scrollLabel": "Döküm: oraya gitmek için bir kelimeye tıkla, seçmek için kelimelerin üzerinde sürükle, Delete keser",
+  "hint_one": "{{count}} kelime. Oraya gitmek için bir kelimeye tıkla; seçmek için sürükle ya da Shift+tıkla; Delete keser. Geri al onu geri getirir.",
+  "hint_other": "{{count}} kelime. Oraya gitmek için bir kelimeye tıkla; seçmek için sürükle ya da Shift+tıkla; Delete keser. Geri al onu geri getirir.",
+  "speaker": {
+    "default": "Konuşmacı",
+    "numbered": "Konuşmacı {{n}}"
+  },
+  "job": {
+    "starting": "Başlatılıyor...",
+    "preparing": "Kayıtlar hazırlanıyor...",
+    "listening": "Dinleniyor...",
+    "signIn": "Döküm oluşturmak için 3Speak'te oturum aç.",
+    "uploadFailed": "Kayıtlar yüklenemedi: {{message}}",
+    "notUploaded": "Kayıtlar henüz sunucuda değil. Yüklendiklerinde tekrar dene.",
+    "serverAnswered": "Sunucunun yanıtı: {{status}}",
+    "lost": "Döküm işi kayboldu (sunucu yeniden mi başladı?)",
+    "failed": "Konuşma tanıma başarısız oldu"
+  },
+  "stt": {
+    "audioUnavailable": "ses kullanılamıyor",
+    "serverError": "sunucu hatası",
+    "connectionFailed": "bağlantı başarısız",
+    "unauthorized": "yetkisiz",
+    "closed": "kapatıldı",
+    "initFailed": "konuşma tanıma başlatılamadı"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "length": {
+    "title": "Twoja oś czasu trwa {{length}}",
+    "body": "{{atMost}} Możesz dalej wszystko edytować, ale renderowanie pozostaje wyłączone, dopóki oś czasu nie skończy się na zaznaczonej linii {{limitAt}}. Przytnij, podziel lub usuń klipy, aby to osiągnąć.",
+    "bodyAudio": "{{atMost}} Możesz dalej wszystko edytować, ale eksport pozostaje wyłączony, dopóki oś czasu nie skończy się na zaznaczonej linii {{limitAt}}. Przytnij, podziel lub usuń klipy, aby to osiągnąć."
+  },
+  "tooLarge": {
+    "title_one": "Ten plik jest za duży",
+    "title_few": "Te pliki są za duże",
+    "title_many": "Te pliki są za duże",
+    "title_other": "Te pliki są za duże",
+    "body": "Edytor przyjmuje pliki do {{size}}. Najpierw skróć lub skompresuj wideo (telefon lub dowolna aplikacja wideo może wyeksportować mniejszą kopię), a potem dodaj je ponownie."
+  },
+  "encoding": {
+    "title": "To wideo trzeba najpierw przekonwertować",
+    "videos_one": "{{count}} film",
+    "videos_few": "{{count}} filmy",
+    "videos_many": "{{count}} filmów",
+    "videos_other": "{{count}} filmu",
+    "next": "Następny w kolejce",
+    "waiting_one": "Czeka na {{count}} inny film",
+    "waiting_few": "Czeka na {{count}} inne filmy",
+    "waiting_many": "Czeka na {{count}} innych filmów",
+    "waiting_other": "Czeka na {{count}} innego filmu",
+    "starting": "Uruchamianie…",
+    "upload": "Przesyłanie",
+    "convert": "Konwersja na odtwarzalną kopię",
+    "hint": "Ta przeglądarka nie odtwarza formatu tego wideo (HEVC lub HDR, częste w telefonach), więc pokazuje czarny obraz, dopóki odtwarzalna kopia nie będzie gotowa. Potem podgląd sam się na nią przełączy. W międzyczasie możesz dalej edytować.",
+    "hide": "Ukryj"
+  }
+}

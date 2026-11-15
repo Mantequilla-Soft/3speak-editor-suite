@@ -1,0 +1,88 @@
+{
+  "title": "Teleprompter",
+  "showOnCamera": "Mostrar sobre a câmera",
+  "speechNotice": {
+    "title": "Por enquanto, seguir a voz só funciona em navegadores Chromium.",
+    "body": "Use Chrome, Edge, Brave ou Opera para o roteiro rolar enquanto você fala. Neste navegador ele rola numa velocidade constante que você pode ajustar."
+  },
+  "speechErrors": {
+    "network": "Não foi possível conectar ao serviço de voz. O reconhecimento precisa de conexão com a internet (o Chrome envia o áudio ao Google para transcrever).",
+    "audioCapture": "Nenhum áudio chegou ao reconhecimento. O microfone pode estar em uso; tente um headset.",
+    "notAllowed": "A permissão do microfone está bloqueada para o reconhecimento de voz.",
+    "unsupported": "Este navegador não tem reconhecimento de voz.",
+    "generic": "Erro no reconhecimento de voz: {{err}}"
+  },
+  "noMic": "Gravando sem microfone (microfone indisponível).",
+  "autoDetect": "Detectar automaticamente ({{lang}})",
+  "presets": {
+    "frontcam": "Câmera frontal",
+    "frontcamTitle": "Faixa pequena sob a câmera frontal, para disfarçar ao máximo que você está lendo",
+    "max": "Tamanho máximo",
+    "maxTitle": "Letra grande para ler de longe",
+    "top": "Linhas no topo",
+    "topTitle": "Várias linhas no topo da tela"
+  },
+  "scroll": {
+    "label": "Rolagem",
+    "modeAria": "Modo de rolagem",
+    "followVoice": "Seguir a voz",
+    "followVoiceTitle": "Rola enquanto você lê o roteiro em voz alta",
+    "needsChromium": "Precisa do Chrome, Edge ou outro navegador Chromium",
+    "timed": "Cronometrada",
+    "timedTitle": "Rola numa velocidade constante",
+    "voiceForcedMissing": "Seguir a voz não está disponível aqui; usando a rolagem cronometrada.",
+    "voiceUnavailable": "Seguir a voz não está disponível neste navegador."
+  },
+  "style": {
+    "title": "Estilo do texto",
+    "fontSize": "Tamanho da fonte",
+    "fontSizeValue": "{{size}} px",
+    "text": "Texto",
+    "background": "Fundo",
+    "bgOpacity": "Opacidade do fundo",
+    "mirrorText": "Espelhar texto (para o espelho de um teleprompter)",
+    "voiceLanguage": "Idioma da voz"
+  },
+  "status": {
+    "serverErrorSwitched": "Erro no servidor de voz ({{reason}}). Mudou para a rolagem cronometrada.",
+    "voiceErrorSwitched": "{{error}} Mudou para a rolagem cronometrada.",
+    "voiceStoppedSwitched": "Seguir a voz parou. Mudou para a rolagem cronometrada.",
+    "serverError": "Erro no servidor de voz ({{reason}}).",
+    "listeningServer": "Ouvindo (servidor)… comece a ler",
+    "connectingServer": "Conectando ao servidor de voz…",
+    "listening": "Ouvindo… comece a ler em voz alta",
+    "startingMic": "Iniciando microfone…",
+    "scrollPaused": "Rolagem pausada",
+    "timedScroll": "Rolagem cronometrada, {{wpm}} ppm",
+    "scrollTest": "Teste de rolagem, {{wpm}} ppm"
+  },
+  "sttReason": {
+    "unreachable": "inacessível",
+    "noMic": "sem microfone",
+    "audioUnavailable": "áudio indisponível",
+    "connectionFailed": "falha na conexão",
+    "unauthorized": "não autorizado",
+    "closed": "fechado",
+    "serverError": "erro do servidor"
+  },
+  "scriptPlaceholder": "Escreva ou cole seu roteiro aqui. Enquanto você grava, ele rola conforme você lê em voz alta, ou numa velocidade constante no modo cronometrado.",
+  "scriptModeVoice": "Rolagem: segue sua voz",
+  "scriptModeTimed": "Rolagem: cronometrada, {{wpm}} ppm",
+  "hide": "Ocultar",
+  "dragToMove": "Arraste para mover",
+  "dragToResize": "Arraste para redimensionar",
+  "expandMenu": "Expandir menu",
+  "collapseMenu": "Recolher menu",
+  "editScript": "Editar roteiro",
+  "testVoice": "Testar voz",
+  "stopVoiceTest": "Parar teste",
+  "scrollSpeed": "Velocidade de rolagem",
+  "slower": "Mais devagar",
+  "faster": "Mais rápido",
+  "wordsPerMin": "palavras/min",
+  "testScroll": "Testar rolagem",
+  "stopScrollTest": "Parar o teste de rolagem",
+  "pauseScroll": "Pausar rolagem",
+  "resumeScroll": "Retomar rolagem",
+  "hideTeleprompter": "Ocultar teleprompter"
+}

@@ -1,0 +1,240 @@
+{
+  "title": "Ad Wizard",
+  "beta": "beta",
+  "loading": "Nilo-load ang scene engine…",
+  "untitled": "Ad na walang pamagat",
+  "seconds": "{{s}} seg",
+  "lengthOfMax": "{{length}} seg / max {{max}} seg",
+  "maxOnly": "/ max {{max}} seg",
+  "steps": {
+    "format": "Format",
+    "brand": "Brand",
+    "scenes": "Mga eksena",
+    "sound": "Tunog",
+    "render": "I-render"
+  },
+  "formats": {
+    "landscape": "Landscape 16:9",
+    "landscapeSub": "mga in-video spot, website",
+    "portrait": "Portrait 9:16",
+    "portraitSub": "shorts, story, reels"
+  },
+  "palettes": {
+    "ember": "Baga",
+    "amber": "Amber",
+    "ocean": "Karagatan",
+    "forest": "Kagubatan",
+    "berry": "Berry",
+    "paper": "Papel"
+  },
+  "roles": {
+    "all": "Lahat",
+    "opener": "Pambungad",
+    "middle": "Gitna",
+    "closer": "Pangwakas"
+  },
+  "defaults": {
+    "brandName": "Ang iyong brand",
+    "brandFallback": "Brand",
+    "adName": "Ad"
+  },
+  "errors": {
+    "engineLoad": "hindi ma-load ang {{src}}",
+    "uploadFailedStatus": "pumalya ang upload ({{status}})",
+    "uploadFailed": "pumalya ang upload",
+    "notSignedIn": "hindi naka-sign in",
+    "drafts": "mga draft {{status}}"
+  },
+  "stage": {
+    "empty": "Dito lalabas ang ad mo.",
+    "addFirst": "Idagdag ang unang eksena",
+    "toStart": "Bumalik sa simula",
+    "playPause": "I-play / i-pause (space)",
+    "time": "{{time}} / {{duration}} seg",
+    "tooLong": "Hanggang {{max}} seg lang ang ad",
+    "properties": "Mga property",
+    "propertiesHint": "Pumili ng eksena sa listahan o sa timeline para i-edit ito rito."
+  },
+  "drafts": {
+    "logInToKeep": "Mag-log in sa 3Speak para maitago ang mga draft",
+    "inBrowser": "Nananatili sa browser na ito ang mga draft",
+    "signingIn": "Nagsa-sign in…",
+    "saveDrafts": "I-save ang mga draft",
+    "status": {
+      "saving": "Sine-save…",
+      "saved": "Na-save",
+      "error": "Hindi na-save",
+      "limit": "Naabot na ang limit ng draft",
+      "idle": "Draft"
+    },
+    "open": "Mga Draft",
+    "title": "Mga draft mo",
+    "listInfo_one": "{{n}} sa {{max}} · bawat isa ay itinatago nang {{count}} araw mula sa huling pagbabago",
+    "listInfo_other": "{{n}} sa {{max}} · bawat isa ay itinatago nang {{count}} araw mula sa huling pagbabago",
+    "draftInfo_one": "{{count}} eksena · na-save {{saved}} · hanggang {{until}}",
+    "draftInfo_other": "{{count}} eksena · na-save {{saved}} · hanggang {{until}}",
+    "isOpen": "bukas",
+    "openDraft": "Buksan",
+    "confirmDelete": "Burahin ang \"{{name}}\"?",
+    "empty": "Wala pang draft. Kusa silang nase-save habang nagtatrabaho ka.",
+    "newAd": "Bagong ad",
+    "limitTitle_one": "May {{count}} draft ka na",
+    "limitTitle_other": "May {{count}} draft ka na",
+    "limitHint": "Pumili ng isa na papalitan ng ad na ito, o isara ito at ituloy ang trabaho nang hindi nagse-save.",
+    "savedAt": "na-save {{date}}",
+    "replace": "Palitan"
+  },
+  "format": {
+    "locked": "Tatakbo ang booking mo bilang <b>{{format}}</b>, hanggang {{max}} seg.",
+    "where": "Saan tatakbo ang ad? Puwede mo itong palitan mamaya; gumagana ang bawat eksena sa pareho.",
+    "sceneChange": "Pagpalit ng eksena",
+    "tip": "Mga ad na madaling basahin: mga 3 seg bawat eksena, 15-30 seg lahat, at nababasa ang pambungad na linya sa unang segundo.",
+    "confirmNew": "Magsimula ng bagong ad? Mananatili ang mga na-save mong draft."
+  },
+  "brand": {
+    "name": "Pangalan",
+    "logo": "Logo",
+    "logoHint": "pinakamaganda ang parisukat; kung wala, ang unang letra ang gagamitin",
+    "monogram": "Monogram",
+    "monogramHint": "letra na gagamitin kapag walang logo",
+    "colours": "Mga kulay",
+    "colors": {
+      "bg": "Background",
+      "ink": "Text",
+      "mute": "Mahinang text",
+      "accent": "Accent",
+      "accent2": "Accent 2",
+      "accent3": "Accent 3"
+    },
+    "coloursTip": "Gamitin ang accent para sa mga highlight (*bituin* sa text). Iginuguhit bilang outline ang mga call-to-action button.",
+    "fonts": "Mga font",
+    "headlines": "Mga headline",
+    "text": "Text",
+    "ownFont": "Sarili mong font file",
+    "fontNamePlaceholder": "Pangalan ng font, hal. Acme Display",
+    "fontRights": "May karapatan akong gamitin ang font na ito sa mga video",
+    "uploading": "Ina-upload…",
+    "uploadFont": "Mag-upload ng TTF / OTF / WOFF"
+  },
+  "scenes": {
+    "duplicate": "Doblehin",
+    "add": "Magdagdag ng eksena",
+    "tip": "Nasa kanan ang text, mga larawan at haba ng napiling eksena."
+  },
+  "sound": {
+    "music": "Musika",
+    "startInSong": "Simula sa kanta",
+    "volume": "Volume",
+    "fadeIn": "Fade in",
+    "fadeOut": "Fade out",
+    "noMusic": "Wala pang musika.",
+    "library": "Library ng musika",
+    "uploading": "Ina-upload…",
+    "uploadSong": "Mag-upload ng kanta",
+    "songRights": "Pag-aari ko o may lisensya ako sa kantang ina-upload ko",
+    "effects": "Mga sound effect",
+    "auto": "Mga awtomatikong tunog (pagpalit ng eksena, mga salitang lumilitaw)",
+    "autoLevel": "Lakas ng mga awtomatikong tunog",
+    "db": "{{gain}} dB",
+    "restore_one": "Ibalik ang {{count}} inalis na awtomatikong tunog",
+    "restore_other": "Ibalik ang {{count}} inalis na awtomatikong tunog",
+    "addAt": "Magdagdag ng tunog sa {{time}} seg",
+    "listen": "Pakinggan",
+    "autoTag": "awto",
+    "tip": "I-drag ang mga tunog sa timeline para ilipat. Kapag inilipat mo ang awtomatikong tunog, magiging iyo na ito.",
+    "kinds": {
+      "trans": "Paglipat",
+      "whoosh": "Whoosh",
+      "swish": "Swish",
+      "tick": "Tik",
+      "click": "Klik",
+      "type": "Pagta-type",
+      "hit": "Palo"
+    }
+  },
+  "render": {
+    "drawing": "Iginuguhit ang mga eksena…",
+    "mixing": "Hinahalo ang tunog…",
+    "sceneRenderFailed": "render ng eksena: {{status}}",
+    "renderFailed": "render: {{status}}",
+    "scenesLength_one": "{{count}} eksena, {{length}} seg",
+    "scenesLength_other": "{{count}} eksena, {{length}} seg",
+    "scenesLengthTooLong_one": "{{count}} eksena, {{length}} seg (masyadong mahaba, max {{max}} seg)",
+    "scenesLengthTooLong_other": "{{count}} eksena, {{length}} seg (masyadong mahaba, max {{max}} seg)",
+    "toFill_one": "{{count}} bagay na kailangang punan",
+    "toFill_other": "{{count}} bagay na kailangang punan",
+    "allFilled": "Napunan na ang lahat ng kailangang field",
+    "music": "Musika: {{title}}",
+    "noMusic": "Walang musika (opsyonal)",
+    "effects_one": "{{count}} sound effect",
+    "effects_other": "{{count}} sound effect",
+    "issue": "Eksena {{n}}, {{field}}: {{msg}}",
+    "button": "I-render ang ad ({{size}})",
+    "progress": "{{phase}} {{percent}}",
+    "sent": "Naipadala sa campaign mo",
+    "useForCampaign": "Gamitin para sa campaign ko",
+    "download": "I-download",
+    "again": "I-render ulit"
+  },
+  "props": {
+    "length": "Haba",
+    "fieldIssue": "{{field}}: {{msg}}",
+    "soundEffect": "Sound effect",
+    "autoNote": "{{name}} (awtomatiko: ilipat o baguhin para maging iyo)",
+    "makeMine": "Gawin kong akin",
+    "at": "Sa",
+    "secondsUnit": "seg",
+    "volume": "Volume"
+  },
+  "picker": {
+    "search": "Maghanap",
+    "look": "Itsura",
+    "all": "Lahat",
+    "nothing": "Walang tugma."
+  },
+  "fields": {
+    "optional": "opsyonal",
+    "auto": "awto",
+    "none": "(wala)",
+    "defaultIcon": "default ({{icon}})",
+    "clear": "I-clear",
+    "accentTip": "Lagyan ng *bituin* ang isang salita para sa kulay ng accent, _underscore_ para sa pangalawang accent.",
+    "up": "Taas",
+    "moveUp": "Itaas",
+    "moveDown": "Ibaba",
+    "add": "Idagdag",
+    "needsAtLeast": "kailangan ng hindi bababa sa {{min}}",
+    "needs": "kailangan ng {{min}}",
+    "pairX": "x %",
+    "pairY": "y %"
+  },
+  "image": {
+    "notPicture": "Hindi iyan larawan.",
+    "noClipboardPicture": "Walang larawan sa clipboard. Kumopya ng isa, o pindutin ang Ctrl+V / Cmd+V dito.",
+    "clipboardBlocked": "Hindi pinayagan ng browser na basahin ang clipboard. I-click dito at pindutin ang Ctrl+V / Cmd+V.",
+    "dragToPlace": "I-drag para piliin kung aling bahagi ng larawan ang makikita",
+    "zoom": "Zoom",
+    "zoomTitle": "Nagzo-zoom sa larawan sa loob ng frame nito; hindi nagbabago ang laki ng frame",
+    "zoomValue": "{{zoom}}x",
+    "resetPlacement": "I-reset ang puwesto",
+    "replace": "Palitan",
+    "pasteTitle": "I-paste mula sa clipboard",
+    "uploadingPct": "Ina-upload {{pct}}%",
+    "upload": "Mag-upload",
+    "paste": "I-paste",
+    "linkPlaceholder": "o mag-paste ng https:// na link, o larawan (Ctrl+V)"
+  },
+  "timeline": {
+    "tick": "{{s}}s",
+    "scenes": "Mga eksena",
+    "blockTitle": "{{type}}: {{length}} seg",
+    "dragLength": "I-drag para baguhin ang haba",
+    "music": "Musika",
+    "musicVolume": "{{title}} · {{volume}}",
+    "effects": "Mga sound effect",
+    "sfxTitle": "{{name}} sa {{at}} seg"
+  },
+  "preview": {
+    "frameTitle": "Preview ng ad"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "header": "Zeitleisten-Vorschau",
+  "smaller": "Kleiner",
+  "larger": "Größer",
+  "loopOn": "Schleife: An",
+  "loopOff": "Schleife: Aus",
+  "aspect": {
+    "title": "Seitenverhältnis: {{ratio}}",
+    "titleAuto": "Seitenverhältnis: Automatisch ({{ratio}})",
+    "auto": "Automatisch"
+  },
+  "fullSize": "Volle Größe",
+  "halfSize": "Halbe Größe",
+  "fullscreen": "Vollbild",
+  "noClipHere": "Kein Clip an dieser Stelle",
+  "noClips": "Keine Clips in der Zeitleiste",
+  "source": {
+    "hls": "(HLS-Stream)",
+    "uploaded": "(hochgeladen)",
+    "local": "(lokal)",
+    "file": "(Datei)"
+  },
+  "stageLayout": {
+    "tileTop": "Kachel oben",
+    "tileBottom": "Kachel unten",
+    "overlay": "Overlay"
+  },
+  "selectClip": "Wähle einen Clip für die Vorschau"
+}

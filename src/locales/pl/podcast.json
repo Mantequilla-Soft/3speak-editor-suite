@@ -1,0 +1,86 @@
+{
+  "video": {
+    "title": "Podcast wideo",
+    "intro": "Cały odcinek ({{length}}) jako film 16:9: obraz, ruchoma fala dźwięku, napisy i kto mówi. Do podcastów wideo w 3Speak, YouTube i Spotify.",
+    "unavailable": "Ten serwer edytora nie potrafi jeszcze tworzyć podcastów wideo.",
+    "tooLong": "Podcasty wideo mogą trwać maksymalnie {{length}}.",
+    "preview": "Podgląd podcastu wideo",
+    "sampleCaption": "<b>Twoje</b> słowa pojawią się tutaj",
+    "stageHint": "Fala dźwięku porusza się z dźwiękiem, napisy i imię podążają za odcinkiem.",
+    "defaultLine": "Oglądaj i słuchaj na *3speak.tv*",
+    "captions": "Napisy",
+    "captionsTranscript": "Słowa z twojej transkrypcji.",
+    "captionsNoStt": "Zamiana mowy na tekst nie jest dostępna na tym serwerze.",
+    "captionsStt": "Słowa rozpoznane przez zamianę mowy na tekst na serwerze. Długie odcinki chwilę to trwają.",
+    "whoSpeaks": "Kto mówi",
+    "noVoices": "Brak ścieżki głosu, z której można wziąć imiona.",
+    "speaker": "Mówca {{n}}",
+    "speakerLabel": "Imię dla ścieżki głosu {{n}}",
+    "loudest": "Każdy głos na własnej ścieżce: widać imię najgłośniejszego.",
+    "frameRate": "Liczba klatek",
+    "fps15": "15 kl./s (mniejszy, szybszy)",
+    "fps24": "24 kl./s (płynniejszy)",
+    "finding": "Ustalanie, kto mówi kiedy...",
+    "sending": "Wysyłanie...",
+    "working": "Przetwarzanie...",
+    "serverAnswered": "Serwer odpowiedział {{status}}",
+    "lost": "Zadanie zostało utracone (serwer się zrestartował?)",
+    "stopped": "Zatrzymano",
+    "signIn": "Zaloguj się w 3Speak, aby zrobić podcast wideo.",
+    "failed": "Nie udało się zrobić podcastu wideo: {{error}}",
+    "stop": "Stop",
+    "make": "Zrób podcast wideo",
+    "again": "Zrób ponownie",
+    "download": "Pobierz MP4",
+    "subtitles": "Napisy (SRT)",
+    "post": "Opublikuj w 3Speak jako film"
+  },
+  "template": {
+    "title": "Twój szablon",
+    "signedOutIntro": "Zapisz raz swoje intro, outro i podkład muzyczny, a każde nowe nagranie dostanie je jednym kliknięciem. Szablon jest przechowywany na stałe, więc wymaga zalogowania w 3Speak.",
+    "signIn": "Zaloguj się, aby użyć szablonu",
+    "logIn": "Zaloguj się w 3Speak, aby użyć szablonu.",
+    "intro": "Jeden szablon, przechowywany na stałe. Zapisanie zastępuje poprzedni.",
+    "role": {
+      "intro": {
+        "title": "Intro",
+        "hint": "Odtwarza się jako pierwsze, przed nagraniem.",
+        "clear": "Bez intro"
+      },
+      "outro": {
+        "title": "Outro",
+        "hint": "Odtwarza się zaraz po końcu nagrania.",
+        "clear": "Bez outro"
+      },
+      "bed": {
+        "title": "Podkład muzyczny",
+        "hint": "Cicha muzyka pod całym nagraniem, zapętlona do długości, wyciszona na końcu.",
+        "clear": "Bez podkładu"
+      }
+    },
+    "useSelected": "Użyj „{{name}}” (przyciętego fragmentu)",
+    "selectFirst": "Najpierw wybierz przesłany klip audio na osi czasu",
+    "selectedClip": "Wybrany klip",
+    "file": "Plik",
+    "volume": "Głośność",
+    "bedVolume": "Głośność podkładu",
+    "loop": "Zapętl na całe nagranie",
+    "cutSilences": "Wycinaj ciszę z każdego nowego nagrania <small>(z twoimi ustawieniami wycinania ciszy)</small>",
+    "loudness": "Normalizuj głośność dla podcastów <small>(-16 LUFS, przy eksporcie)</small>",
+    "duck": "Przyciszaj muzykę, gdy ktoś mówi <small>({{db}} dB na podkładzie; zmienisz to w ustawieniach klipu)</small>",
+    "autoApply": "Stosuj automatycznie, gdy otwieram nagranie",
+    "signInUpload": "Zaloguj się w 3Speak, aby przesłać.",
+    "uploadFailed": "Nie udało się przesłać tego pliku. Spróbuj innego.",
+    "deleteForGood": "Usuń na stałe",
+    "delete": "Usuń szablon",
+    "saveApply": "Zapisz i zastosuj",
+    "voiceTrack": "Głos",
+    "bedTrack": "Podkład muzyczny"
+  },
+  "stage": {
+    "empty": "Dodaj nagranie, nagraj nowe lub wybierz muzykę, aby zacząć.",
+    "chapter": "Rozdział",
+    "position": "Pozycja w audycji",
+    "positionText": "{{at}} z {{total}}"
+  }
+}

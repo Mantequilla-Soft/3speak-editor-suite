@@ -1,0 +1,106 @@
+{
+  "speed": {
+    "title": "Tempo",
+    "stillFrame": "Standbild",
+    "holds": "Hält das Bild bei {{time}} des Videos. Kürze es in der Zeitleiste oder wähle eine Länge:",
+    "seconds": "{{value}} s",
+    "speed": "Tempo",
+    "ramp": "Tempo-Rampe",
+    "ramps": {
+      "montage": "Montage",
+      "hero": "Held",
+      "speedUp": "Beschleunigen",
+      "slowDown": "Verlangsamen"
+    },
+    "rampHint": "Die Vorschau folgt der Rampe ziemlich genau, der Render ist exakt. Der Ton behält seine Tonhöhe.",
+    "freeze": "Standbild",
+    "freezeLength": "Standbild-Länge",
+    "freezeTitle": "Bild unter dem Abspielkopf anhalten",
+    "freezeMoveFirst": "Setz den Abspielkopf zuerst auf diesen Clip",
+    "freezeAt": "Am Abspielkopf anhalten",
+    "stillName": "Standbild · {{name}}",
+    "stillNameFallback": "Clip"
+  },
+  "badge": {
+    "still": "Standbild",
+    "ramp": "Rampe",
+    "stillTitle": "Standbild",
+    "speedTitle": "Tempo {{speed}}",
+    "rampTitle": "Tempo-Rampe"
+  },
+  "keyframes": {
+    "title": "Keyframes",
+    "moveHere": "Setz den Abspielkopf auf diesen Clip, um Keyframes hinzuzufügen.",
+    "props": {
+      "x": "Position X",
+      "y": "Position Y",
+      "scale": "Skalierung",
+      "rotation": "Drehung",
+      "opacity": "Deckkraft",
+      "volume": "Lautstärke"
+    },
+    "aria": {
+      "x": {
+        "prev": "Vorheriger Keyframe für Position X",
+        "next": "Nächster Keyframe für Position X",
+        "add": "Keyframe für Position X hinzufügen",
+        "remove": "Keyframe für Position X entfernen"
+      },
+      "y": {
+        "prev": "Vorheriger Keyframe für Position Y",
+        "next": "Nächster Keyframe für Position Y",
+        "add": "Keyframe für Position Y hinzufügen",
+        "remove": "Keyframe für Position Y entfernen"
+      },
+      "scale": {
+        "prev": "Vorheriger Keyframe für Skalierung",
+        "next": "Nächster Keyframe für Skalierung",
+        "add": "Keyframe für Skalierung hinzufügen",
+        "remove": "Keyframe für Skalierung entfernen"
+      },
+      "rotation": {
+        "prev": "Vorheriger Keyframe für Drehung",
+        "next": "Nächster Keyframe für Drehung",
+        "add": "Keyframe für Drehung hinzufügen",
+        "remove": "Keyframe für Drehung entfernen"
+      },
+      "opacity": {
+        "prev": "Vorheriger Keyframe für Deckkraft",
+        "next": "Nächster Keyframe für Deckkraft",
+        "add": "Keyframe für Deckkraft hinzufügen",
+        "remove": "Keyframe für Deckkraft entfernen"
+      },
+      "volume": {
+        "prev": "Vorheriger Keyframe für Lautstärke",
+        "next": "Nächster Keyframe für Lautstärke",
+        "add": "Keyframe für Lautstärke hinzufügen",
+        "remove": "Keyframe für Lautstärke entfernen"
+      }
+    },
+    "prev": "Vorheriger Keyframe",
+    "next": "Nächster Keyframe",
+    "add": "Keyframe am Abspielkopf hinzufügen",
+    "remove": "Keyframe am Abspielkopf entfernen",
+    "ease": "Von hier bis zum nächsten Keyframe weich übergehen",
+    "removeAll": "Alle Keyframes entfernen"
+  },
+  "kenBurns": {
+    "title": "Ken Burns",
+    "in": "Langsam reinzoomen",
+    "out": "Langsam rauszoomen",
+    "pan": "Langsamer Schwenk"
+  },
+  "punch": {
+    "title": "Punch-in-Zooms",
+    "hint": "Schnelle Zooms am Satzanfang und bei lauten Wörtern, anhand der Untertitel, falls vorhanden, sonst anhand des Tons.",
+    "listening": "Hört zu...",
+    "auto": "Automatische Punch-in-Zooms",
+    "remove": "Punch-in-Zooms entfernen",
+    "noMoments": "In diesem Clip wurden keine Satzanfänge oder lauten Wörter gefunden.",
+    "noSound": "Der Ton dieses Clips konnte nicht gelesen werden. Füge zuerst Auto-Untertitel hinzu und versuch es dann erneut.",
+    "addedCaptions_one": "{{count}} Punch-in-Zoom hinzugefügt, anhand der Untertitel. Es sind normale Keyframes für Skalierung.",
+    "addedCaptions_other": "{{count}} Punch-in-Zooms hinzugefügt, anhand der Untertitel. Es sind normale Keyframes für Skalierung.",
+    "addedSound_one": "{{count}} Punch-in-Zoom hinzugefügt, anhand des Tons. Es sind normale Keyframes für Skalierung.",
+    "addedSound_other": "{{count}} Punch-in-Zooms hinzugefügt, anhand des Tons. Es sind normale Keyframes für Skalierung."
+  }
+}

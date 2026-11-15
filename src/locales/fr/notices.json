@@ -1,0 +1,28 @@
+{
+  "length": {
+    "title": "Votre chronologie dure {{length}}",
+    "body": "{{atMost}} Vous pouvez continuer à tout modifier, mais le rendu reste désactivé tant que la chronologie ne finit pas à la ligne {{limitAt}} marquée. Coupez, scindez ou supprimez des clips pour y arriver.",
+    "bodyAudio": "{{atMost}} Vous pouvez continuer à tout modifier, mais l'export reste désactivé tant que la chronologie ne finit pas à la ligne {{limitAt}} marquée. Coupez, scindez ou supprimez des clips pour y arriver."
+  },
+  "tooLarge": {
+    "title_one": "Ce fichier est trop lourd",
+    "title_many": "Ces fichiers sont trop lourds",
+    "title_other": "Ces fichiers sont trop lourds",
+    "body": "L'éditeur accepte les fichiers jusqu'à {{size}}. Raccourcissez ou compressez d'abord la vidéo (un téléphone ou n'importe quelle appli vidéo peut exporter une copie plus légère), puis ajoutez-la à nouveau."
+  },
+  "encoding": {
+    "title": "Cette vidéo doit d'abord être convertie",
+    "videos_one": "{{count}} vidéo",
+    "videos_many": "{{count}} vidéos",
+    "videos_other": "{{count}} vidéos",
+    "next": "À suivre",
+    "waiting_one": "En attente de {{count}} autre vidéo",
+    "waiting_many": "En attente de {{count}} autres vidéos",
+    "waiting_other": "En attente de {{count}} autres vidéos",
+    "starting": "Démarrage…",
+    "upload": "Envoi",
+    "convert": "Convertir en copie lisible",
+    "hint": "Ce navigateur ne peut pas lire le format de cette vidéo (HEVC ou HDR, courant sur les téléphones), elle reste donc noire jusqu'à ce que la copie lisible soit prête. L'aperçu bascule alors tout seul dessus. Vous pouvez continuer à modifier en attendant.",
+    "hide": "Masquer"
+  }
+}

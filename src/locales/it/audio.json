@@ -1,0 +1,16 @@
+{
+  "cleaning": {
+    "voice_one": "Pulizia della voce di {{count}} clip…",
+    "voice_many": "Pulizia della voce di {{count}} clip…",
+    "voice_other": "Pulizia della voce di {{count}} clip…",
+    "voiceRecording_one": "Pulizia della voce di {{count}} clip · registrazione {{at}} di {{total}}",
+    "voiceRecording_many": "Pulizia della voce di {{count}} clip · registrazione {{at}} di {{total}}",
+    "voiceRecording_other": "Pulizia della voce di {{count}} clip · registrazione {{at}} di {{total}}",
+    "back_one": "Ripristino dell'originale per {{count}} clip…",
+    "back_many": "Ripristino dell'originale per {{count}} clip…",
+    "back_other": "Ripristino dell'originale per {{count}} clip…",
+    "backRecording_one": "Ripristino dell'originale per {{count}} clip · registrazione {{at}} di {{total}}",
+    "backRecording_many": "Ripristino dell'originale per {{count}} clip · registrazione {{at}} di {{total}}",
+    "backRecording_other": "Ripristino dell'originale per {{count}} clip · registrazione {{at}} di {{total}}"
+  }
+}

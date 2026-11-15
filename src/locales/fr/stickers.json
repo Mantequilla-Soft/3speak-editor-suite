@@ -1,0 +1,64 @@
+{
+  "title": "Stickers",
+  "search": "Rechercher des stickers",
+  "textBoxes": "Zones de texte",
+  "loading": "Chargement des stickers...",
+  "noMatch": "Aucun sticker ne correspond.",
+  "tileTitle": "{{name}} (ajouté à la tête de lecture)",
+  "note": "Les stickers sont placés à la tête de lecture pour 3 secondes. Déplacez-les, redimensionnez-les ou coupez-les comme n'importe quel clip ; les zones de texte restent modifiables.",
+  "categories": {
+    "emoji": "Emojis",
+    "badges": "Badges",
+    "shapes": "Flèches et formes",
+    "branding": "Marque"
+  },
+  "presets": {
+    "caption": {
+      "title": "Légende",
+      "text": "Votre légende ici"
+    },
+    "highlight": {
+      "title": "Surligné",
+      "text": "À voir !"
+    },
+    "brand": {
+      "title": "Rouge 3Speak",
+      "text": "Nouvelle vidéo"
+    },
+    "bubble": {
+      "title": "Bulle",
+      "text": "Salut !"
+    },
+    "outline": {
+      "title": "Contour",
+      "text": "Regardez ça"
+    },
+    "neon": {
+      "title": "Néon",
+      "text": "CE SOIR"
+    },
+    "title": {
+      "title": "Grand titre",
+      "text": "GRANDE NOUVELLE"
+    },
+    "comic": {
+      "title": "BD",
+      "text": "BOUM !"
+    },
+    "marker": {
+      "title": "Marqueur",
+      "text": "fait main"
+    },
+    "quote": {
+      "title": "Citation",
+      "text": "« Dites-le bien. »"
+    },
+    "tag": {
+      "title": "Hashtag"
+    },
+    "minimal": {
+      "title": "Minimal",
+      "text": "simple et épuré"
+    }
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "dismiss": "Bỏ qua",
+  "branding": {
+    "audioEditor": "Trình chỉnh sửa âm thanh",
+    "shortsEditor": "Trình chỉnh sửa Shorts",
+    "videoEditor": "Trình chỉnh sửa video",
+    "beta": "beta",
+    "backend": "Máy chủ: {{url}}",
+    "backendSelecting": "Máy chủ: đang chọn...",
+    "showTour": "Xem lại phần hướng dẫn",
+    "shortcuts": "Phím tắt (?)",
+    "shortcutsLabel": "Phím tắt",
+    "fullscreen": "Toàn màn hình (F)",
+    "fullscreenLabel": "Toàn màn hình",
+    "leaveFullscreen": "Thoát toàn màn hình (F)",
+    "leaveFullscreenLabel": "Thoát toàn màn hình",
+    "closeEditor": "Đóng trình chỉnh sửa"
+  },
+  "backendDown": "Không kết nối được máy chủ. Tải bản ghi lên, kết xuất và xử lý phương tiện sẽ không hoạt động.",
+  "menu": {
+    "undo": "Hoàn tác (Ctrl+Z)",
+    "redo": "Làm lại (Ctrl+Shift+Z)"
+  },
+  "audioTools": {
+    "cutSilences": "Cắt khoảng lặng",
+    "cutSilencesTitle": "Cắt khoảng lặng khỏi clip đã chọn (hoặc nhóm của nó): tìm các chỗ ngừng, cắt chúng và khép khoảng trống",
+    "template": "Mẫu",
+    "templateTitle": "Mẫu của bạn: phần mở đầu, phần kết và nhạc nền cho mọi bản ghi",
+    "normalizeLabel": "Chuẩn hóa độ lớn",
+    "normalizeOn": "Chuẩn hóa: bật",
+    "normalizeOff": "Chuẩn hóa: tắt",
+    "normalizeOnTitle": "Chuẩn hóa đang bật: bản xuất được đưa về mức đều -16 LUFS (chuẩn podcast)",
+    "normalizeOffTitle": "Chuẩn hóa đang tắt: bản xuất giữ nguyên mức âm lượng của bạn",
+    "chapters": "Chương",
+    "chaptersCount": "Chương ({{n}})",
+    "chaptersTitle": "Chương: đánh dấu nơi mỗi phần bắt đầu (M thêm một chương tại đầu phát)",
+    "transcript": "Bản ghi lời",
+    "transcriptTitle": "Bản ghi lời: chỉnh sửa chương trình qua văn bản, xóa từ để cắt chúng",
+    "fillersLabel": "Bỏ từ đệm",
+    "fillers": "Từ đệm",
+    "fillersTitle": "Bỏ từ đệm: tìm \"ừm\", \"à\", \"kiểu như\" và các chỗ ngừng dài, xem lại rồi cắt"
+  },
+  "cutSilences": {
+    "progress": "Đang cắt khoảng lặng: clip {{done}}/{{total}}",
+    "failed_other": "Không đọc được {{count}} clip. Các clip còn lại đã được cắt.",
+    "failedUploading_other": "Chưa đọc được {{count}} clip: thử lại khi tải lên xong. Các clip còn lại đã được cắt."
+  },
+  "group": {
+    "nothing": "Không có gì phát cùng lúc trên rãnh giọng nói khác. Hãy đặt giọng còn lại lên một rãnh riêng trước.",
+    "done_other": "Đã nhóm {{count}} giọng: giờ chúng được di chuyển, cắt gọt và cắt khoảng lặng cùng nhau."
+  },
+  "template": {
+    "applied": "Đã áp dụng mẫu: {{parts}}.",
+    "intro": "phần mở đầu",
+    "outro": "phần kết",
+    "bed": "nhạc nền",
+    "takeOff": "Gỡ ra"
+  },
+  "rangePick": {
+    "hint": "Nhấp vào chỗ đoạn audiogram bắt đầu, rồi chỗ nó kết thúc (tối đa 2 phút). Kéo các cạnh để điều chỉnh.",
+    "from": "Từ {{start}}: giờ nhấp vào chỗ kết thúc",
+    "span": "{{start}} – {{end}} · {{seconds}} giây",
+    "listenTitle": "Chỉ nghe đoạn này (Dấu cách)",
+    "stop": "Dừng",
+    "play": "Phát đoạn này",
+    "use": "Dùng đoạn này"
+  },
+  "empty": {
+    "addVideo": "Thêm video",
+    "addImage": "Thêm hình ảnh",
+    "addAudio": "Thêm âm thanh",
+    "addRecording": "Thêm bản ghi",
+    "record": "Ghi âm",
+    "music": "Âm nhạc"
+  },
+  "confirm": {
+    "removeClip": "Gỡ clip này khỏi dòng thời gian?",
+    "removeClips_other": "Gỡ {{count}} clip này khỏi dòng thời gian?",
+    "removeLibraryItem": "Gỡ mục này khỏi thư viện dự án?",
+    "removeTrack": "Gỡ rãnh này cùng tất cả clip của nó?"
+  },
+  "clipStreaming": "Clip này vẫn đang được truyền từ 3Speak. Hãy thử lại khi tải xuống xong.",
+  "reverse": {
+    "title": "Đang đảo ngược clip...",
+    "body": "Đang xử lý trên máy chủ, vui lòng chờ.",
+    "failed": "Không đảo ngược được clip: {{error}}"
+  },
+  "remix": {
+    "stitch": "Ghép nối",
+    "stitchHintBefore": "Quay tối đa {{seconds}} giây. Đoạn này phát ngay trước bản gốc.",
+    "stitchHintAfter": "Quay tối đa {{seconds}} giây. Đoạn này phát ngay sau bản gốc.",
+    "reaction": "Phản ứng",
+    "reactionHint": "Bản gốc phát từ đầu trong lúc bạn quay. Hãy dùng tai nghe để tiếng không vọng vào micrô.",
+    "originalFillsLimit": "Bản gốc đã chiếm hết giới hạn {{limit}}. Hãy cắt gọt nó trên dòng thời gian, rồi quay đoạn ghép nối bằng nút camera."
+  },
+  "chapters": {
+    "intro": "Mở đầu",
+    "numbered": "Chương {{n}}"
+  },
+  "duck": {
+    "allVoices": "Tất cả rãnh giọng nói"
+  },
+  "media": "Phương tiện",
+  "importedMedia": "Phương tiện đã nhập",
+  "files_other": "{{count}} tệp",
+  "side": {
+    "clipsSelected_other": "Đã chọn {{count}} clip",
+    "clearSelection": "Bỏ chọn",
+    "closeProperties": "Đóng thuộc tính",
+    "captions": "Phụ đề",
+    "closeCaptions": "Đóng phụ đề",
+    "noClip": "Chưa chọn clip nào",
+    "noClipHint": "Chọn một clip trên dòng thời gian để xem cài đặt của nó. Kéo khung qua nhiều clip để thay đổi chúng cùng lúc."
+  },
+  "cleaningHint": "Bản ghi dài có thể mất khoảng một phút.",
+  "hlsDownload": {
+    "title": "Đang tải phương tiện",
+    "hint": "Vui lòng chờ trong khi phương tiện đang được chuẩn bị..."
+  },
+  "sendPreview": {
+    "titleAudio": "Nghe trước khi dùng",
+    "titleVideo": "Xem trước video của bạn",
+    "back": "Quay lại trình chỉnh sửa",
+    "askTitle": "Tạo audiogram cho Shorts?",
+    "askBody": "Các video ngắn từ những đoạn hay nhất của âm thanh này, được đăng thành Shorts trên 3Speak cùng với nó, mỗi video đều liên kết về âm thanh gốc.",
+    "askNo": "Không, dùng âm thanh",
+    "askMake": "Tạo audiogram"
+  },
+  "legacy": {
+    "projectLibrary": "Thư viện dự án",
+    "loadingFfmpeg": "Đang tải FFmpeg... {{percent}}",
+    "properties": "Thuộc tính",
+    "propertiesOf": "Thuộc tính: {{name}}",
+    "addMedia": "Thêm phương tiện",
+    "addMediaTitle": "Thêm phương tiện vào thư viện",
+    "record": "Quay",
+    "recordTitle": "Quay video từ camera"
+  },
+  "drafts": {
+    "episode": "Tập",
+    "project": "Dự án"
+  }
+}

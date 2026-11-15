@@ -1,0 +1,29 @@
+{
+  "header": "タイムラインのプレビュー",
+  "smaller": "小さく",
+  "larger": "大きく",
+  "loopOn": "ループ：オン",
+  "loopOff": "ループ：オフ",
+  "aspect": {
+    "title": "アスペクト比：{{ratio}}",
+    "titleAuto": "アスペクト比：自動（{{ratio}}）",
+    "auto": "自動"
+  },
+  "fullSize": "原寸",
+  "halfSize": "半分のサイズ",
+  "fullscreen": "全画面",
+  "noClipHere": "この位置にクリップはありません",
+  "noClips": "タイムラインにクリップがありません",
+  "source": {
+    "hls": "（HLS ストリーム）",
+    "uploaded": "（アップロード済み）",
+    "local": "（ローカル）",
+    "file": "（ファイル）"
+  },
+  "stageLayout": {
+    "tileTop": "上に並べる",
+    "tileBottom": "下に並べる",
+    "overlay": "オーバーレイ"
+  },
+  "selectClip": "クリップを選ぶとプレビューできます"
+}

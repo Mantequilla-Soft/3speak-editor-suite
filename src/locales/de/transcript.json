@@ -1,0 +1,75 @@
+{
+  "language": {
+    "label": "Gesprochene Sprache",
+    "auto": "Automatisch erkennen"
+  },
+  "intro": {
+    "title": "Über Text bearbeiten",
+    "text": "Mach aus dem Gesagten Text, mit jeder Stimme beim Namen, und bearbeite die Aufnahme dann wie ein Dokument: Wörter markieren und Entf drücken, um sie herauszuschneiden.",
+    "checking": "Server wird geprüft...",
+    "unavailable": "Transkripte sind auf diesem Editor-Server gerade nicht verfügbar.",
+    "noSpeech": "Füge zuerst eine Aufnahme mit Sprache hinzu.",
+    "transcribeSeconds": "Transkribieren ({{n}} s Aufnahme)",
+    "transcribeMinutes": "Transkribieren ({{n}} Min. Aufnahme)",
+    "longShow": "Eine lange Sendung dauert eine Weile: die Wörter erscheinen Stück für Stück, und du kannst mit den ersten schon anfangen."
+  },
+  "listening": "Hört zu...",
+  "stop": "Stopp",
+  "goThere": "Hinspringen",
+  "search": {
+    "placeholder": "Wörter finden",
+    "label": "Wörter im Transkript finden",
+    "previous": "Zurück",
+    "previousLabel": "Vorheriger Treffer",
+    "next": "Weiter",
+    "nextLabel": "Nächster Treffer"
+  },
+  "selection": {
+    "count_one": "{{count}} Wort · {{seconds}} s",
+    "count_other": "{{count}} Wörter · {{seconds}} s",
+    "cut": "Schneiden",
+    "cutTitle": "Die markierten Wörter aus der Aufnahme schneiden (Entf)",
+    "clearTitle": "Auswahl aufheben (Esc)",
+    "clearLabel": "Auswahl aufheben"
+  },
+  "found": {
+    "cutAll_one": "{{count}} schneiden",
+    "cutAll_other": "Alle {{count}} schneiden",
+    "cutAllTitle": "Jede gefundene Stelle aus der Aufnahme schneiden"
+  },
+  "fillers": "Füllwörter",
+  "fillersTitle": "Finde ähm, äh, sozusagen und lange Pausen",
+  "copy": "Transkript kopieren",
+  "speakers": "Sprecher",
+  "missing": {
+    "seconds": "{{n}} s der Aufnahme haben noch keinen Text.",
+    "minutes": "{{n}} Min. der Aufnahme haben noch keinen Text.",
+    "transcribe": "Transkribieren"
+  },
+  "scrollLabel": "Transkript: klick auf ein Wort, um hinzuspringen, zieh über Wörter, um sie zu markieren, Entf schneidet sie",
+  "hint_one": "{{count}} Wort. Klick auf ein Wort, um hinzuspringen; ziehen oder Umschalt+Klick zum Markieren; Entf schneidet. Rückgängig holt es zurück.",
+  "hint_other": "{{count}} Wörter. Klick auf ein Wort, um hinzuspringen; ziehen oder Umschalt+Klick zum Markieren; Entf schneidet. Rückgängig holt es zurück.",
+  "speaker": {
+    "default": "Stimme",
+    "numbered": "Stimme {{n}}"
+  },
+  "job": {
+    "starting": "Wird gestartet...",
+    "preparing": "Aufnahmen werden vorbereitet...",
+    "listening": "Hört zu...",
+    "signIn": "Melde dich bei 3Speak an, um ein Transkript zu erstellen.",
+    "uploadFailed": "Die Aufnahmen konnten nicht hochgeladen werden: {{message}}",
+    "notUploaded": "Die Aufnahmen sind noch nicht auf dem Server. Versuch es erneut, wenn sie hochgeladen sind.",
+    "serverAnswered": "Der Server hat mit {{status}} geantwortet",
+    "lost": "Der Transkript-Auftrag ging verloren (wurde der Server neu gestartet?)",
+    "failed": "Spracherkennung fehlgeschlagen"
+  },
+  "stt": {
+    "audioUnavailable": "Audio nicht verfügbar",
+    "serverError": "Serverfehler",
+    "connectionFailed": "Verbindung fehlgeschlagen",
+    "unauthorized": "nicht autorisiert",
+    "closed": "geschlossen",
+    "initFailed": "Start der Spracherkennung fehlgeschlagen"
+  }
+}

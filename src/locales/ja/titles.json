@@ -1,0 +1,111 @@
+{
+  "textFx": {
+    "title": "テキストエフェクト",
+    "outline": "アウトライン",
+    "outlineColour": "アウトラインの色",
+    "outlineWidth": "アウトラインの太さ",
+    "wordsComeIn": "単語の登場",
+    "allAtOnce": "一度にすべて",
+    "atOnce": "一度に",
+    "anims": {
+      "pop": "ポップ",
+      "fadeUp": "フェードアップ",
+      "typewriter": "タイプライター",
+      "slide": "スライド"
+    },
+    "gap": "間隔",
+    "gapSeconds": "単語間の時間（秒）",
+    "defaultText": "テキスト"
+  },
+  "templates": {
+    "dialogTitle": "タイトル",
+    "allTitles": "すべてのタイトル",
+    "overVideo": "動画の上",
+    "ownBackground": "専用の背景",
+    "starsHint": "単語を *アスタリスク* で囲むと色が付きます。",
+    "addTitle": "タイトルを追加",
+    "groups": {
+      "lower": "テロップ（下部）",
+      "title": "動画の上のタイトル",
+      "card": "イントロとアウトロのカード"
+    },
+    "fields": {
+      "name": "名前",
+      "role": "肩書き",
+      "lines": "行",
+      "words": "単語",
+      "lineUnder": "その下の一文",
+      "lineInFront": "手前の一文",
+      "rows": "行",
+      "headline": "見出し",
+      "lineUnderIt": "その下の一文",
+      "tagline": "キャッチコピー",
+      "cta": "行動喚起（CTA）",
+      "smallPrint": "注記"
+    },
+    "items": {
+      "lowerName": {
+        "label": "名前と肩書き",
+        "sub": "3Speak のクリエイター"
+      },
+      "lowerStatement": {
+        "label": "短いメッセージ",
+        "lines": "今日*学んだ*\n3つのこと"
+      },
+      "titleWords": {
+        "label": "1語ずつ",
+        "words": "計画。\n撮影。\n*投稿。*",
+        "line": "3Speak での私の1週間"
+      },
+      "titleKinetic": {
+        "label": "単語が叩きつけられる",
+        "words": "速い\nシンプル\nあなたのもの",
+        "line": "*3Speak* で制作"
+      },
+      "titlePoster": {
+        "label": "巨大な単語の積み重ね",
+        "words": "1日\n目。",
+        "sub": "ゼロからのスタート"
+      },
+      "titleMarquee": {
+        "label": "流れる行",
+        "rows": "計画\n撮影\n投稿\n繰り返し",
+        "line": "毎*週*"
+      },
+      "cardHook": {
+        "label": "イントロ：冒頭の一文",
+        "lines": "私の\n*ショート*\n編集術",
+        "sub": "1分以内で"
+      },
+      "cardEnd": {
+        "label": "アウトロ：フォローしてね",
+        "tagline": "*毎週* 新しいショート",
+        "cta": "3Speak でフォロー"
+      },
+      "cardPoster": {
+        "label": "アウトロ：巨大な単語",
+        "words": "また\n*すぐに*\n会おう。",
+        "cta": "3Speak でフォロー"
+      }
+    }
+  },
+  "scene": {
+    "title": "タイトル",
+    "onePerLine": "1行に1つ",
+    "colours": "カラー",
+    "font": "フォント",
+    "overVideo": "動画の上",
+    "length": "長さ",
+    "lengthSeconds": "長さ（秒）",
+    "defaultName": "私",
+    "layerTitle": "タイトル"
+  },
+  "colors": {
+    "ember": "エンバー",
+    "amber": "アンバー",
+    "ocean": "オーシャン",
+    "forest": "フォレスト",
+    "berry": "ベリー",
+    "paper": "ペーパー"
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "textFx": {
+    "title": "टेक्स्ट इफ़ेक्ट",
+    "outline": "आउटलाइन",
+    "outlineColour": "आउटलाइन का रंग",
+    "outlineWidth": "आउटलाइन की मोटाई",
+    "wordsComeIn": "शब्द कैसे आएँ",
+    "allAtOnce": "सब एक साथ",
+    "atOnce": "एक साथ",
+    "anims": {
+      "pop": "पॉप",
+      "fadeUp": "ऊपर फ़ेड",
+      "typewriter": "टाइपराइटर",
+      "slide": "स्लाइड"
+    },
+    "gap": "अंतराल",
+    "gapSeconds": "शब्दों के बीच समय (सेकंड)",
+    "defaultText": "टेक्स्ट"
+  },
+  "templates": {
+    "dialogTitle": "टाइटल",
+    "allTitles": "सभी टाइटल",
+    "overVideo": "वीडियो के ऊपर",
+    "ownBackground": "अपना बैकग्राउंड",
+    "starsHint": "किसी शब्द को रंगने के लिए उसके चारों ओर *तारे* लगाएँ।",
+    "addTitle": "टाइटल जोड़ें",
+    "groups": {
+      "lower": "लोअर थर्ड",
+      "title": "वीडियो के ऊपर टाइटल",
+      "card": "इंट्रो और आउट्रो कार्ड"
+    },
+    "fields": {
+      "name": "नाम",
+      "role": "भूमिका",
+      "lines": "लाइनें",
+      "words": "शब्द",
+      "lineUnder": "उनके नीचे की लाइन",
+      "lineInFront": "सामने की लाइन",
+      "rows": "पंक्तियाँ",
+      "headline": "हेडलाइन",
+      "lineUnderIt": "इसके नीचे की लाइन",
+      "tagline": "टैगलाइन",
+      "cta": "कॉल टू एक्शन",
+      "smallPrint": "बारीक अक्षर"
+    },
+    "items": {
+      "lowerName": {
+        "label": "नाम और भूमिका",
+        "sub": "3Speak पर क्रिएटर"
+      },
+      "lowerStatement": {
+        "label": "छोटा कथन",
+        "lines": "तीन बातें जो\nमैंने आज *सीखीं*"
+      },
+      "titleWords": {
+        "label": "एक बार में एक शब्द",
+        "words": "योजना।\nशूट।\n*पोस्ट।*",
+        "line": "3Speak पर मेरा हफ़्ता"
+      },
+      "titleKinetic": {
+        "label": "शब्द ज़ोर से आते हैं",
+        "words": "तेज़\nआसान\nआपका",
+        "line": "*3Speak* पर बना"
+      },
+      "titlePoster": {
+        "label": "एक के ऊपर एक विशाल शब्द",
+        "words": "पहला\nदिन।",
+        "sub": "शून्य से शुरुआत"
+      },
+      "titleMarquee": {
+        "label": "चलती पंक्तियाँ",
+        "rows": "योजना\nशूट\nपोस्ट\nदोहराएँ",
+        "line": "हर *हफ़्ते*"
+      },
+      "cardHook": {
+        "label": "इंट्रो: शुरुआती लाइन",
+        "lines": "मैं अपने\n*शॉर्ट्स*\nकैसे एडिट करता हूँ",
+        "sub": "एक मिनट से कम में"
+      },
+      "cardEnd": {
+        "label": "आउट्रो: मुझे फ़ॉलो करें",
+        "tagline": "*हर हफ़्ते* नए शॉर्ट्स",
+        "cta": "3Speak पर फ़ॉलो करें"
+      },
+      "cardPoster": {
+        "label": "आउट्रो: विशाल शब्द",
+        "words": "फिर\nमिलते\n*हैं।*",
+        "cta": "3Speak पर फ़ॉलो करें"
+      }
+    }
+  },
+  "scene": {
+    "title": "टाइटल",
+    "onePerLine": "हर लाइन में एक",
+    "colours": "रंग",
+    "font": "फ़ॉन्ट",
+    "overVideo": "वीडियो के ऊपर",
+    "length": "लंबाई",
+    "lengthSeconds": "लंबाई (सेकंड)",
+    "defaultName": "मैं",
+    "layerTitle": "टाइटल"
+  },
+  "colors": {
+    "ember": "अंगार",
+    "amber": "एम्बर",
+    "ocean": "सागर",
+    "forest": "जंगल",
+    "berry": "बेरी",
+    "paper": "कागज़"
+  }
+}

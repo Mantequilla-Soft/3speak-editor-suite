@@ -1,0 +1,39 @@
+{
+  "cancel": "Ghairi",
+  "close": "Funga",
+  "ok": "Sawa",
+  "gotIt": "Nimeelewa",
+  "done": "Tayari",
+  "save": "Hifadhi",
+  "delete": "Futa",
+  "remove": "Ondoa",
+  "back": "Rudi",
+  "next": "Inayofuata",
+  "skip": "Ruka",
+  "retry": "Jaribu tena",
+  "reset": "Weka upya",
+  "none": "Hakuna",
+  "off": "Imezimwa",
+  "auto": "Otomatiki",
+  "play": "Cheza",
+  "pause": "Sitisha",
+  "undo": "Tendua",
+  "preview": "Onyesho la awali",
+  "render": "Tengeneza",
+  "export": "Hamisha",
+  "duration": {
+    "seconds_one": "sekunde {{count}}",
+    "seconds_other": "sekunde {{count}}",
+    "minutes_one": "dakika {{count}}",
+    "minutes_other": "dakika {{count}}",
+    "hours_one": "saa {{count}}",
+    "hours_other": "saa {{count}}"
+  },
+  "limits": {
+    "atMost": {
+      "short": "Short inaweza kuwa na upeo wa {{limit}}.",
+      "video": "Video inaweza kuwa na upeo wa {{limit}}.",
+      "audio": "Faili linalohamishwa linaweza kuwa na upeo wa {{limit}}."
+    }
+  }
+}

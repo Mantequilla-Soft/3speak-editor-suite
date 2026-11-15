@@ -1,0 +1,111 @@
+{
+  "textFx": {
+    "title": "Effetti di testo",
+    "outline": "Contorno",
+    "outlineColour": "Colore del contorno",
+    "outlineWidth": "Spessore del contorno",
+    "wordsComeIn": "Entrata delle parole",
+    "allAtOnce": "Tutte insieme",
+    "atOnce": "Subito",
+    "anims": {
+      "pop": "Pop",
+      "fadeUp": "Dissolvenza in salita",
+      "typewriter": "Macchina da scrivere",
+      "slide": "Scorrimento"
+    },
+    "gap": "Intervallo",
+    "gapSeconds": "Tempo tra le parole (secondi)",
+    "defaultText": "Testo"
+  },
+  "templates": {
+    "dialogTitle": "Titoli",
+    "allTitles": "Tutti i titoli",
+    "overVideo": "Sopra il video",
+    "ownBackground": "Sfondo proprio",
+    "starsHint": "Metti una parola tra *asterischi* per colorarla.",
+    "addTitle": "Aggiungi titolo",
+    "groups": {
+      "lower": "Sottopancia",
+      "title": "Titoli sopra il video",
+      "card": "Schede di intro e outro"
+    },
+    "fields": {
+      "name": "Nome",
+      "role": "Ruolo",
+      "lines": "Righe",
+      "words": "Parole",
+      "lineUnder": "Riga sotto",
+      "lineInFront": "Riga davanti",
+      "rows": "Righe",
+      "headline": "Titolo",
+      "lineUnderIt": "Riga sotto",
+      "tagline": "Slogan",
+      "cta": "Invito all'azione",
+      "smallPrint": "Note in piccolo"
+    },
+    "items": {
+      "lowerName": {
+        "label": "Nome e ruolo",
+        "sub": "Creator su 3Speak"
+      },
+      "lowerStatement": {
+        "label": "Frase breve",
+        "lines": "Tre cose\nche ho *imparato* oggi"
+      },
+      "titleWords": {
+        "label": "Una parola alla volta",
+        "words": "Pianifica.\nGira.\n*Pubblica.*",
+        "line": "La mia settimana su 3Speak"
+      },
+      "titleKinetic": {
+        "label": "Parole che sbattono",
+        "words": "Veloce\nSemplice\nTuo",
+        "line": "Fatto su *3Speak*"
+      },
+      "titlePoster": {
+        "label": "Parole giganti impilate",
+        "words": "Giorno\nuno.",
+        "sub": "Partendo da zero"
+      },
+      "titleMarquee": {
+        "label": "Righe che scorrono",
+        "rows": "Pianifica\nGira\nPubblica\nRipeti",
+        "line": "Ogni *settimana*"
+      },
+      "cardHook": {
+        "label": "Intro: frase d'apertura",
+        "lines": "Come\nmonto i miei\n*Shorts*",
+        "sub": "In meno di un minuto"
+      },
+      "cardEnd": {
+        "label": "Outro: seguimi",
+        "tagline": "Nuovi Shorts *ogni settimana*",
+        "cta": "Seguimi su 3Speak"
+      },
+      "cardPoster": {
+        "label": "Outro: parole giganti",
+        "words": "Ci\nvediamo\n*presto.*",
+        "cta": "Seguimi su 3Speak"
+      }
+    }
+  },
+  "scene": {
+    "title": "Titolo",
+    "onePerLine": "Uno per riga",
+    "colours": "Colori",
+    "font": "Carattere",
+    "overVideo": "Sopra il video",
+    "length": "Durata",
+    "lengthSeconds": "Durata (secondi)",
+    "defaultName": "Io",
+    "layerTitle": "Titolo"
+  },
+  "colors": {
+    "ember": "Brace",
+    "amber": "Ambra",
+    "ocean": "Oceano",
+    "forest": "Foresta",
+    "berry": "Bacca",
+    "paper": "Carta"
+  }
+}

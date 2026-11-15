@@ -1,0 +1,26 @@
+{
+  "music": {
+    "title": "Muziki",
+    "search": "Tafuta nyimbo",
+    "loading": "Inapakia nyimbo...",
+    "failed": "Maktaba ya muziki haikuweza kupakiwa.",
+    "none": "Hakuna wimbo unaolingana.",
+    "note": "Sifa za wimbo zinaongezwa kwenye chapisho lako kiotomatiki. Kuchagua sauti ya mtayarishi wa 3Speak kunampa asilimia 5 ya zawadi za chapisho.",
+    "addTitle": "Ongeza kwenye video"
+  },
+  "sfx": {
+    "title": "Madoido ya sauti",
+    "search": "Tafuta sauti",
+    "loading": "Inapakia sauti...",
+    "failed": "Madoido ya sauti hayakuweza kupakiwa.",
+    "none": "Hakuna sauti inayolingana.",
+    "note": "Sauti zinawekwa kwenye kiashiria cha kucheza. Ni bure kutumia (CC0, Kenney.nl), hakuna haja ya kutaja chanzo.",
+    "addTitle": "Ongeza kwenye kiashiria cha kucheza"
+  },
+  "all": "Zote",
+  "timeline": "Mfuatano wa muda: {{title}}",
+  "seconds": "sek {{seconds}}",
+  "stop": "Simamisha",
+  "listen": "Sikiliza",
+  "add": "Ongeza"
+}

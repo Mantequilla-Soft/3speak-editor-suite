@@ -1,0 +1,108 @@
+{
+  "speed": {
+    "title": "Velocidade",
+    "stillFrame": "Imagem congelada",
+    "holds": "Congela o quadro em {{time}} do vídeo. Corte na linha do tempo ou escolha uma duração:",
+    "seconds": "{{value}} s",
+    "speed": "Velocidade",
+    "ramp": "Rampa de velocidade",
+    "ramps": {
+      "montage": "Montagem",
+      "hero": "Herói",
+      "speedUp": "Acelerar",
+      "slowDown": "Desacelerar"
+    },
+    "rampHint": "A prévia segue a rampa de perto, a renderização é exata. O som mantém o tom.",
+    "freeze": "Congelar quadro",
+    "freezeLength": "Duração do congelamento",
+    "freezeTitle": "Congelar o quadro sob o cursor de reprodução",
+    "freezeMoveFirst": "Primeiro mova o cursor de reprodução para este clipe",
+    "freezeAt": "Congelar no cursor de reprodução",
+    "stillName": "Congelado · {{name}}",
+    "stillNameFallback": "clipe"
+  },
+  "badge": {
+    "still": "Congelado",
+    "ramp": "Rampa",
+    "stillTitle": "Imagem congelada",
+    "speedTitle": "Velocidade {{speed}}",
+    "rampTitle": "Rampa de velocidade"
+  },
+  "keyframes": {
+    "title": "Quadros-chave",
+    "moveHere": "Mova o cursor de reprodução para este clipe para adicionar quadros-chave.",
+    "props": {
+      "x": "Posição X",
+      "y": "Posição Y",
+      "scale": "Escala",
+      "rotation": "Rotação",
+      "opacity": "Opacidade",
+      "volume": "Volume"
+    },
+    "aria": {
+      "x": {
+        "prev": "Quadro-chave anterior de Posição X",
+        "next": "Próximo quadro-chave de Posição X",
+        "add": "Adicionar quadro-chave de Posição X",
+        "remove": "Remover quadro-chave de Posição X"
+      },
+      "y": {
+        "prev": "Quadro-chave anterior de Posição Y",
+        "next": "Próximo quadro-chave de Posição Y",
+        "add": "Adicionar quadro-chave de Posição Y",
+        "remove": "Remover quadro-chave de Posição Y"
+      },
+      "scale": {
+        "prev": "Quadro-chave anterior de Escala",
+        "next": "Próximo quadro-chave de Escala",
+        "add": "Adicionar quadro-chave de Escala",
+        "remove": "Remover quadro-chave de Escala"
+      },
+      "rotation": {
+        "prev": "Quadro-chave anterior de Rotação",
+        "next": "Próximo quadro-chave de Rotação",
+        "add": "Adicionar quadro-chave de Rotação",
+        "remove": "Remover quadro-chave de Rotação"
+      },
+      "opacity": {
+        "prev": "Quadro-chave anterior de Opacidade",
+        "next": "Próximo quadro-chave de Opacidade",
+        "add": "Adicionar quadro-chave de Opacidade",
+        "remove": "Remover quadro-chave de Opacidade"
+      },
+      "volume": {
+        "prev": "Quadro-chave anterior de Volume",
+        "next": "Próximo quadro-chave de Volume",
+        "add": "Adicionar quadro-chave de Volume",
+        "remove": "Remover quadro-chave de Volume"
+      }
+    },
+    "prev": "Quadro-chave anterior",
+    "next": "Próximo quadro-chave",
+    "add": "Adicionar um quadro-chave no cursor de reprodução",
+    "remove": "Remover o quadro-chave no cursor de reprodução",
+    "ease": "Suavizar daqui até o próximo quadro-chave",
+    "removeAll": "Remover todos os quadros-chave"
+  },
+  "kenBurns": {
+    "title": "Ken Burns",
+    "in": "Zoom lento para dentro",
+    "out": "Zoom lento para fora",
+    "pan": "Panorâmica lenta"
+  },
+  "punch": {
+    "title": "Zooms rápidos",
+    "hint": "Aproximações rápidas no início das frases e em palavras fortes, a partir das legendas se houver, senão a partir do som.",
+    "listening": "Ouvindo...",
+    "auto": "Zooms rápidos automáticos",
+    "remove": "Remover zooms rápidos",
+    "noMoments": "Nenhum início de frase ou palavra forte encontrado neste clipe.",
+    "noSound": "Não foi possível ler o som deste clipe. Adicione legendas automáticas primeiro e tente de novo.",
+    "addedCaptions_one": "{{count}} zoom rápido adicionado a partir das legendas. São quadros-chave normais de Escala.",
+    "addedCaptions_many": "{{count}} de zooms rápidos adicionados a partir das legendas. São quadros-chave normais de Escala.",
+    "addedCaptions_other": "{{count}} zooms rápidos adicionados a partir das legendas. São quadros-chave normais de Escala.",
+    "addedSound_one": "{{count}} zoom rápido adicionado a partir do som. São quadros-chave normais de Escala.",
+    "addedSound_many": "{{count}} de zooms rápidos adicionados a partir do som. São quadros-chave normais de Escala.",
+    "addedSound_other": "{{count}} zooms rápidos adicionados a partir do som. São quadros-chave normais de Escala."
+  }
+}

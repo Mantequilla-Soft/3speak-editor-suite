@@ -1,0 +1,59 @@
+{
+  "panel": {
+    "title": "Transcript",
+    "close": "Isara ang transcript"
+  },
+  "cutNotice": {
+    "plain": "Naputol: {{seconds}} seg na mas maikli.",
+    "words_one": "Naputol ang {{count}} salita: {{seconds}} seg na mas maikli.",
+    "words_other": "Naputol ang {{count}} salita: {{seconds}} seg na mas maikli.",
+    "found_one": "Naputol ang {{count}} nakita: {{seconds}} seg na mas maikli.",
+    "found_other": "Naputol ang {{count}} nakita: {{seconds}} seg na mas maikli.",
+    "fillers": "Naputol ang {{fillers}}, {{pauses}}: {{seconds}} seg na mas maikli.",
+    "dismiss": "Isara"
+  },
+  "fillers": {
+    "title": "Alisin ang mga filler at hinto",
+    "emptyHint": "Gumagana ito mula sa transcript: hinahanap ang um, uh, ano at mga katulad sa wika ng palabas, at ang mahahabang hinto.",
+    "listening": "Nakikinig...",
+    "transcribeFirst": "I-transcribe muna ang palabas",
+    "checking": "Tinitingnan ang server...",
+    "unavailable": "Hindi available ang mga transcript sa editor server na ito ngayon.",
+    "intro": "Mga filler sa {{language}}. Pakinggan ang bawat isa, alisan ng tsek ang dapat manatili.",
+    "introNoList": "Mga filler sa {{language}} (um, uh at mga katulad lang: wala pang listahan para sa wikang ito). Pakinggan ang bawat isa, alisan ng tsek ang dapat manatili.",
+    "stillTranscribing": "Tina-transcribe pa ang natitirang bahagi ng palabas.",
+    "fillerWords": "Mga filler word",
+    "longPauses": "Mahahabang hinto",
+    "minPause": "Hintong mas mahaba sa <strong>{{seconds}} seg</strong>",
+    "keepPause": "Paikliin ang mga hinto sa <strong>{{seconds}} seg</strong>",
+    "keepPauseTitle": "Ang natitira sa mahabang hinto pagkatapos ng putol",
+    "fillerCount_one": "{{count}} filler",
+    "fillerCount_other": "{{count}} filler",
+    "pauseCount_one": "{{count}} hinto",
+    "pauseCount_other": "{{count}} hinto",
+    "summary": "{{fillers}}, {{pauses}} ang natsekan · pumuputol ng {{seconds}} seg",
+    "nothingFound": "Walang nakita sa mga setting na ito.",
+    "tickAllFillers": "Tsekan lahat ng filler",
+    "untickAllFillers": "Alisan ng tsek lahat ng filler",
+    "tickAllPauses": "Tsekan lahat ng hinto",
+    "untickAllPauses": "Alisan ng tsek lahat ng hinto",
+    "listLabel": "Ang mapuputol",
+    "item": {
+      "keepPause": "Panatilihin ang hintong ito",
+      "cutPause": "Putulin ang hintong ito",
+      "keepFiller": "Panatilihin ang {{text}}",
+      "cutFiller": "Putulin ang {{text}}",
+      "stop": "Itigil",
+      "listenTitle": "Pakinggan (may isang segundo sa paligid nito)",
+      "listenAt": "Pakinggan sa {{time}}",
+      "pause": "Hinto",
+      "pauseLength": "{{length}} seg → {{kept}} seg",
+      "filler": "Filler",
+      "fillerTitle": "Tunog ng pag-aatubili",
+      "maybe": "Siguro",
+      "maybeTitle": "May filler dito (napapalibutan ng hinto o kuwit): pakinggan muna"
+    },
+    "cut": "Putulin",
+    "cutCount": "Putulin ang {{n}} ({{seconds}} seg)"
+  }
+}

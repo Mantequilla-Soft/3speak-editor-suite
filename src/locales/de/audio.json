@@ -1,0 +1,12 @@
+{
+  "cleaning": {
+    "voice_one": "Stimme von {{count}} Clip wird bereinigt…",
+    "voice_other": "Stimme von {{count}} Clips wird bereinigt…",
+    "voiceRecording_one": "Stimme von {{count}} Clip wird bereinigt · Aufnahme {{at}} von {{total}}",
+    "voiceRecording_other": "Stimme von {{count}} Clips wird bereinigt · Aufnahme {{at}} von {{total}}",
+    "back_one": "{{count}} Clip wird zurückgestellt…",
+    "back_other": "{{count}} Clips werden zurückgestellt…",
+    "backRecording_one": "{{count}} Clip wird zurückgestellt · Aufnahme {{at}} von {{total}}",
+    "backRecording_other": "{{count}} Clips werden zurückgestellt · Aufnahme {{at}} von {{total}}"
+  }
+}

@@ -1,0 +1,232 @@
+{
+  "title": "Ad Wizard",
+  "beta": "测试版",
+  "loading": "正在加载场景引擎…",
+  "untitled": "未命名广告",
+  "seconds": "{{s}} 秒",
+  "lengthOfMax": "{{length}} 秒 / 最长 {{max}} 秒",
+  "maxOnly": "/ 最长 {{max}} 秒",
+  "steps": {
+    "format": "格式",
+    "brand": "品牌",
+    "scenes": "场景",
+    "sound": "声音",
+    "render": "渲染"
+  },
+  "formats": {
+    "landscape": "横屏 16:9",
+    "landscapeSub": "视频内广告位、网站",
+    "portrait": "竖屏 9:16",
+    "portraitSub": "短视频、快拍、Reels"
+  },
+  "palettes": {
+    "ember": "余烬",
+    "amber": "琥珀",
+    "ocean": "海洋",
+    "forest": "森林",
+    "berry": "浆果",
+    "paper": "纸张"
+  },
+  "roles": {
+    "all": "全部",
+    "opener": "开场",
+    "middle": "中段",
+    "closer": "结尾"
+  },
+  "defaults": {
+    "brandName": "你的品牌",
+    "brandFallback": "品牌",
+    "adName": "广告"
+  },
+  "errors": {
+    "engineLoad": "无法加载 {{src}}",
+    "uploadFailedStatus": "上传失败（{{status}}）",
+    "uploadFailed": "上传失败",
+    "notSignedIn": "未登录",
+    "drafts": "草稿 {{status}}"
+  },
+  "stage": {
+    "empty": "你的广告会显示在这里。",
+    "addFirst": "添加第一个场景",
+    "toStart": "回到开头",
+    "playPause": "播放 / 暂停（空格）",
+    "time": "{{time}} / {{duration}} 秒",
+    "tooLong": "广告最长 {{max}} 秒",
+    "properties": "属性",
+    "propertiesHint": "在列表或时间线上选择一个场景，即可在这里编辑。"
+  },
+  "drafts": {
+    "logInToKeep": "登录 3Speak 即可保留草稿",
+    "inBrowser": "草稿只保存在此浏览器中",
+    "signingIn": "正在登录…",
+    "saveDrafts": "保存草稿",
+    "status": {
+      "saving": "正在保存…",
+      "saved": "已保存",
+      "error": "未保存",
+      "limit": "已达到草稿上限",
+      "idle": "草稿"
+    },
+    "open": "草稿",
+    "title": "你的草稿",
+    "listInfo_other": "{{n}} / {{max}} · 每份草稿在最后一次修改后保留 {{count}} 天",
+    "draftInfo_other": "{{count}} 个场景 · 保存于 {{saved}} · 保留至 {{until}}",
+    "isOpen": "已打开",
+    "openDraft": "打开",
+    "confirmDelete": "要删除“{{name}}”吗？",
+    "empty": "还没有草稿。你工作时草稿会自动保存。",
+    "newAd": "新广告",
+    "limitTitle_other": "你已经有 {{count}} 份草稿了",
+    "limitHint": "选择一份草稿用这个广告替换，或者关闭此窗口，继续工作但不保存。",
+    "savedAt": "保存于 {{date}}",
+    "replace": "替换"
+  },
+  "format": {
+    "locked": "你的预订以 <b>{{format}}</b> 投放，最长 {{max}} 秒。",
+    "where": "广告将在哪里投放？之后可以更改，所有场景两种格式都适用。",
+    "sceneChange": "场景切换",
+    "tip": "易读的广告：每个场景约 3 秒，总长 15-30 秒，开场文字在第一秒内就能看清。",
+    "confirmNew": "要开始制作新广告吗？已保存的草稿会保留。"
+  },
+  "brand": {
+    "name": "名称",
+    "logo": "Logo",
+    "logoHint": "方形效果最好；没有 Logo 时使用首字母",
+    "monogram": "字母标志",
+    "monogramHint": "没有 Logo 时使用的字母",
+    "colours": "颜色",
+    "colors": {
+      "bg": "背景",
+      "ink": "文字",
+      "mute": "次要文字",
+      "accent": "强调色",
+      "accent2": "强调色 2",
+      "accent3": "强调色 3"
+    },
+    "coloursTip": "强调色用于突出显示（文字中用 *星号* 包住）。行动号召按钮以描边样式绘制。",
+    "fonts": "字体",
+    "headlines": "标题",
+    "text": "文字",
+    "ownFont": "你自己的字体文件",
+    "fontNamePlaceholder": "字体名称，例如 Acme Display",
+    "fontRights": "我有权在视频中使用这个字体",
+    "uploading": "上传中…",
+    "uploadFont": "上传 TTF / OTF / WOFF"
+  },
+  "scenes": {
+    "duplicate": "复制",
+    "add": "添加场景",
+    "tip": "所选场景的文字、图片和时长显示在右侧。"
+  },
+  "sound": {
+    "music": "音乐",
+    "startInSong": "歌曲起始位置",
+    "volume": "音量",
+    "fadeIn": "淡入",
+    "fadeOut": "淡出",
+    "noMusic": "还没有音乐。",
+    "library": "音乐库",
+    "uploading": "上传中…",
+    "uploadSong": "上传歌曲",
+    "songRights": "我拥有所上传歌曲的版权或已获得授权",
+    "effects": "音效",
+    "auto": "自动音效（场景切换、文字弹出）",
+    "autoLevel": "自动音效音量",
+    "db": "{{gain}} dB",
+    "restore_other": "恢复 {{count}} 个已移除的自动音效",
+    "addAt": "在 {{time}} 秒处添加音效",
+    "listen": "试听",
+    "autoTag": "自动",
+    "tip": "在时间线上拖动音效即可移动。移动自动音效后，它就变成你自己的音效。",
+    "kinds": {
+      "trans": "转场",
+      "whoosh": "呼啸",
+      "swish": "嗖声",
+      "tick": "滴答",
+      "click": "咔哒",
+      "type": "打字",
+      "hit": "撞击"
+    }
+  },
+  "render": {
+    "drawing": "正在绘制场景…",
+    "mixing": "正在混音…",
+    "sceneRenderFailed": "场景渲染：{{status}}",
+    "renderFailed": "渲染：{{status}}",
+    "scenesLength_other": "{{count}} 个场景，{{length}} 秒",
+    "scenesLengthTooLong_other": "{{count}} 个场景，{{length}} 秒（太长，最长 {{max}} 秒）",
+    "toFill_other": "还有 {{count}} 项需要填写",
+    "allFilled": "所有必填项都已填写",
+    "music": "音乐：{{title}}",
+    "noMusic": "无音乐（可选）",
+    "effects_other": "{{count}} 个音效",
+    "issue": "场景 {{n}}，{{field}}：{{msg}}",
+    "button": "渲染广告（{{size}}）",
+    "progress": "{{phase}} {{percent}}",
+    "sent": "已发送到你的推广活动",
+    "useForCampaign": "用于我的推广活动",
+    "download": "下载",
+    "again": "重新渲染"
+  },
+  "props": {
+    "length": "时长",
+    "fieldIssue": "{{field}}：{{msg}}",
+    "soundEffect": "音效",
+    "autoNote": "{{name}}（自动：移动或修改后即归你所有）",
+    "makeMine": "设为我的",
+    "at": "位置",
+    "secondsUnit": "秒",
+    "volume": "音量"
+  },
+  "picker": {
+    "search": "搜索",
+    "look": "外观",
+    "all": "全部",
+    "nothing": "没有匹配项。"
+  },
+  "fields": {
+    "optional": "可选",
+    "auto": "自动",
+    "none": "（无）",
+    "defaultIcon": "默认（{{icon}}）",
+    "clear": "清空",
+    "accentTip": "用 *星号* 包住文字使用强调色，用 _下划线_ 使用第二强调色。",
+    "up": "上移",
+    "moveUp": "上移",
+    "moveDown": "下移",
+    "add": "添加",
+    "needsAtLeast": "至少需要 {{min}} 项",
+    "needs": "需要 {{min}} 项",
+    "pairX": "x %",
+    "pairY": "y %"
+  },
+  "image": {
+    "notPicture": "这不是图片。",
+    "noClipboardPicture": "剪贴板中没有图片。请先复制一张，或在这里按 Ctrl+V / Cmd+V。",
+    "clipboardBlocked": "浏览器不允许读取剪贴板。请点击这里并按 Ctrl+V / Cmd+V。",
+    "dragToPlace": "拖动以选择显示图片的哪一部分",
+    "zoom": "缩放",
+    "zoomTitle": "在框内放大图片；框的大小保持不变",
+    "zoomValue": "{{zoom}}x",
+    "resetPlacement": "重置位置",
+    "replace": "替换",
+    "pasteTitle": "从剪贴板粘贴",
+    "uploadingPct": "正在上传 {{pct}}%",
+    "upload": "上传",
+    "paste": "粘贴",
+    "linkPlaceholder": "或粘贴 https:// 链接，或粘贴图片（Ctrl+V）"
+  },
+  "timeline": {
+    "tick": "{{s}} 秒",
+    "scenes": "场景",
+    "blockTitle": "{{type}}：{{length}} 秒",
+    "dragLength": "拖动以更改时长",
+    "music": "音乐",
+    "musicVolume": "{{title}} · {{volume}}",
+    "effects": "音效",
+    "sfxTitle": "{{name}}，位于 {{at}} 秒"
+  },
+  "preview": {
+    "frameTitle": "广告预览"
+  }
+}

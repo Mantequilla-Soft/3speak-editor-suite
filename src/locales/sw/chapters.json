@@ -1,0 +1,41 @@
+{
+  "title": "Sura",
+  "intro": "Weka alama mahali kila sehemu ya kipindi inapoanza. Programu za podikasti zinazionyesha, na 3Speak inaziorodhesha kwenye maelezo. Zinabaki na rekodi yako unapoikata. Njia ya mkato: <kbd>M</kbd> inaongeza moja kwenye kiashiria cha kucheza.",
+  "empty": "Bado hakuna sura. Sogeza kiashiria cha kucheza mahali sehemu inapoanza na uongeze moja.",
+  "goThere": "Nenda hapo",
+  "nameLabel": "Jina la sura {{n}}",
+  "moveHere": "Isogeze kwenye kiashiria cha kucheza",
+  "moveLabel": "Sogeza sura {{n}} kwenye kiashiria cha kucheza",
+  "removeLabel": "Ondoa sura {{n}}",
+  "leftOut": "Sura zilizo chini ya sekunde moja kutoka nyingine, au mwishoni kabisa, haziingizwi kwenye faili linalohamishwa.",
+  "tipZero": "Kidokezo: programu nyingi zinatarajia sura ya kwanza kuanza 0:00.",
+  "addAt": "Ongeza kwenye {{time}}",
+  "copyTitle": "Nakili orodha (kwa ajili ya maelezo)",
+  "copied": "Imenakiliwa",
+  "copy": "Nakili orodha",
+  "defaultTitle": "Sura",
+  "suggest": {
+    "title": "Mapendekezo",
+    "findTitle": "Tafuta mahali sehemu zinapoweza kuanza: mada mpya, mapumziko marefu, kubadilika kwa onyesho",
+    "again": "Tafuta tena",
+    "suggest": "Pendekeza sura",
+    "addAll": "Ongeza zote {{n}}",
+    "withTranscript": "Ukiwa na nakala (kitufe cha Nakala), mapendekezo yanafuata mada pia na yanapata vichwa kutoka kinachosemwa.",
+    "none": "Hakuna mahali dhahiri palipopatikana. Kipindi kinaweza kuwa kifupi, au sehemu zake zinaingiliana.",
+    "stop": "Simamisha",
+    "listen": "Sikiliza kuanzia hapa",
+    "titleLabel": "Sura inayopendekezwa kwenye {{time}}",
+    "add": "Ongeza sura hii",
+    "addLabel": "Ongeza sura kwenye {{time}}",
+    "drop": "Si hii",
+    "dropLabel": "Ondoa pendekezo kwenye {{time}}",
+    "reason": {
+      "start": "Mwanzo",
+      "topic": "Mada mpya",
+      "pause": "Pumziko refu",
+      "scene": "Kubadilika kwa onyesho"
+    },
+    "intro": "Utangulizi",
+    "part": "Sehemu {{n}}"
+  }
+}

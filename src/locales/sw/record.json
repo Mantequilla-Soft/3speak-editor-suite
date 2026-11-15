@@ -1,0 +1,109 @@
+{
+  "media": {
+    "blocked": {
+      "camera": "Kamera au maikrofoni imezuiwa kwa tovuti hii. Iruhusu kwa ikoni iliyo kwenye upau wa anwani, kisha ujaribu tena. Kama hujawahi kukataa, mipangilio ya faragha ya kompyuta yako inaweza kuwa inazuia kivinjari.",
+      "microphone": "Maikrofoni imezuiwa kwa tovuti hii. Iruhusu kwa ikoni iliyo kwenye upau wa anwani, kisha ujaribu tena. Kama hujawahi kukataa, mipangilio ya faragha ya kompyuta yako inaweza kuwa inazuia kivinjari."
+    },
+    "notAllowed": {
+      "camera": "Ukurasa huu hauruhusiwi kutumia kamera au maikrofoni. Pakia upya 3Speak na ujaribu tena.",
+      "microphone": "Ukurasa huu hauruhusiwi kutumia maikrofoni. Pakia upya 3Speak na ujaribu tena."
+    },
+    "busy": {
+      "camera": "Kamera au maikrofoni yako inatumika kwenye programu au kichupo kingine (simu ya video, kirekodi kingine). Ifunge huko, kisha ujaribu tena.",
+      "microphone": "Maikrofoni yako inatumika kwenye programu au kichupo kingine (simu ya video, kirekodi kingine). Ifunge huko, kisha ujaribu tena."
+    },
+    "notFound": {
+      "camera": "Hakuna kamera wala maikrofoni iliyopatikana. Unganisha moja, kisha ujaribu tena.",
+      "microphone": "Hakuna maikrofoni iliyopatikana. Unganisha moja, kisha ujaribu tena."
+    },
+    "noDevices": {
+      "camera": "Kivinjari hiki hakiwezi kutumia kamera au maikrofoni hapa.",
+      "microphone": "Kivinjari hiki hakiwezi kutumia maikrofoni hapa."
+    },
+    "failed": {
+      "camera": "Kamera au maikrofoni haikuweza kuanza. Jaribu tena.",
+      "microphone": "Maikrofoni haikuweza kuanza. Jaribu tena."
+    },
+    "failedNamed": {
+      "camera": "Kamera au maikrofoni haikuweza kuanza ({{name}}). Jaribu tena.",
+      "microphone": "Maikrofoni haikuweza kuanza ({{name}}). Jaribu tena."
+    }
+  },
+  "inline": {
+    "camera": "Kamera",
+    "expand": "Panua",
+    "shrink": "Punguza",
+    "uploading": "Inapakia...",
+    "uploadingPct": "Inapakia... {{pct}}%",
+    "converting": "Inabadilisha...",
+    "rec": "REKODI",
+    "starting": "Inaanza...",
+    "plateStepOut": "Toka nje ya picha",
+    "plateShooting": "Inapiga picha ya mandharinyuma, kaa nje...",
+    "gestures": "Shikilia na uburute picha ili kuipanga upya, bana ili kukuza.",
+    "gesturesOverlay": "Shikilia na uburute picha ili kuipanga upya, bana ili kukuza, buruta kisanduku cha kamera yako ili kukisogeza.",
+    "greenScreen": {
+      "label": "Skrini ya kijani",
+      "off": "Imezimwa",
+      "green": "Kijani",
+      "blue": "Bluu",
+      "person": "Mtu",
+      "static": "Tuli",
+      "staticTitle": "Mandharinyuma tuli (majaribio): inaondoa kila kinacholingana na picha ya mandharinyuma tupu",
+      "personTitle": "Hakuna haja ya skrini ya kijani: inakupata kwenye picha",
+      "threshold": "Kizingiti",
+      "thresholdStaticTitle": "Uvumilivu: juu zaidi hupuuza mabadiliko zaidi ya mandharinyuma (kelele, mwanga, ulengaji) lakini kunaweza kuanza kuondoa sehemu zako",
+      "thresholdTitle": "Juu zaidi huondoa zaidi rangi ya skrini",
+      "despill": "Ondoa rangi iliyomwagika",
+      "despillStaticTitle": "Inaondoa rangi ya ukuta kwenye kingo",
+      "despillGreenTitle": "Inaondoa rangi ya kijani kwenye kingo",
+      "despillBlueTitle": "Inaondoa rangi ya bluu kwenye kingo",
+      "retakePlate": "Piga upya mandharinyuma tupu",
+      "shootPlate": "Piga picha ya mandharinyuma tupu",
+      "plateKeep": "Majaribio. Acha kamera na mwanga jinsi vilivyo kabisa.",
+      "plateHowTo": "Majaribio. Weka kamera mahali pamoja, bonyeza kitufe na utoke nje ya picha.",
+      "keyFailed": "Uondoaji wa mandharinyuma wa moja kwa moja haupatikani hapa. Klipu bado inapata mpangilio wa skrini ya kijani.",
+      "personHowTo": "Hakuna haja ya skrini ya kijani: kihariri kinakupata kwenye picha. Rekodi inahifadhiwa kama ilivyo na kukatwa kwenye mfuatano wa muda, ambapo unachagua kitakachokuwa nyuma yako."
+    },
+    "tpEdit": "Hariri maandishi ya teleprompter",
+    "tpAdd": "Ongeza maandishi ya teleprompter",
+    "teleprompter": "Teleprompter",
+    "recordOnly": "Rekodi tu",
+    "recordAndPlay": "Rekodi + Cheza video",
+    "plusPlay": "+ Cheza",
+    "recordReactionTitle": "Rekodi wakati asili inacheza",
+    "recordReaction": "Rekodi mwitikio",
+    "record": "Rekodi",
+    "stop": "Simamisha",
+    "retake": "Rekodi upya",
+    "useClip": "Tumia klipu"
+  },
+  "video": {
+    "title": "Rekodi video",
+    "startingCamera": "Inawasha kamera...",
+    "start": "Anza kurekodi",
+    "stop": "Simamisha",
+    "retake": "Rekodi upya",
+    "useClip": "Tumia klipu"
+  },
+  "audio": {
+    "title": "Rekodi sauti",
+    "cannotRecord": "Kivinjari hiki hakiwezi kurekodi sauti hapa.",
+    "addFailed": "Imeshindwa kuongeza rekodi. Tafadhali jaribu tena.",
+    "yourRecording": "Rekodi yako",
+    "micLevel": "Kiwango cha maikrofoni",
+    "accessingMic": "Inafikia maikrofoni...",
+    "ready": "Tayari kurekodi: zungumza ili kuangalia kiwango chako",
+    "preparing": "Inaandaa rekodi yako...",
+    "adding": "Inaongeza kwenye njia zako...",
+    "tpEdit": "Hariri maandishi ya teleprompter",
+    "tpAdd": "Ongeza maandishi ya teleprompter",
+    "teleprompter": "Teleprompter",
+    "start": "Anza kurekodi",
+    "stop": "Simamisha",
+    "retake": "Rekodi upya",
+    "addingShort": "Inaongeza...",
+    "useRecording": "Tumia rekodi",
+    "useScript": "Tumia maandishi haya"
+  }
+}

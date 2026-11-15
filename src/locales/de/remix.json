@@ -1,0 +1,42 @@
+{
+  "titles": {
+    "mode": "Wie willst du remixen?",
+    "stitch": "Wo soll dein Clip hin?",
+    "reaction": "Wo soll deine Reaktion hin?"
+  },
+  "skip": "Überspringen, frei bearbeiten",
+  "options": {
+    "stitch": {
+      "title": "Stitch",
+      "text": "Nimm einen Clip auf, der vor oder nach dem Original läuft."
+    },
+    "reaction": {
+      "title": "Reaktion",
+      "text": "Nimm dich auf, während das Original läuft."
+    },
+    "free": {
+      "title": "Frei bearbeiten",
+      "text": "Öffne den Editor mit dem Original in der Zeitleiste."
+    },
+    "stitchBefore": {
+      "title": "Vor dem Original",
+      "text": "Dein Clip läuft zuerst, dann das Original."
+    },
+    "stitchAfter": {
+      "title": "Nach dem Original",
+      "text": "Das Original läuft zuerst, dann dein Clip."
+    },
+    "overlay": {
+      "title": "Overlay",
+      "text": "Deine Kamera in einem kleinen Fenster über dem Original. Zieh es, wohin du willst."
+    },
+    "tileTop": {
+      "title": "Kachel oben",
+      "text": "Das Original schrumpft auf die untere Hälfte, du bist oben."
+    },
+    "tileBottom": {
+      "title": "Kachel unten",
+      "text": "Das Original schrumpft auf die obere Hälfte, du bist unten."
+    }
+  }
+}

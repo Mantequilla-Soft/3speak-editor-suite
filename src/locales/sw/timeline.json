@@ -1,0 +1,181 @@
+{
+  "aria": {
+    "timeline": "Mfuatano wa muda",
+    "ruler": "Rula ya muda: bofya ili kusogeza kiashiria cha kucheza",
+    "playhead": "Kiashiria cha kucheza",
+    "zoom": "Kuza"
+  },
+  "split": {
+    "title": "Gawanya klipu kwenye kiashiria cha kucheza (Ctrl+R)",
+    "label": "Gawanya"
+  },
+  "toolbar": {
+    "add": {
+      "title": "Ongeza njia au klipu",
+      "videoTrack": "Njia ya video",
+      "audioTrack": "Njia ya sauti",
+      "musicLibrary": "Maktaba ya muziki",
+      "soundEffects": "Madoido ya sauti",
+      "stickers": "Vibandiko",
+      "titles": "Vichwa",
+      "stock": "Midia za hifadhi"
+    },
+    "zoomTitle": "Kuza: {{value}}px/s",
+    "fit": {
+      "title": "Onyesha mfuatano wote wa muda",
+      "label": "Tosha"
+    },
+    "select": {
+      "titleStart": "Chagua klipu kadhaa: gusa kila moja",
+      "titleDone": "Nimemaliza kuchagua",
+      "label": "Chagua"
+    },
+    "ripple": {
+      "titleTrack": "Ziba pengo kwenye kiashiria cha kucheza katika njia {{number}} (G). Njia nyingine zinabaki kama zilivyo.",
+      "titleNoGap": "Hakuna pengo kwenye kiashiria cha kucheza katika njia ya klipu iliyochaguliwa",
+      "title": "Ondoa pengo kwenye kiashiria cha kucheza (G)",
+      "label": "Ziba pengo"
+    },
+    "captions": {
+      "title": "Manukuu: geuza kinachosemwa kuwa manukuu ya neno kwa neno",
+      "label": "Manukuu"
+    },
+    "transcript": {
+      "title": "Nakala: hariri kupitia maandishi, futa maneno ili kuyakata",
+      "label": "Nakala"
+    },
+    "flag": {
+      "title": "Weka bendera kwenye kiashiria cha kucheza (B): alama yako mwenyewe, yenye namba na rangi, haihamishwi kamwe",
+      "label": "Bendera"
+    },
+    "autoCut": {
+      "title": "Tafuta mapumziko na ukate hapo",
+      "label": "Kata kiotomatiki"
+    },
+    "beats": {
+      "title": "Tafuta mdundo: shikamana nao, panga klipu juu yake",
+      "label": "Midundo"
+    },
+    "delete": {
+      "title": "Futa klipu iliyochaguliwa (Del)",
+      "titleMany": "Futa klipu zilizochaguliwa (Del)",
+      "labelMany": "Futa {{number}}"
+    },
+    "options": "Chaguo",
+    "ungroup": {
+      "titleOne": "Tenganisha kikundi: klipu zake zinasogea na kupunguzwa zenyewe tena",
+      "titleMany": "Tenganisha kikundi: klipu hizi zinasogea na kupunguzwa zenyewe tena",
+      "label": "Tenganisha"
+    },
+    "group": {
+      "title": "Weka kwenye kikundi: klipu hizi zinasogea na kupunguzwa pamoja",
+      "label": "Kikundi {{number}}"
+    },
+    "more": {
+      "title": "Vitendo zaidi vya klipu",
+      "duplicate": "Nakili",
+      "groupVoicesTitle": "Weka kwenye kikundi pamoja na kinachocheza wakati huo huo kwenye njia nyingine za sauti ya mazungumzo: zinasogea, zinapunguzwa na ukimya wake unakatwa pamoja",
+      "groupVoices": "Weka kikundi na sauti nyingine",
+      "reverse": "Geuza kinyume",
+      "unreverse": "Ondoa ugeuzaji",
+      "snapOn": "Kushikamana: washa",
+      "snapOff": "Kushikamana: zima"
+    }
+  },
+  "selectHint": {
+    "count_one": "Klipu {{count}} imechaguliwa: gusa zaidi, au Tayari",
+    "count_other": "Klipu {{count}} zimechaguliwa: gusa zaidi, au Tayari",
+    "none": "Gusa kila klipu unayotaka kuchagua",
+    "clear": "Futa"
+  },
+  "clip": {
+    "settings": "Mipangilio ya klipu",
+    "textFallback": "Maandishi",
+    "layer": "L{{number}}",
+    "kind": {
+      "video": "Klipu ya video",
+      "audio": "Klipu ya sauti",
+      "image": "Picha",
+      "text": "Maandishi",
+      "color": "Rangi",
+      "other": "Klipu"
+    },
+    "aria": {
+      "plain": "{{kind}}, {{from}} hadi {{to}}",
+      "named": "{{kind}} {{name}}, {{from}} hadi {{to}}",
+      "onTrack": "{{kind}} kwenye {{track}}, {{from}} hadi {{to}}",
+      "namedOnTrack": "{{kind}} {{name}} kwenye {{track}}, {{from}} hadi {{to}}"
+    }
+  },
+  "track": {
+    "show": "Onyesha njia",
+    "hide": "Ficha njia",
+    "mute": "Zima sauti ya njia",
+    "unmute": "Washa sauti ya njia",
+    "remove": "Ondoa njia",
+    "addVisual": "Ongeza video, picha au maandishi",
+    "addAudio": "Ongeza sauti",
+    "addFile": "Ongeza faili",
+    "addText": "Ongeza maandishi",
+    "addColor": "Ongeza rangi",
+    "recordVideo": "Rekodi video",
+    "addAudioFile": "Ongeza faili la sauti",
+    "recordAudio": "Rekodi sauti",
+    "resize": {
+      "aria": "Kimo cha {{name}}",
+      "ariaUnnamed": "Kimo cha njia hii",
+      "title": "Buruta ili kufanya njia iwe ndefu au fupi zaidi (bofya mara mbili: rudi kawaida)"
+    },
+    "aria": {
+      "named": {
+        "video": "{{name}} (njia ya video)",
+        "audio": "{{name}} (njia ya sauti)",
+        "music": "{{name}} (njia ya muziki)"
+      },
+      "numbered": {
+        "video": "Njia ya video {{number}}",
+        "audio": "Njia ya sauti {{number}}",
+        "music": "Njia ya muziki {{number}}"
+      }
+    }
+  },
+  "trackName": {
+    "voice": "Sauti ya mazungumzo",
+    "voiceNumbered": "Sauti ya mazungumzo {{number}}",
+    "music": "Muziki",
+    "musicNumbered": "Muziki {{number}}",
+    "video": "Video",
+    "videoNumbered": "Video {{number}}",
+    "audioNumbered": "Sauti {{number}}",
+    "stickers": "Vibandiko",
+    "stickersNumbered": "Vibandiko {{number}}",
+    "sfx": "Madoido",
+    "sfxNumbered": "Madoido {{number}}"
+  },
+  "clipName": {
+    "text": "Tabaka la maandishi",
+    "color": "Rangi",
+    "imported": "Midia zilizoletwa",
+    "linkedAudio": "{{name}} (Sauti)"
+  },
+  "textClip": {
+    "defaultText": "Andika maandishi hapa"
+  },
+  "flag": {
+    "aria": "Bendera {{number}} kwenye {{time}}",
+    "title": "Bendera {{number}} · {{time}}: bofya ili kuruka hapo, buruta ili kusogeza, bofya kulia ili kuondoa"
+  },
+  "range": {
+    "label": "{{from}} – {{to}} · sek {{seconds}}",
+    "startOnly": "{{time}} · bofya mahali inapoishia",
+    "dragStart": "Buruta ili kusogeza mwanzo",
+    "dragEnd": "Buruta ili kusogeza mwisho"
+  },
+  "pastLimit": "Zaidi ya kikomo cha utengenezaji",
+  "backgroundMusic": {
+    "title": "Muziki wa usuli",
+    "add": "Ongeza muziki wa usuli",
+    "remove": "Ondoa muziki"
+  },
+  "partName": "Sehemu {{n}} · {{name}}"
+}

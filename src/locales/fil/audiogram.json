@@ -1,0 +1,184 @@
+{
+  "title": "Mga audiogram",
+  "tour": {
+    "again": "Ipakita ulit ang tour",
+    "againLabel": "Ipakita ulit ang tour ng audiogram"
+  },
+  "saveAndClose": "I-save at isara",
+  "saveAndCloseTitle": "Mananatili ang mga audiogram mo sa audio na ito at lalabas kasama nito bilang Shorts",
+  "loadError": "Hindi ma-load ang mga setting ng audiogram: {{error}}",
+  "loadingLook": "Nilo-load ang itsura ng audiogram mo…",
+  "start": {
+    "title": "Pumili ng piraso ng episode",
+    "text_one": "Ang audiogram ay maikling video ng isang piraso ng episode mo, hanggang {{count}} minuto. Lalabas ito bilang 3Speak Short kasama ng audio. Magsimula sa pagmarka ng simula at dulo nito sa timeline.",
+    "text_other": "Ang audiogram ay maikling video ng isang piraso ng episode mo, hanggang {{count}} minuto. Lalabas ito bilang 3Speak Short kasama ng audio. Magsimula sa pagmarka ng simula at dulo nito sa timeline.",
+    "choose": "Pumili sa timeline"
+  },
+  "stage": {
+    "label": "Preview ng audiogram: i-drag ang mga bahagi para ilipat, ang mga sulok para baguhin ang laki, ang bilog na hawakan para iikot",
+    "frameTitle": "Preview ng audiogram",
+    "turned": "{{name}} · {{angle}}°",
+    "rotate": "Iikot (Shift: 15° bawat hakbang). Double-click: tuwid",
+    "hint": "I-drag ang mga bahagi, hilahin ang sulok para baguhin ang laki (pinapanatili ng Shift ang hugis), ang bilog na hawakan para iikot. Inuusog ng arrow keys, iniikot ng [ at ].",
+    "hintTemplate": "I-drag ang mga bahagi, hilahin ang sulok para baguhin ang laki (pinapanatili ng Shift ang hugis), ang bilog na hawakan para iikot. Inuusog ng arrow keys, iniikot ng [ at ]. Ang huli mong audiogram ang panimulang punto."
+  },
+  "layer": {
+    "logo": {
+      "name": "Logo ng 3Speak",
+      "drag": "Logo ng 3Speak: i-drag para ilipat",
+      "dragSelected": "Logo ng 3Speak: i-drag para ilipat, ang mga sulok para baguhin ang laki, ang bilog na hawakan para iikot"
+    },
+    "cover": {
+      "name": "Larawan",
+      "drag": "Larawan: i-drag para ilipat",
+      "dragSelected": "Larawan: i-drag para ilipat, ang mga sulok para baguhin ang laki, ang bilog na hawakan para iikot",
+      "hide": "Itago ang Larawan",
+      "show": "Ipakita ang Larawan",
+      "forward": "Iusog pasulong ang Larawan",
+      "back": "Iusog paatras ang Larawan"
+    },
+    "title": {
+      "name": "Pamagat",
+      "drag": "Pamagat: i-drag para ilipat",
+      "dragSelected": "Pamagat: i-drag para ilipat, ang mga sulok para baguhin ang laki, ang bilog na hawakan para iikot",
+      "hide": "Itago ang Pamagat",
+      "show": "Ipakita ang Pamagat",
+      "forward": "Iusog pasulong ang Pamagat",
+      "back": "Iusog paatras ang Pamagat"
+    },
+    "line": {
+      "name": "Linya",
+      "drag": "Linya: i-drag para ilipat",
+      "dragSelected": "Linya: i-drag para ilipat, ang mga sulok para baguhin ang laki, ang bilog na hawakan para iikot",
+      "hide": "Itago ang Linya",
+      "show": "Ipakita ang Linya",
+      "forward": "Iusog pasulong ang Linya",
+      "back": "Iusog paatras ang Linya"
+    },
+    "wave": {
+      "name": "Waveform",
+      "drag": "Waveform: i-drag para ilipat",
+      "dragSelected": "Waveform: i-drag para ilipat, ang mga sulok para baguhin ang laki, ang bilog na hawakan para iikot",
+      "hide": "Itago ang Waveform",
+      "show": "Ipakita ang Waveform",
+      "forward": "Iusog pasulong ang Waveform",
+      "back": "Iusog paatras ang Waveform"
+    }
+  },
+  "piece": {
+    "label": "Piraso ng episode",
+    "range": "{{from}} – {{to}} · {{seconds}} seg",
+    "inChapter": "sa “{{title}}”",
+    "change": "Palitan ang piraso"
+  },
+  "look": {
+    "title": "Pamagat",
+    "titleLabel": "Pamagat sa video",
+    "line": "Linya sa ilalim nito <small>(pinapula ito ng *bituin*)</small>",
+    "lineLabel": "Linya sa video",
+    "branding": "Branding ng 3Speak",
+    "logoGroup": "Logo",
+    "picture": "Larawan",
+    "waveform": "Waveform",
+    "waveType": "Uri ng waveform",
+    "waveColour": "Kulay ng waveform",
+    "colour": "Kulay {{colour}}",
+    "anyColour": "Kahit anong kulay",
+    "anyWaveColour": "Kahit anong kulay ng waveform"
+  },
+  "logo": {
+    "mark": "Logo na 3S",
+    "full": "Logo ng 3Speak"
+  },
+  "wave": {
+    "bars": "Mga bar",
+    "centered": "Nakagitna",
+    "line": "Linya",
+    "dots": "Manipis",
+    "circle": "Bilog",
+    "ring": "Bilog na alon"
+  },
+  "picture": {
+    "upload": "Mag-upload ng larawan",
+    "yours": "Ang larawan mo",
+    "coverOf": "Cover ng “{{title}}”",
+    "playlistCover": "Cover ng playlist",
+    "noCovers": "Wala pang cover ang mga playlist mo.",
+    "signIn": "Mag-sign in sa 3Speak para magdagdag ng larawan."
+  },
+  "parts": {
+    "title": "Mga bahagi <small>(harap hanggang likod)</small>",
+    "logoLocked": "Laging nakikita ang logo ng 3Speak, nasa harap, at hindi lumiliit sa itinakdang laki",
+    "alwaysShown": "Laging nakikita",
+    "hide": "Itago",
+    "show": "Ipakita",
+    "forward": "Pasulong",
+    "back": "Paatras",
+    "tidy": "Ayusin ang pagkakaayos"
+  },
+  "make": {
+    "starting": "Nagsisimula...",
+    "working": "Ginagawa...",
+    "noWords": "hindi makita ang mga salita ng pirasong ito (i-off ang captions para gawin ito nang wala)",
+    "failedPlain": "pumalya",
+    "signIn": "Mag-sign in sa 3Speak para gumawa ng audiogram.",
+    "failed": "Hindi magawa ang audiogram: {{error}}",
+    "make": "Gumawa ng audiogram",
+    "another": "Gumawa ng isa pang audiogram"
+  },
+  "made": {
+    "title": "Mga audiogram mo",
+    "hint": "Lalabas sila bilang 3Speak Shorts kasama ng audio, bawat isa ay may link sa post, snap o comment ng audio.",
+    "fallbackTitle": "Audiogram {{n}}",
+    "length": "{{at}} · {{seconds}} seg",
+    "textPlaceholder": "Teksto para sa Short (opsyonal). Kusang idinadagdag ang link sa audio.",
+    "textLabel": "Teksto para sa Short {{n}}",
+    "editText": "I-edit ang teksto",
+    "writeText": "Sumulat ng teksto",
+    "download": "I-download",
+    "removeLabel": "Alisin ang audiogram {{n}}"
+  },
+  "confirm": {
+    "title": "Isara nang hindi ito ginagawa?",
+    "text": "Wala pa sa isang audiogram ang mga pagbabago mo sa itsura. Mawawala ang mga ito kapag isinara mo.",
+    "stays_one": "Mananatili sa audio na ito ang audiogram na ginawa mo.",
+    "stays_other": "Mananatili sa audio na ito ang {{count}} audiogram na ginawa mo.",
+    "keep": "Ituloy ang pag-edit"
+  },
+  "captions": {
+    "label": "Captions",
+    "drag": "Captions: i-drag para ilipat",
+    "dragSelected": "Captions: i-drag para ilipat, hilahin ang gilid para baguhin ang lapad",
+    "sample": "Dito lalabas ang mga salita mo habang sinasabi",
+    "show": "Ipakita ang sinasabi, salita por salita",
+    "checking": "Tinitingnan ang server...",
+    "unavailable": "Hindi available ang captions sa editor server na ito ngayon.",
+    "listening": "Nakikinig...",
+    "getWords": "Kunin ang mga salita",
+    "wordCount_one": "{{count}} salita sa pirasong ito.",
+    "wordCount_other": "{{count}} salita sa pirasong ito.",
+    "noSpeech": "Walang nakitang pananalita sa pirasong ito.",
+    "fix": "Ayusin ang mga salita",
+    "doneFixing": "Tapos nang mag-ayos",
+    "word": "Salita {{n}}",
+    "removeWord": "Alisin ang salitang ito",
+    "removeWordLabel": "Alisin ang {{word}}",
+    "style": "Istilo ng caption",
+    "preset": {
+      "karaoke": "Karaoke",
+      "pop": "Pop",
+      "plain": "Subtitles"
+    },
+    "wordsAtATime": "Mga salita bawat labas",
+    "perPage_one": "{{count}} salita bawat labas",
+    "perPage_other": "{{count}} salita bawat labas",
+    "font": "Font ng caption",
+    "size": "Laki ng caption",
+    "textColour": "Kulay ng text ng caption",
+    "textColourSwatch": "Kulay ng text {{colour}}",
+    "highlightColour": "Kulay ng highlight",
+    "highlight": "Highlight",
+    "highlightSwatch": "Highlight {{colour}}",
+    "capitals": "Malalaking titik"
+  }
+}

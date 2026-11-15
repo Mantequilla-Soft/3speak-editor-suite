@@ -1,0 +1,53 @@
+{
+  "title": "Media stok",
+  "titleBackground": "Pilih latar",
+  "search": "Cari video, foto, dan GIF",
+  "searchProvider": "Cari di {{provider}}",
+  "searchProviderTitle": "Cari di {{provider}} (gratis dipakai, disalin ke server kami saat kamu memilihnya)",
+  "kind": "Jenis",
+  "category": "Kategori",
+  "everything": "Semuanya",
+  "types": {
+    "all": "Semua",
+    "video": "Video",
+    "image": "Foto",
+    "gif": "GIF"
+  },
+  "categories": {
+    "nature": "Alam",
+    "city": "Kota",
+    "people": "Orang",
+    "animals": "Hewan",
+    "food": "Kuliner",
+    "tech": "Teknologi",
+    "sports": "Olahraga",
+    "space": "Luar angkasa",
+    "abstract": "Abstrak",
+    "backgrounds": "Latar"
+  },
+  "loading": "Memuat pustaka...",
+  "typeToSearch": "Ketik apa yang kamu cari untuk mencari di {{provider}}.",
+  "nothingFound": "Tidak ada yang ditemukan.",
+  "searching": "Mencari...",
+  "loadFailed": "Pustaka stok tidak dapat dimuat.",
+  "nothingMatches": "Tidak ada yang cocok.",
+  "adding": "Menambahkan...",
+  "byAuthor": "{{title}} ({{author}})",
+  "licenceOnline": "Dari {{provider}}: gratis dipakai, juga untuk komersial, tanpa perlu kredit. File disalin ke server 3Speak saat kamu memilihnya.",
+  "licence": "Gratis dipakai, juga untuk komersial, tanpa perlu kredit (CC0 / domain publik dari Wikimedia Commons).",
+  "placeBackground": "Ditaruh di belakangmu, di treknya sendiri, sepanjang klipmu.",
+  "placeAdd": "Ditaruh di playhead: di linimasa kosong sebagai videomu, selain itu di atasnya sebagai b-roll.",
+  "errors": {
+    "notCopied": "File itu tidak dapat disalin.",
+    "notAdded": "File itu tidak dapat ditambahkan.",
+    "tooMany": "Terlalu banyak pencarian, tunggu sebentar.",
+    "searchFailed": "Pencarian tidak berhasil, coba lagi.",
+    "copyFailed": "File itu tidak dapat disalin ke server."
+  },
+  "trackName": {
+    "background": "Latar",
+    "backgroundNumbered": "Latar {{number}}",
+    "broll": "B-roll",
+    "brollNumbered": "B-roll {{number}}"
+  }
+}

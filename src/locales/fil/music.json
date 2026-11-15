@@ -1,0 +1,26 @@
+{
+  "music": {
+    "title": "Musika",
+    "search": "Maghanap ng kanta",
+    "loading": "Nilo-load ang mga kanta...",
+    "failed": "Hindi ma-load ang library ng musika.",
+    "none": "Walang tugmang kanta.",
+    "note": "Kusang idinadagdag sa post mo ang credit ng kanta. Kapag pinili mo ang tunog ng isang 3Speak creator, makukuha niya ang 5% ng rewards ng post.",
+    "addTitle": "Idagdag sa video"
+  },
+  "sfx": {
+    "title": "Mga sound effect",
+    "search": "Maghanap ng tunog",
+    "loading": "Nilo-load ang mga tunog...",
+    "failed": "Hindi ma-load ang mga sound effect.",
+    "none": "Walang tugmang tunog.",
+    "note": "Inilalagay ang mga tunog sa playhead. Libreng gamitin (CC0, Kenney.nl), hindi kailangan ng credit.",
+    "addTitle": "Idagdag sa playhead"
+  },
+  "all": "Lahat",
+  "timeline": "Timeline: {{title}}",
+  "seconds": "{{seconds}} seg",
+  "stop": "Itigil",
+  "listen": "Pakinggan",
+  "add": "Idagdag"
+}

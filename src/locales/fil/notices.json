@@ -1,0 +1,25 @@
+{
+  "length": {
+    "title": "{{length}} ang haba ng timeline mo",
+    "body": "{{atMost}} Puwede mo pa ring i-edit ang lahat, pero mananatiling naka-off ang Render hanggang matapos ang timeline sa minarkahang linya na {{limitAt}}. I-trim, hatiin o burahin ang mga clip para maabot iyon.",
+    "bodyAudio": "{{atMost}} Puwede mo pa ring i-edit ang lahat, pero mananatiling naka-off ang Export hanggang matapos ang timeline sa minarkahang linya na {{limitAt}}. I-trim, hatiin o burahin ang mga clip para maabot iyon."
+  },
+  "tooLarge": {
+    "title_one": "Masyadong malaki ang file na ito",
+    "title_other": "Masyadong malalaki ang mga file na ito",
+    "body": "Tumatanggap ang editor ng mga file hanggang {{size}}. Paikliin o i-compress muna ang video (puwedeng mag-export ng mas maliit na kopya ang phone o anumang video app), tapos idagdag ulit."
+  },
+  "encoding": {
+    "title": "Kailangan munang i-convert ang video na ito",
+    "videos_one": "{{count}} video",
+    "videos_other": "{{count}} video",
+    "next": "Susunod",
+    "waiting_one": "Hinihintay ang {{count}} pang video",
+    "waiting_other": "Hinihintay ang {{count}} pang video",
+    "starting": "Sinisimulan…",
+    "upload": "Upload",
+    "convert": "I-convert sa kopyang puwedeng i-play",
+    "hint": "Hindi ma-play ng browser na ito ang format ng video na ito (HEVC o HDR, karaniwan mula sa phone), kaya itim ito hanggang handa na ang kopyang puwedeng i-play. Kusang lilipat doon ang preview. Puwede kang magpatuloy sa pag-edit habang naghihintay.",
+    "hide": "Itago"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "cleaning": {
+    "voice_one": "Stem van {{count}} clip opschonen…",
+    "voice_other": "Stem van {{count}} clips opschonen…",
+    "voiceRecording_one": "Stem van {{count}} clip opschonen · opname {{at}} van {{total}}",
+    "voiceRecording_other": "Stem van {{count}} clips opschonen · opname {{at}} van {{total}}",
+    "back_one": "{{count}} clip terugzetten…",
+    "back_other": "{{count}} clips terugzetten…",
+    "backRecording_one": "{{count}} clip terugzetten · opname {{at}} van {{total}}",
+    "backRecording_other": "{{count}} clips terugzetten · opname {{at}} van {{total}}"
+  }
+}

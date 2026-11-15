@@ -1,0 +1,53 @@
+{
+  "title": "Stock-Medien",
+  "titleBackground": "Hintergrund wählen",
+  "search": "Videos, Fotos und GIFs suchen",
+  "searchProvider": "{{provider}} durchsuchen",
+  "searchProviderTitle": "{{provider}} durchsuchen (frei nutzbar, wird auf unseren Server kopiert, wenn du etwas wählst)",
+  "kind": "Art",
+  "category": "Kategorie",
+  "everything": "Alles",
+  "types": {
+    "all": "Alle",
+    "video": "Videos",
+    "image": "Fotos",
+    "gif": "GIFs"
+  },
+  "categories": {
+    "nature": "Natur",
+    "city": "Stadt",
+    "people": "Menschen",
+    "animals": "Tiere",
+    "food": "Essen",
+    "tech": "Technik",
+    "sports": "Sport",
+    "space": "Weltraum",
+    "abstract": "Abstrakt",
+    "backgrounds": "Hintergründe"
+  },
+  "loading": "Bibliothek wird geladen...",
+  "typeToSearch": "Gib ein, wonach du suchst, um {{provider}} zu durchsuchen.",
+  "nothingFound": "Nichts gefunden.",
+  "searching": "Wird gesucht...",
+  "loadFailed": "Die Stock-Bibliothek konnte nicht geladen werden.",
+  "nothingMatches": "Keine Treffer.",
+  "adding": "Wird hinzugefügt...",
+  "byAuthor": "{{title}} ({{author}})",
+  "licenceOnline": "Von {{provider}}: frei nutzbar, auch kommerziell, keine Nennung nötig. Die Datei wird auf den Server von 3Speak kopiert, wenn du sie wählst.",
+  "licence": "Frei nutzbar, auch kommerziell, keine Nennung nötig (CC0 / gemeinfrei von Wikimedia Commons).",
+  "placeBackground": "Es kommt hinter dich, auf eine eigene Spur, so lang wie dein Clip.",
+  "placeAdd": "Es wird am Abspielkopf eingefügt: in einer leeren Zeitleiste als dein Video, sonst darüber als B-Roll.",
+  "errors": {
+    "notCopied": "Diese Datei konnte nicht kopiert werden.",
+    "notAdded": "Diese Datei konnte nicht hinzugefügt werden.",
+    "tooMany": "Zu viele Suchen, warte einen Moment.",
+    "searchFailed": "Die Suche hat nicht geklappt, versuch es erneut.",
+    "copyFailed": "Diese Datei konnte nicht auf den Server kopiert werden."
+  },
+  "trackName": {
+    "background": "Hintergrund",
+    "backgroundNumbered": "Hintergrund {{number}}",
+    "broll": "B-Roll",
+    "brollNumbered": "B-Roll {{number}}"
+  }
+}

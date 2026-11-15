@@ -1,0 +1,67 @@
+{
+  "language": {
+    "label": "Bahasa yang diucapkan",
+    "auto": "Deteksi otomatis"
+  },
+  "intro": {
+    "title": "Teks otomatis",
+    "text": "Ubah ucapan menjadi teks yang mengikuti setiap kata, ditanam di Short-mu dan juga dikirim ke 3Speak sebagai subtitel.",
+    "checking": "Memeriksa server...",
+    "unavailable": "Teks otomatis saat ini tidak tersedia di server editor ini. Short-mu tetap di-render seperti biasa tanpa teks.",
+    "go": "Teks otomatis"
+  },
+  "presets": {
+    "karaoke": "Karaoke",
+    "pop": "Pop",
+    "plain": "Subtitel"
+  },
+  "presetHints": {
+    "karaoke": "Beberapa kata sekaligus, kata yang sedang diucapkan diberi warna sorotan",
+    "pop": "Satu kata (atau beberapa) sekaligus, muncul tiba-tiba",
+    "plain": "Baris subtitel klasik di atas kotak gelap"
+  },
+  "style": {
+    "title": "Gaya",
+    "presetsLabel": "Gaya teks",
+    "wordsAtATime": "Kata sekaligus",
+    "font": "Font",
+    "size": "Ukuran",
+    "sizeLabel": "Ukuran teks",
+    "position": "Posisi",
+    "positionLabel": "Tinggi teks di gambar",
+    "top": "Atas",
+    "middle": "Tengah",
+    "low": "Bawah",
+    "textColour": "Warna teks",
+    "highlight": "Sorotan",
+    "highlightLabel": "Warna sorotan",
+    "uppercase": "Huruf kapital",
+    "emoji": "Aksen emoji (di atas kata seperti \"api\" atau \"cinta\")",
+    "burn": "Tampilkan di video (mati: hanya sebagai subtitel di 3Speak)"
+  },
+  "words": {
+    "title": "Kata ({{n}})",
+    "hint": "Perbaiki yang salah dengar; kosongkan kata untuk membuangnya. Klip dipindah atau dipotong? Jalankan Teks otomatis lagi.",
+    "goThere": "Ke sana",
+    "word": "Kata {{n}}",
+    "changeEmoji": "Ganti atau hapus emojinya",
+    "addEmoji": "Tambahkan emoji",
+    "remove": "Hapus kata ini",
+    "removeNamed": "Hapus {{word}}"
+  },
+  "actions": {
+    "again": "Ulangi",
+    "againTitle": "Dengarkan lagi (mengganti kata-kata)",
+    "remove": "Hapus teks"
+  },
+  "videoSound": "Suara video",
+  "job": {
+    "preparing": "Menyiapkan suara...",
+    "listening": "Mendengarkan...",
+    "noTracks": "Tidak ada ucapan untuk dijadikan teks: tambahkan klip bersuara terlebih dahulu.",
+    "serverAnswered": "Server menjawab {{status}}",
+    "lost": "Tugas teks hilang (server dimulai ulang?)",
+    "noSpeech": "Tidak ada ucapan ditemukan. Apakah suaranya ada di trek audio yang tidak dibisukan (trek musik tidak diikutkan)?",
+    "failed": "Pengenalan ucapan gagal"
+  }
+}

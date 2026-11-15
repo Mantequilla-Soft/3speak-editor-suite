@@ -1,0 +1,111 @@
+{
+  "textFx": {
+    "title": "Hiệu ứng chữ",
+    "outline": "Viền ngoài",
+    "outlineColour": "Màu viền",
+    "outlineWidth": "Độ dày viền",
+    "wordsComeIn": "Cách từ xuất hiện",
+    "allAtOnce": "Tất cả cùng lúc",
+    "atOnce": "Cùng lúc",
+    "anims": {
+      "pop": "Bật lên",
+      "fadeUp": "Hiện dần lên",
+      "typewriter": "Máy đánh chữ",
+      "slide": "Trượt"
+    },
+    "gap": "Khoảng cách",
+    "gapSeconds": "Thời gian giữa các từ (giây)",
+    "defaultText": "Văn bản"
+  },
+  "templates": {
+    "dialogTitle": "Tiêu đề",
+    "allTitles": "Tất cả tiêu đề",
+    "overVideo": "Trên video",
+    "ownBackground": "Nền riêng",
+    "starsHint": "Đặt *dấu sao* quanh một từ để tô màu cho nó.",
+    "addTitle": "Thêm tiêu đề",
+    "groups": {
+      "lower": "Thanh chữ phía dưới",
+      "title": "Tiêu đề trên video",
+      "card": "Thẻ mở đầu và kết thúc"
+    },
+    "fields": {
+      "name": "Tên",
+      "role": "Vai trò",
+      "lines": "Dòng",
+      "words": "Các từ",
+      "lineUnder": "Dòng bên dưới",
+      "lineInFront": "Dòng phía trước",
+      "rows": "Hàng",
+      "headline": "Tiêu đề chính",
+      "lineUnderIt": "Dòng bên dưới",
+      "tagline": "Khẩu hiệu",
+      "cta": "Kêu gọi hành động",
+      "smallPrint": "Chữ nhỏ"
+    },
+    "items": {
+      "lowerName": {
+        "label": "Tên và vai trò",
+        "sub": "Nhà sáng tạo trên 3Speak"
+      },
+      "lowerStatement": {
+        "label": "Câu ngắn",
+        "lines": "Ba điều\ntôi *học được* hôm nay"
+      },
+      "titleWords": {
+        "label": "Mỗi lần một từ",
+        "words": "Lên kế hoạch.\nQuay.\n*Đăng.*",
+        "line": "Tuần của tôi trên 3Speak"
+      },
+      "titleKinetic": {
+        "label": "Từ đập vào",
+        "words": "Nhanh\nĐơn giản\nCủa bạn",
+        "line": "Làm trên *3Speak*"
+      },
+      "titlePoster": {
+        "label": "Chữ khổng lồ xếp chồng",
+        "words": "Ngày\nđầu.",
+        "sub": "Bắt đầu từ số không"
+      },
+      "titleMarquee": {
+        "label": "Hàng chữ cuộn",
+        "rows": "Lên kế hoạch\nQuay\nĐăng\nLặp lại",
+        "line": "Mỗi *tuần*"
+      },
+      "cardHook": {
+        "label": "Mở đầu: câu mở màn",
+        "lines": "Cách tôi\nchỉnh sửa\n*Shorts*",
+        "sub": "Trong chưa đầy một phút"
+      },
+      "cardEnd": {
+        "label": "Kết thúc: theo dõi tôi",
+        "tagline": "Shorts mới *mỗi tuần*",
+        "cta": "Theo dõi trên 3Speak"
+      },
+      "cardPoster": {
+        "label": "Kết thúc: chữ khổng lồ",
+        "words": "Hẹn\ngặp lại\n*sớm nhé.*",
+        "cta": "Theo dõi trên 3Speak"
+      }
+    }
+  },
+  "scene": {
+    "title": "Tiêu đề",
+    "onePerLine": "Mỗi dòng một mục",
+    "colours": "Màu sắc",
+    "font": "Phông chữ",
+    "overVideo": "Trên video",
+    "length": "Độ dài",
+    "lengthSeconds": "Độ dài (giây)",
+    "defaultName": "Tôi",
+    "layerTitle": "Tiêu đề"
+  },
+  "colors": {
+    "ember": "Than hồng",
+    "amber": "Hổ phách",
+    "ocean": "Đại dương",
+    "forest": "Rừng",
+    "berry": "Quả mọng",
+    "paper": "Giấy"
+  }
+}

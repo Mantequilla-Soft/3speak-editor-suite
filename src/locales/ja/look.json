@@ -1,0 +1,53 @@
+{
+  "title": "ルック",
+  "noEffects": "エフェクトなし",
+  "presetsLabel": "ルックのプリセット",
+  "doubleClickReset": "ダブルクリックでリセット",
+  "presets": {
+    "original": "オリジナル",
+    "warm": "暖色",
+    "cool": "寒色",
+    "vivid": "鮮やか",
+    "matte": "マット",
+    "bw": "モノクロ",
+    "vintage": "ヴィンテージ",
+    "tealorange": "ティール＆オレンジ",
+    "fade": "フェード",
+    "noir": "ノワール",
+    "sunset": "サンセット"
+  },
+  "sliders": {
+    "blur": "ぼかし",
+    "vignette": "周辺減光",
+    "sharpen": "シャープ",
+    "split": "ティール＆オレンジ"
+  },
+  "transition": {
+    "title": "トランジション",
+    "none": "なし",
+    "types": {
+      "crossfade": "クロスフェード",
+      "dissolve": "黒にフェード",
+      "slideleft": "左へスライド",
+      "slideright": "右へスライド",
+      "slideup": "上へスライド",
+      "zoom": "ズーム",
+      "whip": "ウィップ"
+    },
+    "length": "トランジションの長さ（秒）",
+    "fades": "フェード",
+    "noFades": "フェードなし",
+    "in": "イン",
+    "out": "アウト",
+    "fadeInSeconds": "フェードイン（秒）",
+    "fadeOutSeconds": "フェードアウト（秒）",
+    "intoNext": "次のクリップへ",
+    "needNext": "トランジションを追加するには、同じトラックでこのクリップの直後にクリップを置いてください。",
+    "fromTo": "{{from}} から {{to}} へ",
+    "fromUnnamed": "クリップから {{to}} へ",
+    "toUnnamed": "{{from}} から次のクリップへ",
+    "bothUnnamed": "クリップから次のクリップへ",
+    "add": "トランジションを追加",
+    "cutLabel": "{{type}}、{{seconds}}秒"
+  }
+}

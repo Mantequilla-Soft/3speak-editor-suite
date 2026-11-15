@@ -1,0 +1,86 @@
+{
+  "video": {
+    "title": "Video podcast",
+    "intro": "Ang buong episode ({{length}}) bilang 16:9 na video: ang larawan, gumagalaw na waveform, captions at kung sino ang nagsasalita. Para sa mga video podcast sa 3Speak, YouTube at Spotify.",
+    "unavailable": "Hindi pa kayang gumawa ng video podcast ang editor server na ito.",
+    "tooLong": "Hanggang {{length}} ang haba ng mga video podcast.",
+    "preview": "Preview ng video podcast",
+    "sampleCaption": "Dito lalabas ang mga salita <b>mo</b>",
+    "stageHint": "Gumagalaw ang waveform kasabay ng tunog, sumusunod sa episode ang captions at ang pangalan.",
+    "defaultLine": "Manood at makinig sa *3speak.tv*",
+    "captions": "Captions",
+    "captionsTranscript": "Ang mga salita ng transcript mo.",
+    "captionsNoStt": "Hindi available ang speech to text sa server na ito.",
+    "captionsStt": "Ang mga salita, nakuha sa speech to text sa server. Matagal ang mahahabang episode.",
+    "whoSpeaks": "Sino ang nagsasalita",
+    "noVoices": "Walang voice track na makukunan ng pangalan.",
+    "speaker": "Nagsasalita {{n}}",
+    "speakerLabel": "Pangalan para sa voice track {{n}}",
+    "loudest": "Bawat boses ay nasa sariling track: ang pangalan ng pinakamalakas ang ipinapakita.",
+    "frameRate": "Frame rate",
+    "fps15": "15 fps (mas maliit, mas mabilis)",
+    "fps24": "24 fps (mas makinis)",
+    "finding": "Hinahanap kung sino ang nagsasalita at kailan...",
+    "sending": "Ipinapadala...",
+    "working": "Ginagawa...",
+    "serverAnswered": "Sumagot ang server ng {{status}}",
+    "lost": "Nawala ang job (nag-restart ang server?)",
+    "stopped": "Itinigil",
+    "signIn": "Mag-sign in sa 3Speak para gumawa ng video podcast.",
+    "failed": "Hindi magawa ang video podcast: {{error}}",
+    "stop": "Itigil",
+    "make": "Gumawa ng video podcast",
+    "again": "Gawin ulit",
+    "download": "I-download ang MP4",
+    "subtitles": "Subtitles (SRT)",
+    "post": "I-post sa 3Speak bilang video"
+  },
+  "template": {
+    "title": "Ang template mo",
+    "signedOutIntro": "I-save nang isang beses ang intro, outro at music bed mo, at makukuha ito ng bawat bagong recording sa isang click. Permanenteng itinatabi ang template mo, kaya kailangan nito ang sign-in mo sa 3Speak.",
+    "signIn": "Mag-sign in para gumamit ng template",
+    "logIn": "Mag-log in sa 3Speak para gumamit ng template.",
+    "intro": "Isang template, permanenteng nakatabi. Papalitan ng pag-save ang dati mong template.",
+    "role": {
+      "intro": {
+        "title": "Intro",
+        "hint": "Unang tutugtog, bago ang recording mo.",
+        "clear": "Walang intro"
+      },
+      "outro": {
+        "title": "Outro",
+        "hint": "Tutugtog kaagad pagkatapos ng recording mo.",
+        "clear": "Walang outro"
+      },
+      "bed": {
+        "title": "Music bed",
+        "hint": "Mahinang musika sa ilalim ng buong recording, inuulit para magkasya, at humihina sa dulo.",
+        "clear": "Walang music bed"
+      }
+    },
+    "useSelected": "Gamitin ang \"{{name}}\" (ang bahaging na-trim mo)",
+    "selectFirst": "Pumili muna ng na-upload na audio clip sa timeline",
+    "selectedClip": "Napiling clip",
+    "file": "File",
+    "volume": "Volume",
+    "bedVolume": "Volume ng music bed",
+    "loop": "Ulitin para mapuno ang buong recording",
+    "cutSilences": "Putulin ang katahimikan sa bawat bagong recording <small>(gamit ang mga setting mo sa Putulin ang katahimikan)</small>",
+    "loudness": "I-normalize ang lakas para sa podcast <small>(-16 LUFS, inilalapat sa pag-export)</small>",
+    "duck": "Hinaan ang musika habang may nagsasalita <small>({{db}} dB sa music bed; baguhin ito sa mga setting ng clip)</small>",
+    "autoApply": "Kusang ilapat kapag nagbukas ako ng recording",
+    "signInUpload": "Mag-sign in sa 3Speak para mag-upload.",
+    "uploadFailed": "Hindi ma-upload ang file na iyon. Subukan ang iba.",
+    "deleteForGood": "Burahin nang tuluyan",
+    "delete": "Burahin ang template",
+    "saveApply": "I-save at ilapat",
+    "voiceTrack": "Boses",
+    "bedTrack": "Music bed"
+  },
+  "stage": {
+    "empty": "Magdagdag ng recording, mag-record, o pumili ng musika para magsimula.",
+    "chapter": "Kabanata",
+    "position": "Posisyon sa palabas",
+    "positionText": "{{at}} sa {{total}}"
+  }
+}

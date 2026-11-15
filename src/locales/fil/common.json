@@ -1,0 +1,39 @@
+{
+  "cancel": "Kanselahin",
+  "close": "Isara",
+  "ok": "OK",
+  "gotIt": "Sige",
+  "done": "Tapos na",
+  "save": "I-save",
+  "delete": "Burahin",
+  "remove": "Alisin",
+  "back": "Bumalik",
+  "next": "Susunod",
+  "skip": "Laktawan",
+  "retry": "Subukan ulit",
+  "reset": "I-reset",
+  "none": "Wala",
+  "off": "Naka-off",
+  "auto": "Auto",
+  "play": "I-play",
+  "pause": "I-pause",
+  "undo": "I-undo",
+  "preview": "Preview",
+  "render": "I-render",
+  "export": "I-export",
+  "duration": {
+    "seconds_one": "{{count}} segundo",
+    "seconds_other": "{{count}} segundo",
+    "minutes_one": "{{count}} minuto",
+    "minutes_other": "{{count}} minuto",
+    "hours_one": "{{count}} oras",
+    "hours_other": "{{count}} oras"
+  },
+  "limits": {
+    "atMost": {
+      "short": "Hanggang {{limit}} lang ang isang Short.",
+      "video": "Hanggang {{limit}} lang ang isang video.",
+      "audio": "Hanggang {{limit}} lang ang isang export."
+    }
+  }
+}

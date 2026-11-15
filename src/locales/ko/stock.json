@@ -1,0 +1,53 @@
+{
+  "title": "스톡 미디어",
+  "titleBackground": "배경 고르기",
+  "search": "동영상, 사진, GIF 검색",
+  "searchProvider": "{{provider}} 검색",
+  "searchProviderTitle": "{{provider}} 검색 (무료로 사용 가능, 고르면 3Speak 서버로 복사돼요)",
+  "kind": "종류",
+  "category": "카테고리",
+  "everything": "전체",
+  "types": {
+    "all": "전체",
+    "video": "동영상",
+    "image": "사진",
+    "gif": "GIF"
+  },
+  "categories": {
+    "nature": "자연",
+    "city": "도시",
+    "people": "인물",
+    "animals": "동물",
+    "food": "음식",
+    "tech": "기술",
+    "sports": "스포츠",
+    "space": "우주",
+    "abstract": "추상",
+    "backgrounds": "배경"
+  },
+  "loading": "라이브러리 불러오는 중...",
+  "typeToSearch": "{{provider}}에서 검색하려면 찾는 것을 입력하세요.",
+  "nothingFound": "찾은 결과가 없습니다.",
+  "searching": "검색 중...",
+  "loadFailed": "스톡 라이브러리를 불러오지 못했어요.",
+  "nothingMatches": "일치하는 항목이 없어요.",
+  "adding": "추가 중...",
+  "byAuthor": "{{title}} ({{author}})",
+  "licenceOnline": "{{provider}} 제공: 상업적 용도로도 무료로 사용할 수 있고 출처 표기가 필요 없어요. 고르면 파일이 3Speak 서버로 복사돼요.",
+  "licence": "상업적 용도로도 무료로 사용할 수 있고 출처 표기가 필요 없어요 (Wikimedia Commons의 CC0 / 퍼블릭 도메인).",
+  "placeBackground": "내 뒤에, 별도의 트랙으로, 내 클립과 같은 길이로 들어가요.",
+  "placeAdd": "재생 헤드 위치에 들어가요: 타임라인이 비어 있으면 내 동영상으로, 아니면 그 위에 B롤로 들어가요.",
+  "errors": {
+    "notCopied": "그 파일을 복사하지 못했어요.",
+    "notAdded": "그 파일을 추가하지 못했어요.",
+    "tooMany": "검색이 너무 많아요. 잠시 기다려 주세요.",
+    "searchFailed": "검색이 되지 않았어요. 다시 시도하세요.",
+    "copyFailed": "그 파일을 서버로 복사하지 못했어요."
+  },
+  "trackName": {
+    "background": "배경",
+    "backgroundNumbered": "배경 {{number}}",
+    "broll": "B롤",
+    "brollNumbered": "B롤 {{number}}"
+  }
+}

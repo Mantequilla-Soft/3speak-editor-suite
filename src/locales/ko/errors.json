@@ -1,0 +1,28 @@
+{
+  "render": {
+    "unreachable": "렌더링 서버에 연결할 수 없어요. 연결을 확인하고 다시 렌더링하세요.",
+    "stillBusy": "렌더링 서버가 아직 바빠요. 몇 분 뒤에 다시 렌더링하세요.",
+    "unknownJob": "렌더링 서버가 이 렌더링을 더 이상 알지 못해요 (다시 시작됐을 수 있어요). 다시 렌더링하세요.",
+    "lostContact": "렌더링 서버와 연결이 끊겼어요. 다시 렌더링하세요.",
+    "serverStatus": "서버 응답: {{status}}"
+  },
+  "uploadFailed": "업로드 실패: {{status}}",
+  "signIn": {
+    "loggedOut": "편집기를 사용하려면 3Speak에 로그인하세요.",
+    "failed": "업로드하고 렌더링하려면 3Speak에 로그인하세요 (로그인이 취소됐거나 잘 되지 않았어요)."
+  },
+  "export": {
+    "failed": "내보내기 실패",
+    "ffmpegNotLoaded": "FFmpeg를 불러오지 않았어요",
+    "noClips": "내보낼 클립이 없어요",
+    "noCodec": "MediaRecorder에서 지원하는 동영상 코덱을 찾지 못했어요",
+    "cancelled": "내보내기를 취소했어요",
+    "noSource": "클립에 유효한 파일 소스가 없어요: {{name}}",
+    "ffmpegFailed": "FFmpeg 명령이 종료 코드 {{code}}(으)로 실패했어요"
+  },
+  "reverse": {
+    "failed": "역재생 처리에 실패했어요",
+    "timedOut": "역재생 처리 시간이 초과됐어요",
+    "statusCheck": "상태 확인 실패: {{status}}"
+  }
+}

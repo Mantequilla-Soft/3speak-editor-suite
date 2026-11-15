@@ -1,0 +1,88 @@
+{
+  "title": "Prompter",
+  "showOnCamera": "Pokaż na kamerze",
+  "speechNotice": {
+    "title": "Podążanie za głosem działa na razie tylko w przeglądarkach opartych na Chromium.",
+    "body": "Użyj Chrome, Edge, Brave lub Opery, aby tekst przewijał się, gdy mówisz. W tej przeglądarce przewija się ze stałą prędkością, którą możesz ustawić."
+  },
+  "speechErrors": {
+    "network": "Usługa mowy jest nieosiągalna. Rozpoznawanie wymaga połączenia z internetem (Chrome wysyła dźwięk do Google w celu transkrypcji).",
+    "audioCapture": "Do rozpoznawania nie dotarł żaden dźwięk. Mikrofon może być zajęty, spróbuj zestawu słuchawkowego.",
+    "notAllowed": "Uprawnienie do mikrofonu jest zablokowane dla rozpoznawania mowy.",
+    "unsupported": "Ta przeglądarka nie ma rozpoznawania mowy.",
+    "generic": "Błąd rozpoznawania mowy: {{err}}"
+  },
+  "noMic": "Nagrywanie bez mikrofonu (mikrofon niedostępny).",
+  "autoDetect": "Wykryj automatycznie ({{lang}})",
+  "presets": {
+    "frontcam": "Przednia kamera",
+    "frontcamTitle": "Wąski pasek pod obiektywem do selfie, najmniej widać, że czytasz",
+    "max": "Maks. rozmiar",
+    "maxTitle": "Duża czcionka do czytania z daleka",
+    "top": "Górne linie",
+    "topTitle": "Kilka linii u góry"
+  },
+  "scroll": {
+    "label": "Przewijanie",
+    "modeAria": "Tryb przewijania",
+    "followVoice": "Za głosem",
+    "followVoiceTitle": "Przewija się, gdy czytasz tekst na głos",
+    "needsChromium": "Wymaga Chrome, Edge lub innej przeglądarki opartej na Chromium",
+    "timed": "Stałe tempo",
+    "timedTitle": "Przewija się ze stałą prędkością",
+    "voiceForcedMissing": "Podążanie za głosem nie jest tu dostępne, używane jest przewijanie ze stałym tempem.",
+    "voiceUnavailable": "Podążanie za głosem nie jest dostępne w tej przeglądarce."
+  },
+  "style": {
+    "title": "Styl tekstu",
+    "fontSize": "Rozmiar czcionki",
+    "fontSizeValue": "{{size}} px",
+    "text": "Tekst",
+    "background": "Tło",
+    "bgOpacity": "Krycie tła",
+    "mirrorText": "Odbicie lustrzane tekstu (do lustra promptera)",
+    "voiceLanguage": "Język głosu"
+  },
+  "status": {
+    "serverErrorSwitched": "Błąd serwera mowy ({{reason}}). Przełączono na stałe tempo.",
+    "voiceErrorSwitched": "{{error}} Przełączono na stałe tempo.",
+    "voiceStoppedSwitched": "Podążanie za głosem zatrzymane. Przełączono na stałe tempo.",
+    "serverError": "Błąd serwera mowy ({{reason}}).",
+    "listeningServer": "Słucham (serwer)… zacznij czytać",
+    "connectingServer": "Łączenie z serwerem mowy…",
+    "listening": "Słucham… zacznij czytać na głos",
+    "startingMic": "Uruchamianie mikrofonu…",
+    "scrollPaused": "Przewijanie wstrzymane",
+    "timedScroll": "Stałe tempo, {{wpm}} sł./min",
+    "scrollTest": "Test przewijania, {{wpm}} sł./min"
+  },
+  "sttReason": {
+    "unreachable": "nieosiągalny",
+    "noMic": "brak mikrofonu",
+    "audioUnavailable": "dźwięk niedostępny",
+    "connectionFailed": "połączenie nieudane",
+    "unauthorized": "brak autoryzacji",
+    "closed": "zamknięty",
+    "serverError": "błąd serwera"
+  },
+  "scriptPlaceholder": "Napisz lub wklej tu swój scenariusz. Podczas nagrywania przewija się, gdy czytasz go na głos, albo ze stałą prędkością w trybie stałego tempa.",
+  "scriptModeVoice": "Przewijanie: za twoim głosem",
+  "scriptModeTimed": "Przewijanie: stałe tempo, {{wpm}} sł./min",
+  "hide": "Ukryj",
+  "dragToMove": "Przeciągnij, aby przesunąć",
+  "dragToResize": "Przeciągnij, aby zmienić rozmiar",
+  "expandMenu": "Rozwiń menu",
+  "collapseMenu": "Zwiń menu",
+  "editScript": "Edytuj skrypt",
+  "testVoice": "Testuj głos",
+  "stopVoiceTest": "Zatrzymaj test",
+  "scrollSpeed": "Prędkość przewijania",
+  "slower": "Wolniej",
+  "faster": "Szybciej",
+  "wordsPerMin": "słów/min",
+  "testScroll": "Testuj przewijanie",
+  "stopScrollTest": "Zatrzymaj test przewijania",
+  "pauseScroll": "Wstrzymaj przewijanie",
+  "resumeScroll": "Wznów przewijanie",
+  "hideTeleprompter": "Ukryj prompter"
+}

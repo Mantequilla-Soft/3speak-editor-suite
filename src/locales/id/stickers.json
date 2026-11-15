@@ -1,0 +1,64 @@
+{
+  "title": "Stiker",
+  "search": "Cari stiker",
+  "textBoxes": "Kotak teks",
+  "loading": "Memuat stiker...",
+  "noMatch": "Tidak ada stiker yang cocok.",
+  "tileTitle": "{{name}} (ditambahkan di playhead)",
+  "note": "Stiker ditaruh di playhead selama 3 detik. Seret, ubah ukuran, atau pangkas seperti klip lainnya; kotak teks tetap bisa diedit.",
+  "categories": {
+    "emoji": "Emoji",
+    "badges": "Lencana",
+    "shapes": "Panah & bentuk",
+    "branding": "Branding"
+  },
+  "presets": {
+    "caption": {
+      "title": "Keterangan",
+      "text": "Keteranganmu di sini"
+    },
+    "highlight": {
+      "title": "Sorotan",
+      "text": "Wajib lihat!"
+    },
+    "brand": {
+      "title": "Merah 3Speak",
+      "text": "Video baru"
+    },
+    "bubble": {
+      "title": "Gelembung",
+      "text": "Halo!"
+    },
+    "outline": {
+      "title": "Garis luar",
+      "text": "Lihat ini"
+    },
+    "neon": {
+      "title": "Neon",
+      "text": "MALAM INI"
+    },
+    "title": {
+      "title": "Judul besar",
+      "text": "KABAR BESAR"
+    },
+    "comic": {
+      "title": "Komik",
+      "text": "DUAR!"
+    },
+    "marker": {
+      "title": "Spidol",
+      "text": "buatan tangan"
+    },
+    "quote": {
+      "title": "Kutipan",
+      "text": "“Ucapkan dengan baik.”"
+    },
+    "tag": {
+      "title": "Tagar"
+    },
+    "minimal": {
+      "title": "Minimalis",
+      "text": "sederhana dan bersih"
+    }
+  }
+}

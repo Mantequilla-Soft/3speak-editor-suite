@@ -1,0 +1,88 @@
+{
+  "title": "Teleprompter",
+  "showOnCamera": "Kamerada göster",
+  "speechNotice": {
+    "title": "Sesi takip etme şimdilik yalnızca Chromium tarayıcılarında çalışıyor.",
+    "body": "Metnin sen konuştukça kayması için Chrome, Edge, Brave ya da Opera kullan. Bu tarayıcıda ayarlayabileceğin sabit bir hızla kayar."
+  },
+  "speechErrors": {
+    "network": "Konuşma hizmetine ulaşılamıyor. Tanıma için internet bağlantısı gerekir (Chrome, metne dönüştürmek için sesi Google'a gönderir).",
+    "audioCapture": "Tanımaya hiç ses ulaşmadı. Mikrofon meşgul olabilir, bir kulaklık dene.",
+    "notAllowed": "Konuşma tanıma için mikrofon izni engellendi.",
+    "unsupported": "Bu tarayıcıda konuşma tanıma yok.",
+    "generic": "Konuşma tanıma hatası: {{err}}"
+  },
+  "noMic": "Mikrofonsuz kaydediliyor (mikrofon kullanılamıyor).",
+  "autoDetect": "Otomatik algıla ({{lang}})",
+  "presets": {
+    "frontcam": "Ön kamera",
+    "frontcamTitle": "Selfie lensinin altında küçük bir şerit, okuduğun en az belli olur",
+    "max": "En büyük boyut",
+    "maxTitle": "Uzaktan okumak için büyük yazı",
+    "top": "Üst satırlar",
+    "topTitle": "Üst kısımda birkaç satır"
+  },
+  "scroll": {
+    "label": "Kaydırma",
+    "modeAria": "Kaydırma modu",
+    "followVoice": "Sesi takip et",
+    "followVoiceTitle": "Metni yüksek sesle okudukça kayar",
+    "needsChromium": "Chrome, Edge ya da başka bir Chromium tarayıcı gerekir",
+    "timed": "Zamanlı",
+    "timedTitle": "Sabit bir hızla kayar",
+    "voiceForcedMissing": "Sesi takip etme burada kullanılamıyor, zamanlı kaydırma kullanılıyor.",
+    "voiceUnavailable": "Sesi takip etme bu tarayıcıda kullanılamıyor."
+  },
+  "style": {
+    "title": "Metin stili",
+    "fontSize": "Yazı boyutu",
+    "fontSizeValue": "{{size}} px",
+    "text": "Metin",
+    "background": "Arka plan",
+    "bgOpacity": "Arka plan opaklığı",
+    "mirrorText": "Metni aynala (teleprompter aynası için)",
+    "voiceLanguage": "Ses dili"
+  },
+  "status": {
+    "serverErrorSwitched": "Konuşma sunucusu hatası ({{reason}}). Zamanlı kaydırmaya geçildi.",
+    "voiceErrorSwitched": "{{error}} Zamanlı kaydırmaya geçildi.",
+    "voiceStoppedSwitched": "Sesi takip etme durdu. Zamanlı kaydırmaya geçildi.",
+    "serverError": "Konuşma sunucusu hatası ({{reason}}).",
+    "listeningServer": "Dinleniyor (sunucu)… okumaya başla",
+    "connectingServer": "Konuşma sunucusuna bağlanılıyor…",
+    "listening": "Dinleniyor… sesli okumaya başla",
+    "startingMic": "Mikrofon başlatılıyor…",
+    "scrollPaused": "Kaydırma duraklatıldı",
+    "timedScroll": "Zamanlı kaydırma, dakikada {{wpm}} kelime",
+    "scrollTest": "Kaydırma testi, dakikada {{wpm}} kelime"
+  },
+  "sttReason": {
+    "unreachable": "ulaşılamıyor",
+    "noMic": "mikrofon yok",
+    "audioUnavailable": "ses kullanılamıyor",
+    "connectionFailed": "bağlantı başarısız",
+    "unauthorized": "yetkisiz",
+    "closed": "kapatıldı",
+    "serverError": "sunucu hatası"
+  },
+  "scriptPlaceholder": "Metnini buraya yaz ya da yapıştır. Kayıt sırasında sen yüksek sesle okudukça ya da zamanlı modda sabit bir hızla kayar.",
+  "scriptModeVoice": "Kaydırma: sesini takip eder",
+  "scriptModeTimed": "Kaydırma: zamanlı, dakikada {{wpm}} kelime",
+  "hide": "Gizle",
+  "dragToMove": "Taşımak için sürükle",
+  "dragToResize": "Boyutlandırmak için sürükle",
+  "expandMenu": "Menüyü genişlet",
+  "collapseMenu": "Menüyü daralt",
+  "editScript": "Metni düzenle",
+  "testVoice": "Sesi test et",
+  "stopVoiceTest": "Testi durdur",
+  "scrollSpeed": "Kaydırma hızı",
+  "slower": "Daha yavaş",
+  "faster": "Daha hızlı",
+  "wordsPerMin": "kelime/dk",
+  "testScroll": "Kaydırmayı test et",
+  "stopScrollTest": "Kaydırma testini durdur",
+  "pauseScroll": "Kaydırmayı duraklat",
+  "resumeScroll": "Kaydırmayı sürdür",
+  "hideTeleprompter": "Teleprompter'ı gizle"
+}

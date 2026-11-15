@@ -1,0 +1,109 @@
+{
+  "media": {
+    "blocked": {
+      "camera": "此网站的摄像头或麦克风已被阻止。请通过地址栏中的图标允许访问，然后再试。如果你从未拒绝过，可能是电脑的隐私设置阻止了浏览器。",
+      "microphone": "此网站的麦克风已被阻止。请通过地址栏中的图标允许访问，然后再试。如果你从未拒绝过，可能是电脑的隐私设置阻止了浏览器。"
+    },
+    "notAllowed": {
+      "camera": "此页面不允许使用摄像头或麦克风。请重新加载 3Speak 后再试。",
+      "microphone": "此页面不允许使用麦克风。请重新加载 3Speak 后再试。"
+    },
+    "busy": {
+      "camera": "你的摄像头或麦克风正被其他应用或标签页占用（视频通话、其他录制工具）。请先在那里关闭，然后再试。",
+      "microphone": "你的麦克风正被其他应用或标签页占用（视频通话、其他录制工具）。请先在那里关闭，然后再试。"
+    },
+    "notFound": {
+      "camera": "没有找到摄像头或麦克风。请连接设备后再试。",
+      "microphone": "没有找到麦克风。请连接设备后再试。"
+    },
+    "noDevices": {
+      "camera": "此浏览器无法在这里使用摄像头或麦克风。",
+      "microphone": "此浏览器无法在这里使用麦克风。"
+    },
+    "failed": {
+      "camera": "摄像头或麦克风无法启动。请再试一次。",
+      "microphone": "麦克风无法启动。请再试一次。"
+    },
+    "failedNamed": {
+      "camera": "摄像头或麦克风无法启动（{{name}}）。请再试一次。",
+      "microphone": "麦克风无法启动（{{name}}）。请再试一次。"
+    }
+  },
+  "inline": {
+    "camera": "摄像头",
+    "expand": "展开",
+    "shrink": "收起",
+    "uploading": "上传中...",
+    "uploadingPct": "上传中... {{pct}}%",
+    "converting": "转换中...",
+    "rec": "录制中",
+    "starting": "正在开始...",
+    "plateStepOut": "请离开画面",
+    "plateShooting": "正在拍摄背景，请不要进入画面...",
+    "gestures": "按住并拖动图片可重新构图，双指捏合可缩放。",
+    "gesturesOverlay": "按住并拖动图片可重新构图，双指捏合可缩放，拖动摄像头画框可移动它。",
+    "greenScreen": {
+      "label": "绿幕",
+      "off": "关闭",
+      "green": "绿色",
+      "blue": "蓝色",
+      "person": "人物",
+      "static": "静态",
+      "staticTitle": "静态背景（实验性）：去除与空背景画面一致的部分",
+      "personTitle": "不需要绿幕：在画面中找到你",
+      "threshold": "阈值",
+      "thresholdStaticTitle": "容差：越高越能忽略背景变化（噪点、光线、对焦），但可能开始去除你身上的部分",
+      "thresholdTitle": "越高去除的幕布颜色越多",
+      "despill": "溢色去除",
+      "despillStaticTitle": "去除边缘上的墙面颜色",
+      "despillGreenTitle": "去除边缘上的绿色色调",
+      "despillBlueTitle": "去除边缘上的蓝色色调",
+      "retakePlate": "重新拍摄空背景",
+      "shootPlate": "拍摄空背景",
+      "plateKeep": "实验性功能。请保持摄像头和光线完全不变。",
+      "plateHowTo": "实验性功能。固定好摄像头，按下按钮后离开画面。",
+      "keyFailed": "这里无法使用实时抠像。片段仍会保留绿幕设置。",
+      "personHowTo": "不需要绿幕：编辑器会在画面中找到你。拍摄内容会按原样录制，然后在时间线上抠出，你可以在那里选择身后放什么。"
+    },
+    "tpEdit": "编辑提词器文字",
+    "tpAdd": "添加提词器文字",
+    "teleprompter": "提词器",
+    "recordOnly": "仅录制",
+    "recordAndPlay": "录制 + 播放视频",
+    "plusPlay": "+ 播放",
+    "recordReactionTitle": "在原视频播放时录制",
+    "recordReaction": "录制回应",
+    "record": "录制",
+    "stop": "停止",
+    "retake": "重拍",
+    "useClip": "使用片段"
+  },
+  "video": {
+    "title": "录制视频",
+    "startingCamera": "正在启动摄像头...",
+    "start": "开始录制",
+    "stop": "停止",
+    "retake": "重拍",
+    "useClip": "使用片段"
+  },
+  "audio": {
+    "title": "录制音频",
+    "cannotRecord": "此浏览器无法在这里录制音频。",
+    "addFailed": "无法添加录音。请再试一次。",
+    "yourRecording": "你的录音",
+    "micLevel": "麦克风音量",
+    "accessingMic": "正在访问麦克风...",
+    "ready": "准备录制：说几句话检查音量",
+    "preparing": "正在准备你的录音...",
+    "adding": "正在添加到你的轨道...",
+    "tpEdit": "编辑提词器文字",
+    "tpAdd": "添加提词器文字",
+    "teleprompter": "提词器",
+    "start": "开始录制",
+    "stop": "停止",
+    "retake": "重录",
+    "addingShort": "正在添加...",
+    "useRecording": "使用录音",
+    "useScript": "使用这份稿件"
+  }
+}

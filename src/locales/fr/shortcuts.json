@@ -1,0 +1,53 @@
+{
+  "sheet": {
+    "title": "Raccourcis clavier"
+  },
+  "groups": {
+    "playback": "Lecture",
+    "clips": "Clips",
+    "project": "Projet"
+  },
+  "items": {
+    "playPause": "Lecture / pause",
+    "playForward": "Lire en avant ; appuyez à nouveau pour 2x, 4x, 8x",
+    "playBackward": "Lire en arrière ; appuyez à nouveau pour accélérer",
+    "stop": "Arrêter",
+    "frameStep": "Une image en arrière / en avant (Maj : 10 images)",
+    "nudge": "Déplacer la tête de lecture de 0,1 s (Maj : 1 s)",
+    "fullscreen": "Plein écran activé / désactivé",
+    "nextPrevClip": "Sélectionner le clip suivant / précédent",
+    "clipLeftRight": "Clip précédent / suivant sur la même piste",
+    "clipUpDown": "Clip sur la piste du dessus / du dessous",
+    "openClip": "Ouvrir les réglages du clip sélectionné",
+    "selectNone": "Ne rien sélectionner",
+    "selectAll": "Sélectionner tous les clips",
+    "remove": "Retirer le ou les clips sélectionnés",
+    "split": "Scinder le clip sélectionné à la tête de lecture",
+    "duplicate": "Dupliquer le clip sélectionné",
+    "ungroup": "Dissocier les clips",
+    "closeGap": "Combler le trou à la tête de lecture",
+    "addText": "Ajouter du texte à la tête de lecture",
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "addFlag": "Ajouter un repère à la tête de lecture",
+    "addChapter": "Ajouter un chapitre à la tête de lecture",
+    "zoom": "Zoomer / dézoomer la chronologie",
+    "showSheet": "Afficher ces raccourcis"
+  },
+  "keys": {
+    "space": "Espace",
+    "tab": "Tab",
+    "shift": "Maj",
+    "alt": "Alt",
+    "ctrl": "Ctrl",
+    "enter": "Entrée",
+    "esc": "Échap",
+    "delete": "Suppr"
+  },
+  "announce": {
+    "selected": "{{clip}} sélectionné",
+    "stopped": "Arrêté",
+    "forward": "Avant {{speed}}x",
+    "backward": "Arrière {{speed}}x"
+  }
+}

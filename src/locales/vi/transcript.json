@@ -1,0 +1,72 @@
+{
+  "language": {
+    "label": "Ngôn ngữ nói",
+    "auto": "Tự động phát hiện"
+  },
+  "intro": {
+    "title": "Chỉnh sửa qua văn bản",
+    "text": "Biến lời nói thành văn bản với tên của từng giọng, rồi chỉnh sửa bản ghi như một tài liệu: chọn từ và nhấn Delete để cắt chúng.",
+    "checking": "Đang kiểm tra máy chủ...",
+    "unavailable": "Bản ghi lời hiện không khả dụng trên máy chủ chỉnh sửa này.",
+    "noSpeech": "Hãy thêm một bản ghi có lời nói trước.",
+    "transcribeSeconds": "Chép lời ({{n}} giây bản ghi)",
+    "transcribeMinutes": "Chép lời ({{n}} phút bản ghi)",
+    "longShow": "Chương trình dài sẽ mất một lúc: lời hiện ra từng phần, và bạn có thể bắt đầu chỉnh sửa những phần đầu."
+  },
+  "listening": "Đang nghe...",
+  "stop": "Dừng",
+  "goThere": "Đến đó",
+  "search": {
+    "placeholder": "Tìm từ",
+    "label": "Tìm từ trong bản ghi lời",
+    "previous": "Trước",
+    "previousLabel": "Kết quả trước",
+    "next": "Tiếp",
+    "nextLabel": "Kết quả tiếp theo"
+  },
+  "selection": {
+    "count_other": "{{count}} từ · {{seconds}} giây",
+    "cut": "Cắt",
+    "cutTitle": "Cắt các từ đã chọn khỏi bản ghi (Delete)",
+    "clearTitle": "Bỏ chọn (Esc)",
+    "clearLabel": "Bỏ chọn"
+  },
+  "found": {
+    "cutAll_other": "Cắt cả {{count}}",
+    "cutAllTitle": "Cắt mọi vị trí tìm thấy khỏi bản ghi"
+  },
+  "fillers": "Từ đệm",
+  "fillersTitle": "Tìm \"ừm\", \"à\", \"kiểu như\" và các chỗ ngừng dài",
+  "copy": "Sao chép bản ghi lời",
+  "speakers": "Người nói",
+  "missing": {
+    "seconds": "{{n}} giây bản ghi chưa có văn bản.",
+    "minutes": "{{n}} phút bản ghi chưa có văn bản.",
+    "transcribe": "Chép lời"
+  },
+  "scrollLabel": "Bản ghi lời: nhấp vào một từ để đến đó, kéo qua các từ để chọn, Delete để cắt",
+  "hint_other": "{{count}} từ. Nhấp vào một từ để đến đó; kéo hoặc Shift+nhấp để chọn; Delete để cắt. Hoàn tác sẽ khôi phục.",
+  "speaker": {
+    "default": "Giọng nói",
+    "numbered": "Giọng {{n}}"
+  },
+  "job": {
+    "starting": "Đang bắt đầu...",
+    "preparing": "Đang chuẩn bị bản ghi...",
+    "listening": "Đang nghe...",
+    "signIn": "Đăng nhập 3Speak để tạo bản ghi lời.",
+    "uploadFailed": "Không tải lên được bản ghi: {{message}}",
+    "notUploaded": "Bản ghi chưa có trên máy chủ. Hãy thử lại khi chúng đã tải lên xong.",
+    "serverAnswered": "Máy chủ phản hồi {{status}}",
+    "lost": "Tác vụ bản ghi lời bị mất (máy chủ đã khởi động lại?)",
+    "failed": "Nhận dạng giọng nói thất bại"
+  },
+  "stt": {
+    "audioUnavailable": "âm thanh không khả dụng",
+    "serverError": "lỗi máy chủ",
+    "connectionFailed": "kết nối thất bại",
+    "unauthorized": "không được phép",
+    "closed": "đã đóng",
+    "initFailed": "khởi tạo chép lời thất bại"
+  }
+}

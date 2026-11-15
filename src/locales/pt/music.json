@@ -1,0 +1,26 @@
+{
+  "music": {
+    "title": "Música",
+    "search": "Pesquisar músicas",
+    "loading": "Carregando músicas...",
+    "failed": "Não foi possível carregar a biblioteca de músicas.",
+    "none": "Nenhuma música corresponde.",
+    "note": "O crédito da música é adicionado ao seu post automaticamente. Ao escolher um som de um criador do 3Speak, ele recebe 5% das recompensas do post.",
+    "addTitle": "Adicionar ao vídeo"
+  },
+  "sfx": {
+    "title": "Efeitos sonoros",
+    "search": "Pesquisar sons",
+    "loading": "Carregando sons...",
+    "failed": "Não foi possível carregar os efeitos sonoros.",
+    "none": "Nenhum som corresponde.",
+    "note": "Os sons entram na posição do cursor de reprodução. Uso livre (CC0, Kenney.nl), sem necessidade de crédito.",
+    "addTitle": "Adicionar no cursor de reprodução"
+  },
+  "all": "Todos",
+  "timeline": "Linha do tempo: {{title}}",
+  "seconds": "{{seconds}} s",
+  "stop": "Parar",
+  "listen": "Ouvir",
+  "add": "Adicionar"
+}

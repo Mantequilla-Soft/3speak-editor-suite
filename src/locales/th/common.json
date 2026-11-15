@@ -1,0 +1,36 @@
+{
+  "cancel": "ยกเลิก",
+  "close": "ปิด",
+  "ok": "ตกลง",
+  "gotIt": "เข้าใจแล้ว",
+  "done": "เสร็จสิ้น",
+  "save": "บันทึก",
+  "delete": "ลบ",
+  "remove": "นำออก",
+  "back": "กลับ",
+  "next": "ถัดไป",
+  "skip": "ข้าม",
+  "retry": "ลองอีกครั้ง",
+  "reset": "รีเซ็ต",
+  "none": "ไม่มี",
+  "off": "ปิด",
+  "auto": "อัตโนมัติ",
+  "play": "เล่น",
+  "pause": "หยุดชั่วคราว",
+  "undo": "เลิกทำ",
+  "preview": "ตัวอย่าง",
+  "render": "เรนเดอร์",
+  "export": "ส่งออก",
+  "duration": {
+    "seconds_other": "{{count}} วินาที",
+    "minutes_other": "{{count}} นาที",
+    "hours_other": "{{count}} ชั่วโมง"
+  },
+  "limits": {
+    "atMost": {
+      "short": "Short ยาวได้ไม่เกิน {{limit}}",
+      "video": "วิดีโอยาวได้ไม่เกิน {{limit}}",
+      "audio": "ไฟล์ส่งออกยาวได้ไม่เกิน {{limit}}"
+    }
+  }
+}

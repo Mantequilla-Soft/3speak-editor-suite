@@ -1,0 +1,181 @@
+{
+  "aria": {
+    "timeline": "Tijdlijn",
+    "ruler": "Tijdliniaal: klik om de afspeelkop te verplaatsen",
+    "playhead": "Afspeelkop",
+    "zoom": "Zoom"
+  },
+  "split": {
+    "title": "Clip splitsen op de afspeelkop (Ctrl+R)",
+    "label": "Splitsen"
+  },
+  "toolbar": {
+    "add": {
+      "title": "Spoor of clip toevoegen",
+      "videoTrack": "Videospoor",
+      "audioTrack": "Audiospoor",
+      "musicLibrary": "Muziekbibliotheek",
+      "soundEffects": "Geluidseffecten",
+      "stickers": "Stickers",
+      "titles": "Titels",
+      "stock": "Stockmedia"
+    },
+    "zoomTitle": "Zoom: {{value}} px/s",
+    "fit": {
+      "title": "De hele tijdlijn tonen",
+      "label": "Passend"
+    },
+    "select": {
+      "titleStart": "Meerdere clips selecteren: tik op elke clip",
+      "titleDone": "Klaar met selecteren",
+      "label": "Selecteren"
+    },
+    "ripple": {
+      "titleTrack": "Het gat op de afspeelkop dichten op spoor {{number}} (G). Andere sporen blijven zoals ze zijn.",
+      "titleNoGap": "Geen gat op de afspeelkop op het spoor van de geselecteerde clip",
+      "title": "Gat op de afspeelkop verwijderen (G)",
+      "label": "Gat dichten"
+    },
+    "captions": {
+      "title": "Ondertitels: zet wat er wordt gezegd om in ondertitels woord voor woord",
+      "label": "Ondertitels"
+    },
+    "transcript": {
+      "title": "Transcript: bewerk via de tekst, verwijder woorden om ze weg te knippen",
+      "label": "Transcript"
+    },
+    "flag": {
+      "title": "Een vlag zetten op de afspeelkop (B): je eigen markering, genummerd en gekleurd, wordt nooit geëxporteerd",
+      "label": "Vlag"
+    },
+    "autoCut": {
+      "title": "De pauzes vinden en daar knippen",
+      "label": "Auto-knip"
+    },
+    "beats": {
+      "title": "De beat vinden: eraan vastklikken, clips erop leggen",
+      "label": "Beats"
+    },
+    "delete": {
+      "title": "Geselecteerde clip verwijderen (Del)",
+      "titleMany": "De geselecteerde clips verwijderen (Del)",
+      "labelMany": "{{number}} verwijderen"
+    },
+    "options": "Opties",
+    "ungroup": {
+      "titleOne": "Degroeperen: de clips worden weer los verplaatst en ingekort",
+      "titleMany": "Degroeperen: deze clips worden weer los verplaatst en ingekort",
+      "label": "Degroeperen"
+    },
+    "group": {
+      "title": "Groeperen: deze clips worden samen verplaatst en ingekort",
+      "label": "{{number}} groeperen"
+    },
+    "more": {
+      "title": "Meer clipacties",
+      "duplicate": "Dupliceren",
+      "groupVoicesTitle": "Groeperen met wat tegelijk speelt op de andere stemsporen: ze worden samen verplaatst, ingekort en van stiltes ontdaan",
+      "groupVoices": "Groeperen met andere stemmen",
+      "reverse": "Omkeren",
+      "unreverse": "Omkeren ongedaan maken",
+      "snapOn": "Magnetisch aan",
+      "snapOff": "Magnetisch uit"
+    }
+  },
+  "selectHint": {
+    "count_one": "{{count}} clip geselecteerd: tik op meer, of Klaar",
+    "count_other": "{{count}} clips geselecteerd: tik op meer, of Klaar",
+    "none": "Tik op elke clip die je wilt selecteren",
+    "clear": "Wissen"
+  },
+  "clip": {
+    "settings": "Clipinstellingen",
+    "textFallback": "Tekst",
+    "layer": "L{{number}}",
+    "kind": {
+      "video": "Videoclip",
+      "audio": "Geluidsclip",
+      "image": "Afbeelding",
+      "text": "Tekst",
+      "color": "Kleur",
+      "other": "Clip"
+    },
+    "aria": {
+      "plain": "{{kind}}, {{from}} tot {{to}}",
+      "named": "{{kind}} {{name}}, {{from}} tot {{to}}",
+      "onTrack": "{{kind}} op {{track}}, {{from}} tot {{to}}",
+      "namedOnTrack": "{{kind}} {{name}} op {{track}}, {{from}} tot {{to}}"
+    }
+  },
+  "track": {
+    "show": "Spoor tonen",
+    "hide": "Spoor verbergen",
+    "mute": "Spoor dempen",
+    "unmute": "Dempen van spoor opheffen",
+    "remove": "Spoor verwijderen",
+    "addVisual": "Video, afbeelding of tekst toevoegen",
+    "addAudio": "Audio toevoegen",
+    "addFile": "Bestand toevoegen",
+    "addText": "Tekst toevoegen",
+    "addColor": "Kleur toevoegen",
+    "recordVideo": "Video opnemen",
+    "addAudioFile": "Audiobestand toevoegen",
+    "recordAudio": "Audio opnemen",
+    "resize": {
+      "aria": "Hoogte van {{name}}",
+      "ariaUnnamed": "Hoogte van dit spoor",
+      "title": "Sleep om het spoor hoger of lager te maken (dubbelklik: terug naar normaal)"
+    },
+    "aria": {
+      "named": {
+        "video": "{{name}} (videospoor)",
+        "audio": "{{name}} (audiospoor)",
+        "music": "{{name}} (muziekspoor)"
+      },
+      "numbered": {
+        "video": "Videospoor {{number}}",
+        "audio": "Audiospoor {{number}}",
+        "music": "Muziekspoor {{number}}"
+      }
+    }
+  },
+  "trackName": {
+    "voice": "Stem",
+    "voiceNumbered": "Stem {{number}}",
+    "music": "Muziek",
+    "musicNumbered": "Muziek {{number}}",
+    "video": "Video",
+    "videoNumbered": "Video {{number}}",
+    "audioNumbered": "Audio {{number}}",
+    "stickers": "Stickers",
+    "stickersNumbered": "Stickers {{number}}",
+    "sfx": "SFX",
+    "sfxNumbered": "SFX {{number}}"
+  },
+  "clipName": {
+    "text": "Tekstlaag",
+    "color": "Kleur",
+    "imported": "Geïmporteerde media",
+    "linkedAudio": "{{name}} (audio)"
+  },
+  "textClip": {
+    "defaultText": "Typ hier tekst"
+  },
+  "flag": {
+    "aria": "Vlag {{number}} op {{time}}",
+    "title": "Vlag {{number}} · {{time}}: klik om ernaartoe te springen, sleep om te verplaatsen, rechtsklik om te verwijderen"
+  },
+  "range": {
+    "label": "{{from}} – {{to}} · {{seconds}}s",
+    "startOnly": "{{time}} · klik waar het eindigt",
+    "dragStart": "Sleep om het begin te verplaatsen",
+    "dragEnd": "Sleep om het einde te verplaatsen"
+  },
+  "pastLimit": "Voorbij de renderlimiet",
+  "backgroundMusic": {
+    "title": "Achtergrondmuziek",
+    "add": "Achtergrondmuziek toevoegen",
+    "remove": "Muziek verwijderen"
+  },
+  "partName": "Deel {{n}} · {{name}}"
+}

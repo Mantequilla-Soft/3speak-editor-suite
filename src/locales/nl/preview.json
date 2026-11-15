@@ -1,0 +1,29 @@
+{
+  "header": "Voorbeeld van de tijdlijn",
+  "smaller": "Kleiner",
+  "larger": "Groter",
+  "loopOn": "Herhalen: aan",
+  "loopOff": "Herhalen: uit",
+  "aspect": {
+    "title": "Beeldverhouding: {{ratio}}",
+    "titleAuto": "Beeldverhouding: auto ({{ratio}})",
+    "auto": "Auto"
+  },
+  "fullSize": "Volledige grootte",
+  "halfSize": "Halve grootte",
+  "fullscreen": "Volledig scherm",
+  "noClipHere": "Geen clip op deze positie",
+  "noClips": "Geen clips op de tijdlijn",
+  "source": {
+    "hls": "(HLS-stream)",
+    "uploaded": "(geüpload)",
+    "local": "(lokaal)",
+    "file": "(bestand)"
+  },
+  "stageLayout": {
+    "tileTop": "Tegel boven",
+    "tileBottom": "Tegel onder",
+    "overlay": "Overlay"
+  },
+  "selectClip": "Selecteer een clip voor een voorbeeld"
+}

@@ -1,0 +1,29 @@
+{
+  "header": "时间线预览",
+  "smaller": "缩小",
+  "larger": "放大",
+  "loopOn": "循环：开",
+  "loopOff": "循环：关",
+  "aspect": {
+    "title": "画面比例：{{ratio}}",
+    "titleAuto": "画面比例：自动（{{ratio}}）",
+    "auto": "自动"
+  },
+  "fullSize": "原始大小",
+  "halfSize": "一半大小",
+  "fullscreen": "全屏",
+  "noClipHere": "此位置没有片段",
+  "noClips": "时间线上没有片段",
+  "source": {
+    "hls": "（HLS 流）",
+    "uploaded": "（已上传）",
+    "local": "（本地）",
+    "file": "（文件）"
+  },
+  "stageLayout": {
+    "tileTop": "平铺在上方",
+    "tileBottom": "平铺在下方",
+    "overlay": "叠加层"
+  },
+  "selectClip": "选择一个片段进行预览"
+}

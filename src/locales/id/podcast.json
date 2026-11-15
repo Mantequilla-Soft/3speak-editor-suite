@@ -1,0 +1,86 @@
+{
+  "video": {
+    "title": "Podcast video",
+    "intro": "Seluruh episode ({{length}}) sebagai video 16:9: gambar, gelombang suara bergerak, teks, dan siapa yang berbicara. Untuk podcast video di 3Speak, YouTube, dan Spotify.",
+    "unavailable": "Server editor ini belum bisa membuat podcast video.",
+    "tooLong": "Podcast video bisa berdurasi hingga {{length}}.",
+    "preview": "Pratinjau podcast video",
+    "sampleCaption": "Kata-kata<b>mu</b> tampil di sini",
+    "stageHint": "Gelombang suara bergerak mengikuti suara, teks dan nama mengikuti episode.",
+    "defaultLine": "Tonton dan dengarkan di *3speak.tv*",
+    "captions": "Teks",
+    "captionsTranscript": "Kata-kata dari transkripmu.",
+    "captionsNoStt": "Ucapan ke teks tidak tersedia di server ini.",
+    "captionsStt": "Kata-kata, dikenali lewat ucapan ke teks di server. Episode panjang butuh waktu.",
+    "whoSpeaks": "Siapa yang berbicara",
+    "noVoices": "Tidak ada trek suara untuk diambil namanya.",
+    "speaker": "Pembicara {{n}}",
+    "speakerLabel": "Nama untuk trek suara {{n}}",
+    "loudest": "Setiap suara di treknya sendiri: nama suara yang paling keras yang tampil.",
+    "frameRate": "Laju frame",
+    "fps15": "15 fps (lebih kecil, lebih cepat)",
+    "fps24": "24 fps (lebih halus)",
+    "finding": "Mencari siapa berbicara kapan...",
+    "sending": "Mengirim...",
+    "working": "Memproses...",
+    "serverAnswered": "Server menjawab {{status}}",
+    "lost": "Tugas hilang (server dimulai ulang?)",
+    "stopped": "Dihentikan",
+    "signIn": "Masuk di 3Speak untuk membuat podcast video.",
+    "failed": "Podcast video tidak dapat dibuat: {{error}}",
+    "stop": "Berhenti",
+    "make": "Buat podcast video",
+    "again": "Buat lagi",
+    "download": "Unduh MP4",
+    "subtitles": "Subtitel (SRT)",
+    "post": "Posting di 3Speak sebagai video"
+  },
+  "template": {
+    "title": "Templatemu",
+    "signedOutIntro": "Simpan intro, outro, dan musik latarmu sekali, dan setiap rekaman baru mendapatkannya dengan satu klik. Templatemu disimpan selamanya, jadi perlu masuk ke 3Speak.",
+    "signIn": "Masuk untuk memakai template",
+    "logIn": "Masuk di 3Speak untuk memakai template.",
+    "intro": "Satu template, disimpan selamanya. Menyimpan akan mengganti template yang lama.",
+    "role": {
+      "intro": {
+        "title": "Intro",
+        "hint": "Diputar pertama, sebelum rekamanmu.",
+        "clear": "Tanpa intro"
+      },
+      "outro": {
+        "title": "Outro",
+        "hint": "Diputar tepat setelah rekamanmu berakhir.",
+        "clear": "Tanpa outro"
+      },
+      "bed": {
+        "title": "Musik latar",
+        "hint": "Musik pelan di bawah seluruh rekaman, diulang agar pas, memudar di akhir.",
+        "clear": "Tanpa musik latar"
+      }
+    },
+    "useSelected": "Pakai \"{{name}}\" (bagian yang sudah kamu pangkas)",
+    "selectFirst": "Pilih klip audio yang sudah diunggah di linimasa terlebih dahulu",
+    "selectedClip": "Klip terpilih",
+    "file": "File",
+    "volume": "Volume",
+    "bedVolume": "Volume musik latar",
+    "loop": "Ulangi untuk mengisi seluruh rekaman",
+    "cutSilences": "Potong hening dari setiap rekaman baru <small>(dengan pengaturan Potong hening milikmu)</small>",
+    "loudness": "Normalisasi kenyaringan untuk podcast <small>(-16 LUFS, diterapkan saat ekspor)</small>",
+    "duck": "Kecilkan musik saat ada yang berbicara <small>({{db}} dB pada musik latar; ubah di pengaturan klip)</small>",
+    "autoApply": "Terapkan otomatis saat aku membuka rekaman",
+    "signInUpload": "Masuk di 3Speak untuk mengunggah.",
+    "uploadFailed": "File itu tidak dapat diunggah. Coba file lain.",
+    "deleteForGood": "Hapus selamanya",
+    "delete": "Hapus template",
+    "saveApply": "Simpan dan terapkan",
+    "voiceTrack": "Suara",
+    "bedTrack": "Musik latar"
+  },
+  "stage": {
+    "empty": "Tambahkan rekaman, rekam sendiri, atau pilih musik untuk memulai.",
+    "chapter": "Bab",
+    "position": "Posisi di acara",
+    "positionText": "{{at}} dari {{total}}"
+  }
+}

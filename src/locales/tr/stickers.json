@@ -1,0 +1,64 @@
+{
+  "title": "Çıkartmalar",
+  "search": "Çıkartma ara",
+  "textBoxes": "Metin kutuları",
+  "loading": "Çıkartmalar yükleniyor...",
+  "noMatch": "Eşleşen çıkartma yok.",
+  "tileTitle": "{{name}} (oynatma kafasına eklenir)",
+  "note": "Çıkartmalar oynatma kafasına 3 saniyeliğine eklenir. Her klip gibi sürükle, boyutlandır ya da kırp; metin kutuları düzenlenebilir kalır.",
+  "categories": {
+    "emoji": "Emojiler",
+    "badges": "Rozetler",
+    "shapes": "Oklar ve şekiller",
+    "branding": "Marka"
+  },
+  "presets": {
+    "caption": {
+      "title": "Alt yazı",
+      "text": "Alt yazın burada"
+    },
+    "highlight": {
+      "title": "Vurgu",
+      "text": "Mutlaka izle!"
+    },
+    "brand": {
+      "title": "3Speak kırmızısı",
+      "text": "Yeni video"
+    },
+    "bubble": {
+      "title": "Balon",
+      "text": "Merhaba!"
+    },
+    "outline": {
+      "title": "Çerçeve",
+      "text": "Şuna bak"
+    },
+    "neon": {
+      "title": "Neon",
+      "text": "BU AKŞAM"
+    },
+    "title": {
+      "title": "Büyük başlık",
+      "text": "BÜYÜK HABER"
+    },
+    "comic": {
+      "title": "Çizgi roman",
+      "text": "BUM!"
+    },
+    "marker": {
+      "title": "Keçeli kalem",
+      "text": "el yapımı"
+    },
+    "quote": {
+      "title": "Alıntı",
+      "text": "“İyi söyle.”"
+    },
+    "tag": {
+      "title": "Hashtag"
+    },
+    "minimal": {
+      "title": "Minimal",
+      "text": "sade ve temiz"
+    }
+  }
+}

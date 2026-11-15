@@ -1,0 +1,104 @@
+{
+  "speed": {
+    "title": "Kecepatan",
+    "stillFrame": "Frame diam",
+    "holds": "Menahan frame di {{time}} video. Pangkas di linimasa atau pilih durasi:",
+    "seconds": "{{value}} dtk",
+    "speed": "Kecepatan",
+    "ramp": "Ramp kecepatan",
+    "ramps": {
+      "montage": "Montase",
+      "hero": "Hero",
+      "speedUp": "Percepat",
+      "slowDown": "Perlambat"
+    },
+    "rampHint": "Pratinjau mengikuti ramp dengan cukup dekat, hasil render persis. Nada suara tetap sama.",
+    "freeze": "Bekukan frame",
+    "freezeLength": "Durasi beku",
+    "freezeTitle": "Tahan frame di bawah playhead",
+    "freezeMoveFirst": "Pindahkan playhead ke klip ini terlebih dahulu",
+    "freezeAt": "Bekukan di playhead",
+    "stillName": "Diam · {{name}}",
+    "stillNameFallback": "klip"
+  },
+  "badge": {
+    "still": "Diam",
+    "ramp": "Ramp",
+    "stillTitle": "Frame diam",
+    "speedTitle": "Kecepatan {{speed}}",
+    "rampTitle": "Ramp kecepatan"
+  },
+  "keyframes": {
+    "title": "Keyframe",
+    "moveHere": "Pindahkan playhead ke klip ini untuk menambahkan keyframe.",
+    "props": {
+      "x": "Posisi X",
+      "y": "Posisi Y",
+      "scale": "Skala",
+      "rotation": "Rotasi",
+      "opacity": "Opasitas",
+      "volume": "Volume"
+    },
+    "aria": {
+      "x": {
+        "prev": "Keyframe Posisi X sebelumnya",
+        "next": "Keyframe Posisi X berikutnya",
+        "add": "Tambahkan keyframe Posisi X",
+        "remove": "Hapus keyframe Posisi X"
+      },
+      "y": {
+        "prev": "Keyframe Posisi Y sebelumnya",
+        "next": "Keyframe Posisi Y berikutnya",
+        "add": "Tambahkan keyframe Posisi Y",
+        "remove": "Hapus keyframe Posisi Y"
+      },
+      "scale": {
+        "prev": "Keyframe Skala sebelumnya",
+        "next": "Keyframe Skala berikutnya",
+        "add": "Tambahkan keyframe Skala",
+        "remove": "Hapus keyframe Skala"
+      },
+      "rotation": {
+        "prev": "Keyframe Rotasi sebelumnya",
+        "next": "Keyframe Rotasi berikutnya",
+        "add": "Tambahkan keyframe Rotasi",
+        "remove": "Hapus keyframe Rotasi"
+      },
+      "opacity": {
+        "prev": "Keyframe Opasitas sebelumnya",
+        "next": "Keyframe Opasitas berikutnya",
+        "add": "Tambahkan keyframe Opasitas",
+        "remove": "Hapus keyframe Opasitas"
+      },
+      "volume": {
+        "prev": "Keyframe Volume sebelumnya",
+        "next": "Keyframe Volume berikutnya",
+        "add": "Tambahkan keyframe Volume",
+        "remove": "Hapus keyframe Volume"
+      }
+    },
+    "prev": "Keyframe sebelumnya",
+    "next": "Keyframe berikutnya",
+    "add": "Tambahkan keyframe di playhead",
+    "remove": "Hapus keyframe di playhead",
+    "ease": "Perhalus dari sini ke keyframe berikutnya",
+    "removeAll": "Hapus semua keyframe"
+  },
+  "kenBurns": {
+    "title": "Ken Burns",
+    "in": "Zoom masuk perlahan",
+    "out": "Zoom keluar perlahan",
+    "pan": "Geser perlahan"
+  },
+  "punch": {
+    "title": "Punch-in",
+    "hint": "Zoom cepat di awal kalimat dan pada kata yang keras, dari teks jika ada, atau dari suaranya.",
+    "listening": "Mendengarkan...",
+    "auto": "Punch-in otomatis",
+    "remove": "Hapus punch-in",
+    "noMoments": "Tidak ditemukan awal kalimat atau kata keras di klip ini.",
+    "noSound": "Suara klip ini tidak dapat dibaca. Tambahkan teks otomatis dulu, lalu coba lagi.",
+    "addedCaptions_other": "{{count}} punch-in ditambahkan, dari teks. Semuanya keyframe biasa pada Skala.",
+    "addedSound_other": "{{count}} punch-in ditambahkan, dari suara. Semuanya keyframe biasa pada Skala."
+  }
+}

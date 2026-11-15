@@ -1,0 +1,28 @@
+{
+  "render": {
+    "unreachable": "Der Render-Server ist nicht erreichbar. Prüf deine Verbindung und rendere erneut.",
+    "stillBusy": "Die Render-Server sind noch ausgelastet. Bitte rendere in ein paar Minuten erneut.",
+    "unknownJob": "Der Render-Server kennt diesen Render nicht mehr (er wurde vielleicht neu gestartet). Bitte rendere erneut.",
+    "lostContact": "Die Verbindung zum Render-Server ist abgebrochen. Bitte rendere erneut.",
+    "serverStatus": "Der Server hat mit {{status}} geantwortet"
+  },
+  "uploadFailed": "Upload fehlgeschlagen: {{status}}",
+  "signIn": {
+    "loggedOut": "Melde dich bei 3Speak an, um den Editor zu nutzen.",
+    "failed": "Melde dich bei 3Speak an, um hochzuladen und zu rendern (die Anmeldung wurde abgebrochen oder hat nicht geklappt)."
+  },
+  "export": {
+    "failed": "Export fehlgeschlagen",
+    "ffmpegNotLoaded": "FFmpeg nicht geladen",
+    "noClips": "Keine Clips zum Exportieren",
+    "noCodec": "Kein unterstützter Video-Codec für MediaRecorder gefunden",
+    "cancelled": "Export abgebrochen",
+    "noSource": "Keine gültige Dateiquelle für den Clip: {{name}}",
+    "ffmpegFailed": "FFmpeg-Befehl mit Exit-Code {{code}} fehlgeschlagen"
+  },
+  "reverse": {
+    "failed": "Rückwärts-Verarbeitung fehlgeschlagen",
+    "timedOut": "Zeitüberschreitung bei der Rückwärts-Verarbeitung",
+    "statusCheck": "Statusprüfung fehlgeschlagen: {{status}}"
+  }
+}

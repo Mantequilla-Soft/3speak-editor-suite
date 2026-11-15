@@ -1,0 +1,53 @@
+{
+  "sheet": {
+    "title": "Phím tắt"
+  },
+  "groups": {
+    "playback": "Phát",
+    "clips": "Clip",
+    "project": "Dự án"
+  },
+  "items": {
+    "playPause": "Phát / tạm dừng",
+    "playForward": "Phát tới; nhấn lần nữa để 2x, 4x, 8x",
+    "playBackward": "Phát lùi; nhấn lần nữa để nhanh hơn",
+    "stop": "Dừng",
+    "frameStep": "Lùi / tiến một khung hình (Shift: 10 khung hình)",
+    "nudge": "Dịch đầu phát 0,1 giây (Shift: 1 giây)",
+    "fullscreen": "Bật / tắt toàn màn hình",
+    "nextPrevClip": "Chọn clip tiếp theo / trước đó",
+    "clipLeftRight": "Clip trước / tiếp theo trên cùng rãnh",
+    "clipUpDown": "Clip trên rãnh phía trên / phía dưới",
+    "openClip": "Mở cài đặt của clip đã chọn",
+    "selectNone": "Bỏ chọn tất cả",
+    "selectAll": "Chọn mọi clip",
+    "remove": "Gỡ (các) clip đã chọn",
+    "split": "Tách clip đã chọn tại đầu phát",
+    "duplicate": "Nhân bản clip đã chọn",
+    "ungroup": "Bỏ nhóm clip",
+    "closeGap": "Khép khoảng trống tại đầu phát",
+    "addText": "Thêm văn bản tại đầu phát",
+    "undo": "Hoàn tác",
+    "redo": "Làm lại",
+    "addFlag": "Thêm cờ tại đầu phát",
+    "addChapter": "Thêm chương tại đầu phát",
+    "zoom": "Phóng to / thu nhỏ dòng thời gian",
+    "showSheet": "Hiện các phím tắt này"
+  },
+  "keys": {
+    "space": "Dấu cách",
+    "tab": "Tab",
+    "shift": "Shift",
+    "alt": "Alt",
+    "ctrl": "Ctrl",
+    "enter": "Enter",
+    "esc": "Esc",
+    "delete": "Delete"
+  },
+  "announce": {
+    "selected": "Đã chọn {{clip}}",
+    "stopped": "Đã dừng",
+    "forward": "Tới {{speed}}x",
+    "backward": "Lùi {{speed}}x"
+  }
+}

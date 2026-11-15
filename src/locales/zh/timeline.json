@@ -1,0 +1,180 @@
+{
+  "aria": {
+    "timeline": "时间线",
+    "ruler": "时间标尺：点击以移动播放头",
+    "playhead": "播放头",
+    "zoom": "缩放"
+  },
+  "split": {
+    "title": "在播放头处分割片段（Ctrl+R）",
+    "label": "分割"
+  },
+  "toolbar": {
+    "add": {
+      "title": "添加轨道或片段",
+      "videoTrack": "视频轨道",
+      "audioTrack": "音频轨道",
+      "musicLibrary": "音乐库",
+      "soundEffects": "音效",
+      "stickers": "贴纸",
+      "titles": "标题",
+      "stock": "素材库"
+    },
+    "zoomTitle": "缩放：{{value}}px/秒",
+    "fit": {
+      "title": "显示整条时间线",
+      "label": "适应宽度"
+    },
+    "select": {
+      "titleStart": "选择多个片段：逐个点按",
+      "titleDone": "完成选择",
+      "label": "选择"
+    },
+    "ripple": {
+      "titleTrack": "合拢轨道 {{number}} 上播放头处的空隙（G）。其他轨道保持不变。",
+      "titleNoGap": "所选片段的轨道上播放头处没有空隙",
+      "title": "移除播放头处的空隙（G）",
+      "label": "波纹删除"
+    },
+    "captions": {
+      "title": "字幕：把所说的话变成逐字字幕",
+      "label": "字幕"
+    },
+    "transcript": {
+      "title": "文字稿：通过文字编辑，删除文字即可剪掉对应内容",
+      "label": "文字稿"
+    },
+    "flag": {
+      "title": "在播放头处设置标记（B）：你自己的标记，带编号和颜色，不会被导出",
+      "label": "标记"
+    },
+    "autoCut": {
+      "title": "找出停顿并在那里剪切",
+      "label": "自动剪辑"
+    },
+    "beats": {
+      "title": "检测节拍：吸附到节拍上，按节拍排列片段",
+      "label": "节拍"
+    },
+    "delete": {
+      "title": "删除所选片段（Del）",
+      "titleMany": "删除所选片段（Del）",
+      "labelMany": "删除 {{number}} 个"
+    },
+    "options": "选项",
+    "ungroup": {
+      "titleOne": "取消分组：其中的片段重新各自移动和修剪",
+      "titleMany": "取消分组：这些片段重新各自移动和修剪",
+      "label": "取消分组"
+    },
+    "group": {
+      "title": "分组：这些片段会一起移动和修剪",
+      "label": "分组 {{number}} 个"
+    },
+    "more": {
+      "title": "更多片段操作",
+      "duplicate": "复制",
+      "groupVoicesTitle": "与其他语音轨道上同时播放的内容编为一组：它们会一起移动、修剪和剪掉静音",
+      "groupVoices": "与其他声音编组",
+      "reverse": "倒放",
+      "unreverse": "取消倒放",
+      "snapOn": "吸附：开",
+      "snapOff": "吸附：关"
+    }
+  },
+  "selectHint": {
+    "count_other": "已选择 {{count}} 个片段：继续点按，或点“完成”",
+    "none": "点按每个你想选择的片段",
+    "clear": "清空"
+  },
+  "clip": {
+    "settings": "片段设置",
+    "textFallback": "文字",
+    "layer": "层 {{number}}",
+    "kind": {
+      "video": "视频片段",
+      "audio": "声音片段",
+      "image": "图片",
+      "text": "文字",
+      "color": "颜色",
+      "other": "片段"
+    },
+    "aria": {
+      "plain": "{{kind}}，{{from}} 到 {{to}}",
+      "named": "{{kind}} {{name}}，{{from}} 到 {{to}}",
+      "onTrack": "{{track}} 上的{{kind}}，{{from}} 到 {{to}}",
+      "namedOnTrack": "{{track}} 上的{{kind}} {{name}}，{{from}} 到 {{to}}"
+    }
+  },
+  "track": {
+    "show": "显示轨道",
+    "hide": "隐藏轨道",
+    "mute": "轨道静音",
+    "unmute": "取消轨道静音",
+    "remove": "移除轨道",
+    "addVisual": "添加视频、图片或文字",
+    "addAudio": "添加音频",
+    "addFile": "添加文件",
+    "addText": "添加文字",
+    "addColor": "添加颜色",
+    "recordVideo": "录制视频",
+    "addAudioFile": "添加音频文件",
+    "recordAudio": "录制音频",
+    "resize": {
+      "aria": "{{name}} 的高度",
+      "ariaUnnamed": "此轨道的高度",
+      "title": "拖动以调高或调低轨道（双击：恢复默认）"
+    },
+    "aria": {
+      "named": {
+        "video": "{{name}}（视频轨道）",
+        "audio": "{{name}}（音频轨道）",
+        "music": "{{name}}（音乐轨道）"
+      },
+      "numbered": {
+        "video": "视频轨道 {{number}}",
+        "audio": "音频轨道 {{number}}",
+        "music": "音乐轨道 {{number}}"
+      }
+    }
+  },
+  "trackName": {
+    "voice": "语音",
+    "voiceNumbered": "语音 {{number}}",
+    "music": "音乐",
+    "musicNumbered": "音乐 {{number}}",
+    "video": "视频",
+    "videoNumbered": "视频 {{number}}",
+    "audioNumbered": "音频 {{number}}",
+    "stickers": "贴纸",
+    "stickersNumbered": "贴纸 {{number}}",
+    "sfx": "音效",
+    "sfxNumbered": "音效 {{number}}"
+  },
+  "clipName": {
+    "text": "文字图层",
+    "color": "颜色",
+    "imported": "已导入的媒体",
+    "linkedAudio": "{{name}}（音频）"
+  },
+  "textClip": {
+    "defaultText": "在此输入文字"
+  },
+  "flag": {
+    "aria": "{{time}} 处的标记 {{number}}",
+    "title": "标记 {{number}} · {{time}}：点击跳转，拖动移动，右键移除"
+  },
+  "range": {
+    "label": "{{from}} – {{to}} · {{seconds}} 秒",
+    "startOnly": "{{time}} · 点击结束位置",
+    "dragStart": "拖动以移动起点",
+    "dragEnd": "拖动以移动终点"
+  },
+  "pastLimit": "超出渲染上限",
+  "backgroundMusic": {
+    "title": "背景音乐",
+    "add": "添加背景音乐",
+    "remove": "移除音乐"
+  },
+  "partName": "第 {{n}} 部分 · {{name}}"
+}

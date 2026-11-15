@@ -1,0 +1,12 @@
+{
+  "cleaning": {
+    "voice_one": "Inasafisha sauti ya klipu {{count}}…",
+    "voice_other": "Inasafisha sauti ya klipu {{count}}…",
+    "voiceRecording_one": "Inasafisha sauti ya klipu {{count}} · rekodi {{at}} kati ya {{total}}",
+    "voiceRecording_other": "Inasafisha sauti ya klipu {{count}} · rekodi {{at}} kati ya {{total}}",
+    "back_one": "Inarudisha klipu {{count}}…",
+    "back_other": "Inarudisha klipu {{count}}…",
+    "backRecording_one": "Inarudisha klipu {{count}} · rekodi {{at}} kati ya {{total}}",
+    "backRecording_other": "Inarudisha klipu {{count}} · rekodi {{at}} kati ya {{total}}"
+  }
+}

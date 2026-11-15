@@ -1,0 +1,67 @@
+{
+  "language": {
+    "label": "Gesprochene Sprache",
+    "auto": "Automatisch erkennen"
+  },
+  "intro": {
+    "title": "Auto-Untertitel",
+    "text": "Mach aus dem Gesagten Untertitel, die jedem Wort folgen, fest in deinen Short eingebrannt und zusätzlich als Untertitel an 3Speak gesendet.",
+    "checking": "Server wird geprüft...",
+    "unavailable": "Auto-Untertitel sind auf diesem Editor-Server gerade nicht verfügbar. Dein Short wird wie gewohnt ohne sie gerendert.",
+    "go": "Auto-Untertitel"
+  },
+  "presets": {
+    "karaoke": "Karaoke",
+    "pop": "Pop",
+    "plain": "Untertitel"
+  },
+  "presetHints": {
+    "karaoke": "Ein paar Wörter auf einmal, das gesprochene Wort in der Hervorhebungsfarbe",
+    "pop": "Ein Wort (oder ein paar) auf einmal, das hereinploppt",
+    "plain": "Klassische Untertitelzeilen auf dunklem Kasten"
+  },
+  "style": {
+    "title": "Stil",
+    "presetsLabel": "Untertitel-Stil",
+    "wordsAtATime": "Wörter auf einmal",
+    "font": "Schriftart",
+    "size": "Größe",
+    "sizeLabel": "Untertitel-Größe",
+    "position": "Position",
+    "positionLabel": "Höhe der Untertitel im Bild",
+    "top": "Oben",
+    "middle": "Mitte",
+    "low": "Unten",
+    "textColour": "Textfarbe",
+    "highlight": "Hervorheben",
+    "highlightLabel": "Hervorhebungsfarbe",
+    "uppercase": "Großbuchstaben",
+    "emoji": "Emoji-Akzente (über Wörtern wie „Feuer“ oder „Liebe“)",
+    "burn": "Im Video zeigen (aus: nur als Untertitel auf 3Speak)"
+  },
+  "words": {
+    "title": "Wörter ({{n}})",
+    "hint": "Korrigiere falsch Verstandenes, leere ein Wort, um es zu entfernen. Clips verschoben oder geschnitten? Starte Auto-Untertitel erneut.",
+    "goThere": "Hinspringen",
+    "word": "Wort {{n}}",
+    "changeEmoji": "Emoji ändern oder entfernen",
+    "addEmoji": "Emoji hinzufügen",
+    "remove": "Dieses Wort entfernen",
+    "removeNamed": "{{word}} entfernen"
+  },
+  "actions": {
+    "again": "Erneut",
+    "againTitle": "Erneut zuhören (ersetzt die Wörter)",
+    "remove": "Untertitel entfernen"
+  },
+  "videoSound": "Video-Ton",
+  "job": {
+    "preparing": "Ton wird vorbereitet...",
+    "listening": "Hört zu...",
+    "noTracks": "Es gibt keine Sprache für Untertitel: füge zuerst einen Clip mit Ton hinzu.",
+    "serverAnswered": "Der Server hat mit {{status}} geantwortet",
+    "lost": "Der Untertitel-Auftrag ging verloren (wurde der Server neu gestartet?)",
+    "noSpeech": "Keine Sprache gefunden. Liegt die Stimme auf einer Audiospur, die nicht stummgeschaltet ist (Musikspuren werden ausgelassen)?",
+    "failed": "Spracherkennung fehlgeschlagen"
+  }
+}

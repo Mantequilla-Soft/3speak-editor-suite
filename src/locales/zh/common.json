@@ -1,0 +1,36 @@
+{
+  "cancel": "取消",
+  "close": "关闭",
+  "ok": "好的",
+  "gotIt": "知道了",
+  "done": "完成",
+  "save": "保存",
+  "delete": "删除",
+  "remove": "移除",
+  "back": "返回",
+  "next": "下一步",
+  "skip": "跳过",
+  "retry": "再试一次",
+  "reset": "重置",
+  "none": "无",
+  "off": "关闭",
+  "auto": "自动",
+  "play": "播放",
+  "pause": "暂停",
+  "undo": "撤销",
+  "preview": "预览",
+  "render": "渲染",
+  "export": "导出",
+  "duration": {
+    "seconds_other": "{{count}} 秒",
+    "minutes_other": "{{count}} 分钟",
+    "hours_other": "{{count}} 小时"
+  },
+  "limits": {
+    "atMost": {
+      "short": "短视频最长为 {{limit}}。",
+      "video": "视频最长为 {{limit}}。",
+      "audio": "导出内容最长为 {{limit}}。"
+    }
+  }
+}

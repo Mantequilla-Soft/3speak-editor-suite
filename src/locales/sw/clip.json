@@ -1,0 +1,308 @@
+{
+  "empty": "Chagua klipu ili kuona sifa zake",
+  "types": {
+    "video": "video",
+    "audio": "sauti",
+    "image": "picha",
+    "text": "maandishi",
+    "color": "rangi",
+    "scene": "onyesho"
+  },
+  "sections": {
+    "content": "Maudhui",
+    "color": "Rangi",
+    "audio": "Sauti",
+    "layout": "Mpangilio",
+    "transform": "Ubadilishaji",
+    "timing": "Muda",
+    "motion": "Mwendo",
+    "greenScreen": "Skrini ya kijani"
+  },
+  "doubleClickReset": "Bofya mara mbili ili kuweka upya",
+  "text": {
+    "label": "Maandishi",
+    "placeholder": "Andika maandishi hapa...",
+    "font": "Fonti",
+    "resetFont": "Weka upya fonti",
+    "fontGroups": {
+      "sansSerif": "Sans Serif",
+      "serif": "Serif",
+      "display": "Display",
+      "handwriting": "Mwandiko wa mkono",
+      "monospace": "Monospace"
+    },
+    "weight": {
+      "normal": "Kawaida",
+      "bold": "Nzito"
+    },
+    "style": "Mtindo",
+    "resetStyle": "Weka upya mtindo",
+    "size": "Ukubwa",
+    "alignment": "Mpangilio",
+    "resetAlignment": "Weka upya mpangilio",
+    "align": {
+      "left": "Panga kushoto",
+      "center": "Panga katikati",
+      "right": "Panga kulia"
+    },
+    "box": "Kisanduku cha mandharinyuma",
+    "fill": "Rangi ya ndani",
+    "opacity": "Uangavu",
+    "padding": "Nafasi ya ndani",
+    "radius": "Mviringo wa pembe",
+    "border": "Mpaka",
+    "width": "Upana"
+  },
+  "colorClip": {
+    "background": "Rangi ya mandharinyuma",
+    "gradient": "Mchanganyiko wa rangi",
+    "enabled": "Imewashwa",
+    "disabled": "Imezimwa",
+    "endColor": "Rangi ya mwisho",
+    "angle": "Pembe",
+    "resetAngle": "Weka upya pembe"
+  },
+  "volume": {
+    "label": "Kiwango cha sauti",
+    "reset": "Weka upya kiwango cha sauti",
+    "mute": "Zima sauti",
+    "unmute": "Washa sauti"
+  },
+  "fades": {
+    "label": "Kufifia",
+    "none": "Bila kufifia",
+    "in": "Kuingia",
+    "out": "Kutoka",
+    "inSeconds": "Kuingia (sekunde)",
+    "outSeconds": "Kutoka (sekunde)"
+  },
+  "noise": {
+    "reduce": "Punguza kelele za nyuma",
+    "cleanVoice": "Safisha sauti",
+    "group": "Kupunguza kelele",
+    "working": "Inafanya kazi",
+    "workingDots": "Inafanya kazi…",
+    "afterUpload": "Inapatikana klipu hii ikimaliza kupakiwa.",
+    "appliesGroup_one": "Inatumika kwa klipu hii na kikundi chake (klipu {{count}}).",
+    "appliesGroup_other": "Inatumika kwa klipu hii na kikundi chake (klipu {{count}}).",
+    "appliesOne": "Inatumika kwa klipu hii pekee.",
+    "failed": "Kupunguza kelele kumeshindwa. Jaribu tena.",
+    "levels": {
+      "light": "Kidogo",
+      "medium": "Wastani",
+      "strong": "Kali"
+    },
+    "studioTitle": "Kali: kelele kidogo, bila mvumo, sauti wazi na sawa zaidi, sauti za S laini zaidi"
+  },
+  "duck": {
+    "label": "Fifisha",
+    "group": "Fifisha klipu hii",
+    "depth": "{{db}} dB",
+    "source": "<lead>Inashuka wakati</lead><pick/><tail>inacheza</tail>",
+    "sourceLabel": "Chanzo cha kufifisha",
+    "hint": "Klipu hii inapungua sauti wakati njia iliyochaguliwa inacheza, na inarudi juu wakati wa mapumziko."
+  },
+  "greenScreen": {
+    "removeBackground": "Ondoa mandharinyuma",
+    "modes": {
+      "green": "Kijani",
+      "blue": "Bluu",
+      "person": "Mtu",
+      "static": "Tuli (majaribio)"
+    },
+    "modeTitles": {
+      "green": "Skrini ya kijani",
+      "blue": "Skrini ya bluu",
+      "person": "Hakuna haja ya skrini ya kijani: inakupata kwenye picha na kuondoa kilichobaki",
+      "static": "Mandharinyuma tuli (majaribio): inaondoa kila kinacholingana na fremu ya mandharinyuma tupu"
+    },
+    "staticHint": "Inaondoa kila kinachofanana na fremu chache za mandharinyuma tupu. Mabadiliko madogo (kelele, mwanga, ulengaji) hayazingatiwi na sehemu zako zinazofanana na ukuta zinabaki ndani ya umbo lako. Inahitaji kamera isiyosogea; vivuli vyako vinabaki kuonekana. Sehemu za chumba zikiendelea kuonekana, ongeza Kizingiti.",
+    "hint": {
+      "green": "Inaondoa mandhari ya kijani ili klipu za njia za chini zionekane.",
+      "blue": "Inaondoa mandhari ya bluu ili klipu za njia za chini zionekane.",
+      "person": "Hakuna haja ya skrini ya kijani: kihariri kinampata mtu katika kila fremu na kuondoa kilichobaki. Inafanya kazi vizuri zaidi na mtu mmoja, mwenye mwanga wa kutosha, mbele ya kamera."
+    },
+    "plate": "Fremu ya mandharinyuma tupu",
+    "plateAlt": "Mandharinyuma tupu",
+    "plateHint": "Sogeza kiashiria cha kucheza hadi wakati unaoonyesha mandharinyuma pekee, bila wewe. Nusu sekunde yake inatumika.",
+    "grabbing": "Inachukua fremu...",
+    "useFrame": "Tumia fremu iliyo kwenye kiashiria cha kucheza",
+    "useFrameInstead": "Tumia fremu iliyo kwenye kiashiria cha kucheza badala yake",
+    "grabFailed": "Imeshindwa kuchukua fremu hiyo. Jaribu tena, au chagua wakati mwingine.",
+    "threshold": "Kizingiti",
+    "thresholdStaticTitle": "Uvumilivu: juu zaidi hupuuza mabadiliko zaidi ya mandharinyuma (kelele, mwanga, ulengaji) lakini kunaweza kuanza kuondoa sehemu zako",
+    "thresholdTitle": "Juu zaidi huondoa zaidi rangi ya skrini",
+    "resetThreshold": "Weka upya kizingiti",
+    "softness": "Ulaini wa kingo",
+    "resetSoftness": "Weka upya ulaini",
+    "despill": "Ondoa rangi iliyomwagika",
+    "despillStaticTitle": "Inaondoa rangi ya ukuta kwenye kingo",
+    "despillTitle": {
+      "green": "Inaondoa rangi ya kijani kwenye kingo",
+      "blue": "Inaondoa rangi ya bluu kwenye kingo"
+    },
+    "resetDespill": "Weka upya uondoaji wa rangi",
+    "cameraLock": {
+      "allLocked": "Ulengaji na mwangaza wa kamera vimefungwa, pamoja na usawa wa rangi nyeupe.",
+      "focusExposureLocked": "Ulengaji na mwangaza wa kamera vimefungwa.",
+      "noFocus": "Kamera yako hairuhusu kufunga ulengaji; epuka kusogea karibu au mbali zaidi.",
+      "lockedList": "Vimefungwa: {{list}}.",
+      "noExposure": "Ulengaji umefungwa. Mwangaza hauwezi kufungwa kwenye kamera hii; weka mwanga thabiti.",
+      "names": {
+        "focus": "ulengaji",
+        "exposure": "mwangaza",
+        "whiteBalance": "usawa wa rangi nyeupe"
+      }
+    }
+  },
+  "layout": {
+    "boxSize": "Ukubwa wa kisanduku",
+    "smaller": "Ndogo zaidi",
+    "larger": "Kubwa zaidi",
+    "zoom": "Kuza",
+    "resetZoom": "Weka upya ukuzaji",
+    "hint": "Buruta klipu ili kuisogeza. Bonyeza na ushikilie, kisha buruta, ili kusogeza video ndani ya kisanduku chake. Bana ili kukuza kwenye skrini za kugusa.",
+    "freeTransform": "Badilisha kwenda ubadilishaji huru"
+  },
+  "transform": {
+    "scale": "Kipimo",
+    "resetScale": "Weka upya kipimo",
+    "rotation": "Mzunguko",
+    "resetRotation": "Weka upya mzunguko",
+    "position": "Mahali",
+    "resetPosition": "Weka upya mahali",
+    "dragToMove": "Buruta ili kubadilisha mahali",
+    "crop": "Punguza",
+    "resetCrop": "Weka upya upunguzaji",
+    "cropWidth": "Upana",
+    "cropHeight": "Kimo",
+    "opacity": "Uangavu",
+    "resetOpacity": "Weka upya uangavu"
+  },
+  "timing": {
+    "duration": "Muda",
+    "seconds": "Sek",
+    "in": "Kuingia:",
+    "out": "Kutoka:",
+    "durationColon": "Muda:",
+    "position": "Mahali:"
+  },
+  "color": {
+    "measuring": "Inapima…",
+    "autoTitle": "Rekebisha viwango, toni za kati na usawa wa rangi nyeupe kutoka fremu za klipu hii",
+    "resetAll": "Weka upya marekebisho yote ya rangi",
+    "failed": "Imeshindwa kusoma picha ya klipu hii.",
+    "sliders": {
+      "brightness": "Mwangaza",
+      "contrast": "Utofautishaji",
+      "midtones": "Toni za kati",
+      "saturation": "Ukolezi wa rangi",
+      "warmth": "Joto",
+      "tint": "Kivuli cha rangi"
+    }
+  },
+  "effects": {
+    "hiddenName": "{{name}} (imefichwa)",
+    "show": "Onyesha athari hii tena",
+    "hide": "Ficha athari hii (inahifadhiwa, lakini haitumiki)",
+    "remove": "Ondoa athari hii",
+    "comesFrom": "Inatoka",
+    "goesTo": "Inaenda",
+    "from": "Kuanzia",
+    "to": "Hadi",
+    "speed": "Kasi",
+    "amount": {
+      "amplitude": "Ukubwa wa mwendo",
+      "bounce": "Ruka ruka",
+      "distance": "Umbali"
+    },
+    "addFirst": "Ongeza athari…",
+    "addAnother": "Ongeza athari nyingine…",
+    "groups": {
+      "loop": "Mizunguko",
+      "in": "Kuingia",
+      "out": "Kutoka"
+    },
+    "effect": {
+      "pulse": "Pigo",
+      "wobble": "Tetemeka",
+      "bob": "Elea juu chini",
+      "sway": "Yumba",
+      "spin": "Zunguka",
+      "pop": "Ibuka ndani",
+      "slideIn": "Teleza ndani",
+      "fadeIn": "Fifia kuingia",
+      "popOut": "Ibuka nje",
+      "slideOut": "Teleza nje",
+      "fadeOut": "Fifia kutoka"
+    },
+    "direction": {
+      "left": "kushoto",
+      "right": "kulia",
+      "top": "juu",
+      "bottom": "chini"
+    },
+    "pivot": "Kitovu",
+    "pivotPoint": "Kitovu cha kuzunguka",
+    "pivotName": {
+      "topLeft": "juu kushoto",
+      "top": "juu",
+      "topRight": "juu kulia",
+      "left": "kushoto",
+      "centre": "katikati",
+      "right": "kulia",
+      "bottomLeft": "chini kushoto",
+      "bottom": "chini",
+      "bottomRight": "chini kulia",
+      "custom": "maalum"
+    }
+  },
+  "multi": {
+    "volume": "Kiwango cha sauti",
+    "volumeMixed": "Kiwango cha sauti (mchanganyiko)",
+    "volumeAll": "Kiwango cha sauti cha klipu zote zilizochaguliwa",
+    "muteAll": "Zima sauti zote",
+    "unmuteAll": "Washa sauti zote",
+    "cleanVoice": "Safisha sauti",
+    "cleanGroup": "Kusafisha sauti kwa klipu zote zilizochaguliwa",
+    "afterUpload": "Inapatikana klipu hizi zikimaliza kupakiwa.",
+    "failed": "Kusafisha sauti kumeshindwa. Jaribu tena.",
+    "applies_one": "Inatumika kwa klipu {{count}} iliyochaguliwa.",
+    "applies_other": "Inatumika kwa klipu {{count}} zilizochaguliwa.",
+    "appliesWithGroups_one": "Inatumika kwa klipu {{selected}} zilizochaguliwa na klipu nyingine {{count}} katika vikundi vyake.",
+    "appliesWithGroups_other": "Inatumika kwa klipu {{selected}} zilizochaguliwa na klipu nyingine {{count}} katika vikundi vyake.",
+    "stillUploading": "Klipu ambazo bado zinapakiwa zinabaki kama zilivyo.",
+    "remove_one": "Ondoa klipu {{count}}",
+    "remove_other": "Ondoa klipu {{count}}"
+  },
+  "trim": {
+    "title": "Punguza: {{name}}",
+    "start": "Mahali pa kuanzia",
+    "end": "Mahali pa kuishia",
+    "trimmed": "Muda baada ya kupunguza"
+  },
+  "reframe": {
+    "readFailed": "Video haikuweza kusomwa hapa",
+    "openFailed": "Video haikuweza kufunguliwa kwa ufuatiliaji wa uso"
+  },
+  "personKey": {
+    "ready": "Tayari: umekatwa katika kila fremu. Utengenezaji unaonekana kama onyesho la awali.",
+    "failed": "Hakuna mtu aliyepatikana kwenye klipu hii ({{error}}).",
+    "finding": "Inakutafuta katika kila fremu... Onyesho la awali tayari linaonyesha moja kwa moja wakati huo huo.",
+    "findingProgress": "Inakutafuta katika kila fremu: {{percent}} Onyesho la awali tayari linaonyesha moja kwa moja wakati huo huo.",
+    "behind": "Nyuma yako",
+    "backgrounds": {
+      "none": "Uwazi",
+      "noneTitle": "Klipu za njia za chini zinaonekana nyuma yako",
+      "blur": "Ukungu",
+      "blurTitle": "Mandharinyuma yako mwenyewe, yenye ukungu",
+      "color": "Rangi",
+      "colorTitle": "Rangi moja nyuma yako"
+    },
+    "pickStock": "Weka picha au video ya hifadhi nyuma",
+    "colour": "Rangi",
+    "blur": "Ukungu",
+    "resetBlur": "Weka upya ukungu",
+    "thresholdTitle": "Juu zaidi huhifadhi kidogo karibu nawe, chini zaidi huhifadhi zaidi"
+  }
+}

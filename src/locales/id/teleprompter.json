@@ -1,0 +1,88 @@
+{
+  "title": "Teleprompter",
+  "showOnCamera": "Tampilkan di kamera",
+  "speechNotice": {
+    "title": "Mengikuti suara saat ini hanya berfungsi di browser Chromium.",
+    "body": "Pakai Chrome, Edge, Brave, atau Opera agar naskah bergulir saat kamu berbicara. Di browser ini naskah bergulir dengan kecepatan tetap yang bisa kamu atur."
+  },
+  "speechErrors": {
+    "network": "Layanan suara tidak dapat dijangkau. Pengenalan butuh koneksi internet (Chrome mengirim audio ke Google untuk ditranskripsi).",
+    "audioCapture": "Tidak ada audio yang sampai ke pengenalan. Mikrofon mungkin sedang dipakai, coba headset.",
+    "notAllowed": "Izin mikrofon diblokir untuk pengenalan suara.",
+    "unsupported": "Browser ini tidak punya pengenalan suara.",
+    "generic": "Kesalahan pengenalan suara: {{err}}"
+  },
+  "noMic": "Merekam tanpa mikrofon (mikrofon tidak tersedia).",
+  "autoDetect": "Deteksi otomatis ({{lang}})",
+  "presets": {
+    "frontcam": "Kamera depan",
+    "frontcamTitle": "Strip kecil di bawah lensa selfie, paling tidak kelihatan bahwa kamu sedang membaca",
+    "max": "Ukuran maks",
+    "maxTitle": "Huruf besar untuk dibaca dari jauh",
+    "top": "Baris atas",
+    "topTitle": "Beberapa baris di bagian atas"
+  },
+  "scroll": {
+    "label": "Gulir",
+    "modeAria": "Mode gulir",
+    "followVoice": "Ikuti suara",
+    "followVoiceTitle": "Bergulir saat kamu membacakan naskah",
+    "needsChromium": "Butuh Chrome, Edge, atau browser Chromium lain",
+    "timed": "Berwaktu",
+    "timedTitle": "Bergulir dengan kecepatan tetap",
+    "voiceForcedMissing": "Mengikuti suara tidak tersedia di sini, memakai gulir berwaktu.",
+    "voiceUnavailable": "Mengikuti suara tidak tersedia di browser ini."
+  },
+  "style": {
+    "title": "Gaya teks",
+    "fontSize": "Ukuran font",
+    "fontSizeValue": "{{size}}px",
+    "text": "Teks",
+    "background": "Latar",
+    "bgOpacity": "Opasitas latar",
+    "mirrorText": "Cerminkan teks (untuk cermin teleprompter)",
+    "voiceLanguage": "Bahasa suara"
+  },
+  "status": {
+    "serverErrorSwitched": "Kesalahan server suara ({{reason}}). Beralih ke gulir berwaktu.",
+    "voiceErrorSwitched": "{{error}} Beralih ke gulir berwaktu.",
+    "voiceStoppedSwitched": "Mengikuti suara berhenti. Beralih ke gulir berwaktu.",
+    "serverError": "Kesalahan server suara ({{reason}}).",
+    "listeningServer": "Mendengarkan (server)… mulai membaca",
+    "connectingServer": "Menghubungkan ke server suara…",
+    "listening": "Mendengarkan… mulai membaca dengan suara keras",
+    "startingMic": "Menyalakan mikrofon…",
+    "scrollPaused": "Gulir dijeda",
+    "timedScroll": "Gulir berwaktu, {{wpm}} kpm",
+    "scrollTest": "Tes gulir, {{wpm}} kpm"
+  },
+  "sttReason": {
+    "unreachable": "tidak terjangkau",
+    "noMic": "tidak ada mikrofon",
+    "audioUnavailable": "audio tidak tersedia",
+    "connectionFailed": "koneksi gagal",
+    "unauthorized": "tidak diizinkan",
+    "closed": "ditutup",
+    "serverError": "kesalahan server"
+  },
+  "scriptPlaceholder": "Tulis atau tempel naskahmu di sini. Saat merekam, naskah bergulir mengikuti bacaanmu, atau dengan kecepatan tetap dalam mode berwaktu.",
+  "scriptModeVoice": "Gulir: mengikuti suaramu",
+  "scriptModeTimed": "Gulir: berwaktu, {{wpm}} kpm",
+  "hide": "Sembunyikan",
+  "dragToMove": "Seret untuk memindahkan",
+  "dragToResize": "Seret untuk mengubah ukuran",
+  "expandMenu": "Luaskan menu",
+  "collapseMenu": "Ciutkan menu",
+  "editScript": "Edit naskah",
+  "testVoice": "Tes suara",
+  "stopVoiceTest": "Hentikan tes",
+  "scrollSpeed": "Kecepatan gulir",
+  "slower": "Lebih lambat",
+  "faster": "Lebih cepat",
+  "wordsPerMin": "kata/menit",
+  "testScroll": "Tes gulir",
+  "stopScrollTest": "Hentikan tes gulir",
+  "pauseScroll": "Jeda gulir",
+  "resumeScroll": "Lanjutkan gulir",
+  "hideTeleprompter": "Sembunyikan teleprompter"
+}

@@ -1,0 +1,25 @@
+{
+  "length": {
+    "title": "Zaman çizelgen {{length}} uzunluğunda",
+    "body": "{{atMost}} Her şeyi düzenlemeye devam edebilirsin, ancak zaman çizelgesi işaretli {{limitAt}} çizgisinde bitene kadar İşle kapalı kalır. Oraya ulaşmak için klipleri kırp, böl ya da sil.",
+    "bodyAudio": "{{atMost}} Her şeyi düzenlemeye devam edebilirsin, ancak zaman çizelgesi işaretli {{limitAt}} çizgisinde bitene kadar Dışa aktar kapalı kalır. Oraya ulaşmak için klipleri kırp, böl ya da sil."
+  },
+  "tooLarge": {
+    "title_one": "Bu dosya çok büyük",
+    "title_other": "Bu dosyalar çok büyük",
+    "body": "Düzenleyici en fazla {{size}} boyutunda dosya kabul eder. Önce videoyu kısalt ya da sıkıştır (telefonun ya da herhangi bir video uygulaması daha küçük bir kopya dışa aktarabilir), sonra yeniden ekle."
+  },
+  "encoding": {
+    "title": "Bu videonun önce dönüştürülmesi gerekiyor",
+    "videos_one": "{{count}} video",
+    "videos_other": "{{count}} video",
+    "next": "Sıradaki",
+    "waiting_one": "Diğer {{count}} video bekleniyor",
+    "waiting_other": "Diğer {{count}} video bekleniyor",
+    "starting": "Başlatılıyor…",
+    "upload": "Yükleme",
+    "convert": "Oynatılabilir kopyaya dönüştür",
+    "hint": "Bu tarayıcı bu videonun biçimini (telefonlarda yaygın olan HEVC ya da HDR) oynatamıyor, bu yüzden oynatılabilir kopya hazır olana kadar siyah görünür. Ardından önizleme kendiliğinden ona geçer. Bu sırada düzenlemeye devam edebilirsin.",
+    "hide": "Gizle"
+  }
+}

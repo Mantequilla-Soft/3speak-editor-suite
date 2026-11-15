@@ -1,0 +1,86 @@
+{
+  "video": {
+    "title": "Video-Podcast",
+    "intro": "Die ganze Folge ({{length}}) als 16:9-Video: das Bild, eine bewegte Wellenform, Untertitel und wer gerade spricht. Für Video-Podcasts auf 3Speak, YouTube und Spotify.",
+    "unavailable": "Dieser Editor-Server kann noch keine Video-Podcasts erstellen.",
+    "tooLong": "Video-Podcasts dürfen bis zu {{length}} lang sein.",
+    "preview": "Vorschau des Video-Podcasts",
+    "sampleCaption": "<b>Deine</b> Wörter erscheinen hier",
+    "stageHint": "Die Wellenform bewegt sich mit dem Ton, die Untertitel und der Name folgen der Folge.",
+    "defaultLine": "Anschauen und anhören auf *3speak.tv*",
+    "captions": "Untertitel",
+    "captionsTranscript": "Die Wörter aus deinem Transkript.",
+    "captionsNoStt": "Spracherkennung ist auf diesem Server nicht verfügbar.",
+    "captionsStt": "Die Wörter, per Spracherkennung auf dem Server ermittelt. Lange Folgen dauern eine Weile.",
+    "whoSpeaks": "Wer spricht",
+    "noVoices": "Keine Sprachspur, aus der Namen kommen könnten.",
+    "speaker": "Sprecher {{n}}",
+    "speakerLabel": "Name für Sprachspur {{n}}",
+    "loudest": "Jede Stimme auf eigener Spur: der Name der lautesten wird angezeigt.",
+    "frameRate": "Bildrate",
+    "fps15": "15 fps (kleiner, schneller)",
+    "fps24": "24 fps (flüssiger)",
+    "finding": "Es wird ermittelt, wer wann spricht...",
+    "sending": "Wird gesendet...",
+    "working": "Wird bearbeitet...",
+    "serverAnswered": "Der Server hat mit {{status}} geantwortet",
+    "lost": "Der Auftrag ging verloren (wurde der Server neu gestartet?)",
+    "stopped": "Gestoppt",
+    "signIn": "Melde dich bei 3Speak an, um einen Video-Podcast zu erstellen.",
+    "failed": "Der Video-Podcast konnte nicht erstellt werden: {{error}}",
+    "stop": "Stopp",
+    "make": "Video-Podcast erstellen",
+    "again": "Erneut erstellen",
+    "download": "MP4 herunterladen",
+    "subtitles": "Untertitel (SRT)",
+    "post": "Auf 3Speak als Video posten"
+  },
+  "template": {
+    "title": "Deine Vorlage",
+    "signedOutIntro": "Speichere dein Intro, Outro und Musikbett einmal, und jede neue Aufnahme bekommt sie mit einem Klick. Deine Vorlage bleibt dauerhaft gespeichert, deshalb braucht sie deine 3Speak-Anmeldung.",
+    "signIn": "Anmelden, um eine Vorlage zu nutzen",
+    "logIn": "Melde dich bei 3Speak an, um eine Vorlage zu nutzen.",
+    "intro": "Eine Vorlage, dauerhaft gespeichert. Speichern ersetzt deine bisherige.",
+    "role": {
+      "intro": {
+        "title": "Intro",
+        "hint": "Läuft zuerst, vor deiner Aufnahme.",
+        "clear": "Kein Intro"
+      },
+      "outro": {
+        "title": "Outro",
+        "hint": "Läuft direkt nach dem Ende deiner Aufnahme.",
+        "clear": "Kein Outro"
+      },
+      "bed": {
+        "title": "Musikbett",
+        "hint": "Leise Musik unter der ganzen Aufnahme, passend wiederholt, am Ende ausgeblendet.",
+        "clear": "Kein Musikbett"
+      }
+    },
+    "useSelected": "„{{name}}“ verwenden (den Teil, auf den du es gekürzt hast)",
+    "selectFirst": "Wähle zuerst einen hochgeladenen Audio-Clip in der Zeitleiste",
+    "selectedClip": "Gewählter Clip",
+    "file": "Datei",
+    "volume": "Lautstärke",
+    "bedVolume": "Lautstärke des Musikbetts",
+    "loop": "Wiederholen, bis die ganze Aufnahme gefüllt ist",
+    "cutSilences": "Stille aus jeder neuen Aufnahme schneiden <small>(mit deinen Einstellungen für Stille schneiden)</small>",
+    "loudness": "Lautheit für Podcasts normalisieren <small>(-16 LUFS, beim Export angewendet)</small>",
+    "duck": "Musik absenken, während jemand spricht <small>({{db}} dB beim Musikbett; änderbar in den Clip-Einstellungen)</small>",
+    "autoApply": "Automatisch anwenden, wenn ich eine Aufnahme öffne",
+    "signInUpload": "Melde dich bei 3Speak an, um hochzuladen.",
+    "uploadFailed": "Diese Datei konnte nicht hochgeladen werden. Versuch eine andere.",
+    "deleteForGood": "Endgültig löschen",
+    "delete": "Vorlage löschen",
+    "saveApply": "Speichern und anwenden",
+    "voiceTrack": "Stimme",
+    "bedTrack": "Musikbett"
+  },
+  "stage": {
+    "empty": "Füge eine Aufnahme hinzu, nimm eine auf oder wähle Musik, um zu starten.",
+    "chapter": "Kapitel",
+    "position": "Position in der Sendung",
+    "positionText": "{{at}} von {{total}}"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "titles": {
+    "mode": "Paano mo gustong mag-remix?",
+    "stitch": "Saan ilalagay ang clip mo?",
+    "reaction": "Saan ilalagay ang reaction mo?"
+  },
+  "skip": "Laktawan, malayang edit",
+  "options": {
+    "stitch": {
+      "title": "Stitch",
+      "text": "Mag-record ng clip na ipe-play bago o pagkatapos ng orihinal."
+    },
+    "reaction": {
+      "title": "Reaction",
+      "text": "I-record ang sarili mo habang tumutugtog ang orihinal."
+    },
+    "free": {
+      "title": "Malayang edit",
+      "text": "Buksan ang editor na nasa timeline ang orihinal."
+    },
+    "stitchBefore": {
+      "title": "Bago ang orihinal",
+      "text": "Unang ipe-play ang clip mo, tapos ang orihinal."
+    },
+    "stitchAfter": {
+      "title": "Pagkatapos ng orihinal",
+      "text": "Unang ipe-play ang orihinal, tapos ang clip mo."
+    },
+    "overlay": {
+      "title": "Overlay",
+      "text": "Ang camera mo sa maliit na kahon sa ibabaw ng orihinal. I-drag kahit saan."
+    },
+    "tileTop": {
+      "title": "Tile sa itaas",
+      "text": "Liliit ang orihinal sa ibabang kalahati, ikaw sa itaas."
+    },
+    "tileBottom": {
+      "title": "Tile sa ibaba",
+      "text": "Liliit ang orihinal sa itaas na kalahati, ikaw sa ibaba."
+    }
+  }
+}

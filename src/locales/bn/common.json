@@ -1,0 +1,39 @@
+{
+  "cancel": "বাতিল",
+  "close": "বন্ধ করুন",
+  "ok": "ঠিক আছে",
+  "gotIt": "বুঝেছি",
+  "done": "সম্পন্ন",
+  "save": "সেভ",
+  "delete": "মুছুন",
+  "remove": "সরান",
+  "back": "পেছনে",
+  "next": "পরের",
+  "skip": "স্কিপ",
+  "retry": "আবার চেষ্টা করুন",
+  "reset": "রিসেট",
+  "none": "নেই",
+  "off": "বন্ধ",
+  "auto": "অটো",
+  "play": "চালান",
+  "pause": "থামান",
+  "undo": "আগের অবস্থায় ফেরান",
+  "preview": "প্রিভিউ",
+  "render": "রেন্ডার",
+  "export": "এক্সপোর্ট",
+  "duration": {
+    "seconds_one": "{{count}} সেকেন্ড",
+    "seconds_other": "{{count}} সেকেন্ড",
+    "minutes_one": "{{count}} মিনিট",
+    "minutes_other": "{{count}} মিনিট",
+    "hours_one": "{{count}} ঘণ্টা",
+    "hours_other": "{{count}} ঘণ্টা"
+  },
+  "limits": {
+    "atMost": {
+      "short": "একটি শর্ট সর্বোচ্চ {{limit}} হতে পারে।",
+      "video": "একটি ভিডিও সর্বোচ্চ {{limit}} হতে পারে।",
+      "audio": "একটি এক্সপোর্ট সর্বোচ্চ {{limit}} হতে পারে।"
+    }
+  }
+}

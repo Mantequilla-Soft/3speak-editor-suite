@@ -1,0 +1,53 @@
+{
+  "title": "外观",
+  "noEffects": "无效果",
+  "presetsLabel": "外观预设",
+  "doubleClickReset": "双击重置",
+  "presets": {
+    "original": "原始",
+    "warm": "暖色",
+    "cool": "冷色",
+    "vivid": "鲜艳",
+    "matte": "哑光",
+    "bw": "黑白",
+    "vintage": "复古",
+    "tealorange": "青橙",
+    "fade": "褪色",
+    "noir": "黑色电影",
+    "sunset": "日落"
+  },
+  "sliders": {
+    "blur": "模糊",
+    "vignette": "暗角",
+    "sharpen": "锐化",
+    "split": "青橙"
+  },
+  "transition": {
+    "title": "转场",
+    "none": "无",
+    "types": {
+      "crossfade": "交叉淡化",
+      "dissolve": "黑场过渡",
+      "slideleft": "向左滑动",
+      "slideright": "向右滑动",
+      "slideup": "向上滑动",
+      "zoom": "缩放",
+      "whip": "快速甩动"
+    },
+    "length": "转场时长（秒）",
+    "fades": "淡入淡出",
+    "noFades": "无淡入淡出",
+    "in": "淡入",
+    "out": "淡出",
+    "fadeInSeconds": "淡入（秒）",
+    "fadeOutSeconds": "淡出（秒）",
+    "intoNext": "过渡到下一个片段",
+    "needNext": "在同一轨道上紧接着这个片段放一个片段，才能添加转场。",
+    "fromTo": "{{from}} 过渡到 {{to}}",
+    "fromUnnamed": "片段过渡到 {{to}}",
+    "toUnnamed": "{{from}} 过渡到下一个片段",
+    "bothUnnamed": "片段过渡到下一个片段",
+    "add": "添加转场",
+    "cutLabel": "{{type}}，{{seconds}} 秒"
+  }
+}

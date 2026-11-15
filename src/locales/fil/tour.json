@@ -1,0 +1,117 @@
+{
+  "shorts": {
+    "welcome": {
+      "title": "Maligayang pagdating!",
+      "text": "Maligayang pagdating sa 3Speak Shorts Editor. Mabilis nating silipin ang mga pangunahing feature."
+    },
+    "preview": {
+      "title": "Preview",
+      "text": "Ito ang preview ng video mo. Puwede mong i-drag ang mga clip para ilipat ang mga ito at mag-pinch para mag-zoom."
+    },
+    "timeline": {
+      "title": "Timeline",
+      "text": "Ayusin dito ang mga clip mo. I-drag para baguhin ang pagkakasunod, hilahin ang mga gilid para i-trim."
+    },
+    "addMedia": {
+      "title": "Magdagdag ng media",
+      "text": "I-tap ang + para magdagdag ng video, larawan, text, audio o color clip sa mga track mo."
+    },
+    "clipSettings": {
+      "title": "Mga setting ng clip",
+      "text": "Pumili ng clip at i-tap ang icon na gear para i-edit ang mga property nito gaya ng scale, posisyon at opacity."
+    },
+    "render": {
+      "title": "I-render",
+      "text": "Kapag tapos ka nang mag-edit, pindutin ang Render para i-export ang video mo. Pagkatapos, puwede mo itong i-download o ipadala."
+    }
+  },
+  "audio": {
+    "welcome": {
+      "title": "Maligayang pagdating sa Audio Editor",
+      "text": "Putulin, linisin at pantayin ang level ng isang podcast, kanta o voice note, tapos i-post ito sa 3Speak. Narito ang mabilis na silip sa kaya nitong gawin."
+    },
+    "addAudio": {
+      "title": "Idagdag ang audio mo",
+      "text": "Magdagdag ng recording, mag-record mismo rito, o pumili ng musika mula sa library. Gumagana rin ang mga video file: tunog lang ang kinukuha ng editor. Hanggang 3 oras."
+    },
+    "tracks": {
+      "title": "Mga voice at music track",
+      "text": "Napupunta sa mga voice track ang mga recording, at sa sariling track ang musika. I-drag ang clip para ilipat, hilahin ang mga gilid para i-trim. Mag-zoom gamit ang slider, o i-tap ang Ipagkasya para makita ang lahat."
+    },
+    "clipSettings": {
+      "title": "Mga setting ng clip",
+      "text": "Pumili ng clip para makita ang mga setting nito. Linisin ang boses (inaalis ng Malakas ang ingay at ugong at ginagawa itong mas malinaw at mas pantay), at Duck: humihina ang clip habang tumutugtog ang ibang track. I-grupo ang mga boses na sabay na ni-record para manatili silang sabay."
+    },
+    "cutSilences": {
+      "title": "Putulin ang katahimikan",
+      "text": "Hinahanap ang mga hinto sa mga voice track mo, inaalis ang mga ito at isinasara ang mga puwang. Pinuputol lang ang mga naka-grupong boses kapag tahimik ang lahat."
+    },
+    "template": {
+      "title": "Ang template mo",
+      "text": "Mag-set up ng intro, outro at music bed nang isang beses. Mapupunta ang mga ito sa bawat bagong recording, at permanenteng itinatabi ang template mo."
+    },
+    "normalize": {
+      "title": "Normalize",
+      "text": "Dinadala ang export sa pantay na lakas ng podcast (-16 LUFS), para kasinlakas ng nakaraan ang bawat episode. I-off ito para panatilihin ang sarili mong mga level."
+    },
+    "chapters": {
+      "title": "Mga kabanata",
+      "text": "Markahan kung saan nagsisimula ang bawat bahagi (pindutin ang M para magdagdag ng isa sa playhead). Napupunta ang mga kabanata sa MP3 at sa description ng episode mo."
+    },
+    "export": {
+      "title": "I-export",
+      "text": "Gumagawa ng MP3 ang Export. Pakinggan ito, tapos gamitin para sa upload mo o i-download. Kapag naka-sign in, itinatabi ang proyekto mo bilang draft habang nagtatrabaho ka."
+    }
+  },
+  "audiogram": {
+    "intro": {
+      "title": "Mga audiogram",
+      "text": "Maiikling video ng isang piraso ng episode mo: gumagalaw na waveform, ang pamagat at larawan mo, sa itsura ng 3Speak. Lalabas ang mga ito bilang 3Speak Shorts kasama ng episode."
+    },
+    "piece": {
+      "title": "Ang piraso mo",
+      "text": "Ang pirasong pinili mo sa timeline, hanggang 2 minuto. Palitan ito rito anumang oras."
+    },
+    "arrange": {
+      "title": "Ayusin ayon sa gusto mo",
+      "text": "I-drag ang anumang bahagi para ilipat, hilahin ang sulok para baguhin ang laki (pinapanatili ng Shift ang hugis), at iikot gamit ang bilog na hawakan sa ilalim nito. Laging nandiyan ang logo ng 3Speak, bilang 3S o ang buong logo."
+    },
+    "picture": {
+      "title": "Isang larawan",
+      "text": "Mag-upload ng isa o kunin ang cover ng isa sa mga playlist mo. Lalabas ito bilang card na puwede mong ilipat at baguhin ang laki gaya ng ibang bahagi."
+    },
+    "waveform": {
+      "title": "Ang waveform",
+      "text": "Mga bar, linya, bilog o bilog na alon, sa pula ng 3Speak o anumang kulay na gusto mo."
+    },
+    "parts": {
+      "title": "Mga bahagi",
+      "text": "Itago ang isang bahagi, o iusog ito pasulong o paatras kapag nagpapatong ang mga bahagi."
+    },
+    "make": {
+      "title": "Gawin ito",
+      "text": "Gumawa ng kahit ilan: bawat isa ay lalabas bilang Short kasama ng episode, may sariling text at link dito. Itinatabi ang huli mong itsura bilang template para sa susunod."
+    }
+  },
+  "rangePick": {
+    "startEnd": {
+      "title": "I-click ang simula, tapos ang dulo",
+      "text": "I-click kung saan dapat magsimula ang piraso, tapos kung saan ito nagtatapos: hanggang 2 minuto. Hilahin ang mga gilid para ayusin, o i-drag sa mga track para iguhit ang isang buong piraso. Magsisimula ulit ang bagong click."
+    },
+    "moveAround": {
+      "title": "Gumalaw-galaw",
+      "text": "I-drag ang ruler o mag-scroll para gumalaw sa episode. Mag-zoom in gamit ang slider para sa eksaktong simula, o i-tap ang Ipagkasya para makita ang buong episode."
+    },
+    "listen": {
+      "title": "Pakinggan ito",
+      "text": "Ipe-play ng I-play ang piraso (o Space) ang bahaging pinili mo lang, tapos babalik sa simula nito."
+    },
+    "use": {
+      "title": "Gamitin ito",
+      "text": "Ibinabalik ng Gamitin ang pirasong ito (o Enter) ang piraso sa audiogram mo, pinapanatili ng Kanselahin (o Escape) ang dati. Hanggang doon, naka-lock ang natitirang bahagi ng editor, kaya walang ibang nagbabago nang hindi sinasadya."
+    }
+  },
+  "buttons": {
+    "done": "Sige!"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "header": "타임라인 미리보기",
+  "smaller": "작게",
+  "larger": "크게",
+  "loopOn": "반복: 켜짐",
+  "loopOff": "반복: 꺼짐",
+  "aspect": {
+    "title": "화면 비율: {{ratio}}",
+    "titleAuto": "화면 비율: 자동 ({{ratio}})",
+    "auto": "자동"
+  },
+  "fullSize": "원래 크기",
+  "halfSize": "절반 크기",
+  "fullscreen": "전체 화면",
+  "noClipHere": "이 위치에 클립이 없어요",
+  "noClips": "타임라인에 클립이 없어요",
+  "source": {
+    "hls": "(HLS 스트림)",
+    "uploaded": "(업로드됨)",
+    "local": "(로컬)",
+    "file": "(파일)"
+  },
+  "stageLayout": {
+    "tileTop": "위에 배치",
+    "tileBottom": "아래에 배치",
+    "overlay": "오버레이"
+  },
+  "selectClip": "미리 보려면 클립을 선택하세요"
+}

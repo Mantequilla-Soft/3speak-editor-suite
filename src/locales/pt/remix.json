@@ -1,0 +1,42 @@
+{
+  "titles": {
+    "mode": "Como você quer fazer o remix?",
+    "stitch": "Onde seu clipe deve entrar?",
+    "reaction": "Onde sua reação deve entrar?"
+  },
+  "skip": "Pular, edição livre",
+  "options": {
+    "stitch": {
+      "title": "Juntar",
+      "text": "Grave um clipe que toca antes ou depois do original."
+    },
+    "reaction": {
+      "title": "Reação",
+      "text": "Grave você mesmo enquanto o original toca."
+    },
+    "free": {
+      "title": "Edição livre",
+      "text": "Abra o editor com o original na linha do tempo."
+    },
+    "stitchBefore": {
+      "title": "Antes do original",
+      "text": "Seu clipe toca primeiro, depois o original."
+    },
+    "stitchAfter": {
+      "title": "Depois do original",
+      "text": "O original toca primeiro, depois seu clipe."
+    },
+    "overlay": {
+      "title": "Sobreposição",
+      "text": "Sua câmera em uma caixa pequena sobre o original. Arraste para onde quiser."
+    },
+    "tileTop": {
+      "title": "Lado a lado em cima",
+      "text": "O original diminui para a metade de baixo, você fica em cima."
+    },
+    "tileBottom": {
+      "title": "Lado a lado embaixo",
+      "text": "O original diminui para a metade de cima, você fica embaixo."
+    }
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "title": "Téléprompteur",
+  "showOnCamera": "Afficher sur la caméra",
+  "speechNotice": {
+    "title": "Le suivi de la voix ne marche pour l'instant que dans les navigateurs Chromium.",
+    "body": "Utilisez Chrome, Edge, Brave ou Opera pour que le script défile pendant que vous parlez. Dans ce navigateur, il défile à une vitesse régulière que vous pouvez régler."
+  },
+  "speechErrors": {
+    "network": "Service vocal injoignable. La reconnaissance a besoin d'une connexion Internet (Chrome envoie l'audio à Google pour le transcrire).",
+    "audioCapture": "Aucun son n'est parvenu à la reconnaissance. Le micro est peut-être occupé, essayez un casque.",
+    "notAllowed": "L'accès au micro est bloqué pour la reconnaissance vocale.",
+    "unsupported": "Ce navigateur n'a pas de reconnaissance vocale.",
+    "generic": "Erreur de reconnaissance vocale : {{err}}"
+  },
+  "noMic": "Enregistrement sans micro (micro indisponible).",
+  "autoDetect": "Détection auto ({{lang}})",
+  "presets": {
+    "frontcam": "Caméra avant",
+    "frontcamTitle": "Petite bande sous l'objectif selfie, pour qu'on voie le moins que vous lisez",
+    "max": "Taille max",
+    "maxTitle": "Grand texte pour lire de loin",
+    "top": "Lignes en haut",
+    "topTitle": "Plusieurs lignes en haut de l'écran"
+  },
+  "scroll": {
+    "label": "Défilement",
+    "modeAria": "Mode de défilement",
+    "followVoice": "Suivre la voix",
+    "followVoiceTitle": "Défile pendant que vous lisez le script à voix haute",
+    "needsChromium": "Nécessite Chrome, Edge ou un autre navigateur Chromium",
+    "timed": "Minuté",
+    "timedTitle": "Défile à une vitesse régulière",
+    "voiceForcedMissing": "Le suivi de la voix n'est pas disponible ici, défilement minuté utilisé.",
+    "voiceUnavailable": "Le suivi de la voix n'est pas disponible dans ce navigateur."
+  },
+  "style": {
+    "title": "Style du texte",
+    "fontSize": "Taille de police",
+    "fontSizeValue": "{{size}} px",
+    "text": "Texte",
+    "background": "Arrière-plan",
+    "bgOpacity": "Opacité du fond",
+    "mirrorText": "Texte en miroir (pour un miroir de téléprompteur)",
+    "voiceLanguage": "Langue de la voix"
+  },
+  "status": {
+    "serverErrorSwitched": "Erreur du serveur vocal ({{reason}}). Passage au défilement minuté.",
+    "voiceErrorSwitched": "{{error}} Passage au défilement minuté.",
+    "voiceStoppedSwitched": "Le suivi de la voix s'est arrêté. Passage au défilement minuté.",
+    "serverError": "Erreur du serveur vocal ({{reason}}).",
+    "listeningServer": "Écoute (serveur)… commencez à lire",
+    "connectingServer": "Connexion au serveur vocal…",
+    "listening": "Écoute… commencez à lire à voix haute",
+    "startingMic": "Démarrage du micro…",
+    "scrollPaused": "Défilement en pause",
+    "timedScroll": "Défilement minuté, {{wpm}} mots/min",
+    "scrollTest": "Test de défilement, {{wpm}} mots/min"
+  },
+  "sttReason": {
+    "unreachable": "injoignable",
+    "noMic": "pas de micro",
+    "audioUnavailable": "audio indisponible",
+    "connectionFailed": "échec de la connexion",
+    "unauthorized": "non autorisé",
+    "closed": "fermé",
+    "serverError": "erreur du serveur"
+  },
+  "scriptPlaceholder": "Écrivez ou collez votre script ici. Pendant l'enregistrement, il défile au fil de votre lecture à voix haute, ou à vitesse régulière en mode minuté.",
+  "scriptModeVoice": "Défilement : suit votre voix",
+  "scriptModeTimed": "Défilement : minuté, {{wpm}} mots/min",
+  "hide": "Masquer",
+  "dragToMove": "Glisser pour déplacer",
+  "dragToResize": "Glisser pour redimensionner",
+  "expandMenu": "Déplier le menu",
+  "collapseMenu": "Réduire le menu",
+  "editScript": "Modifier le script",
+  "testVoice": "Tester la voix",
+  "stopVoiceTest": "Arrêter le test",
+  "scrollSpeed": "Vitesse de défilement",
+  "slower": "Plus lent",
+  "faster": "Plus rapide",
+  "wordsPerMin": "mots/min",
+  "testScroll": "Tester le défilement",
+  "stopScrollTest": "Arrêter le test de défilement",
+  "pauseScroll": "Mettre le défilement en pause",
+  "resumeScroll": "Reprendre le défilement",
+  "hideTeleprompter": "Masquer le téléprompteur"
+}

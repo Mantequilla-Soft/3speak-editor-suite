@@ -1,0 +1,28 @@
+{
+  "render": {
+    "unreachable": "Nie można połączyć się z serwerem renderowania. Sprawdź połączenie i renderuj ponownie.",
+    "stillBusy": "Serwery renderowania są nadal zajęte. Renderuj ponownie za kilka minut.",
+    "unknownJob": "Serwer renderowania nie zna już tego renderowania (mógł się zrestartować). Renderuj ponownie.",
+    "lostContact": "Utracono połączenie z serwerem renderowania. Renderuj ponownie.",
+    "serverStatus": "Serwer odpowiedział {{status}}"
+  },
+  "uploadFailed": "Przesyłanie nie powiodło się: {{status}}",
+  "signIn": {
+    "loggedOut": "Zaloguj się w 3Speak, aby korzystać z edytora.",
+    "failed": "Zaloguj się w 3Speak, aby przesyłać i renderować (logowanie zostało anulowane lub nie zadziałało)."
+  },
+  "export": {
+    "failed": "Eksport nie powiódł się",
+    "ffmpegNotLoaded": "FFmpeg nie jest wczytany",
+    "noClips": "Brak klipów do eksportu",
+    "noCodec": "Nie znaleziono obsługiwanego kodeka wideo dla MediaRecorder",
+    "cancelled": "Eksport anulowany",
+    "noSource": "Brak prawidłowego źródła pliku dla klipu: {{name}}",
+    "ffmpegFailed": "Polecenie FFmpeg zakończyło się kodem {{code}}"
+  },
+  "reverse": {
+    "failed": "Odwracanie nie powiodło się",
+    "timedOut": "Przekroczono czas odwracania",
+    "statusCheck": "Sprawdzenie stanu nie powiodło się: {{status}}"
+  }
+}

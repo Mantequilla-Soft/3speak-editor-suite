@@ -1,0 +1,28 @@
+{
+  "render": {
+    "unreachable": "Il server di rendering non è raggiungibile. Controlla la connessione e rifai il rendering.",
+    "stillBusy": "I server di rendering sono ancora occupati. Rifai il rendering tra qualche minuto.",
+    "unknownJob": "Il server di rendering non conosce più questo rendering (forse si è riavviato). Rifai il rendering.",
+    "lostContact": "Contatto perso con il server di rendering. Rifai il rendering.",
+    "serverStatus": "Il server ha risposto {{status}}"
+  },
+  "uploadFailed": "Caricamento non riuscito: {{status}}",
+  "signIn": {
+    "loggedOut": "Accedi su 3Speak per usare l'editor.",
+    "failed": "Accedi su 3Speak per caricare e fare il rendering (l'accesso è stato annullato o non ha funzionato)."
+  },
+  "export": {
+    "failed": "Esportazione non riuscita",
+    "ffmpegNotLoaded": "FFmpeg non caricato",
+    "noClips": "Nessuna clip da esportare",
+    "noCodec": "Nessun codec video supportato trovato per MediaRecorder",
+    "cancelled": "Esportazione annullata",
+    "noSource": "Nessuna sorgente file valida per la clip: {{name}}",
+    "ffmpegFailed": "Comando FFmpeg non riuscito con codice di uscita {{code}}"
+  },
+  "reverse": {
+    "failed": "Inversione non riuscita",
+    "timedOut": "Tempo scaduto per l'inversione",
+    "statusCheck": "Verifica dello stato non riuscita: {{status}}"
+  }
+}

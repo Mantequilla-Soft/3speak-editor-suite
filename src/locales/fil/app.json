@@ -1,0 +1,149 @@
+{
+  "dismiss": "Isara",
+  "branding": {
+    "audioEditor": "Audio Editor",
+    "shortsEditor": "Shorts Editor",
+    "videoEditor": "Video Editor",
+    "beta": "beta",
+    "backend": "Backend: {{url}}",
+    "backendSelecting": "Backend: pumipili...",
+    "showTour": "Ipakita ulit ang tour",
+    "shortcuts": "Mga keyboard shortcut (?)",
+    "shortcutsLabel": "Mga keyboard shortcut",
+    "fullscreen": "Full screen (F)",
+    "fullscreenLabel": "Full screen",
+    "leaveFullscreen": "Umalis sa full screen (F)",
+    "leaveFullscreenLabel": "Umalis sa full screen",
+    "closeEditor": "Isara ang editor"
+  },
+  "backendDown": "Hindi maabot ang backend server. Hindi gagana ang pag-upload ng recording, pag-render at pagproseso ng media.",
+  "menu": {
+    "undo": "I-undo (Ctrl+Z)",
+    "redo": "I-redo (Ctrl+Shift+Z)"
+  },
+  "audioTools": {
+    "cutSilences": "Putulin ang katahimikan",
+    "cutSilencesTitle": "Putulin ang mga katahimikan sa napiling clip (o sa grupo nito): hanapin ang mga hinto, putulin, at isara ang mga puwang",
+    "template": "Template",
+    "templateTitle": "Ang template mo: intro, outro at music bed para sa bawat recording",
+    "normalizeLabel": "I-normalize ang lakas",
+    "normalizeOn": "Normalize: naka-on",
+    "normalizeOff": "Normalize: naka-off",
+    "normalizeOnTitle": "Naka-on ang normalize: pinapantay ang export sa -16 LUFS (ang pamantayan sa podcast)",
+    "normalizeOffTitle": "Naka-off ang normalize: pinapanatili ng export ang mga level mo",
+    "chapters": "Mga kabanata",
+    "chaptersCount": "Mga kabanata ({{n}})",
+    "chaptersTitle": "Mga kabanata: markahan kung saan nagsisimula ang bawat bahagi (nagdadagdag ang M ng isa sa playhead)",
+    "transcript": "Transcript",
+    "transcriptTitle": "Transcript: i-edit ang palabas sa pamamagitan ng text nito, burahin ang mga salita para putulin",
+    "fillersLabel": "Alisin ang mga filler",
+    "fillers": "Mga filler",
+    "fillersTitle": "Alisin ang mga filler: hanapin ang um, uh, ano, at mahahabang hinto, suriin, at putulin"
+  },
+  "cutSilences": {
+    "progress": "Pinuputol ang katahimikan: clip {{done}} sa {{total}}",
+    "failed_one": "Hindi mabasa ang {{count}} clip. Naputol na ang iba.",
+    "failed_other": "Hindi mabasa ang {{count}} clip. Naputol na ang iba.",
+    "failedUploading_one": "Hindi pa mabasa ang {{count}} clip: subukan ulit kapag tapos na ang upload. Naputol na ang iba.",
+    "failedUploading_other": "Hindi pa mabasa ang {{count}} clip: subukan ulit kapag tapos na ang upload. Naputol na ang iba."
+  },
+  "group": {
+    "nothing": "Walang sabay na tumutugtog sa ibang voice track. Ilagay muna sa sariling track ang ibang boses.",
+    "done_one": "Na-grupo ang {{count}} boses: sabay na silang ililipat, iti-trim at puputulan ng katahimikan.",
+    "done_other": "Na-grupo ang {{count}} boses: sabay na silang ililipat, iti-trim at puputulan ng katahimikan."
+  },
+  "template": {
+    "applied": "Nailapat ang template: {{parts}}.",
+    "intro": "intro",
+    "outro": "outro",
+    "bed": "music bed",
+    "takeOff": "Tanggalin"
+  },
+  "rangePick": {
+    "hint": "I-click kung saan nagsisimula ang piraso ng audiogram, tapos kung saan ito nagtatapos (hanggang 2 minuto). Hilahin ang mga gilid para ayusin.",
+    "from": "Mula {{start}}: i-click na kung saan ito nagtatapos",
+    "span": "{{start}} – {{end}} · {{seconds}} seg",
+    "listenTitle": "Pakinggan ang pirasong ito lang (Space)",
+    "stop": "Itigil",
+    "play": "I-play ang piraso",
+    "use": "Gamitin ang pirasong ito"
+  },
+  "empty": {
+    "addVideo": "Magdagdag ng video",
+    "addImage": "Magdagdag ng larawan",
+    "addAudio": "Magdagdag ng audio",
+    "addRecording": "Magdagdag ng recording",
+    "record": "Mag-record",
+    "music": "Musika"
+  },
+  "confirm": {
+    "removeClip": "Alisin ang clip na ito sa timeline?",
+    "removeClips_one": "Alisin ang {{count}} clip na ito sa timeline?",
+    "removeClips_other": "Alisin ang {{count}} clip na ito sa timeline?",
+    "removeLibraryItem": "Alisin ang item na ito sa library ng proyekto?",
+    "removeTrack": "Alisin ang track na ito at lahat ng clip nito?"
+  },
+  "clipStreaming": "Nag-i-stream pa mula sa 3Speak ang clip na ito. Subukan ulit kapag tapos na ang download nito.",
+  "reverse": {
+    "title": "Binabaligtad ang clip...",
+    "body": "Pinoproseso sa server, pakihintay.",
+    "failed": "Hindi nabaligtad ang clip: {{error}}"
+  },
+  "remix": {
+    "stitch": "Stitch",
+    "stitchHintBefore": "Mag-record nang hanggang {{seconds}} seg. Ipe-play ito bago mismo ang orihinal.",
+    "stitchHintAfter": "Mag-record nang hanggang {{seconds}} seg. Ipe-play ito pagkatapos mismo ng orihinal.",
+    "reaction": "Reaction",
+    "reactionHint": "Ipe-play ang orihinal mula sa simula habang nagre-record ka. Gumamit ng headphones para hindi ito pumasok sa mic mo.",
+    "originalFillsLimit": "Puno na ng orihinal ang limit na {{limit}}. I-trim ito sa timeline, tapos i-record ang stitch mo gamit ang camera button."
+  },
+  "chapters": {
+    "intro": "Intro",
+    "numbered": "Kabanata {{n}}"
+  },
+  "duck": {
+    "allVoices": "Lahat ng voice track"
+  },
+  "media": "Media",
+  "importedMedia": "Na-import na media",
+  "files_one": "{{count}} file",
+  "files_other": "{{count}} file",
+  "side": {
+    "clipsSelected_one": "{{count}} clip ang napili",
+    "clipsSelected_other": "{{count}} clip ang napili",
+    "clearSelection": "I-clear ang pinili",
+    "closeProperties": "Isara ang mga property",
+    "captions": "Captions",
+    "closeCaptions": "Isara ang captions",
+    "noClip": "Walang napiling clip",
+    "noClipHint": "Pumili ng clip sa timeline para makita ang mga setting nito. Mag-drag ng kahon sa ibabaw ng ilang clip para sabay silang baguhin."
+  },
+  "cleaningHint": "Puwedeng umabot nang isang minuto ang mahahabang recording.",
+  "hlsDownload": {
+    "title": "Dina-download ang media",
+    "hint": "Pakihintay habang inihahanda ang media..."
+  },
+  "sendPreview": {
+    "titleAudio": "Pakinggan bago gamitin",
+    "titleVideo": "I-preview ang video mo",
+    "back": "Bumalik sa Editor",
+    "askTitle": "Gumawa ng mga audiogram para sa Shorts?",
+    "askBody": "Maiikling video ng pinakamagagandang piraso ng audio na ito, ipo-post bilang 3Speak Shorts kasama nito, at bawat isa ay may link pabalik dito.",
+    "askNo": "Hindi, gamitin ang audio",
+    "askMake": "Gumawa ng mga audiogram"
+  },
+  "legacy": {
+    "projectLibrary": "Library ng proyekto",
+    "loadingFfmpeg": "Nilo-load ang FFmpeg... {{percent}}",
+    "properties": "Mga property",
+    "propertiesOf": "Mga property: {{name}}",
+    "addMedia": "Magdagdag ng media",
+    "addMediaTitle": "Magdagdag ng media sa library",
+    "record": "Mag-record",
+    "recordTitle": "Mag-record ng video mula sa camera"
+  },
+  "drafts": {
+    "episode": "Episode",
+    "project": "Proyekto"
+  }
+}

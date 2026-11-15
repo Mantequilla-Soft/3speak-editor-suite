@@ -1,0 +1,67 @@
+{
+  "language": {
+    "label": "Wikang sinasalita",
+    "auto": "Kusang tukuyin"
+  },
+  "intro": {
+    "title": "Auto captions",
+    "text": "Gawing captions ang sinasabi na sumusunod sa bawat salita, nakalapat sa Short mo at ipinapadala rin sa 3Speak bilang subtitles.",
+    "checking": "Tinitingnan ang server...",
+    "unavailable": "Hindi available ang auto captions sa editor server na ito ngayon. Magre-render ang Short mo gaya ng dati nang wala ang mga ito.",
+    "go": "Auto captions"
+  },
+  "presets": {
+    "karaoke": "Karaoke",
+    "pop": "Pop",
+    "plain": "Subtitles"
+  },
+  "presetHints": {
+    "karaoke": "Ilang salita bawat labas, nasa kulay ng highlight ang salitang binibigkas",
+    "pop": "Isang salita (o ilan) bawat labas, biglang lumilitaw",
+    "plain": "Klasikong linya ng subtitle sa madilim na kahon"
+  },
+  "style": {
+    "title": "Istilo",
+    "presetsLabel": "Istilo ng caption",
+    "wordsAtATime": "Mga salita bawat labas",
+    "font": "Font",
+    "size": "Laki",
+    "sizeLabel": "Laki ng caption",
+    "position": "Posisyon",
+    "positionLabel": "Taas ng caption sa larawan",
+    "top": "Itaas",
+    "middle": "Gitna",
+    "low": "Ibaba",
+    "textColour": "Kulay ng text",
+    "highlight": "Highlight",
+    "highlightLabel": "Kulay ng highlight",
+    "uppercase": "Malalaking titik",
+    "emoji": "Mga emoji accent (sa itaas ng mga salitang gaya ng \"apoy\" o \"pag-ibig\")",
+    "burn": "Ipakita sa video (off: bilang subtitles lang sa 3Speak)"
+  },
+  "words": {
+    "title": "Mga salita ({{n}})",
+    "hint": "Ayusin ang mga maling narinig; burahin ang laman ng salita para alisin ito. Inilipat o pinutol ang mga clip? Patakbuhin ulit ang Auto captions.",
+    "goThere": "Pumunta roon",
+    "word": "Salita {{n}}",
+    "changeEmoji": "Palitan o alisin ang emoji nito",
+    "addEmoji": "Magdagdag ng emoji",
+    "remove": "Alisin ang salitang ito",
+    "removeNamed": "Alisin ang {{word}}"
+  },
+  "actions": {
+    "again": "Ulitin",
+    "againTitle": "Pakinggan ulit (papalitan ang mga salita)",
+    "remove": "Alisin ang captions"
+  },
+  "videoSound": "Tunog ng video",
+  "job": {
+    "preparing": "Inihahanda ang tunog...",
+    "listening": "Nakikinig...",
+    "noTracks": "Walang pananalitang lalagyan ng caption: magdagdag muna ng clip na may tunog.",
+    "serverAnswered": "Sumagot ang server ng {{status}}",
+    "lost": "Nawala ang captions job (nag-restart ang server?)",
+    "noSpeech": "Walang nakitang pananalita. Nasa audio track ba ang boses na hindi naka-mute (hindi isinasama ang mga music track)?",
+    "failed": "Pumalya ang speech recognition"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "title": "Stickers",
+  "search": "Stickers zoeken",
+  "textBoxes": "Tekstvakken",
+  "loading": "Stickers laden...",
+  "noMatch": "Geen stickers gevonden.",
+  "tileTitle": "{{name}} (komt op de afspeelkop)",
+  "note": "Stickers komen voor 3 seconden op de afspeelkop. Sleep ze, wijzig het formaat of kort ze in zoals elke clip; tekstvakken blijven bewerkbaar.",
+  "categories": {
+    "emoji": "Emoji's",
+    "badges": "Badges",
+    "shapes": "Pijlen & vormen",
+    "branding": "Branding"
+  },
+  "presets": {
+    "caption": {
+      "title": "Bijschrift",
+      "text": "Je bijschrift hier"
+    },
+    "highlight": {
+      "title": "Markeren",
+      "text": "Niet missen!"
+    },
+    "brand": {
+      "title": "3Speak-rood",
+      "text": "Nieuwe video"
+    },
+    "bubble": {
+      "title": "Ballon",
+      "text": "Hoi!"
+    },
+    "outline": {
+      "title": "Omlijnd",
+      "text": "Kijk hier eens"
+    },
+    "neon": {
+      "title": "Neon",
+      "text": "VANAVOND"
+    },
+    "title": {
+      "title": "Grote titel",
+      "text": "GROOT NIEUWS"
+    },
+    "comic": {
+      "title": "Strip",
+      "text": "BOEM!"
+    },
+    "marker": {
+      "title": "Marker",
+      "text": "handgemaakt"
+    },
+    "quote": {
+      "title": "Citaat",
+      "text": "“Zeg het goed.”"
+    },
+    "tag": {
+      "title": "Hashtag"
+    },
+    "minimal": {
+      "title": "Minimaal",
+      "text": "simpel en strak"
+    }
+  }
+}

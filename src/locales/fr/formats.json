@@ -1,0 +1,88 @@
+{
+  "aspect": {
+    "short": {
+      "label": "Short",
+      "hint": "Vertical, jusqu'à 2 minutes, publié en Short"
+    },
+    "landscape": {
+      "label": "Paysage",
+      "hint": "Vidéo grand écran, jusqu'à 10 minutes"
+    },
+    "classic": {
+      "label": "Classique",
+      "hint": "Vidéo 4:3, jusqu'à 10 minutes"
+    },
+    "square": {
+      "label": "Carré",
+      "hint": "Vidéo carrée, jusqu'à 10 minutes"
+    }
+  },
+  "chip": {
+    "title": "Format de ce projet : {{shape}}. Cliquez pour le changer",
+    "aria": "Format du projet : {{shape}}"
+  },
+  "picker": {
+    "title": "Que créez-vous ?",
+    "tooLong": "votre chronologie dure {{length}}, coupez-la à {{limit}} pour faire le rendu",
+    "note": "Le format décide comment il arrive sur 3Speak : 9:16 en Short, les autres en vidéo normale. « Exporter en » le rend aussi dans d'autres formats."
+  },
+  "preview": {
+    "heading": "Aperçu en",
+    "yours": "{{aspect}} (le vôtre)",
+    "projectIs": {
+      "short": "Votre projet est en Short 9:16. Dans un autre format, les images remplissent le cadre, recadrées autour du visage.",
+      "landscape": "Votre projet est en Paysage 16:9. Dans un autre format, les images remplissent le cadre, recadrées autour du visage.",
+      "classic": "Votre projet est en Classique 4:3. Dans un autre format, les images remplissent le cadre, recadrées autour du visage.",
+      "square": "Votre projet est en Carré 1:1. Dans un autre format, les images remplissent le cadre, recadrées autour du visage."
+    }
+  },
+  "faces": {
+    "heading": "Suivre les visages",
+    "noFootage": "Pas encore d'images à recadrer. Les clips déplacés ou zoomés gardent leur propre cadrage.",
+    "hint": "Le visage est détecté dans votre navigateur, quelques images par seconde. Sans visage, le centre reste visible.",
+    "found": "Visage trouvé",
+    "noFace": "Pas de visage : centre",
+    "middle": "Centre",
+    "finding": "Recherche des visages",
+    "findOne": "Trouver le visage",
+    "findMany_one": "Trouver les visages dans {{count}} clip",
+    "findMany_many": "Trouver les visages dans {{count}} clips",
+    "findMany_other": "Trouver les visages dans {{count}} clips",
+    "streamNamed": "{{name}} est un flux : il est recadré autour de son centre.",
+    "streamUnnamed": "Un clip est un flux : il est recadré autour de son centre.",
+    "failed": "Le suivi du visage n'a pas marché ici : {{error}}",
+    "moveWindow": "{{name}} : déplacer la fenêtre",
+    "left": "Gauche",
+    "right": "Droite",
+    "up": "Haut",
+    "down": "Bas",
+    "moveX": "Déplacer la fenêtre à gauche ou à droite",
+    "moveY": "Déplacer la fenêtre vers le haut ou le bas",
+    "findAgain": "Retrouver le visage",
+    "reset": "Centre, sans décalage"
+  },
+  "clipFallback": "Clip",
+  "stop": "Arrêter",
+  "render": {
+    "heading": "Rendre en",
+    "shortsLimit": "Les Shorts durent au maximum {{limit}} : coupez la chronologie pour en rendre un en 9:16.",
+    "button_one": "Rendre {{count}} vidéo",
+    "button_many": "Rendre {{count}} vidéos",
+    "button_other": "Rendre {{count}} vidéos",
+    "failed": "Échec du rendu : {{error}}",
+    "download": "Télécharger",
+    "postShort": "Publier en Short",
+    "postVideo": "Publier en vidéo"
+  },
+  "job": {
+    "waiting": "En attente...",
+    "preparing": "Préparation des fichiers...",
+    "starting": "Démarrage...",
+    "rendering": "Rendu en cours...",
+    "done": "Terminé",
+    "stopped": "Arrêté",
+    "busy": "Les serveurs de rendu sont occupés. Nouvel essai dans {{seconds}} s...",
+    "offline": "Pas de connexion au serveur de rendu. Nouvel essai dans {{seconds}} s...",
+    "failed": "Le rendu a échoué"
+  }
+}

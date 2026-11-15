@@ -1,0 +1,64 @@
+{
+  "title": "Naklejki",
+  "search": "Szukaj naklejek",
+  "textBoxes": "Pola tekstowe",
+  "loading": "Wczytywanie naklejek...",
+  "noMatch": "Brak pasujących naklejek.",
+  "tileTitle": "{{name}} (dodaje w miejscu głowicy)",
+  "note": "Naklejki trafiają w miejsce głowicy na 3 sekundy. Przeciągaj, zmieniaj rozmiar lub przycinaj je jak każdy klip; pola tekstowe pozostają edytowalne.",
+  "categories": {
+    "emoji": "Emoji",
+    "badges": "Odznaki",
+    "shapes": "Strzałki i kształty",
+    "branding": "Marka"
+  },
+  "presets": {
+    "caption": {
+      "title": "Podpis",
+      "text": "Twój podpis tutaj"
+    },
+    "highlight": {
+      "title": "Wyróżnienie",
+      "text": "Musisz to zobaczyć!"
+    },
+    "brand": {
+      "title": "Czerwień 3Speak",
+      "text": "Nowy film"
+    },
+    "bubble": {
+      "title": "Dymek",
+      "text": "Cześć!"
+    },
+    "outline": {
+      "title": "Kontur",
+      "text": "Zobacz to"
+    },
+    "neon": {
+      "title": "Neon",
+      "text": "DZIŚ WIECZOREM"
+    },
+    "title": {
+      "title": "Duży tytuł",
+      "text": "WIELKIE WIEŚCI"
+    },
+    "comic": {
+      "title": "Komiks",
+      "text": "BUM!"
+    },
+    "marker": {
+      "title": "Marker",
+      "text": "ręcznie robione"
+    },
+    "quote": {
+      "title": "Cytat",
+      "text": "„Powiedz to dobrze.”"
+    },
+    "tag": {
+      "title": "Hashtag"
+    },
+    "minimal": {
+      "title": "Minimalny",
+      "text": "prosto i czysto"
+    }
+  }
+}

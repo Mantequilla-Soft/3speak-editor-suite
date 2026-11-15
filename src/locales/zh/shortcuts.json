@@ -1,0 +1,53 @@
+{
+  "sheet": {
+    "title": "键盘快捷键"
+  },
+  "groups": {
+    "playback": "播放",
+    "clips": "片段",
+    "project": "项目"
+  },
+  "items": {
+    "playPause": "播放 / 暂停",
+    "playForward": "向前播放；再按一次为 2x、4x、8x",
+    "playBackward": "向后播放；再按一次更快",
+    "stop": "停止",
+    "frameStep": "后退 / 前进一帧（Shift：10 帧）",
+    "nudge": "将播放头移动 0.1 秒（Shift：1 秒）",
+    "fullscreen": "开启 / 关闭全屏",
+    "nextPrevClip": "选择下一个 / 上一个片段",
+    "clipLeftRight": "同一轨道上的上一个 / 下一个片段",
+    "clipUpDown": "上方 / 下方轨道上的片段",
+    "openClip": "打开所选片段的设置",
+    "selectNone": "取消全部选择",
+    "selectAll": "选择所有片段",
+    "remove": "移除所选片段",
+    "split": "在播放头处分割所选片段",
+    "duplicate": "复制所选片段",
+    "ungroup": "取消片段分组",
+    "closeGap": "合拢播放头处的空隙",
+    "addText": "在播放头处添加文字",
+    "undo": "撤销",
+    "redo": "重做",
+    "addFlag": "在播放头处添加标记",
+    "addChapter": "在播放头处添加章节",
+    "zoom": "放大 / 缩小时间线",
+    "showSheet": "显示这些快捷键"
+  },
+  "keys": {
+    "space": "空格",
+    "tab": "Tab",
+    "shift": "Shift",
+    "alt": "Alt",
+    "ctrl": "Ctrl",
+    "enter": "Enter",
+    "esc": "Esc",
+    "delete": "Delete"
+  },
+  "announce": {
+    "selected": "已选择 {{clip}}",
+    "stopped": "已停止",
+    "forward": "向前 {{speed}}x",
+    "backward": "向后 {{speed}}x"
+  }
+}

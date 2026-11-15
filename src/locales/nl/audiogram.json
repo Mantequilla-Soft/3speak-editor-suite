@@ -1,0 +1,184 @@
+{
+  "title": "Audiogrammen",
+  "tour": {
+    "again": "Rondleiding opnieuw tonen",
+    "againLabel": "Rondleiding voor audiogrammen opnieuw tonen"
+  },
+  "saveAndClose": "Opslaan en sluiten",
+  "saveAndCloseTitle": "Je audiogrammen blijven bij deze audio en worden er als Shorts mee geplaatst",
+  "loadError": "De instellingen van de audiogram konden niet worden geladen: {{error}}",
+  "loadingLook": "Je audiogram-look laden…",
+  "start": {
+    "title": "Kies een stuk van de aflevering",
+    "text_one": "Een audiogram is een korte video van een stuk van je aflevering, tot {{count}} minuut. Hij wordt samen met de audio geplaatst als 3Speak-Short. Markeer eerst begin en einde op de tijdlijn.",
+    "text_other": "Een audiogram is een korte video van een stuk van je aflevering, tot {{count}} minuten. Hij wordt samen met de audio geplaatst als 3Speak-Short. Markeer eerst begin en einde op de tijdlijn.",
+    "choose": "Kiezen op de tijdlijn"
+  },
+  "stage": {
+    "label": "Voorbeeld van de audiogram: sleep de onderdelen om ze te verplaatsen, de hoeken om het formaat te wijzigen, de ronde greep om te draaien",
+    "frameTitle": "Voorbeeld van de audiogram",
+    "turned": "{{name}} · {{angle}}°",
+    "rotate": "Draaien (Shift: stappen van 15°). Dubbelklik: recht",
+    "hint": "Sleep de onderdelen, trek aan een hoek voor het formaat (Shift houdt de vorm), aan de ronde greep om te draaien. Pijltoetsen schuiven, [ en ] draaien.",
+    "hintTemplate": "Sleep de onderdelen, trek aan een hoek voor het formaat (Shift houdt de vorm), aan de ronde greep om te draaien. Pijltoetsen schuiven, [ en ] draaien. Je laatste audiogram is het startpunt."
+  },
+  "layer": {
+    "logo": {
+      "name": "3Speak-logo",
+      "drag": "3Speak-logo: sleep om te verplaatsen",
+      "dragSelected": "3Speak-logo: sleep om te verplaatsen, hoeken voor het formaat, ronde greep om te draaien"
+    },
+    "cover": {
+      "name": "Afbeelding",
+      "drag": "Afbeelding: sleep om te verplaatsen",
+      "dragSelected": "Afbeelding: sleep om te verplaatsen, hoeken voor het formaat, ronde greep om te draaien",
+      "hide": "Afbeelding verbergen",
+      "show": "Afbeelding tonen",
+      "forward": "Afbeelding naar voren",
+      "back": "Afbeelding naar achteren"
+    },
+    "title": {
+      "name": "Titel",
+      "drag": "Titel: sleep om te verplaatsen",
+      "dragSelected": "Titel: sleep om te verplaatsen, hoeken voor het formaat, ronde greep om te draaien",
+      "hide": "Titel verbergen",
+      "show": "Titel tonen",
+      "forward": "Titel naar voren",
+      "back": "Titel naar achteren"
+    },
+    "line": {
+      "name": "Regel",
+      "drag": "Regel: sleep om te verplaatsen",
+      "dragSelected": "Regel: sleep om te verplaatsen, hoeken voor het formaat, ronde greep om te draaien",
+      "hide": "Regel verbergen",
+      "show": "Regel tonen",
+      "forward": "Regel naar voren",
+      "back": "Regel naar achteren"
+    },
+    "wave": {
+      "name": "Golfvorm",
+      "drag": "Golfvorm: sleep om te verplaatsen",
+      "dragSelected": "Golfvorm: sleep om te verplaatsen, hoeken voor het formaat, ronde greep om te draaien",
+      "hide": "Golfvorm verbergen",
+      "show": "Golfvorm tonen",
+      "forward": "Golfvorm naar voren",
+      "back": "Golfvorm naar achteren"
+    }
+  },
+  "piece": {
+    "label": "Stuk van de aflevering",
+    "range": "{{from}} – {{to}} · {{seconds}}s",
+    "inChapter": "in “{{title}}”",
+    "change": "Stuk wijzigen"
+  },
+  "look": {
+    "title": "Titel",
+    "titleLabel": "Titel in de video",
+    "line": "Regel eronder <small>(*sterretjes* maken het rood)</small>",
+    "lineLabel": "Regel in de video",
+    "branding": "3Speak-branding",
+    "logoGroup": "Logo",
+    "picture": "Afbeelding",
+    "waveform": "Golfvorm",
+    "waveType": "Soort golfvorm",
+    "waveColour": "Kleur van de golfvorm",
+    "colour": "Kleur {{colour}}",
+    "anyColour": "Elke kleur",
+    "anyWaveColour": "Elke kleur voor de golfvorm"
+  },
+  "logo": {
+    "mark": "3S-logo",
+    "full": "3Speak-logo"
+  },
+  "wave": {
+    "bars": "Balken",
+    "centered": "Gecentreerd",
+    "line": "Lijn",
+    "dots": "Dun",
+    "circle": "Cirkel",
+    "ring": "Cirkelgolf"
+  },
+  "picture": {
+    "upload": "Afbeelding uploaden",
+    "yours": "Jouw afbeelding",
+    "coverOf": "Cover van “{{title}}”",
+    "playlistCover": "Playlistcover",
+    "noCovers": "Je playlists hebben nog geen covers.",
+    "signIn": "Log in op 3Speak om een afbeelding toe te voegen."
+  },
+  "parts": {
+    "title": "Onderdelen <small>(van voor naar achter)</small>",
+    "logoLocked": "Het 3Speak-logo wordt altijd getoond, vooraan, en nooit kleiner dan een vaste grootte",
+    "alwaysShown": "Altijd zichtbaar",
+    "hide": "Verbergen",
+    "show": "Tonen",
+    "forward": "Naar voren",
+    "back": "Naar achteren",
+    "tidy": "Netjes schikken"
+  },
+  "make": {
+    "starting": "Starten...",
+    "working": "Bezig...",
+    "noWords": "de woorden van dit stuk zijn niet gevonden (zet de ondertitels uit om hem zonder te maken)",
+    "failedPlain": "mislukt",
+    "signIn": "Log in op 3Speak om een audiogram te maken.",
+    "failed": "De audiogram kon niet worden gemaakt: {{error}}",
+    "make": "Audiogram maken",
+    "another": "Nog een audiogram maken"
+  },
+  "made": {
+    "title": "Je audiogrammen",
+    "hint": "Ze worden samen met de audio geplaatst als 3Speak-Shorts, elk met een link naar de post, snap of reactie van de audio.",
+    "fallbackTitle": "Audiogram {{n}}",
+    "length": "{{at}} · {{seconds}}s",
+    "textPlaceholder": "Tekst bij de Short (optioneel). Een link naar de audio wordt automatisch toegevoegd.",
+    "textLabel": "Tekst bij Short {{n}}",
+    "editText": "Tekst bewerken",
+    "writeText": "Tekst schrijven",
+    "download": "Downloaden",
+    "removeLabel": "Audiogram {{n}} verwijderen"
+  },
+  "confirm": {
+    "title": "Sluiten zonder hem te maken?",
+    "text": "Je wijzigingen aan de look zitten nog in geen enkele audiogram. Ze gaan verloren als je sluit.",
+    "stays_one": "De audiogram die je hebt gemaakt blijft bij deze audio.",
+    "stays_other": "De {{count}} audiogrammen die je hebt gemaakt blijven bij deze audio.",
+    "keep": "Verder bewerken"
+  },
+  "captions": {
+    "label": "Ondertitels",
+    "drag": "Ondertitels: sleep om te verplaatsen",
+    "dragSelected": "Ondertitels: sleep om te verplaatsen, trek aan een zijkant om de breedte te wijzigen",
+    "sample": "Je woorden verschijnen hier terwijl ze worden uitgesproken",
+    "show": "Toon wat er wordt gezegd, woord voor woord",
+    "checking": "Server controleren...",
+    "unavailable": "Ondertitels zijn nu niet beschikbaar op deze editorserver.",
+    "listening": "Luisteren...",
+    "getWords": "Woorden ophalen",
+    "wordCount_one": "{{count}} woord in dit stuk.",
+    "wordCount_other": "{{count}} woorden in dit stuk.",
+    "noSpeech": "Geen spraak gevonden in dit stuk.",
+    "fix": "Woorden corrigeren",
+    "doneFixing": "Klaar met corrigeren",
+    "word": "Woord {{n}}",
+    "removeWord": "Dit woord verwijderen",
+    "removeWordLabel": "{{word}} verwijderen",
+    "style": "Stijl van de ondertitels",
+    "preset": {
+      "karaoke": "Karaoke",
+      "pop": "Pop",
+      "plain": "Ondertitels"
+    },
+    "wordsAtATime": "Woorden tegelijk",
+    "perPage_one": "{{count}} woord tegelijk",
+    "perPage_other": "{{count}} woorden tegelijk",
+    "font": "Lettertype van de ondertitels",
+    "size": "Grootte van de ondertitels",
+    "textColour": "Tekstkleur van de ondertitels",
+    "textColourSwatch": "Tekstkleur {{colour}}",
+    "highlightColour": "Markeerkleur",
+    "highlight": "Markeren",
+    "highlightSwatch": "Markering {{colour}}",
+    "capitals": "Hoofdletters"
+  }
+}

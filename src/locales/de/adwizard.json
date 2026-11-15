@@ -1,0 +1,240 @@
+{
+  "title": "Ad Wizard",
+  "beta": "Beta",
+  "loading": "Szenen-Engine wird geladen…",
+  "untitled": "Werbung ohne Titel",
+  "seconds": "{{s}} s",
+  "lengthOfMax": "{{length}} s / max. {{max}} s",
+  "maxOnly": "/ max. {{max}} s",
+  "steps": {
+    "format": "Format",
+    "brand": "Marke",
+    "scenes": "Szenen",
+    "sound": "Ton",
+    "render": "Rendern"
+  },
+  "formats": {
+    "landscape": "Querformat 16:9",
+    "landscapeSub": "Spots im Video, Websites",
+    "portrait": "Hochformat 9:16",
+    "portraitSub": "Shorts, Storys, Reels"
+  },
+  "palettes": {
+    "ember": "Glut",
+    "amber": "Bernstein",
+    "ocean": "Ozean",
+    "forest": "Wald",
+    "berry": "Beere",
+    "paper": "Papier"
+  },
+  "roles": {
+    "all": "Alle",
+    "opener": "Einstiege",
+    "middle": "Mitte",
+    "closer": "Abschlüsse"
+  },
+  "defaults": {
+    "brandName": "Deine Marke",
+    "brandFallback": "Marke",
+    "adName": "Anzeige"
+  },
+  "errors": {
+    "engineLoad": "{{src}} konnte nicht geladen werden",
+    "uploadFailedStatus": "Upload fehlgeschlagen ({{status}})",
+    "uploadFailed": "Upload fehlgeschlagen",
+    "notSignedIn": "nicht angemeldet",
+    "drafts": "Entwürfe {{status}}"
+  },
+  "stage": {
+    "empty": "Hier erscheint deine Werbung.",
+    "addFirst": "Erste Szene hinzufügen",
+    "toStart": "Zurück zum Anfang",
+    "playPause": "Abspielen / Pause (Leertaste)",
+    "time": "{{time}} / {{duration}} s",
+    "tooLong": "Die Werbung darf höchstens {{max}} s lang sein",
+    "properties": "Eigenschaften",
+    "propertiesHint": "Wähle eine Szene in der Liste oder in der Zeitleiste, um sie hier zu bearbeiten."
+  },
+  "drafts": {
+    "logInToKeep": "Melde dich bei 3Speak an, um Entwürfe zu behalten",
+    "inBrowser": "Entwürfe bleiben in diesem Browser",
+    "signingIn": "Anmeldung läuft…",
+    "saveDrafts": "Entwürfe speichern",
+    "status": {
+      "saving": "Wird gespeichert…",
+      "saved": "Gespeichert",
+      "error": "Nicht gespeichert",
+      "limit": "Entwurfslimit erreicht",
+      "idle": "Entwurf"
+    },
+    "open": "Entwürfe",
+    "title": "Deine Entwürfe",
+    "listInfo_one": "{{n}} von {{max}} · jeder bleibt {{count}} Tag nach der letzten Änderung",
+    "listInfo_other": "{{n}} von {{max}} · jeder bleibt {{count}} Tage nach der letzten Änderung",
+    "draftInfo_one": "{{count}} Szene · gespeichert {{saved}} · bis {{until}}",
+    "draftInfo_other": "{{count}} Szenen · gespeichert {{saved}} · bis {{until}}",
+    "isOpen": "geöffnet",
+    "openDraft": "Öffnen",
+    "confirmDelete": "„{{name}}“ löschen?",
+    "empty": "Noch keine Entwürfe. Sie speichern sich von selbst, während du arbeitest.",
+    "newAd": "Neue Werbung",
+    "limitTitle_one": "Du hast schon {{count}} Entwurf",
+    "limitTitle_other": "Du hast schon {{count}} Entwürfe",
+    "limitHint": "Wähle einen, der durch diese Werbung ersetzt wird, oder schließ das hier und arbeite ohne Speichern weiter.",
+    "savedAt": "gespeichert {{date}}",
+    "replace": "Ersetzen"
+  },
+  "format": {
+    "locked": "Deine Buchung läuft als <b>{{format}}</b>, bis zu {{max}} s.",
+    "where": "Wo soll die Werbung laufen? Du kannst später wechseln, jede Szene funktioniert in beiden.",
+    "sceneChange": "Szenenwechsel",
+    "tip": "Gut lesbare Werbung: etwa 3 s pro Szene, insgesamt 15-30 s, die erste Zeile in der ersten Sekunde lesbar.",
+    "confirmNew": "Neue Werbung beginnen? Deine gespeicherten Entwürfe bleiben."
+  },
+  "brand": {
+    "name": "Name",
+    "logo": "Logo",
+    "logoHint": "quadratisch klappt am besten, ohne Logo wird der erste Buchstabe verwendet",
+    "monogram": "Monogramm",
+    "monogramHint": "Buchstabe(n), die ohne Logo verwendet werden",
+    "colours": "Farben",
+    "colors": {
+      "bg": "Hintergrund",
+      "ink": "Text",
+      "mute": "Dezenter Text",
+      "accent": "Akzent",
+      "accent2": "Akzent 2",
+      "accent3": "Akzent 3"
+    },
+    "coloursTip": "Nutze den Akzent für Hervorhebungen (*Sternchen* im Text). Call-to-Action-Buttons werden als Umrisse gezeichnet.",
+    "fonts": "Schriften",
+    "headlines": "Überschriften",
+    "text": "Text",
+    "ownFont": "Deine eigene Schriftdatei",
+    "fontNamePlaceholder": "Name der Schrift, z. B. Acme Display",
+    "fontRights": "Ich habe das Recht, diese Schrift in Videos zu verwenden",
+    "uploading": "Wird hochgeladen…",
+    "uploadFont": "TTF / OTF / WOFF hochladen"
+  },
+  "scenes": {
+    "duplicate": "Duplizieren",
+    "add": "Szene hinzufügen",
+    "tip": "Text, Bilder und Länge der gewählten Szene findest du rechts."
+  },
+  "sound": {
+    "music": "Musik",
+    "startInSong": "Startpunkt im Song",
+    "volume": "Lautstärke",
+    "fadeIn": "Einblenden",
+    "fadeOut": "Ausblenden",
+    "noMusic": "Noch keine Musik.",
+    "library": "Musikbibliothek",
+    "uploading": "Wird hochgeladen…",
+    "uploadSong": "Song hochladen",
+    "songRights": "Der Song, den ich hochlade, gehört mir oder ist lizenziert",
+    "effects": "Soundeffekte",
+    "auto": "Automatische Sounds (Szenenwechsel, auftauchende Wörter)",
+    "autoLevel": "Pegel der automatischen Sounds",
+    "db": "{{gain}} dB",
+    "restore_one": "{{count}} entfernten automatischen Sound wiederherstellen",
+    "restore_other": "{{count}} entfernte automatische Sounds wiederherstellen",
+    "addAt": "Sound bei {{time}} s hinzufügen",
+    "listen": "Anhören",
+    "autoTag": "auto",
+    "tip": "Zieh Sounds in der Zeitleiste, um sie zu verschieben. Ein verschobener automatischer Sound gehört dann dir.",
+    "kinds": {
+      "trans": "Übergang",
+      "whoosh": "Wusch",
+      "swish": "Zisch",
+      "tick": "Ticken",
+      "click": "Klick",
+      "type": "Tippen",
+      "hit": "Schlag"
+    }
+  },
+  "render": {
+    "drawing": "Szenen werden gezeichnet…",
+    "mixing": "Ton wird gemischt…",
+    "sceneRenderFailed": "Szenen-Render: {{status}}",
+    "renderFailed": "Render: {{status}}",
+    "scenesLength_one": "{{count}} Szene, {{length}} s",
+    "scenesLength_other": "{{count}} Szenen, {{length}} s",
+    "scenesLengthTooLong_one": "{{count}} Szene, {{length}} s (zu lang, max. {{max}} s)",
+    "scenesLengthTooLong_other": "{{count}} Szenen, {{length}} s (zu lang, max. {{max}} s)",
+    "toFill_one": "{{count}} Feld auszufüllen",
+    "toFill_other": "{{count}} Felder auszufüllen",
+    "allFilled": "Alle Pflichtfelder ausgefüllt",
+    "music": "Musik: {{title}}",
+    "noMusic": "Keine Musik (optional)",
+    "effects_one": "{{count}} Soundeffekt",
+    "effects_other": "{{count}} Soundeffekte",
+    "issue": "Szene {{n}}, {{field}}: {{msg}}",
+    "button": "Werbung rendern ({{size}})",
+    "progress": "{{phase}} {{percent}}",
+    "sent": "An deine Kampagne gesendet",
+    "useForCampaign": "Für meine Kampagne verwenden",
+    "download": "Herunterladen",
+    "again": "Erneut rendern"
+  },
+  "props": {
+    "length": "Länge",
+    "fieldIssue": "{{field}}: {{msg}}",
+    "soundEffect": "Soundeffekt",
+    "autoNote": "{{name}} (automatisch: verschieb oder ändere ihn, damit er dir gehört)",
+    "makeMine": "Übernehmen",
+    "at": "Bei",
+    "secondsUnit": "s",
+    "volume": "Lautstärke"
+  },
+  "picker": {
+    "search": "Suchen",
+    "look": "Stil",
+    "all": "Alle",
+    "nothing": "Keine Treffer."
+  },
+  "fields": {
+    "optional": "optional",
+    "auto": "auto",
+    "none": "(keine)",
+    "defaultIcon": "Standard ({{icon}})",
+    "clear": "Leeren",
+    "accentTip": "Setz ein Wort in *Sternchen* für die Akzentfarbe, in _Unterstriche_ für den zweiten Akzent.",
+    "up": "Hoch",
+    "moveUp": "Nach oben",
+    "moveDown": "Nach unten",
+    "add": "Hinzufügen",
+    "needsAtLeast": "braucht mindestens {{min}}",
+    "needs": "braucht {{min}}",
+    "pairX": "x %",
+    "pairY": "y %"
+  },
+  "image": {
+    "notPicture": "Das ist kein Bild.",
+    "noClipboardPicture": "Kein Bild in der Zwischenablage. Kopier eins oder drück hier Strg+V / Cmd+V.",
+    "clipboardBlocked": "Der Browser hat das Lesen der Zwischenablage nicht erlaubt. Klick hier und drück Strg+V / Cmd+V.",
+    "dragToPlace": "Ziehen, um den sichtbaren Bildausschnitt zu wählen",
+    "zoom": "Zoom",
+    "zoomTitle": "Zoomt ins Bild innerhalb seines Rahmens, der Rahmen behält seine Größe",
+    "zoomValue": "{{zoom}}x",
+    "resetPlacement": "Position zurücksetzen",
+    "replace": "Ersetzen",
+    "pasteTitle": "Aus der Zwischenablage einfügen",
+    "uploadingPct": "Wird hochgeladen {{pct}} %",
+    "upload": "Hochladen",
+    "paste": "Einfügen",
+    "linkPlaceholder": "oder einen https://-Link oder ein Bild einfügen (Strg+V)"
+  },
+  "timeline": {
+    "tick": "{{s}} s",
+    "scenes": "Szenen",
+    "blockTitle": "{{type}}: {{length}} s",
+    "dragLength": "Ziehen, um die Länge zu ändern",
+    "music": "Musik",
+    "musicVolume": "{{title}} · {{volume}}",
+    "effects": "Soundeffekte",
+    "sfxTitle": "{{name}} bei {{at}} s"
+  },
+  "preview": {
+    "frameTitle": "Werbevorschau"
+  }
+}

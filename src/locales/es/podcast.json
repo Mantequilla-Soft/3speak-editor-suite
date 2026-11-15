@@ -1,0 +1,86 @@
+{
+  "video": {
+    "title": "Videopodcast",
+    "intro": "El episodio completo ({{length}}) como video 16:9: la imagen, una forma de onda en movimiento, subtítulos y quién habla. Para videopodcasts en 3Speak, YouTube y Spotify.",
+    "unavailable": "Este servidor del editor aún no puede crear videopodcasts.",
+    "tooLong": "Los videopodcasts pueden durar hasta {{length}}.",
+    "preview": "Vista previa del videopodcast",
+    "sampleCaption": "<b>Tus</b> palabras aparecen aquí",
+    "stageHint": "La forma de onda se mueve con el sonido; los subtítulos y el nombre siguen el episodio.",
+    "defaultLine": "Mira y escucha en *3speak.tv*",
+    "captions": "Subtítulos",
+    "captionsTranscript": "Las palabras de tu transcripción.",
+    "captionsNoStt": "La conversión de voz a texto no está disponible en este servidor.",
+    "captionsStt": "Las palabras, detectadas por voz a texto en el servidor. Los episodios largos tardan un rato.",
+    "whoSpeaks": "Quién habla",
+    "noVoices": "No hay pista de voz de la que tomar nombres.",
+    "speaker": "Hablante {{n}}",
+    "speakerLabel": "Nombre para la pista de voz {{n}}",
+    "loudest": "Cada voz en su propia pista: se muestra el nombre de la que suena más fuerte.",
+    "frameRate": "Fotogramas por segundo",
+    "fps15": "15 fps (más ligero, más rápido)",
+    "fps24": "24 fps (más fluido)",
+    "finding": "Detectando quién habla y cuándo...",
+    "sending": "Enviando...",
+    "working": "Procesando...",
+    "serverAnswered": "El servidor respondió {{status}}",
+    "lost": "Se perdió la tarea (¿se reinició el servidor?)",
+    "stopped": "Detenido",
+    "signIn": "Inicia sesión en 3Speak para crear un videopodcast.",
+    "failed": "No se pudo crear el videopodcast: {{error}}",
+    "stop": "Detener",
+    "make": "Crear videopodcast",
+    "again": "Crearlo otra vez",
+    "download": "Descargar MP4",
+    "subtitles": "Subtítulos (SRT)",
+    "post": "Publicar en 3Speak como video"
+  },
+  "template": {
+    "title": "Tu plantilla",
+    "signedOutIntro": "Guarda tu intro, outro y música de fondo una vez, y cada grabación nueva los recibe con un clic. Tu plantilla se guarda para siempre, por eso necesita que inicies sesión en 3Speak.",
+    "signIn": "Inicia sesión para usar una plantilla",
+    "logIn": "Inicia sesión en 3Speak para usar una plantilla.",
+    "intro": "Una plantilla, guardada para siempre. Al guardar reemplazas la que tenías.",
+    "role": {
+      "intro": {
+        "title": "Intro",
+        "hint": "Suena primero, antes de tu grabación.",
+        "clear": "Sin intro"
+      },
+      "outro": {
+        "title": "Outro",
+        "hint": "Suena justo después de que termine tu grabación.",
+        "clear": "Sin outro"
+      },
+      "bed": {
+        "title": "Música de fondo",
+        "hint": "Música suave bajo toda la grabación, en bucle para que encaje y con fundido al final.",
+        "clear": "Sin música de fondo"
+      }
+    },
+    "useSelected": "Usar \"{{name}}\" (la parte a la que lo recortaste)",
+    "selectFirst": "Primero selecciona un clip de audio subido en la línea de tiempo",
+    "selectedClip": "Clip seleccionado",
+    "file": "Archivo",
+    "volume": "Volumen",
+    "bedVolume": "Volumen de la música de fondo",
+    "loop": "Repetir en bucle para llenar toda la grabación",
+    "cutSilences": "Cortar los silencios de cada grabación nueva <small>(con tus ajustes de Cortar silencios)</small>",
+    "loudness": "Normalizar el volumen para podcasts <small>(-16 LUFS, se aplica al exportar)</small>",
+    "duck": "Bajar la música mientras alguien habla <small>({{db}} dB en la música de fondo; cámbialo en los ajustes del clip)</small>",
+    "autoApply": "Aplicarla sola cuando abro una grabación",
+    "signInUpload": "Inicia sesión en 3Speak para subir.",
+    "uploadFailed": "No se pudo subir ese archivo. Prueba con otro.",
+    "deleteForGood": "Eliminarla para siempre",
+    "delete": "Eliminar plantilla",
+    "saveApply": "Guardar y aplicar",
+    "voiceTrack": "Voz",
+    "bedTrack": "Música de fondo"
+  },
+  "stage": {
+    "empty": "Añade una grabación, graba una o elige música para empezar.",
+    "chapter": "Capítulo",
+    "position": "Posición en el programa",
+    "positionText": "{{at}} de {{total}}"
+  }
+}

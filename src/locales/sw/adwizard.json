@@ -1,0 +1,240 @@
+{
+  "title": "Msaidizi wa Matangazo",
+  "beta": "beta",
+  "loading": "Inapakia injini ya maonyesho…",
+  "untitled": "Tangazo lisilo na jina",
+  "seconds": "sek {{s}}",
+  "lengthOfMax": "sek {{length}} / upeo sek {{max}}",
+  "maxOnly": "/ upeo sek {{max}}",
+  "steps": {
+    "format": "Muundo",
+    "brand": "Chapa",
+    "scenes": "Maonyesho",
+    "sound": "Sauti",
+    "render": "Tengeneza"
+  },
+  "formats": {
+    "landscape": "Mlalo 16:9",
+    "landscapeSub": "matangazo ndani ya video, tovuti",
+    "portrait": "Wima 9:16",
+    "portraitSub": "Shorts, hadithi, reels"
+  },
+  "palettes": {
+    "ember": "Kaa la moto",
+    "amber": "Kahawia",
+    "ocean": "Bahari",
+    "forest": "Msitu",
+    "berry": "Beri",
+    "paper": "Karatasi"
+  },
+  "roles": {
+    "all": "Zote",
+    "opener": "Ya kufungua",
+    "middle": "Ya katikati",
+    "closer": "Ya kufunga"
+  },
+  "defaults": {
+    "brandName": "Chapa yako",
+    "brandFallback": "Chapa",
+    "adName": "Tangazo"
+  },
+  "errors": {
+    "engineLoad": "imeshindwa kupakia {{src}}",
+    "uploadFailedStatus": "upakiaji umeshindwa ({{status}})",
+    "uploadFailed": "upakiaji umeshindwa",
+    "notSignedIn": "hujaingia",
+    "drafts": "rasimu {{status}}"
+  },
+  "stage": {
+    "empty": "Tangazo lako linaonekana hapa.",
+    "addFirst": "Ongeza onyesho la kwanza",
+    "toStart": "Rudi mwanzo",
+    "playPause": "Cheza / sitisha (nafasi)",
+    "time": "sek {{time}} / {{duration}}",
+    "tooLong": "Tangazo linaweza kuwa na upeo wa sek {{max}}",
+    "properties": "Sifa",
+    "propertiesHint": "Chagua onyesho kwenye orodha au kwenye mfuatano wa muda ili ulihariri hapa."
+  },
+  "drafts": {
+    "logInToKeep": "Ingia kwenye 3Speak ili kuhifadhi rasimu",
+    "inBrowser": "Rasimu zinabaki kwenye kivinjari hiki",
+    "signingIn": "Inaingia…",
+    "saveDrafts": "Hifadhi rasimu",
+    "status": {
+      "saving": "Inahifadhi…",
+      "saved": "Imehifadhiwa",
+      "error": "Haijahifadhiwa",
+      "limit": "Kikomo cha rasimu kimefikiwa",
+      "idle": "Rasimu"
+    },
+    "open": "Rasimu",
+    "title": "Rasimu zako",
+    "listInfo_one": "{{n}} kati ya {{max}} · kila moja inahifadhiwa siku {{count}} baada ya mabadiliko yake ya mwisho",
+    "listInfo_other": "{{n}} kati ya {{max}} · kila moja inahifadhiwa siku {{count}} baada ya mabadiliko yake ya mwisho",
+    "draftInfo_one": "onyesho {{count}} · imehifadhiwa {{saved}} · hadi {{until}}",
+    "draftInfo_other": "maonyesho {{count}} · imehifadhiwa {{saved}} · hadi {{until}}",
+    "isOpen": "imefunguliwa",
+    "openDraft": "Fungua",
+    "confirmDelete": "Futa \"{{name}}\"?",
+    "empty": "Bado hakuna rasimu. Zinajihifadhi zenyewe unapofanya kazi.",
+    "newAd": "Tangazo jipya",
+    "limitTitle_one": "Tayari una rasimu {{count}}",
+    "limitTitle_other": "Tayari una rasimu {{count}}",
+    "limitHint": "Chagua moja ya kubadilisha na tangazo hili, au funga hili na uendelee kufanya kazi bila kuhifadhi.",
+    "savedAt": "imehifadhiwa {{date}}",
+    "replace": "Badilisha"
+  },
+  "format": {
+    "locked": "Nafasi uliyoweka inaonyeshwa kama <b>{{format}}</b>, hadi sek {{max}}.",
+    "where": "Tangazo litaonyeshwa wapi? Unaweza kubadilisha baadaye; kila onyesho linafanya kazi kwa yote mawili.",
+    "sceneChange": "Kubadilisha onyesho",
+    "tip": "Matangazo yanayosomeka: takriban sek 3 kwa kila onyesho, sek 15-30 kwa jumla, mstari wa kwanza usomeke ndani ya sekunde ya kwanza.",
+    "confirmNew": "Anza tangazo jipya? Rasimu zako zilizohifadhiwa zinabaki."
+  },
+  "brand": {
+    "name": "Jina",
+    "logo": "Nembo",
+    "logoHint": "mraba unafaa zaidi; bila nembo herufi ya kwanza inatumika",
+    "monogram": "Herufi za kwanza",
+    "monogramHint": "herufi zinazotumika wakati hakuna nembo",
+    "colours": "Rangi",
+    "colors": {
+      "bg": "Mandharinyuma",
+      "ink": "Maandishi",
+      "mute": "Maandishi hafifu",
+      "accent": "Rangi ya msisitizo",
+      "accent2": "Rangi ya msisitizo 2",
+      "accent3": "Rangi ya msisitizo 3"
+    },
+    "coloursTip": "Tumia rangi ya msisitizo kwa kuangazia (*nyota* kwenye maandishi). Vitufe vya wito wa kuchukua hatua huchorwa kwa mstari wa nje.",
+    "fonts": "Fonti",
+    "headlines": "Vichwa vikuu",
+    "text": "Maandishi",
+    "ownFont": "Faili lako la fonti",
+    "fontNamePlaceholder": "Jina la fonti, k.m. Acme Display",
+    "fontRights": "Nina haki ya kutumia fonti hii kwenye video",
+    "uploading": "Inapakia…",
+    "uploadFont": "Pakia TTF / OTF / WOFF"
+  },
+  "scenes": {
+    "duplicate": "Nakili",
+    "add": "Ongeza onyesho",
+    "tip": "Maandishi, picha na urefu wa onyesho lililochaguliwa viko upande wa kulia."
+  },
+  "sound": {
+    "music": "Muziki",
+    "startInSong": "Mahali pa kuanzia kwenye wimbo",
+    "volume": "Kiwango cha sauti",
+    "fadeIn": "Fifia kuingia",
+    "fadeOut": "Fifia kutoka",
+    "noMusic": "Bado hakuna muziki.",
+    "library": "Maktaba ya muziki",
+    "uploading": "Inapakia…",
+    "uploadSong": "Pakia wimbo",
+    "songRights": "Ninamiliki au nina leseni ya wimbo ninaoupakia",
+    "effects": "Madoido ya sauti",
+    "auto": "Sauti za otomatiki (kubadilisha maonyesho, maneno yanayojitokeza)",
+    "autoLevel": "Kiwango cha sauti za otomatiki",
+    "db": "{{gain}} dB",
+    "restore_one": "Rejesha sauti {{count}} ya otomatiki iliyoondolewa",
+    "restore_other": "Rejesha sauti {{count}} za otomatiki zilizoondolewa",
+    "addAt": "Ongeza sauti kwenye sek {{time}}",
+    "listen": "Sikiliza",
+    "autoTag": "otomatiki",
+    "tip": "Buruta sauti kwenye mfuatano wa muda ili kuzisogeza. Kusogeza sauti ya otomatiki kunaifanya kuwa yako.",
+    "kinds": {
+      "trans": "Mpito",
+      "whoosh": "Mvumo",
+      "swish": "Mpepeo",
+      "tick": "Tiki",
+      "click": "Kubofya",
+      "type": "Kuandika",
+      "hit": "Pigo"
+    }
+  },
+  "render": {
+    "drawing": "Inachora maonyesho…",
+    "mixing": "Inachanganya sauti…",
+    "sceneRenderFailed": "utengenezaji wa onyesho: {{status}}",
+    "renderFailed": "utengenezaji: {{status}}",
+    "scenesLength_one": "onyesho {{count}}, sek {{length}}",
+    "scenesLength_other": "maonyesho {{count}}, sek {{length}}",
+    "scenesLengthTooLong_one": "onyesho {{count}}, sek {{length}} (ni refu mno, upeo sek {{max}})",
+    "scenesLengthTooLong_other": "maonyesho {{count}}, sek {{length}} (ni refu mno, upeo sek {{max}})",
+    "toFill_one": "kitu {{count}} cha kujaza",
+    "toFill_other": "vitu {{count}} vya kujaza",
+    "allFilled": "Sehemu zote zinazohitajika zimejazwa",
+    "music": "Muziki: {{title}}",
+    "noMusic": "Hakuna muziki (si lazima)",
+    "effects_one": "doido {{count}} la sauti",
+    "effects_other": "madoido {{count}} ya sauti",
+    "issue": "Onyesho {{n}}, {{field}}: {{msg}}",
+    "button": "Tengeneza tangazo ({{size}})",
+    "progress": "{{phase}} {{percent}}",
+    "sent": "Imetumwa kwenye kampeni yako",
+    "useForCampaign": "Tumia kwa kampeni yangu",
+    "download": "Pakua",
+    "again": "Tengeneza tena"
+  },
+  "props": {
+    "length": "Urefu",
+    "fieldIssue": "{{field}}: {{msg}}",
+    "soundEffect": "Doido la sauti",
+    "autoNote": "{{name}} (otomatiki: isogeze au ibadilishe ili iwe yako)",
+    "makeMine": "Ifanye yangu",
+    "at": "Kwenye",
+    "secondsUnit": "sek",
+    "volume": "Kiwango cha sauti"
+  },
+  "picker": {
+    "search": "Tafuta",
+    "look": "Mwonekano",
+    "all": "Zote",
+    "nothing": "Hakuna kinacholingana."
+  },
+  "fields": {
+    "optional": "si lazima",
+    "auto": "otomatiki",
+    "none": "(hakuna)",
+    "defaultIcon": "chaguo-msingi ({{icon}})",
+    "clear": "Futa",
+    "accentTip": "Zungushia neno *nyota* kwa rangi ya msisitizo, _mistari ya chini_ kwa rangi ya pili ya msisitizo.",
+    "up": "Juu",
+    "moveUp": "Sogeza juu",
+    "moveDown": "Sogeza chini",
+    "add": "Ongeza",
+    "needsAtLeast": "inahitaji angalau {{min}}",
+    "needs": "inahitaji {{min}}",
+    "pairX": "x %",
+    "pairY": "y %"
+  },
+  "image": {
+    "notPicture": "Hiyo si picha.",
+    "noClipboardPicture": "Hakuna picha kwenye ubao wa kunakili. Nakili moja, au bonyeza Ctrl+V / Cmd+V hapa.",
+    "clipboardBlocked": "Kivinjari hakikuruhusu kusoma ubao wa kunakili. Bofya hapa na ubonyeze Ctrl+V / Cmd+V.",
+    "dragToPlace": "Buruta ili kuchagua sehemu ya picha inayoonekana",
+    "zoom": "Kuza",
+    "zoomTitle": "Inakuza picha ndani ya fremu yake; fremu inabaki na ukubwa wake",
+    "zoomValue": "{{zoom}}x",
+    "resetPlacement": "Weka upya mahali",
+    "replace": "Badilisha",
+    "pasteTitle": "Bandika kutoka ubao wa kunakili",
+    "uploadingPct": "Inapakia {{pct}}%",
+    "upload": "Pakia",
+    "paste": "Bandika",
+    "linkPlaceholder": "au bandika kiungo cha https://, au picha (Ctrl+V)"
+  },
+  "timeline": {
+    "tick": "sek {{s}}",
+    "scenes": "Maonyesho",
+    "blockTitle": "{{type}}: sek {{length}}",
+    "dragLength": "Buruta ili kubadilisha urefu",
+    "music": "Muziki",
+    "musicVolume": "{{title}} · {{volume}}",
+    "effects": "Madoido ya sauti",
+    "sfxTitle": "{{name}} kwenye sek {{at}}"
+  },
+  "preview": {
+    "frameTitle": "Onyesho la awali la tangazo"
+  }
+}

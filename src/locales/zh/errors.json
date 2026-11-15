@@ -1,0 +1,28 @@
+{
+  "render": {
+    "unreachable": "无法连接渲染服务器。请检查网络连接后重新渲染。",
+    "stillBusy": "渲染服务器仍然繁忙。请过几分钟再渲染。",
+    "unknownJob": "渲染服务器已找不到这次渲染（可能已重启）。请重新渲染。",
+    "lostContact": "与渲染服务器失去联系。请重新渲染。",
+    "serverStatus": "服务器返回 {{status}}"
+  },
+  "uploadFailed": "上传失败：{{status}}",
+  "signIn": {
+    "loggedOut": "请先登录 3Speak 再使用编辑器。",
+    "failed": "请登录 3Speak 以上传和渲染（登录已取消或未成功）。"
+  },
+  "export": {
+    "failed": "导出失败",
+    "ffmpegNotLoaded": "FFmpeg 未加载",
+    "noClips": "没有可导出的片段",
+    "noCodec": "没有找到 MediaRecorder 支持的视频编码",
+    "cancelled": "导出已取消",
+    "noSource": "片段没有有效的文件来源：{{name}}",
+    "ffmpegFailed": "FFmpeg 命令执行失败，退出代码 {{code}}"
+  },
+  "reverse": {
+    "failed": "倒放处理失败",
+    "timedOut": "倒放处理超时",
+    "statusCheck": "状态检查失败：{{status}}"
+  }
+}

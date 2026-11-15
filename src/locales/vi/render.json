@@ -1,0 +1,83 @@
+{
+  "button": {
+    "rendering": "Đang kết xuất...",
+    "exporting": "Đang xuất...",
+    "uploading": "Đang tải lên {{percent}}",
+    "reRender": "Kết xuất lại",
+    "exportAgain": "Xuất lại",
+    "trimToRender": "Cắt gọt dòng thời gian còn {{limit}} hoặc ngắn hơn để kết xuất",
+    "trimToExport": "Cắt gọt dòng thời gian còn {{limit}} hoặc ngắn hơn để xuất"
+  },
+  "exportAs": {
+    "button": "Xuất dưới dạng",
+    "title": "Xuất dưới dạng: cùng dự án thành Short, video vuông hoặc video ngang, cắt quanh khuôn mặt",
+    "close": "Đóng Xuất dưới dạng",
+    "waitUpload": "Hãy chờ tải lên xong."
+  },
+  "done": {
+    "download": "Tải xuống",
+    "audiograms": "Audiogram",
+    "audiogramsCount": "Audiogram ({{n}})",
+    "audiogramsTitle": "Video ngắn từ các đoạn của tập, để chia sẻ hoặc đăng thành Shorts cùng với nó",
+    "videoPodcast": "Podcast video",
+    "videoPodcastTitle": "Cả tập dưới dạng video 16:9 với ảnh bìa, dạng sóng, phụ đề và người đang nói",
+    "useAudio": "Dùng âm thanh này",
+    "sendVideo": "Gửi video"
+  },
+  "failed": "Kết xuất thất bại: {{error}}",
+  "phase": {
+    "preparing": "Đang chuẩn bị tệp...",
+    "submitting": "Đang gửi tác vụ kết xuất...",
+    "busyRetry": "Các máy chủ kết xuất đang bận. Thử lại sau {{seconds}} giây...",
+    "offlineRetry": "Không có kết nối tới máy chủ kết xuất. Thử lại sau {{seconds}} giây...",
+    "starting": "Đang bắt đầu...",
+    "reconnecting": "Đang kết nối lại máy chủ kết xuất...",
+    "uploadingFile": "Đang tải lên {{name}} ({{index}}/{{total}})...",
+    "uploadingUnnamed": "Đang tải tệp lên ({{index}}/{{total}})...",
+    "uploadingPlate": "Đang tải lên khung phông nền cho {{name}}...",
+    "uploadingPlateUnnamed": "Đang tải lên khung phông nền cho clip..."
+  },
+  "queue": {
+    "next": "Bạn là người tiếp theo",
+    "inLine": {
+      "one": "Bạn đang ở vị trí thứ {{n}} trong hàng chờ",
+      "two": "Bạn đang ở vị trí thứ {{n}} trong hàng chờ",
+      "few": "Bạn đang ở vị trí thứ {{n}} trong hàng chờ",
+      "other": "Bạn đang ở vị trí thứ {{n}} trong hàng chờ"
+    },
+    "waiting": "Đang chờ một chỗ kết xuất trống..."
+  },
+  "legacy": {
+    "exportVideo": "Xuất video",
+    "cancelTitle": "Hủy xuất",
+    "settingsTitle": "Cài đặt xuất",
+    "uploadingRender": "Đang tải lên {{name}} ({{percent}}). Cứ tiếp tục chỉnh sửa; Kết xuất sẽ mở khi xong.",
+    "uploadingExport": "Đang tải lên {{name}} ({{percent}}). Cứ tiếp tục chỉnh sửa; Xuất sẽ mở khi xong.",
+    "lengthRender": "Dòng thời gian dài {{length}}. Hãy cắt gọt còn {{limit}} hoặc ngắn hơn để kết xuất.",
+    "lengthExport": "Dòng thời gian dài {{length}}. Hãy cắt gọt còn {{limit}} hoặc ngắn hơn để xuất.",
+    "method": "Phương thức xuất",
+    "methodCanvas": "Canvas (thấy sao xuất vậy)",
+    "methodFast": "Nhanh (không hiệu ứng)",
+    "canvasHint": "Ghi lại mọi hiệu ứng hình ảnh đúng như trong bản xem trước",
+    "fastHint": "Xuất nhanh hơn nhưng bỏ qua thu phóng, vị trí, cắt khung, chữ phủ",
+    "quality": "Chất lượng",
+    "qualityHigh": "Cao (tệp lớn hơn)",
+    "qualityMedium": "Trung bình (khuyên dùng)",
+    "qualityLow": "Thấp (tệp nhỏ hơn)",
+    "processing": "Đang xử lý... {{percent}}",
+    "renderingPercent": "Đang kết xuất... {{percent}}",
+    "downloadRendered": "Tải video đã kết xuất",
+    "ffmpegLoading": "Đang tải FFmpeg...",
+    "ffmpegNotLoaded": "Chưa tải FFmpeg",
+    "addClips": "Hãy thêm clip vào dòng thời gian để xuất"
+  },
+  "canvas": {
+    "loadingMedia": "Đang tải phương tiện...",
+    "renderingFrames": "Đang kết xuất khung hình...",
+    "encodingVideo": "Đang mã hóa video...",
+    "processingAudio": "Đang xử lý âm thanh...",
+    "convertingMp4": "Đang chuyển sang MP4...",
+    "preparingDownload": "Đang chuẩn bị tải xuống...",
+    "complete": "Hoàn tất!"
+  }
+}

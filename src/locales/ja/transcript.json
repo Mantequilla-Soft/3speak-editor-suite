@@ -1,0 +1,72 @@
+{
+  "language": {
+    "label": "話されている言語",
+    "auto": "自動検出"
+  },
+  "intro": {
+    "title": "テキストで編集",
+    "text": "話した内容を、話者ごとに名前を付けてテキストにし、録音をドキュメントのように編集できます：単語を選んで Delete を押すとカットされます。",
+    "checking": "サーバーを確認中...",
+    "unavailable": "このエディターサーバーでは現在文字起こしを利用できません。",
+    "noSpeech": "まず話し声の入った録音を追加してください。",
+    "transcribeSeconds": "文字起こし（録音 {{n}} 秒）",
+    "transcribeMinutes": "文字起こし（録音 {{n}} 分）",
+    "longShow": "長い番組は時間がかかります：言葉は少しずつ表示され、最初の部分から編集を始められます。"
+  },
+  "listening": "聞き取り中...",
+  "stop": "停止",
+  "goThere": "移動",
+  "search": {
+    "placeholder": "言葉を検索",
+    "label": "文字起こし内の言葉を検索",
+    "previous": "前へ",
+    "previousLabel": "前の一致",
+    "next": "次へ",
+    "nextLabel": "次の一致"
+  },
+  "selection": {
+    "count_other": "{{count}} 語 · {{seconds}} 秒",
+    "cut": "カット",
+    "cutTitle": "選択した単語を録音からカット（Delete）",
+    "clearTitle": "選択を解除（Esc）",
+    "clearLabel": "選択を解除"
+  },
+  "found": {
+    "cutAll_other": "{{count}} 件すべてカット",
+    "cutAllTitle": "見つかった箇所をすべて録音からカット"
+  },
+  "fillers": "フィラー",
+  "fillersTitle": "「えー」「あの」「なんか」や長い間を探す",
+  "copy": "文字起こしをコピー",
+  "speakers": "話者",
+  "missing": {
+    "seconds": "録音のうち {{n}} 秒にはまだテキストがありません。",
+    "minutes": "録音のうち {{n}} 分にはまだテキストがありません。",
+    "transcribe": "文字起こしする"
+  },
+  "scrollLabel": "文字起こし：単語をクリックでその位置へ移動、ドラッグで選択、Delete でカット",
+  "hint_other": "{{count}} 語。単語をクリックでその位置へ移動、ドラッグか Shift+クリックで選択、Delete でカット。元に戻すで復元できます。",
+  "speaker": {
+    "default": "ボイス",
+    "numbered": "ボイス {{n}}"
+  },
+  "job": {
+    "starting": "開始中...",
+    "preparing": "録音を準備中...",
+    "listening": "聞き取り中...",
+    "signIn": "文字起こしを作るには 3Speak にログインしてください。",
+    "uploadFailed": "録音をアップロードできませんでした：{{message}}",
+    "notUploaded": "録音はまだサーバーにありません。アップロードが終わってからもう一度お試しください。",
+    "serverAnswered": "サーバーの応答：{{status}}",
+    "lost": "文字起こしの処理が失われました（サーバーが再起動した可能性があります）",
+    "failed": "音声認識に失敗しました"
+  },
+  "stt": {
+    "audioUnavailable": "音声を利用できません",
+    "serverError": "サーバーエラー",
+    "connectionFailed": "接続に失敗しました",
+    "unauthorized": "認証されていません",
+    "closed": "切断されました",
+    "initFailed": "音声認識の初期化に失敗しました"
+  }
+}

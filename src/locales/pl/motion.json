@@ -1,0 +1,110 @@
+{
+  "speed": {
+    "title": "Tempo",
+    "stillFrame": "Stopklatka",
+    "holds": "Zatrzymuje klatkę z {{time}} filmu. Przytnij ją na osi czasu lub wybierz długość:",
+    "seconds": "{{value}} s",
+    "speed": "Tempo",
+    "ramp": "Rampa tempa",
+    "ramps": {
+      "montage": "Montaż",
+      "hero": "Bohater",
+      "speedUp": "Przyspieszenie",
+      "slowDown": "Zwolnienie"
+    },
+    "rampHint": "Podgląd dokładnie podąża za rampą, render jest precyzyjny. Dźwięk zachowuje wysokość.",
+    "freeze": "Zamrożenie klatki",
+    "freezeLength": "Długość zamrożenia",
+    "freezeTitle": "Zatrzymaj klatkę pod głowicą",
+    "freezeMoveFirst": "Najpierw przesuń głowicę na ten klip",
+    "freezeAt": "Zamroź w miejscu głowicy",
+    "stillName": "Stopklatka · {{name}}",
+    "stillNameFallback": "klip"
+  },
+  "badge": {
+    "still": "Stop",
+    "ramp": "Rampa",
+    "stillTitle": "Stopklatka",
+    "speedTitle": "Tempo {{speed}}",
+    "rampTitle": "Rampa tempa"
+  },
+  "keyframes": {
+    "title": "Klatki kluczowe",
+    "moveHere": "Przesuń głowicę na ten klip, aby dodać klatki kluczowe.",
+    "props": {
+      "x": "Położenie X",
+      "y": "Położenie Y",
+      "scale": "Skala",
+      "rotation": "Obrót",
+      "opacity": "Krycie",
+      "volume": "Głośność"
+    },
+    "aria": {
+      "x": {
+        "prev": "Poprzednia klatka kluczowa położenia X",
+        "next": "Następna klatka kluczowa położenia X",
+        "add": "Dodaj klatkę kluczową położenia X",
+        "remove": "Usuń klatkę kluczową położenia X"
+      },
+      "y": {
+        "prev": "Poprzednia klatka kluczowa położenia Y",
+        "next": "Następna klatka kluczowa położenia Y",
+        "add": "Dodaj klatkę kluczową położenia Y",
+        "remove": "Usuń klatkę kluczową położenia Y"
+      },
+      "scale": {
+        "prev": "Poprzednia klatka kluczowa skali",
+        "next": "Następna klatka kluczowa skali",
+        "add": "Dodaj klatkę kluczową skali",
+        "remove": "Usuń klatkę kluczową skali"
+      },
+      "rotation": {
+        "prev": "Poprzednia klatka kluczowa obrotu",
+        "next": "Następna klatka kluczowa obrotu",
+        "add": "Dodaj klatkę kluczową obrotu",
+        "remove": "Usuń klatkę kluczową obrotu"
+      },
+      "opacity": {
+        "prev": "Poprzednia klatka kluczowa krycia",
+        "next": "Następna klatka kluczowa krycia",
+        "add": "Dodaj klatkę kluczową krycia",
+        "remove": "Usuń klatkę kluczową krycia"
+      },
+      "volume": {
+        "prev": "Poprzednia klatka kluczowa głośności",
+        "next": "Następna klatka kluczowa głośności",
+        "add": "Dodaj klatkę kluczową głośności",
+        "remove": "Usuń klatkę kluczową głośności"
+      }
+    },
+    "prev": "Poprzednia klatka kluczowa",
+    "next": "Następna klatka kluczowa",
+    "add": "Dodaj klatkę kluczową w miejscu głowicy",
+    "remove": "Usuń klatkę kluczową w miejscu głowicy",
+    "ease": "Płynne przejście stąd do następnej klatki kluczowej",
+    "removeAll": "Usuń wszystkie klatki kluczowe"
+  },
+  "kenBurns": {
+    "title": "Ken Burns",
+    "in": "Powolne przybliżenie",
+    "out": "Powolne oddalenie",
+    "pan": "Powolna panorama"
+  },
+  "punch": {
+    "title": "Szybkie zbliżenia",
+    "hint": "Szybkie zbliżenia na początku zdań i przy głośnych słowach, na podstawie napisów, jeśli są, a w przeciwnym razie dźwięku.",
+    "listening": "Słucham...",
+    "auto": "Automatyczne zbliżenia",
+    "remove": "Usuń zbliżenia",
+    "noMoments": "Nie znaleziono w tym klipie początków zdań ani głośnych słów.",
+    "noSound": "Nie udało się odczytać dźwięku tego klipu. Najpierw dodaj automatyczne napisy, a potem spróbuj ponownie.",
+    "addedCaptions_one": "Dodano {{count}} zbliżenie na podstawie napisów. To zwykłe klatki kluczowe skali.",
+    "addedCaptions_few": "Dodano {{count}} zbliżenia na podstawie napisów. To zwykłe klatki kluczowe skali.",
+    "addedCaptions_many": "Dodano {{count}} zbliżeń na podstawie napisów. To zwykłe klatki kluczowe skali.",
+    "addedCaptions_other": "Dodano {{count}} zbliżenia na podstawie napisów. To zwykłe klatki kluczowe skali.",
+    "addedSound_one": "Dodano {{count}} zbliżenie na podstawie dźwięku. To zwykłe klatki kluczowe skali.",
+    "addedSound_few": "Dodano {{count}} zbliżenia na podstawie dźwięku. To zwykłe klatki kluczowe skali.",
+    "addedSound_many": "Dodano {{count}} zbliżeń na podstawie dźwięku. To zwykłe klatki kluczowe skali.",
+    "addedSound_other": "Dodano {{count}} zbliżenia na podstawie dźwięku. To zwykłe klatki kluczowe skali."
+  }
+}

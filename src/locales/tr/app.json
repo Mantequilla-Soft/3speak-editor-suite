@@ -1,0 +1,149 @@
+{
+  "dismiss": "Kapat",
+  "branding": {
+    "audioEditor": "Ses Düzenleyici",
+    "shortsEditor": "Shorts Düzenleyici",
+    "videoEditor": "Video Düzenleyici",
+    "beta": "beta",
+    "backend": "Sunucu: {{url}}",
+    "backendSelecting": "Sunucu: seçiliyor...",
+    "showTour": "Turu yeniden göster",
+    "shortcuts": "Klavye kısayolları (?)",
+    "shortcutsLabel": "Klavye kısayolları",
+    "fullscreen": "Tam ekran (F)",
+    "fullscreenLabel": "Tam ekran",
+    "leaveFullscreen": "Tam ekrandan çık (F)",
+    "leaveFullscreenLabel": "Tam ekrandan çık",
+    "closeEditor": "Düzenleyiciyi kapat"
+  },
+  "backendDown": "Sunucuya ulaşılamıyor. Kayıt yükleme, işleme ve medya işlemleri çalışmayacak.",
+  "menu": {
+    "undo": "Geri al (Ctrl+Z)",
+    "redo": "Yinele (Ctrl+Shift+Z)"
+  },
+  "audioTools": {
+    "cutSilences": "Sessizlikleri kes",
+    "cutSilencesTitle": "Seçili klipteki (ya da grubundaki) sessizlikleri kes: duraklamaları bul, kes, boşlukları kapat",
+    "template": "Şablon",
+    "templateTitle": "Şablonun: her kayıt için giriş, kapanış ve fon müziği",
+    "normalizeLabel": "Ses yüksekliğini dengele",
+    "normalizeOn": "Dengeleme: açık",
+    "normalizeOff": "Dengeleme: kapalı",
+    "normalizeOnTitle": "Dengeleme açık: dışa aktarılan dosya eşit -16 LUFS düzeyine getirilir (podcast standardı)",
+    "normalizeOffTitle": "Dengeleme kapalı: dışa aktarılan dosya düzeylerini olduğu gibi korur",
+    "chapters": "Kısımlar",
+    "chaptersCount": "Kısımlar ({{n}})",
+    "chaptersTitle": "Kısımlar: her bölümün nerede başladığını işaretle (M, oynatma kafasına bir tane ekler)",
+    "transcript": "Döküm",
+    "transcriptTitle": "Döküm: programı metniyle düzenle, kelimeleri silerek kes",
+    "fillersLabel": "Dolgu seslerini kaldır",
+    "fillers": "Dolgu sesleri",
+    "fillersTitle": "Dolgu seslerini kaldır: ıı, eee, yani gibi sesleri ve uzun duraklamaları bul, gözden geçir, kes"
+  },
+  "cutSilences": {
+    "progress": "Sessizlikler kesiliyor: klip {{done}} / {{total}}",
+    "failed_one": "{{count}} klip okunamadı. Diğerleri kesildi.",
+    "failed_other": "{{count}} klip okunamadı. Diğerleri kesildi.",
+    "failedUploading_one": "{{count}} klip henüz okunamadı: yükleme bitince tekrar dene. Diğerleri kesildi.",
+    "failedUploading_other": "{{count}} klip henüz okunamadı: yükleme bitince tekrar dene. Diğerleri kesildi."
+  },
+  "group": {
+    "nothing": "Başka bir konuşma kanalında aynı anda çalan bir şey yok. Önce diğer sesi kendi kanalına koy.",
+    "done_one": "{{count}} ses gruplandı: artık birlikte taşınır, kırpılır ve sessizlikleri birlikte kesilir.",
+    "done_other": "{{count}} ses gruplandı: artık birlikte taşınır, kırpılır ve sessizlikleri birlikte kesilir."
+  },
+  "template": {
+    "applied": "Şablon uygulandı: {{parts}}.",
+    "intro": "giriş",
+    "outro": "kapanış",
+    "bed": "fon müziği",
+    "takeOff": "Kaldır"
+  },
+  "rangePick": {
+    "hint": "Audiogram parçasının başladığı yere, sonra bittiği yere tıkla (en fazla 2 dakika). Ayarlamak için kenarlarını çek.",
+    "from": "Başlangıç {{start}}: şimdi bittiği yere tıkla",
+    "span": "{{start}} – {{end}} · {{seconds}} sn",
+    "listenTitle": "Sadece bu parçayı dinle (Boşluk)",
+    "stop": "Durdur",
+    "play": "Parçayı oynat",
+    "use": "Bu parçayı kullan"
+  },
+  "empty": {
+    "addVideo": "Video ekle",
+    "addImage": "Görsel ekle",
+    "addAudio": "Ses ekle",
+    "addRecording": "Kayıt ekle",
+    "record": "Kaydet",
+    "music": "Müzik"
+  },
+  "confirm": {
+    "removeClip": "Bu klip zaman çizelgesinden kaldırılsın mı?",
+    "removeClips_one": "Bu {{count}} klip zaman çizelgesinden kaldırılsın mı?",
+    "removeClips_other": "Bu {{count}} klip zaman çizelgesinden kaldırılsın mı?",
+    "removeLibraryItem": "Bu öğe proje kitaplığından kaldırılsın mı?",
+    "removeTrack": "Bu kanal ve tüm klipleri kaldırılsın mı?"
+  },
+  "clipStreaming": "Bu klip hâlâ 3Speak'ten akış olarak geliyor. İndirmesi bitince tekrar dene.",
+  "reverse": {
+    "title": "Klip ters çevriliyor...",
+    "body": "Sunucuda işleniyor, lütfen bekle.",
+    "failed": "Klip ters çevrilemedi: {{error}}"
+  },
+  "remix": {
+    "stitch": "Ekleme",
+    "stitchHintBefore": "En fazla {{seconds}} sn kaydet. Orijinalin hemen öncesinde oynar.",
+    "stitchHintAfter": "En fazla {{seconds}} sn kaydet. Orijinalin hemen ardından oynar.",
+    "reaction": "Tepki",
+    "reactionHint": "Sen kayıt yaparken orijinal baştan oynar. Mikrofonuna yankı yapmaması için kulaklık kullan.",
+    "originalFillsLimit": "Orijinal zaten {{limit}} sınırını dolduruyor. Zaman çizelgesinde kırp, sonra eklemeni kamera düğmesiyle kaydet."
+  },
+  "chapters": {
+    "intro": "Giriş",
+    "numbered": "Kısım {{n}}"
+  },
+  "duck": {
+    "allVoices": "Tüm konuşma kanalları"
+  },
+  "media": "Medya",
+  "importedMedia": "İçe Aktarılan Medya",
+  "files_one": "{{count}} dosya",
+  "files_other": "{{count}} dosya",
+  "side": {
+    "clipsSelected_one": "{{count}} klip seçildi",
+    "clipsSelected_other": "{{count}} klip seçildi",
+    "clearSelection": "Seçimi temizle",
+    "closeProperties": "Özellikleri kapat",
+    "captions": "Altyazılar",
+    "closeCaptions": "Altyazıları kapat",
+    "noClip": "Klip seçilmedi",
+    "noClipHint": "Ayarlarını görmek için zaman çizelgesinde bir klip seç. Birkaç klibi birlikte değiştirmek için üzerlerine bir kutu çiz."
+  },
+  "cleaningHint": "Uzun kayıtlar bir dakika sürebilir.",
+  "hlsDownload": {
+    "title": "Medya İndiriliyor",
+    "hint": "Medya hazırlanırken lütfen bekle..."
+  },
+  "sendPreview": {
+    "titleAudio": "Kullanmadan önce dinle",
+    "titleVideo": "Videonu önizle",
+    "back": "Düzenleyiciye Dön",
+    "askTitle": "Shorts için audiogram yapılsın mı?",
+    "askBody": "Bu sesin en iyi parçalarından kısa videolar; sesle birlikte 3Speak Shorts olarak paylaşılır, her biri sese bağlantı verir.",
+    "askNo": "Hayır, sesi kullan",
+    "askMake": "Audiogram yap"
+  },
+  "legacy": {
+    "projectLibrary": "Proje Kitaplığı",
+    "loadingFfmpeg": "FFmpeg yükleniyor... {{percent}}",
+    "properties": "Özellikler",
+    "propertiesOf": "Özellikler: {{name}}",
+    "addMedia": "Medya Ekle",
+    "addMediaTitle": "Kitaplığa medya ekle",
+    "record": "Kaydet",
+    "recordTitle": "Kameradan video kaydet"
+  },
+  "drafts": {
+    "episode": "Bölüm",
+    "project": "Proje"
+  }
+}

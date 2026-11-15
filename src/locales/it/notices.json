@@ -1,0 +1,28 @@
+{
+  "length": {
+    "title": "La tua timeline dura {{length}}",
+    "body": "{{atMost}} Puoi continuare a modificare tutto, ma il rendering resta disattivato finché la timeline non finisce alla linea segnata a {{limitAt}}. Rifila, dividi o elimina clip per arrivarci.",
+    "bodyAudio": "{{atMost}} Puoi continuare a modificare tutto, ma l'esportazione resta disattivata finché la timeline non finisce alla linea segnata a {{limitAt}}. Rifila, dividi o elimina clip per arrivarci."
+  },
+  "tooLarge": {
+    "title_one": "Questo file è troppo grande",
+    "title_many": "Questi file sono troppo grandi",
+    "title_other": "Questi file sono troppo grandi",
+    "body": "L'editor accetta file fino a {{size}}. Prima accorcia o comprimi il video (un telefono o qualsiasi app video può esportarne una copia più leggera), poi aggiungilo di nuovo."
+  },
+  "encoding": {
+    "title": "Questo video va prima convertito",
+    "videos_one": "{{count}} video",
+    "videos_many": "{{count}} video",
+    "videos_other": "{{count}} video",
+    "next": "Prossimo",
+    "waiting_one": "In attesa di {{count}} altro video",
+    "waiting_many": "In attesa di altri {{count}} video",
+    "waiting_other": "In attesa di altri {{count}} video",
+    "starting": "Avvio…",
+    "upload": "Caricamento",
+    "convert": "Converti in una copia riproducibile",
+    "hint": "Questo browser non può riprodurre il formato di questo video (HEVC o HDR, comune dai telefoni), quindi resta nero finché la copia riproducibile non è pronta. Poi l'anteprima passa da sola alla copia. Nel frattempo puoi continuare a modificare.",
+    "hide": "Nascondi"
+  }
+}

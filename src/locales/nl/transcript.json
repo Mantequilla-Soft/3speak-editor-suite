@@ -1,0 +1,75 @@
+{
+  "language": {
+    "label": "Gesproken taal",
+    "auto": "Automatisch herkennen"
+  },
+  "intro": {
+    "title": "Bewerken via tekst",
+    "text": "Zet wat er wordt gezegd om in tekst, met elke stem bij naam, en bewerk de opname dan als een document: selecteer woorden en druk op Delete om ze weg te knippen.",
+    "checking": "Server controleren...",
+    "unavailable": "Transcripten zijn nu niet beschikbaar op deze editorserver.",
+    "noSpeech": "Voeg eerst een opname met spraak toe.",
+    "transcribeSeconds": "Transcriberen ({{n}} s opname)",
+    "transcribeMinutes": "Transcriberen ({{n}} min opname)",
+    "longShow": "Een lange show duurt even: de woorden verschijnen stukje voor stukje, en je kunt de eerste al bewerken."
+  },
+  "listening": "Luisteren...",
+  "stop": "Stoppen",
+  "goThere": "Ga ernaartoe",
+  "search": {
+    "placeholder": "Woorden zoeken",
+    "label": "Woorden zoeken in het transcript",
+    "previous": "Vorige",
+    "previousLabel": "Vorige treffer",
+    "next": "Volgende",
+    "nextLabel": "Volgende treffer"
+  },
+  "selection": {
+    "count_one": "{{count}} woord · {{seconds}} s",
+    "count_other": "{{count}} woorden · {{seconds}} s",
+    "cut": "Knippen",
+    "cutTitle": "De geselecteerde woorden uit de opname knippen (Delete)",
+    "clearTitle": "Selectie wissen (Esc)",
+    "clearLabel": "Selectie wissen"
+  },
+  "found": {
+    "cutAll_one": "{{count}} knippen",
+    "cutAll_other": "Alle {{count}} knippen",
+    "cutAllTitle": "Elke gevonden plek uit de opname knippen"
+  },
+  "fillers": "Stopwoorden",
+  "fillersTitle": "Vind eh, ehm, weet je en lange pauzes",
+  "copy": "Het transcript kopiëren",
+  "speakers": "Sprekers",
+  "missing": {
+    "seconds": "{{n}} s van de opname heeft nog geen tekst.",
+    "minutes": "{{n}} min van de opname heeft nog geen tekst.",
+    "transcribe": "Transcriberen"
+  },
+  "scrollLabel": "Transcript: klik op een woord om ernaartoe te gaan, sleep over woorden om ze te selecteren, Delete knipt ze weg",
+  "hint_one": "{{count}} woord. Klik op een woord om ernaartoe te gaan; sleep of Shift+klik om te selecteren; Delete knipt. Ongedaan maken haalt het terug.",
+  "hint_other": "{{count}} woorden. Klik op een woord om ernaartoe te gaan; sleep of Shift+klik om te selecteren; Delete knipt. Ongedaan maken haalt het terug.",
+  "speaker": {
+    "default": "Stem",
+    "numbered": "Stem {{n}}"
+  },
+  "job": {
+    "starting": "Starten...",
+    "preparing": "De opnames voorbereiden...",
+    "listening": "Luisteren...",
+    "signIn": "Log in op 3Speak om een transcript te maken.",
+    "uploadFailed": "De opnames konden niet worden geüpload: {{message}}",
+    "notUploaded": "De opnames staan nog niet op de server. Probeer het opnieuw als ze zijn geüpload.",
+    "serverAnswered": "De server antwoordde {{status}}",
+    "lost": "De transcripttaak is verloren gegaan (is de server herstart?)",
+    "failed": "Spraakherkenning mislukt"
+  },
+  "stt": {
+    "audioUnavailable": "audio niet beschikbaar",
+    "serverError": "serverfout",
+    "connectionFailed": "verbinding mislukt",
+    "unauthorized": "niet gemachtigd",
+    "closed": "gesloten",
+    "initFailed": "starten van spraakherkenning mislukt"
+  }
+}

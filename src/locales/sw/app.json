@@ -1,0 +1,149 @@
+{
+  "dismiss": "Funga",
+  "branding": {
+    "audioEditor": "Kihariri cha Sauti",
+    "shortsEditor": "Kihariri cha Shorts",
+    "videoEditor": "Kihariri cha Video",
+    "beta": "beta",
+    "backend": "Seva: {{url}}",
+    "backendSelecting": "Seva: inachagua...",
+    "showTour": "Onyesha ziara tena",
+    "shortcuts": "Njia za mkato za kibodi (?)",
+    "shortcutsLabel": "Njia za mkato za kibodi",
+    "fullscreen": "Skrini nzima (F)",
+    "fullscreenLabel": "Skrini nzima",
+    "leaveFullscreen": "Toka kwenye skrini nzima (F)",
+    "leaveFullscreenLabel": "Toka kwenye skrini nzima",
+    "closeEditor": "Funga kihariri"
+  },
+  "backendDown": "Seva haifikiki. Kupakia rekodi, utengenezaji na uchakataji wa midia havitafanya kazi.",
+  "menu": {
+    "undo": "Tendua (Ctrl+Z)",
+    "redo": "Rudia (Ctrl+Shift+Z)"
+  },
+  "audioTools": {
+    "cutSilences": "Kata ukimya",
+    "cutSilencesTitle": "Kata ukimya kutoka klipu iliyochaguliwa (au kikundi chake): tafuta mapumziko, yakate, ziba mapengo",
+    "template": "Kiolezo",
+    "templateTitle": "Kiolezo chako: utangulizi, hitimisho na muziki wa usuli kwa kila rekodi",
+    "normalizeLabel": "Sawazisha sauti",
+    "normalizeOn": "Sawazisha: imewashwa",
+    "normalizeOff": "Sawazisha: imezimwa",
+    "normalizeOnTitle": "Kusawazisha kumewashwa: faili linalohamishwa linaletwa kwenye kiwango sawa cha -16 LUFS (kiwango cha podikasti)",
+    "normalizeOffTitle": "Kusawazisha kumezimwa: faili linalohamishwa linabaki na viwango vyako kama vilivyo",
+    "chapters": "Sura",
+    "chaptersCount": "Sura ({{n}})",
+    "chaptersTitle": "Sura: weka alama mahali kila sehemu inapoanza (M inaongeza moja kwenye kiashiria cha kucheza)",
+    "transcript": "Nakala",
+    "transcriptTitle": "Nakala: hariri kipindi kupitia maandishi yake, futa maneno ili kuyakata",
+    "fillersLabel": "Ondoa maneno ya kujaza",
+    "fillers": "Maneno ya kujaza",
+    "fillersTitle": "Ondoa maneno ya kujaza: tafuta \"aa\", \"mm\", \"unajua\" na mapumziko marefu, yakague, yakate"
+  },
+  "cutSilences": {
+    "progress": "Inakata ukimya: klipu {{done}} kati ya {{total}}",
+    "failed_one": "Klipu {{count}} haikuweza kusomwa. Nyingine zimekatwa.",
+    "failed_other": "Klipu {{count}} hazikuweza kusomwa. Nyingine zimekatwa.",
+    "failedUploading_one": "Klipu {{count}} bado haiwezi kusomwa: jaribu tena upakiaji ukikamilika. Nyingine zimekatwa.",
+    "failedUploading_other": "Klipu {{count}} bado haziwezi kusomwa: jaribu tena upakiaji ukikamilika. Nyingine zimekatwa."
+  },
+  "group": {
+    "nothing": "Hakuna kinachocheza wakati huo huo kwenye njia nyingine ya sauti ya mazungumzo. Weka sauti nyingine kwenye njia yake kwanza.",
+    "done_one": "Sauti {{count}} imewekwa kwenye kikundi: sasa zinasogea, zinapunguzwa na ukimya wake unakatwa pamoja.",
+    "done_other": "Sauti {{count}} zimewekwa kwenye kikundi: sasa zinasogea, zinapunguzwa na ukimya wake unakatwa pamoja."
+  },
+  "template": {
+    "applied": "Kiolezo kimetumika: {{parts}}.",
+    "intro": "utangulizi",
+    "outro": "hitimisho",
+    "bed": "muziki wa usuli",
+    "takeOff": "Kiondoe"
+  },
+  "rangePick": {
+    "hint": "Bofya mahali kipande cha audiogramu kinapoanza, kisha mahali kinapoishia (hadi dakika 2). Vuta kingo zake ili kurekebisha.",
+    "from": "Kuanzia {{start}}: sasa bofya mahali kinapoishia",
+    "span": "{{start}} – {{end}} · sek {{seconds}}",
+    "listenTitle": "Sikiliza kipande hiki tu (nafasi)",
+    "stop": "Simamisha",
+    "play": "Cheza kipande",
+    "use": "Tumia kipande hiki"
+  },
+  "empty": {
+    "addVideo": "Ongeza video",
+    "addImage": "Ongeza picha",
+    "addAudio": "Ongeza sauti",
+    "addRecording": "Ongeza rekodi",
+    "record": "Rekodi",
+    "music": "Muziki"
+  },
+  "confirm": {
+    "removeClip": "Ondoa klipu hii kwenye mfuatano wa muda?",
+    "removeClips_one": "Ondoa klipu hii {{count}} kwenye mfuatano wa muda?",
+    "removeClips_other": "Ondoa klipu hizi {{count}} kwenye mfuatano wa muda?",
+    "removeLibraryItem": "Ondoa kipengee hiki kwenye maktaba ya mradi?",
+    "removeTrack": "Ondoa njia hii na klipu zake zote?"
+  },
+  "clipStreaming": "Klipu hii bado inatiririshwa kutoka 3Speak. Jaribu tena upakuaji wake ukikamilika.",
+  "reverse": {
+    "title": "Inageuza klipu kinyume...",
+    "body": "Inachakatwa kwenye seva, tafadhali subiri.",
+    "failed": "Imeshindwa kugeuza klipu kinyume: {{error}}"
+  },
+  "remix": {
+    "stitch": "Unganisha",
+    "stitchHintBefore": "Rekodi hadi sek {{seconds}}. Itacheza kabla ya asili.",
+    "stitchHintAfter": "Rekodi hadi sek {{seconds}}. Itacheza mara baada ya asili.",
+    "reaction": "Mwitikio",
+    "reactionHint": "Asili inacheza tangu mwanzo unaporekodi. Tumia vipokea sauti ili sauti isirudi kwenye maikrofoni yako.",
+    "originalFillsLimit": "Asili tayari imejaza kikomo cha {{limit}}. Ipunguze kwenye mfuatano wa muda, kisha rekodi kiungo chako kwa kitufe cha kamera."
+  },
+  "chapters": {
+    "intro": "Utangulizi",
+    "numbered": "Sura {{n}}"
+  },
+  "duck": {
+    "allVoices": "Njia zote za sauti ya mazungumzo"
+  },
+  "media": "Midia",
+  "importedMedia": "Midia zilizoletwa",
+  "files_one": "Faili {{count}}",
+  "files_other": "Faili {{count}}",
+  "side": {
+    "clipsSelected_one": "Klipu {{count}} imechaguliwa",
+    "clipsSelected_other": "Klipu {{count}} zimechaguliwa",
+    "clearSelection": "Futa uteuzi",
+    "closeProperties": "Funga sifa",
+    "captions": "Manukuu",
+    "closeCaptions": "Funga manukuu",
+    "noClip": "Hakuna klipu iliyochaguliwa",
+    "noClipHint": "Chagua klipu kwenye mfuatano wa muda ili kuona mipangilio yake. Buruta kisanduku juu ya klipu kadhaa ili kuzibadilisha pamoja."
+  },
+  "cleaningHint": "Rekodi ndefu zinaweza kuchukua dakika moja.",
+  "hlsDownload": {
+    "title": "Inapakua midia",
+    "hint": "Tafadhali subiri wakati midia inaandaliwa..."
+  },
+  "sendPreview": {
+    "titleAudio": "Sikiliza kabla ya kuitumia",
+    "titleVideo": "Onyesho la awali la video yako",
+    "back": "Rudi kwenye kihariri",
+    "askTitle": "Tengeneza audiogramu kwa ajili ya Shorts?",
+    "askBody": "Video fupi za vipande bora vya sauti hii, zinazochapishwa kama Shorts za 3Speak pamoja nayo, kila moja ikiwa na kiungo kurudi kwake.",
+    "askNo": "Hapana, tumia sauti",
+    "askMake": "Tengeneza audiogramu"
+  },
+  "legacy": {
+    "projectLibrary": "Maktaba ya mradi",
+    "loadingFfmpeg": "Inapakia FFmpeg... {{percent}}",
+    "properties": "Sifa",
+    "propertiesOf": "Sifa: {{name}}",
+    "addMedia": "Ongeza midia",
+    "addMediaTitle": "Ongeza midia kwenye maktaba",
+    "record": "Rekodi",
+    "recordTitle": "Rekodi video kutoka kamera"
+  },
+  "drafts": {
+    "episode": "Kipindi",
+    "project": "Mradi"
+  }
+}

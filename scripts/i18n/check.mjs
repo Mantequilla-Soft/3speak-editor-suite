@@ -102,7 +102,8 @@ export function checkLocales(root) {
       }
       const ref = m && enPluralBases.has(b) ? en[`${b}_other`] : en[k]
       // a plural form may leave out {{count}} ("one clip"), and may use any token of any English form
-      const allowed = m ? [...new Set(FORMS.flatMap(c => (`${b}_${c}` in en ? tokens(en[`${b}_${c}`]) : [])))] : tokens(ref)
+      // ({{count}} is always there for a plural: Russian names it in "21 files" even where English says "These files")
+      const allowed = m ? [...new Set(['{{count}}', ...FORMS.flatMap(c => (`${b}_${c}` in en ? tokens(en[`${b}_${c}`]) : []))])] : tokens(ref)
       const want = tokens(ref).filter(x => !(m && x === '{{count}}'))
       const have = tokens(v)
       const lost = want.filter(x => !have.includes(x))

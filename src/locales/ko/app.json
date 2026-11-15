@@ -1,0 +1,143 @@
+{
+  "dismiss": "닫기",
+  "branding": {
+    "audioEditor": "오디오 편집기",
+    "shortsEditor": "쇼츠 편집기",
+    "videoEditor": "동영상 편집기",
+    "beta": "베타",
+    "backend": "백엔드: {{url}}",
+    "backendSelecting": "백엔드: 선택 중...",
+    "showTour": "둘러보기 다시 보기",
+    "shortcuts": "키보드 단축키 (?)",
+    "shortcutsLabel": "키보드 단축키",
+    "fullscreen": "전체 화면 (F)",
+    "fullscreenLabel": "전체 화면",
+    "leaveFullscreen": "전체 화면 종료 (F)",
+    "leaveFullscreenLabel": "전체 화면 종료",
+    "closeEditor": "편집기 닫기"
+  },
+  "backendDown": "백엔드 서버에 연결할 수 없어요. 녹화 업로드, 렌더링, 미디어 처리가 작동하지 않아요.",
+  "menu": {
+    "undo": "실행 취소 (Ctrl+Z)",
+    "redo": "다시 실행 (Ctrl+Shift+Z)"
+  },
+  "audioTools": {
+    "cutSilences": "무음 자르기",
+    "cutSilencesTitle": "선택한 클립(또는 그 그룹)에서 무음을 잘라내요: 쉼을 찾아 자르고 빈틈을 메워요",
+    "template": "템플릿",
+    "templateTitle": "내 템플릿: 모든 녹음에 붙일 인트로, 아웃트로, 배경 음악",
+    "normalizeLabel": "음량 정규화",
+    "normalizeOn": "정규화: 켜짐",
+    "normalizeOff": "정규화: 꺼짐",
+    "normalizeOnTitle": "정규화가 켜져 있어요: 내보내기 음량을 고른 -16 LUFS(팟캐스트 표준)로 맞춰요",
+    "normalizeOffTitle": "정규화가 꺼져 있어요: 내보내기는 지금 음량을 그대로 유지해요",
+    "chapters": "챕터",
+    "chaptersCount": "챕터 ({{n}})",
+    "chaptersTitle": "챕터: 각 부분이 시작하는 곳을 표시해요 (M을 누르면 재생 헤드 위치에 추가)",
+    "transcript": "스크립트",
+    "transcriptTitle": "스크립트: 텍스트로 방송을 편집하고, 단어를 지우면 그 부분이 잘려요",
+    "fillersLabel": "군말 제거",
+    "fillers": "군말",
+    "fillersTitle": "군말 제거: 음, 어, 그러니까 같은 말과 긴 쉼을 찾아 확인하고 잘라요"
+  },
+  "cutSilences": {
+    "progress": "무음 자르는 중: 클립 {{done}} / {{total}}",
+    "failed_other": "클립 {{count}}개를 읽을 수 없었어요. 나머지는 잘랐어요.",
+    "failedUploading_other": "클립 {{count}}개를 아직 읽을 수 없어요: 업로드가 끝나면 다시 시도하세요. 나머지는 잘랐어요."
+  },
+  "group": {
+    "nothing": "다른 음성 트랙에서 동시에 재생되는 것이 없어요. 먼저 다른 목소리를 별도의 트랙에 놓으세요.",
+    "done_other": "목소리 {{count}}개를 그룹으로 묶었어요: 이제 함께 이동하고, 트리밍되고, 무음이 잘려요."
+  },
+  "template": {
+    "applied": "템플릿을 적용했어요: {{parts}}.",
+    "intro": "인트로",
+    "outro": "아웃트로",
+    "bed": "배경 음악",
+    "takeOff": "빼기"
+  },
+  "rangePick": {
+    "hint": "오디오그램으로 만들 부분이 시작하는 곳을 클릭하고, 끝나는 곳을 클릭하세요(최대 2분). 가장자리를 당겨 조정할 수 있어요.",
+    "from": "{{start}}부터: 이제 끝나는 곳을 클릭하세요",
+    "span": "{{start}} – {{end}} · {{seconds}}초",
+    "listenTitle": "이 부분만 듣기 (스페이스바)",
+    "stop": "중지",
+    "play": "이 부분 재생",
+    "use": "이 부분 사용"
+  },
+  "empty": {
+    "addVideo": "동영상 추가",
+    "addImage": "이미지 추가",
+    "addAudio": "오디오 추가",
+    "addRecording": "녹음 추가",
+    "record": "녹음",
+    "music": "음악"
+  },
+  "confirm": {
+    "removeClip": "이 클립을 타임라인에서 제거할까요?",
+    "removeClips_other": "이 클립 {{count}}개를 타임라인에서 제거할까요?",
+    "removeLibraryItem": "이 항목을 프로젝트 라이브러리에서 제거할까요?",
+    "removeTrack": "이 트랙과 모든 클립을 제거할까요?"
+  },
+  "clipStreaming": "이 클립은 아직 3Speak에서 스트리밍 중이에요. 다운로드가 끝나면 다시 시도하세요.",
+  "reverse": {
+    "title": "클립 역재생 만드는 중...",
+    "body": "서버에서 처리 중이에요. 잠시 기다려 주세요.",
+    "failed": "클립을 역재생으로 만들지 못했어요: {{error}}"
+  },
+  "remix": {
+    "stitch": "스티치",
+    "stitchHintBefore": "최대 {{seconds}}초까지 녹화하세요. 원본 바로 앞에 재생돼요.",
+    "stitchHintAfter": "최대 {{seconds}}초까지 녹화하세요. 원본 바로 뒤에 재생돼요.",
+    "reaction": "리액션",
+    "reactionHint": "녹화하는 동안 원본이 처음부터 재생돼요. 마이크에 소리가 들어가지 않도록 헤드폰을 사용하세요.",
+    "originalFillsLimit": "원본만으로 이미 한도 {{limit}}에 도달했어요. 타임라인에서 트리밍한 뒤 카메라 버튼으로 스티치를 녹화하세요."
+  },
+  "chapters": {
+    "intro": "인트로",
+    "numbered": "챕터 {{n}}"
+  },
+  "duck": {
+    "allVoices": "모든 음성 트랙"
+  },
+  "media": "미디어",
+  "importedMedia": "가져온 미디어",
+  "files_other": "파일 {{count}}개",
+  "side": {
+    "clipsSelected_other": "클립 {{count}}개 선택됨",
+    "clearSelection": "선택 해제",
+    "closeProperties": "속성 닫기",
+    "captions": "자막",
+    "closeCaptions": "자막 닫기",
+    "noClip": "선택한 클립 없음",
+    "noClipHint": "타임라인에서 클립을 선택하면 설정이 보여요. 여러 클립 위로 상자를 드래그하면 한꺼번에 바꿀 수 있어요."
+  },
+  "cleaningHint": "긴 녹음은 1분 정도 걸릴 수 있어요.",
+  "hlsDownload": {
+    "title": "미디어 다운로드 중",
+    "hint": "미디어를 준비하는 동안 잠시 기다려 주세요..."
+  },
+  "sendPreview": {
+    "titleAudio": "사용하기 전에 들어 보세요",
+    "titleVideo": "동영상 미리보기",
+    "back": "편집기로 돌아가기",
+    "askTitle": "쇼츠용 오디오그램을 만들까요?",
+    "askBody": "이 오디오의 가장 좋은 부분을 짧은 동영상으로 만들어 3Speak 쇼츠로 함께 게시하고, 각각 원본 오디오로 연결해요.",
+    "askNo": "아니요, 오디오 사용",
+    "askMake": "오디오그램 만들기"
+  },
+  "legacy": {
+    "projectLibrary": "프로젝트 라이브러리",
+    "loadingFfmpeg": "FFmpeg 불러오는 중... {{percent}}",
+    "properties": "속성",
+    "propertiesOf": "속성: {{name}}",
+    "addMedia": "미디어 추가",
+    "addMediaTitle": "라이브러리에 미디어 추가",
+    "record": "녹화",
+    "recordTitle": "카메라로 동영상 녹화"
+  },
+  "drafts": {
+    "episode": "에피소드",
+    "project": "프로젝트"
+  }
+}

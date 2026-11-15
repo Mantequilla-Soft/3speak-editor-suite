@@ -1,0 +1,88 @@
+{
+  "title": "提词器",
+  "showOnCamera": "在摄像头画面上显示",
+  "speechNotice": {
+    "title": "目前只有 Chromium 内核浏览器支持跟随语音。",
+    "body": "使用 Chrome、Edge、Brave 或 Opera，稿件会随你说话自动滚动。在此浏览器中，稿件会以你设定的固定速度滚动。"
+  },
+  "speechErrors": {
+    "network": "无法连接语音服务。识别需要网络连接（Chrome 会把音频发送到 Google 进行转写）。",
+    "audioCapture": "识别没有收到音频。麦克风可能正被占用，试试耳机。",
+    "notAllowed": "语音识别的麦克风权限被阻止了。",
+    "unsupported": "此浏览器不支持语音识别。",
+    "generic": "语音识别出错：{{err}}"
+  },
+  "noMic": "在没有麦克风的情况下录制（麦克风不可用）。",
+  "autoDetect": "自动检测（{{lang}}）",
+  "presets": {
+    "frontcam": "前置镜头",
+    "frontcamTitle": "自拍镜头下方的小条，最不容易看出你在读稿",
+    "max": "最大字号",
+    "maxTitle": "大号文字，适合远距离阅读",
+    "top": "顶部多行",
+    "topTitle": "在顶部显示多行文字"
+  },
+  "scroll": {
+    "label": "滚动",
+    "modeAria": "滚动模式",
+    "followVoice": "跟随语音",
+    "followVoiceTitle": "你朗读稿件时自动滚动",
+    "needsChromium": "需要 Chrome、Edge 或其他 Chromium 内核浏览器",
+    "timed": "定速",
+    "timedTitle": "以固定速度滚动",
+    "voiceForcedMissing": "这里无法使用跟随语音，改用定速滚动。",
+    "voiceUnavailable": "此浏览器不支持跟随语音。"
+  },
+  "style": {
+    "title": "文字样式",
+    "fontSize": "字号",
+    "fontSizeValue": "{{size}}px",
+    "text": "文字",
+    "background": "背景",
+    "bgOpacity": "背景不透明度",
+    "mirrorText": "镜像文字（用于提词器反射镜）",
+    "voiceLanguage": "语音语言"
+  },
+  "status": {
+    "serverErrorSwitched": "语音服务器出错（{{reason}}）。已切换为定速滚动。",
+    "voiceErrorSwitched": "{{error}} 已切换为定速滚动。",
+    "voiceStoppedSwitched": "跟随语音已停止。已切换为定速滚动。",
+    "serverError": "语音服务器出错（{{reason}}）。",
+    "listeningServer": "正在聆听（服务器）……开始朗读吧",
+    "connectingServer": "正在连接语音服务器…",
+    "listening": "正在聆听……开始大声朗读吧",
+    "startingMic": "正在启动麦克风…",
+    "scrollPaused": "滚动已暂停",
+    "timedScroll": "定速滚动，每分钟 {{wpm}} 词",
+    "scrollTest": "滚动测试，每分钟 {{wpm}} 词"
+  },
+  "sttReason": {
+    "unreachable": "无法连接",
+    "noMic": "没有麦克风",
+    "audioUnavailable": "音频不可用",
+    "connectionFailed": "连接失败",
+    "unauthorized": "未授权",
+    "closed": "已关闭",
+    "serverError": "服务器错误"
+  },
+  "scriptPlaceholder": "在这里撰写或粘贴你的稿件。录制时，它会随你朗读而滚动，或在定速模式下以固定速度滚动。",
+  "scriptModeVoice": "滚动：跟随你的声音",
+  "scriptModeTimed": "滚动：定速，每分钟 {{wpm}} 词",
+  "hide": "隐藏",
+  "dragToMove": "拖动以移动",
+  "dragToResize": "拖动以调整大小",
+  "expandMenu": "展开菜单",
+  "collapseMenu": "收起菜单",
+  "editScript": "编辑稿件",
+  "testVoice": "测试语音",
+  "stopVoiceTest": "停止测试",
+  "scrollSpeed": "滚动速度",
+  "slower": "慢一点",
+  "faster": "快一点",
+  "wordsPerMin": "词/分钟",
+  "testScroll": "测试滚动",
+  "stopScrollTest": "停止滚动测试",
+  "pauseScroll": "暂停滚动",
+  "resumeScroll": "继续滚动",
+  "hideTeleprompter": "隐藏提词器"
+}

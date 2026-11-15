@@ -1,0 +1,28 @@
+{
+  "length": {
+    "title": "Tu línea de tiempo dura {{length}}",
+    "body": "{{atMost}} Puedes seguir editando todo, pero Renderizar seguirá desactivado hasta que la línea de tiempo termine en la línea marcada de {{limitAt}}. Recorta, divide o elimina clips para llegar.",
+    "bodyAudio": "{{atMost}} Puedes seguir editando todo, pero Exportar seguirá desactivado hasta que la línea de tiempo termine en la línea marcada de {{limitAt}}. Recorta, divide o elimina clips para llegar."
+  },
+  "tooLarge": {
+    "title_one": "Este archivo es demasiado grande",
+    "title_many": "Estos archivos son demasiado grandes",
+    "title_other": "Estos archivos son demasiado grandes",
+    "body": "El editor acepta archivos de hasta {{size}}. Primero acorta o comprime el video (un teléfono o cualquier app de video puede exportar una copia más pequeña) y luego vuelve a añadirlo."
+  },
+  "encoding": {
+    "title": "Primero hay que convertir este video",
+    "videos_one": "{{count}} video",
+    "videos_many": "{{count}} de videos",
+    "videos_other": "{{count}} videos",
+    "next": "Siguiente",
+    "waiting_one": "Esperando {{count}} video más",
+    "waiting_many": "Esperando {{count}} de videos más",
+    "waiting_other": "Esperando {{count}} videos más",
+    "starting": "Iniciando…",
+    "upload": "Subida",
+    "convert": "Convertir a una copia reproducible",
+    "hint": "Este navegador no puede reproducir el formato de este video (HEVC o HDR, habitual en teléfonos), así que se ve en negro hasta que la copia reproducible esté lista. Después la vista previa cambia a ella sola. Mientras tanto puedes seguir editando.",
+    "hide": "Ocultar"
+  }
+}

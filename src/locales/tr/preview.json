@@ -1,0 +1,29 @@
+{
+  "header": "Zaman Çizelgesi Önizlemesi",
+  "smaller": "Daha küçük",
+  "larger": "Daha büyük",
+  "loopOn": "Döngü: Açık",
+  "loopOff": "Döngü: Kapalı",
+  "aspect": {
+    "title": "En boy oranı: {{ratio}}",
+    "titleAuto": "En boy oranı: Otomatik ({{ratio}})",
+    "auto": "Otomatik"
+  },
+  "fullSize": "Tam boyut",
+  "halfSize": "Yarım boyut",
+  "fullscreen": "Tam ekran",
+  "noClipHere": "Bu konumda klip yok",
+  "noClips": "Zaman çizelgesinde klip yok",
+  "source": {
+    "hls": "(HLS akışı)",
+    "uploaded": "(yüklendi)",
+    "local": "(yerel)",
+    "file": "(dosya)"
+  },
+  "stageLayout": {
+    "tileTop": "Üstte döşe",
+    "tileBottom": "Altta döşe",
+    "overlay": "Kaplama"
+  },
+  "selectClip": "Önizlemek için bir klip seç"
+}

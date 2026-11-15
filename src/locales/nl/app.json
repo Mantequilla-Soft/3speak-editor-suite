@@ -1,0 +1,149 @@
+{
+  "dismiss": "Sluiten",
+  "branding": {
+    "audioEditor": "Audio-editor",
+    "shortsEditor": "Shorts-editor",
+    "videoEditor": "Video-editor",
+    "beta": "bèta",
+    "backend": "Backend: {{url}}",
+    "backendSelecting": "Backend: kiezen...",
+    "showTour": "Rondleiding opnieuw tonen",
+    "shortcuts": "Sneltoetsen (?)",
+    "shortcutsLabel": "Sneltoetsen",
+    "fullscreen": "Volledig scherm (F)",
+    "fullscreenLabel": "Volledig scherm",
+    "leaveFullscreen": "Volledig scherm sluiten (F)",
+    "leaveFullscreenLabel": "Volledig scherm sluiten",
+    "closeEditor": "Editor sluiten"
+  },
+  "backendDown": "De backendserver is niet bereikbaar. Opnames uploaden, renderen en mediaverwerking werken niet.",
+  "menu": {
+    "undo": "Ongedaan maken (Ctrl+Z)",
+    "redo": "Opnieuw (Ctrl+Shift+Z)"
+  },
+  "audioTools": {
+    "cutSilences": "Stiltes knippen",
+    "cutSilencesTitle": "Knip de stiltes uit de gekozen clip (of zijn groep): pauzes vinden, wegknippen, gaten dichten",
+    "template": "Sjabloon",
+    "templateTitle": "Je sjabloon: intro, outro en muziekbed voor elke opname",
+    "normalizeLabel": "Luidheid normaliseren",
+    "normalizeOn": "Normaliseren: aan",
+    "normalizeOff": "Normaliseren: uit",
+    "normalizeOnTitle": "Normaliseren staat aan: de export wordt op een gelijkmatige -16 LUFS gebracht (de podcaststandaard)",
+    "normalizeOffTitle": "Normaliseren staat uit: de export houdt je niveaus zoals ze zijn",
+    "chapters": "Hoofdstukken",
+    "chaptersCount": "Hoofdstukken ({{n}})",
+    "chaptersTitle": "Hoofdstukken: markeer waar elk deel begint (M voegt er een toe op de afspeelkop)",
+    "transcript": "Transcript",
+    "transcriptTitle": "Transcript: bewerk de show via de tekst, verwijder woorden om ze weg te knippen",
+    "fillersLabel": "Stopwoorden verwijderen",
+    "fillers": "Stopwoorden",
+    "fillersTitle": "Stopwoorden verwijderen: vind eh, ehm, weet je en lange pauzes, controleer ze, knip ze weg"
+  },
+  "cutSilences": {
+    "progress": "Stiltes knippen: clip {{done}} van {{total}}",
+    "failed_one": "{{count}} clip kon niet worden gelezen. De andere zijn geknipt.",
+    "failed_other": "{{count}} clips konden niet worden gelezen. De andere zijn geknipt.",
+    "failedUploading_one": "{{count}} clip kon nog niet worden gelezen: probeer het opnieuw als de upload klaar is. De andere zijn geknipt.",
+    "failedUploading_other": "{{count}} clips konden nog niet worden gelezen: probeer het opnieuw als de upload klaar is. De andere zijn geknipt."
+  },
+  "group": {
+    "nothing": "Er speelt niets tegelijk op een ander stemspoor. Zet de andere stem eerst op een eigen spoor.",
+    "done_one": "{{count}} stem gegroepeerd: ze worden nu samen verplaatst, ingekort en van stiltes ontdaan.",
+    "done_other": "{{count}} stemmen gegroepeerd: ze worden nu samen verplaatst, ingekort en van stiltes ontdaan."
+  },
+  "template": {
+    "applied": "Sjabloon toegepast: {{parts}}.",
+    "intro": "intro",
+    "outro": "outro",
+    "bed": "muziekbed",
+    "takeOff": "Weer weghalen"
+  },
+  "rangePick": {
+    "hint": "Klik waar het stuk voor de audiogram begint, en dan waar het eindigt (tot 2 minuten). Trek aan de randen om het aan te passen.",
+    "from": "Vanaf {{start}}: klik nu waar het eindigt",
+    "span": "{{start}} – {{end}} · {{seconds}}s",
+    "listenTitle": "Alleen dit stuk beluisteren (spatie)",
+    "stop": "Stoppen",
+    "play": "Stuk afspelen",
+    "use": "Dit stuk gebruiken"
+  },
+  "empty": {
+    "addVideo": "Video toevoegen",
+    "addImage": "Afbeelding toevoegen",
+    "addAudio": "Audio toevoegen",
+    "addRecording": "Opname toevoegen",
+    "record": "Opnemen",
+    "music": "Muziek"
+  },
+  "confirm": {
+    "removeClip": "Deze clip van de tijdlijn verwijderen?",
+    "removeClips_one": "Deze {{count}} clip van de tijdlijn verwijderen?",
+    "removeClips_other": "Deze {{count}} clips van de tijdlijn verwijderen?",
+    "removeLibraryItem": "Dit item uit de projectbibliotheek verwijderen?",
+    "removeTrack": "Dit spoor met al zijn clips verwijderen?"
+  },
+  "clipStreaming": "Deze clip wordt nog vanaf 3Speak gestreamd. Probeer het opnieuw als de download klaar is.",
+  "reverse": {
+    "title": "Clip omkeren...",
+    "body": "Bezig op de server, even geduld.",
+    "failed": "Clip omkeren mislukt: {{error}}"
+  },
+  "remix": {
+    "stitch": "Stitch",
+    "stitchHintBefore": "Neem tot {{seconds}}s op. Het speelt direct voor het origineel.",
+    "stitchHintAfter": "Neem tot {{seconds}}s op. Het speelt direct na het origineel.",
+    "reaction": "Reactie",
+    "reactionHint": "Het origineel speelt vanaf het begin terwijl je opneemt. Gebruik een koptelefoon zodat het niet in je microfoon doorklinkt.",
+    "originalFillsLimit": "Het origineel vult de limiet van {{limit}} al. Kort het in op de tijdlijn en neem dan je stitch op met de cameraknop."
+  },
+  "chapters": {
+    "intro": "Intro",
+    "numbered": "Hoofdstuk {{n}}"
+  },
+  "duck": {
+    "allVoices": "Alle stemsporen"
+  },
+  "media": "Media",
+  "importedMedia": "Geïmporteerde media",
+  "files_one": "{{count}} bestand",
+  "files_other": "{{count}} bestanden",
+  "side": {
+    "clipsSelected_one": "{{count}} clip geselecteerd",
+    "clipsSelected_other": "{{count}} clips geselecteerd",
+    "clearSelection": "Selectie wissen",
+    "closeProperties": "Eigenschappen sluiten",
+    "captions": "Ondertitels",
+    "closeCaptions": "Ondertitels sluiten",
+    "noClip": "Geen clip geselecteerd",
+    "noClipHint": "Selecteer een clip op de tijdlijn om de instellingen te zien. Sleep een kader over meerdere clips om ze samen te wijzigen."
+  },
+  "cleaningHint": "Lange opnames kunnen een minuut duren.",
+  "hlsDownload": {
+    "title": "Media downloaden",
+    "hint": "Even geduld terwijl de media worden voorbereid..."
+  },
+  "sendPreview": {
+    "titleAudio": "Luister voordat je het gebruikt",
+    "titleVideo": "Bekijk een voorbeeld van je video",
+    "back": "Terug naar editor",
+    "askTitle": "Audiogrammen maken voor Shorts?",
+    "askBody": "Korte video's van de beste stukken van deze audio, samen ermee geplaatst als 3Speak-Shorts, elk met een link terug.",
+    "askNo": "Nee, audio gebruiken",
+    "askMake": "Audiogrammen maken"
+  },
+  "legacy": {
+    "projectLibrary": "Projectbibliotheek",
+    "loadingFfmpeg": "FFmpeg laden... {{percent}}",
+    "properties": "Eigenschappen",
+    "propertiesOf": "Eigenschappen: {{name}}",
+    "addMedia": "Media toevoegen",
+    "addMediaTitle": "Media aan bibliotheek toevoegen",
+    "record": "Opnemen",
+    "recordTitle": "Video opnemen met de camera"
+  },
+  "drafts": {
+    "episode": "Aflevering",
+    "project": "Project"
+  }
+}

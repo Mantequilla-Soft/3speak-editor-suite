@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "line": "{{clips}} · {{length}} · {{edited}}",
+    "audioLine": "Audio · {{clips}} · {{length}} · {{edited}}",
+    "clips_one": "{{count}} clip",
+    "clips_many": "{{count}} clips",
+    "clips_other": "{{count}} clips",
+    "edited": {
+      "justNow": "editado justo ahora",
+      "minutes_one": "editado hace {{count}} min",
+      "minutes_many": "editado hace {{count}} de min",
+      "minutes_other": "editado hace {{count}} min",
+      "hours_one": "editado hace {{count}} h",
+      "hours_many": "editado hace {{count}} de h",
+      "hours_other": "editado hace {{count}} h",
+      "days_one": "editado hace {{count}} día",
+      "days_many": "editado hace {{count}} de días",
+      "days_other": "editado hace {{count}} días"
+    }
+  },
+  "prompt": {
+    "titleOne": "¿Continuar tu borrador?",
+    "titleMany": "¿Continuar un borrador?",
+    "keptUntil": "Se guarda hasta el {{date}}",
+    "open": "Abrir",
+    "startNew": "Empezar un proyecto nuevo",
+    "singleNote": "Puedes guardar un borrador. Si empiezas un proyecto nuevo, reemplaza a este en cuanto edites. 3Speak Pro guarda 3 borradores durante 30 días."
+  },
+  "limit": {
+    "titleOne": "¿Reemplazar tu borrador guardado?",
+    "titleMany": "Ya tienes {{n}} proyectos guardados",
+    "skipTitle": "No guardar este proyecto",
+    "noteOne": "Puedes guardar un borrador. Si guardas este proyecto, reemplaza al de abajo.",
+    "noteMany": "Puedes guardar hasta {{n}}. Elige cuál reemplaza este proyecto:",
+    "replace": "Reemplazar",
+    "skip": "No guardar este proyecto"
+  },
+  "close": {
+    "saveTitle": "¿Guardar tu proyecto?",
+    "closeTitle": "¿Cerrar el editor?",
+    "keepEditing": "Seguir editando",
+    "signInFailed": "No funcionó. Aprueba la solicitud de inicio de sesión en tu billetera e inténtalo de nuevo, o cierra sesión en 3Speak y vuelve a entrar.",
+    "signInToKeep": "Inicia sesión una vez para guardar este proyecto como borrador y continuar más tarde.",
+    "signedOutLost": "Tus cambios se perderán. Inicia sesión en 3Speak para guardar borradores de tus proyectos.",
+    "lost": "Tus cambios se perderán.",
+    "signingIn": "Iniciando sesión…",
+    "signInToSave": "Inicia sesión para guardar",
+    "withoutSaving": "Cerrar sin guardar",
+    "keepTitle": "¿Guardar este proyecto?",
+    "keepDays_one": "Lo guardamos durante {{count}} día",
+    "keepDays_many": "Lo guardamos durante {{count}} de días",
+    "keepDays_other": "Lo guardamos durante {{count}} días",
+    "keepHours_one": "Lo guardamos durante {{count}} hora",
+    "keepHours_many": "Lo guardamos durante {{count}} de horas",
+    "keepHours_other": "Lo guardamos durante {{count}} horas",
+    "until": "hasta el {{date}}",
+    "uploadingOne": "{{name}} todavía se está subiendo ({{percent}}). Podrás guardar cuando termine.",
+    "uploadingFiles_one": "{{count}} archivo todavía se está subiendo ({{percent}}). Podrás guardar cuando termine.",
+    "uploadingFiles_many": "{{count}} de archivos todavía se están subiendo ({{percent}}). Podrás guardar cuando terminen.",
+    "uploadingFiles_other": "{{count}} archivos todavía se están subiendo ({{percent}}). Podrás guardar cuando terminen.",
+    "name": "Nombre del proyecto",
+    "namePlaceholder": "Proyecto sin título",
+    "saveError": "No se pudo guardar. Revisa tu conexión e inténtalo de nuevo.",
+    "saveAndClose": "Guardar y cerrar",
+    "afterUpload": "Disponible cuando termine la subida",
+    "deleteAndClose": "Eliminarlo y cerrar"
+  },
+  "pro": {
+    "title": "Más con 3Speak Pro",
+    "text": "Guarda hasta 3 proyectos durante 30 días cada uno, en vez de 1 durante 7 días.",
+    "get": "Obtener Pro"
+  },
+  "status": {
+    "signingIn": "Iniciando sesión… revisa tu billetera",
+    "signInTitle": "Inicia sesión una vez para guardar tu proyecto como borrador",
+    "signInFailed": "Falló el inicio de sesión · inténtalo de nuevo",
+    "saveDrafts": "Guardar borradores",
+    "notSavedTitle": "Este proyecto aún no está guardado",
+    "chooseSlot": "Sin guardar: elige un espacio",
+    "saving": "Guardando…",
+    "notSaved": "Borrador sin guardar",
+    "keptUntil": "Borrador guardado hasta el {{date}}",
+    "savedUntil": "Borrador guardado · hasta el {{date}}"
+  },
+  "library": {
+    "title": "Biblioteca del proyecto",
+    "addFiles": "Añadir archivos",
+    "groups": {
+      "videos": "Videos",
+      "images": "Imágenes",
+      "sounds": "Sonidos"
+    },
+    "empty": {
+      "videos": "Sin videos",
+      "images": "Sin imágenes",
+      "sounds": "Sin sonidos"
+    },
+    "dropToAdd": "Suelta archivos para añadirlos",
+    "hint": "Suelta archivos aquí o arrastra elementos a la línea de tiempo",
+    "downloading": "Descargando... {{percent}}",
+    "downloaded": "Descargado localmente",
+    "local": "local",
+    "uploadingTitle": "Subiendo en segundo plano. El renderizado espera hasta que termine.",
+    "converting": "convirtiendo",
+    "convertingTitle": "Este navegador no puede mostrar el formato de este video. La vista previa cambia a una copia en 480p cuando esté lista.",
+    "noPreview": "sin vista previa",
+    "noPreviewTitle": "No se pudo crear una copia reproducible. La vista previa puede quedarse en negro, pero el renderizado sigue funcionando.",
+    "encodedTitle": "Codificado a 480p en el servidor",
+    "encoding": "Codificando...",
+    "addToTimeline": "Añadir a la línea de tiempo",
+    "remove": "Quitar de la biblioteca"
+  }
+}

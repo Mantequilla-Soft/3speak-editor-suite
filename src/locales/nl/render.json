@@ -1,0 +1,83 @@
+{
+  "button": {
+    "rendering": "Renderen...",
+    "exporting": "Exporteren...",
+    "uploading": "Uploaden {{percent}}",
+    "reRender": "Opnieuw renderen",
+    "exportAgain": "Opnieuw exporteren",
+    "trimToRender": "Kort de tijdlijn in tot {{limit}} of minder om te renderen",
+    "trimToExport": "Kort de tijdlijn in tot {{limit}} of minder om te exporteren"
+  },
+  "exportAs": {
+    "button": "Exporteren als",
+    "title": "Exporteren als: hetzelfde project als Short, vierkante of liggende video, uitgesneden rond de gezichten",
+    "close": "Exporteren als sluiten",
+    "waitUpload": "Wacht tot de upload klaar is."
+  },
+  "done": {
+    "download": "Downloaden",
+    "audiograms": "Audiogrammen",
+    "audiogramsCount": "Audiogrammen ({{n}})",
+    "audiogramsTitle": "Korte video's van stukken van de aflevering, om te delen of als Shorts mee te plaatsen",
+    "videoPodcast": "Videopodcast",
+    "videoPodcastTitle": "De hele aflevering als 16:9-video met de cover, een golfvorm, ondertitels en wie er spreekt",
+    "useAudio": "Deze audio gebruiken",
+    "sendVideo": "Video versturen"
+  },
+  "failed": "Renderen mislukt: {{error}}",
+  "phase": {
+    "preparing": "Bestanden voorbereiden...",
+    "submitting": "Rendertaak versturen...",
+    "busyRetry": "De renderservers zijn bezet. Opnieuw proberen over {{seconds}} s...",
+    "offlineRetry": "Geen verbinding met de renderserver. Opnieuw proberen over {{seconds}} s...",
+    "starting": "Starten...",
+    "reconnecting": "Opnieuw verbinden met de renderserver...",
+    "uploadingFile": "{{name}} uploaden ({{index}}/{{total}})...",
+    "uploadingUnnamed": "Bestand uploaden ({{index}}/{{total}})...",
+    "uploadingPlate": "Achtergrondbeeld uploaden voor {{name}}...",
+    "uploadingPlateUnnamed": "Achtergrondbeeld uploaden voor clip..."
+  },
+  "queue": {
+    "next": "Jij bent de volgende",
+    "inLine": {
+      "one": "Je bent {{n}}e in de rij",
+      "two": "Je bent {{n}}e in de rij",
+      "few": "Je bent {{n}}e in de rij",
+      "other": "Je bent {{n}}e in de rij"
+    },
+    "waiting": "Wachten op een vrije renderplek..."
+  },
+  "legacy": {
+    "exportVideo": "Video exporteren",
+    "cancelTitle": "Exporteren annuleren",
+    "settingsTitle": "Exportinstellingen",
+    "uploadingRender": "{{name}} uploaden ({{percent}}). Bewerk gerust verder; Renderen wordt vrijgegeven zodra het klaar is.",
+    "uploadingExport": "{{name}} uploaden ({{percent}}). Bewerk gerust verder; Exporteren wordt vrijgegeven zodra het klaar is.",
+    "lengthRender": "De tijdlijn duurt {{length}}. Kort hem in tot {{limit}} of minder om te renderen.",
+    "lengthExport": "De tijdlijn duurt {{length}}. Kort hem in tot {{limit}} of minder om te exporteren.",
+    "method": "Exportmethode",
+    "methodCanvas": "Canvas (WYSIWYG)",
+    "methodFast": "Snel (geen effecten)",
+    "canvasHint": "Legt alle visuele effecten precies vast zoals in het voorbeeld",
+    "fastHint": "Sneller exporteren, maar negeert zoom, positie, bijsnijden en tekstoverlays",
+    "quality": "Kwaliteit",
+    "qualityHigh": "Hoog (groter bestand)",
+    "qualityMedium": "Middel (aanbevolen)",
+    "qualityLow": "Laag (kleiner bestand)",
+    "processing": "Verwerken... {{percent}}",
+    "renderingPercent": "Renderen... {{percent}}",
+    "downloadRendered": "Gerenderde video downloaden",
+    "ffmpegLoading": "FFmpeg laden...",
+    "ffmpegNotLoaded": "FFmpeg niet geladen",
+    "addClips": "Voeg clips toe aan de tijdlijn om te exporteren"
+  },
+  "canvas": {
+    "loadingMedia": "Media laden...",
+    "renderingFrames": "Beelden renderen...",
+    "encodingVideo": "Video coderen...",
+    "processingAudio": "Audio verwerken...",
+    "convertingMp4": "Omzetten naar MP4...",
+    "preparingDownload": "Download voorbereiden...",
+    "complete": "Klaar!"
+  }
+}

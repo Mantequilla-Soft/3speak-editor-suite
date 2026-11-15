@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "line": "{{clips}} · {{length}} · {{edited}}",
+    "audioLine": "Sauti · {{clips}} · {{length}} · {{edited}}",
+    "clips_one": "klipu {{count}}",
+    "clips_other": "klipu {{count}}",
+    "edited": {
+      "justNow": "imehaririwa sasa hivi",
+      "minutes_one": "imehaririwa dakika {{count}} zilizopita",
+      "minutes_other": "imehaririwa dakika {{count}} zilizopita",
+      "hours_one": "imehaririwa saa {{count}} iliyopita",
+      "hours_other": "imehaririwa saa {{count}} zilizopita",
+      "days_one": "imehaririwa siku {{count}} iliyopita",
+      "days_other": "imehaririwa siku {{count}} zilizopita"
+    }
+  },
+  "prompt": {
+    "titleOne": "Endelea na rasimu yako?",
+    "titleMany": "Endelea na rasimu?",
+    "keptUntil": "Inahifadhiwa hadi {{date}}",
+    "open": "Fungua",
+    "startNew": "Anza mradi mpya",
+    "singleNote": "Unaweza kuhifadhi rasimu moja. Kuanza mradi mpya kunabadilisha hii mara tu unapohariri. 3Speak Pro inahifadhi rasimu 3 kwa siku 30."
+  },
+  "limit": {
+    "titleOne": "Badilisha rasimu yako iliyohifadhiwa?",
+    "titleMany": "Tayari una miradi {{n}} iliyohifadhiwa",
+    "skipTitle": "Usihifadhi mradi huu",
+    "noteOne": "Unaweza kuhifadhi rasimu moja. Kuhifadhi mradi huu kunabadilisha ile iliyo hapa chini.",
+    "noteMany": "Unaweza kuhifadhi hadi {{n}}. Chagua mmoja utakaobadilishwa na mradi huu:",
+    "replace": "Badilisha",
+    "skip": "Usihifadhi mradi huu"
+  },
+  "close": {
+    "saveTitle": "Hifadhi mradi wako?",
+    "closeTitle": "Funga kihariri?",
+    "keepEditing": "Endelea kuhariri",
+    "signInFailed": "Hilo halikufanya kazi. Idhinisha ombi la kuingia kwenye pochi yako na ujaribu tena, au toka kwenye 3Speak na uingie tena.",
+    "signInToKeep": "Ingia mara moja ili kuhifadhi mradi huu kama rasimu, ili uendelee baadaye.",
+    "signedOutLost": "Mabadiliko yako yatapotea. Ingia kwenye 3Speak ili kuhifadhi rasimu za miradi yako.",
+    "lost": "Mabadiliko yako yatapotea.",
+    "signingIn": "Inaingia…",
+    "signInToSave": "Ingia ili kuhifadhi",
+    "withoutSaving": "Funga bila kuhifadhi",
+    "keepTitle": "Hifadhi mradi huu?",
+    "keepDays_one": "Tunauhifadhi kwa siku {{count}}",
+    "keepDays_other": "Tunauhifadhi kwa siku {{count}}",
+    "keepHours_one": "Tunauhifadhi kwa saa {{count}}",
+    "keepHours_other": "Tunauhifadhi kwa saa {{count}}",
+    "until": "hadi {{date}}",
+    "uploadingOne": "{{name}} bado inapakiwa ({{percent}}). Unaweza kuhifadhi ikikamilika.",
+    "uploadingFiles_one": "Faili {{count}} bado linapakiwa ({{percent}}). Unaweza kuhifadhi likikamilika.",
+    "uploadingFiles_other": "Faili {{count}} bado yanapakiwa ({{percent}}). Unaweza kuhifadhi yakikamilika.",
+    "name": "Jina la mradi",
+    "namePlaceholder": "Mradi usio na jina",
+    "saveError": "Imeshindwa kuhifadhi. Angalia muunganisho wako na ujaribu tena.",
+    "saveAndClose": "Hifadhi na ufunge",
+    "afterUpload": "Inapatikana upakiaji ukikamilika",
+    "deleteAndClose": "Ifute na ufunge"
+  },
+  "pro": {
+    "title": "Zaidi ukiwa na 3Speak Pro",
+    "text": "Hifadhi hadi miradi 3 kwa siku 30 kila mmoja, badala ya 1 kwa siku 7.",
+    "get": "Pata Pro"
+  },
+  "status": {
+    "signingIn": "Inaingia… angalia pochi yako",
+    "signInTitle": "Ingia mara moja ili kuhifadhi mradi wako kama rasimu",
+    "signInFailed": "Kuingia kumeshindwa · jaribu tena",
+    "saveDrafts": "Hifadhi rasimu",
+    "notSavedTitle": "Mradi huu bado haujahifadhiwa",
+    "chooseSlot": "Haijahifadhiwa: chagua nafasi",
+    "saving": "Inahifadhi…",
+    "notSaved": "Rasimu haijahifadhiwa",
+    "keptUntil": "Rasimu inahifadhiwa hadi {{date}}",
+    "savedUntil": "Rasimu imehifadhiwa · hadi {{date}}"
+  },
+  "library": {
+    "title": "Maktaba ya mradi",
+    "addFiles": "Ongeza faili",
+    "groups": {
+      "videos": "Video",
+      "images": "Picha",
+      "sounds": "Sauti"
+    },
+    "empty": {
+      "videos": "Hakuna video",
+      "images": "Hakuna picha",
+      "sounds": "Hakuna sauti"
+    },
+    "dropToAdd": "Dondosha faili ili kuongeza",
+    "hint": "Dondosha faili hapa au buruta vipengee kwenye mfuatano wa muda",
+    "downloading": "Inapakua... {{percent}}",
+    "downloaded": "Imepakuliwa kwenye kifaa",
+    "local": "kwenye kifaa",
+    "uploadingTitle": "Inapakia chinichini. Utengenezaji unasubiri hadi ikamilike.",
+    "converting": "inabadilisha",
+    "convertingTitle": "Kivinjari hiki hakiwezi kuonyesha muundo wa video hii. Onyesho la awali linabadilika kwenda nakala ya 480p ikiwa tayari.",
+    "noPreview": "hakuna onyesho la awali",
+    "noPreviewTitle": "Imeshindwa kutengeneza nakala inayochezeka. Onyesho la awali linaweza kubaki jeusi, utengenezaji bado unafanya kazi.",
+    "encodedTitle": "Imesimbwa kuwa 480p kwenye seva",
+    "encoding": "Inasimba...",
+    "addToTimeline": "Ongeza kwenye mfuatano wa muda",
+    "remove": "Ondoa kwenye maktaba"
+  }
+}

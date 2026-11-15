@@ -1,0 +1,88 @@
+{
+  "aspect": {
+    "short": {
+      "label": "Short",
+      "hint": "Verticale, fino a 2 minuti, pubblicato come Short"
+    },
+    "landscape": {
+      "label": "Orizzontale",
+      "hint": "Video panoramico, fino a 10 minuti"
+    },
+    "classic": {
+      "label": "Classico",
+      "hint": "Video 4:3, fino a 10 minuti"
+    },
+    "square": {
+      "label": "Quadrato",
+      "hint": "Video quadrato, fino a 10 minuti"
+    }
+  },
+  "chip": {
+    "title": "Formato di questo progetto: {{shape}}. Fai clic per cambiarlo",
+    "aria": "Formato del progetto: {{shape}}"
+  },
+  "picker": {
+    "title": "Cosa stai creando?",
+    "tooLong": "la tua timeline dura {{length}}, accorciala a {{limit}} per il rendering",
+    "note": "Il formato decide come arriva su 3Speak: 9:16 come Short, gli altri come video normale. \"Esporta come\" lo renderizza anche in altri formati."
+  },
+  "preview": {
+    "heading": "Anteprima in",
+    "yours": "{{aspect}} (il tuo)",
+    "projectIs": {
+      "short": "Il tuo progetto è Short 9:16. In un altro formato, le riprese riempiono l'inquadratura, ritagliate attorno al volto.",
+      "landscape": "Il tuo progetto è Orizzontale 16:9. In un altro formato, le riprese riempiono l'inquadratura, ritagliate attorno al volto.",
+      "classic": "Il tuo progetto è Classico 4:3. In un altro formato, le riprese riempiono l'inquadratura, ritagliate attorno al volto.",
+      "square": "Il tuo progetto è Quadrato 1:1. In un altro formato, le riprese riempiono l'inquadratura, ritagliate attorno al volto."
+    }
+  },
+  "faces": {
+    "heading": "Segui i volti",
+    "noFootage": "Ancora nessuna ripresa da reinquadrare. Le clip spostate o ingrandite mantengono la propria inquadratura.",
+    "hint": "Il volto viene trovato nel tuo browser, qualche fotogramma al secondo. Senza volto resta inquadrato il centro.",
+    "found": "Volto trovato",
+    "noFace": "Nessun volto: centro",
+    "middle": "Centro",
+    "finding": "Ricerca dei volti",
+    "findOne": "Trova il volto",
+    "findMany_one": "Trova i volti in {{count}} clip",
+    "findMany_many": "Trova i volti in {{count}} clip",
+    "findMany_other": "Trova i volti in {{count}} clip",
+    "streamNamed": "{{name}} è uno stream: viene ritagliato attorno al centro.",
+    "streamUnnamed": "Una clip è uno stream: viene ritagliata attorno al centro.",
+    "failed": "Il tracciamento del volto non ha funzionato qui: {{error}}",
+    "moveWindow": "{{name}}: sposta la finestra",
+    "left": "Sinistra",
+    "right": "Destra",
+    "up": "Su",
+    "down": "Giù",
+    "moveX": "Sposta la finestra a sinistra o a destra",
+    "moveY": "Sposta la finestra su o giù",
+    "findAgain": "Trova di nuovo il volto",
+    "reset": "Centro, senza spostamento"
+  },
+  "clipFallback": "Clip",
+  "stop": "Stop",
+  "render": {
+    "heading": "Renderizza come",
+    "shortsLimit": "Gli Shorts durano al massimo {{limit}}: accorcia la timeline per renderizzarne uno in 9:16.",
+    "button_one": "Renderizza {{count}} video",
+    "button_many": "Renderizza {{count}} video",
+    "button_other": "Renderizza {{count}} video",
+    "failed": "Rendering non riuscito: {{error}}",
+    "download": "Scarica",
+    "postShort": "Pubblica come Short",
+    "postVideo": "Pubblica come video"
+  },
+  "job": {
+    "waiting": "In attesa...",
+    "preparing": "Preparazione dei file...",
+    "starting": "Avvio...",
+    "rendering": "Rendering...",
+    "done": "Fatto",
+    "stopped": "Interrotto",
+    "busy": "I server di rendering sono occupati. Nuovo tentativo tra {{seconds}} s...",
+    "offline": "Nessuna connessione al server di rendering. Nuovo tentativo tra {{seconds}} s...",
+    "failed": "Rendering non riuscito"
+  }
+}

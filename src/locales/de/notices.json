@@ -1,0 +1,25 @@
+{
+  "length": {
+    "title": "Deine Zeitleiste ist {{length}} lang",
+    "body": "{{atMost}} Du kannst alles weiter bearbeiten, aber Rendern bleibt aus, bis die Zeitleiste an der markierten Linie bei {{limitAt}} endet. Kürze, teile oder lösche Clips, um dahin zu kommen.",
+    "bodyAudio": "{{atMost}} Du kannst alles weiter bearbeiten, aber Exportieren bleibt aus, bis die Zeitleiste an der markierten Linie bei {{limitAt}} endet. Kürze, teile oder lösche Clips, um dahin zu kommen."
+  },
+  "tooLarge": {
+    "title_one": "Diese Datei ist zu groß",
+    "title_other": "Diese Dateien sind zu groß",
+    "body": "Der Editor nimmt Dateien bis {{size}}. Kürze oder komprimiere das Video zuerst (ein Handy oder jede Video-App kann eine kleinere Kopie exportieren) und füge es dann erneut hinzu."
+  },
+  "encoding": {
+    "title": "Dieses Video muss zuerst umgewandelt werden",
+    "videos_one": "{{count}} Video",
+    "videos_other": "{{count}} Videos",
+    "next": "Weiter",
+    "waiting_one": "Warte auf {{count}} anderes Video",
+    "waiting_other": "Warte auf {{count}} andere Videos",
+    "starting": "Wird gestartet…",
+    "upload": "Upload",
+    "convert": "In eine abspielbare Kopie umwandeln",
+    "hint": "Dieser Browser kann das Format dieses Videos nicht abspielen (HEVC oder HDR, typisch bei Handys), daher bleibt es schwarz, bis die abspielbare Kopie fertig ist. Die Vorschau wechselt dann von selbst dorthin. Du kannst in der Zwischenzeit weiter bearbeiten.",
+    "hide": "Ausblenden"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "language": {
+    "label": "Lugha inayozungumzwa",
+    "auto": "Gundua kiotomatiki"
+  },
+  "intro": {
+    "title": "Manukuu ya otomatiki",
+    "text": "Geuza kinachosemwa kuwa manukuu yanayofuata kila neno, yaliyochomwa kwenye Short yako na kutumwa kwa 3Speak kama manukuu pia.",
+    "checking": "Inakagua seva...",
+    "unavailable": "Manukuu ya otomatiki hayapatikani kwenye seva hii ya kihariri kwa sasa. Short yako itatengenezwa kama kawaida bila hayo.",
+    "go": "Manukuu ya otomatiki"
+  },
+  "presets": {
+    "karaoke": "Karaoke",
+    "pop": "Kuibuka",
+    "plain": "Manukuu"
+  },
+  "presetHints": {
+    "karaoke": "Maneno machache kwa wakati mmoja, neno linalotamkwa likiwa kwa rangi ya kuangazia",
+    "pop": "Neno moja (au machache) kwa wakati mmoja, likiibuka",
+    "plain": "Mistari ya kawaida ya manukuu kwenye kisanduku cheusi"
+  },
+  "style": {
+    "title": "Mtindo",
+    "presetsLabel": "Mtindo wa manukuu",
+    "wordsAtATime": "Maneno kwa wakati mmoja",
+    "font": "Fonti",
+    "size": "Ukubwa",
+    "sizeLabel": "Ukubwa wa manukuu",
+    "position": "Mahali",
+    "positionLabel": "Kimo cha manukuu kwenye picha",
+    "top": "Juu",
+    "middle": "Katikati",
+    "low": "Chini",
+    "textColour": "Rangi ya maandishi",
+    "highlight": "Angazia",
+    "highlightLabel": "Rangi ya kuangazia",
+    "uppercase": "Herufi kubwa",
+    "emoji": "Emoji za msisitizo (juu ya maneno kama \"moto\" au \"upendo\")",
+    "burn": "Onyesha kwenye video (imezimwa: kama manukuu kwenye 3Speak pekee)"
+  },
+  "words": {
+    "title": "Maneno ({{n}})",
+    "hint": "Rekebisha yaliyosikika vibaya; futa neno ili kuliondoa. Umesogeza au kukata klipu? Endesha manukuu ya otomatiki tena.",
+    "goThere": "Nenda hapo",
+    "word": "Neno {{n}}",
+    "changeEmoji": "Badilisha au ondoa emoji yake",
+    "addEmoji": "Ongeza emoji",
+    "remove": "Ondoa neno hili",
+    "removeNamed": "Ondoa {{word}}"
+  },
+  "actions": {
+    "again": "Tena",
+    "againTitle": "Sikiliza tena (inabadilisha maneno)",
+    "remove": "Ondoa manukuu"
+  },
+  "videoSound": "Sauti ya video",
+  "job": {
+    "preparing": "Inaandaa sauti...",
+    "listening": "Inasikiliza...",
+    "noTracks": "Hakuna usemi wa kuwekea manukuu: ongeza klipu yenye sauti kwanza.",
+    "serverAnswered": "Seva ilijibu {{status}}",
+    "lost": "Kazi ya manukuu imepotea (seva ilianzishwa upya?)",
+    "noSpeech": "Hakuna usemi uliopatikana. Je, sauti iko kwenye njia ya sauti ambayo haijanyamazishwa (njia za muziki haziingizwi)?",
+    "failed": "Utambuzi wa usemi umeshindwa"
+  }
+}

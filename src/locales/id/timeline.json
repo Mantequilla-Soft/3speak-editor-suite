@@ -1,0 +1,180 @@
+{
+  "aria": {
+    "timeline": "Linimasa",
+    "ruler": "Penggaris waktu: klik untuk memindahkan playhead",
+    "playhead": "Playhead",
+    "zoom": "Zoom"
+  },
+  "split": {
+    "title": "Bagi klip di playhead (Ctrl+R)",
+    "label": "Bagi"
+  },
+  "toolbar": {
+    "add": {
+      "title": "Tambah trek atau klip",
+      "videoTrack": "Trek video",
+      "audioTrack": "Trek audio",
+      "musicLibrary": "Pustaka musik",
+      "soundEffects": "Efek suara",
+      "stickers": "Stiker",
+      "titles": "Judul",
+      "stock": "Media stok"
+    },
+    "zoomTitle": "Zoom: {{value}}px/dtk",
+    "fit": {
+      "title": "Tampilkan seluruh linimasa",
+      "label": "Pas"
+    },
+    "select": {
+      "titleStart": "Pilih beberapa klip: ketuk satu per satu",
+      "titleDone": "Selesai memilih",
+      "label": "Pilih"
+    },
+    "ripple": {
+      "titleTrack": "Rapatkan celah di playhead pada trek {{number}} (G). Trek lain tetap seperti semula.",
+      "titleNoGap": "Tidak ada celah di playhead pada trek klip terpilih",
+      "title": "Hapus celah di playhead (G)",
+      "label": "Ripple"
+    },
+    "captions": {
+      "title": "Teks: ubah ucapan menjadi teks kata demi kata",
+      "label": "Teks"
+    },
+    "transcript": {
+      "title": "Transkrip: edit lewat teks, hapus kata untuk memotongnya",
+      "label": "Transkrip"
+    },
+    "flag": {
+      "title": "Pasang penanda di playhead (B): penanda pribadimu, bernomor dan berwarna, tidak pernah diekspor",
+      "label": "Penanda"
+    },
+    "autoCut": {
+      "title": "Temukan jeda dan potong di sana",
+      "label": "Potong otomatis"
+    },
+    "beats": {
+      "title": "Temukan ketukan: menempel padanya, tata klip di atasnya",
+      "label": "Ketukan"
+    },
+    "delete": {
+      "title": "Hapus klip terpilih (Del)",
+      "titleMany": "Hapus klip-klip terpilih (Del)",
+      "labelMany": "Hapus {{number}}"
+    },
+    "options": "Opsi",
+    "ungroup": {
+      "titleOne": "Pisahkan grup: klip-klipnya kembali dipindah dan dipangkas sendiri-sendiri",
+      "titleMany": "Pisahkan grup: klip-klip ini kembali dipindah dan dipangkas sendiri-sendiri",
+      "label": "Pisahkan"
+    },
+    "group": {
+      "title": "Grupkan: klip-klip ini dipindah dan dipangkas bersama",
+      "label": "Grupkan {{number}}"
+    },
+    "more": {
+      "title": "Aksi klip lainnya",
+      "duplicate": "Duplikat",
+      "groupVoicesTitle": "Grupkan dengan yang diputar bersamaan di trek suara lain: semuanya dipindah, dipangkas, dan dipotong heningnya bersama",
+      "groupVoices": "Grupkan dengan suara lain",
+      "reverse": "Balik",
+      "unreverse": "Batalkan balik",
+      "snapOn": "Snap aktif",
+      "snapOff": "Snap mati"
+    }
+  },
+  "selectHint": {
+    "count_other": "{{count}} klip dipilih: ketuk lagi, atau Selesai",
+    "none": "Ketuk setiap klip yang ingin kamu pilih",
+    "clear": "Kosongkan"
+  },
+  "clip": {
+    "settings": "Pengaturan klip",
+    "textFallback": "Teks",
+    "layer": "L{{number}}",
+    "kind": {
+      "video": "Klip video",
+      "audio": "Klip suara",
+      "image": "Gambar",
+      "text": "Teks",
+      "color": "Warna",
+      "other": "Klip"
+    },
+    "aria": {
+      "plain": "{{kind}}, {{from}} sampai {{to}}",
+      "named": "{{kind}} {{name}}, {{from}} sampai {{to}}",
+      "onTrack": "{{kind}} di {{track}}, {{from}} sampai {{to}}",
+      "namedOnTrack": "{{kind}} {{name}} di {{track}}, {{from}} sampai {{to}}"
+    }
+  },
+  "track": {
+    "show": "Tampilkan trek",
+    "hide": "Sembunyikan trek",
+    "mute": "Bisukan trek",
+    "unmute": "Bunyikan trek",
+    "remove": "Hapus trek",
+    "addVisual": "Tambah video, gambar, atau teks",
+    "addAudio": "Tambah audio",
+    "addFile": "Tambah file",
+    "addText": "Tambah teks",
+    "addColor": "Tambah warna",
+    "recordVideo": "Rekam Video",
+    "addAudioFile": "Tambah file audio",
+    "recordAudio": "Rekam Audio",
+    "resize": {
+      "aria": "Tinggi {{name}}",
+      "ariaUnnamed": "Tinggi trek ini",
+      "title": "Seret untuk membuat trek lebih tinggi atau lebih pendek (klik dua kali: kembali normal)"
+    },
+    "aria": {
+      "named": {
+        "video": "{{name}} (trek video)",
+        "audio": "{{name}} (trek audio)",
+        "music": "{{name}} (trek musik)"
+      },
+      "numbered": {
+        "video": "Trek video {{number}}",
+        "audio": "Trek audio {{number}}",
+        "music": "Trek musik {{number}}"
+      }
+    }
+  },
+  "trackName": {
+    "voice": "Suara",
+    "voiceNumbered": "Suara {{number}}",
+    "music": "Musik",
+    "musicNumbered": "Musik {{number}}",
+    "video": "Video",
+    "videoNumbered": "Video {{number}}",
+    "audioNumbered": "Audio {{number}}",
+    "stickers": "Stiker",
+    "stickersNumbered": "Stiker {{number}}",
+    "sfx": "Efek",
+    "sfxNumbered": "Efek {{number}}"
+  },
+  "clipName": {
+    "text": "Lapisan teks",
+    "color": "Warna",
+    "imported": "Media yang diimpor",
+    "linkedAudio": "{{name}} (Audio)"
+  },
+  "textClip": {
+    "defaultText": "Tulis teks di sini"
+  },
+  "flag": {
+    "aria": "Penanda {{number}} di {{time}}",
+    "title": "Penanda {{number}} · {{time}}: klik untuk melompat ke sana, seret untuk memindahkan, klik kanan untuk menghapus"
+  },
+  "range": {
+    "label": "{{from}} – {{to}} · {{seconds}} dtk",
+    "startOnly": "{{time}} · klik di mana berakhirnya",
+    "dragStart": "Seret untuk memindahkan awal",
+    "dragEnd": "Seret untuk memindahkan akhir"
+  },
+  "pastLimit": "Melewati batas render",
+  "backgroundMusic": {
+    "title": "Musik latar",
+    "add": "Tambah musik latar",
+    "remove": "Hapus musik"
+  },
+  "partName": "Bagian {{n}} · {{name}}"
+}

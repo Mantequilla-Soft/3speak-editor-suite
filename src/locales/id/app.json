@@ -1,0 +1,143 @@
+{
+  "dismiss": "Tutup",
+  "branding": {
+    "audioEditor": "Editor Audio",
+    "shortsEditor": "Editor Shorts",
+    "videoEditor": "Editor Video",
+    "beta": "beta",
+    "backend": "Backend: {{url}}",
+    "backendSelecting": "Backend: memilih...",
+    "showTour": "Tampilkan tur lagi",
+    "shortcuts": "Pintasan keyboard (?)",
+    "shortcutsLabel": "Pintasan keyboard",
+    "fullscreen": "Layar penuh (F)",
+    "fullscreenLabel": "Layar penuh",
+    "leaveFullscreen": "Keluar dari layar penuh (F)",
+    "leaveFullscreenLabel": "Keluar dari layar penuh",
+    "closeEditor": "Tutup editor"
+  },
+  "backendDown": "Server backend tidak dapat dijangkau. Unggah rekaman, render, dan pemrosesan media tidak akan berfungsi.",
+  "menu": {
+    "undo": "Urungkan (Ctrl+Z)",
+    "redo": "Ulangi (Ctrl+Shift+Z)"
+  },
+  "audioTools": {
+    "cutSilences": "Potong hening",
+    "cutSilencesTitle": "Potong bagian hening dari klip terpilih (atau grupnya): temukan jeda, potong, lalu rapatkan celahnya",
+    "template": "Template",
+    "templateTitle": "Templatemu: intro, outro, dan musik latar untuk setiap rekaman",
+    "normalizeLabel": "Normalisasi kenyaringan",
+    "normalizeOn": "Normalisasi: aktif",
+    "normalizeOff": "Normalisasi: mati",
+    "normalizeOnTitle": "Normalisasi aktif: hasil ekspor disamakan ke -16 LUFS (standar podcast)",
+    "normalizeOffTitle": "Normalisasi mati: hasil ekspor mempertahankan level aslimu",
+    "chapters": "Bab",
+    "chaptersCount": "Bab ({{n}})",
+    "chaptersTitle": "Bab: tandai di mana tiap bagian dimulai (M menambah satu di playhead)",
+    "transcript": "Transkrip",
+    "transcriptTitle": "Transkrip: edit acara lewat teksnya, hapus kata untuk memotongnya",
+    "fillersLabel": "Hapus kata pengisi",
+    "fillers": "Pengisi",
+    "fillersTitle": "Hapus kata pengisi: temukan em, eh, gitu, dan jeda panjang, tinjau, lalu potong"
+  },
+  "cutSilences": {
+    "progress": "Memotong hening: klip {{done}} dari {{total}}",
+    "failed_other": "{{count}} klip tidak dapat dibaca. Yang lain sudah dipotong.",
+    "failedUploading_other": "{{count}} klip belum dapat dibaca: coba lagi setelah unggahan selesai. Yang lain sudah dipotong."
+  },
+  "group": {
+    "nothing": "Tidak ada yang diputar bersamaan di trek suara lain. Taruh suara lainnya di treknya sendiri terlebih dahulu.",
+    "done_other": "{{count}} suara digrupkan: kini dipindah, dipangkas, dan dipotong heningnya bersama-sama."
+  },
+  "template": {
+    "applied": "Template diterapkan: {{parts}}.",
+    "intro": "intro",
+    "outro": "outro",
+    "bed": "musik latar",
+    "takeOff": "Lepaskan"
+  },
+  "rangePick": {
+    "hint": "Klik di mana potongan audiogram dimulai, lalu di mana berakhir (hingga 2 menit). Tarik tepinya untuk menyesuaikan.",
+    "from": "Dari {{start}}: sekarang klik di mana berakhirnya",
+    "span": "{{start}} – {{end}} · {{seconds}} dtk",
+    "listenTitle": "Dengarkan potongan ini saja (Spasi)",
+    "stop": "Berhenti",
+    "play": "Putar potongan",
+    "use": "Pakai potongan ini"
+  },
+  "empty": {
+    "addVideo": "Tambah video",
+    "addImage": "Tambah gambar",
+    "addAudio": "Tambah audio",
+    "addRecording": "Tambah rekaman",
+    "record": "Rekam",
+    "music": "Musik"
+  },
+  "confirm": {
+    "removeClip": "Hapus klip ini dari linimasa?",
+    "removeClips_other": "Hapus {{count}} klip ini dari linimasa?",
+    "removeLibraryItem": "Hapus item ini dari pustaka proyek?",
+    "removeTrack": "Hapus trek ini beserta semua klipnya?"
+  },
+  "clipStreaming": "Klip ini masih di-streaming dari 3Speak. Coba lagi setelah unduhannya selesai.",
+  "reverse": {
+    "title": "Membalik klip...",
+    "body": "Sedang diproses di server, harap tunggu.",
+    "failed": "Gagal membalik klip: {{error}}"
+  },
+  "remix": {
+    "stitch": "Sambung",
+    "stitchHintBefore": "Rekam hingga {{seconds}} dtk. Diputar tepat sebelum video asli.",
+    "stitchHintAfter": "Rekam hingga {{seconds}} dtk. Diputar tepat setelah video asli.",
+    "reaction": "Reaksi",
+    "reactionHint": "Video asli diputar dari awal selagi kamu merekam. Pakai headphone agar suaranya tidak masuk ke mikrofonmu.",
+    "originalFillsLimit": "Video asli sudah memenuhi batas {{limit}}. Pangkas di linimasa, lalu rekam sambunganmu dengan tombol kamera."
+  },
+  "chapters": {
+    "intro": "Intro",
+    "numbered": "Bab {{n}}"
+  },
+  "duck": {
+    "allVoices": "Semua trek suara"
+  },
+  "media": "Media",
+  "importedMedia": "Media yang diimpor",
+  "files_other": "{{count}} file",
+  "side": {
+    "clipsSelected_other": "{{count}} klip dipilih",
+    "clearSelection": "Hapus pilihan",
+    "closeProperties": "Tutup properti",
+    "captions": "Teks",
+    "closeCaptions": "Tutup teks",
+    "noClip": "Tidak ada klip dipilih",
+    "noClipHint": "Pilih klip di linimasa untuk melihat pengaturannya. Seret kotak di atas beberapa klip untuk mengubahnya sekaligus."
+  },
+  "cleaningHint": "Rekaman panjang bisa memakan waktu satu menit.",
+  "hlsDownload": {
+    "title": "Mengunduh media",
+    "hint": "Harap tunggu, media sedang disiapkan..."
+  },
+  "sendPreview": {
+    "titleAudio": "Dengarkan sebelum memakainya",
+    "titleVideo": "Pratinjau videomu",
+    "back": "Kembali ke Editor",
+    "askTitle": "Buat audiogram untuk Shorts?",
+    "askBody": "Video pendek dari bagian terbaik audio ini, diposting sebagai Shorts 3Speak bersamaan dengannya, masing-masing menautkan kembali ke audio ini.",
+    "askNo": "Tidak, pakai audionya",
+    "askMake": "Buat audiogram"
+  },
+  "legacy": {
+    "projectLibrary": "Pustaka proyek",
+    "loadingFfmpeg": "Memuat FFmpeg... {{percent}}",
+    "properties": "Properti",
+    "propertiesOf": "Properti: {{name}}",
+    "addMedia": "Tambah media",
+    "addMediaTitle": "Tambahkan media ke pustaka",
+    "record": "Rekam",
+    "recordTitle": "Rekam video dari kamera"
+  },
+  "drafts": {
+    "episode": "Episode",
+    "project": "Proyek"
+  }
+}

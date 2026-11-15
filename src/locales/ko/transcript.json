@@ -1,0 +1,72 @@
+{
+  "language": {
+    "label": "말하는 언어",
+    "auto": "자동 감지"
+  },
+  "intro": {
+    "title": "텍스트로 편집",
+    "text": "말한 내용을 목소리마다 이름을 붙여 텍스트로 바꾸고, 녹음을 문서처럼 편집하세요: 단어를 선택하고 Delete를 누르면 잘려요.",
+    "checking": "서버 확인 중...",
+    "unavailable": "지금은 이 편집기 서버에서 스크립트를 사용할 수 없어요.",
+    "noSpeech": "먼저 말소리가 있는 녹음을 추가하세요.",
+    "transcribeSeconds": "받아쓰기 (녹음 {{n}}초)",
+    "transcribeMinutes": "받아쓰기 (녹음 {{n}}분)",
+    "longShow": "긴 방송은 시간이 걸려요: 단어가 부분별로 나타나고, 먼저 나온 부분부터 편집을 시작할 수 있어요."
+  },
+  "listening": "듣는 중...",
+  "stop": "중지",
+  "goThere": "이동",
+  "search": {
+    "placeholder": "단어 찾기",
+    "label": "스크립트에서 단어 찾기",
+    "previous": "이전",
+    "previousLabel": "이전 일치 항목",
+    "next": "다음",
+    "nextLabel": "다음 일치 항목"
+  },
+  "selection": {
+    "count_other": "{{count}}단어 · {{seconds}}초",
+    "cut": "자르기",
+    "cutTitle": "선택한 단어를 녹음에서 잘라내기 (Delete)",
+    "clearTitle": "선택 해제 (Esc)",
+    "clearLabel": "선택 해제"
+  },
+  "found": {
+    "cutAll_other": "{{count}}개 모두 자르기",
+    "cutAllTitle": "찾은 곳을 모두 녹음에서 잘라내기"
+  },
+  "fillers": "군말",
+  "fillersTitle": "음, 어, 그러니까 같은 말과 긴 쉼 찾기",
+  "copy": "스크립트 복사",
+  "speakers": "화자",
+  "missing": {
+    "seconds": "녹음 중 {{n}}초에 아직 텍스트가 없어요.",
+    "minutes": "녹음 중 {{n}}분에 아직 텍스트가 없어요.",
+    "transcribe": "받아쓰기"
+  },
+  "scrollLabel": "스크립트: 단어를 클릭하면 그곳으로 이동, 단어 위로 드래그하면 선택, Delete로 잘라요",
+  "hint_other": "{{count}}단어. 단어를 클릭하면 그곳으로 이동해요. 드래그하거나 Shift+클릭으로 선택, Delete로 잘라요. 실행 취소로 되돌릴 수 있어요.",
+  "speaker": {
+    "default": "음성",
+    "numbered": "음성 {{n}}"
+  },
+  "job": {
+    "starting": "시작하는 중...",
+    "preparing": "녹음 준비 중...",
+    "listening": "듣는 중...",
+    "signIn": "스크립트를 만들려면 3Speak에 로그인하세요.",
+    "uploadFailed": "녹음을 업로드하지 못했어요: {{message}}",
+    "notUploaded": "녹음이 아직 서버에 없어요. 업로드가 끝나면 다시 시도하세요.",
+    "serverAnswered": "서버 응답: {{status}}",
+    "lost": "스크립트 작업이 사라졌어요 (서버가 다시 시작됐을 수 있어요)",
+    "failed": "음성 인식에 실패했어요"
+  },
+  "stt": {
+    "audioUnavailable": "오디오를 사용할 수 없음",
+    "serverError": "서버 오류",
+    "connectionFailed": "연결 실패",
+    "unauthorized": "권한 없음",
+    "closed": "연결 종료됨",
+    "initFailed": "음성 인식 초기화 실패"
+  }
+}
