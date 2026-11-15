@@ -166,3 +166,42 @@
 }
 .formats-result-phase { color: var(--muted); font-size: var(--fs-11); font-weight: var(--fw-regular); }
 .formats-error { color: var(--accent); font-size: var(--fs-12); }
+
+/* Video podcast (VideoPodcastDialog.jsx): the 16:9 stage and the burnt-in parts shown over the preview page */
+.video-podcast-studio .audiogram-stage { overflow: hidden; flex: none; }
+.video-podcast-speaker {
+  position: absolute;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: var(--on-media);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.video-podcast-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  text-align: center;
+  color: var(--on-media);
+  font-weight: var(--fw-bold);
+  text-shadow: 0 0 3px var(--media-scrim), 0 1px 2px var(--media-scrim);
+  pointer-events: none;
+}
+.video-podcast-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+.video-podcast-toggle > span { display: inline-flex; align-items: center; gap: var(--sp-2); }
+.video-podcast-toggle input[type="checkbox"] { accent-color: var(--cyan); width: 18px; height: 18px; }
+.video-podcast-video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--r-md);
+  background: var(--media-bg, var(--frame));
+}

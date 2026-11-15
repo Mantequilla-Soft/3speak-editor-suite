@@ -11,6 +11,7 @@ import { adDraftsRouter } from './routes/adDrafts.js'
 import { templatesRouter } from './routes/templates.js'
 import { audiogramRouter } from './routes/audiogram.js'
 import { captionsRouter } from './routes/captions.js'
+import { videoPodcastRouter } from './routes/videoPodcast.js'
 import { pinnedUploads, uploadBase } from './utils/pinnedUploads.js'
 import { RENDER_CACHE_DIR } from './services/ffmpeg.js'
 
@@ -47,6 +48,8 @@ app.use('/api/templates', templatesRouter)
 app.use('/api/audiogram', audiogramRouter)
 // Auto captions: speech to text with word times (whisper.cpp, services/stt.js)
 app.use('/api/captions', captionsRouter)
+// Video podcasts: a whole episode as a 16:9 video (cover, waveform, captions, speaker names)
+app.use('/api/video-podcast', videoPodcastRouter)
 
 // Ad Wizard: scene-engine docs -> silent scene video (headless Chromium), and its drafts
 app.use('/api/scene-render', sceneRenderRouter)

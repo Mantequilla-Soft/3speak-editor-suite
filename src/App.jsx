@@ -55,6 +55,7 @@ import { isTypingTarget } from './utils/keyboard'
 import logo3speak from './assets/3speak.png'
 import ProjectFormat from './components/ProjectFormat'
 import FormatsPanel from './components/FormatsPanel'
+import VideoPodcastDialog from './components/VideoPodcastDialog'
 import { useProjectFormat } from './hooks/useProjectFormat'
 import { postFormat } from './utils/projectFormat'
 
@@ -1228,6 +1229,8 @@ function App() {
   // Audiograms (after an export): the ones made, the piece of the timeline
   // they are made from, and picking that piece on the timeline
   const [audiogramOpen, setAudiogramOpen] = useState(false)
+  // Video podcast: the whole episode as a 16:9 video (VideoPodcastDialog)
+  const [videoPodcastOpen, setVideoPodcastOpen] = useState(false)
   const [audiograms, setAudiograms] = useState([])
   const [audiogramRange, setAudiogramRange] = useState(null)
   const [pickingRange, setPickingRange] = useState(false)
@@ -1728,6 +1731,12 @@ function App() {
                     <span>Audiograms{audiograms.length ? ` (${audiograms.length})` : ''}</span>
                   </button>
                 )}
+                {audioMode && (
+                  <button className="compact-download-btn" onClick={() => setVideoPodcastOpen(true)} title="The whole episode as a 16:9 video with the cover, a waveform, captions and who is speaking">
+                    <Film size={14} />
+                    <span>Video podcast</span>
+                  </button>
+                )}
                 {isIframe && (
                   <button
                     className="compact-render-btn"
@@ -2056,6 +2065,35 @@ function App() {
             onRequestCovers={requestPlaylistCovers}
             onEditText={isIframe ? editTextInHost : undefined}
             onClose={() => setAudiogramOpen(false)}
+          />
+        )}
+
+        {videoPodcastOpen && audioMode && renderStatus?.status === 'completed' && renderStatus.outputUrl && (
+          <VideoPodcastDialog
+            outputUrl={renderStatus.outputUrl}
+            length={timelineEnd}
+            title={audioTitle}
+            tracks={tracks}
+            playlistCovers={playlistCovers}
+            onRequestCovers={requestPlaylistCovers}
+            canSend={isIframe}
+            onSend={(r) => {
+              setVideoPodcastOpen(false)
+              if (drafts.hasEdits()) drafts.save().catch(() => {})
+              // 3Speak posts it as a normal video (format), the chapters in its description
+              sendToParent('post-to-3speak', {
+                mediaType: 'video',
+                outputUrl: r.outputUrl,
+                fileName: audioFileName(audioTitle).replace(/\.mp3$/i, '.mp4'),
+                durationSec: r.durationSec,
+                format: postFormat('16:9', r.durationSec),
+                ...(audioTitle ? { title: String(audioTitle).slice(0, 120) } : {}),
+                ...(chapterList.length > 0 && { chapters: chapterList }),
+                ...(musicCredits.length > 0 && { musicCredits }),
+                ...(r.subtitles && { subtitles: r.subtitles })
+              })
+            }}
+            onClose={() => setVideoPodcastOpen(false)}
           />
         )}
 
