@@ -10,6 +10,8 @@ COPY index.html vite.config.js ./
 COPY .env* ./
 COPY src/ src/
 COPY public/ public/
+# MediaPipe wasm into public/vision (prebuild runs it; no CDN at run time)
+COPY scripts/vision/ scripts/vision/
 
 RUN npm run build
 

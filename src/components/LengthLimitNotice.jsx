@@ -1,5 +1,5 @@
 import { X } from './icons'
-import { MAX_TIMELINE_SECONDS, MAX_TIMELINE_TEXT, formatLength } from '../utils/limits'
+import { MAX_TIMELINE_SECONDS, MAX_TIMELINE_TEXT, RENDER_NOUN, formatLength } from '../utils/limits'
 import { isAudioMode } from '../utils/editorMode'
 
 /**
@@ -24,7 +24,7 @@ function LengthLimitNotice({ length, onClose }) {
           </button>
         </div>
         <p className="length-notice-text">
-          {isAudioMode ? 'An export' : 'A short'} can be at most {MAX_TIMELINE_TEXT}. You can keep editing everything,
+          {RENDER_NOUN} can be at most {MAX_TIMELINE_TEXT}. You can keep editing everything,
           but {isAudioMode ? 'Export' : 'Render'} stays off until the timeline ends at the marked {formatLength(MAX_TIMELINE_SECONDS)} line.
           Trim, split or delete clips to get there.
         </p>

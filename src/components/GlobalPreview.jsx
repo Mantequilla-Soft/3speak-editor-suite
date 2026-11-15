@@ -72,6 +72,8 @@ import { duckGainAt } from '../utils/duck'
 import { clipColorFilter } from './ClipColorFilters'
 import { motionStyle, normalizeMotion, pivotPoint } from '../utils/stickerMotion'
 import usePhoneLayout from '../hooks/usePhoneLayout'
+import { reframeBox, isReframable } from '../utils/reframe'
+import { canvasCss, aspectValue } from '../utils/projectFormat'
 import { REMIX_LAYOUTS, hasLayout, clampLayout, layoutPan, layoutZoom, LAYOUT_ZOOM_MIN, LAYOUT_ZOOM_MAX } from '../utils/remixLayout'
 import { getClipChromaKey } from '../utils/chromaKey'
 import ChromaKeyCanvas from './ChromaKeyCanvas'
@@ -90,8 +92,6 @@ function PreviewColumn({ own, controls, children }) {
 }
 
 // The 9:16 output canvas contained in .preview-layer-container (a size container)
-const CANVAS_W = 'min(100cqw, 56.25cqh)'
-const CANVAS_H = 'min(100cqh, 177.7778cqw)'
 
 // Reaction layouts offered on the phone record stage
 const STAGE_LAYOUTS = [
@@ -147,7 +147,10 @@ function FitTextBox({ measureKey, children, ...rest }) {
   return <span ref={ref} {...rest}>{children}</span>
 }
 
-function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVideo, activeAspectRatio, aspectRatioOverride, onSetAspectRatio, selectedClipId, onUpdateClip, onSelectClip, compact, inlineRecording, onRecordedInline, onCloseInlineRecorder, recorderSize, onSetRecorderSize, recorderGuide, onChangeRemixMode, onChangeStageLayout, controlRef, emptyActions, audioMode = false, duck = null, chapters = null, onPlayingChange, captions = null }) {
+function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVideo, activeAspectRatio, aspectRatioOverride, onSetAspectRatio, selectedClipId, onUpdateClip, onSelectClip, compact, inlineRecording, onRecordedInline, onCloseInlineRecorder, recorderSize, onSetRecorderSize, recorderGuide, onChangeRemixMode, onChangeStageLayout, controlRef, emptyActions, audioMode = false, duck = null, chapters = null, onPlayingChange, captions = null, reframeView = false }) {
+  // The frame's shape: remix layout boxes are fractions of it (utils/projectFormat.js)
+  const { w: CANVAS_W, h: CANVAS_H } = canvasCss(activeAspectRatio)
+  const frameRatio = aspectValue(activeAspectRatio)
   const videoRefs = useRef({}) // Map of clip ID to video element
   // Sticker motion: the layer container (= the frame) and the moving clips,
   // which the playback loop moves every frame (React renders only ~20/s)
@@ -1134,8 +1137,8 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
 
     // Layout boxes are relative to the 9:16 canvas contained in the layer container
     const rect = e.currentTarget.closest('.preview-layer-container')?.getBoundingClientRect()
-    const canvasW = rect ? Math.min(rect.width, rect.height * 9 / 16) : 1
-    const container = { width: canvasW, height: canvasW * 16 / 9 }
+    const canvasW = rect ? Math.min(rect.width, rect.height * frameRatio) : 1
+    const container = { width: canvasW, height: canvasW / frameRatio }
 
     const layout = hasLayout(clip) ? clip.layout : null
 
@@ -1409,13 +1412,20 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                   const showPivot = !!motion && isSelected && !isPlaying
 
                   const stageSource = !!(stageLayout?.source && clip.id === recorderGuide.sourceClipId)
+                  // "Export as" preview in another shape: footage fills the frame,
+                  // its window on the face path at this moment (utils/reframe.js)
+                  const reframed = !stageSource && reframeView && isReframable(clip)
+                    ? reframeBox(clip.reframe || { path: [] }, playheadPosition - clip.timelineStart + (clip.startTime || 0), frameRatio,
+                      videoRefs.current[clip.id]?.videoWidth ? videoRefs.current[clip.id].videoWidth / videoRefs.current[clip.id].videoHeight : null)
+                    : null
                   const box = stageSource
                     ? stageLayout.source
-                    : hasLayout(clip) ? clip.layout : null
+                    : hasLayout(clip) ? clip.layout : reframed
                   // On the stage the original's tile pans and zooms but stays in place
+                  // (a reframed clip is moved with Export as, not by dragging)
                   const gestureClip = stageSource
                     ? { id: 'stage:source', layout: box, movable: false }
-                    : clip
+                    : reframed ? { id: clip.id, movable: false } : clip
                   const layerStyle = {
                     ...(box
                       ? { opacity: (clip.opacity ?? 100) < 100 ? clip.opacity / 100 : undefined }

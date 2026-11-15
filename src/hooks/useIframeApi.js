@@ -10,6 +10,7 @@ import { outputSize } from '../utils/outputSize'
 import { normalizeCaptions } from '../utils/captions'
 import { emojiUrlsOf } from '../utils/captionSources'
 import { loadCreditOf, isMusicLoad } from '../utils/loadCredit'
+import { reframeForRender, exportSizes } from '../utils/exportAs'
 
 const isIframe = typeof window !== 'undefined' && window.parent !== window
 const GATEWAY_URL = (import.meta.env.VITE_GATEWAY_URL || '').replace(/\/+$/, '')
@@ -218,7 +219,10 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
     // it answers "Use this audio" with post-to-3speak { mediaType: 'audio' }.
     // `canLoadSound`: load-media { music: true, credit } puts a sound on the music
     // track with its credit, and musicCredits only names the songs still used.
-    sendToParent('editor-ready', { canLoadFile: true, canSaveDrafts: true, ...(canLoadSound ? { canLoadSound: true } : {}), ...(audioMode ? { mode: 'audio', canEditAudio: true } : {}) })
+    // `canFormat`: post-to-3speak carries `format: { aspect, short, durationSec }`
+    // (utils/projectFormat.js): a landscape, classic or square video is posted as
+    // a normal video, a 9:16 one as a Short; ?aspect= picks the first shape.
+    sendToParent('editor-ready', { canLoadFile: true, canSaveDrafts: true, canFormat: true, ...(canLoadSound ? { canLoadSound: true } : {}), ...(audioMode ? { mode: 'audio', canEditAudio: true, canVideoPodcast: true } : {}) })
   }, [sendToParent, audioMode, canLoadSound])
 
   // Abort an active render job
@@ -283,9 +287,12 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
   /**
    * Upload all blob: files and build the timeline payload with server URLs.
    * `voiceTracks` (auto captions, utils/captionSources.js voiceTracksOf): only
-   * these tracks, as an audio timeline for speech to text.
+   * these tracks, as an audio timeline for speech to text. `aspect` ("Export
+   * as", utils/exportAs.js): render in this shape, footage reframed when it
+   * differs from the project's own.
    */
-  const buildAndUploadPayload = useCallback(async (onProgress, { voiceTracks = null } = {}) => {
+  const buildAndUploadPayload = useCallback(async (onProgress, { voiceTracks = null, aspect = null } = {}) => {
+    const reframing = !!aspect && aspect !== activeAspectRatio
     const tracks = voiceTracks || allTracks
     const fileStore = fileStoreRef?.current
     // Collect clips that have blob: URLs but NO serverUrl (need upload)
@@ -379,6 +386,9 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
           if (+clip.fadeOut > 0) baseClip.fadeOut = +clip.fadeOut
         }
         if (hasLayout(clip)) baseClip.layout = clip.layout
+        // Another shape than the project's: the footage follows its face path (utils/reframe.js)
+        const reframe = reframeForRender(clip, track.type, reframing)
+        if (reframe) baseClip.reframe = reframe
 
         // Colour adjustments (utils/clipColor.js), same maths as the preview
         const color = (clip.type === 'video' || clip.type === 'image') ? normalizeColor(clip.color) : null
@@ -504,12 +514,16 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
     }
 
     // Output dimensions based on aspect ratio (utils/outputSize.js: Shorts at 1080x1920)
-    const { width: outputWidth, height: outputHeight } = outputSize(activeAspectRatio || '16:9')
+    const own = outputSize(activeAspectRatio || '16:9')
 
     // Measure the preview container so backend can scale pixel values
     const previewEl = document.querySelector('.preview-layer-container') || document.querySelector('.global-preview-video')
-    const previewWidth = previewEl ? previewEl.clientWidth : outputWidth
-    const previewHeight = previewEl ? previewEl.clientHeight : outputHeight
+    // ("Export as" another shape: sizes scaled so text keeps its size, utils/exportAs.js)
+    const { outputWidth, outputHeight, previewWidth, previewHeight } = exportSizes(
+      aspect || activeAspectRatio || '16:9',
+      previewEl ? previewEl.clientWidth : own.width,
+      previewEl ? previewEl.clientHeight : own.height
+    )
 
     // Auto captions: burnt in (unless switched off) and written as subtitle
     // files by the backend (services/captionBurn.js); emoji pictures by URL

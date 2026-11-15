@@ -7,6 +7,7 @@ import { ffmpegColorFilter } from '../utils/clipColor.js'
 import crypto from 'crypto'
 import { ffmpegMotionFilter, normalizeMotion, pivotPoint, activeEffects } from '../utils/stickerMotion.js'
 import { captionBurn } from './captionBurn.js'
+import { reframeFilter, normalizeReframe } from '../utils/reframe.js'
 
 // clip volume 0..100 -> gain. 0 means silent: `volume || 100` used to turn it into full volume.
 const clipVolume = clip => (Number.isFinite(+clip.volume) ? Math.max(0, +clip.volume) : 100) / 100
@@ -870,6 +871,11 @@ function buildTransformFilter(clip, w, h, fps = null) {
     return filters.join(',')
   }
 
+  // Reframed ("Export as" another shape, utils/reframe.js): cover the frame,
+  // the window follows the clip's face path. zoom/crop/position are ignored.
+  const reframe = reframeFilter(clip.reframe, { w, h, startTime: clip.startTime || 0 })
+  if (reframe) return fps ? `${reframe},fps=${fps}` : reframe
+
   // Free crop, as in the preview (see freeCrop): contain-fit the media in the
   // canvas, cut the crop rect (canvas pixels; the media starts (W-iw)/2 into the
   // canvas, letterbox parts of the rect have nothing to cut), then zoom.
@@ -997,7 +1003,7 @@ function clipZoom(clip) {
  * clips keep the old path.
  */
 function freeCrop(clip, w, h) {
-  if (getLayoutBox(clip, w, h) || clip.crop || clip.width || clip.height) return null
+  if (getLayoutBox(clip, w, h) || normalizeReframe(clip.reframe) || clip.crop || clip.width || clip.height) return null
   const x = (clip.cropX || 0) / 100
   const y = (clip.cropY || 0) / 100
   const cw = (clip.cropWidth || 100) / 100
@@ -1349,6 +1355,7 @@ async function processPlate(clip, plateFile, processedClipPath, outPath, w, h, s
 function getOverlayPosition(clip, w, h, scaleFactor = 1, src = null) {
   const box = getLayoutBox(clip, w, h)
   if (box) return `${box.x}:${box.y}`
+  if (normalizeReframe(clip.reframe)) return '0:0' // the whole frame (buildTransformFilter)
   const cropped = freeCropOverlay(clip, w, h, scaleFactor, src)
   if (cropped) return cropped
 

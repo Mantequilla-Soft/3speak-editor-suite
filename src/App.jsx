@@ -53,6 +53,10 @@ import ConfirmDialog from './components/ConfirmDialog'
 import { useCleaningStatus, cleaningText } from './utils/cleaningStatus'
 import { isTypingTarget } from './utils/keyboard'
 import logo3speak from './assets/3speak.png'
+import ProjectFormat from './components/ProjectFormat'
+import FormatsPanel from './components/FormatsPanel'
+import { useProjectFormat } from './hooks/useProjectFormat'
+import { postFormat } from './utils/projectFormat'
 
 // Audio editor: the talking = clips on audio tracks that are not music and not template parts
 function voiceClipsOf(list) {
@@ -241,9 +245,15 @@ function App() {
     return first ? String(first.name || '').replace(/^Part \d+ · /, '').replace(/\.[a-z0-9]{2,4}$/i, '').trim() || null : null
   }, [audioMode, tracks])
 
-  // Locked to 9:16 for shorts
-  const activeAspectRatio = '9:16'
-  const isVerticalVideo = true
+  // The project's shape (utils/projectFormat.js): a Short (9:16, up to 2 minutes)
+  // or a 16:9, 4:3 or 1:1 video (up to 10). The audio editor keeps the old frame.
+  const projectFormat = useProjectFormat()
+  const activeAspectRatio = audioMode ? '9:16' : projectFormat.aspect
+  const isVerticalVideo = activeAspectRatio === '9:16'
+  // Export as (FormatsPanel): the preview may show the project in another shape, reframed
+  const [formatsOpen, setFormatsOpen] = useState(false)
+  const [viewAspect, setViewAspect] = useState(null)
+  const shownAspect = (formatsOpen && viewAspect) || activeAspectRatio
   const [orientationOverride, setOrientationOverride] = useState(null)
 
   // Auto captions of a Short (utils/captions.js): { words, language, style, burn } or null
@@ -1055,13 +1065,15 @@ function App() {
     setChapters(Array.isArray(state?.chapters) ? state.chapters.slice(0, MAX_CHAPTERS) : [])
     setFlags(cleanFlags(state?.flags))
     setCaptions(normalizeCaptions(state?.captions) ? { ...state.captions, ...normalizeCaptions(state.captions) } : null)
+    // the video project's shape (a draft from before shapes is a Short)
+    if (!audioMode) { projectFormat.setAspect(state?.aspect); setViewAspect(null) }
     // a remix draft: its export posts under the original again
     restoreRemixSource(state?.remix || null)
     // and the clip(s) that were selected (those still on the timeline)
     const ids = new Set((state?.tracks || []).flatMap(t => (t.clips || []).map(c => c.id)))
     const sel = Array.isArray(state?.selected) ? state.selected.filter(id => ids.has(id)) : []
     if (sel.length) selectClips(sel)
-  }, [loadProjectState, setPlayheadPosition, selectClips, restoreRemixSource])
+  }, [loadProjectState, setPlayheadPosition, selectClips, restoreRemixSource, audioMode, projectFormat.setAspect]) // eslint-disable-line react-hooks/exhaustive-deps
   const drafts = useDrafts({
     session: draftSession,
     hasMedia: draftContext.hasMedia,
@@ -1078,7 +1090,8 @@ function App() {
     flags,
     selected: selectedClipIds.length ? selectedClipIds : (selectedClipId ? [selectedClipId] : []),
     remix: remixing ? remixSource : null,
-    captions: audioMode ? null : captions
+    captions: audioMode ? null : captions,
+    aspect: audioMode ? null : activeAspectRatio
   })
   const canDraftSignIn = isIframe && !draftSession && ['sign-in-needed', 'sign-in-failed', 'signing-in'].includes(draftContext.reason)
 
@@ -1494,6 +1507,44 @@ function App() {
           </div>
   ) : null
 
+  // Export as: one of the other shapes, rendered by the panel
+  const sendFormatToHost = ({ outputUrl, aspect, subtitles }) => {
+    if (drafts.hasEdits()) drafts.save().catch(() => {})
+    sendToParent('post-to-3speak', {
+      outputUrl,
+      ...(remixSource && { remixSource }),
+      ...(musicCredits.length > 0 && { musicCredits }),
+      ...(subtitles && { subtitles }),
+      format: postFormat(aspect, timelineEnd)
+    })
+  }
+  const formatsPanel = formatsOpen && !audioMode ? (
+    <div className="compact-properties-panel captions-side">
+      <div className="compact-properties-header">
+        <span className="compact-properties-title">Export as</span>
+        <button className="compact-btn compact-properties-close" onClick={() => { setFormatsOpen(false); setViewAspect(null) }} title="Close Export as">
+          <X size={14} />
+        </button>
+      </div>
+      <FormatsPanel
+        projectAspect={activeAspectRatio}
+        viewAspect={viewAspect}
+        onViewAspect={setViewAspect}
+        tracks={tracks}
+        fileStore={fileStoreRef.current}
+        onUpdateClip={updateClip}
+        selectedClipId={selectedClipId}
+        onSelectClip={selectClip}
+        timelineEnd={timelineEnd}
+        buildPayload={(aspect, onPhase) => buildAndUploadPayload(onPhase, { aspect })}
+        canRender={videoClips.length > 0 && !activeUpload && !isBackendRendering}
+        renderBlocked={activeUpload ? 'Wait for the upload to finish.' : null}
+        canSend={isIframe}
+        onSend={sendFormatToHost}
+      />
+    </div>
+  ) : null
+
   // Auto captions (Shorts editor): in the clip settings' place while open, so
   // the canvas stays in sight and shows every change live
   const captionsPanel = captionsOpen && !audioMode ? (
@@ -1522,7 +1573,7 @@ function App() {
   const sideBesideStage = isDesktop && audioMode
   const sidePanel = (
     <aside className="compact-side">
-      {captionsPanel || multiPanel || (sideClip ? compactPropertiesPanel : (
+      {formatsPanel || captionsPanel || multiPanel || (sideClip ? compactPropertiesPanel : (
         <div className="compact-side-empty">
           <MousePointerClick size={28} />
           <strong>No clip selected</strong>
@@ -1565,7 +1616,9 @@ function App() {
       ...(remixSource && { remixSource }),
       ...(musicCredits.length > 0 && { musicCredits }),
       // Auto captions as subtitles: { language, vttUrl, srtUrl, cues: [{ start, end, text }] }
-      ...(!audioMode && renderStatus.subtitles && { subtitles: renderStatus.subtitles })
+      ...(!audioMode && renderStatus.subtitles && { subtitles: renderStatus.subtitles }),
+      // The shape: 3Speak posts a 9:16 render as a Short, the others as a normal video
+      ...(!audioMode && { format: postFormat(activeAspectRatio, timelineEnd) })
     })
   }
 
@@ -1584,7 +1637,8 @@ function App() {
         <header className="app-branding">
           <div className="branding-left">
             <img src={logo3speak} alt="3Speak" className="branding-logo" />
-            <span className="branding-text">{audioMode ? 'Audio Editor' : 'Shorts Editor'} <span className="branding-badge">beta</span></span>
+            <span className="branding-text">{audioMode ? 'Audio Editor' : isVerticalVideo ? 'Shorts Editor' : 'Video Editor'} <span className="branding-badge">beta</span></span>
+            {!audioMode && <ProjectFormat aspect={activeAspectRatio} onChange={(a) => { projectFormat.setAspect(a); setViewAspect(null) }} tracks={tracks} />}
             <span className="branding-info" onClick={() => setShowBackendInfo(prev => !prev)}>
               <Info size={14} />
               {showBackendInfo && (
@@ -1644,6 +1698,18 @@ function App() {
               {audioMode ? <AudioWaveform size={14} /> : <Clapperboard size={14} />}
               <span>{isBackendRendering ? (audioMode ? 'Exporting...' : 'Rendering...') : activeUpload ? `Uploading ${Math.round(activeUpload.progress * 100)}%` : renderStatus?.status === 'completed' ? (audioMode ? 'Export again' : 'Re-render') : (audioMode ? 'Export' : 'Render')}</span>
             </button>
+            {!audioMode && (
+              <button
+                className={`compact-download-btn${formatsOpen ? ' active' : ''}`}
+                onClick={() => { setFormatsOpen(o => !o); setViewAspect(null) }}
+                disabled={videoClips.length === 0}
+                aria-pressed={formatsOpen}
+                title="Export as: the same project as a Short, a square or a landscape video, cut around the faces"
+              >
+                <Film size={14} />
+                <span>Export as</span>
+              </button>
+            )}
             {renderStatus?.status === 'completed' && renderStatus.outputUrl && (
               <>
                 <a
@@ -1785,8 +1851,9 @@ function App() {
           tracks={tracks}
           playheadPosition={playheadPosition}
           onSetPlayhead={setPlayheadPosition}
-          isVerticalVideo={isVerticalVideo}
-          activeAspectRatio={activeAspectRatio}
+          isVerticalVideo={shownAspect === '9:16'}
+          activeAspectRatio={shownAspect}
+          reframeView={shownAspect !== activeAspectRatio}
           selectedClipId={selectedClipId}
           onUpdateClip={updateClip}
           onSelectClip={selectClip}
@@ -1898,7 +1965,7 @@ function App() {
           )}
 
           {/* Compact properties panel (phones: over the timeline; desktop: the sidebar) */}
-          {!isDesktop && (captionsPanel || multiPanel || compactPropertiesPanel)}
+          {!isDesktop && (formatsPanel || captionsPanel || multiPanel || compactPropertiesPanel)}
         </div>
         </div>
         {/* Desktop shorts editor: the selected clip's settings beside preview and timeline */}
