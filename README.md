@@ -110,9 +110,15 @@ The same editor for podcasts, music and voice. 3Speak opens it from its share me
 - **Chapters:** `M` or "Chapters" marks where a part starts. A chapter is pinned to the moment in the recording, so it moves with Cut silences, trims and the template intro. They go into the MP3 as ID3 chapters (`timeline.chapters`) and to 3Speak with "Use this audio".
 - **Export:** an MP3 rendered by the backend (`timeline.output: 'audio'`), levelled to -16 LUFS for podcasts (can be switched off). "Use this audio" posts `{ type: 'post-to-3speak', mediaType: 'audio', outputUrl, fileName, durationSec, musicCredits?, chapters? }` (chapters: `[{ start, end, title }]`; audiograms: `[{ url, title, description, start, duration, width, height }]`, `start` = seconds into the episode, for the podcast feed's soundbites).
 - **Audiogram:** after an export, a short video (up to 60 s, square or vertical) of a piece of the episode with its title and a moving waveform, to share as a teaser (`POST /api/audiogram`, then `GET /api/audiogram/:jobId`).
+- **Audiogram captions:** "Captions" in the studio puts the spoken words on the audiogram in the Shorts captions' looks (Karaoke, Pop, Subtitles), in a box moved and widened like the other parts and kept clear of the logo. The words come from the exported MP3's piece (`POST /api/transcript`), can be fixed by hand, and are burnt in with libass (`src/utils/audiogramCaptions.js`, the same file in the backend, so preview and video match). The captions' look is part of the audiogram template.
 - **Drafts:** like the video editor's. Each editor only offers its own drafts, and the limit counts both.
 - **Template:** one per user, kept for good (`/api/templates/audio`): intro, outro and a music bed (looped under the recording, faded out at the end), plus "cut silences", "level loudness" and "duck". It is applied by itself to a new recording, and one click takes it off again.
 - **Handshake:** `editor-ready` carries `mode: 'audio'` and `canEditAudio: true`. Both editors also say `canLoadSound: true`: `load-media { url, name, mediaType: 'audio', music: true, credit: { id, title, ... } }` (3Speak's "Use this sound", an HLS `.m3u8` too) puts the sound on the music track with its credit, and `musicCredits` names only the songs still on the timeline. Load a recording with `load-media { file, name, mediaType: 'audio' }`.
+
+### Word tools (both editors, built for long podcasts)
+- **Transcript** (toolbar in the audio editor, timeline in the Shorts editor): the words of every recording with speaker labels (each voice track is a speaker). Click a word to go there, drag or Shift+click to select, Delete cuts the stretch out of every track and closes the gap (`rippleCutRanges` in `src/utils/ripple.js`, one undo step; Undo brings the words back). Find words and cut every place found. The words are pinned to the recordings (`src/utils/transcript.js`), so they follow every cut and trim, and are kept in the draft. Long shows are transcribed in 5-minute chunks (`POST /api/transcript`, `TRANSCRIPT_CHUNK_SECONDS`), the words appear chunk by chunk, and only the paragraphs in sight are drawn.
+- **Remove fillers** (Fillers): um, uh, "you know", "like" as a filler and their equivalents per language (`src/data/fillerWords.json`), plus pauses over a chosen length, in a review list (listen to each, untick to keep); then the fillers are cut and the pauses shortened to a chosen length. Whisper writes the fillers down because the transcript starts it from a line full of them in the spoken language (`backend/src/utils/verbatimPrompts.js`).
+- **Chapter suggestions** (Chapters, Suggest chapters): topic shifts in the transcript (TextTiling, no AI), long pauses (from the loudness without a transcript) and scene changes (`POST /api/clip/scenes`), titled with the words that set each part apart (`src/utils/chapterSuggest.js`). Add them one by one or all.
 
 ## Tests
 
@@ -120,6 +126,7 @@ The same editor for podcasts, music and voice. 3Speak opens it from its share me
 npm test                        # editor unit tests (Vitest)
 cd backend && npm test          # backend: routes, audio render through real ffmpeg, templates
 npm run test:e2e:audio          # the audio editor end to end in Chromium against a local backend
+npm run test:e2e:words          # transcript, fillers, chapter ideas, audiogram captions (a stand-in whisper)
 ```
 
 The end-to-end test needs `ffmpeg`/`ffprobe` on PATH and Chromium (`E2E_CHROME`, default Playwright's chromium-1148). It makes its own test audio, starts a backend on a free port with throwaway folders and token secret, builds the editor against it, plays the 3Speak side (`e2e/host.html`), and removes everything afterwards.

@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:e2e:audio": "node e2e/audio-editor.e2e.mjs"
+    "test:e2e:audio": "node e2e/audio-editor.e2e.mjs",
+    "test:e2e:words": "node e2e/word-tools.e2e.mjs"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.10",
