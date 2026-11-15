@@ -138,6 +138,15 @@ The end-to-end test needs `ffmpeg`/`ffprobe` on PATH and Chromium (`E2E_CHROME`,
 | `Ctrl+Shift+G` | Ungroup clips |
 | `Arrow Left/Right` | Move playhead (100ms, 1s with Shift) |
 | `M` | Add a chapter at the playhead (audio editor) |
+| `J` / `K` / `L` | Play backward / stop / play forward (press J or L again: 2x, 4x, 8x) |
+| `,` / `.` | One frame back / forward (Shift: 10 frames) |
+| `Tab` / `Shift+Tab` | Next / previous clip (when a clip is selected) |
+| `Alt+Arrow Left/Right` | Previous / next clip on the same track |
+| `Alt+Arrow Up/Down` | Clip on the track above / below |
+| `Enter` | Open the selected clip's settings |
+| `?` | All shortcuts (also the keyboard button at the top, on desktop) |
+
+Shortcuts never fire while typing in a field (`src/utils/keyboard.js`). The timeline is labelled for screen readers: clips are buttons ("clip") with their name and time, tracks are named groups, the playhead is a slider; a moved selection is announced. The list lives in `src/utils/shortcuts.js` (the `?` sheet reads it).
 
 ## Getting Started
 

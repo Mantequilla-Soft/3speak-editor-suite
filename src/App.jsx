@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useMemo, useState } from 'react'
-import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, HelpCircle, Maximize, Minimize, Scissors, Play, Pause, MousePointerClick } from './components/icons'
+import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, HelpCircle, Maximize, Minimize, Scissors, Play, Pause, MousePointerClick, Keyboard } from './components/icons'
 import { useFFmpeg } from './hooks/useFFmpeg'
 import { useCanvasExport } from './hooks/useCanvasExport'
 import { useTimeline } from './hooks/useTimeline'
@@ -11,7 +11,7 @@ import { selectBackend, getBackendUrl, api } from './utils/backendSelector'
 import Timeline from './components/Timeline'
 import GlobalPreview from './components/GlobalPreview'
 // opened on demand, each its own chunk (components/lazyPanels.jsx)
-import { ProjectLibrary, VideoPreview, ExportButton, RecordVideo, RecordAudio, RemixModePicker, MusicLibrary, AudioTemplateDialog, ChaptersDialog, AudiogramDialog, BeatSyncModal, StickerPicker, CaptionsPanel } from './components/lazyPanels'
+import { ProjectLibrary, VideoPreview, ExportButton, RecordVideo, RecordAudio, RemixModePicker, MusicLibrary, AudioTemplateDialog, ChaptersDialog, AudiogramDialog, BeatSyncModal, StickerPicker, CaptionsPanel, ShortcutSheet } from './components/lazyPanels'
 import ClipProperties from './components/ClipProperties'
 import OnboardingTour, { AUDIO_TOUR_STEPS, RANGE_PICK_TOUR_STEPS, useFirstTimeTour } from './components/OnboardingTour'
 import MultiClipProperties from './components/MultiClipProperties'
@@ -43,6 +43,7 @@ import ConfirmDialog from './components/ConfirmDialog'
 import { useCleaningStatus, cleaningText } from './utils/cleaningStatus'
 import { isTypingTarget } from './utils/keyboard'
 import { isRenderActive } from './utils/renderQueue'
+import { useShortcuts } from './hooks/useShortcuts'
 import logo3speak from './assets/3speak.png'
 
 // Audio editor: the talking = clips on audio tracks that are not music and not template parts
@@ -627,12 +628,13 @@ function App() {
       const PLAYHEAD_STEP_LARGE = 1 // 1 second when holding shift
       const step = e.shiftKey ? PLAYHEAD_STEP_LARGE : PLAYHEAD_STEP
 
-      if (e.key === 'ArrowLeft') {
+      // (Alt+arrows move between clips: hooks/useShortcuts.js)
+      if (e.key === 'ArrowLeft' && !e.altKey) {
         e.preventDefault()
         setPlayheadPosition(prev => Math.max(0, prev - step))
       }
 
-      if (e.key === 'ArrowRight') {
+      if (e.key === 'ArrowRight' && !e.altKey) {
         e.preventDefault()
         setPlayheadPosition(prev => prev + step)
       }
@@ -1538,6 +1540,24 @@ function App() {
     </div>
   ) : null
 
+  // J / K / L, frame steps, moving between clips, the `?` sheet (hooks/useShortcuts.js)
+  const shortcuts = useShortcuts({
+    previewRef: previewControlRef,
+    playing: previewPlaying,
+    tracks,
+    duration: timelineEnd,
+    selectedClipId,
+    selectClip,
+    setPlayheadPosition,
+    openClip: (id) => { if (compactMode || audioMode) setCompactPropertiesClipId(id); else setPropertiesOpen(true) }
+  })
+  const shortcutLayer = (
+    <>
+      {shortcuts.sheetOpen && <ShortcutSheet mode={audioMode ? 'audio' : 'video'} onClose={() => shortcuts.setSheetOpen(false)} />}
+      <div className="editor-sr-only" role="status" aria-live="polite">{shortcuts.announcement}</div>
+    </>
+  )
+
   const confirmDialog = confirmAsk ? (
     <ConfirmDialog message={confirmAsk.message} onConfirm={acceptConfirm} onCancel={closeConfirm} />
   ) : null
@@ -1590,6 +1610,11 @@ function App() {
             {audioMode && (
               <button className="branding-help-btn" onClick={() => setShowTour(true)} title="Show the tour again" aria-label="Show the tour again">
                 <HelpCircle size={15} />
+              </button>
+            )}
+            {isDesktop && (
+              <button className="branding-help-btn" onClick={() => shortcuts.setSheetOpen(true)} title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts">
+                <Keyboard size={15} />
               </button>
             )}
           </div>
@@ -1902,6 +1927,7 @@ function App() {
         </div>
 
         {confirmDialog}
+        {shortcutLayer}
         {cleaningNotice}
 
         {/* Onboarding Tour (the shorts editor's, or the audio editor's) */}
@@ -2495,6 +2521,7 @@ function App() {
       )}
 
       {confirmDialog}
+      {shortcutLayer}
     </div>
   )
 }
