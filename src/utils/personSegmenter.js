@@ -175,7 +175,8 @@ export async function analyzePersonMask(clip, { onProgress, signal } = {}) {
     else v.src = clip.url
     await loaded
     const duration = Number.isFinite(v.duration) && v.duration > 0 ? v.duration : clip.duration
-    const range = personMaskRange(duration, clip.startTime, clip.endTime)
+    // media seconds (a clip at another speed shows another stretch of its source)
+    const range = personMaskRange(duration, clip.mediaStart ?? clip.startTime, clip.mediaEnd ?? clip.endTime)
     const total = personMaskFrames(range, MASK_FPS)
     const [w, h] = personMaskSize(v.videoWidth, v.videoHeight)
     const frames = new Uint8Array(w * h * total)

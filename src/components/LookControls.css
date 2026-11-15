@@ -1,0 +1,68 @@
+/* Look presets (LookControls.jsx): a strip of the clip's frame in each look */
+.look-thumb-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.look-strip {
+  display: flex;
+  gap: var(--sp-2);
+  overflow-x: auto;
+  padding: var(--sp-1) 0 var(--sp-2);
+  scrollbar-width: thin;
+}
+
+.look-chip {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-1);
+  width: 56px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--fs-10);
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+}
+
+.look-chip-frame {
+  display: block;
+  width: 56px;
+  height: 72px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--surface-2);
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+
+.look-chip-frame img,
+.look-chip-blank {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.look-chip:hover .look-chip-frame {
+  outline-color: var(--border);
+}
+
+.look-chip.active {
+  color: var(--cyan);
+}
+
+.look-chip.active .look-chip-frame {
+  outline-color: var(--cyan);
+}
+
+.look-chip-label {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

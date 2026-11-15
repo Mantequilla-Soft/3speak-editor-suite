@@ -3,6 +3,9 @@
  * preview (src/utils/) and the backend render (backend/src/utils/): the two
  * copies must stay identical (scripts/check-static-mask-sync.mjs).
  *
+ * The matte is indexed by MEDIA seconds of the source: a clip with a speed,
+ * ramp or freeze (utils/clipSpeed.js) looks it up at the media time it shows.
+ *
  * The browser finds the person in every frame of the clip's source with
  * MediaPipe's selfie segmenter (src/utils/personSegmenter.js) and keeps the
  * result as a low-resolution grayscale matte track: MASK_FPS frames a second,
@@ -109,13 +112,15 @@ export function maskFrameIndex(header, t) {
 }
 
 /**
- * Matte frame for each output frame of a clip: output frame j shows source
- * time startTime + j / fps. Returns an array of matte frame indexes.
+ * Matte frame for each output frame of a clip: output frame j is at clip time
+ * startTime + j / fps, which shows media second mediaAt(that clip time) (the
+ * clip's speed / ramp / freeze, utils/clipSpeed.js sourceAt; media time = clip
+ * time without one). Returns an array of matte frame indexes.
  */
-export function resampleMaskIndexes(header, startTime, endTime, fps) {
+export function resampleMaskIndexes(header, startTime, endTime, fps, mediaAt = (t) => t) {
   const n = Math.max(1, Math.round((endTime - startTime) * fps))
   const out = new Array(n)
-  for (let j = 0; j < n; j++) out[j] = maskFrameIndex(header, startTime + j / fps)
+  for (let j = 0; j < n; j++) out[j] = maskFrameIndex(header, mediaAt(startTime + j / fps))
   return out
 }
 

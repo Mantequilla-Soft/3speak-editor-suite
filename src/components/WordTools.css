@@ -1,0 +1,408 @@
+/* Word tools: the transcript (edit by text), Remove fillers, chapter ideas,
+   captions on audiograms. 3Speak v2 tokens only (src/styles/tokens.css). */
+
+/* ---- transcript ---- */
+.transcript-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  min-height: 0;
+}
+
+.transcript-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  font-size: var(--fs-12);
+  color: var(--muted);
+}
+
+.transcript-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.transcript-search {
+  flex: 1 1 160px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  color: var(--muted);
+}
+
+.transcript-search input {
+  flex: 1;
+  min-width: 0;
+}
+
+.transcript-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  margin-left: auto;
+}
+
+.transcript-count {
+  font-size: var(--fs-12);
+  color: var(--muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.transcript-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.transcript-icon:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.transcript-speakers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+}
+
+.transcript-speaker {
+  font-size: var(--fs-11);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0 var(--sp-2);
+  line-height: 20px;
+  border-radius: var(--r-round);
+  background: var(--surface-2);
+  color: var(--text);
+  border-left: 3px solid var(--speaker, var(--accent));
+}
+
+/* each voice its own mark (v2 has no other hues: red, cyan, text, muted) */
+.speaker-0 { --speaker: var(--accent); }
+.speaker-1 { --speaker: var(--cyan); }
+.speaker-2 { --speaker: var(--text); }
+.speaker-3 { --speaker: var(--muted); }
+
+.transcript-missing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-12);
+  color: var(--muted);
+}
+
+.transcript-scroll {
+  position: relative;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  height: min(60dvh, 560px);
+  min-height: 220px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  outline: none;
+}
+
+.transcript-scroll:focus-visible {
+  border-color: var(--cyan);
+}
+
+.transcript-rows {
+  position: relative;
+}
+
+.transcript-window {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+}
+
+.transcript-para {
+  padding: var(--sp-2) var(--sp-3);
+}
+
+.transcript-para-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-bottom: 2px;
+}
+
+.transcript-para-head .transcript-speaker {
+  background: transparent;
+  padding-left: var(--sp-1);
+}
+
+.transcript-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 var(--sp-1);
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--fs-11);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.transcript-time:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.transcript-text {
+  margin: 0;
+  font-size: var(--fs-14);
+  line-height: 22px;
+  color: var(--text);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.transcript-word {
+  border-radius: var(--r-xs);
+  cursor: text;
+  padding: 1px 0;
+}
+
+.transcript-word:hover {
+  background: var(--surface-2);
+}
+
+.transcript-word.match {
+  box-shadow: inset 0 -2px 0 var(--cyan);
+}
+
+.transcript-word.active {
+  color: var(--accent);
+}
+
+.transcript-word.selected {
+  background: var(--cyan-tint);
+  color: var(--text);
+}
+
+.transcript-hint {
+  margin: 0;
+  font-size: var(--fs-11);
+  color: var(--muted);
+}
+
+.transcript-cut {
+  gap: var(--sp-1);
+}
+
+@media (max-width: 767px) {
+  .transcript-scroll {
+    height: 50dvh;
+  }
+}
+
+/* ---- remove fillers ---- */
+.filler-review {
+  max-width: 640px;
+}
+
+.filler-empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding-bottom: var(--sp-3);
+}
+
+.filler-controls .beat-sync-toggle {
+  font-size: var(--fs-13);
+  color: var(--text);
+}
+
+.filler-bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+  margin: var(--sp-2) 0;
+}
+
+.filler-list {
+  list-style: none;
+  margin: 0 0 var(--sp-3);
+  padding: 0;
+  max-height: min(42dvh, 420px);
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+
+.filler-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-2);
+  font-size: var(--fs-13);
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+
+.filler-item:last-child {
+  border-bottom: none;
+}
+
+.filler-item.kept .filler-what {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.filler-what {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filler-context {
+  color: var(--muted);
+}
+
+.filler-chip {
+  display: inline-block;
+  padding: 0 var(--sp-1);
+  margin-right: var(--sp-1);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: var(--fs-11);
+  font-weight: 700;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.filler-chip.maybe {
+  background: var(--cyan-tint);
+}
+
+.filler-speaker {
+  flex: none;
+  max-width: 7rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-11);
+  color: var(--muted);
+}
+
+@media (max-width: 767px) {
+  .filler-speaker { display: none; }
+}
+
+/* a small text button */
+.audiogram-link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--cyan);
+  font: inherit;
+  font-size: var(--fs-12);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* ---- chapter ideas ---- */
+.chapter-suggest {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--border);
+}
+
+.chapter-suggest-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.chapter-suggest-head strong {
+  margin-right: auto;
+  font-size: var(--fs-14);
+  color: var(--text);
+}
+
+.chapter-suggest-list .audio-chapters-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* ---- captions on audiograms ---- */
+.audiogram-captions-text {
+  pointer-events: none;
+}
+
+.audiogram-captions-edge {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 22px;
+  margin-top: -11px;
+  background: var(--on-media);
+  border: 1px solid var(--accent-primary);
+  border-radius: 3px;
+  cursor: ew-resize;
+}
+
+.audiogram-captions-edge.w { left: -6px; }
+.audiogram-captions-edge.e { right: -6px; }
+
+.audiogram-captions-field .noise-levels {
+  flex-wrap: wrap;
+}
+
+.audiogram-captions-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.audiogram-captions-row select {
+  flex: 1;
+  min-width: 0;
+}
+
+.audiogram-captions-row input[type="range"] {
+  flex: 1;
+}
+
+.audiogram-captions-words {
+  max-height: 200px;
+}
+
+/* The audio editor's tools row has two more buttons (Transcript, Fillers): on
+   narrow phones its tools go onto a second row instead of off the screen */
+@media (max-width: 767px) {
+  .compact-menu-bar {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+  .compact-menu-right:not(:empty) {
+    flex: 1 1 auto;
+  }
+}

@@ -107,3 +107,11 @@ describe('drafts', () => {
     expect(jobs.needsPersonMask(state.tracks[0].clips[1])).toBe(true)
   })
 })
+
+describe('speed', () => {
+  it('a clip at another speed, or a still, makes its matte over the media seconds it shows', () => {
+    expect(jobs.mediaRange({ startTime: 1, endTime: 3, speed: 2 })).toEqual([2, 6])
+    expect(jobs.mediaRange({ startTime: 0, endTime: 5, freezeAt: 4 })).toEqual([4, 4])
+    expect(jobs.mediaRange({ startTime: 1, endTime: 3 })).toEqual([1, 3])
+  })
+})

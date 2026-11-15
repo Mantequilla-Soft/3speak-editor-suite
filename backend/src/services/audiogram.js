@@ -1,4 +1,5 @@
 import { cleanLayers, defaultLayers, DEFAULT_LINE, SIZES, CIRCLE_SHAPES, IMAGE_LAYOUTS, LOGO_STYLES } from './audiogramPage.js'
+import { cleanAudiogramCaptionLook } from '../utils/audiogramCaptions.js'
 
 /**
  * Audiogram: a short video of a piece of an episode for sharing (3Speak Shorts,
@@ -86,7 +87,8 @@ export function cleanAudiogramStyle(input = {}) {
     background: { image, imageLayout: pick(b.imageLayout, IMAGE_LAYOUTS, d.background.imageLayout) },
     line: typeof s.line === 'string' ? s.line.replace(/\s+/g, ' ').trim().slice(0, MAX_LINE) : d.line,
     logo,
-    layouts
+    layouts,
+    captions: cleanAudiogramCaptionLook(s.captions)
   }
 }
 
@@ -180,19 +182,19 @@ const LOUDNESS = 'aeval=abs(val(0)):c=mono,aformat=sample_fmts=s16:channel_layou
 /**
  * The moving waveform of a type, w x h, in a colour, on transparent. For the
  * round ones (w = h = the circle) this is the straight strip that circleMaps
- * bends round.
+ * bends round. `fps`: the video's frame rate (the video podcast runs slower).
  */
-export function waveFilter(type, w, h, color) {
+export function waveFilter(type, w, h, color, fps = FPS) {
   const c = hex(color)
   if (type === 'circle') {
     // bars standing out from the inner ring: the top half of centred bars
     const g = circleGeometry(type, w)
-    return `${LOUDNESS},showwaves=s=${g.cols}x${g.rows * 2}:mode=cline:rate=${FPS}:colors=${c}:scale=sqrt:draw=full,crop=${g.cols}:${g.rows}:0:0,format=rgba`
+    return `${LOUDNESS},showwaves=s=${g.cols}x${g.rows * 2}:mode=cline:rate=${fps}:colors=${c}:scale=sqrt:draw=full,crop=${g.cols}:${g.rows}:0:0,format=rgba`
   }
   if (type === 'ring') {
     const g = circleGeometry(type, w)
     // a wavy line: the sound without its highs, so it swings instead of buzzing
-    return `lowpass=f=420,lowpass=f=420,showwaves=s=${g.cols}x${g.rows}:mode=p2p:rate=${FPS}:colors=${c}:scale=sqrt:draw=full,format=rgba`
+    return `lowpass=f=420,lowpass=f=420,showwaves=s=${g.cols}x${g.rows}:mode=p2p:rate=${fps}:colors=${c}:scale=sqrt:draw=full,format=rgba`
   }
   if (type === 'bars') {
     // Bars: a narrow centred waveform of the loudness, blown up without
@@ -201,11 +203,11 @@ export function waveFilter(type, w, h, color) {
     const n = Math.max(12, Math.round(w / 24))
     const step = Math.max(4, Math.floor(w / n))
     return `${LOUDNESS},` +
-      `showwaves=s=${n}x${h}:mode=cline:rate=${FPS}:colors=${c}:scale=sqrt:draw=full,scale=${n * step}:${h}:flags=neighbor,` +
+      `showwaves=s=${n}x${h}:mode=cline:rate=${fps}:colors=${c}:scale=sqrt:draw=full,scale=${n * step}:${h}:flags=neighbor,` +
       `format=rgba,drawgrid=w=${step}:h=${h + 2}:t=${Math.max(2, Math.round(step / 4))}:c=0x000000@1,colorkey=0x000000:0.02:0,pad=${w}:${h}:(ow-iw)/2:0:color=0x00000000`
   }
   const mode = type === 'line' ? 'line' : type === 'dots' ? 'p2p' : 'cline'
-  return `showwaves=s=${w}x${h}:mode=${mode}:rate=${FPS}:colors=${c}:scale=sqrt:draw=full,format=rgba`
+  return `showwaves=s=${w}x${h}:mode=${mode}:rate=${fps}:colors=${c}:scale=sqrt:draw=full,format=rgba`
 }
 
 /**
@@ -213,9 +215,10 @@ export function waveFilter(type, w, h, color) {
  * under the waveform (input 1), the waveform at `box` { cx, cy, w, h, r } (its
  * middle, size, degrees; or none), the still over it (input 2, transparent
  * PNG, or none), faded in and out. A round waveform needs `maps` { x, y }
- * (files of circleMaps).
+ * (files of circleMaps). `captionsFilter`: a filter drawing the captions over
+ * it all (services/audiogramCaptions.js), or none.
  */
-export function audiogramArgs({ input, below, above = null, box, maps = null, output, start, duration, style = DEFAULT_STYLE }) {
+export function audiogramArgs({ input, below, above = null, box, maps = null, output, start, duration, style = DEFAULT_STYLE, captionsFilter = null }) {
   const st = cleanAudiogramStyle(style)
   const fade = Math.min(0.5, duration / 4).toFixed(3)
   const out = (duration - +fade).toFixed(3)
@@ -249,7 +252,8 @@ export function audiogramArgs({ input, below, above = null, box, maps = null, ou
     v = 'bt'
   }
   parts.push(
-    `[${v}]fade=t=in:st=0:d=${fade},fade=t=out:st=${out}:d=${fade},format=yuv420p[v]`,
+    // captions (utils/audiogramCaptions.js) over everything, faded with the rest
+    `[${v}]${captionsFilter ? `${captionsFilter},` : ''}fade=t=in:st=0:d=${fade},fade=t=out:st=${out}:d=${fade},format=yuv420p[v]`,
     `[ao]afade=t=in:st=0:d=${fade},afade=t=out:st=${out}:d=${fade}[a]`
   )
   const still = (file) => ['-loop', '1', '-framerate', String(FPS), '-t', String(duration), '-i', file]

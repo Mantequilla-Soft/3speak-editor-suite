@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Download, Settings, X, Send, ExternalLink } from './icons'
 import { MAX_TIMELINE_TEXT, formatLength } from '../utils/limits'
+import { isRenderActive } from '../utils/renderQueue'
 
 // Quality presets mapped to CRF values (lower CRF = higher quality, larger file)
 const QUALITY_PRESETS = [
@@ -34,7 +35,7 @@ function ExportButton({
   const [showSettings, setShowSettings] = useState(false)
   const [useCanvasExport, setUseCanvasExport] = useState(true) // Default to canvas export
 
-  const isBackendRendering = renderStatus && (renderStatus.status === 'submitting' || renderStatus.status === 'processing')
+  const isBackendRendering = !!renderStatus && isRenderActive(renderStatus.status)
 
   const canExport = !overLengthLimit && !pendingUpload && (isIframe
     ? clips.length > 0 && !exporting && !isBackendRendering

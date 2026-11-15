@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import fs from 'fs/promises'
 import path from 'path'
-import { renderRouter, getRenderStats } from './routes/render.js'
+import { renderRouter, getRenderStats, restoreRenderJobs } from './routes/render.js'
 import { uploadRouter } from './routes/upload.js'
 import { clipRouter } from './routes/clip.js'
 import { projectsRouter } from './routes/projects.js'
@@ -12,6 +12,8 @@ import { templatesRouter } from './routes/templates.js'
 import { audiogramRouter } from './routes/audiogram.js'
 import { captionsRouter } from './routes/captions.js'
 import { stockRouter } from './routes/stock.js'
+import { transcriptRouter } from './routes/transcript.js'
+import { videoPodcastRouter, getVideoPodcastStats } from './routes/videoPodcast.js'
 import { pinnedUploads, uploadBase } from './utils/pinnedUploads.js'
 import { RENDER_CACHE_DIR } from './services/ffmpeg.js'
 
@@ -27,8 +29,10 @@ app.use(express.json({ limit: '50mb' }))
 
 // Health check
 app.get('/api/health', (req, res) => {
-  const { activeJobs, maxConcurrentJobs } = getRenderStats()
-  res.json({ status: 'ok', timestamp: new Date().toISOString(), activeJobs, maxConcurrentJobs })
+  const { activeJobs, maxConcurrentJobs, queuedJobs, maxQueuedJobs } = getRenderStats()
+  // video podcasts (hours long) count as jobs too, so a deploy waits for them
+  const podcasts = getVideoPodcastStats()
+  res.json({ status: 'ok', timestamp: new Date().toISOString(), activeJobs: activeJobs + podcasts.running, maxConcurrentJobs, queuedJobs: queuedJobs + podcasts.waiting, maxQueuedJobs })
 })
 
 // Upload routes
@@ -48,6 +52,10 @@ app.use('/api/templates', templatesRouter)
 app.use('/api/audiogram', audiogramRouter)
 // Auto captions: speech to text with word times (whisper.cpp, services/stt.js)
 app.use('/api/captions', captionsRouter)
+// Transcripts of whole shows, in chunks (edit by text, fillers, chapter ideas)
+app.use('/api/transcript', transcriptRouter)
+// Video podcasts: a whole episode as a 16:9 video (cover, waveform, captions, speaker names)
+app.use('/api/video-podcast', videoPodcastRouter)
 
 // Stock media: live Pexels / Pixabay search when their keys are set (our own library is static, /stock/)
 app.use('/api/stock', stockRouter)
@@ -110,6 +118,8 @@ async function cleanupOldFiles() {
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`[backend] Render service listening on port ${PORT}`)
+  // Render jobs from before a restart: queued ones queue again, a running one starts over
+  restoreRenderJobs()
 
   // Run cleanup on startup and then periodically
   cleanupOldFiles()

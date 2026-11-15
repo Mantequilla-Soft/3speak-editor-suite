@@ -61,13 +61,13 @@ async function uploadLocalImage(localUrl, name) {
  * autosave after their upload picks them up. `plates` maps local plate / noise
  * map URLs to their uploaded copies (see useDrafts).
  */
-export function serializeProject(tracks, library, plates = new Map(), { mode = 'video', master = null, chapters = null, playhead = null, zoom = null, flags = null, selected = null, remix = null, captions = null } = {}) {
+export function serializeProject(tracks, library, plates = new Map(), { mode = 'video', master = null, chapters = null, playhead = null, zoom = null, flags = null, selected = null, remix = null, captions = null, transcript = null, aspect = null } = {}) {
   let pending = 0
   const serverRef = (x) => x.serverUrl || (x.url && !LOCAL.test(x.url) ? x.url : null)
   const outTracks = tracks.map(t => ({
     ...t,
     clips: t.clips.flatMap(c => {
-      if (c.type === 'text' || c.type === 'color') return [stripLocal(c)]
+      if (c.type === 'text' || c.type === 'color' || c.type === 'scene') return [stripLocal(c)]
       const url = serverRef(c)
       if (!url) { pending++; return [] }
       let source = { ...c, url }
@@ -106,6 +106,12 @@ export function serializeProject(tracks, library, plates = new Map(), { mode = '
   // captions: the Shorts editor's auto captions (utils/captions.js), words and look
   const caps = mode !== 'audio' ? normalizeCaptions(captions) : null
   if (caps) state.captions = { ...caps, ...(captions.burn === false ? { burn: false } : {}) }
+  // transcript: the words of the recordings still on the timeline (utils/transcript.js)
+  const used = new Set(outTracks.flatMap(t => t.clips.map(c => c.libraryId)).filter(Boolean))
+  const sources = Object.entries(transcript?.sources || {}).filter(([id]) => used.has(id))
+  if (sources.length) state.transcript = { v: 1, language: transcript.language || null, sources: Object.fromEntries(sources) }
+  // aspect: the video project's shape (utils/projectFormat.js); a draft without it is a Short
+  if (mode !== 'audio' && typeof aspect === 'string' && aspect !== '9:16') state.aspect = aspect
   if (mode === 'audio') {
     state.mode = 'audio'
     state.master = { loudness: master?.loudness !== false, duck: master?.duck === true, ...(Number.isFinite(+master?.duckDb) ? { duckDb: +master.duckDb } : {}) }
@@ -132,7 +138,7 @@ export const projectMode = (p) => (p?.mode === 'audio' ? 'audio' : 'video')
  * per-tier limit (free: 1 for 7 days, Pro: 3 for 30 days; each save restarts
  * the clock) and deleting the draft once the video is sent.
  */
-export function useDrafts({ session, hasMedia, tracks, library, loadProjectState, onUnauthorized, mode = 'video', master = null, chapters = null, playhead = 0, playing = false, zoom = null, flags = null, selected = null, remix = null, captions = null }) {
+export function useDrafts({ session, hasMedia, tracks, library, loadProjectState, onUnauthorized, mode = 'video', master = null, chapters = null, playhead = 0, playing = false, zoom = null, flags = null, selected = null, remix = null, captions = null, transcript = null, aspect = null }) {
   const [drafts, setDrafts] = useState(null) // summaries, once fetched
   const [limits, setLimits] = useState(null)
   const [prompt, setPrompt] = useState(false) // "continue a draft?" on start
@@ -202,7 +208,7 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
     const at = playheadRef.current
     const z = zoomRef.current
     const sel = selectedRef.current
-    const { state, pending: notYet } = serializeProject(tracks, library, platesRef.current, { mode, master, chapters, playhead: at, zoom: z, flags, selected: sel, remix, captions })
+    const { state, pending: notYet } = serializeProject(tracks, library, platesRef.current, { mode, master, chapters, playhead: at, zoom: z, flags, selected: sel, remix, captions, transcript, aspect })
     setPending(notYet)
     if (!projectIdRef.current) projectIdRef.current = newId()
     const finalName = (saveName ?? name).trim() || defaultName(tracks, mode)
@@ -240,7 +246,7 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
       setStatus('error')
       return { ok: false }
     }
-  }, [session, tracks, library, name, authed, limits, uploadPlates, mode, master, chapters, flags, remix, captions])
+  }, [session, tracks, library, name, authed, limits, uploadPlates, mode, master, chapters, flags, remix, captions, transcript, aspect])
 
   // Autosave from the first edit on (not while the limit question is open)
   useEffect(() => {
@@ -251,7 +257,7 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
     clearTimeout(timerRef.current)
     timerRef.current = setTimeout(() => { save() }, AUTOSAVE_DELAY)
     return () => clearTimeout(timerRef.current)
-  }, [tracks, library, session, master, chapters, flags, captions]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tracks, library, session, master, chapters, flags, captions, transcript, aspect]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // The playhead came to rest somewhere else (paused, moved, a draft opened),
   // the timeline was zoomed or another clip selected: a draft already on the

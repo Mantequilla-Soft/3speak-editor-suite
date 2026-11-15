@@ -9,13 +9,16 @@ import { downloadMedia } from '../utils/download.js'
 import { audiogramArgs, cleanAudiogramOptions, cleanAudiogramStyle, pageState, uploadPathOf, circleMaps, CIRCLE_WAVES, AUDIOGRAM_MAX_SECONDS } from '../services/audiogram.js'
 import { audiogramPageHtml, renderStills, defaultLayers, SIZES, LOGO_STYLES } from '../services/audiogramPage.js'
 import { privateAddress } from '../utils/privateAddress.js'
+import { audiogramCaptionsOf, audiogramCaptionsFilter } from '../services/audiogramCaptionBurn.js'
 
 /**
  * Audiogram jobs (the audio editor's Audiograms, after an export):
- *   POST /api/audiogram { url, start, duration, format, title, style }
+ *   POST /api/audiogram { url, start, duration, format, title, style, captions? }
  *     -> { jobId }; url is the exported MP3 (/rendered/<name>.mp3 on this
  *        backend, else fetched like a render's media); style is the look and
- *        the arrangement (services/audiogram.js cleanAudiogramStyle)
+ *        the arrangement (services/audiogram.js cleanAudiogramStyle);
+ *        captions { words: [{ text, start, end }], language } are the piece's
+ *        words (seconds from its start), shown when style.captions.on
  *   GET /api/audiogram/page -> the page the editor shows as its live preview
  *   GET /api/audiogram/defaults -> { style, coverLayouts, logoStyles, maxSeconds }: the first look
  *       (no template yet), and the arrangement with a cover for when a picture comes in
@@ -115,16 +118,18 @@ async function process_(job, { url }) {
       await fs.writeFile(maps.x, m.x)
       await fs.writeFile(maps.y, m.y)
     }
+    // captions: the words of the piece in the look of the captions part
+    const captionsFilter = await audiogramCaptionsFilter({ captions: job.captions, style: o.style, format: o.format, size: SIZES[o.format], layers: o.style.layouts[o.format], jobDir })
     await fs.mkdir(RENDERED_DIR, { recursive: true })
     const name = `audiogram-${job.id}.mp4`
     const part = path.join(RENDERED_DIR, `${name}.part.mp4`)
     job.phase = 'Drawing the audiogram...'
-    await run(audiogramArgs({ input, ...stills, maps, output: part, start: o.start, duration: o.duration, style: o.style }), (t) => {
+    await run(audiogramArgs({ input, ...stills, maps, output: part, start: o.start, duration: o.duration, style: o.style, captionsFilter }), (t) => {
       job.progress = Math.min(0.99, t / o.duration)
     })
     await fs.rename(part, path.join(RENDERED_DIR, name))
     Object.assign(job, { status: 'completed', progress: 1, phase: 'Complete', outputUrl: `/rendered/${name}` })
-    console.log(`[audiogram] ${job.id}: ${o.format} ${o.duration}s${image ? ' with picture' : ''} -> ${name}`)
+    console.log(`[audiogram] ${job.id}: ${o.format} ${o.duration}s${image ? ' with picture' : ''}${captionsFilter ? ' with captions' : ''} -> ${name}`)
   } catch (err) {
     Object.assign(job, { status: 'failed', phase: 'Failed', error: err.message })
     console.warn(`[audiogram] ${job.id} failed: ${err.message}`)
@@ -159,7 +164,7 @@ router.post('/', requireSignIn, (req, res) => {
   if (options.error) return res.status(400).json({ error: options.error })
   if (running >= MAX_RUNNING) return res.status(503).json({ error: 'Server busy', retryAfter: 15 })
   const id = uuidv4()
-  const job = { id, status: 'processing', progress: 0, phase: 'Starting...', options }
+  const job = { id, status: 'processing', progress: 0, phase: 'Starting...', options, captions: audiogramCaptionsOf(options.style, req.body?.captions, options.duration) }
   jobs.set(id, job)
   running++
   process_(job, { url })

@@ -53,6 +53,7 @@ export const MATERIAL = {
   HelpCircle: 'help',
   Image: 'image',
   Info: 'info',
+  Keyboard: 'keyboard',
   LayoutTemplate: 'space_dashboard',
   Link: 'link',
   ListChecks: 'checklist',
@@ -166,6 +167,7 @@ export const GripVertical = make('GripVertical')
 export const HelpCircle = make('HelpCircle')
 export const Image = make('Image')
 export const Info = make('Info')
+export const Keyboard = make('Keyboard')
 export const LayoutTemplate = make('LayoutTemplate')
 export const Link = make('Link')
 export const ListChecks = make('ListChecks')

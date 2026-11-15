@@ -1,0 +1,11 @@
+/* Text clips with a word by word entrance (TextFx.jsx): the words lie over a
+   hidden copy of the text, in the same box, wrapping the same way */
+.text-word-layer {
+  position: absolute;
+  inset: 0;
+  padding: inherit;
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  word-break: break-word;
+  pointer-events: none;
+}

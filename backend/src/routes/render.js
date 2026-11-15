@@ -9,6 +9,7 @@ import crypto from 'crypto'
 import { requireSignIn } from '../auth.js'
 import { renderUrlOf } from '../utils/uploadFiles.js'
 import { emojiDownloads, emojiKey, writeSubtitleFiles } from '../services/captionBurn.js'
+import { createRenderQueue, createJobStore, QueueFullError } from '../utils/renderQueue.js'
 
 const router = Router()
 const RENDERED_DIR = process.env.RENDERED_DIR || '/app/rendered'
@@ -17,11 +18,28 @@ const MAX_CONCURRENT = parseInt(process.env.MAX_CONCURRENT_JOBS || '2', 10)
 // Longest audio-mode render (the editor's own limit is the same, src/utils/limits.js)
 export const MAX_AUDIO_RENDER_SECONDS = 3 * 60 * 60
 
-// In-memory job store
-const jobs = new Map()
-// AbortControllers for active jobs
-const abortControllers = new Map()
-let activeJobs = 0
+// Jobs wait in line when every render place is taken (utils/renderQueue.js),
+// up to MAX_QUEUED_JOBS; each is a JSON file under RENDER_JOBS_DIR, so a
+// restart or a redeploy loses none (the uploads volume, like the drafts)
+const MAX_QUEUED = parseInt(process.env.MAX_QUEUED_JOBS || '20', 10)
+const UPLOAD_DIR = process.env.UPLOAD_DIR || '/app/uploads'
+export const RENDER_JOBS_DIR = process.env.RENDER_JOBS_DIR || path.join(UPLOAD_DIR, '.render-jobs')
+const queue = createRenderQueue({
+  maxConcurrent: MAX_CONCURRENT,
+  maxQueued: MAX_QUEUED,
+  store: createJobStore(RENDER_JOBS_DIR),
+  run: (job, { signal }) => processJob(job, path.join(WORK_DIR, job.id), signal).catch(err => {
+    console.error(`[render] Job ${job.id} failed:`, err)
+    throw err
+  })
+})
+
+/** At boot: jobs from before the restart queue again (a running one starts over). */
+export function restoreRenderJobs() {
+  const c = queue.restore()
+  if (c.requeued || c.restarted || c.failed) console.log(`[render] after the restart: ${c.requeued} queued again, ${c.restarted} started again, ${c.failed} failed (interrupted twice)`)
+  return c
+}
 
 // Re-renders reuse what did not change (all kept for the usual cleanup age,
 // refreshed when used):
@@ -89,37 +107,15 @@ router.post('/', requireSignIn, async (req, res) => {
       }
     }
 
-    if (activeJobs >= MAX_CONCURRENT) {
-      return res.status(503).json({ error: 'Server busy', retryAfter: 30 })
+    let job
+    try {
+      job = queue.add({ id: uuidv4(), timeline })
+    } catch (err) {
+      if (!(err instanceof QueueFullError)) throw err
+      // The line is full too: the editor tries again by itself
+      return res.status(503).json({ error: 'Server busy', retryAfter: 30, queuedJobs: err.queued })
     }
-
-    const jobId = uuidv4()
-    const jobDir = path.join(WORK_DIR, jobId)
-
-    const job = {
-      id: jobId,
-      status: 'queued',
-      progress: 0,
-      phase: 'Queued',
-      outputUrl: null,
-      error: null,
-      createdAt: Date.now(),
-      timeline
-    }
-
-    jobs.set(jobId, job)
-
-    processJob(jobId, jobDir).catch(err => {
-      console.error(`[render] Job ${jobId} failed:`, err)
-      const j = jobs.get(jobId)
-      if (j && j.status !== 'aborted') {
-        j.status = 'failed'
-        j.error = err.message
-        j.phase = 'Failed'
-      }
-    })
-
-    res.json({ jobId })
+    res.json(queue.view(job))
   } catch (err) {
     console.error('[render] Error creating job:', err)
     res.status(500).json({ error: 'Internal server error' })
@@ -130,27 +126,19 @@ router.post('/', requireSignIn, async (req, res) => {
  * GET /api/render/:jobId
  */
 router.get('/:jobId', (req, res) => {
-  const job = jobs.get(req.params.jobId)
+  const job = queue.get(req.params.jobId)
   if (!job) {
     return res.status(404).json({ error: 'Job not found' })
   }
 
-  res.json({
-    jobId: job.id,
-    status: job.status,
-    progress: job.progress,
-    phase: job.phase,
-    outputUrl: job.outputUrl,
-    error: job.error,
-    ...(job.subtitles && { subtitles: job.subtitles })
-  })
+  res.json(queue.view(job))
 })
 
 /**
  * POST /api/render/:jobId/abort
  */
 router.post('/:jobId/abort', requireSignIn, (req, res) => {
-  const job = jobs.get(req.params.jobId)
+  const job = queue.get(req.params.jobId)
   if (!job) {
     return res.status(404).json({ error: 'Job not found' })
   }
@@ -159,14 +147,7 @@ router.post('/:jobId/abort', requireSignIn, (req, res) => {
     return res.json({ jobId: job.id, status: job.status, message: 'Job already finished' })
   }
 
-  const ac = abortControllers.get(req.params.jobId)
-  if (ac) {
-    ac.abort()
-  }
-
-  job.status = 'aborted'
-  job.phase = 'Aborted'
-  job.error = 'Job aborted by user'
+  queue.abort(job.id)
 
   console.log(`[render] Job ${req.params.jobId} aborted`)
   res.json({ jobId: job.id, status: 'aborted' })
@@ -178,16 +159,13 @@ router.post('/:jobId/abort', requireSignIn, (req, res) => {
  * 2. Run FFmpeg
  * 3. Move output to rendered dir
  */
-async function processJob(jobId, jobDir) {
-  const job = jobs.get(jobId)
-  if (!job) return
-
-  const ac = new AbortController()
-  abortControllers.set(jobId, ac)
-
-  activeJobs++
+async function processJob(job, jobDir, signal) {
+  const jobId = job.id
+  const ac = { signal }
 
   try {
+    // a job started again after a restart begins with a clean folder
+    await fs.rm(jobDir, { recursive: true, force: true })
     await fs.mkdir(jobDir, { recursive: true })
     await fs.mkdir(RENDERED_DIR, { recursive: true })
 
@@ -322,22 +300,15 @@ async function processJob(jobId, jobDir) {
 
     await fs.rm(jobDir, { recursive: true, force: true }).catch(() => {})
     throw err
-  } finally {
-    activeJobs--
-    abortControllers.delete(jobId)
-
-    // Clean up job data after 1 hour
-    setTimeout(() => {
-      jobs.delete(jobId)
-    }, 60 * 60 * 1000)
   }
 }
 
 export { router as renderRouter }
 
+// activeJobs = rendering now, queuedJobs = waiting (the deploy swaps a backend only when both are 0)
 export function getRenderStats() {
-  return {
-    activeJobs,
-    maxConcurrentJobs: MAX_CONCURRENT
-  }
+  return queue.stats()
 }
+
+/** Tests: the queue itself. */
+export const renderQueue = queue

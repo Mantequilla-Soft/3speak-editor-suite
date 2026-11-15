@@ -8,6 +8,7 @@
  * - Progress is observable for the clip settings (subscribePersonMasks).
  */
 import { personMaskRange } from './personMask'
+import { sourceRange } from './clipSpeed'
 
 const tracks = new Map() // maskUrl -> { header, data }
 const loading = new Map() // maskUrl -> Promise<track | null>
@@ -22,9 +23,15 @@ export function subscribePersonMasks(fn) {
   return () => listeners.delete(fn)
 }
 
+/** [first, last] media second a clip shows (its speed / ramp / freeze, utils/clipSpeed.js) */
+export function mediaRange(clip) {
+  const [a, b] = sourceRange({ ...clip, startTime: clip.startTime || 0, endTime: clip.endTime || 0 })
+  return [Math.min(a, b), Math.max(a, b)]
+}
+
 /** The job key of a clip: its source and the range a matte would cover. */
 export function personJobKey(clip) {
-  const r = personMaskRange(clip.duration, clip.startTime, clip.endTime)
+  const r = personMaskRange(clip.duration, ...mediaRange(clip))
   return `${clip.url}|${r.start.toFixed(2)}|${r.end.toFixed(2)}`
 }
 
@@ -86,7 +93,8 @@ export function startPersonMask(clip) {
   const job = { progress: 0, error: null, promise: null }
   job.promise = (async () => {
     const { analyzePersonMask, encodeMaskBlob } = await import('./personSegmenter')
-    const { header, frames } = await analyzePersonMask(clip, {
+    const [mediaStart, mediaEnd] = mediaRange(clip)
+    const { header, frames } = await analyzePersonMask({ ...clip, mediaStart, mediaEnd }, {
       onProgress: (p) => { job.progress = p; notify() }
     })
     const blob = await encodeMaskBlob(header, frames)

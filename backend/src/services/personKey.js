@@ -18,6 +18,7 @@ import { promisify } from 'util'
 import {
   normalizePersonKey, parseMaskPayload, resampleMaskIndexes, maskFrame, personAlphaRange, blurSigma
 } from '../utils/personMask.js'
+import { sourceAt } from '../utils/clipSpeed.js'
 
 const gunzip = promisify(zlib.gunzip)
 // A matte file is small (a minute is a few MB); refuse anything absurd
@@ -42,7 +43,8 @@ export async function writePersonMaskStream(clip, maskFile, outPath, fps) {
   const track = await readMaskFile(maskFile)
   if (!track) return null
   const { w, h } = track.header
-  const idx = resampleMaskIndexes(track.header, clip.startTime || 0, clip.endTime, fps)
+  // the matte is in media seconds: a retimed clip (speed, ramp, freeze) reads it where its frames are
+  const idx = resampleMaskIndexes(track.header, clip.startTime || 0, clip.endTime, fps, (c) => sourceAt(clip, c))
   // one spare frame at the end, so the matte never runs out before the picture
   idx.push(idx[idx.length - 1])
   const out = createWriteStream(outPath)
@@ -56,14 +58,16 @@ export async function writePersonMaskStream(clip, maskFile, outPath, fps) {
 /**
  * Filtergraph parts: [clipLabel] keyed by [maskLabel] -> [outLabel].
  * maskTransform frames the whole-frame matte like the clip (and scales it to
- * the processed clip's size); `delay` puts it at its timeline position.
+ * the processed clip's size); `hold` (a transition's held first / last frame,
+ * tpad) is applied to the matte too, so both stay frame for frame in step;
+ * `delay` puts it at its timeline position.
  */
-export function buildPersonKeyFilter({ clipLabel, maskLabel, maskTransform, key, i, delay, outLabel }) {
+export function buildPersonKeyFilter({ clipLabel, maskLabel, maskTransform, key, i, delay, outLabel, hold = null }) {
   const n = (s) => `[p${i}${s}]`
   const { lo, hi } = personAlphaRange(key)
   const end = `${delay ? `,${delay}` : ''}[${outLabel}]`
   const parts = [
-    `[${maskLabel}]${maskTransform},format=gray,lut=c0='clip((val-${lo})*255/${hi - lo},0,255)'${n('a')}`
+    `[${maskLabel}]${maskTransform},format=gray,lut=c0='clip((val-${lo})*255/${hi - lo},0,255)'${hold ? `,${hold}` : ''}${n('a')}`
   ]
   const bg = key.background
   if (bg.kind === 'none') {

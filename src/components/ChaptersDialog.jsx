@@ -7,9 +7,10 @@ import { chapterTime, chaptersText, MAX_CHAPTERS, MAX_CHAPTER_TITLE } from '../u
  * They stay with the recording through cuts (utils/chapters.js), go into the
  * MP3 and, with "Use this audio", into the post's description.
  * `resolved`: [{ id, title, at }] where they are now; `spans`: what is exported;
- * `focusId`: a chapter just added (its name field gets the focus).
+ * `focusId`: a chapter just added (its name field gets the focus);
+ * `suggestions`: the chapter ideas (ChapterSuggestions), shown under the list.
  */
-export default function ChaptersDialog({ resolved, spans, playheadPosition, focusId, onAdd, onRename, onMove, onRemove, onSeek, onClose }) {
+export default function ChaptersDialog({ resolved, spans, playheadPosition, focusId, onAdd, onRename, onMove, onRemove, onSeek, onClose, suggestions = null }) {
   const listRef = useRef(null)
   const [copied, setCopied] = useState(false)
   const exported = new Set(spans.map(s => s.start))
@@ -68,6 +69,8 @@ export default function ChaptersDialog({ resolved, spans, playheadPosition, focu
         {spans.length > 0 && spans[0].start > 0.5 && (
           <p className="audio-template-hint">Tip: many apps expect the first chapter at 0:00.</p>
         )}
+
+        {suggestions}
 
         <div className="silence-cut-actions audio-template-actions">
           <button className="silence-cut-apply" onClick={() => onAdd(playheadPosition)} disabled={resolved.length >= MAX_CHAPTERS}>

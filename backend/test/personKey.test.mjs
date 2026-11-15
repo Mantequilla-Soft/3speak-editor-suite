@@ -144,3 +144,35 @@ test('render: without its matte the clip renders unkeyed instead of failing', { 
   const f = await renderPerson('nomask', { kind: 'none' }, { maskOk: false })
   assert.ok(near(rgbAt(f, 130, 55), [0, 0, 255]), `right ${rgbAt(f, 130, 55)}`)
 })
+
+test('render: a person-keyed clip at 2x speed reads its matte at the media second it shows', { skip: !hasFfmpeg, timeout: 120000 }, async () => {
+  const blue4 = path.join(dir, 'blue4.mp4')
+  execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-f', 'lavfi', '-i', `color=c=blue:s=${W}x${H}:d=4:r=30`, '-pix_fmt', 'yuv420p', blue4])
+  // 4 media seconds: the person is on the left before media second 2, on the right after it
+  const mask = writeGz('speed.gz', matte(16, 12, 60, 15, 0, (f, x) => ((f < 30) === (x < 8) ? 255 : 0)))
+  const tracks = [
+    { id: 'top', type: 'video', clips: [{ id: 'p', type: 'video', name: 'me', duration: 4, startTime: 0, endTime: 2, speed: 2, timelinePosition: 0, zoom: 100, chromaKey: { color: 'person', maskUrl: '/x.gz' } }] },
+    { id: 'bottom', type: 'video', clips: [{ id: 'bg', type: 'color', duration: 2, startTime: 0, endTime: 2, timelinePosition: 0, backgroundColor: '#ff0000' }] }
+  ]
+  const jobDir = path.join(dir, 'speed'); fs.mkdirSync(jobDir, { recursive: true })
+  const out = path.join(dir, 'speed.mp4')
+  await buildAndRunFFmpeg({ timeline: { outputWidth: W, outputHeight: H, previewWidth: W, previewHeight: H, fps: 30, tracks }, downloadedFiles: new Map([['p', blue4], ['p__mask', mask]]), outputPath: out, jobDir, onProgress: () => {} })
+  const at = (t, x) => {
+    const raw = execFileSync('ffmpeg', ['-loglevel', 'error', '-ss', String(t), '-i', out, '-frames:v', '1', '-vf', `crop=10:10:${x}:55`, '-f', 'rawvideo', '-pix_fmt', 'rgb24', 'pipe:1'])
+    const s = [0, 0, 0]
+    for (let i = 0; i < raw.length; i += 3) for (let c = 0; c < 3; c++) s[c] += raw[i + c]
+    return s.map(v => Math.round(v / (raw.length / 3)))
+  }
+  // timeline 0.5 s = media 1 s: person left; timeline 1.5 s = media 3 s: person right
+  assert.ok(near(at(0.5, 20), [0, 0, 255]) && near(at(0.5, 130), [255, 0, 0]), `0.5 s: ${at(0.5, 20)} | ${at(0.5, 130)}`)
+  assert.ok(near(at(1.5, 20), [255, 0, 0]) && near(at(1.5, 130), [0, 0, 255]), `1.5 s: ${at(1.5, 20)} | ${at(1.5, 130)}`)
+})
+
+test('matte picks follow the clip speed (sourceAt)', async () => {
+  const { sourceAt } = await import('../src/utils/clipSpeed.js')
+  const h = { v: 1, w: 8, h: 8, fps: 15, start: 0, frames: 60 }
+  const clip = { startTime: 0, endTime: 1, speed: 2 }
+  assert.deepEqual(PM.resampleMaskIndexes(h, 0, 0.2, 30, (c) => sourceAt(clip, c)), [0, 1, 2, 3, 4, 5])
+  const still = { startTime: 0, endTime: 1, freezeAt: 2 }
+  assert.deepEqual(new Set(PM.resampleMaskIndexes(h, 0, 1, 30, (c) => sourceAt(still, c))), new Set([30]))
+})
