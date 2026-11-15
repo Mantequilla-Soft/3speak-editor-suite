@@ -51,10 +51,16 @@ export function hasAssFilter() {
   return assFilter
 }
 
-/** The whisper-cli arguments: one segment per word (-ml 1 -sow), JSON out. */
-export function whisperArgs({ model, threads }, wavPath, outPrefix, language = 'auto') {
+/**
+ * The whisper-cli arguments: one segment per word (-ml 1 -sow), JSON out.
+ * `prompt` (optional): text whisper continues from; the transcript uses one
+ * full of "um" and "uh" so they are written down instead of tidied away.
+ */
+export function whisperArgs({ model, threads }, wavPath, outPrefix, language = 'auto', prompt = '') {
   const lang = STT_LANGUAGES.includes(language) ? language : 'auto'
-  return ['-m', model, '-f', wavPath, '-t', String(threads), '-l', lang, '-ml', '1', '-sow', '-oj', '-of', outPrefix, '-np', '-pp']
+  const args = ['-m', model, '-f', wavPath, '-t', String(threads), '-l', lang, '-ml', '1', '-sow', '-oj', '-of', outPrefix, '-np', '-pp']
+  const p = typeof prompt === 'string' ? prompt.replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 300) : ''
+  return p ? [...args, '--prompt', p] : args
 }
 
 /** 16 kHz mono WAV of any audio file (what whisper reads). */
@@ -77,10 +83,10 @@ export function toWav(input, output, signal) {
  * Transcribe a 16 kHz WAV: resolves { words: [{ text, start, end }], language }.
  * Runs at low CPU priority; onProgress(0..1) follows whisper's own progress.
  */
-export async function transcribeWav(wavPath, { language = 'auto', durationSec = 60, onProgress = () => {}, signal } = {}) {
+export async function transcribeWav(wavPath, { language = 'auto', prompt = '', durationSec = 60, onProgress = () => {}, signal } = {}) {
   const cfg = sttConfig()
   const outPrefix = wavPath.replace(/\.wav$/, '')
-  const args = whisperArgs(cfg, wavPath, outPrefix, language)
+  const args = whisperArgs(cfg, wavPath, outPrefix, language, prompt)
   await new Promise((resolve, reject) => {
     const proc = spawn(cfg.bin, args, { stdio: ['ignore', 'pipe', 'pipe'] })
     try { os.setPriority(proc.pid, 10) } catch { /* not allowed here: normal priority */ }

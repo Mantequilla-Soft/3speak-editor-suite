@@ -1,0 +1,561 @@
+{
+  "_about": "Filler words per spoken language (utils/fillers.js). 'sounds': hesitation sounds, always fillers. 'phrases': words or phrases that are fillers only when set off by a pause or a comma on both sides (\"it was, like, huge\" but not \"I like it\"). Written in lower case without punctuation; phrases are words with single spaces. 'any' applies to every language.",
+  "any": {
+    "sounds": [
+      "um",
+      "umm",
+      "ummm",
+      "uh",
+      "uhh",
+      "uhm",
+      "uhmm",
+      "hmm",
+      "hmmm",
+      "hm",
+      "mm",
+      "mmm",
+      "mhm",
+      "erm",
+      "er",
+      "ehm",
+      "eh",
+      "ehh",
+      "ah",
+      "ahh",
+      "aah"
+    ],
+    "phrases": []
+  },
+  "en": {
+    "sounds": [
+      "err",
+      "uhhh",
+      "uh-huh"
+    ],
+    "phrases": [
+      "like",
+      "you know",
+      "i mean",
+      "basically",
+      "actually",
+      "literally",
+      "sort of",
+      "kind of",
+      "you see",
+      "okay so",
+      "right",
+      "well"
+    ]
+  },
+  "de": {
+    "sounds": [
+      "äh",
+      "ähm",
+      "öh",
+      "öhm",
+      "ähh",
+      "äähm",
+      "hmm"
+    ],
+    "phrases": [
+      "also",
+      "halt",
+      "sozusagen",
+      "quasi",
+      "irgendwie",
+      "weißt du",
+      "ich meine",
+      "na ja",
+      "naja",
+      "eigentlich",
+      "genau",
+      "ne",
+      "gell"
+    ]
+  },
+  "es": {
+    "sounds": [
+      "eh",
+      "ehh",
+      "em",
+      "emm",
+      "mmm"
+    ],
+    "phrases": [
+      "este",
+      "o sea",
+      "pues",
+      "bueno",
+      "sabes",
+      "vale",
+      "digamos",
+      "en plan",
+      "tipo",
+      "es decir",
+      "como que"
+    ]
+  },
+  "fr": {
+    "sounds": [
+      "euh",
+      "euhh",
+      "heu",
+      "bah",
+      "ben",
+      "hum"
+    ],
+    "phrases": [
+      "genre",
+      "en fait",
+      "du coup",
+      "tu vois",
+      "tu sais",
+      "voilà",
+      "quoi",
+      "bref",
+      "enfin",
+      "disons"
+    ]
+  },
+  "pt": {
+    "sounds": [
+      "hã",
+      "ãh",
+      "éé",
+      "ééé",
+      "hum",
+      "ahn"
+    ],
+    "phrases": [
+      "tipo",
+      "né",
+      "então",
+      "sabe",
+      "assim",
+      "tá",
+      "olha",
+      "quer dizer",
+      "pois",
+      "bem"
+    ]
+  },
+  "it": {
+    "sounds": [
+      "ehm",
+      "eh",
+      "ehh",
+      "mmm",
+      "uhm",
+      "beh"
+    ],
+    "phrases": [
+      "cioè",
+      "tipo",
+      "allora",
+      "insomma",
+      "diciamo",
+      "praticamente",
+      "sai",
+      "ecco",
+      "boh",
+      "comunque"
+    ]
+  },
+  "nl": {
+    "sounds": [
+      "eh",
+      "ehm",
+      "uh",
+      "uhm",
+      "euh",
+      "hè"
+    ],
+    "phrases": [
+      "nou",
+      "dus",
+      "zeg maar",
+      "weet je",
+      "eigenlijk",
+      "gewoon",
+      "ja",
+      "toch",
+      "zo"
+    ]
+  },
+  "pl": {
+    "sounds": [
+      "yyy",
+      "yy",
+      "eee",
+      "ee",
+      "mmm",
+      "hmm",
+      "eh"
+    ],
+    "phrases": [
+      "no",
+      "wiesz",
+      "jakby",
+      "znaczy",
+      "tak jakby",
+      "po prostu",
+      "w sumie",
+      "generalnie",
+      "właściwie"
+    ]
+  },
+  "sv": {
+    "sounds": [
+      "öh",
+      "öhm",
+      "eh",
+      "ehm",
+      "hmm"
+    ],
+    "phrases": [
+      "liksom",
+      "alltså",
+      "typ",
+      "ba",
+      "asså",
+      "du vet",
+      "va"
+    ]
+  },
+  "da": {
+    "sounds": [
+      "øh",
+      "øhm",
+      "hmm"
+    ],
+    "phrases": [
+      "altså",
+      "ligesom",
+      "ikke",
+      "jo",
+      "du ved"
+    ]
+  },
+  "no": {
+    "sounds": [
+      "eh",
+      "ehm",
+      "øh",
+      "hmm"
+    ],
+    "phrases": [
+      "liksom",
+      "altså",
+      "sånn",
+      "på en måte",
+      "vet du"
+    ]
+  },
+  "fi": {
+    "sounds": [
+      "öö",
+      "ööh",
+      "äh",
+      "hmm"
+    ],
+    "phrases": [
+      "niinku",
+      "tota",
+      "siis",
+      "tavallaan",
+      "silleen",
+      "no"
+    ]
+  },
+  "cs": {
+    "sounds": [
+      "ehm",
+      "éé",
+      "eee",
+      "hmm"
+    ],
+    "phrases": [
+      "jako",
+      "no",
+      "prostě",
+      "víš",
+      "vlastně",
+      "takže"
+    ]
+  },
+  "ro": {
+    "sounds": [
+      "ăă",
+      "ăăă",
+      "ăm",
+      "mmm"
+    ],
+    "phrases": [
+      "deci",
+      "adică",
+      "păi",
+      "știi",
+      "practic"
+    ]
+  },
+  "hu": {
+    "sounds": [
+      "ööö",
+      "öö",
+      "ö",
+      "hmm"
+    ],
+    "phrases": [
+      "hát",
+      "izé",
+      "szóval",
+      "tudod",
+      "ugye",
+      "mondjuk"
+    ]
+  },
+  "ru": {
+    "sounds": [
+      "ээ",
+      "эээ",
+      "эм",
+      "мм",
+      "хм"
+    ],
+    "phrases": [
+      "ну",
+      "как бы",
+      "типа",
+      "то есть",
+      "вот",
+      "короче",
+      "в общем",
+      "значит"
+    ]
+  },
+  "uk": {
+    "sounds": [
+      "ее",
+      "еее",
+      "ем",
+      "мм",
+      "хм"
+    ],
+    "phrases": [
+      "ну",
+      "як би",
+      "типу",
+      "тобто",
+      "от",
+      "коротше",
+      "значить"
+    ]
+  },
+  "tr": {
+    "sounds": [
+      "ee",
+      "eee",
+      "ııı",
+      "ıı",
+      "hmm"
+    ],
+    "phrases": [
+      "şey",
+      "yani",
+      "hani",
+      "işte",
+      "aslında"
+    ]
+  },
+  "el": {
+    "sounds": [
+      "εε",
+      "εμ",
+      "χμ"
+    ],
+    "phrases": [
+      "δηλαδή",
+      "ας πούμε",
+      "ξέρεις",
+      "λοιπόν",
+      "τέλος πάντων"
+    ]
+  },
+  "id": {
+    "sounds": [
+      "eh",
+      "em",
+      "hmm",
+      "ehm"
+    ],
+    "phrases": [
+      "anu",
+      "gitu",
+      "kayak",
+      "jadi",
+      "apa ya"
+    ]
+  },
+  "ms": {
+    "sounds": [
+      "eh",
+      "em",
+      "hmm"
+    ],
+    "phrases": [
+      "macam",
+      "jadi",
+      "kan",
+      "apa"
+    ]
+  },
+  "ja": {
+    "sounds": [
+      "えー",
+      "えーと",
+      "えっと",
+      "あの",
+      "あのー",
+      "うーん"
+    ],
+    "phrases": [
+      "まあ",
+      "その",
+      "なんか",
+      "ちょっと",
+      "やっぱり"
+    ]
+  },
+  "ko": {
+    "sounds": [
+      "음",
+      "어"
+    ],
+    "phrases": [
+      "저",
+      "그",
+      "그러니까",
+      "뭐",
+      "약간",
+      "이제"
+    ]
+  },
+  "zh": {
+    "sounds": [
+      "嗯",
+      "呃",
+      "啊",
+      "额"
+    ],
+    "phrases": [
+      "这个",
+      "那个",
+      "就是",
+      "然后",
+      "所以说"
+    ]
+  },
+  "hi": {
+    "sounds": [
+      "हम्म",
+      "अं"
+    ],
+    "phrases": [
+      "मतलब",
+      "वो",
+      "यानी",
+      "तो"
+    ]
+  },
+  "vi": {
+    "sounds": [
+      "ờ",
+      "ừm",
+      "à"
+    ],
+    "phrases": [
+      "kiểu",
+      "thì",
+      "là"
+    ]
+  },
+  "th": {
+    "sounds": [
+      "เอ่อ",
+      "อืม"
+    ],
+    "phrases": [
+      "แบบ",
+      "ก็"
+    ]
+  },
+  "ar": {
+    "sounds": [
+      "امم",
+      "ااا",
+      "إمم"
+    ],
+    "phrases": [
+      "يعني",
+      "طيب",
+      "خلاص"
+    ]
+  },
+  "he": {
+    "sounds": [
+      "אממ",
+      "אה",
+      "אמ"
+    ],
+    "phrases": [
+      "כאילו",
+      "בעצם",
+      "נגיד"
+    ]
+  },
+  "fa": {
+    "sounds": [
+      "اممم",
+      "اِ"
+    ],
+    "phrases": [
+      "یعنی",
+      "مثلاً",
+      "خب"
+    ]
+  },
+  "tl": {
+    "sounds": [
+      "ah",
+      "eh",
+      "uhm"
+    ],
+    "phrases": [
+      "parang",
+      "kasi",
+      "ano"
+    ]
+  },
+  "sw": {
+    "sounds": [
+      "eeh",
+      "aah",
+      "mmh"
+    ],
+    "phrases": [
+      "yaani",
+      "kama",
+      "sasa"
+    ]
+  },
+  "bn": {
+    "sounds": [
+      "উম",
+      "আ"
+    ],
+    "phrases": [
+      "মানে",
+      "তো"
+    ]
+  }
+}

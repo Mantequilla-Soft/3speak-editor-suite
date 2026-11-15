@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo, memo } from 'react'
 import { boxFrom, clipIdsInBox, toggleInSelection, clipIdsInRange } from '../utils/marquee'
 import { trackNumbers } from '../utils/trackNumbers'
-import { Trash2, Flag, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker, Maximize2, ListChecks, Subtitles } from './icons'
+import { Trash2, Flag, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker, Maximize2, ListChecks, Subtitles, ScrollText } from './icons'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 import { getGroupColor } from '../hooks/useTimeline'
 import { MAX_TIMELINE_SECONDS } from '../utils/limits'
@@ -627,6 +627,9 @@ function Timeline({
   // Auto captions panel (Shorts editor); captionsActive: it is open or the Short has captions
   onOpenCaptions,
   captionsActive = false,
+  // The transcript panel (edit by text); transcriptActive: it is open
+  onOpenTranscript,
+  transcriptActive = false,
   onRecordVideo,
   onReverseClip,
   onUpdateTrack,
@@ -1534,6 +1537,16 @@ function Timeline({
               title="Captions: turn what is said into word-by-word captions"
             >
               <Subtitles size={14} /> <span>Captions</span>
+            </button>
+          )}
+          {onOpenTranscript && (
+            <button
+              className={`action-btn transcript-btn${transcriptActive ? ' active' : ''}`}
+              onClick={onOpenTranscript}
+              aria-pressed={transcriptActive}
+              title="Transcript: edit by text, delete words to cut them"
+            >
+              <ScrollText size={14} /> <span>Transcript</span>
             </button>
           )}
           {onAddFlag && (

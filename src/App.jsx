@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useMemo, useState } from 'react'
-import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, HelpCircle, Maximize, Minimize, Scissors, Play, Pause, MousePointerClick } from './components/icons'
+import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, HelpCircle, Maximize, Minimize, Scissors, Play, Pause, MousePointerClick, ScrollText, Wand2 } from './components/icons'
 import { useFFmpeg } from './hooks/useFFmpeg'
 import { useCanvasExport } from './hooks/useCanvasExport'
 import { useTimeline } from './hooks/useTimeline'
@@ -52,6 +52,7 @@ import { voiceTracksOf } from './utils/captionSources'
 import ConfirmDialog from './components/ConfirmDialog'
 import { useCleaningStatus, cleaningText } from './utils/cleaningStatus'
 import { isTypingTarget } from './utils/keyboard'
+import { useWordTools } from './components/WordTools'
 import logo3speak from './assets/3speak.png'
 
 // Audio editor: the talking = clips on audio tracks that are not music and not template parts
@@ -279,6 +280,12 @@ function App() {
     editTextInHost,
     buildAndUploadPayload
   } = useIframeApi({ addToLibraryAndTimeline, addMusicClip, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay, audioMode, master, title: audioTitle, chapters: chapterList, captions: audioMode ? null : captions })
+
+  // Word tools (components/WordTools.jsx): the transcript to edit by text,
+  // Remove fillers, chapter ideas. wordRefitRef: the audio template refitted
+  // after a cut, in the same undo step (set with the template further down)
+  const wordRefitRef = useRef(null)
+  const wordTools = useWordTools({ tracks, buildAndUploadPayload, applyTracks, undo, fileStoreRef, previewControlRef, setChapters, refitRef: wordRefitRef })
 
   // Auto captions: speech to text on the backend, then the words go on screen
   const autoCaptions = useAutoCaptions({ enabled: !audioMode })
@@ -1055,6 +1062,7 @@ function App() {
     setChapters(Array.isArray(state?.chapters) ? state.chapters.slice(0, MAX_CHAPTERS) : [])
     setFlags(cleanFlags(state?.flags))
     setCaptions(normalizeCaptions(state?.captions) ? { ...state.captions, ...normalizeCaptions(state.captions) } : null)
+    wordTools.tr.load(state?.transcript)
     // a remix draft: its export posts under the original again
     restoreRemixSource(state?.remix || null)
     // and the clip(s) that were selected (those still on the timeline)
@@ -1078,7 +1086,8 @@ function App() {
     flags,
     selected: selectedClipIds.length ? selectedClipIds : (selectedClipId ? [selectedClipId] : []),
     remix: remixing ? remixSource : null,
-    captions: audioMode ? null : captions
+    captions: audioMode ? null : captions,
+    transcript: wordTools.tr.transcript
   })
   const canDraftSignIn = isIframe && !draftSession && ['sign-in-needed', 'sign-in-failed', 'signing-in'].includes(draftContext.reason)
 
@@ -1095,6 +1104,7 @@ function App() {
     if (!tpl || !appliedRoles(tracksRef.current).length) return
     applyTracks(t => applyAudioTemplate(t, tpl))
   }, [audioTemplate.template, applyTracks])
+  wordRefitRef.current = (t) => (audioTemplate.template && appliedRoles(t).length ? applyAudioTemplate(t, audioTemplate.template) : t)
 
   const voiceClips = useMemo(() => (audioMode ? voiceClipsOf(tracks) : []), [audioMode, tracks])
 
@@ -1517,12 +1527,15 @@ function App() {
     </div>
   ) : null
 
+  // The transcript (edit by text), in the same place while open
+  const transcriptPanel = wordTools.transcriptPanel({ playheadPosition, playing: previewPlaying, onSeek: setPlayheadPosition })
+
   // Desktop: the selected clip's settings in a sidebar. The audio editor puts
   // it beside the stage only, so the timeline gets the full width below.
   const sideBesideStage = isDesktop && audioMode
   const sidePanel = (
     <aside className="compact-side">
-      {captionsPanel || multiPanel || (sideClip ? compactPropertiesPanel : (
+      {captionsPanel || transcriptPanel || multiPanel || (sideClip ? compactPropertiesPanel : (
         <div className="compact-side-empty">
           <MousePointerClick size={28} />
           <strong>No clip selected</strong>
@@ -1711,6 +1724,24 @@ function App() {
                 >
                   <Bookmark size={15} /><span>{chapters.length ? `Chapters (${chapters.length})` : 'Chapters'}</span>
                 </button>
+                <button
+                  className={`compact-btn compact-tool-btn${wordTools.transcriptOpen ? ' active' : ''}`}
+                  onClick={wordTools.openTranscript}
+                  aria-pressed={wordTools.transcriptOpen}
+                  aria-label="Transcript"
+                  title="Transcript: edit the show by its text, delete words to cut them"
+                >
+                  <ScrollText size={15} /><span>Transcript</span>
+                </button>
+                <button
+                  className="compact-btn compact-tool-btn"
+                  onClick={() => wordTools.setFillersOpen(true)}
+                  disabled={!audioClips.length}
+                  aria-label="Remove fillers"
+                  title="Remove fillers: find um, uh, you know and long pauses, review them, cut them"
+                >
+                  <Wand2 size={15} /><span>Fillers</span>
+                </button>
               </>
             )}
           </div>
@@ -1749,6 +1780,8 @@ function App() {
             <button className="compact-btn" onClick={() => setTemplateNotice(null)} title="Dismiss"><X size={12} /></button>
           </div>
         )}
+
+        {wordTools.cutNoticeBar}
 
         {/* Render progress bar (shown below menu bar when active) */}
         {isBackendRendering && (
@@ -1869,8 +1902,10 @@ function App() {
             onOpenMusic={(trackId) => openAdd('music', trackId)}
             onOpenSfx={(trackId) => openAdd('sfx', trackId)}
             onOpenStickers={audioMode ? undefined : () => setStickersOpen(true)}
-            onOpenCaptions={audioMode ? undefined : () => setCaptionsOpen(o => !o)}
+            onOpenCaptions={audioMode ? undefined : () => { wordTools.setTranscriptOpen(false); setCaptionsOpen(o => !o) }}
             captionsActive={captionsOpen || !!captions}
+            onOpenTranscript={audioMode ? undefined : () => { setCaptionsOpen(false); wordTools.openTranscript() }}
+            transcriptActive={wordTools.transcriptOpen}
             onRecordVideo={audioMode ? undefined : openRecorder}
             onReverseClip={audioMode ? undefined : handleReverseClip}
             onUpdateTrack={updateTrack}
@@ -1898,7 +1933,7 @@ function App() {
           )}
 
           {/* Compact properties panel (phones: over the timeline; desktop: the sidebar) */}
-          {!isDesktop && (captionsPanel || multiPanel || compactPropertiesPanel)}
+          {!isDesktop && (captionsPanel || transcriptPanel || multiPanel || compactPropertiesPanel)}
         </div>
         </div>
         {/* Desktop shorts editor: the selected clip's settings beside preview and timeline */}
@@ -2004,8 +2039,10 @@ function App() {
             onRemove={removeChapter}
             onSeek={(t) => setPlayheadPosition(t)}
             onClose={() => { setChaptersOpen(false); setChapterFocus(null) }}
+            suggestions={wordTools.chapterSuggestions({ end: timelineEnd, resolved: resolvedChapters })}
           />
         )}
+        {wordTools.fillerDialog}
 
         {templateOpen && (
           <AudioTemplateDialog
@@ -2328,8 +2365,10 @@ function App() {
               onOpenMusic={(trackId) => openAdd('music', trackId)}
               onOpenSfx={(trackId) => openAdd('sfx', trackId)}
               onOpenStickers={() => setStickersOpen(true)}
-              onOpenCaptions={() => setCaptionsOpen(o => !o)}
+              onOpenCaptions={() => { wordTools.setTranscriptOpen(false); setCaptionsOpen(o => !o) }}
               captionsActive={captionsOpen || !!captions}
+              onOpenTranscript={() => { setCaptionsOpen(false); wordTools.openTranscript() }}
+              transcriptActive={wordTools.transcriptOpen}
               onRecordVideo={openRecorder}
               onReverseClip={handleReverseClip}
               onUpdateTrack={updateTrack}
@@ -2352,7 +2391,7 @@ function App() {
 
         {/* Right panel: properties for horizontal, timeline preview for vertical */}
         <div className="right-panel">
-          {captionsPanel}
+          {captionsPanel || transcriptPanel}
           {isVerticalVideo ? (
             <GlobalPreview
               emptyActions={emptyTimelineActions}
@@ -2451,6 +2490,7 @@ function App() {
           onClose={() => setAutoCutClipId(null)}
         />
       )}
+      {wordTools.fillerDialog}
 
       {musicOpen && <MusicLibrary onPick={handlePickMusic} onClose={() => setMusicOpen(false)} />}
 
