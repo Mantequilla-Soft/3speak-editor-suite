@@ -14,6 +14,7 @@
     "test:e2e:audio": "node e2e/audio-editor.e2e.mjs"
   },
   "dependencies": {
+    "@ffmpeg/core": "0.12.6",
     "@ffmpeg/ffmpeg": "^0.12.10",
     "@ffmpeg/util": "^0.12.1",
     "@mediapipe/tasks-vision": "1.2.0",

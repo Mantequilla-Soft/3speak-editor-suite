@@ -1,8 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import ffmpegCore from './scripts/viteFfmpegCore.js'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), ffmpegCore()],
   server: {
     port: 8089,
     host: '0.0.0.0',

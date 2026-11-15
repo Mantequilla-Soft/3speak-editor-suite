@@ -3,6 +3,7 @@ import { authFetch, currentToken } from './editorAuth'
 import { outputSize } from './outputSize'
 import { isReframable, normalizeReframe } from './reframe'
 import { cleanAspect } from './projectFormat'
+import { submitRender, pollRender, statusPhase } from './renderQueue'
 
 // "Export as": one project rendered in other shapes too (9:16, 1:1, 16:9, 4:3).
 // Footage framed as it came (utils/reframe.js isReframable) is cut to the new
@@ -54,58 +55,39 @@ function jobUrl(jobId, backendEndpoint, tail = '') {
   return api(`/api/render/${jobId}${tail}`)
 }
 
-const wait = (ms, signal) => new Promise((resolve, reject) => {
-  const t = setTimeout(resolve, ms)
-  signal?.addEventListener('abort', () => { clearTimeout(t); reject(new DOMException('Stopped', 'AbortError')) }, { once: true })
-})
-
 /**
  * Render a payload ({ timeline, mediaUrls }) as a job: resolves { outputUrl,
- * subtitles? } with absolute URLs. onStatus({ progress, phase }). A busy server
- * (503) is asked again after the time it says.
+ * subtitles? } with absolute URLs. onStatus({ progress, phase }). Busy servers
+ * and the line work as for Render (utils/renderQueue.js).
  */
 export async function runRenderJob(payload, { onStatus = () => {}, signal = null } = {}) {
   const renderUrl = GATEWAY_URL ? `${GATEWAY_URL}/api/render` : api('/api/render')
-  let job = null
-  for (let tries = 0; !job; tries++) {
-    const res = await authFetch(renderUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), signal })
-    const data = await res.json().catch(() => ({}))
-    if (res.status === 503 && tries < 40) {
-      onStatus({ progress: 0, phase: 'The server is busy, trying again...' })
-      await wait(Math.min(60, Math.max(5, Number(data.retryAfter) || 15)) * 1000, signal)
-      continue
-    }
-    if (!res.ok) throw new Error(data.error || `The server answered ${res.status}`)
-    job = data
-  }
+  const body = JSON.stringify(payload)
+  const job = await submitRender({
+    send: () => authFetch(renderUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, signal }),
+    signal,
+    onWait: ({ seconds, busy }) => onStatus({ progress: 0, phase: busy ? `The render servers are busy. Trying again in ${seconds} s...` : `No connection to the render server. Trying again in ${seconds} s...` })
+  })
+  if (!job) throw new DOMException('Stopped', 'AbortError')
+  onStatus({ progress: 0, phase: statusPhase(job) || 'Starting...' })
   const abort = () => {
     const tok = currentToken()
     fetch(jobUrl(job.jobId, job.backendEndpoint, '/abort'), { method: 'POST', keepalive: true, headers: tok ? { Authorization: `Bearer ${tok}` } : {} }).catch(() => {})
   }
   signal?.addEventListener('abort', abort, { once: true })
   try {
-    for (let misses = 0; ;) {
-      await wait(1500, signal)
-      let data
-      try {
-        const res = await fetch(jobUrl(job.jobId, job.backendEndpoint), { cache: 'no-store' })
-        data = await res.json()
-        if (res.status === 404) throw new Error('The render job was lost (the server restarted?)')
-        misses = 0
-      } catch (err) {
-        if (/lost/.test(err.message) || ++misses > 10) throw err
-        continue
-      }
-      if (data.status === 'completed') {
-        const base = job.backendEndpoint || getBackendUrl() || window.location.origin
-        const abs = (u) => new URL(u, base).href
-        return {
-          outputUrl: abs(data.outputUrl),
-          ...(data.subtitles ? { subtitles: { ...data.subtitles, vttUrl: abs(data.subtitles.vttUrl), srtUrl: abs(data.subtitles.srtUrl) } } : {})
-        }
-      }
-      if (data.status === 'failed' || data.status === 'aborted') throw new Error(data.error || 'The render failed')
-      onStatus({ progress: Number(data.progress) || 0, phase: data.phase || 'Rendering...' })
+    const data = await pollRender({
+      get: () => fetch(jobUrl(job.jobId, job.backendEndpoint), { cache: 'no-store', signal }),
+      signal,
+      onStatus: (d) => { if (!d.reconnecting) onStatus({ progress: Number(d.progress) || 0, phase: statusPhase(d) || 'Rendering...' }) }
+    })
+    if (!data) throw new DOMException('Stopped', 'AbortError')
+    if (data.status !== 'completed') throw new Error(data.error || 'The render failed')
+    const base = job.backendEndpoint || getBackendUrl() || window.location.origin
+    const abs = (u) => new URL(u, base).href
+    return {
+      outputUrl: abs(data.outputUrl),
+      ...(data.subtitles ? { subtitles: { ...data.subtitles, vttUrl: abs(data.subtitles.vttUrl), srtUrl: abs(data.subtitles.srtUrl) } } : {})
     }
   } finally {
     signal?.removeEventListener('abort', abort)

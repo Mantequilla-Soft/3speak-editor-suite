@@ -222,4 +222,9 @@ router.post('/:jobId/abort', requireSignIn, (req, res) => {
   res.json({ status: 'aborted' })
 })
 
+/** For /api/health: the deploy swaps a backend only when nothing runs or waits, a long episode included. */
+export function getVideoPodcastStats() {
+  return { running, waiting: waiting.length }
+}
+
 export { router as videoPodcastRouter }

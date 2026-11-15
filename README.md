@@ -50,7 +50,7 @@ The editor follows 3Speak's v2 design (the `design_handoff_3speak_v2` package in
 - Duplicate clips
 - Linked video+audio clips via group IDs -- operations propagate to both
 - Group/ungroup clips
-- Undo/redo with 20-level history
+- Undo/redo, 200 steps: every clip setting, plus chapters, flags, captions and the audio settings (src/utils/history.js keeps steps small by sharing what did not change; quick repeats such as a slider drag are one step)
 - Timeline zoom (10-200 px/s) with adaptive ruler
 
 ### Media Support
@@ -87,6 +87,8 @@ The editor follows 3Speak's v2 design (the `design_handoff_3speak_v2` package in
 
 Quality presets: High (CRF 18), Medium (CRF 23), Low (CRF 28).
 
+**Render queue:** a backend renders `MAX_CONCURRENT_JOBS` at a time; more jobs wait in line (up to `MAX_QUEUED_JOBS`, default 20) and the editor shows "You are 2nd in line" until its turn (`backend/src/utils/renderQueue.js`). Every job is a JSON file in `RENDER_JOBS_DIR` (default `<UPLOAD_DIR>/.render-jobs`, the uploads volume), so a restart or redeploy loses none: queued jobs queue again, a running one starts over once. A full line answers 503 and the editor tries again by itself with backoff (also on network errors); it stops polling on a hard error (`src/utils/renderQueue.js`). `/api/health` reports `activeJobs` and `queuedJobs`; the gateway sends a job to a free backend first, else to the shortest line; the deploy swaps a backend only when both are 0.
+
 ### Render quality and captions (Shorts)
 - Shorts render at **1080x1920** from the uploaded **originals**: the 480p copy of a video upload is only the editing proxy the preview plays (`GET /api/upload/files/<name>`); renders ask for `?for=render` (backend/src/utils/uploadFiles.js). Originals that are HDR, larger than 1920 on the long side or in an unusual codec get a `_master.mp4` render copy (fit 1920, never upscaled, SDR) that replaces them. Old uploads that only have their 480p file still render from it.
 - **Auto captions** (Captions button on the timeline): speech to text with word times (whisper.cpp in the backend image), styles Karaoke (the spoken word highlighted), Pop (one or a few words at a time) and Subtitles, optional emoji accents, an editable words list. Burnt in with libass exactly where the preview draws them (src/utils/captions.js, shared with the backend), and written as WebVTT / SRT next to the render; `post-to-3speak` carries them as `subtitles` (`{ language, vttUrl, srtUrl, cues, burnedIn }`; `burnedIn` = "Show in the video" was on and the backend drew them, so 3Speak keeps CC off for them by default).
@@ -102,6 +104,7 @@ Quality presets: High (CRF 18), Medium (CRF 23), Low (CRF 28).
 - First-time onboarding tour
 - Light and dark theme support
 - Iframe embedding API with postMessage communication
+- Opens light: FFmpeg.wasm (only the legacy layout's exports and whole-HLS downloads in the browser use it) is served by the editor itself (`/ffmpeg/<version>/`, copied from `@ffmpeg/core` at build by `scripts/viteFfmpegCore.js`, gzipped) and loaded on first use; hls.js and the dialogs are their own chunks (`src/components/lazyPanels.jsx`)
 
 ### Audio editor (`?mode=audio`)
 The same editor for podcasts, music and voice. 3Speak opens it from its share menu (standalone) and from the audio upload ("Edit audio" on a track).
@@ -140,6 +143,15 @@ The end-to-end test needs `ffmpeg`/`ffprobe` on PATH and Chromium (`E2E_CHROME`,
 | `Ctrl+Shift+G` | Ungroup clips |
 | `Arrow Left/Right` | Move playhead (100ms, 1s with Shift) |
 | `M` | Add a chapter at the playhead (audio editor) |
+| `J` / `K` / `L` | Play backward / stop / play forward (press J or L again: 2x, 4x, 8x) |
+| `,` / `.` | One frame back / forward (Shift: 10 frames) |
+| `Tab` / `Shift+Tab` | Next / previous clip (when a clip is selected) |
+| `Alt+Arrow Left/Right` | Previous / next clip on the same track |
+| `Alt+Arrow Up/Down` | Clip on the track above / below |
+| `Enter` | Open the selected clip's settings |
+| `?` | All shortcuts (also the keyboard button at the top, on desktop) |
+
+Shortcuts never fire while typing in a field (`src/utils/keyboard.js`). The timeline is labelled for screen readers: clips are buttons ("clip") with their name and time, tracks are named groups, the playhead is a slider; a moved selection is announced. The list lives in `src/utils/shortcuts.js` (the `?` sheet reads it).
 
 ## Getting Started
 

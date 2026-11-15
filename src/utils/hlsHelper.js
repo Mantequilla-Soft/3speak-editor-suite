@@ -1,4 +1,8 @@
-import Hls from 'hls.js'
+// hls.js (about 400 KB) is its own chunk, loaded the first time an HLS
+// stream plays: most editor sessions never need it
+let hlsModule = null
+const loadHls = () => (hlsModule ||= import('hls.js').then(m => m.default))
+const mseSupported = () => typeof window !== 'undefined' && !!(window.MediaSource || window.ManagedMediaSource || window.WebKitMediaSource)
 
 /**
  * Check if a URL is an HLS stream (.m3u8)
@@ -23,7 +27,8 @@ export function isHlsUrl(url) {
 
 /**
  * Attach HLS.js to a video/audio element if the URL is HLS.
- * Returns the Hls instance (for cleanup) or null if not HLS.
+ * Returns a handle to destroy (hls.js attaches to it once loaded), or null
+ * when the browser plays it natively or the URL is not HLS.
  */
 export function attachHls(element, url) {
   if (!element || !url) return null
@@ -35,41 +40,59 @@ export function attachHls(element, url) {
     return null
   }
 
-  if (!Hls.isSupported()) {
+  if (!mseSupported()) {
     console.warn('[hlsHelper] HLS.js not supported in this browser')
     return null
   }
 
-  const hls = new Hls({
-    enableWorker: true,
-    lowLatencyMode: false,
-    // Use anonymous crossOrigin to work with COEP: credentialless
-    xhrSetup: (xhr) => {
-      xhr.withCredentials = false
+  // A handle right away (callers keep it to destroy it); hls.js attaches once loaded
+  const handle = {
+    hls: null,
+    destroyed: false,
+    destroy() {
+      handle.destroyed = true
+      if (handle.hls) handle.hls.destroy()
+      handle.hls = null
     }
-  })
-
-  hls.loadSource(url)
-  hls.attachMedia(element)
-
-  hls.on(Hls.Events.MANIFEST_PARSED, () => {
-    console.log('[hlsHelper] Manifest parsed, levels:', hls.levels.length)
-  })
-
-  hls.on(Hls.Events.ERROR, (event, data) => {
-    console.error('[hlsHelper] HLS error:', data.type, data.details, data.fatal ? '(FATAL)' : '')
-    if (data.fatal) {
-      if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-        console.log('[hlsHelper] Retrying load...')
-        hls.startLoad()
-      } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-        console.log('[hlsHelper] Recovering media error...')
-        hls.recoverMediaError()
+  }
+  loadHls().then((Hls) => {
+    if (handle.destroyed) return
+    if (!Hls.isSupported()) {
+      console.warn('[hlsHelper] HLS.js not supported in this browser')
+      return
+    }
+    const hls = new Hls({
+      enableWorker: true,
+      lowLatencyMode: false,
+      // Use anonymous crossOrigin to work with COEP: credentialless
+      xhrSetup: (xhr) => {
+        xhr.withCredentials = false
       }
-    }
-  })
+    })
+    handle.hls = hls
 
-  return hls
+    hls.loadSource(url)
+    hls.attachMedia(element)
+
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      console.log('[hlsHelper] Manifest parsed, levels:', hls.levels.length)
+    })
+
+    hls.on(Hls.Events.ERROR, (event, data) => {
+      console.error('[hlsHelper] HLS error:', data.type, data.details, data.fatal ? '(FATAL)' : '')
+      if (data.fatal) {
+        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+          console.log('[hlsHelper] Retrying load...')
+          hls.startLoad()
+        } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+          console.log('[hlsHelper] Recovering media error...')
+          hls.recoverMediaError()
+        }
+      }
+    })
+  }).catch((err) => console.error('[hlsHelper] hls.js did not load:', err))
+
+  return handle
 }
 
 /**
@@ -85,9 +108,10 @@ export function destroyHls(hlsInstance) {
  * Get duration of an HLS stream by loading metadata.
  * Returns a promise that resolves with the duration in seconds.
  */
-export function getHlsDuration(url) {
+export async function getHlsDuration(url) {
+  const Hls = await loadHls().catch(() => null)
   return new Promise((resolve) => {
-    if (!Hls.isSupported()) {
+    if (!Hls || !Hls.isSupported()) {
       const video = document.createElement('video')
       video.preload = 'metadata'
       video.src = url
