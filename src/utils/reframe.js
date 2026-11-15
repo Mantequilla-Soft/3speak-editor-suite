@@ -228,10 +228,11 @@ export function pathExpr(reframe, axis, T) {
  * clip that starts `startTime` seconds into its source (the clip's frames start
  * at t = 0 after the input seek). null when the clip has no reframe.
  */
-export function reframeFilter(reframe, { w, h, startTime = 0 }) {
+export function reframeFilter(reframe, { w, h, startTime = 0, mediaTime = null }) {
   const r = normalizeReframe(reframe)
   if (!r) return null
-  const T = startTime > 0 ? `(t+${fx(startTime)})` : 't'
+  // mediaTime: an expression in t for a retimed clip (speed, ramp, still)
+  const T = mediaTime || (startTime > 0 ? `(t+${fx(startTime)})` : 't')
   const x = `clip(${pathExpr(r, 1, T)}*iw-${FACE_X}*ow,0,iw-ow)`
   const y = `clip(${pathExpr(r, 2, T)}*ih-${FACE_Y}*oh,0,ih-oh)`
   return `scale=${w}:${h}:force_original_aspect_ratio=increase,crop=w=${w}:h=${h}:x='${x}':y='${y}'`

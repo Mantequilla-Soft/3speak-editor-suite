@@ -136,3 +136,12 @@ test('ffmpeg: a full render of a reframed 16:9 clip into 9:16, trimmed into its 
   const [r, g, b] = colourAt(plain, 1)
   assert.ok(r + g + b < 200, 'letterboxed: dark on average')
 })
+
+test('a retimed clip maps its clip time back to the face path in media seconds', () => {
+  const path = [[0, 0.3, 0.5], [10, 0.7, 0.5]]
+  const plain = reframeFilter({ path }, { w: 1080, h: 1920, startTime: 2 })
+  assert.match(plain, /\(t\+2\)/)
+  const fast = reframeFilter({ path }, { w: 1080, h: 1920, startTime: 2, mediaTime: '(2+t*2)' })
+  assert.match(fast, /\(2\+t\*2\)/)
+  assert.doesNotMatch(fast, /\(t\+2\)/)
+})

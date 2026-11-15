@@ -12,6 +12,8 @@ import { autoColor } from '../utils/autoColor'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
 import './GreenScreen.css'
+import SpeedControls from './SpeedControls'
+import KeyframeControls from './KeyframeControls'
 
 // Green screen (chroma key) on a video clip: keyed pixels turn transparent, so
 // the clips on the tracks below show through. See utils/chromaKey.js.
@@ -819,7 +821,7 @@ function PositionDragHandle({ positionX, positionY, onChange }) {
 // The tab a phone user last picked, kept across clips (if the next clip has it)
 let lastTab = null
 
-function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, voiceTargets = null, onUpdateClipsEach = null, duckInfo = null }) {
+function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, voiceTargets = null, onUpdateClipsEach = null, duckInfo = null, motionKit = null }) {
   // Phones (tabbed): one section at a time, a tab per section. The sections
   // differ per clip type and come from several components, so the tabs are
   // read from the rendered sections (.prop-group and its label) after render.
@@ -1427,6 +1429,10 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
 
         {/* Motion (stickers: image and text clips) */}
         {(isImage || isText) && <MotionControls clip={clip} onUpdateClip={onUpdateClip} />}
+
+        {/* Speed, ramps and freeze frames (video), keyframes (Shorts editor) */}
+        {motionKit && <SpeedControls clip={clip} playheadPosition={playheadPosition} kit={motionKit} onUpdateClip={onUpdateClip} />}
+        {motionKit && <KeyframeControls clip={clip} playheadPosition={playheadPosition} onUpdateClip={onUpdateClip} linkedAudio={linkedAudio} onUpdateLinkedAudio={onUpdateLinkedAudio} kit={motionKit} />}
 
         {/* Colour adjustments (video and image clips) */}
         {(clip.type === 'video' || isImage) && (

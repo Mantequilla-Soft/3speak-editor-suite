@@ -8,6 +8,8 @@ import { MAX_TIMELINE_SECONDS } from '../utils/limits'
 import { timelineBeats } from '../utils/beatDetect'
 import { getPeaks, peaksForRange } from '../utils/peakCache'
 import { clipLabel, trackAriaLabel, formatSpokenTime } from '../utils/shortcuts'
+import { maxEndTime, sourceRange } from '../utils/clipSpeed'
+import KeyframeMarks from './KeyframeMarks'
 
 function formatTime(seconds) {
   const s = Math.floor(seconds)
@@ -214,9 +216,11 @@ const TimelineClip = memo(function TimelineClip({
   }, [isAudio, clip.url, clip.serverUrl])
 
   // This clip's own stretch of the file (trim / zoom only re-read it)
+  // (its media seconds: a sped-up clip covers more of the file, utils/clipSpeed.js)
+  const [mediaFrom, mediaTo] = sourceRange(clip)
   const realWaveform = useMemo(
-    () => peaksForRange(peakEnvelope, clip.startTime, clip.endTime, barCount),
-    [peakEnvelope, clip.startTime, clip.endTime, barCount]
+    () => peaksForRange(peakEnvelope, mediaFrom, mediaTo, barCount),
+    [peakEnvelope, mediaFrom, mediaTo, barCount]
   )
 
   const [waveformFailed, setWaveformFailed] = useState(false)
@@ -405,7 +409,7 @@ const TimelineClip = memo(function TimelineClip({
         onTrimStart(newStartTime, newPosition)
       } else if (isDragging === 'trimEnd') {
         const minEnd = initialValues.startTime + 0.1
-        const maxEnd = (isImage || isText || isColor) ? 600 : initialValues.duration
+        const maxEnd = (isImage || isText || isColor) ? 600 : maxEndTime(clip, initialValues.duration)
         const newEndTime = Math.max(minEnd, Math.min(initialValues.endTime + deltaTime, maxEnd))
         const newClipEnd = (initialValues.timelinePosition || 0) + (newEndTime - initialValues.startTime)
 
@@ -521,7 +525,7 @@ const TimelineClip = memo(function TimelineClip({
                   const spriteTime = i * spriteData.interval
                   const spriteEndTime = (i + 1) * spriteData.interval
                   // Only show sprites that overlap with the trimmed region
-                  if (spriteEndTime < clip.startTime || spriteTime > clip.endTime) return null
+                  if (spriteEndTime < mediaFrom || spriteTime > mediaTo) return null
                   return src ? (
                     <img key={i} src={src} alt="" className="sprite-frame" />
                   ) : (
@@ -542,6 +546,7 @@ const TimelineClip = memo(function TimelineClip({
             <span className="clip-duration">{formatTime(clipDuration)}</span>
           </div>
         )}
+        <KeyframeMarks clip={clip} pixelsPerSecond={pixelsPerSecond} selected={isSelected} />
         {/* Group indicator */}
         {clip.groupId && (
           <div className="group-indicator" style={{ backgroundColor: getGroupColor(clip.groupId) }}>

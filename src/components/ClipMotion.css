@@ -1,0 +1,189 @@
+/* Speed, freeze frames and keyframes: the clip settings sections
+   (SpeedControls, KeyframeControls) and the marks on timeline clips (KeyframeMarks) */
+
+/* Timeline clip: speed badge, keyframe diamonds */
+.clip-speed-badge {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0 4px;
+  font-size: var(--fs-10);
+  font-weight: var(--fw-black);
+  line-height: 14px;
+  color: var(--on-media);
+  background: var(--media-scrim);
+  border-radius: var(--r-xs);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.clip-keyframe-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 3px;
+  height: 8px;
+  pointer-events: none;
+}
+
+.clip-keyframe-diamond {
+  position: absolute;
+  top: 0;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  background: var(--cyan);
+  border: 1px solid var(--on-media);
+  transform: rotate(45deg);
+  border-radius: 1px;
+}
+
+/* Settings: chips (speed steps, ramp presets, Ken Burns, freeze length) */
+.motion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.motion-chip {
+  height: 28px;
+  padding: 0 10px;
+  font-size: var(--fs-12);
+  font-weight: var(--fw-bold);
+  font-family: inherit;
+  color: var(--text);
+  background: var(--surface-2);
+  border: none;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+
+.motion-chip:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--text) 8%, var(--surface-2));
+}
+
+.motion-chip.active {
+  color: var(--cyan);
+  background: var(--cyan-tint);
+}
+
+.motion-chip:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+.motion-hint {
+  font-size: var(--fs-11);
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.motion-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Keyframes: one row per property */
+.kf-row {
+  display: grid;
+  grid-template-columns: 74px 1fr auto;
+  align-items: center;
+  gap: 6px;
+}
+
+.kf-row .kf-name {
+  font-size: var(--fs-12);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kf-row .property-slider {
+  min-width: 0;
+}
+
+.kf-row .property-slider input[type="range"] {
+  min-width: 0;
+  width: 100%;
+}
+
+.kf-row .property-slider span {
+  min-width: 40px;
+}
+
+.kf-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.kf-nav button {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+
+.kf-nav button:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.kf-nav button:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+/* The diamond button: outline = no keyframe here, filled = one at the playhead */
+.kf-diamond-btn .kf-diamond {
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid currentColor;
+  border-radius: 1px;
+  transform: rotate(45deg);
+}
+
+.kf-diamond-btn.on {
+  color: var(--cyan);
+}
+
+.kf-diamond-btn.on .kf-diamond {
+  background: currentColor;
+}
+
+.kf-diamond-btn.animated:not(.on) {
+  color: var(--text);
+}
+
+.kf-ease {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-12);
+  color: var(--muted);
+}
+
+@media (max-width: 767px) {
+  .kf-row {
+    grid-template-columns: 64px 1fr auto;
+  }
+  .motion-chip {
+    height: 32px;
+  }
+  .kf-nav button {
+    width: 32px;
+    height: 32px;
+  }
+}
