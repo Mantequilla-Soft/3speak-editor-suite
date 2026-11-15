@@ -1483,6 +1483,7 @@ function App() {
             <ClipProperties
               clip={sideClip}
               linkedAudio={linkedAudioOf(sideClip)}
+              tracks={audioMode ? null : tracks}
               onUpdateLinkedAudio={(u) => { const a = linkedAudioOf(sideClip); if (a) updateClip(a.id, u) }}
               onUpdateClip={(updates) => updateClip(sideClip.id, updates)}
               onSplit={() => splitClip(sideClip.id)}
@@ -2388,6 +2389,7 @@ function App() {
                   <ClipProperties
                     clip={selectedClip}
                     linkedAudio={linkedAudioOf(selectedClip)}
+                    tracks={audioMode ? null : tracks}
                     onUpdateLinkedAudio={(u) => { const a = linkedAudioOf(selectedClip); if (a) updateClip(a.id, u) }}
                     onUpdateClip={(updates) => selectedClipId && updateClip(selectedClipId, updates)}
                     onSplit={(time) => selectedClipId && splitClip(selectedClipId, time)}

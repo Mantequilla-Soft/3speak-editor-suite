@@ -10,6 +10,7 @@ import { MAX_TIMELINE_SECONDS, MAX_IMPORT_BYTES, getTimelineEnd } from '../utils
 import { createSHA256 } from 'hash-wasm'
 import { isAudioMode } from '../utils/editorMode'
 import { applyGroupCut } from '../utils/groupSilence'
+import { splitPair } from '../utils/transitions'
 
 // Upload requests (whole small files or chunks of big ones) in flight at once,
 // shared by every upload; the rest wait for a free slot. Kept under the
@@ -1974,7 +1975,8 @@ export function useTimeline() {
             fileStoreRef.current.set(secondClip.id, originalFile)
           }
 
-          newClips.push(firstClip, secondClip)
+          // fades stay at the outer ends, a transition with the second half (utils/transitions.js)
+          newClips.push(...splitPair(firstClip, secondClip))
         }
 
         return modified ? { ...track, clips: newClips } : track
@@ -2096,7 +2098,7 @@ export function useTimeline() {
       }
 
       const newClips = [...track.clips]
-      newClips.splice(clipIndex, 1, firstClip, secondClip)
+      newClips.splice(clipIndex, 1, ...splitPair(firstClip, secondClip))
       return { ...track, clips: newClips }
     }))
   }, [setTracksWithHistory])

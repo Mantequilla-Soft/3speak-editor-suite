@@ -5,6 +5,8 @@ import { createWriteStream } from 'fs'
 import { createStaticMasker, staticMaskSize } from '../utils/staticKeyMask.js'
 import { ffmpegGradeFilter } from '../utils/clipLook.js'
 import { clipFxFilter } from '../utils/lookFx.js'
+import { transitionPlan, clipExtent } from '../utils/transitions.js'
+import { transitionLayer, transitionAudioSources } from '../utils/transitionRender.js'
 import crypto from 'crypto'
 import { ffmpegMotionFilter, normalizeMotion, pivotPoint, activeEffects } from '../utils/stickerMotion.js'
 import { captionBurn } from './captionBurn.js'
@@ -226,12 +228,23 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
     //    Keyed clips carry alpha, so overlay lets the lower layers show through.
     const filterParts = []
     const clipLabels = []
+    // Transitions (utils/transitions.js): a clip in one shows a little before
+    // its start / after its end, held on its first / last frame
+    const plan = transitionPlan(timeline.tracks)
+    const layerStarts = []
 
     for (let i = 0; i < overlayClips.length; i++) {
       const oc = overlayClips[i]
-      const pos = oc.clip.timelinePosition || 0
-      const delay = pos > 0.01 ? `setpts=PTS+${pos.toFixed(3)}/TB` : null
       const key = oc.clip.type === 'video' ? getChromaKey(oc.clip) : null
+      const ext = key?.mode === 'static' ? { head: 0, tail: 0 } : clipExtent(plan.get(oc.clip.id))
+      const pos = Math.max(0, (oc.clip.timelinePosition || 0) - ext.head)
+      layerStarts.push(pos)
+      const delay = pos > 0.01 ? `setpts=PTS+${pos.toFixed(3)}/TB` : null
+      let src = `${i + 1}:v`
+      if (ext.head || ext.tail) {
+        filterParts.push(`[${src}]tpad=start_mode=clone:start_duration=${ext.head.toFixed(3)}:stop_mode=clone:stop_duration=${ext.tail.toFixed(3)}[ext${i}]`)
+        src = `ext${i}`
+      }
 
       if (key && key.mode === 'static' && plateInputs.has(i)) {
         const pi = plateInputs.get(i)
@@ -247,13 +260,13 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
         }))
         clipLabels.push(keyedColor(oc.clip, i, filterParts, keyedFx.get(oc.clip.id)))
       } else if (key && key.mode !== 'static') {
-        filterParts.push(...buildChromaKeyFilter(`${i + 1}:v`, key, i, delay, `v${i}`))
+        filterParts.push(...buildChromaKeyFilter(src, key, i, delay, `v${i}`))
         clipLabels.push(keyedColor(oc.clip, i, filterParts, keyedFx.get(oc.clip.id)))
       } else if (delay) {
-        filterParts.push(`[${i + 1}:v]${delay}[v${i}]`)
+        filterParts.push(`[${src}]${delay}[v${i}]`)
         clipLabels.push(`[v${i}]`)
       } else {
-        clipLabels.push(`[${i + 1}:v]`)
+        clipLabels.push(`[${src}]`)
       }
     }
 
@@ -261,12 +274,13 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
     for (let i = 0; i < overlayClips.length; i++) {
       const oc = overlayClips[i]
       const out = i === overlayClips.length - 1 ? '[outv]' : `[tmp${i}]`
-      const clipLabel = clipLabels[i]
-
       // Text/image/color clips have position baked into their canvas → overlay at 0:0
       // Video clips need position applied here
       const isFullCanvas = oc.clip.type === 'text' || oc.clip.type === 'image' || oc.clip.type === 'color'
-      const overlayPos = isFullCanvas ? '0:0' : getOverlayPosition(oc.clip, outputWidth, outputHeight, scaleFactor, cropSources.get(oc.clip.id))
+      const basePos = isFullCanvas ? '0:0' : getOverlayPosition(oc.clip, outputWidth, outputHeight, scaleFactor, cropSources.get(oc.clip.id))
+      // Transitions and fades: the layer's opacity, slide, zoom, blur (utils/transitionRender.js)
+      const { label: clipLabel, pos: overlayPos } = transitionLayer(filterParts, i, clipLabels[i], basePos, oc.clip, plan.get(oc.clip.id),
+        { frameH: outputHeight, zoom: clipZoom(oc.clip), fps, start: layerStarts[i] })
 
       filterParts.push(`[${prev}]${clipLabel}overlay=${overlayPos}:eof_action=pass:format=auto${out}`)
       prev = `tmp${i}`
@@ -309,7 +323,8 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
       audioSources.push({
         file: audioPath,
         volume: clipVolume(clip),
-        offset: clip.timelinePosition || 0
+        offset: clip.timelinePosition || 0,
+        clipId: clip.id
       })
     }
   }
@@ -323,11 +338,22 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
         audioSources.push({
           file: processedClips.get(clip.id),
           volume: clipVolume(clip),
-          offset: clip.timelinePosition || 0
+          offset: clip.timelinePosition || 0,
+          clipId: clip.id
         })
       }
     }
   }
+
+  // Sound crossfades at transitions (utils/transitionRender.js): ramps, and the
+  // bits of media past the cut
+  await transitionAudioSources(timeline.tracks, audioSources, async (piece) => {
+    const file = downloadedFiles.get(piece.id.split('~')[0])
+    if (!file) throw new Error('no source file')
+    const out = path.join(jobDir, `xfade_${piece.id.replace(/[^\w-]/g, '_')}.m4a`)
+    await processClip(piece, file, out, outputWidth, outputHeight, fps, signal, scaleFactor)
+    return out
+  })
 
   // STEP 5: Final encode
   onProgress(0.85, 'Encoding final output...')
@@ -1602,6 +1628,8 @@ async function combineVideoAudio(videoPath, allSources, outputPath, fps, signal)
     const delayMs = Math.round(offset * 1000)
 
     const filters = []
+    // a crossfade's volume ramp, in the source's own time (before the delay)
+    if (src.gain) filters.push(src.gain)
     if (delayMs > 0) {
       filters.push(`adelay=${delayMs}|${delayMs}`)
     }

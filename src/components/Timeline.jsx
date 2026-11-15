@@ -7,6 +7,7 @@ import { getGroupColor } from '../hooks/useTimeline'
 import { MAX_TIMELINE_SECONDS } from '../utils/limits'
 import { timelineBeats } from '../utils/beatDetect'
 import { getPeaks, peaksForRange } from '../utils/peakCache'
+import TransitionCuts from './TransitionCuts'
 
 function formatTime(seconds) {
   const s = Math.floor(seconds)
@@ -1952,6 +1953,8 @@ function Timeline({
               {crossTrackGhost && crossTrackGhost.trackId === track.id && (
                 <div className="clip-ghost" style={{ left: `${crossTrackGhost.left}px`, width: `${crossTrackGhost.width}px` }} />
               )}
+              {/* Transitions: a button on each cut between two clips */}
+              {!audioMode && <TransitionCuts track={track} pixelsPerSecond={pixelsPerSecond} onUpdateClip={onUpdateClip} />}
             </div>
           ))}
 

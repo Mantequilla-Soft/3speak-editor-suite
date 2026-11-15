@@ -12,6 +12,7 @@ import { autoColor } from '../utils/autoColor'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
 import LookControls from './LookControls'
+import TransitionControls from './TransitionControls'
 import './GreenScreen.css'
 
 // Green screen (chroma key) on a video clip: keyed pixels turn transparent, so
@@ -820,7 +821,7 @@ function PositionDragHandle({ positionX, positionY, onChange }) {
 // The tab a phone user last picked, kept across clips (if the next clip has it)
 let lastTab = null
 
-function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, voiceTargets = null, onUpdateClipsEach = null, duckInfo = null }) {
+function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, voiceTargets = null, onUpdateClipsEach = null, duckInfo = null, tracks = null }) {
   // Phones (tabbed): one section at a time, a tab per section. The sections
   // differ per clip type and come from several components, so the tabs are
   // read from the rendered sections (.prop-group and its label) after render.
@@ -1428,6 +1429,11 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
 
         {/* Motion (stickers: image and text clips) */}
         {(isImage || isText) && <MotionControls clip={clip} onUpdateClip={onUpdateClip} />}
+
+        {/* Fades and the transition into the next clip (video, image and colour clips on a video track) */}
+        {tracks && (clip.type === 'video' || isImage || isColor) && (
+          <TransitionControls clip={clip} tracks={tracks} onUpdateClip={onUpdateClip} linkedAudio={linkedAudio} onUpdateLinkedAudio={onUpdateLinkedAudio} />
+        )}
 
         {/* Looks: presets, blur, vignette, sharpen (video and image clips) */}
         {(clip.type === 'video' || isImage) && (
