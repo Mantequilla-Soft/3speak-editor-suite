@@ -163,7 +163,7 @@ try {
     assert.equal(await t.frame.evaluate(() => localStorage.getItem('3speak-audio-tour-done')), '1')
     // the shorts editor's tour is a separate flag: seeing this one doesn't skip it
     assert.equal(await t.frame.evaluate(() => localStorage.getItem('3speak-tour-done')), null)
-    await t.frame.locator('.branding-help-btn').click()
+    await t.frame.getByRole('button', { name: 'Show the tour again' }).click()
     await tip.waitFor({ timeout: 5000 })
     await tip.locator('.tour-skip-btn').click()
     await until(async () => (await t.frame.locator('.tour-overlay').count()) === 0, 'tour skipped')
@@ -227,7 +227,7 @@ try {
     await dialog.getByLabel('Music bed volume').fill('15')
     await dialog.getByText('Cut the silences out of every new recording').click()
     await dialog.getByRole('button', { name: /Save and apply/ }).click()
-    await frame.getByText(/Template applied: intro, outro and music bed/).waitFor()
+    await frame.getByText(/Template applied: intro, outro,? and music bed/).waitFor()
     const tpl = JSON.parse(fs.readFileSync(templateFile, 'utf8'))
     assert.deepEqual(Object.keys(tpl.slots).sort(), ['bed', 'intro', 'outro'])
     assert.equal(tpl.expiresAt, undefined, 'kept for good')
@@ -281,7 +281,7 @@ try {
   await step('a new recording gets the template by itself: silences cut, intro/outro/bed placed', async () => {
     const second = await openEditor()
     const f = second.frame
-    await f.getByText(/Template applied: intro, outro and music bed/).waitFor({ timeout: 30000 })
+    await f.getByText(/Template applied: intro, outro,? and music bed/).waitFor({ timeout: 30000 })
     // the kept draft holds the free tier's one slot: the new project asks to replace it
     await f.getByText('Replace your saved draft?').waitFor({ timeout: 30000 })
     await f.locator('.drafts-item').first().click()
