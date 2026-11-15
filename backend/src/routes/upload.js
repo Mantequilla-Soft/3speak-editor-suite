@@ -7,6 +7,7 @@ import crypto from 'crypto'
 import { createReadStream } from 'fs'
 import { v4 as uuidv4 } from 'uuid'
 import { requireSignIn } from '../auth.js'
+import { masterReason, masterScaleFilter, isHdr, masterName, proxyName, renderSource, pendingMasters } from '../utils/uploadFiles.js'
 
 const router = Router()
 const UPLOAD_DIR = process.env.UPLOAD_DIR || '/app/uploads'
@@ -42,8 +43,8 @@ function sha256File(filePath) {
   })
 }
 
-const encodedPathOf = (filename) =>
-  path.join(UPLOAD_DIR, `${path.basename(filename, path.extname(filename))}_480p.mp4`)
+const encodedPathOf = (filename) => path.join(UPLOAD_DIR, proxyName(filename))
+const masterPathOf = (filename) => path.join(UPLOAD_DIR, masterName(filename))
 
 async function exists(p) {
   try { await fs.access(p); return true } catch { return false }
@@ -71,8 +72,8 @@ const MAX_UPLOAD_BYTES = 2 * 1024 * 1024 * 1024
 const UPLOAD_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 
 /**
- * Read what a file holds: duration, video codec, pixel format and transfer
- * (HDR or not). Resolves {} when ffprobe cannot read it.
+ * Read what a file holds: duration, video codec, size, pixel format and
+ * transfer (HDR or not). Resolves {} when ffprobe cannot read it.
  */
 function probeMedia(filePath) {
   return new Promise((resolve) => {
@@ -87,6 +88,8 @@ function probeMedia(filePath) {
         resolve({
           duration: parseFloat(info.format?.duration) || null,
           videoCodec: video?.codec_name || null,
+          width: video?.width || null,
+          height: video?.height || null,
           pixFmt: video?.pix_fmt || null,
           transfer: video?.color_transfer || null
         })
@@ -105,40 +108,60 @@ function isBrowserSafe(probe) {
     ['yuv420p', 'yuvj420p'].includes(probe.pixFmt)
 }
 
-const isHdr = (probe) => ['smpte2084', 'arib-std-b67'].includes(probe.transfer)
+// HDR (iPhone HLG / PQ) to SDR, else colours come out washed out
+const TONEMAP = 'zscale=t=linear:npl=100,format=gbrpf32le,zscale=p=bt709,tonemap=tonemap=hable:desat=0,zscale=t=bt709:m=bt709:r=tv'
+const PROXY_FILTERS = [
+  'scale=iw*sar:ih,scale=854:480:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2,setsar=1',
+  // fps=30: browser recordings (MediaRecorder webm) carry a 1ms timebase, and
+  // without a fixed rate the MP4 comes out at 1000fps of duplicated frames,
+  // which stutters on playback
+  'fps=30',
+  // 8-bit: 10-bit input would otherwise give High 10 H.264, which browsers cannot play
+  'format=yuv420p'
+]
+const PROXY_OUT = ['-c:v', 'libx264', '-preset', 'fast', '-crf', '23', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '128k', '-movflags', '+faststart', '-f', 'mp4']
+// The render copy: close to the original (CRF 18), at most 60 fps, 8-bit SDR
+const MASTER_OUT = ['-c:v', 'libx264', '-preset', 'fast', '-crf', '18', '-pix_fmt', 'yuv420p', '-fpsmax', '60', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', '-f', 'mp4']
 
 /**
- * Encode a video file to 480p MP4: 8-bit H.264, so every browser can play it
- * whatever came in (HEVC, 10-bit, HDR, which is tone-mapped to SDR).
- * Writes to a .part file and renames it to _480p.mp4 only when complete, so the
- * GET route never serves a half-written file. Removes the original on success.
+ * The ffmpeg arguments for an upload's copies: always the 480p proxy, plus the
+ * master (render copy, see utils/uploadFiles.js) when the original needs one,
+ * both from one decode.
+ */
+export function encodeArgs(inputPath, probe, proxyPart, masterPart = null) {
+  const tonemap = isHdr(probe) ? [TONEMAP] : []
+  if (!masterPart) {
+    return ['-i', inputPath, '-vf', [...tonemap, ...PROXY_FILTERS].join(','), ...PROXY_OUT, '-y', proxyPart]
+  }
+  const pre = tonemap.length ? `${tonemap.join(',')},` : ''
+  const graph = `[0:v]${pre}split=2[p0][m0];[p0]${PROXY_FILTERS.join(',')}[p];[m0]${masterScaleFilter()},format=yuv420p[m]`
+  return [
+    '-i', inputPath, '-filter_complex', graph,
+    '-map', '[p]', '-map', '0:a:0?', ...PROXY_OUT, '-y', proxyPart,
+    '-map', '[m]', '-map', '0:a:0?', ...MASTER_OUT, '-y', masterPart
+  ]
+}
+
+/**
+ * Encode a video upload's copies: the 480p MP4 the preview plays (8-bit H.264,
+ * so every browser can play it whatever came in: HEVC, 10-bit, HDR, which is
+ * tone-mapped to SDR) and, when the original needs one, its master for renders
+ * (masterReason: HDR, over 1920 on the long side, an unusual codec).
+ * Writes .part files and renames them only when complete, so the GET route
+ * never serves a half-written file. The original stays for renders, unless a
+ * master was made: then the master replaces it.
  * Resolves true on success, false otherwise.
  */
 function encodeTo480p(inputPath, probe = {}, onProgress = null) {
   const baseName = path.basename(inputPath, path.extname(inputPath))
-  const finalPath = path.join(path.dirname(inputPath), `${baseName}_480p.mp4`)
-  const partPath = path.join(path.dirname(inputPath), `${baseName}_480p.part.mp4`)
-  const filters = [
-    // HDR (iPhone HLG / PQ) to SDR, else colours come out washed out
-    ...(isHdr(probe) ? ['zscale=t=linear:npl=100,format=gbrpf32le,zscale=p=bt709,tonemap=tonemap=hable:desat=0,zscale=t=bt709:m=bt709:r=tv'] : []),
-    'scale=iw*sar:ih,scale=854:480:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2,setsar=1',
-    // fps=30: browser recordings (MediaRecorder webm) carry a 1ms timebase, and
-    // without a fixed rate the MP4 comes out at 1000fps of duplicated frames,
-    // which stutters on playback
-    'fps=30',
-    // 8-bit: 10-bit input would otherwise give High 10 H.264, which browsers cannot play
-    'format=yuv420p'
-  ]
-  const args = [
-    '-i', inputPath,
-    '-vf', filters.join(','),
-    '-c:v', 'libx264', '-preset', 'fast', '-crf', '23', '-pix_fmt', 'yuv420p',
-    '-c:a', 'aac', '-b:a', '128k',
-    '-movflags', '+faststart',
-    '-f', 'mp4',
-    '-y',
-    partPath
-  ]
+  const dir = path.dirname(inputPath)
+  const finalPath = path.join(dir, `${baseName}_480p.mp4`)
+  const partPath = path.join(dir, `${baseName}_480p.part.mp4`)
+  const reason = masterReason(probe)
+  const masterFinal = reason ? path.join(dir, masterName(inputPath)) : null
+  const masterPart = reason ? path.join(dir, `${baseName}_master.part.mp4`) : null
+  const args = encodeArgs(inputPath, probe, partPath, masterPart)
+  if (reason) console.log(`[upload] ${path.basename(inputPath)}: render copy too (${reason})`)
 
   return new Promise((resolve) => {
     const proc = spawn('ffmpeg', args, { stdio: ['ignore', 'pipe', 'pipe'] })
@@ -154,7 +177,8 @@ function encodeTo480p(inputPath, probe = {}, onProgress = null) {
     })
 
     // Safety timeout: 5 minutes, or three times the footage length if longer
-    const limitMs = Math.max(5 * 60 * 1000, (probe.duration || 0) * 3 * 1000)
+    // (six times with a master, which is a full-size encode)
+    const limitMs = Math.max(5 * 60 * 1000, (probe.duration || 0) * (reason ? 6 : 3) * 1000)
     const timer = setTimeout(() => proc.kill('SIGTERM'), limitMs)
 
     proc.on('close', async (code) => {
@@ -163,8 +187,12 @@ function encodeTo480p(inputPath, probe = {}, onProgress = null) {
         try {
           await fs.rename(partPath, finalPath)
           console.log(`[upload] Encode done: ${path.basename(finalPath)}`)
-          // Remove original now that encoded version is ready
-          await fs.unlink(inputPath).catch(() => {})
+          // The original stays for renders; a master takes its place
+          if (masterPart) {
+            await fs.rename(masterPart, masterFinal)
+            console.log(`[upload] Render copy done: ${path.basename(masterFinal)}`)
+            await fs.unlink(inputPath).catch(() => {})
+          }
           return resolve(true)
         } catch (err) {
           console.warn(`[upload] Could not finalize ${path.basename(finalPath)}: ${err.message}`)
@@ -173,6 +201,7 @@ function encodeTo480p(inputPath, probe = {}, onProgress = null) {
         console.warn(`[upload] Encode failed (exit ${code}), keeping original: ${stderrTail.split('\n').filter(Boolean).slice(-2).join(' | ')}`)
       }
       await fs.unlink(partPath).catch(() => {})
+      if (masterPart) await fs.unlink(masterPart).catch(() => {})
       resolve(false)
     })
 
@@ -201,6 +230,8 @@ const encodeProgress = new Map()
 function queueEncode(inputPath, probe, { urgent = false, first = false } = {}) {
   const name = path.basename(inputPath)
   encodeState.set(name, 'queued')
+  // Renders read the original until its master is there (see renderSource)
+  if (masterReason(probe)) pendingMasters.set(name, { hdr: isHdr(probe) })
   return new Promise((resolve) => {
     const run = () => {
       runningEncodes++
@@ -208,6 +239,7 @@ function queueEncode(inputPath, probe, { urgent = false, first = false } = {}) {
       encodeTo480p(inputPath, probe, (p) => encodeProgress.set(name, p)).then((ok) => {
         encodeState.set(name, ok ? 'done' : 'failed')
         encodeProgress.delete(name)
+        pendingMasters.delete(name)
         resolve(ok)
       }).finally(() => {
         runningEncodes--
@@ -279,7 +311,7 @@ async function finishUpload(res, { filename, originalName, size, wait, hash = nu
       probe = await probeMedia(filePath)
     }
   }
-  // Only real video gets a 480p copy (which replaces the original): a voice
+  // Only real video gets a 480p copy (the original stays for renders): a voice
   // recording from the browser is .webm too, but holds no picture. Unreadable
   // files keep the old behaviour (try the encode).
   const isVideo = /\.(webm|mp4|mov|avi|mkv|m4v|hevc)$/i.test(filename) &&
@@ -448,8 +480,9 @@ router.get('/by-hash/:hash', async (req, res) => {
 
   const originalPath = path.join(UPLOAD_DIR, entry.filename)
   const encodedPath = encodedPathOf(entry.filename)
-  const [hasOriginal, hasEncoded] = await Promise.all([exists(originalPath), exists(encodedPath)])
-  if (!hasOriginal && !hasEncoded) {
+  const masterPath = masterPathOf(entry.filename)
+  const [hasOriginal, hasEncoded, hasMaster] = await Promise.all([exists(originalPath), exists(encodedPath), exists(masterPath)])
+  if (!hasOriginal && !hasEncoded && !hasMaster) {
     delete hashIndex[hash]
     saveHashIndex()
     return res.status(404).json({ error: 'Not uploaded' })
@@ -457,9 +490,11 @@ router.get('/by-hash/:hash', async (req, res) => {
   const now = new Date()
   if (hasOriginal) await fs.utimes(originalPath, now, now).catch(() => {})
   if (hasEncoded) await fs.utimes(encodedPath, now, now).catch(() => {})
+  if (hasMaster) await fs.utimes(masterPath, now, now).catch(() => {})
 
   let state = encodeStateOf(entry.filename, hasEncoded)
-  // Original still here, no copy and no encode running (e.g. after a restart): encode again
+  // Original still here, no copy and no encode running (e.g. after a restart):
+  // encode again (the 480p copy and, when it needs one, the master)
   if (entry.encodes && !hasEncoded && hasOriginal && state === 'unknown') {
     queueEncode(originalPath, entry.probe || {}, { first: !entry.browserSafe })
     state = 'queued'
@@ -498,9 +533,25 @@ router.get('/status/:filename', async (req, res) => {
 
 /**
  * GET /api/upload/files/:filename
- * Serves an uploaded file. Prefers the 480p encoded version if available.
+ * Serves an uploaded file. Prefers the 480p encoded version if available: the
+ * editing proxy the preview plays.
+ * ?for=render: what renders read instead (master, else original, else the 480p
+ * file of an old upload; see utils/uploadFiles.js renderSource). Headers say
+ * which (X-Render-Source) and whether a better file is still coming
+ * (X-Render-Final: 0), so a render on another backend does not cache it.
  */
 router.get('/files/:filename', async (req, res) => {
+  if (req.query.for === 'render') {
+    const name = path.basename(req.params.filename)
+    const pending = pendingMasters.get(name)
+    const src = await renderSource(UPLOAD_DIR, name, { pendingMaster: !!pending, hdr: !!pending?.hdr })
+    if (!src) return res.status(404).json({ error: 'File not found' })
+    res.set('Cache-Control', 'no-store')
+    res.set('X-Render-Source', src.kind)
+    res.set('X-Render-Final', src.final ? '1' : '0')
+    return res.sendFile(src.path)
+  }
+
   const filePath = path.join(UPLOAD_DIR, req.params.filename)
   const baseName = path.basename(req.params.filename, path.extname(req.params.filename))
   const encodedPath = path.join(UPLOAD_DIR, `${baseName}_480p.mp4`)

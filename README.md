@@ -87,6 +87,9 @@ The editor follows 3Speak's v2 design (the `design_handoff_3speak_v2` package in
 
 Quality presets: High (CRF 18), Medium (CRF 23), Low (CRF 28).
 
+### Render quality (Shorts)
+- Shorts render at **1080x1920** from the uploaded **originals**: the 480p copy of a video upload is only the editing proxy the preview plays (`GET /api/upload/files/<name>`); renders ask for `?for=render` (backend/src/utils/uploadFiles.js). Originals that are HDR, larger than 1920 on the long side or in an unusual codec get a `_master.mp4` render copy (fit 1920, never upscaled, SDR) that replaces them. Old uploads that only have their 480p file still render from it.
+
 ### Other
 - Drag-and-drop or file-picker media import with categorized library (Videos, Images, Sounds)
 - HLS stream support with automatic download and progress tracking
@@ -325,6 +328,7 @@ All variables are configured in `.env` (see `.env.example`).
 | `HLS_TARGET_RESOLUTION` | `480` | Target resolution for HLS clip prep |
 | `CLEANUP_MAX_AGE_HOURS` | `2` | Auto-cleanup files older than this |
 | `CLEANUP_INTERVAL_MINUTES` | `30` | Cleanup frequency |
+| `MAX_PARALLEL_ENCODES` | `2` | Upload encodes (480p proxy, render master) at a time |
 
 ### Gateway
 
@@ -345,7 +349,7 @@ All variables are configured in `.env` (see `.env.example`).
 |--------|------|-------------|
 | `GET` | `/api/health` | Health check with active/max job counts |
 | `POST` | `/api/upload` | Upload file (multipart, 2GB max) |
-| `GET` | `/api/upload/files/:filename` | Serve uploaded file |
+| `GET` | `/api/upload/files/:filename` | Serve uploaded file (the 480p proxy once there; `?for=render`: the original or its master) |
 | `POST` | `/api/render` | Submit render job (timeline JSON) |
 | `GET` | `/api/render/:jobId` | Poll render job status |
 | `POST` | `/api/clip/prepare` | Submit HLS clip preparation |

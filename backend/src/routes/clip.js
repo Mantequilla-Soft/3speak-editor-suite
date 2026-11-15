@@ -6,6 +6,7 @@ import { spawn } from 'child_process'
 import { selectVariantUrl } from '../utils/m3u8Parser.js'
 import multer from 'multer'
 import { requireSignIn } from '../auth.js'
+import { renderSource, renderUrlOf, pendingMasters } from '../utils/uploadFiles.js'
 
 const router = Router()
 const RENDERED_DIR = process.env.RENDERED_DIR || '/app/rendered'
@@ -223,9 +224,13 @@ router.post('/reverse', requireSignIn, upload.single('file'), async (req, res) =
     } else if (url.startsWith('/rendered/')) {
       inputPath = path.join(RENDERED_DIR, url.split('/').pop())
     } else if (url.startsWith('/api/upload/files/')) {
-      inputPath = path.join(UPLOADS_DIR, url.split('/').pop())
+      // the render source (master or original, the 480p file of old uploads)
+      const name = path.basename(url.split('?')[0])
+      const pending = pendingMasters.get(name)
+      const src = await renderSource(UPLOADS_DIR, name, { pendingMaster: !!pending, hdr: !!pending?.hdr })
+      inputPath = src ? src.path : path.join(UPLOADS_DIR, name)
     } else {
-      inputPath = url
+      inputPath = renderUrlOf(url)
     }
 
     const jobId = uuidv4()
@@ -396,7 +401,7 @@ const DENOISE = {
 const UPLOAD_ROOT = process.env.UPLOAD_DIR || UPLOADS_DIR
 
 // One of our /api/upload/files/<name> URLs -> { base, input } on disk (the
-// 480p copy once it exists: the GET route serves that, the original is gone)
+// 480p copy once it exists: its sound is the original's, and it is smaller to read)
 async function resolveUpload(url) {
   const match = String(url || '').match(/\/api\/upload\/files\/([A-Za-z0-9_.-]+?)(?:\?.*)?$/)
   if (!match) return null

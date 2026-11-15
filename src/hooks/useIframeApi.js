@@ -6,6 +6,7 @@ import { getClipChromaKey } from '../utils/chromaKey'
 import { normalizeColor } from '../utils/clipColor'
 import { normalizeMotion } from '../utils/stickerMotion'
 import { duckPlans, localDuckPlan } from '../utils/duck'
+import { outputSize } from '../utils/outputSize'
 
 const isIframe = typeof window !== 'undefined' && window.parent !== window
 const GATEWAY_URL = (import.meta.env.VITE_GATEWAY_URL || '').replace(/\/+$/, '')
@@ -479,20 +480,8 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
       }
     }
 
-    // Output dimensions based on aspect ratio
-    let outputWidth = 1280
-    let outputHeight = 720
-    const ratio = activeAspectRatio || '16:9'
-    if (ratio === '9:16') {
-      outputWidth = 720
-      outputHeight = 1280
-    } else if (ratio === '4:3') {
-      outputWidth = 960
-      outputHeight = 720
-    } else if (ratio === '1:1') {
-      outputWidth = 720
-      outputHeight = 720
-    }
+    // Output dimensions based on aspect ratio (utils/outputSize.js: Shorts at 1080x1920)
+    const { width: outputWidth, height: outputHeight } = outputSize(activeAspectRatio || '16:9')
 
     // Measure the preview container so backend can scale pixel values
     const previewEl = document.querySelector('.preview-layer-container') || document.querySelector('.global-preview-video')
