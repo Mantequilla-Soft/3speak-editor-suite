@@ -1,5 +1,6 @@
 import { api, getBackendUrl } from './backendSelector'
 import { authFetch } from './editorAuth'
+import { t } from '../i18n'
 
 /**
  * Request the backend to reverse a clip segment.
@@ -32,7 +33,7 @@ export async function reverseClipOnBackend(url, startTime, endTime, onProgress =
 
   if (!res.ok) {
     const errData = await res.json().catch(() => ({}))
-    throw new Error(errData.error || `Server responded with ${res.status}`)
+    throw new Error(errData.error || t('errors.render.serverStatus', { status: String(res.status) }))
   }
 
   const { jobId } = await res.json()
@@ -44,7 +45,7 @@ export async function reverseClipOnBackend(url, startTime, endTime, onProgress =
         const statusRes = await fetch(api(`/api/clip/reverse/${jobId}`))
         if (!statusRes.ok) {
           clearInterval(poll)
-          reject(new Error(`Status check failed: ${statusRes.status}`))
+          reject(new Error(t('errors.reverse.statusCheck', { status: String(statusRes.status) })))
           return
         }
 
@@ -58,7 +59,7 @@ export async function reverseClipOnBackend(url, startTime, endTime, onProgress =
           resolve(outUrl)
         } else if (data.status === 'failed') {
           clearInterval(poll)
-          reject(new Error(data.error || 'Reverse processing failed'))
+          reject(new Error(data.error || t('errors.reverse.failed')))
         }
       } catch (err) {
         clearInterval(poll)
@@ -68,7 +69,7 @@ export async function reverseClipOnBackend(url, startTime, endTime, onProgress =
 
     setTimeout(() => {
       clearInterval(poll)
-      reject(new Error('Reverse processing timed out'))
+      reject(new Error(t('errors.reverse.timedOut')))
     }, 10 * 60 * 1000)
   })
 }

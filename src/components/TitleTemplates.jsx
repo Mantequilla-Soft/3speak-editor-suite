@@ -4,6 +4,7 @@ import { COLOR_PRESETS } from '../adwizard/engine'
 import SceneLayer from './SceneLayer'
 import { SceneFieldInputs, SceneStyleInputs } from './SceneControls'
 import { X, ChevronLeft } from './icons'
+import { useT } from '../i18n'
 import './TitleTemplates.css'
 
 const PREVIEW_FRAME = { width: 1080, height: 1920 }
@@ -21,6 +22,7 @@ const previewBox = () => {
  * playhead above the footage.
  */
 export default function TitleTemplates({ onAdd, onClose, frame = PREVIEW_FRAME }) {
+  const { t, lang } = useT()
   const [pickedId, setPickedId] = useState(null)
   const [values, setValues] = useState({})
   const [style, setStyle] = useState({ colors: COLOR_PRESETS[0].name, font: 'Inter' })
@@ -38,7 +40,7 @@ export default function TitleTemplates({ onAdd, onClose, frame = PREVIEW_FRAME }
     const c = titleClip(template.id, { values, colors: style.colors, font: style.font })
     // shown whole and centred in the dialog
     return { ...c, id: 'title-preview', zoom: 100, positionX: 0, positionY: 0, timelineStart: 0 }
-  }, [template, values, style])
+  }, [template, values, style, lang])
 
   // play the title on a loop
   const registry = useRef({})
@@ -47,8 +49,8 @@ export default function TitleTemplates({ onAdd, onClose, frame = PREVIEW_FRAME }
     let raf = 0
     const t0 = performance.now()
     const tick = (now) => {
-      const t = ((now - t0) / 1000) % (draft.endTime + 0.6)
-      registry.current[draft.id]?.seek(Math.min(t, draft.endTime))
+      const at = ((now - t0) / 1000) % (draft.endTime + 0.6)
+      registry.current[draft.id]?.seek(Math.min(at, draft.endTime))
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
@@ -66,10 +68,10 @@ export default function TitleTemplates({ onAdd, onClose, frame = PREVIEW_FRAME }
       <div className="remix-picker title-templates" role="dialog" aria-modal="true" aria-labelledby="title-templates-heading">
         <div className="remix-picker-header">
           {template
-            ? <button className="remix-picker-icon-btn" onClick={() => setPickedId(null)} title="All titles"><ChevronLeft size={16} /></button>
+            ? <button className="remix-picker-icon-btn" onClick={() => setPickedId(null)} title={t('titles.templates.allTitles')}><ChevronLeft size={16} /></button>
             : <span className="remix-picker-icon-spacer" />}
-          <h3 id="title-templates-heading">{template ? template.label : 'Titles'}</h3>
-          <button className="remix-picker-icon-btn" onClick={onClose} title="Close">
+          <h3 id="title-templates-heading">{template ? template.label : t('titles.templates.dialogTitle')}</h3>
+          <button className="remix-picker-icon-btn" onClick={onClose} title={t('common.close')}>
             <X size={16} />
           </button>
         </div>
@@ -78,10 +80,10 @@ export default function TitleTemplates({ onAdd, onClose, frame = PREVIEW_FRAME }
           <section key={g.id} className="title-group">
             <h4>{g.label}</h4>
             <div className="title-grid">
-              {TITLE_TEMPLATES.filter(t => t.group === g.id).map(t => (
-                <button key={t.id} type="button" className="title-card" onClick={() => pick(t.id)}>
-                  <span className="title-card-name">{t.label}</span>
-                  <span className="title-card-sub">{t.transparent ? 'Over the video' : 'Own background'}</span>
+              {TITLE_TEMPLATES.filter(tpl => tpl.group === g.id).map(tpl => (
+                <button key={tpl.id} type="button" className="title-card" onClick={() => pick(tpl.id)}>
+                  <span className="title-card-name">{tpl.label}</span>
+                  <span className="title-card-sub">{tpl.transparent ? t('titles.templates.overVideo') : t('titles.templates.ownBackground')}</span>
                 </button>
               ))}
             </div>
@@ -101,7 +103,7 @@ export default function TitleTemplates({ onAdd, onClose, frame = PREVIEW_FRAME }
             </div>
             <div className="title-fields">
               <SceneFieldInputs template={template} values={values} onChange={(p) => setValues(v => ({ ...v, ...p }))} />
-              <p className="transition-hint">Put *stars* around a word to colour it.</p>
+              <p className="transition-hint">{t('titles.templates.starsHint')}</p>
               <SceneStyleInputs style={style} onChange={(p) => setStyle(s => ({ ...s, ...p }))} />
             </div>
           </div>
@@ -109,8 +111,8 @@ export default function TitleTemplates({ onAdd, onClose, frame = PREVIEW_FRAME }
 
         {template && (
           <div className="silence-cut-actions">
-            <button type="button" className="silence-cut-cancel" onClick={onClose}>Cancel</button>
-            <button type="button" className="silence-cut-apply" onClick={add}>Add title</button>
+            <button type="button" className="silence-cut-cancel" onClick={onClose}>{t('common.cancel')}</button>
+            <button type="button" className="silence-cut-apply" onClick={add}>{t('titles.templates.addTitle')}</button>
           </div>
         )}
       </div>

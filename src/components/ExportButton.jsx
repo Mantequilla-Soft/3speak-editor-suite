@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { Download, Settings, X, Send, ExternalLink } from './icons'
-import { MAX_TIMELINE_TEXT, formatLength } from '../utils/limits'
+import { maxTimelineText, formatLength } from '../utils/limits'
 import { isRenderActive } from '../utils/renderQueue'
+import { useT } from '../i18n'
 
 // Quality presets mapped to CRF values (lower CRF = higher quality, larger file)
 const QUALITY_PRESETS = [
-  { label: 'High (larger file)', crf: 18, bitrate: '~15-25 Mbps' },
-  { label: 'Medium (recommended)', crf: 23, bitrate: '~8-12 Mbps' },
-  { label: 'Low (smaller file)', crf: 28, bitrate: '~3-5 Mbps' },
+  { labelKey: 'render.legacy.qualityHigh', crf: 18, bitrate: '~15-25 Mbps' },
+  { labelKey: 'render.legacy.qualityMedium', crf: 23, bitrate: '~8-12 Mbps' },
+  { labelKey: 'render.legacy.qualityLow', crf: 28, bitrate: '~3-5 Mbps' },
 ]
 
 function ExportButton({
@@ -30,6 +31,8 @@ function ExportButton({
   overLengthLimit = false,
   pendingUpload = null
 }) {
+  const { t, formatNumber } = useT()
+  const percent = (p) => formatNumber(p, { style: 'percent', maximumFractionDigits: 0 })
   const [error, setError] = useState(null)
   const [quality, setQuality] = useState(23) // Default to medium quality (CRF 23)
   const [showSettings, setShowSettings] = useState(false)
@@ -59,7 +62,7 @@ function ExportButton({
         await onExport(clips, backgroundMusic, { crf: quality })
       }
     } catch (err) {
-      setError(err.message || 'Export failed')
+      setError(err.message || t('errors.export.failed'))
     }
   }
 
@@ -83,13 +86,13 @@ function ExportButton({
             ? <Send size={20} style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} />
             : <Download size={20} style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} />
           }
-          {isBackendRendering ? 'Rendering...' : exporting ? 'Exporting...' : (isIframe ? 'Render' : 'Export Video')}
+          {isBackendRendering ? t('render.button.rendering') : exporting ? t('render.button.exporting') : (isIframe ? t('common.render') : t('render.legacy.exportVideo'))}
         </button>
         {exporting && onCancelExport && (
           <button
             className="export-cancel-btn"
             onClick={handleCancel}
-            title="Cancel export"
+            title={t('render.legacy.cancelTitle')}
           >
             <X size={16} />
           </button>
@@ -98,7 +101,7 @@ function ExportButton({
           <button
             className="export-settings-btn"
             onClick={() => setShowSettings(!showSettings)}
-            title="Export settings"
+            title={t('render.legacy.settingsTitle')}
           >
             <Settings size={16} />
           </button>
@@ -109,45 +112,45 @@ function ExportButton({
         <div className="export-upload-status" role="status">
           <div className="export-upload-bar"><div style={{ width: `${Math.round(pendingUpload.progress * 100)}%` }} /></div>
           <p>
-            Uploading {pendingUpload.name} ({Math.round(pendingUpload.progress * 100)}%). Keep editing; {isIframe ? 'Render' : 'Export'} unlocks when it is done.
+            {t(isIframe ? 'render.legacy.uploadingRender' : 'render.legacy.uploadingExport', { name: pendingUpload.name, percent: percent(pendingUpload.progress) })}
           </p>
         </div>
       )}
 
       {overLengthLimit && (
         <p className="export-length-hint">
-          Timeline is {formatLength(timelineEnd)}. Trim it to {MAX_TIMELINE_TEXT} or less to {isIframe ? 'render' : 'export'}.
+          {t(isIframe ? 'render.legacy.lengthRender' : 'render.legacy.lengthExport', { length: formatLength(timelineEnd), limit: maxTimelineText() })}
         </p>
       )}
 
       {showSettings && !exporting && !isIframe && (
         <div className="export-settings">
           <div className="export-setting-row">
-            <label>Export Method</label>
+            <label>{t('render.legacy.method')}</label>
             <div className="export-method-toggle">
               <button
                 className={`method-btn ${useCanvasExport ? 'active' : ''}`}
                 onClick={() => setUseCanvasExport(true)}
               >
-                Canvas (WYSIWYG)
+                {t('render.legacy.methodCanvas')}
               </button>
               <button
                 className={`method-btn ${!useCanvasExport ? 'active' : ''}`}
                 onClick={() => setUseCanvasExport(false)}
               >
-                Fast (no effects)
+                {t('render.legacy.methodFast')}
               </button>
             </div>
             <span className="setting-hint">
               {useCanvasExport
-                ? 'Captures all visual effects exactly as shown in preview'
-                : 'Faster export but ignores zoom, position, crop, text overlays'
+                ? t('render.legacy.canvasHint')
+                : t('render.legacy.fastHint')
               }
             </span>
           </div>
 
           <div className="export-setting-row">
-            <label>Quality</label>
+            <label>{t('render.legacy.quality')}</label>
             <select
               value={quality}
               onChange={(e) => setQuality(parseInt(e.target.value))}
@@ -155,7 +158,7 @@ function ExportButton({
             >
               {QUALITY_PRESETS.map(preset => (
                 <option key={preset.crf} value={preset.crf}>
-                  {preset.label}
+                  {t(preset.labelKey)}
                 </option>
               ))}
             </select>
@@ -171,7 +174,7 @@ function ExportButton({
             <div className="fill" style={{ width: `${exportProgress * 100}%` }} />
           </div>
           <div className="export-progress-text">
-            {exportPhase || `Processing... ${Math.round(exportProgress * 100)}%`}
+            {exportPhase || t('render.legacy.processing', { percent: percent(exportProgress) })}
           </div>
         </div>
       )}
@@ -183,7 +186,7 @@ function ExportButton({
             <div className="fill" style={{ width: `${(renderStatus.progress || 0) * 100}%` }} />
           </div>
           <div className="export-progress-text">
-            {renderStatus.phase || `Rendering... ${Math.round((renderStatus.progress || 0) * 100)}%`}
+            {renderStatus.phase || t('render.legacy.renderingPercent', { percent: percent(renderStatus.progress || 0) })}
           </div>
         </div>
       )}
@@ -199,13 +202,13 @@ function ExportButton({
             style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none', fontSize: '0.85rem' }}
           >
             <ExternalLink size={16} style={{ marginRight: '0.4rem' }} />
-            Download Rendered Video
+            {t('render.legacy.downloadRendered')}
           </a>
           <button
             onClick={onClearRenderStatus}
             style={{ marginLeft: '0.5rem', background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '12px' }}
           >
-            Dismiss
+            {t('app.dismiss')}
           </button>
         </div>
       )}
@@ -214,13 +217,13 @@ function ExportButton({
       {renderStatus && renderStatus.status === 'failed' && (
         <div style={{ marginTop: '0.5rem' }}>
           <div className="export-error" style={{ color: 'var(--accent)', fontSize: '14px' }}>
-            Render failed: {renderStatus.error}
+            {t('render.failed', { error: renderStatus.error })}
           </div>
           <button
             onClick={onClearRenderStatus}
             style={{ marginTop: '0.25rem', background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '12px' }}
           >
-            Dismiss
+            {t('app.dismiss')}
           </button>
         </div>
       )}
@@ -233,13 +236,13 @@ function ExportButton({
 
       {!ffmpegLoaded && !isIframe && (
         <div style={{ marginTop: '0.5rem', fontSize: '12px', color: 'var(--muted)' }}>
-          {ffmpegLoading ? 'Loading FFmpeg...' : 'FFmpeg not loaded'}
+          {ffmpegLoading ? t('render.legacy.ffmpegLoading') : t('render.legacy.ffmpegNotLoaded')}
         </div>
       )}
 
       {(isIframe ? true : ffmpegLoaded) && clips.length === 0 && (
         <div style={{ marginTop: '0.5rem', fontSize: '12px', color: 'var(--muted)' }}>
-          Add clips to the timeline to export
+          {t('render.legacy.addClips')}
         </div>
       )}
     </div>

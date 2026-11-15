@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { TRANSITION_TYPES, TRANSITION_MIN, TRANSITION_MAX, TRANSITION_DEFAULT, VIDEO_FADE_MAX, normalizeTransition, nextClipOf, canTransition, videoFades } from '../utils/transitions'
 import { RotateCcw, X } from './icons'
+import { useT } from '../i18n'
 import './TransitionControls.css'
 
 /**
@@ -8,23 +9,24 @@ import './TransitionControls.css'
  * length. value: the normalised transition or null; onChange(type, duration).
  */
 export function TransitionPicker({ value, onChange }) {
+  const { t } = useT()
   const duration = value?.duration ?? TRANSITION_DEFAULT
   return (
     <div className="transition-picker">
-      <div className="transition-chips" role="radiogroup" aria-label="Transition">
+      <div className="transition-chips" role="radiogroup" aria-label={t('look.transition.title')}>
         <button type="button" role="radio" aria-checked={!value} className={`transition-chip${!value ? ' active' : ''}`} onClick={() => onChange(null)}>
-          None
+          {t('look.transition.none')}
         </button>
-        {TRANSITION_TYPES.map(t => (
+        {TRANSITION_TYPES.map(tt => (
           <button
-            key={t.id}
+            key={tt.id}
             type="button"
             role="radio"
-            aria-checked={value?.type === t.id}
-            className={`transition-chip${value?.type === t.id ? ' active' : ''}`}
-            onClick={() => onChange(t.id, duration)}
+            aria-checked={value?.type === tt.id}
+            className={`transition-chip${value?.type === tt.id ? ' active' : ''}`}
+            onClick={() => onChange(tt.id, duration)}
           >
-            {t.label}
+            {t(`look.transition.types.${tt.id}`)}
           </button>
         ))}
       </div>
@@ -37,7 +39,7 @@ export function TransitionPicker({ value, onChange }) {
             step="0.1"
             value={duration}
             onChange={(e) => onChange(value.type, parseFloat(e.target.value))}
-            aria-label="Transition length (seconds)"
+            aria-label={t('look.transition.length')}
           />
           <span>{duration.toFixed(1)}s</span>
         </div>
@@ -63,6 +65,7 @@ export const transitionUpdate = (next, type, duration) => ({
  * with it), and the transition into the clip right after it.
  */
 export default function TransitionControls({ clip, tracks, onUpdateClip, linkedAudio = null, onUpdateLinkedAudio = null }) {
+  const { t } = useT()
   const next = transitionTarget(tracks, clip)
   const current = normalizeTransition(clip.transition)
   const active = current && next && current.to === next.id ? current : null
@@ -74,7 +77,7 @@ export default function TransitionControls({ clip, tracks, onUpdateClip, linkedA
     onUpdateClip({ [key]: value })
     if (linkedAudio && onUpdateLinkedAudio) onUpdateLinkedAudio({ [key]: value })
   }
-  const fadeRow = (key, label) => (
+  const fadeRow = (key, label, ariaLabel) => (
     <div className="property-slider fade-slider">
       <span className="fade-label">{label}</span>
       <input
@@ -84,31 +87,31 @@ export default function TransitionControls({ clip, tracks, onUpdateClip, linkedA
         step="0.1"
         value={Math.min(max, fades[key])}
         onChange={(e) => setFade(key, parseFloat(e.target.value))}
-        aria-label={`Fade ${label.toLowerCase()} (seconds)`}
+        aria-label={ariaLabel}
       />
       <span>{Math.min(max, fades[key]).toFixed(1)}s</span>
     </div>
   )
   return (
     <div className="prop-group">
-      <div className="prop-group-label">Transition</div>
+      <div className="prop-group-label">{t('look.transition.title')}</div>
       <div className="property-group">
         <label>
-          Fades
+          {t('look.transition.fades')}
           {(fades.fadeIn > 0 || fades.fadeOut > 0) && (
-            <button className="prop-reset-btn" onClick={() => { setFade('fadeIn', 0); setFade('fadeOut', 0) }} title="No fades">
+            <button className="prop-reset-btn" onClick={() => { setFade('fadeIn', 0); setFade('fadeOut', 0) }} title={t('look.transition.noFades')}>
               <RotateCcw size={10} />
             </button>
           )}
         </label>
-        {fadeRow('fadeIn', 'In')}
-        {fadeRow('fadeOut', 'Out')}
+        {fadeRow('fadeIn', t('look.transition.in'), t('look.transition.fadeInSeconds'))}
+        {fadeRow('fadeOut', t('look.transition.out'), t('look.transition.fadeOutSeconds'))}
       </div>
       <div className="property-group">
-        <label>Into the next clip</label>
+        <label>{t('look.transition.intoNext')}</label>
         {next
           ? <TransitionPicker value={active} onChange={(type, duration) => onUpdateClip(transitionUpdate(next, type, duration))} />
-          : <p className="transition-hint">Put a clip right after this one on the same track to add a transition.</p>}
+          : <p className="transition-hint">{t('look.transition.needNext')}</p>}
       </div>
     </div>
   )
@@ -116,6 +119,7 @@ export default function TransitionControls({ clip, tracks, onUpdateClip, linkedA
 
 /** The picker as a dialog, for the button on a cut in the timeline. */
 export function TransitionDialog({ from, to, onUpdateClip, onClose }) {
+  const { t } = useT()
   const current = normalizeTransition(from.transition)
   const value = current && current.to === to.id ? current : null
   useEffect(() => {
@@ -128,12 +132,17 @@ export function TransitionDialog({ from, to, onUpdateClip, onClose }) {
       <div className="remix-picker transition-dialog" role="dialog" aria-modal="true" aria-labelledby="transition-dialog-title">
         <div className="remix-picker-header">
           <span className="remix-picker-icon-spacer" />
-          <h3 id="transition-dialog-title">Transition</h3>
-          <button className="remix-picker-icon-btn" onClick={onClose} title="Close">
+          <h3 id="transition-dialog-title">{t('look.transition.title')}</h3>
+          <button className="remix-picker-icon-btn" onClick={onClose} title={t('common.close')}>
             <X size={16} />
           </button>
         </div>
-        <p className="transition-hint">{from.name || 'Clip'} into {to.name || 'the next clip'}</p>
+        <p className="transition-hint">
+          {from.name && to.name ? t('look.transition.fromTo', { from: from.name, to: to.name })
+            : to.name ? t('look.transition.fromUnnamed', { to: to.name })
+              : from.name ? t('look.transition.toUnnamed', { from: from.name })
+                : t('look.transition.bothUnnamed')}
+        </p>
         <TransitionPicker value={value} onChange={(type, duration) => onUpdateClip(from.id, transitionUpdate(to, type, duration))} />
       </div>
     </div>

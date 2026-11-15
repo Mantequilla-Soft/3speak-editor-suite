@@ -1,8 +1,10 @@
 import { useRef, useEffect } from 'react'
 import { Music } from './icons'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
+import { useT } from '../i18n'
 
 function VideoPreview({ clip, isVerticalVideo }) {
+  const { t } = useT()
   const mediaRef = useRef(null)
   const hlsRef = useRef(null)
   const loadedUrlRef = useRef(null)
@@ -63,7 +65,7 @@ function VideoPreview({ clip, isVerticalVideo }) {
   if (!clip) {
     return (
       <div className={previewClass}>
-        <span className="no-video">Select a clip to preview</span>
+        <span className="no-video">{t('preview.selectClip')}</span>
       </div>
     )
   }

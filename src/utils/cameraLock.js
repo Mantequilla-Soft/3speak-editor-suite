@@ -4,12 +4,16 @@
  * re-adjust). Each one is tried on its own, only when the browser and camera
  * list a 'manual' mode for it; nothing here ever throws.
  */
+import { t, formatList } from '../i18n'
+
 const CONTROLS = [
   // [mode setting, value that pins it, readable name]
   ['focusMode', 'focusDistance', 'focus'],
   ['exposureMode', 'exposureTime', 'exposure'],
   ['whiteBalanceMode', 'colorTemperature', 'white balance']
 ]
+// The readable names' keys (clip.greenScreen.cameraLock.names.*)
+const CONTROL_KEYS = { focus: 'focus', exposure: 'exposure', 'white balance': 'whiteBalance' }
 
 /**
  * Returns { result: { focus, exposure, 'white balance' } -> true when locked,
@@ -62,13 +66,16 @@ export async function unlockCamera(track) {
   }
 }
 
-/** One line for the recorder, from lockCamera's result. */
+/** One line for the recorder, from lockCamera's result (in the interface language). */
 export function describeCameraLock(r) {
   if (!r) return ''
   const locked = Object.keys(r).filter(k => r[k])
-  if (r.focus && r.exposure) return `Camera focus and exposure locked${r['white balance'] ? ', white balance too' : ''}.`
+  if (r.focus && r.exposure) return r['white balance'] ? t('clip.greenScreen.cameraLock.allLocked') : t('clip.greenScreen.cameraLock.focusExposureLocked')
   if (!r.focus) {
-    return `Your camera doesn't allow locking focus; avoid moving closer or further.${locked.length ? ` Locked: ${locked.join(', ')}.` : ''}`
+    const noFocus = t('clip.greenScreen.cameraLock.noFocus')
+    if (!locked.length) return noFocus
+    const names = locked.map(k => t(`clip.greenScreen.cameraLock.names.${CONTROL_KEYS[k] || 'focus'}`))
+    return `${noFocus} ${t('clip.greenScreen.cameraLock.lockedList', { list: formatList(names) })}`
   }
-  return `Focus locked. Exposure can't be locked on this camera; keep the light steady.`
+  return t('clip.greenScreen.cameraLock.noExposure')
 }

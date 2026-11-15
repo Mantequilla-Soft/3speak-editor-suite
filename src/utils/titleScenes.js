@@ -8,6 +8,7 @@
 // The preview plays the scene in the engine's own host page (SceneLayer.jsx),
 // the render records the same page frame by frame (backend services/sceneClip.js).
 import { COLOR_PRESETS, fontSpec } from '../adwizard/engine'
+import { t } from '../i18n'
 
 export const SCENE_HOST_URL = '/scenes/host/index.html'
 
@@ -19,60 +20,66 @@ export const SCENE_TRANSPARENT_CSS = 'html,body,#stage{background:transparent !i
 export const TITLE_FONTS = ['Inter', 'Montserrat', 'Poppins', 'Oswald', 'Bebas Neue', 'Anton', 'Archivo Black', 'Playfair Display', 'Permanent Marker', 'Caveat']
 
 // fields: k = the scene field, kind: 'lines' (one per line) | 'text' | 'para'
+// Labels and the sample words are read in the interface language when they are
+// used (getters): the sample words are what a new title starts from.
+const field = (k, kind, label, max) => ({
+  k, kind, ...(max ? { max } : {}), labelKey: `titles.templates.fields.${label}`,
+  get label() { return t(this.labelKey) }
+})
+const lines = (key) => t(key).split('\n')
 export const TITLE_TEMPLATES = [
   {
-    id: 'lower-name', group: 'lower', type: 'hook', label: 'Name and role', transparent: true, placement: 'lower',
-    fields: [{ k: 'lines', kind: 'lines', label: 'Name', max: 2 }, { k: 'sub', kind: 'para', label: 'Role' }],
-    values: { lines: ['badadib'], sub: 'Creator on 3Speak' }, duration: 4
+    id: 'lower-name', group: 'lower', type: 'hook', get label() { return t('titles.templates.items.lowerName.label') }, transparent: true, placement: 'lower',
+    fields: [field('lines', 'lines', 'name', 2), field('sub', 'para', 'role')],
+    get values() { return { lines: ['badadib'], sub: t('titles.templates.items.lowerName.sub') } }, duration: 4
   },
   {
-    id: 'lower-statement', group: 'lower', type: 'statement', label: 'Short statement', transparent: true, placement: 'lower',
-    fields: [{ k: 'lines', kind: 'lines', label: 'Lines', max: 3 }],
-    values: { lines: ['Three things', 'I *learned* today'] }, duration: 3.5
+    id: 'lower-statement', group: 'lower', type: 'statement', get label() { return t('titles.templates.items.lowerStatement.label') }, transparent: true, placement: 'lower',
+    fields: [field('lines', 'lines', 'lines', 3)],
+    get values() { return { lines: lines('titles.templates.items.lowerStatement.lines') } }, duration: 3.5
   },
   {
-    id: 'title-words', group: 'title', type: 'words', label: 'One word at a time', transparent: true,
-    fields: [{ k: 'words', kind: 'lines', label: 'Words', max: 5 }, { k: 'line', kind: 'text', label: 'Line under them' }],
-    values: { words: ['Plan.', 'Film.', '*Post.*'], line: 'My week on 3Speak' }, duration: 2.8
+    id: 'title-words', group: 'title', type: 'words', get label() { return t('titles.templates.items.titleWords.label') }, transparent: true,
+    fields: [field('words', 'lines', 'words', 5), field('line', 'text', 'lineUnder')],
+    get values() { return { words: lines('titles.templates.items.titleWords.words'), line: t('titles.templates.items.titleWords.line') } }, duration: 2.8
   },
   {
-    id: 'title-kinetic', group: 'title', type: 'kinetic', label: 'Words slam in', transparent: true,
-    fields: [{ k: 'words', kind: 'lines', label: 'Words', max: 5 }, { k: 'line', kind: 'text', label: 'Line under them' }],
-    values: { words: ['Fast', 'Simple', 'Yours'], line: 'Made on *3Speak*' }, duration: 3
+    id: 'title-kinetic', group: 'title', type: 'kinetic', get label() { return t('titles.templates.items.titleKinetic.label') }, transparent: true,
+    fields: [field('words', 'lines', 'words', 5), field('line', 'text', 'lineUnder')],
+    get values() { return { words: lines('titles.templates.items.titleKinetic.words'), line: t('titles.templates.items.titleKinetic.line') } }, duration: 3
   },
   {
-    id: 'title-poster', group: 'title', type: 'heroPoster', label: 'Giant stacked words', transparent: true,
-    fields: [{ k: 'words', kind: 'lines', label: 'Words', max: 4 }, { k: 'sub', kind: 'para', label: 'Line under them' }],
-    values: { words: ['Day', 'one.'], sub: 'Starting from zero' }, duration: 3
+    id: 'title-poster', group: 'title', type: 'heroPoster', get label() { return t('titles.templates.items.titlePoster.label') }, transparent: true,
+    fields: [field('words', 'lines', 'words', 4), field('sub', 'para', 'lineUnder')],
+    get values() { return { words: lines('titles.templates.items.titlePoster.words'), sub: t('titles.templates.items.titlePoster.sub') } }, duration: 3
   },
   {
-    id: 'title-marquee', group: 'title', type: 'marquee', label: 'Scrolling rows', transparent: true,
-    fields: [{ k: 'rows', kind: 'lines', label: 'Rows', max: 5 }, { k: 'line', kind: 'text', label: 'Line in front' }],
-    values: { rows: ['Plan', 'Film', 'Post', 'Repeat'], line: 'Every *week*' }, duration: 3
+    id: 'title-marquee', group: 'title', type: 'marquee', get label() { return t('titles.templates.items.titleMarquee.label') }, transparent: true,
+    fields: [field('rows', 'lines', 'rows', 5), field('line', 'text', 'lineInFront')],
+    get values() { return { rows: lines('titles.templates.items.titleMarquee.rows'), line: t('titles.templates.items.titleMarquee.line') } }, duration: 3
   },
   {
-    id: 'card-hook', group: 'card', type: 'hook', label: 'Intro: opening line', transparent: false,
-    fields: [{ k: 'lines', kind: 'lines', label: 'Headline', max: 3 }, { k: 'sub', kind: 'para', label: 'Line under it' }],
-    values: { lines: ['How I', 'edit my', '*Shorts*'], sub: 'In under a minute' }, duration: 3
+    id: 'card-hook', group: 'card', type: 'hook', get label() { return t('titles.templates.items.cardHook.label') }, transparent: false,
+    fields: [field('lines', 'lines', 'headline', 3), field('sub', 'para', 'lineUnderIt')],
+    get values() { return { lines: lines('titles.templates.items.cardHook.lines'), sub: t('titles.templates.items.cardHook.sub') } }, duration: 3
   },
   {
-    id: 'card-end', group: 'card', type: 'endcard', label: 'Outro: follow me', transparent: false,
-    fields: [{ k: 'brand', kind: 'text', label: 'Name' }, { k: 'tagline', kind: 'text', label: 'Tagline' }, { k: 'cta', kind: 'text', label: 'Call to action' }, { k: 'footer', kind: 'text', label: 'Small print' }],
-    values: { brand: 'badadib', tagline: 'New Shorts *every week*', cta: 'Follow on 3Speak', footer: '' }, duration: 3.2
+    id: 'card-end', group: 'card', type: 'endcard', get label() { return t('titles.templates.items.cardEnd.label') }, transparent: false,
+    fields: [field('brand', 'text', 'name'), field('tagline', 'text', 'tagline'), field('cta', 'text', 'cta'), field('footer', 'text', 'smallPrint')],
+    get values() { return { brand: 'badadib', tagline: t('titles.templates.items.cardEnd.tagline'), cta: t('titles.templates.items.cardEnd.cta'), footer: '' } }, duration: 3.2
   },
   {
-    id: 'card-poster', group: 'card', type: 'endPoster', label: 'Outro: giant words', transparent: false,
-    fields: [{ k: 'words', kind: 'lines', label: 'Words', max: 4 }, { k: 'cta', kind: 'text', label: 'Call to action' }],
-    values: { words: ['See', 'you', '*soon.*'], cta: 'Follow on 3Speak' }, duration: 3
+    id: 'card-poster', group: 'card', type: 'endPoster', get label() { return t('titles.templates.items.cardPoster.label') }, transparent: false,
+    fields: [field('words', 'lines', 'words', 4), field('cta', 'text', 'cta')],
+    get values() { return { words: lines('titles.templates.items.cardPoster.words'), cta: t('titles.templates.items.cardPoster.cta') } }, duration: 3
   }
 ]
 
 export const TITLE_GROUPS = [
-  { id: 'lower', label: 'Lower thirds' },
-  { id: 'title', label: 'Titles over the video' },
-  { id: 'card', label: 'Intro and outro cards' }
+  { id: 'lower', get label() { return t('titles.templates.groups.lower') } },
+  { id: 'title', get label() { return t('titles.templates.groups.title') } },
+  { id: 'card', get label() { return t('titles.templates.groups.card') } }
 ]
-
 export const SCENE_DURATION = [1.5, 8]
 export const templateOf = (id) => TITLE_TEMPLATES.find(t => t.id === id) || null
 
@@ -115,7 +122,7 @@ export function sceneDoc(clip, frame = { width: 1080, height: 1920 }) {
   const preset = COLOR_PRESETS.find(p => p.name === clip.sceneStyle?.colors) || COLOR_PRESETS[0]
   const font = TITLE_FONTS.includes(clip.sceneStyle?.font) ? clip.sceneStyle.font : 'Inter'
   const fields = template ? sceneFields(template, s.fields) : { ...(s.fields || {}) }
-  const name = fields.brand || 'Me'
+  const name = fields.brand || t('titles.scene.defaultName')
   const c = preset.colors
   return {
     width: frame.width,
@@ -145,17 +152,17 @@ export const sceneLength = (clip) => {
  * without previewW it is taken as 9:16).
  */
 export function titleClip(templateId, { values = null, colors = null, font = null, previewH = 640, previewW = null } = {}) {
-  const t = templateOf(templateId)
-  if (!t) return null
-  const duration = t.duration
-  const lower = t.placement === 'lower'
+  const tpl = templateOf(templateId)
+  if (!tpl) return null
+  const duration = tpl.duration
+  const lower = tpl.placement === 'lower'
   const width = previewW || previewH * 9 / 16
   return {
     type: 'scene',
-    name: t.label,
-    scene: { template: t.id, type: t.type, duration, fields: { ...t.values, ...(values || {}) } },
+    name: tpl.label,
+    scene: { template: tpl.id, type: tpl.type, duration, fields: { ...tpl.values, ...(values || {}) } },
     sceneStyle: { colors: colors || COLOR_PRESETS[0].name, font: font || 'Inter' },
-    transparent: t.transparent,
+    transparent: tpl.transparent,
     startTime: 0,
     endTime: duration,
     duration,

@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { useTranscriptJob } from './useTranscriptJob'
 import { voiceTracksOf } from '../utils/captionSources'
+import { t as tr } from '../i18n'
 import { addChunk, cleanTranscript, neededRanges, neededSeconds, placeWords, paragraphsOf, wordCount } from '../utils/transcript'
 
 /**
@@ -32,7 +33,7 @@ export function useTranscript({ tracks, buildAndUploadPayload, enabled = true })
     const need = neededRanges(now, ref.current)
     if (!need.length) return true
     setError(null)
-    setPreparing('Preparing the recordings...')
+    setPreparing(tr('transcript.job.preparing'))
     let urls
     try {
       const payload = await buildAndUploadPayload((phase) => setPreparing(phase), { voiceTracks: voiceTracksOf(now) })
@@ -40,14 +41,14 @@ export function useTranscript({ tracks, buildAndUploadPayload, enabled = true })
       for (const t of payload?.timeline?.tracks || []) for (const c of t.clips || []) if (c.url) urls.set(c.id, c.url)
     } catch (err) {
       setPreparing(null)
-      setError(err?.code === 'sign-in' ? 'Sign in on 3Speak to make a transcript.' : `The recordings could not be uploaded: ${err.message}`)
+      setError(err?.code === 'sign-in' ? tr('transcript.job.signIn') : tr('transcript.job.uploadFailed', { message: err.message }))
       return false
     }
     setPreparing(null)
     const libraryUrl = new Map()
     for (const t of voiceTracksOf(now)) for (const c of t.clips) if (urls.has(c.id) && !libraryUrl.has(c.libraryId)) libraryUrl.set(c.libraryId, urls.get(c.id))
     const sources = need.map(e => ({ id: e.libraryId, url: urls.get(e.clipId) || libraryUrl.get(e.libraryId), ranges: e.ranges })).filter(s => s.url && !/^blob:/.test(s.url))
-    if (!sources.length) { setError('The recordings are not on the server yet. Try again once they have uploaded.'); return false }
+    if (!sources.length) { setError(tr('transcript.job.notUploaded')); return false }
     return stt.start({
       sources,
       language,

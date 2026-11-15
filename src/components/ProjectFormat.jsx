@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { X, Crop } from './icons'
-import { PROJECT_ASPECTS, ASPECT_INFO, aspectValue } from '../utils/projectFormat'
+import { PROJECT_ASPECTS, ASPECT_INFO, aspectValue, aspectLabel } from '../utils/projectFormat'
 import { limitText, maxSecondsFor, formatLength, getTimelineEnd } from '../utils/limits'
+import { useT } from '../i18n'
 import './ProjectFormat.css'
 
 /** A small picture of a shape: a frame of its aspect in a 40 x 40 box. */
@@ -22,26 +23,27 @@ export function AspectDiagram({ aspect, size = 40 }) {
  * the new frame (Export as reframes it around faces instead).
  */
 export default function ProjectFormat({ aspect, onChange, tracks }) {
+  const { t } = useT()
   const [open, setOpen] = useState(false)
-  const info = ASPECT_INFO[aspect] || ASPECT_INFO['9:16']
+  const shape = aspectLabel(ASPECT_INFO[aspect] ? aspect : '9:16')
   const length = getTimelineEnd(tracks)
   return (
     <>
       <button
         className="project-format-chip"
         onClick={() => setOpen(true)}
-        title={`Shape of this project: ${info.label} ${aspect}. Click to change it`}
-        aria-label={`Project shape: ${info.label} ${aspect}`}
+        title={t('formats.chip.title', { shape })}
+        aria-label={t('formats.chip.aria', { shape })}
       >
-        <Crop size={13} /><span>{info.label} {aspect}</span>
+        <Crop size={13} /><span>{shape}</span>
       </button>
       {open && (
         <div className="remix-picker-overlay" onClick={() => setOpen(false)}>
           <div className="remix-picker project-format-picker" role="dialog" aria-modal="true" aria-labelledby="project-format-title" onClick={e => e.stopPropagation()}>
             <div className="remix-picker-header">
               <span className="remix-picker-icon-spacer" />
-              <h3 id="project-format-title">What are you making?</h3>
-              <button className="remix-picker-icon-btn" onClick={() => setOpen(false)} title="Close">
+              <h3 id="project-format-title">{t('formats.picker.title')}</h3>
+              <button className="remix-picker-icon-btn" onClick={() => setOpen(false)} title={t('common.close')}>
                 <X size={16} />
               </button>
             </div>
@@ -57,17 +59,17 @@ export default function ProjectFormat({ aspect, onChange, tracks }) {
                   >
                     <span className="remix-picker-diagram"><AspectDiagram aspect={a} /></span>
                     <span className="remix-picker-copy">
-                      <strong>{ASPECT_INFO[a].label} {a}</strong>
+                      <strong>{aspectLabel(a)}</strong>
                       <small>
-                        {ASPECT_INFO[a].hint}
-                        {over ? ` · your timeline is ${formatLength(length)}, trim it to ${limitText(maxSecondsFor('video', a))} to render` : ''}
+                        {t(ASPECT_INFO[a].hintKey)}
+                        {over ? ` · ${t('formats.picker.tooLong', { length: formatLength(length), limit: limitText(maxSecondsFor('video', a)) })}` : ''}
                       </small>
                     </span>
                   </button>
                 )
               })}
             </div>
-            <p className="project-format-note">The shape decides how it goes to 3Speak: 9:16 as a Short, the others as a normal video. Export as renders it in other shapes too.</p>
+            <p className="project-format-note">{t('formats.picker.note')}</p>
           </div>
         </div>
       )}

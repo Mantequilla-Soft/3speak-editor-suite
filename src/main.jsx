@@ -4,6 +4,7 @@ import App from './App.jsx'
 import './styles/tokens.css'
 import './App.css'
 import './utils/editorAuth' // listens for the 3Speak sign-in from the first message on
+import { initI18n, listenForParentLanguage } from './i18n'
 
 // Two entry modes. Default: the Shorts editor (App). ?mode=ads: the Ad Wizard, its own shell and its own
 // code chunk (src/adwizard), so the editor does not load or change because of it.
@@ -28,10 +29,13 @@ document.addEventListener('touchmove', (e) => {
   }
 }, { passive: false })
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+// The viewer's language (?lang= from 3Speak, else the browser's): its strings load
+// before the first render (capped, see initI18n), later switches come as messages.
+listenForParentLanguage()
+initI18n().finally(() => ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     {MODE === 'ads'
       ? <Suspense fallback={null}><AdWizard /></Suspense>
       : <App />}
   </React.StrictMode>,
-)
+))

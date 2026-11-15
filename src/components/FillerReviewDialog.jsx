@@ -4,6 +4,7 @@ import { findFillers, findPauses, fillerCutRanges, fillerTable } from '../utils/
 import { cutLength } from '../utils/ripple'
 import { transcriptTime } from '../utils/transcript'
 import './WordTools.css'
+import { useT, languageName, formatNumber } from '../i18n'
 
 const SETTINGS_KEY = 'filler-settings'
 const DEFAULTS = { fillers: true, pauses: true, minPause: 1.5, keepPause: 0.5 }
@@ -13,13 +14,7 @@ function loadSettings() {
   try { return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') } } catch { return DEFAULTS }
 }
 
-let languageNames = null
-const languageName = (code) => {
-  try {
-    languageNames = languageNames || new Intl.DisplayNames(['en'], { type: 'language' })
-    return languageNames.of(code) || code
-  } catch { return code }
-}
+const oneDecimal = (n) => formatNumber(n, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 
 /**
  * Remove fillers and long pauses: finds "um", "uh", "you know" and their kind
@@ -30,6 +25,7 @@ const languageName = (code) => {
  * `tr`: useTranscript; `player`: useRangePlayback; onApply(ranges, what).
  */
 export default function FillerReviewDialog({ tr, player, onApply, onClose }) {
+  const { t, tRich } = useT()
   const [settings, setSettings] = useState(loadSettings)
   const [kept, setKept] = useState(() => new Set()) // unticked item ids
   const { words, job, status } = tr
@@ -68,65 +64,69 @@ export default function FillerReviewDialog({ tr, player, onApply, onClose }) {
       <div className="remix-picker silence-cut filler-review" role="dialog" aria-modal="true" aria-labelledby="filler-review-title" onClick={e => e.stopPropagation()}>
         <div className="remix-picker-header">
           <span className="remix-picker-icon-spacer" />
-          <h3 id="filler-review-title">Remove fillers and pauses</h3>
-          <button className="remix-picker-icon-btn" onClick={onClose} title="Close"><X size={16} /></button>
+          <h3 id="filler-review-title">{t('words.fillers.title')}</h3>
+          <button className="remix-picker-icon-btn" onClick={onClose} title={t('common.close')}><X size={16} /></button>
         </div>
 
         {!words.length ? (
           <div className="filler-empty">
-            <p className="silence-cut-mode-hint">This works from the transcript: it finds um, uh, you know and their kind in the show&apos;s language, and the long pauses.</p>
+            <p className="silence-cut-mode-hint">{t('words.fillers.emptyHint')}</p>
             {running ? (
               <div className="captions-progress" role="status" aria-live="polite">
                 <div className="captions-progress-bar"><div style={{ width: `${Math.round((job.progress || 0) * 100)}%` }} /></div>
-                <span><Loader2 size={13} className="encoding-notice-spin" /> {job.phase || 'Listening...'}</span>
+                <span><Loader2 size={13} className="encoding-notice-spin" /> {job.phase || t('words.fillers.listening')}</span>
               </div>
             ) : status?.available ? (
-              <button className="silence-cut-apply" onClick={() => tr.transcribe()} disabled={tr.missingSeconds <= 0}><Wand2 size={14} /> Transcribe the show first</button>
+              <button className="silence-cut-apply" onClick={() => tr.transcribe()} disabled={tr.missingSeconds <= 0}><Wand2 size={14} /> {t('words.fillers.transcribeFirst')}</button>
             ) : (
-              <p className="captions-error" role="status">{status === null ? 'Checking the server...' : 'Transcripts are not available on this editor server right now.'}</p>
+              <p className="captions-error" role="status">{status === null ? t('words.fillers.checking') : t('words.fillers.unavailable')}</p>
             )}
             {job?.status === 'failed' && <p className="captions-error" role="alert">{job.error}</p>}
           </div>
         ) : (
           <>
             <p className="silence-cut-mode-hint">
-              Fillers in {languageName(language)}{known ? '' : ' (only um, uh and the like: no list for this language yet)'}. Listen to each, untick what should stay.
-              {running ? ' The rest of the show is still being transcribed.' : ''}
+              {t(known ? 'words.fillers.intro' : 'words.fillers.introNoList', { language: languageName(language) })}
+              {running ? ` ${t('words.fillers.stillTranscribing')}` : ''}
             </p>
             <div className="silence-cut-controls filler-controls">
-              <label className="beat-sync-toggle"><input type="checkbox" checked={settings.fillers} onChange={e => setSettings(s => ({ ...s, fillers: e.target.checked }))} /><span>Filler words</span></label>
-              <label className="beat-sync-toggle"><input type="checkbox" checked={settings.pauses} onChange={e => setSettings(s => ({ ...s, pauses: e.target.checked }))} /><span>Long pauses</span></label>
+              <label className="beat-sync-toggle"><input type="checkbox" checked={settings.fillers} onChange={e => setSettings(s => ({ ...s, fillers: e.target.checked }))} /><span>{t('words.fillers.fillerWords')}</span></label>
+              <label className="beat-sync-toggle"><input type="checkbox" checked={settings.pauses} onChange={e => setSettings(s => ({ ...s, pauses: e.target.checked }))} /><span>{t('words.fillers.longPauses')}</span></label>
               <label>
-                <span>Pause longer than <strong>{settings.minPause.toFixed(1)}s</strong></span>
+                <span>{tRich('words.fillers.minPause', { seconds: oneDecimal(settings.minPause) }, { strong: <strong /> })}</span>
                 <input type="range" min={0.5} max={5} step={0.1} value={settings.minPause} onChange={set('minPause')} disabled={!settings.pauses} />
               </label>
-              <label title="What is left of a long pause after the cut">
-                <span>Shorten pauses to <strong>{settings.keepPause.toFixed(1)}s</strong></span>
+              <label title={t('words.fillers.keepPauseTitle')}>
+                <span>{tRich('words.fillers.keepPause', { seconds: oneDecimal(settings.keepPause) }, { strong: <strong /> })}</span>
                 <input type="range" min={0.1} max={2} step={0.1} value={settings.keepPause} onChange={set('keepPause')} />
               </label>
             </div>
 
             <div className="filler-bulk">
-              <span className="silence-cut-summary">{items.length ? `${nFill} filler${nFill === 1 ? '' : 's'}, ${nPause} pause${nPause === 1 ? '' : 's'} ticked · cuts ${saves.toFixed(1)}s` : 'Nothing found with these settings.'}</span>
-              {fillers.length > 0 && <button className="audiogram-link" onClick={() => setAll('filler', fillers.some(f => kept.has(f.id)))}>{fillers.some(f => kept.has(f.id)) ? 'Tick all fillers' : 'Untick all fillers'}</button>}
-              {pauses.length > 0 && <button className="audiogram-link" onClick={() => setAll('pause', pauses.some(p => kept.has(p.id)))}>{pauses.some(p => kept.has(p.id)) ? 'Tick all pauses' : 'Untick all pauses'}</button>}
+              <span className="silence-cut-summary">{items.length
+                ? t('words.fillers.summary', { fillers: t('words.fillers.fillerCount', { count: nFill }), pauses: t('words.fillers.pauseCount', { count: nPause }), seconds: oneDecimal(saves) })
+                : t('words.fillers.nothingFound')}</span>
+              {fillers.length > 0 && <button className="audiogram-link" onClick={() => setAll('filler', fillers.some(f => kept.has(f.id)))}>{fillers.some(f => kept.has(f.id)) ? t('words.fillers.tickAllFillers') : t('words.fillers.untickAllFillers')}</button>}
+              {pauses.length > 0 && <button className="audiogram-link" onClick={() => setAll('pause', pauses.some(p => kept.has(p.id)))}>{pauses.some(p => kept.has(p.id)) ? t('words.fillers.tickAllPauses') : t('words.fillers.untickAllPauses')}</button>}
             </div>
 
-            <ul className="filler-list" aria-label="What would be cut">
+            <ul className="filler-list" aria-label={t('words.fillers.listLabel')}>
               {items.map(it => {
                 const on = !kept.has(it.id)
                 const key = it.id
                 const isPlaying = player.playing?.key === key
                 return (
                   <li key={it.id} className={`filler-item${on ? '' : ' kept'}`}>
-                    <input type="checkbox" checked={on} onChange={() => toggle(it.id)} aria-label={`${on ? 'Keep' : 'Cut'} ${it.kind === 'pause' ? 'this pause' : it.text}`} />
-                    <button className="transcript-time" onClick={() => player.play(it.start - 1.5, it.end + 1.5, key)} title={isPlaying ? 'Stop' : 'Listen (with a second around it)'} aria-label={isPlaying ? 'Stop' : `Listen at ${transcriptTime(it.start)}`}>
+                    <input type="checkbox" checked={on} onChange={() => toggle(it.id)} aria-label={it.kind === 'pause'
+                      ? t(on ? 'words.fillers.item.keepPause' : 'words.fillers.item.cutPause')
+                      : t(on ? 'words.fillers.item.keepFiller' : 'words.fillers.item.cutFiller', { text: it.text })} />
+                    <button className="transcript-time" onClick={() => player.play(it.start - 1.5, it.end + 1.5, key)} title={isPlaying ? t('words.fillers.item.stop') : t('words.fillers.item.listenTitle')} aria-label={isPlaying ? t('words.fillers.item.stop') : t('words.fillers.item.listenAt', { time: transcriptTime(it.start) })}>
                       {isPlaying ? <Pause size={12} /> : <Play size={12} />} {transcriptTime(it.start)}
                     </button>
                     {it.kind === 'pause' ? (
-                      <span className="filler-what"><span className="filler-chip">Pause</span> {(it.end - it.start).toFixed(1)}s → {settings.keepPause.toFixed(1)}s</span>
+                      <span className="filler-what"><span className="filler-chip">{t('words.fillers.item.pause')}</span> {t('words.fillers.item.pauseLength', { length: oneDecimal(it.end - it.start), kept: oneDecimal(settings.keepPause) })}</span>
                     ) : (
-                      <span className="filler-what"><span className={`filler-chip${it.sure ? '' : ' maybe'}`} title={it.sure ? 'A hesitation sound' : 'A filler here (set off by pauses or commas): listen first'}>{it.sure ? 'Filler' : 'Maybe'}</span> {context(it)}</span>
+                      <span className="filler-what"><span className={`filler-chip${it.sure ? '' : ' maybe'}`} title={it.sure ? t('words.fillers.item.fillerTitle') : t('words.fillers.item.maybeTitle')}>{it.sure ? t('words.fillers.item.filler') : t('words.fillers.item.maybe')}</span> {context(it)}</span>
                     )}
                     <span className="filler-speaker">{it.speaker}</span>
                   </li>
@@ -137,9 +137,9 @@ export default function FillerReviewDialog({ tr, player, onApply, onClose }) {
         )}
 
         <div className="silence-cut-actions">
-          <button className="silence-cut-cancel" onClick={onClose}>Cancel</button>
-          <button className="silence-cut-apply" disabled={!ranges.length} onClick={() => { player.stop(); onApply(ranges, `${nFill} fillers, ${nPause} pauses`); onClose() }}>
-            <Wand2 size={14} /> {ranges.length ? `Cut ${ticked.length} (${saves.toFixed(1)}s)` : 'Cut'}
+          <button className="silence-cut-cancel" onClick={onClose}>{t('common.cancel')}</button>
+          <button className="silence-cut-apply" disabled={!ranges.length} onClick={() => { player.stop(); onApply(ranges, { kind: 'fillers', fillers: nFill, pauses: nPause }); onClose() }}>
+            <Wand2 size={14} /> {ranges.length ? t('words.fillers.cutCount', { n: ticked.length, seconds: oneDecimal(saves) }) : t('words.fillers.cut')}
           </button>
         </div>
       </div>

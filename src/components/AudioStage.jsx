@@ -3,6 +3,7 @@ import { Mic } from './icons'
 import { getPeaks, peaksForRange } from '../utils/peakCache'
 import { formatLength } from '../utils/limits'
 import { duckGainAt } from '../utils/duck'
+import { useT } from '../i18n'
 
 // The audio editor's preview: the whole show at a glance, one lane per track,
 // each clip drawn with its waveform, the playhead, click or drag to jump.
@@ -26,6 +27,7 @@ function cssVar(el, name, fallback) {
 }
 
 export default function AudioStage({ tracks, playheadPosition, totalDuration, onSeek, nowPlaying, emptyActions, duck = null, chapters = null }) {
+  const { t } = useT()
   const wrapRef = useRef(null)
   const canvasRef = useRef(null)
   const [size, setSize] = useState({ w: 0, h: 0 })
@@ -126,7 +128,7 @@ export default function AudioStage({ tracks, playheadPosition, totalDuration, on
     return (
       <div className="audio-stage audio-stage-empty">
         <Mic size={28} className="audio-stage-empty-icon" />
-        <p>Add a recording, record one, or pick music to start.</p>
+        <p>{t('podcast.stage.empty')}</p>
         {emptyActions}
       </div>
     )
@@ -138,18 +140,18 @@ export default function AudioStage({ tracks, playheadPosition, totalDuration, on
         <span className="audio-stage-time">{formatLength(playheadPosition)}</span>
         <span className="audio-stage-total">/ {formatLength(totalDuration)}</span>
         {nowPlaying && <span className="audio-stage-clip" title={nowPlaying}>{nowPlaying}</span>}
-        {currentChapter && <span className="audio-stage-chapter-now" title="Chapter">{currentChapter.title}</span>}
+        {currentChapter && <span className="audio-stage-chapter-now" title={t('podcast.stage.chapter')}>{currentChapter.title}</span>}
       </div>
       <div
         className="audio-stage-overview"
         ref={wrapRef}
         role="slider"
         tabIndex={0}
-        aria-label="Position in the show"
+        aria-label={t('podcast.stage.position')}
         aria-valuemin={0}
         aria-valuemax={Math.round(totalDuration)}
         aria-valuenow={Math.round(playheadPosition)}
-        aria-valuetext={`${formatLength(playheadPosition)} of ${formatLength(totalDuration)}`}
+        aria-valuetext={t('podcast.stage.positionText', { at: formatLength(playheadPosition), total: formatLength(totalDuration) })}
         onPointerDown={(e) => { draggingRef.current = true; e.currentTarget.setPointerCapture?.(e.pointerId); seekAt(e.clientX) }}
         onPointerMove={(e) => { if (draggingRef.current) seekAt(e.clientX) }}
         onPointerUp={() => { draggingRef.current = false }}

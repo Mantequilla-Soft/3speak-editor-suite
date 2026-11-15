@@ -10,11 +10,11 @@
 // Vertical only: the shape of a Short
 export const SIZES = { vertical: { w: 1080, h: 1920 } }
 export const LAYERS = [
-  { id: 'logo', name: '3Speak logo' },
-  { id: 'cover', name: 'Picture' },
-  { id: 'title', name: 'Title' },
-  { id: 'line', name: 'Line' },
-  { id: 'wave', name: 'Waveform' }
+  { id: 'logo', nameKey: 'audiogram.layer.logo.name' },
+  { id: 'cover', nameKey: 'audiogram.layer.cover.name' },
+  { id: 'title', nameKey: 'audiogram.layer.title.name' },
+  { id: 'line', nameKey: 'audiogram.layer.line.name' },
+  { id: 'wave', nameKey: 'audiogram.layer.wave.name' }
 ]
 export const MIN_BOX = 16
 export const AUDIOGRAM_MIN_SECONDS = 3

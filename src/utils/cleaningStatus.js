@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { t } from '../i18n'
 
 // A voice clean-up in progress (cleanVoiceChanges in ClipProperties): every
 // recording among the clips goes through the backend one after the other,
@@ -41,7 +42,7 @@ export function useCleaningStatus() {
 /** "Cleaning up the voice of 12 clips · recording 2 of 3" */
 export function cleaningText(s) {
   if (!s) return ''
-  const what = s.level ? `Cleaning up the voice of ${s.clips} clip${s.clips === 1 ? '' : 's'}` : `Switching ${s.clips} clip${s.clips === 1 ? '' : 's'} back`
-  if (s.recordings == null) return `${what}…`
-  return s.recordings > 1 ? `${what} · recording ${Math.min(s.done + 1, s.recordings)} of ${s.recordings}` : `${what}…`
+  const kind = s.level ? 'voice' : 'back'
+  if (s.recordings == null || !(s.recordings > 1)) return t(`audio.cleaning.${kind}`, { count: s.clips })
+  return t(`audio.cleaning.${kind}Recording`, { count: s.clips, at: Math.min(s.done + 1, s.recordings), total: s.recordings })
 }

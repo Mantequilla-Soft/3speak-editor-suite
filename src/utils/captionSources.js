@@ -1,4 +1,5 @@
 // What auto captions listen to, and where their emoji pictures come from.
+import { t } from '../i18n'
 
 /**
  * The tracks whose sound is speech: audio tracks that are not music or sound
@@ -14,7 +15,7 @@ export function voiceTracksOf(tracks) {
     .filter(t => t.type === 'video' && t.visible !== false)
     .flatMap(t => t.clips.filter(c => c.type === 'video' && c.audioEnabled === true))
     .map(c => ({ ...c, type: 'audio' }))
-  if (fromVideo.length) voice.push({ id: 'captions-video-sound', type: 'audio', name: 'Video sound', clips: fromVideo })
+  if (fromVideo.length) voice.push({ id: 'captions-video-sound', type: 'audio', name: t('captions.videoSound'), clips: fromVideo })
   return voice.filter(t => t.clips.length > 0)
 }
 

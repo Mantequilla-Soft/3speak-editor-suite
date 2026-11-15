@@ -4,6 +4,7 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { AUDIO_TOUR_STEPS, TOUR_STEPS } from '../src/components/OnboardingTour.jsx'
+import { t } from '../src/i18n'
 
 const source = ['src/App.jsx', 'src/components/Timeline.jsx', 'src/components/GlobalPreview.jsx']
   .map(f => readFileSync(new URL(`../${f}`, import.meta.url), 'utf8'))
@@ -22,21 +23,21 @@ describe('audio editor tour', () => {
   it('has its own steps, separate from the shorts tour', () => {
     expect(AUDIO_TOUR_STEPS.length).toBeGreaterThan(5)
     expect(AUDIO_TOUR_STEPS).not.toBe(TOUR_STEPS)
-    expect(AUDIO_TOUR_STEPS[0].title).toMatch(/Audio Editor/)
+    expect(t(AUDIO_TOUR_STEPS[0].titleKey)).toMatch(/Audio Editor/)
   })
 
   it('every step targets a control that exists', () => {
     for (const step of AUDIO_TOUR_STEPS) {
       const selectors = [step.target, step.fallbackTarget].filter(Boolean).flatMap(s => s.split(',').map(x => x.trim()))
-      expect(selectors.some(inSource), `${step.title}: ${selectors.join(' | ')}`).toBe(true)
+      expect(selectors.some(inSource), `${step.titleKey}: ${selectors.join(' | ')}`).toBe(true)
     }
   })
 
   it('every step has a title and text, and the copy has no em dashes', () => {
     for (const step of AUDIO_TOUR_STEPS) {
-      expect(step.title).toBeTruthy()
-      expect(step.text).toBeTruthy()
-      expect(step.title + step.text).not.toMatch(/—/)
+      expect(t(step.titleKey)).not.toBe(step.titleKey)
+      expect(t(step.textKey)).not.toBe(step.textKey)
+      expect(t(step.titleKey) + t(step.textKey)).not.toMatch(/—/)
     }
   })
 })

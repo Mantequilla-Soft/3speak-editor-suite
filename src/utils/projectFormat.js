@@ -4,17 +4,23 @@
 // page that opens it (?aspect=16:9, or ?format=landscape|classic|square|short).
 // Kept with the draft. The audio editor has no shape.
 
+import { t } from '../i18n'
+
 export const PROJECT_ASPECTS = ['9:16', '16:9', '4:3', '1:1']
 export const DEFAULT_ASPECT = '9:16'
 // The owner's rule: anything that is not a Short is at most 10 minutes
 export const MAX_VIDEO_SECONDS = 10 * 60
 
+// Names and hints are keys (formats.json): t(info.labelKey), read at render
 export const ASPECT_INFO = {
-  '9:16': { label: 'Short', hint: 'Vertical, up to 2 minutes, posted as a Short', short: true },
-  '16:9': { label: 'Landscape', hint: 'Widescreen video, up to 10 minutes', short: false },
-  '4:3': { label: 'Classic', hint: '4:3 video, up to 10 minutes', short: false },
-  '1:1': { label: 'Square', hint: 'Square video, up to 10 minutes', short: false }
+  '9:16': { id: 'short', labelKey: 'formats.aspect.short.label', hintKey: 'formats.aspect.short.hint', short: true },
+  '16:9': { id: 'landscape', labelKey: 'formats.aspect.landscape.label', hintKey: 'formats.aspect.landscape.hint', short: false },
+  '4:3': { id: 'classic', labelKey: 'formats.aspect.classic.label', hintKey: 'formats.aspect.classic.hint', short: false },
+  '1:1': { id: 'square', labelKey: 'formats.aspect.square.label', hintKey: 'formats.aspect.square.hint', short: false }
 }
+
+/** A shape's name in the interface language, with its ratio: "Short 9:16". */
+export const aspectLabel = (a) => (ASPECT_INFO[a] ? `${t(ASPECT_INFO[a].labelKey)} ${a}` : a)
 
 const FORMAT_NAMES = { short: '9:16', vertical: '9:16', landscape: '16:9', wide: '16:9', classic: '4:3', square: '1:1' }
 

@@ -1,0 +1,240 @@
+{
+  "title": "Ad Wizard",
+  "beta": "beta",
+  "loading": "Loading the scene engine…",
+  "untitled": "Untitled ad",
+  "seconds": "{{s}} s",
+  "lengthOfMax": "{{length}} s / max {{max}} s",
+  "maxOnly": "/ max {{max}} s",
+  "steps": {
+    "format": "Format",
+    "brand": "Brand",
+    "scenes": "Scenes",
+    "sound": "Sound",
+    "render": "Render"
+  },
+  "formats": {
+    "landscape": "Landscape 16:9",
+    "landscapeSub": "in-video spots, websites",
+    "portrait": "Portrait 9:16",
+    "portraitSub": "shorts, stories, reels"
+  },
+  "palettes": {
+    "ember": "Ember",
+    "amber": "Amber",
+    "ocean": "Ocean",
+    "forest": "Forest",
+    "berry": "Berry",
+    "paper": "Paper"
+  },
+  "roles": {
+    "all": "All",
+    "opener": "Openers",
+    "middle": "Middle",
+    "closer": "Closers"
+  },
+  "defaults": {
+    "brandName": "Your brand",
+    "brandFallback": "Brand",
+    "adName": "Ad"
+  },
+  "errors": {
+    "engineLoad": "could not load {{src}}",
+    "uploadFailedStatus": "upload failed ({{status}})",
+    "uploadFailed": "upload failed",
+    "notSignedIn": "not signed in",
+    "drafts": "drafts {{status}}"
+  },
+  "stage": {
+    "empty": "Your ad shows here.",
+    "addFirst": "Add the first scene",
+    "toStart": "Back to the start",
+    "playPause": "Play / pause (space)",
+    "time": "{{time}} / {{duration}} s",
+    "tooLong": "The ad can be at most {{max}} s",
+    "properties": "Properties",
+    "propertiesHint": "Pick a scene in the list or on the timeline to edit it here."
+  },
+  "drafts": {
+    "logInToKeep": "Log in on 3Speak to keep drafts",
+    "inBrowser": "Drafts stay in this browser",
+    "signingIn": "Signing in…",
+    "saveDrafts": "Save drafts",
+    "status": {
+      "saving": "Saving…",
+      "saved": "Saved",
+      "error": "Not saved",
+      "limit": "Draft limit reached",
+      "idle": "Draft"
+    },
+    "open": "Drafts",
+    "title": "Your drafts",
+    "listInfo_one": "{{n}} of {{max}} · each kept {{count}} day after its last change",
+    "listInfo_other": "{{n}} of {{max}} · each kept {{count}} days after its last change",
+    "draftInfo_one": "{{count}} scene · saved {{saved}} · until {{until}}",
+    "draftInfo_other": "{{count}} scenes · saved {{saved}} · until {{until}}",
+    "isOpen": "open",
+    "openDraft": "Open",
+    "confirmDelete": "Delete \"{{name}}\"?",
+    "empty": "No drafts yet. They save themselves while you work.",
+    "newAd": "New ad",
+    "limitTitle_one": "You have {{count}} draft already",
+    "limitTitle_other": "You have {{count}} drafts already",
+    "limitHint": "Pick one to replace with this ad, or close this and keep working without saving.",
+    "savedAt": "saved {{date}}",
+    "replace": "Replace"
+  },
+  "format": {
+    "locked": "Your booking runs as <b>{{format}}</b>, up to {{max}} s.",
+    "where": "Where will the ad run? You can switch later; every scene works in both.",
+    "sceneChange": "Scene change",
+    "tip": "Readable ads: about 3 s per scene, 15-30 s in total, the opening line readable within the first second.",
+    "confirmNew": "Start a new ad? Your saved drafts stay."
+  },
+  "brand": {
+    "name": "Name",
+    "logo": "Logo",
+    "logoHint": "square works best; without one the first letter is used",
+    "monogram": "Monogram",
+    "monogramHint": "letter(s) used when there is no logo",
+    "colours": "Colours",
+    "colors": {
+      "bg": "Background",
+      "ink": "Text",
+      "mute": "Quiet text",
+      "accent": "Accent",
+      "accent2": "Accent 2",
+      "accent3": "Accent 3"
+    },
+    "coloursTip": "Use the accent for highlights (*stars* in text). Call-to-action buttons are drawn as outlines.",
+    "fonts": "Fonts",
+    "headlines": "Headlines",
+    "text": "Text",
+    "ownFont": "Your own font file",
+    "fontNamePlaceholder": "Font name, e.g. Acme Display",
+    "fontRights": "I have the right to use this font in videos",
+    "uploading": "Uploading…",
+    "uploadFont": "Upload TTF / OTF / WOFF"
+  },
+  "scenes": {
+    "duplicate": "Duplicate",
+    "add": "Add a scene",
+    "tip": "The selected scene's text, pictures and length are on the right."
+  },
+  "sound": {
+    "music": "Music",
+    "startInSong": "Start in the song",
+    "volume": "Volume",
+    "fadeIn": "Fade in",
+    "fadeOut": "Fade out",
+    "noMusic": "No music yet.",
+    "library": "Music library",
+    "uploading": "Uploading…",
+    "uploadSong": "Upload a song",
+    "songRights": "I own or licensed the song I upload",
+    "effects": "Sound effects",
+    "auto": "Automatic sounds (scene changes, words popping in)",
+    "autoLevel": "Automatic sounds level",
+    "db": "{{gain}} dB",
+    "restore_one": "Restore {{count}} removed automatic sound",
+    "restore_other": "Restore {{count}} removed automatic sounds",
+    "addAt": "Add a sound at {{time}} s",
+    "listen": "Listen",
+    "autoTag": "auto",
+    "tip": "Drag sounds on the timeline to move them. Moving an automatic sound makes it yours.",
+    "kinds": {
+      "trans": "Transition",
+      "whoosh": "Whoosh",
+      "swish": "Swish",
+      "tick": "Tick",
+      "click": "Click",
+      "type": "Typing",
+      "hit": "Hit"
+    }
+  },
+  "render": {
+    "drawing": "Drawing the scenes…",
+    "mixing": "Mixing the sound…",
+    "sceneRenderFailed": "scene render: {{status}}",
+    "renderFailed": "render: {{status}}",
+    "scenesLength_one": "{{count}} scene, {{length}} s",
+    "scenesLength_other": "{{count}} scenes, {{length}} s",
+    "scenesLengthTooLong_one": "{{count}} scene, {{length}} s (too long, max {{max}} s)",
+    "scenesLengthTooLong_other": "{{count}} scenes, {{length}} s (too long, max {{max}} s)",
+    "toFill_one": "{{count}} thing to fill in",
+    "toFill_other": "{{count}} things to fill in",
+    "allFilled": "All required fields filled in",
+    "music": "Music: {{title}}",
+    "noMusic": "No music (optional)",
+    "effects_one": "{{count}} sound effect",
+    "effects_other": "{{count}} sound effects",
+    "issue": "Scene {{n}}, {{field}}: {{msg}}",
+    "button": "Render the ad ({{size}})",
+    "progress": "{{phase}} {{percent}}",
+    "sent": "Sent to your campaign",
+    "useForCampaign": "Use for my campaign",
+    "download": "Download",
+    "again": "Render again"
+  },
+  "props": {
+    "length": "Length",
+    "fieldIssue": "{{field}}: {{msg}}",
+    "soundEffect": "Sound effect",
+    "autoNote": "{{name}} (automatic: move or change it to make it yours)",
+    "makeMine": "Make it mine",
+    "at": "At",
+    "secondsUnit": "s",
+    "volume": "Volume"
+  },
+  "picker": {
+    "search": "Search",
+    "look": "Look",
+    "all": "All",
+    "nothing": "Nothing matches."
+  },
+  "fields": {
+    "optional": "optional",
+    "auto": "auto",
+    "none": "(none)",
+    "defaultIcon": "default ({{icon}})",
+    "clear": "Clear",
+    "accentTip": "Wrap a word in *stars* for the accent colour, _underscores_ for the second accent.",
+    "up": "Up",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "add": "Add",
+    "needsAtLeast": "needs at least {{min}}",
+    "needs": "needs {{min}}",
+    "pairX": "x %",
+    "pairY": "y %"
+  },
+  "image": {
+    "notPicture": "That is not a picture.",
+    "noClipboardPicture": "No picture on the clipboard. Copy one, or press Ctrl+V / Cmd+V here.",
+    "clipboardBlocked": "The browser did not allow reading the clipboard. Click here and press Ctrl+V / Cmd+V.",
+    "dragToPlace": "Drag to choose which part of the picture shows",
+    "zoom": "Zoom",
+    "zoomTitle": "Zooms into the picture inside its frame; the frame keeps its size",
+    "zoomValue": "{{zoom}}x",
+    "resetPlacement": "Reset placement",
+    "replace": "Replace",
+    "pasteTitle": "Paste from the clipboard",
+    "uploadingPct": "Uploading {{pct}}%",
+    "upload": "Upload",
+    "paste": "Paste",
+    "linkPlaceholder": "or paste an https:// link, or a picture (Ctrl+V)"
+  },
+  "timeline": {
+    "tick": "{{s}}s",
+    "scenes": "Scenes",
+    "blockTitle": "{{type}}: {{length}}s",
+    "dragLength": "Drag to change the length",
+    "music": "Music",
+    "musicVolume": "{{title}} · {{volume}}",
+    "effects": "Sound effects",
+    "sfxTitle": "{{name}} at {{at}}s"
+  },
+  "preview": {
+    "frameTitle": "Ad preview"
+  }
+}

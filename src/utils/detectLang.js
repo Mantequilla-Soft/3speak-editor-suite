@@ -31,11 +31,15 @@ const DEFAULT_LANG = 'en-US';
  * @param {string} text   the script
  * @param {string[]} [allowed]  BCP-47 tags the recognizer actually supports;
  *                              a detection outside this set is discarded.
+ * @param {string} [prefer]    the viewer's interface language ('de', 'pt-BR'): what an
+ *                              empty or unclear script falls back to, when allowed
+ *                              (editor addition: the teleprompter follows the editor's language).
  * @returns {string} a BCP-47 tag, always one of `allowed` when that is given.
  */
-export function detectScriptLang(text, { allowed } = {}) {
+export function detectScriptLang(text, { allowed, prefer } = {}) {
   const permit = (tag) => !allowed || !allowed.length || allowed.includes(tag);
-  const fallback = permit(DEFAULT_LANG) ? DEFAULT_LANG : (allowed && allowed[0]) || DEFAULT_LANG;
+  const preferred = preferredTag(prefer, allowed);
+  const fallback = preferred || (permit(DEFAULT_LANG) ? DEFAULT_LANG : (allowed && allowed[0]) || DEFAULT_LANG);
 
   const raw = (text || '').trim();
   if (raw.length < 8) return fallback; // too little to judge
@@ -67,6 +71,14 @@ export function detectScriptLang(text, { allowed } = {}) {
   // Require a real signal — at least 2 hits and 5% of the words — else English.
   if (!best || bestScore < 2 || bestScore / tokens.length < 0.05) return fallback;
   return best;
+}
+
+// 'de' -> 'de-DE' (or whichever de-* tag the recognizer has); null when it has none
+function preferredTag(prefer, allowed) {
+  const base = String(prefer || '').toLowerCase().split(/[-_]/)[0];
+  if (!base || base === 'en') return null;
+  if (allowed && allowed.length) return allowed.find((tag) => tag.toLowerCase().split('-')[0] === base) || null;
+  return modelIdToTag(base);
 }
 
 /** Vosk-ish model id ("en-us", "de") → BCP-47 ("en-US", "de-DE"). */

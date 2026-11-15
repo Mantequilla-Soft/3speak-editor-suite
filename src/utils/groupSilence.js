@@ -2,6 +2,7 @@
 // their own tracks (host and guest). A pause is only cut where EVERYONE is
 // quiet, and the same stretch of time comes out of every clip of the group, so
 // the voices stay in sync. Works on timeline time, not on any one file's time.
+import { partName, stripPart } from './partName'
 
 const FLOOR_DB = -90
 const len = (c) => Math.max(0, c.endTime - c.startTime)
@@ -79,7 +80,7 @@ export function applyGroupCut(tracks, memberIds, keep, { closeGaps = true, newId
       if (ids.has(c.id)) {
         const p0 = pos(c)
         const p1 = p0 + len(c)
-        const base = (c.name || '').replace(/^Part \d+ · /, '')
+        const base = stripPart(c.name)
         const pieces = []
         keep.forEach((p, k) => {
           const a = Math.max(p.start, p0)
@@ -93,7 +94,7 @@ export function applyGroupCut(tracks, memberIds, keep, { closeGaps = true, newId
           return {
             ...c,
             id,
-            name: pieces.length > 1 ? `Part ${i + 1} · ${base}` : c.name,
+            name: pieces.length > 1 ? partName(i + 1, base) : c.name,
             startTime: c.startTime + (a - p0),
             endTime: c.startTime + (b - p0),
             timelinePosition: closeGaps ? packed(a) : a,

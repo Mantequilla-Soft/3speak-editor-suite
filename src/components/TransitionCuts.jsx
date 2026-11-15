@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { trackCuts, normalizeTransition, TRANSITION_TYPES } from '../utils/transitions'
 import { TransitionDialog } from './TransitionControls'
 import { ArrowRightLeft } from './icons'
+import { useT } from '../i18n'
 
 /**
  * A small button on every cut between two clips of a video track: it opens
@@ -9,6 +10,7 @@ import { ArrowRightLeft } from './icons'
  * button filled, so transitions are visible on the timeline.
  */
 export default function TransitionCuts({ track, pixelsPerSecond, onUpdateClip }) {
+  const { t } = useT()
   const [open, setOpen] = useState(null) // { from, to }
   const cuts = trackCuts(track)
   if (!cuts.length && !open) return null
@@ -16,9 +18,10 @@ export default function TransitionCuts({ track, pixelsPerSecond, onUpdateClip })
   return (
     <>
       {cuts.map(({ from, to, cut }) => {
-        const t = normalizeTransition(from.transition)
-        const on = !!t && t.to === to.id
-        const label = on ? `${TRANSITION_TYPES.find(x => x.id === t.type)?.label}, ${t.duration.toFixed(1)}s` : 'Add a transition'
+        const tr = normalizeTransition(from.transition)
+        const on = !!tr && tr.to === to.id
+        const known = on && TRANSITION_TYPES.some(x => x.id === tr.type)
+        const label = on ? t('look.transition.cutLabel', { type: known ? t(`look.transition.types.${tr.type}`) : tr.type, seconds: tr.duration.toFixed(1) }) : t('look.transition.add')
         return (
           <button
             key={`${from.id}-${to.id}`}

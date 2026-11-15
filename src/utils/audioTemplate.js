@@ -5,6 +5,8 @@
 // Applying it is a pure function of the tracks, so it can be undone in one step
 // and applied again: clips it placed carry `templateRole` ('intro' | 'outro' |
 // 'bed') and are replaced, never stacked, when it is applied once more.
+import { t } from '../i18n'
+import { stripPart } from './partName'
 
 export const TEMPLATE_ROLES = ['intro', 'outro', 'bed']
 export const BED_DEFAULT_VOLUME = 20
@@ -30,7 +32,7 @@ export function slotFromClip(clip, role) {
   if (!url || clip.type !== 'audio') return null
   const slot = {
     url,
-    name: String(clip.name || role).replace(/^Part \d+ · /, ''),
+    name: stripPart(clip.name || role),
     duration: clip.duration || clip.endTime,
     startTime: clip.startTime || 0,
     endTime: clip.endTime,
@@ -102,7 +104,7 @@ export function applyAudioTemplate(tracks, template, { newId = defaultId } = {})
 
   let voice = next.find(t => t.type === 'audio' && !t.music)
   if (!voice && (slots.intro || slots.outro)) {
-    voice = { id: newId('track'), type: 'audio', name: 'Voice', clips: [] }
+    voice = { id: newId('track'), type: 'audio', name: t('podcast.template.voiceTrack'), clips: [] }
     next = [voice, ...next]
   }
 
@@ -141,7 +143,7 @@ export function applyAudioTemplate(tracks, template, { newId = defaultId } = {})
       // A music track free over the content, else a new one for the bed
       let bedTrack = next.find(t => t.type === 'audio' && t.music && !t.clips.some(c => (c.timelinePosition || 0) < contentEnd && end(c) > contentStart))
       if (!bedTrack) {
-        bedTrack = { id: newId('track'), type: 'audio', name: 'Music bed', music: true, templateTrack: true, clips: [] }
+        bedTrack = { id: newId('track'), type: 'audio', name: t('podcast.template.bedTrack'), music: true, templateTrack: true, clips: [] }
         next = [...next, bedTrack]
       }
       add(bedTrack.id, pieces)

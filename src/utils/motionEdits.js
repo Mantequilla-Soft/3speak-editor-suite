@@ -6,6 +6,7 @@
 import { retime, rampUpdates, sourceAt, clipTimeAt, timeMap } from './clipSpeed'
 import { KEYFRAME_PROPS, normalizeKeyframes, propAt, staticValue, keyframesOf } from './keyframes'
 import { splitPair } from './transitions'
+import { t as i18nT } from '../i18n'
 
 const pos = (c) => c.timelinePosition || 0
 const len = (c) => c.endTime - c.startTime
@@ -84,6 +85,15 @@ export function retimeMapper(before, after) {
   }
 }
 
+// A still's clip name, "Still · <name>" in the interface language (a still of a
+// still keeps one prefix, in English or in the language it was made in now)
+function stillName(name) {
+  const prefix = i18nT('motion.speed.stillName', { name: '' })
+  let base = name || i18nT('motion.speed.stillNameFallback')
+  for (const p of [prefix, 'Still · ']) if (p && base.startsWith(p)) { base = base.slice(p.length); break }
+  return i18nT('motion.speed.stillName', { name: base })
+}
+
 /**
  * A still of the frame under the playhead, `seconds` long, put in at the
  * playhead: the clip (and its linked sound) is split there, the still goes in
@@ -102,7 +112,7 @@ export function insertFreezeFrame(tracks, clipId, playhead, seconds = 1) {
   const atStart = c - target.startTime < 0.02
   const atEnd = target.endTime - c < 0.02
   // The still keeps how the clip looked at that moment (animated values frozen too)
-  const still = { ...target, id: newClipId(), name: `Still · ${(target.name || 'clip').replace(/^Still · /, '')}`,
+  const still = { ...target, id: newClipId(), name: stillName(target.name),
     startTime: 0, endTime: N, timelinePosition: playhead, freezeAt: Number(sourceAt(target, c).toFixed(4)),
     groupId: undefined, audioEnabled: false, speed: undefined, speedRamp: undefined, keyframes: undefined,
     // no fades or transition of its own (utils/transitions.js): those stay at the clip's outer ends
@@ -231,9 +241,9 @@ export const valueAtPlayhead = (clip, prop, playhead) => {
 
 // Ken Burns: a slow zoom / pan over the whole clip (images), tag 'kenburns'
 export const KEN_BURNS = [
-  { id: 'in', label: 'Slow zoom in' },
-  { id: 'out', label: 'Slow zoom out' },
-  { id: 'pan', label: 'Slow pan' }
+  { id: 'in', get label() { return i18nT('motion.kenBurns.in') } },
+  { id: 'out', get label() { return i18nT('motion.kenBurns.out') } },
+  { id: 'pan', get label() { return i18nT('motion.kenBurns.pan') } }
 ]
 
 /** Updates for a Ken Burns preset; `frameW` = the preview frame width (px) */

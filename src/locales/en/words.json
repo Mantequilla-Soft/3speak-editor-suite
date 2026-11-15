@@ -1,0 +1,59 @@
+{
+  "panel": {
+    "title": "Transcript",
+    "close": "Close the transcript"
+  },
+  "cutNotice": {
+    "plain": "Cut {{seconds}} s shorter.",
+    "words_one": "Cut {{count}} word: {{seconds}} s shorter.",
+    "words_other": "Cut {{count}} words: {{seconds}} s shorter.",
+    "found_one": "Cut {{count}} found: {{seconds}} s shorter.",
+    "found_other": "Cut {{count}} found: {{seconds}} s shorter.",
+    "fillers": "Cut {{fillers}}, {{pauses}}: {{seconds}} s shorter.",
+    "dismiss": "Dismiss"
+  },
+  "fillers": {
+    "title": "Remove fillers and pauses",
+    "emptyHint": "This works from the transcript: it finds um, uh, you know and their kind in the show's language, and the long pauses.",
+    "listening": "Listening...",
+    "transcribeFirst": "Transcribe the show first",
+    "checking": "Checking the server...",
+    "unavailable": "Transcripts are not available on this editor server right now.",
+    "intro": "Fillers in {{language}}. Listen to each, untick what should stay.",
+    "introNoList": "Fillers in {{language}} (only um, uh and the like: no list for this language yet). Listen to each, untick what should stay.",
+    "stillTranscribing": "The rest of the show is still being transcribed.",
+    "fillerWords": "Filler words",
+    "longPauses": "Long pauses",
+    "minPause": "Pause longer than <strong>{{seconds}}s</strong>",
+    "keepPause": "Shorten pauses to <strong>{{seconds}}s</strong>",
+    "keepPauseTitle": "What is left of a long pause after the cut",
+    "fillerCount_one": "{{count}} filler",
+    "fillerCount_other": "{{count}} fillers",
+    "pauseCount_one": "{{count}} pause",
+    "pauseCount_other": "{{count}} pauses",
+    "summary": "{{fillers}}, {{pauses}} ticked · cuts {{seconds}}s",
+    "nothingFound": "Nothing found with these settings.",
+    "tickAllFillers": "Tick all fillers",
+    "untickAllFillers": "Untick all fillers",
+    "tickAllPauses": "Tick all pauses",
+    "untickAllPauses": "Untick all pauses",
+    "listLabel": "What would be cut",
+    "item": {
+      "keepPause": "Keep this pause",
+      "cutPause": "Cut this pause",
+      "keepFiller": "Keep {{text}}",
+      "cutFiller": "Cut {{text}}",
+      "stop": "Stop",
+      "listenTitle": "Listen (with a second around it)",
+      "listenAt": "Listen at {{time}}",
+      "pause": "Pause",
+      "pauseLength": "{{length}}s → {{kept}}s",
+      "filler": "Filler",
+      "fillerTitle": "A hesitation sound",
+      "maybe": "Maybe",
+      "maybeTitle": "A filler here (set off by pauses or commas): listen first"
+    },
+    "cut": "Cut",
+    "cutCount": "Cut {{n}} ({{seconds}}s)"
+  }
+}

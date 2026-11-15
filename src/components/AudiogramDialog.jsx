@@ -11,20 +11,15 @@ import OnboardingTour, { AUDIOGRAM_TOUR_STEPS, useFirstTimeTour } from './Onboar
 import { AudiogramCaptionsLayer, AudiogramCaptionsField } from './AudiogramCaptions'
 import { cleanAudiogramCaptionLook, captionBox, clampCaptionBox } from '../utils/audiogramCaptions'
 import { useAudiogramCaptions } from '../hooks/useAudiogramCaptions'
+import { useT } from '../i18n'
 
-const WAVES = [
-  { id: 'bars', label: 'Bars' },
-  { id: 'centered', label: 'Centered' },
-  { id: 'line', label: 'Line' },
-  { id: 'dots', label: 'Thin' },
-  { id: 'circle', label: 'Circle' },
-  { id: 'ring', label: 'Circle wave' }
-]
+// labels: t(`audiogram.wave.${id}`) / t(`audiogram.logo.${id}`)
+const WAVES = ['bars', 'centered', 'line', 'dots', 'circle', 'ring'].map(id => ({ id, labelKey: `audiogram.wave.${id}` }))
 // The 3Speak red, white, the navy lightened for the dark background (no cyan)
 const COLORS = ['#e32933', '#f4f5f8', '#7f88ea']
 const LOGOS = [
-  { id: 'mark', label: '3S logo' },
-  { id: 'full', label: '3Speak logo' }
+  { id: 'mark', labelKey: 'audiogram.logo.mark' },
+  { id: 'full', labelKey: 'audiogram.logo.full' }
 ]
 const CORNERS = ['nw', 'ne', 'sw', 'se']
 const FORMAT = 'vertical' // the shape of a Short
@@ -60,6 +55,7 @@ export default function AudiogramDialog({
   audiograms, onAddAudiogram, onUpdateAudiogram, onRemoveAudiogram,
   playlistCovers, onRequestCovers, onEditText, onClose
 }) {
+  const { t, tRich } = useT()
   const [defaults, setDefaults] = useState(null) // { style, coverLayouts }
   const [style, setStyle] = useState(null)
   const [hasTemplate, setHasTemplate] = useState(false)
@@ -266,7 +262,7 @@ export default function AudiogramDialog({
       const { url } = await res.json()
       setImage(absolute(url))
     } catch (err) {
-      setJob({ status: 'failed', error: err?.code === 'sign-in' ? 'Sign in on 3Speak to add a picture.' : err.message })
+      setJob({ status: 'failed', error: err?.code === 'sign-in' ? t('audiogram.picture.signIn') : err.message })
     } finally {
       setUploading(false)
     }
@@ -280,14 +276,14 @@ export default function AudiogramDialog({
 
   const make = async () => {
     clearInterval(pollRef.current)
-    setJob({ status: 'processing', progress: 0, phase: 'Starting...' })
+    setJob({ status: 'processing', progress: 0, phase: t('audiogram.make.starting') })
     const used = { ...style, duration: Math.round(seconds) }
     const usedKey = lookKey(style, text)
     try {
       // captions on: the piece's words (listened to first when they are not there yet)
       const words = capLook.on ? (ag.ready ? ag.words : await ag.transcribe()) : null
-      if (capLook.on && !words) throw new Error('the words of this piece could not be found (switch captions off to make it without)')
-      setJob({ status: 'processing', progress: 0, phase: 'Starting...' })
+      if (capLook.on && !words) throw new Error(t('audiogram.make.noWords'))
+      setJob({ status: 'processing', progress: 0, phase: t('audiogram.make.starting') })
       const res = await authFetch(api('/api/audiogram'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -319,14 +315,14 @@ export default function AudiogramDialog({
             }).then(r => { if (r.ok) setHasTemplate(true) }).catch(() => {})
           } else if (st.status === 'failed' || st.error) {
             clearInterval(pollRef.current)
-            setJob({ status: 'failed', error: st.error || 'failed' })
+            setJob({ status: 'failed', error: st.error || t('audiogram.make.failedPlain') })
           } else {
             setJob(st)
           }
         } catch {}
       }, 1000)
     } catch (err) {
-      setJob({ status: 'failed', error: err?.code === 'sign-in' ? 'Sign in on 3Speak to make an audiogram.' : err.message })
+      setJob({ status: 'failed', error: err?.code === 'sign-in' ? t('audiogram.make.signIn') : err.message })
     }
   }
 
@@ -376,30 +372,30 @@ export default function AudiogramDialog({
       <div className="remix-picker audiogram-studio" role="dialog" aria-modal="true" aria-labelledby="audiogram-title" onClick={e => e.stopPropagation()}>
         <div className="remix-picker-header">
           {style && layers && picked ? (
-            <button className="remix-picker-icon-btn" onClick={() => setTourAgain(true)} title="Show the tour again" aria-label="Show the audiogram tour again"><HelpCircle size={16} /></button>
+            <button className="remix-picker-icon-btn" onClick={() => setTourAgain(true)} title={t('audiogram.tour.again')} aria-label={t('audiogram.tour.againLabel')}><HelpCircle size={16} /></button>
           ) : <span className="remix-picker-icon-spacer" />}
-          <h3 id="audiogram-title">Audiograms</h3>
+          <h3 id="audiogram-title">{t('audiogram.title')}</h3>
           <div className="audiogram-header-actions">
             {audiograms.length > 0 && (
-              <button className="compact-render-btn audiogram-save-close" onClick={saveAndClose} disabled={busy} title="Your audiograms stay with this audio and go out with it as Shorts">
-                <Check size={14} /> Save and close
+              <button className="compact-render-btn audiogram-save-close" onClick={saveAndClose} disabled={busy} title={t('audiogram.saveAndCloseTitle')}>
+                <Check size={14} /> {t('audiogram.saveAndClose')}
               </button>
             )}
-            <button className="remix-picker-icon-btn" onClick={requestClose} title="Close" disabled={busy}><X size={16} /></button>
+            <button className="remix-picker-icon-btn" onClick={requestClose} title={t('common.close')} disabled={busy}><X size={16} /></button>
           </div>
         </div>
 
-        {loadError && <p className="audio-template-error" role="alert">The audiogram settings could not be loaded: {loadError}</p>}
-        {!style && !loadError && <p className="audio-template-intro"><Loader2 size={14} className="encoding-notice-spin" /> Loading your audiogram look…</p>}
+        {loadError && <p className="audio-template-error" role="alert">{t('audiogram.loadError', { error: loadError })}</p>}
+        {!style && !loadError && <p className="audio-template-intro"><Loader2 size={14} className="encoding-notice-spin" /> {t('audiogram.loadingLook')}</p>}
 
         {/* First the piece: nothing else until it is picked */}
         {style && layers && !picked && (
           <div className="audiogram-start" data-testid="audiogram-start">
             <Scissors size={22} aria-hidden="true" />
-            <h4>Pick a piece of the episode</h4>
-            <p>An audiogram is a short video of a piece of your episode, up to {AUDIOGRAM_MAX_SECONDS / 60} minutes. It goes out as a 3Speak Short together with the audio. Start by marking its start and end on the timeline.</p>
+            <h4>{t('audiogram.start.title')}</h4>
+            <p>{t('audiogram.start.text', { count: AUDIOGRAM_MAX_SECONDS / 60 })}</p>
             <button className="silence-cut-apply audiogram-pick" onClick={onPickRange}>
-              <Scissors size={14} /> Choose on the timeline
+              <Scissors size={14} /> {t('audiogram.start.choose')}
             </button>
           </div>
         )}
@@ -414,11 +410,11 @@ export default function AudiogramDialog({
                 tabIndex={0}
                 onKeyDown={nudge}
                 onPointerDown={() => setSelected(null)}
-                aria-label="Audiogram preview: drag the parts to move them, the corners to resize, the round handle to turn"
+                aria-label={t('audiogram.stage.label')}
               >
                 <iframe
                   ref={frameRef}
-                  title="Audiogram preview"
+                  title={t('audiogram.stage.frameTitle')}
                   src={api('/api/audiogram/page')}
                   sandbox="allow-scripts"
                   width={size.w}
@@ -438,18 +434,19 @@ export default function AudiogramDialog({
                     onBox={(b) => setCapLook({ boxes: { ...capLook.boxes, [format]: b } })}
                   />
                 )}
-                {LAYERS.filter(l => shown(l.id)).map(({ id, name }) => {
+                {LAYERS.filter(l => shown(l.id)).map(({ id }) => {
                   const b = layers[id]
+                  const name = t(`audiogram.layer.${id}.name`)
                   return (
                     <div
                       key={id}
                       className={`audiogram-box${selected === id ? ' selected' : ''}`}
                       data-layer={id}
-                      title={`${name}: drag to move${selected === id ? ', corners to resize, the round handle to turn' : ''}`}
+                      title={selected === id ? t(`audiogram.layer.${id}.dragSelected`) : t(`audiogram.layer.${id}.drag`)}
                       style={{ left: b.x * scale, top: b.y * scale, width: b.w * scale, height: b.h * scale, zIndex: id === 'logo' ? 30 : b.z + 1, transform: b.r ? `rotate(${b.r}deg)` : undefined }}
                       onPointerDown={(e) => startDrag(e, id)}
                     >
-                      {selected === id && <span className="audiogram-box-name">{name}{b.r ? ` · ${b.r}°` : ''}</span>}
+                      {selected === id && <span className="audiogram-box-name">{b.r ? t('audiogram.stage.turned', { name, angle: b.r }) : name}</span>}
                       {selected === id && CORNERS.map(c => (
                         <span key={c} className={`audiogram-handle ${c}`} data-corner={c} onPointerDown={(e) => startDrag(e, id, c)} />
                       ))}
@@ -457,7 +454,7 @@ export default function AudiogramDialog({
                         <span
                           className="audiogram-rotate"
                           data-rotate={id}
-                          title="Turn (Shift: 15° steps). Double-click: straight"
+                          title={t('audiogram.stage.rotate')}
                           onPointerDown={(e) => startRotate(e, id)}
                           onDoubleClick={(e) => { e.stopPropagation(); setLayers(l => rotateLayer(l, id, 0)) }}
                         />
@@ -467,73 +464,73 @@ export default function AudiogramDialog({
                 })}
               </div>
               <p className="audiogram-stage-hint">
-                Drag the parts, pull a corner to resize (Shift keeps the shape), the round handle to turn. Arrow keys nudge, [ and ] turn.{hasTemplate ? ' Your last audiogram is the starting point.' : ''}
+                {hasTemplate ? t('audiogram.stage.hintTemplate') : t('audiogram.stage.hint')}
               </p>
             </div>
 
             <div className="audiogram-controls">
               <div className="audiogram-field">
-                <span>Piece of the episode</span>
+                <span>{t('audiogram.piece.label')}</span>
                 <div className="audiogram-piece">
-                  <strong data-testid="audiogram-piece">{chapterTime(piece.start)} – {chapterTime(piece.end)} · {Math.round(seconds)}s</strong>
-                  {chapterHere && <small>in “{chapterHere.title}”</small>}
+                  <strong data-testid="audiogram-piece">{t('audiogram.piece.range', { from: chapterTime(piece.start), to: chapterTime(piece.end), seconds: Math.round(seconds) })}</strong>
+                  {chapterHere && <small>{t('audiogram.piece.inChapter', { title: chapterHere.title })}</small>}
                 </div>
                 <button className="silence-cut-apply audiogram-pick" onClick={onPickRange} disabled={busy}>
-                  <Scissors size={14} /> Change the piece
+                  <Scissors size={14} /> {t('audiogram.piece.change')}
                 </button>
               </div>
 
               <label className="audiogram-field">
-                <span>Title</span>
-                <input value={text} maxLength={120} onChange={(e) => setText(e.target.value)} aria-label="Title on the video" />
+                <span>{t('audiogram.look.title')}</span>
+                <input value={text} maxLength={120} onChange={(e) => setText(e.target.value)} aria-label={t('audiogram.look.titleLabel')} />
               </label>
               <label className="audiogram-field">
-                <span>Line under it <small>(*stars* make it red)</small></span>
-                <input value={style.line} maxLength={120} onChange={(e) => { const v = e.target.value; setStyle(s => ({ ...s, line: v })) }} aria-label="Line on the video" />
+                <span>{tRich('audiogram.look.line', null, { small: <small /> })}</span>
+                <input value={style.line} maxLength={120} onChange={(e) => { const v = e.target.value; setStyle(s => ({ ...s, line: v })) }} aria-label={t('audiogram.look.lineLabel')} />
               </label>
 
               <div className="audiogram-field">
-                <span>3Speak branding</span>
-                <div className="noise-levels" role="radiogroup" aria-label="Logo">
+                <span>{t('audiogram.look.branding')}</span>
+                <div className="noise-levels" role="radiogroup" aria-label={t('audiogram.look.logoGroup')}>
                   {LOGOS.map(l => (
-                    <button key={l.id} role="radio" aria-checked={logoStyle === l.id} className={logoStyle === l.id ? 'active' : ''} onClick={() => setLogo(l.id)}>{l.label}</button>
+                    <button key={l.id} role="radio" aria-checked={logoStyle === l.id} className={logoStyle === l.id ? 'active' : ''} onClick={() => setLogo(l.id)}>{t(l.labelKey)}</button>
                   ))}
                 </div>
               </div>
 
               <div className="audiogram-field">
-                <span>Picture</span>
-                <div className="audiogram-pictures" role="radiogroup" aria-label="Picture">
-                  <button role="radio" aria-checked={!image} className={`audiogram-pic none${!image ? ' active' : ''}`} onClick={() => setImage(null)}>None</button>
-                  <button className="audiogram-pic upload" onClick={() => fileRef.current?.click()} disabled={uploading} title="Upload a picture">
+                <span>{t('audiogram.look.picture')}</span>
+                <div className="audiogram-pictures" role="radiogroup" aria-label={t('audiogram.look.picture')}>
+                  <button role="radio" aria-checked={!image} className={`audiogram-pic none${!image ? ' active' : ''}`} onClick={() => setImage(null)}>{t('common.none')}</button>
+                  <button className="audiogram-pic upload" onClick={() => fileRef.current?.click()} disabled={uploading} title={t('audiogram.picture.upload')}>
                     {uploading ? <Loader2 size={16} className="encoding-notice-spin" /> : <Upload size={16} />}
                   </button>
                   {image && !(playlistCovers || []).some(c => c.url === image) && (
-                    <button role="radio" aria-checked className="audiogram-pic active" title="Your picture"><img src={image} alt="" /></button>
+                    <button role="radio" aria-checked className="audiogram-pic active" title={t('audiogram.picture.yours')}><img src={image} alt="" /></button>
                   )}
                   {(playlistCovers || []).map(c => (
-                    <button key={c.url} role="radio" aria-checked={image === c.url} className={`audiogram-pic${image === c.url ? ' active' : ''}`} title={c.title ? `Cover of “${c.title}”` : 'Playlist cover'} onClick={() => setImage(c.url)}>
+                    <button key={c.url} role="radio" aria-checked={image === c.url} className={`audiogram-pic${image === c.url ? ' active' : ''}`} title={c.title ? t('audiogram.picture.coverOf', { title: c.title }) : t('audiogram.picture.playlistCover')} onClick={() => setImage(c.url)}>
                       <img src={c.url} alt="" loading="lazy" />
                     </button>
                   ))}
                   <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(e) => { upload(e.target.files?.[0]); e.target.value = '' }} />
                 </div>
-                {playlistCovers && playlistCovers.length === 0 && <small className="audiogram-note">Your playlists have no covers yet.</small>}
+                {playlistCovers && playlistCovers.length === 0 && <small className="audiogram-note">{t('audiogram.picture.noCovers')}</small>}
               </div>
 
               <div className="audiogram-field">
-                <span>Waveform</span>
-                <div className="noise-levels audiogram-wave-types" role="radiogroup" aria-label="Waveform type">
+                <span>{t('audiogram.look.waveform')}</span>
+                <div className="noise-levels audiogram-wave-types" role="radiogroup" aria-label={t('audiogram.look.waveType')}>
                   {WAVES.map(w => (
-                    <button key={w.id} role="radio" aria-checked={style.wave.type === w.id} className={style.wave.type === w.id ? 'active' : ''} onClick={() => setWaveType(w.id)}>{w.label}</button>
+                    <button key={w.id} role="radio" aria-checked={style.wave.type === w.id} className={style.wave.type === w.id ? 'active' : ''} onClick={() => setWaveType(w.id)}>{t(w.labelKey)}</button>
                   ))}
                 </div>
-                <div className="audiogram-colors" role="radiogroup" aria-label="Waveform colour">
+                <div className="audiogram-colors" role="radiogroup" aria-label={t('audiogram.look.waveColour')}>
                   {COLORS.map(c => (
-                    <button key={c} role="radio" aria-checked={style.wave.color === c} aria-label={`Colour ${c}`} className={`audiogram-swatch${style.wave.color === c ? ' active' : ''}`} style={{ background: c }} onClick={() => setStyle(s => ({ ...s, wave: { ...s.wave, color: c } }))} />
+                    <button key={c} role="radio" aria-checked={style.wave.color === c} aria-label={t('audiogram.look.colour', { colour: c })} className={`audiogram-swatch${style.wave.color === c ? ' active' : ''}`} style={{ background: c }} onClick={() => setStyle(s => ({ ...s, wave: { ...s.wave, color: c } }))} />
                   ))}
-                  <label className={`audiogram-swatch custom${!COLORS.includes(style.wave.color) ? ' active' : ''}`} title="Any colour" style={{ background: COLORS.includes(style.wave.color) ? undefined : style.wave.color }}>
-                    <input type="color" value={style.wave.color} aria-label="Any waveform colour" onChange={(e) => { const v = e.target.value; setStyle(s => ({ ...s, wave: { ...s.wave, color: v } })) }} />
+                  <label className={`audiogram-swatch custom${!COLORS.includes(style.wave.color) ? ' active' : ''}`} title={t('audiogram.look.anyColour')} style={{ background: COLORS.includes(style.wave.color) ? undefined : style.wave.color }}>
+                    <input type="color" value={style.wave.color} aria-label={t('audiogram.look.anyWaveColour')} onChange={(e) => { const v = e.target.value; setStyle(s => ({ ...s, wave: { ...s.wave, color: v } })) }} />
                   </label>
                 </div>
               </div>
@@ -541,42 +538,41 @@ export default function AudiogramDialog({
               <AudiogramCaptionsField look={capLook} onChange={setCapLook} ag={ag} disabled={busy} />
 
               <div className="audiogram-field">
-                <span>Parts <small>(front to back)</small></span>
+                <span>{tRich('audiogram.parts.title', null, { small: <small /> })}</span>
                 <ul className="audiogram-layers">
                   {order.filter(id => id !== 'cover' || hasCard).map((id, i, list) => {
-                    const meta = LAYERS.find(l => l.id === id)
                     if (id === 'logo') {
                       // always shown, in front, never under its minimum size: it can be moved, resized and turned only
                       return (
                         <li key={id} className={`audiogram-layer-locked${selected === id ? ' selected' : ''}`}>
-                          <button className="audiogram-layer-name" onClick={() => setSelected(id)}>{meta.name}</button>
-                          <span className="audiogram-layer-lock" title="The 3Speak logo is always shown, in front, and never smaller than a set size"><Lock size={12} /> Always shown</span>
+                          <button className="audiogram-layer-name" onClick={() => setSelected(id)}>{t(`audiogram.layer.${id}.name`)}</button>
+                          <span className="audiogram-layer-lock" title={t('audiogram.parts.logoLocked')}><Lock size={12} /> {t('audiogram.parts.alwaysShown')}</span>
                         </li>
                       )
                     }
                     const on = layers[id].on !== false
                     return (
                       <li key={id} className={selected === id ? 'selected' : ''}>
-                        <button className="audiogram-layer-name" onClick={() => setSelected(id)}>{meta.name}</button>
-                        <button className="audiogram-layer-btn" onClick={() => setLayers(l => toggleLayer(l, id))} aria-label={on ? `Hide ${meta.name}` : `Show ${meta.name}`} title={on ? 'Hide' : 'Show'}>{on ? <Eye size={14} /> : <EyeOff size={14} />}</button>
-                        <button className="audiogram-layer-btn" onClick={() => setLayers(l => restack(l, id, 1))} disabled={i <= 1} aria-label={`Bring ${meta.name} forward`} title="Forward"><ChevronUp size={14} /></button>
-                        <button className="audiogram-layer-btn" onClick={() => setLayers(l => restack(l, id, -1))} disabled={i === list.length - 1} aria-label={`Send ${meta.name} back`} title="Back"><ChevronDown size={14} /></button>
+                        <button className="audiogram-layer-name" onClick={() => setSelected(id)}>{t(`audiogram.layer.${id}.name`)}</button>
+                        <button className="audiogram-layer-btn" onClick={() => setLayers(l => toggleLayer(l, id))} aria-label={on ? t(`audiogram.layer.${id}.hide`) : t(`audiogram.layer.${id}.show`)} title={on ? t('audiogram.parts.hide') : t('audiogram.parts.show')}>{on ? <Eye size={14} /> : <EyeOff size={14} />}</button>
+                        <button className="audiogram-layer-btn" onClick={() => setLayers(l => restack(l, id, 1))} disabled={i <= 1} aria-label={t(`audiogram.layer.${id}.forward`)} title={t('audiogram.parts.forward')}><ChevronUp size={14} /></button>
+                        <button className="audiogram-layer-btn" onClick={() => setLayers(l => restack(l, id, -1))} disabled={i === list.length - 1} aria-label={t(`audiogram.layer.${id}.back`)} title={t('audiogram.parts.back')}><ChevronDown size={14} /></button>
                       </li>
                     )
                   })}
                 </ul>
-                <button className="audiogram-reset" onClick={resetArrangement}><RotateCcw size={12} /> Tidy arrangement</button>
+                <button className="audiogram-reset" onClick={resetArrangement}><RotateCcw size={12} /> {t('audiogram.parts.tidy')}</button>
               </div>
 
               {busy && (
                 <div className="compact-render-progress" role="status">
                   <div className="compact-render-progress-bar"><div className="compact-render-progress-fill" style={{ width: `${Math.round((job.progress || 0) * 100)}%` }} /></div>
-                  <span className="compact-render-progress-text">{job.phase || 'Working...'}</span>
+                  <span className="compact-render-progress-text">{job.phase || t('audiogram.make.working')}</span>
                 </div>
               )}
-              {job?.status === 'failed' && <p className="audio-template-error" role="alert">The audiogram could not be made: {job.error}</p>}
+              {job?.status === 'failed' && <p className="audio-template-error" role="alert">{t('audiogram.make.failed', { error: job.error })}</p>}
               <button className="silence-cut-apply audiogram-make" onClick={make} disabled={busy || length < 3 || seconds < 3}>
-                {busy ? <Loader2 size={14} className="encoding-notice-spin" /> : <Film size={14} />} {audiograms.length ? 'Make another audiogram' : 'Make audiogram'}
+                {busy ? <Loader2 size={14} className="encoding-notice-spin" /> : <Film size={14} />} {audiograms.length ? t('audiogram.make.another') : t('audiogram.make.make')}
               </button>
             </div>
           </div>
@@ -584,26 +580,26 @@ export default function AudiogramDialog({
 
         {audiograms.length > 0 && (
           <div className="audiogram-made">
-            <h4>Your audiograms</h4>
-            <p className="audiogram-made-hint">They go out as 3Speak Shorts together with the audio, each with a link to the audio’s post, snap or comment.</p>
+            <h4>{t('audiogram.made.title')}</h4>
+            <p className="audiogram-made-hint">{t('audiogram.made.hint')}</p>
             <ul>
               {audiograms.map((a, i) => (
                 <li key={a.id} className="audiogram-made-item" data-testid="audiogram-item">
                   <video className={`audiogram-preview ${a.format}`} src={a.url} controls playsInline preload="metadata" />
                   <div className="audiogram-made-info">
-                    <strong className="audiogram-made-title">{a.title || `Audiogram ${i + 1}`}</strong>
-                    <small className="audiogram-note">{chapterTime(a.start)} · {Math.round(a.duration)}s</small>
+                    <strong className="audiogram-made-title">{a.title || t('audiogram.made.fallbackTitle', { n: i + 1 })}</strong>
+                    <small className="audiogram-note">{t('audiogram.made.length', { at: chapterTime(a.start), seconds: Math.round(a.duration) })}</small>
                     {inlineText === a.id ? (
                       <textarea
                         className="audiogram-desc"
                         rows={4}
                         maxLength={TEXT_MAX}
                         autoFocus
-                        placeholder="Text for the Short (optional). A link to the audio is added for you."
+                        placeholder={t('audiogram.made.textPlaceholder')}
                         value={a.description}
                         onChange={(e) => onUpdateAudiogram(a.id, { description: e.target.value })}
                         onBlur={() => setInlineText(null)}
-                        aria-label={`Text for Short ${i + 1}`}
+                        aria-label={t('audiogram.made.textLabel', { n: i + 1 })}
                       />
                     ) : (
                       <button
@@ -611,16 +607,16 @@ export default function AudiogramDialog({
                         className={`audiogram-desc audiogram-desc-box${a.description ? '' : ' empty'}`}
                         onClick={() => editText(a)}
                         disabled={editingText === a.id}
-                        aria-label={`Text for Short ${i + 1}`}
+                        aria-label={t('audiogram.made.textLabel', { n: i + 1 })}
                         data-testid="audiogram-text"
                       >
-                        <span className="audiogram-desc-text">{a.description || 'Text for the Short (optional). A link to the audio is added for you.'}</span>
-                        <span className="audiogram-desc-edit">{editingText === a.id ? <Loader2 size={12} className="encoding-notice-spin" /> : <PenLine size={12} />} {a.description ? 'Edit text' : 'Write text'}</span>
+                        <span className="audiogram-desc-text">{a.description || t('audiogram.made.textPlaceholder')}</span>
+                        <span className="audiogram-desc-edit">{editingText === a.id ? <Loader2 size={12} className="encoding-notice-spin" /> : <PenLine size={12} />} {a.description ? t('audiogram.made.editText') : t('audiogram.made.writeText')}</span>
                       </button>
                     )}
                     <div className="audiogram-made-actions">
-                      <a className="audiogram-layer-btn" href={a.url} download target="_blank" rel="noopener noreferrer" title="Download"><Download size={14} /></a>
-                      <button className="audiogram-layer-btn" onClick={() => onRemoveAudiogram(a.id)} title="Remove" aria-label={`Remove audiogram ${i + 1}`}><Trash2 size={14} /></button>
+                      <a className="audiogram-layer-btn" href={a.url} download target="_blank" rel="noopener noreferrer" title={t('audiogram.made.download')}><Download size={14} /></a>
+                      <button className="audiogram-layer-btn" onClick={() => onRemoveAudiogram(a.id)} title={t('common.remove')} aria-label={t('audiogram.made.removeLabel', { n: i + 1 })}><Trash2 size={14} /></button>
                     </div>
                   </div>
                 </li>
@@ -633,14 +629,14 @@ export default function AudiogramDialog({
         {confirmClose && (
           <div className="audiogram-confirm" role="alertdialog" aria-modal="true" aria-labelledby="audiogram-confirm-title">
             <div className="audiogram-confirm-card">
-              <h4 id="audiogram-confirm-title">Close without making it?</h4>
+              <h4 id="audiogram-confirm-title">{t('audiogram.confirm.title')}</h4>
               <p>
-                Your changes to the look are not in an audiogram yet. They are lost when you close.
-                {audiograms.length > 0 && <> The {audiograms.length === 1 ? 'audiogram you made stays' : `${audiograms.length} audiograms you made stay`} with this audio.</>}
+                {t('audiogram.confirm.text')}
+                {audiograms.length > 0 && <> {t('audiogram.confirm.stays', { count: audiograms.length })}</>}
               </p>
               <div className="audiogram-confirm-actions">
-                <button className="compact-btn audiogram-confirm-keep" onClick={() => setConfirmClose(false)} autoFocus>Keep editing</button>
-                <button className="compact-render-btn" onClick={() => { setConfirmClose(false); onClose() }}>Close</button>
+                <button className="compact-btn audiogram-confirm-keep" onClick={() => setConfirmClose(false)} autoFocus>{t('audiogram.confirm.keep')}</button>
+                <button className="compact-render-btn" onClick={() => { setConfirmClose(false); onClose() }}>{t('common.close')}</button>
               </div>
             </div>
           </div>

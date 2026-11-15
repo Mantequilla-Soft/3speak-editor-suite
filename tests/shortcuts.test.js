@@ -2,6 +2,7 @@
 import { describe, it, expect } from 'vitest'
 import fs from 'node:fs'
 import { nextShuttleSpeed, stepFrames, shortcutAction, neighbourClip, clipOrder, clipLabel, trackAriaLabel, shortcutList, shortcutsFor } from '../src/utils/shortcuts.js'
+import TIMELINE_EN from '../src/locales/en/timeline.json'
 
 const key = (k, mods = {}) => ({ key: k, ctrlKey: false, metaKey: false, altKey: false, shiftKey: false, ...mods })
 
@@ -96,8 +97,9 @@ describe('screen readers', () => {
   it('the timeline marks up clips, tracks, ruler and playhead', () => {
     const src = fs.readFileSync(new URL('../src/components/Timeline.jsx', import.meta.url), 'utf8')
     expect(src).toMatch(/aria-roledescription="clip"/)
-    expect(src).toMatch(/role="slider"[\s\S]{0,80}aria-label="Playhead"/)
-    expect(src).toMatch(/className="timeline-content"\s+role="region"\s+aria-label="Timeline"/)
+    expect(src).toMatch(/role="slider"[\s\S]{0,80}aria-label=\{t\('timeline\.aria\.playhead'\)\}/)
+    expect(src).toMatch(/className="timeline-content"\s+role="region"\s+aria-label=\{t\('timeline\.aria\.timeline'\)\}/)
+    expect(TIMELINE_EN.aria).toMatchObject({ playhead: 'Playhead', timeline: 'Timeline' })
     expect((src.match(/aria-label=\{trackAriaLabel\(track, trackIndex\)\}/g) || []).length).toBe(2)
   })
 })

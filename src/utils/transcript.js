@@ -13,6 +13,7 @@
 // time map, so at 2x they come twice as fast; a freeze frame has no words.
 
 import { voiceTracksOf } from './captionSources'
+import { t as tr } from '../i18n'
 import { sourceAt, clipTimeAt, isFrozen } from './clipSpeed'
 
 const EPS = 0.001
@@ -114,7 +115,7 @@ export const wordCount = (transcript) => Object.values(transcript?.sources || {}
 export function speechClips(tracks) {
   const out = []
   voiceTracksOf(tracks).forEach((t, i) => {
-    const speaker = String(t.name || '').trim() || `Voice ${i + 1}`
+    const speaker = String(t.name || '').trim() || tr('transcript.speaker.numbered', { n: i + 1 })
     for (const clip of t.clips) {
       if (!clip.libraryId || len(clip) <= 0 || isFrozen(clip)) continue
       out.push({ clip, trackId: t.id, speaker, speakerIndex: i })

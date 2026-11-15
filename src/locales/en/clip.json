@@ -1,0 +1,285 @@
+{
+  "empty": "Select a clip to view properties",
+  "types": {
+    "video": "video",
+    "audio": "audio",
+    "image": "image",
+    "text": "text",
+    "color": "color",
+    "scene": "scene"
+  },
+  "sections": {
+    "content": "Content",
+    "color": "Color",
+    "audio": "Audio",
+    "layout": "Layout",
+    "transform": "Transform",
+    "timing": "Timing",
+    "motion": "Motion",
+    "greenScreen": "Green screen"
+  },
+  "doubleClickReset": "Double-click to reset",
+  "text": {
+    "label": "Text",
+    "placeholder": "Enter text here...",
+    "font": "Font",
+    "resetFont": "Reset font",
+    "fontGroups": {
+      "sansSerif": "Sans Serif",
+      "serif": "Serif",
+      "display": "Display",
+      "handwriting": "Handwriting",
+      "monospace": "Monospace"
+    },
+    "weight": {
+      "normal": "Normal",
+      "bold": "Bold"
+    },
+    "style": "Style",
+    "resetStyle": "Reset style",
+    "size": "Size",
+    "alignment": "Alignment",
+    "resetAlignment": "Reset alignment",
+    "align": {
+      "left": "Align left",
+      "center": "Align center",
+      "right": "Align right"
+    },
+    "box": "Background Box",
+    "fill": "Fill",
+    "opacity": "Opacity",
+    "padding": "Padding",
+    "radius": "Radius",
+    "border": "Border",
+    "width": "Width"
+  },
+  "colorClip": {
+    "background": "Background Color",
+    "gradient": "Gradient",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "endColor": "End Color",
+    "angle": "Angle",
+    "resetAngle": "Reset angle"
+  },
+  "volume": {
+    "label": "Volume",
+    "reset": "Reset volume",
+    "mute": "Mute",
+    "unmute": "Unmute"
+  },
+  "fades": {
+    "label": "Fades",
+    "none": "No fades",
+    "in": "In",
+    "out": "Out",
+    "inSeconds": "In (seconds)",
+    "outSeconds": "Out (seconds)"
+  },
+  "noise": {
+    "reduce": "Reduce background noise",
+    "cleanVoice": "Clean up the voice",
+    "group": "Noise reduction",
+    "working": "Working",
+    "workingDots": "Working…",
+    "afterUpload": "Available once this clip has finished uploading.",
+    "appliesGroup_one": "Applies to this clip and its group ({{count}} clip).",
+    "appliesGroup_other": "Applies to this clip and its group ({{count}} clips).",
+    "appliesOne": "Applies to this clip only.",
+    "failed": "Noise reduction failed. Try again.",
+    "levels": {
+      "light": "Light",
+      "medium": "Medium",
+      "strong": "Strong"
+    },
+    "studioTitle": "Strong: less noise, no rumble, clearer and more even, softer S sounds"
+  },
+  "duck": {
+    "label": "Duck",
+    "group": "Duck this clip",
+    "depth": "{{db}} dB",
+    "source": "<lead>Goes down while</lead><pick/><tail>plays</tail>",
+    "sourceLabel": "Duck source",
+    "hint": "This clip gets quieter while the chosen track plays, and comes back up in the pauses."
+  },
+  "greenScreen": {
+    "removeBackground": "Remove background",
+    "modes": {
+      "green": "Green",
+      "blue": "Blue",
+      "static": "Static (experimental)"
+    },
+    "modeTitles": {
+      "green": "Green screen",
+      "blue": "Blue screen",
+      "static": "Static background (experimental): removes whatever matches a frame of the empty background"
+    },
+    "staticHint": "Removes everything that looks like a few frames of the empty background. Small changes (noise, light, focus) are ignored and parts of you that match the wall are kept inside your outline. Needs a camera that does not move; shadows you cast stay visible. If parts of the room keep showing, raise Threshold.",
+    "hint": {
+      "green": "Removes the green backdrop so the clips on the tracks below show through.",
+      "blue": "Removes the blue backdrop so the clips on the tracks below show through."
+    },
+    "plate": "Empty background frame",
+    "plateAlt": "Empty background",
+    "plateHint": "Move the playhead to a moment that shows only the background, without you in it. Half a second of it is used.",
+    "grabbing": "Grabbing frame...",
+    "useFrame": "Use the frame at the playhead",
+    "useFrameInstead": "Use the frame at the playhead instead",
+    "grabFailed": "Could not grab that frame. Try again, or pick another moment.",
+    "threshold": "Threshold",
+    "thresholdStaticTitle": "Tolerance: higher ignores more change in the background (noise, light, focus) but can start to remove parts of you",
+    "thresholdTitle": "Higher removes more of the screen colour",
+    "resetThreshold": "Reset threshold",
+    "softness": "Edge softness",
+    "resetSoftness": "Reset softness",
+    "despill": "Despill",
+    "despillStaticTitle": "Removes the wall colour from the edges",
+    "despillTitle": {
+      "green": "Removes the green tint from the edges",
+      "blue": "Removes the blue tint from the edges"
+    },
+    "resetDespill": "Reset despill",
+    "cameraLock": {
+      "allLocked": "Camera focus and exposure locked, white balance too.",
+      "focusExposureLocked": "Camera focus and exposure locked.",
+      "noFocus": "Your camera doesn't allow locking focus; avoid moving closer or further.",
+      "lockedList": "Locked: {{list}}.",
+      "noExposure": "Focus locked. Exposure can't be locked on this camera; keep the light steady.",
+      "names": {
+        "focus": "focus",
+        "exposure": "exposure",
+        "whiteBalance": "white balance"
+      }
+    }
+  },
+  "layout": {
+    "boxSize": "Box size",
+    "smaller": "Smaller",
+    "larger": "Larger",
+    "zoom": "Zoom",
+    "resetZoom": "Reset zoom",
+    "hint": "Drag the clip to move it. Press and hold, then drag, to move the video inside its box. Pinch to zoom on touch screens.",
+    "freeTransform": "Switch to free transform"
+  },
+  "transform": {
+    "scale": "Scale",
+    "resetScale": "Reset scale",
+    "rotation": "Rotation",
+    "resetRotation": "Reset rotation",
+    "position": "Position",
+    "resetPosition": "Reset position",
+    "dragToMove": "Drag to reposition",
+    "crop": "Crop",
+    "resetCrop": "Reset crop",
+    "cropWidth": "W",
+    "cropHeight": "H",
+    "opacity": "Opacity",
+    "resetOpacity": "Reset opacity"
+  },
+  "timing": {
+    "duration": "Duration",
+    "seconds": "Sec",
+    "in": "In:",
+    "out": "Out:",
+    "durationColon": "Duration:",
+    "position": "Position:"
+  },
+  "color": {
+    "measuring": "Measuring…",
+    "autoTitle": "Fix levels, midtones and white balance from this clip's frames",
+    "resetAll": "Reset all colour adjustments",
+    "failed": "Could not read this clip's picture.",
+    "sliders": {
+      "brightness": "Brightness",
+      "contrast": "Contrast",
+      "midtones": "Midtones",
+      "saturation": "Saturation",
+      "warmth": "Warmth",
+      "tint": "Tint"
+    }
+  },
+  "effects": {
+    "hiddenName": "{{name}} (hidden)",
+    "show": "Show this effect again",
+    "hide": "Hide this effect (kept, but not applied)",
+    "remove": "Remove this effect",
+    "comesFrom": "Comes from",
+    "goesTo": "Goes to",
+    "from": "From",
+    "to": "To",
+    "speed": "Speed",
+    "amount": {
+      "amplitude": "Amplitude",
+      "bounce": "Bounce",
+      "distance": "Distance"
+    },
+    "addFirst": "Add an effect…",
+    "addAnother": "Add another effect…",
+    "groups": {
+      "loop": "Loops",
+      "in": "Entrances",
+      "out": "Exits"
+    },
+    "effect": {
+      "pulse": "Pulse",
+      "wobble": "Wobble",
+      "bob": "Bob",
+      "sway": "Sway",
+      "spin": "Spin",
+      "pop": "Pop in",
+      "slideIn": "Slide in",
+      "fadeIn": "Fade in",
+      "popOut": "Pop out",
+      "slideOut": "Slide out",
+      "fadeOut": "Fade out"
+    },
+    "direction": {
+      "left": "left",
+      "right": "right",
+      "top": "top",
+      "bottom": "bottom"
+    },
+    "pivot": "Pivot",
+    "pivotPoint": "Pivot point",
+    "pivotName": {
+      "topLeft": "top left",
+      "top": "top",
+      "topRight": "top right",
+      "left": "left",
+      "centre": "centre",
+      "right": "right",
+      "bottomLeft": "bottom left",
+      "bottom": "bottom",
+      "bottomRight": "bottom right",
+      "custom": "custom"
+    }
+  },
+  "multi": {
+    "volume": "Volume",
+    "volumeMixed": "Volume (mixed)",
+    "volumeAll": "Volume of all selected clips",
+    "muteAll": "Mute all",
+    "unmuteAll": "Unmute all",
+    "cleanVoice": "Clean up the voice",
+    "cleanGroup": "Voice clean-up for all selected clips",
+    "afterUpload": "Available once these clips have finished uploading.",
+    "failed": "Cleaning up the voice failed. Try again.",
+    "applies_one": "Applies to the {{count}} selected clip.",
+    "applies_other": "Applies to the {{count}} selected clips.",
+    "appliesWithGroups_one": "Applies to the {{selected}} selected clips and the {{count}} other clip in their groups.",
+    "appliesWithGroups_other": "Applies to the {{selected}} selected clips and the {{count}} other clips in their groups.",
+    "stillUploading": "Clips still uploading are left as they are.",
+    "remove_one": "Remove {{count}} clip",
+    "remove_other": "Remove {{count}} clips"
+  },
+  "trim": {
+    "title": "Trim: {{name}}",
+    "start": "Start Point",
+    "end": "End Point",
+    "trimmed": "Trimmed Duration"
+  },
+  "reframe": {
+    "readFailed": "The video could not be read here",
+    "openFailed": "The video could not be opened for face tracking"
+  }
+}

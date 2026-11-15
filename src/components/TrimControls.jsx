@@ -1,3 +1,5 @@
+import { useT } from '../i18n'
+
 function formatTime(seconds) {
   const mins = Math.floor(seconds / 60)
   const secs = (seconds % 60).toFixed(1)
@@ -5,6 +7,7 @@ function formatTime(seconds) {
 }
 
 function TrimControls({ clip, onUpdate }) {
+  const { t } = useT()
   const handleStartChange = (e) => {
     const newStart = parseFloat(e.target.value)
     if (newStart < clip.endTime) {
@@ -21,10 +24,10 @@ function TrimControls({ clip, onUpdate }) {
 
   return (
     <div className="trim-controls">
-      <h3>Trim: {clip.name}</h3>
+      <h3>{t('clip.trim.title', { name: clip.name })}</h3>
 
       <div className="trim-control">
-        <label>Start Point</label>
+        <label>{t('clip.trim.start')}</label>
         <input
           type="range"
           min={0}
@@ -37,7 +40,7 @@ function TrimControls({ clip, onUpdate }) {
       </div>
 
       <div className="trim-control">
-        <label>End Point</label>
+        <label>{t('clip.trim.end')}</label>
         <input
           type="range"
           min={0}
@@ -50,7 +53,7 @@ function TrimControls({ clip, onUpdate }) {
       </div>
 
       <div className="trim-control">
-        <label>Trimmed Duration</label>
+        <label>{t('clip.trim.trimmed')}</label>
         <span className="value">{formatTime(clip.endTime - clip.startTime)}</span>
       </div>
     </div>

@@ -53,7 +53,7 @@ describe('captions on audiograms', () => {
     expect(off).not.toContain('Karaoke')
     const on = renderToStaticMarkup(createElement(AudiogramCaptionsField, { look: cleanAudiogramCaptionLook({ on: true }), onChange: () => {}, ag: { ...ag, ready: true, words: [{ text: 'a', start: 0, end: 1 }] } }))
     expect(on).toContain('Karaoke')
-    expect(on).toContain('1 words in this piece')
+    expect(on).toContain('1 word in this piece')
     const none = renderToStaticMarkup(createElement(AudiogramCaptionsField, { look: cleanAudiogramCaptionLook({}), onChange: () => {}, ag: { ...ag, status: { available: false } } }))
     expect(none).toContain('not available')
   })

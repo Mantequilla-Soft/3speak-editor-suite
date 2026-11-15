@@ -18,7 +18,7 @@ import OnboardingTour, { AUDIO_TOUR_STEPS, RANGE_PICK_TOUR_STEPS, useFirstTimeTo
 import MultiClipProperties from './components/MultiClipProperties'
 import { soundTargets } from './utils/multiSelect'
 import { REMIX_LAYOUTS, hasLayout, clampLayout } from './utils/remixLayout'
-import { MAX_TIMELINE_SECONDS, MAX_TIMELINE_ADJ, MAX_TIMELINE_TEXT, getTimelineEnd } from './utils/limits'
+import { MAX_TIMELINE_SECONDS, maxTimelineText, getTimelineEnd } from './utils/limits'
 import LengthLimitNotice from './components/LengthLimitNotice'
 import TooLargeNotice from './components/TooLargeNotice'
 import SilenceCutModal, { loadSettings as loadAutoCutSettings } from './components/SilenceCutModal'
@@ -53,6 +53,8 @@ import FormatsPanel from './components/FormatsPanel'
 import VideoPodcastDialog from './components/VideoPodcastDialog'
 import { useProjectFormat } from './hooks/useProjectFormat'
 import { postFormat } from './utils/projectFormat'
+import { useT } from './i18n'
+import { stripPart } from './utils/partName'
 
 // Audio editor: the talking = clips on audio tracks that are not music and not template parts
 function voiceClipsOf(list) {
@@ -79,6 +81,8 @@ const masterOf = (m) => ({
 })
 
 function App() {
+  const { t, lang, formatNumber, formatList } = useT()
+  const percent = (p) => formatNumber(p, { style: 'percent', maximumFractionDigits: 0 })
   const { ffmpeg, loaded, loading, progress, exporting, exportProgress, loadFFmpeg, processVideo } = useFFmpeg()
   const {
     exporting: canvasExporting,
@@ -170,7 +174,7 @@ function App() {
     ? (fileStoreRef.current.get(autoCutClip.id) || autoCutClip.file || (isHlsUrl(autoCutClip.url) ? null : autoCutClip.url))
     : null
   const autoCutUnavailable = autoCutClip && !autoCutSource
-    ? 'This clip is still streaming from 3Speak. Try again once its download has finished.'
+    ? t('app.clipStreaming')
     : null
   const autoCutOpenRef = useRef(false)
   // Audio editor: M adds a chapter at the playhead (set further down)
@@ -246,7 +250,7 @@ function App() {
   const audioTitle = useMemo(() => {
     if (!audioMode) return null
     const first = tracks.filter(t => t.type === 'audio' && !t.music).flatMap(t => t.clips).find(c => !c.templateRole)
-    return first ? String(first.name || '').replace(/^Part \d+ · /, '').replace(/\.[a-z0-9]{2,4}$/i, '').trim() || null : null
+    return first ? stripPart(first.name).replace(/\.[a-z0-9]{2,4}$/i, '').trim() || null : null
   }, [audioMode, tracks])
 
   // The project's shape (utils/projectFormat.js): a Short (9:16, up to 2 minutes)
@@ -382,19 +386,19 @@ function App() {
   }, [])
 
   const handleRemoveClip = useCallback((clipId) => {
-    askConfirm('Remove this clip from the timeline?', () => removeClip(clipId))
+    askConfirm(t('app.confirm.removeClip'), () => removeClip(clipId))
   }, [removeClip, askConfirm])
 
   const handleRemoveClips = useCallback((clipIds) => {
-    askConfirm(`Remove these ${clipIds.length} clips from the timeline?`, () => removeClip(clipIds))
+    askConfirm(t('app.confirm.removeClips', { count: clipIds.length }), () => removeClip(clipIds))
   }, [removeClip, askConfirm])
 
   const handleRemoveFromLibrary = useCallback((itemId) => {
-    askConfirm('Remove this item from the project library?', () => removeFromLibrary(itemId))
+    askConfirm(t('app.confirm.removeLibraryItem'), () => removeFromLibrary(itemId))
   }, [removeFromLibrary, askConfirm])
 
   const handleRemoveTrack = useCallback((trackId) => {
-    askConfirm('Remove this track and all its clips?', () => removeTrack(trackId))
+    askConfirm(t('app.confirm.removeTrack'), () => removeTrack(trackId))
   }, [removeTrack, askConfirm])
 
   // Reverse clip: send to backend, get reversed file, swap URL
@@ -472,7 +476,7 @@ function App() {
       }
     } catch (err) {
       console.error('Failed to reverse clip:', err)
-      alert('Failed to reverse clip: ' + err.message)
+      alert(t('app.reverse.failed', { error: err.message }))
     } finally {
       setReversingClipId(null)
     }
@@ -801,25 +805,25 @@ function App() {
     const { mode, maxDuration } = remixSession
     if (mode === 'stitch') {
       return {
-        title: 'Stitch',
+        title: t('app.remix.stitch'),
         mode,
         sourceClipId: remixSession.sourceClipId,
-        hint: `Record up to ${Math.floor(maxDuration)}s. It plays right ${remixSession.before ? 'before' : 'after'} the original.`,
+        hint: t(remixSession.before ? 'app.remix.stitchHintBefore' : 'app.remix.stitchHintAfter', { seconds: Math.floor(maxDuration) }),
         maxDuration,
         sync: false
       }
     }
     return {
-      title: 'Reaction',
+      title: t('app.remix.reaction'),
       mode,
       sourceClipId: remixSession.sourceClipId,
       layouts: remixSession.layouts,
       timelineStart: remixSession.timelineStart || 0,
-      hint: 'The original plays from the start while you record. Use headphones so it does not echo into your mic.',
+      hint: t('app.remix.reactionHint'),
       maxDuration,
       sync: true
     }
-  }, [remixSession])
+  }, [remixSession, lang]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleRemixChoice = useCallback((mode) => {
     const sourceClipId = remixPrompt?.clipId
@@ -834,7 +838,7 @@ function App() {
     if (mode === 'stitchBefore' || mode === 'stitchAfter') {
       const remaining = MAX_TIMELINE_SECONDS - sourceEnd
       if (remaining < 1) {
-        alert(`The original already fills the ${MAX_TIMELINE_ADJ} limit. Trim it on the timeline, then record your stitch with the camera button.`)
+        alert(t('app.remix.originalFillsLimit', { limit: maxTimelineText() }))
         return
       }
       const before = mode === 'stitchBefore'
@@ -980,8 +984,8 @@ function App() {
     if (!downloading) return null
     const [id, info] = downloading
     const item = library.find(l => l.id === id)
-    return { name: item?.name || 'Media', progress: info.progress }
-  }, [hlsDownloads, library])
+    return { name: item?.name || t('app.media'), progress: info.progress }
+  }, [hlsDownloads, library, lang]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Footage this browser cannot show while its playable copy is made; the
   // popup can be hidden per video (the library badge still shows the status)
@@ -1010,13 +1014,13 @@ function App() {
   const emptyTimelineActions = (
     <div className="empty-timeline-actions">
       <button type="button" onClick={() => emptyVideoInputRef.current?.click()}>
-        <Film size={22} /> <span>Add video</span>
+        <Film size={22} /> <span>{t('app.empty.addVideo')}</span>
       </button>
       <button type="button" onClick={() => emptyImageInputRef.current?.click()}>
-        <ImageIcon size={22} /> <span>Add image</span>
+        <ImageIcon size={22} /> <span>{t('app.empty.addImage')}</span>
       </button>
       <button type="button" onClick={() => emptyAudioInputRef.current?.click()}>
-        <Music size={22} /> <span>Add audio</span>
+        <Music size={22} /> <span>{t('app.empty.addAudio')}</span>
       </button>
       <input ref={emptyVideoInputRef} type="file" accept="video/*" multiple hidden onChange={(e) => addFilesFromEmpty(e, 'video')} />
       <input ref={emptyImageInputRef} type="file" accept="image/*" multiple hidden onChange={(e) => addFilesFromEmpty(e, 'image')} />
@@ -1028,13 +1032,13 @@ function App() {
   const emptyAudioActions = (
     <div className="empty-timeline-actions">
       <button type="button" onClick={() => emptyAudioInputRef.current?.click()}>
-        <Upload size={22} /> <span>Add recording</span>
+        <Upload size={22} /> <span>{t('app.empty.addRecording')}</span>
       </button>
       <button type="button" onClick={() => openAdd('record')}>
-        <Mic size={22} /> <span>Record</span>
+        <Mic size={22} /> <span>{t('app.empty.record')}</span>
       </button>
       <button type="button" onClick={() => openAdd('music')}>
-        <Music size={22} /> <span>Music</span>
+        <Music size={22} /> <span>{t('app.empty.music')}</span>
       </button>
       <input ref={emptyAudioInputRef} type="file" accept="audio/*,video/*" multiple hidden onChange={(e) => addFilesFromEmpty(e, 'audio')} />
     </div>
@@ -1052,9 +1056,9 @@ function App() {
       total += size
       done += size * (item.uploadProgress || 0)
     }
-    const name = uploading.length > 1 ? `${uploading.length} files` : (uploading[0].name || 'Media')
+    const name = uploading.length > 1 ? t('app.files', { count: uploading.length }) : (uploading[0].name || t('app.media'))
     return { name, progress: total ? done / total : 0, count: uploading.length }
-  }, [library])
+  }, [library, lang]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Ref for add-media file input
   const addMediaInputRef = useRef(null)
@@ -1238,11 +1242,11 @@ function App() {
   const groupWithVoices = useCallback((clipId) => {
     const ids = overlappingVoices(tracksRef.current, clipId)
     if (ids.length < 2) {
-      setGroupNotice('Nothing plays at the same time on another voice track. Put the other voice on its own track first.')
+      setGroupNotice(t('app.group.nothing'))
       return
     }
     groupClips(ids)
-    setGroupNotice(`${ids.length} voices grouped: they now move, trim and get their silences cut together.`)
+    setGroupNotice(t('app.group.done', { count: ids.length }))
   }, [groupClips])
 
   // Chapters: added at the playhead (M), renamed, moved, removed
@@ -1353,7 +1357,7 @@ function App() {
   const addChapter = useCallback((at) => {
     setChapters(list => {
       if (list.length >= MAX_CHAPTERS) return list
-      const ch = newChapter(tracksRef.current, at, list.length === 0 && at < 1 ? 'Intro' : `Chapter ${list.length + 1}`)
+      const ch = newChapter(tracksRef.current, at, list.length === 0 && at < 1 ? t('app.chapters.intro') : t('app.chapters.numbered', { n: list.length + 1 }))
       setChapterFocus(ch.id)
       return [...list, ch]
     })
@@ -1434,7 +1438,7 @@ function App() {
       // every other track by its number and name, then all voice tracks at once
       sources: [
         ...others.sort((a, b) => numbers.get(a.id) - numbers.get(b.id)).map(t => ({ id: t.id, label: trackLabel(t, numbers) })),
-        { id: 'voices', label: 'All voice tracks' }
+        { id: 'voices', label: t('app.duck.allVoices') }
       ],
       // a new Duck listens to the first other voice track (else the first other track)
       defaultSource: (others.find(t => !t.music) || others[0])?.id || 'voices'
@@ -1491,8 +1495,8 @@ function App() {
   const multiPanel = multiClips.length > 1 && !(selectMode && !isDesktop) ? (
           <div className="compact-properties-panel multi-clip-panel">
             <div className="compact-properties-header">
-              <span className="compact-properties-title">{multiClips.length} clips selected</span>
-              <button className="compact-btn compact-properties-close" onClick={() => selectClips([])} title="Clear the selection">
+              <span className="compact-properties-title">{t('app.side.clipsSelected', { count: multiClips.length })}</span>
+              <button className="compact-btn compact-properties-close" onClick={() => selectClips([])} title={t('app.side.clearSelection')}>
                 <X size={14} />
               </button>
             </div>
@@ -1519,7 +1523,7 @@ function App() {
               <button
                 className="compact-btn compact-properties-close"
                 onClick={() => { setCompactPropertiesClipId(null); if (isDesktop) selectClip(null) }}
-                title="Close properties"
+                title={t('app.side.closeProperties')}
               >
                 <X size={14} />
               </button>
@@ -1555,8 +1559,8 @@ function App() {
   const formatsPanel = formatsOpen && !audioMode ? (
     <div className="compact-properties-panel captions-side">
       <div className="compact-properties-header">
-        <span className="compact-properties-title">Export as</span>
-        <button className="compact-btn compact-properties-close" onClick={() => { setFormatsOpen(false); setViewAspect(null) }} title="Close Export as">
+        <span className="compact-properties-title">{t('render.exportAs.button')}</span>
+        <button className="compact-btn compact-properties-close" onClick={() => { setFormatsOpen(false); setViewAspect(null) }} title={t('render.exportAs.close')}>
           <X size={14} />
         </button>
       </div>
@@ -1572,7 +1576,7 @@ function App() {
         timelineEnd={timelineEnd}
         buildPayload={(aspect, onPhase) => buildAndUploadPayload(onPhase, { aspect })}
         canRender={videoClips.length > 0 && !activeUpload && !isBackendRendering}
-        renderBlocked={activeUpload ? 'Wait for the upload to finish.' : null}
+        renderBlocked={activeUpload ? t('render.exportAs.waitUpload') : null}
         canSend={isIframe}
         onSend={sendFormatToHost}
       />
@@ -1584,8 +1588,8 @@ function App() {
   const captionsPanel = captionsOpen && !audioMode ? (
     <div className="compact-properties-panel captions-side">
       <div className="compact-properties-header">
-        <span className="compact-properties-title">Captions</span>
-        <button className="compact-btn compact-properties-close" onClick={() => setCaptionsOpen(false)} title="Close captions">
+        <span className="compact-properties-title">{t('app.side.captions')}</span>
+        <button className="compact-btn compact-properties-close" onClick={() => setCaptionsOpen(false)} title={t('app.side.closeCaptions')}>
           <X size={14} />
         </button>
       </div>
@@ -1613,8 +1617,8 @@ function App() {
       {formatsPanel || captionsPanel || transcriptPanel || multiPanel || (sideClip ? compactPropertiesPanel : (
         <div className="compact-side-empty">
           <MousePointerClick size={28} />
-          <strong>No clip selected</strong>
-          <p>Select a clip on the timeline to see its settings. Drag a box over several clips to change them together.</p>
+          <strong>{t('app.side.noClip')}</strong>
+          <p>{t('app.side.noClipHint')}</p>
         </div>
       ))}
     </aside>
@@ -1626,7 +1630,7 @@ function App() {
     <div className="cleaning-notice" role="status" aria-live="polite">
       <Loader2 size={15} className="encoding-notice-spin" />
       <span>{cleaningText(cleaning)}</span>
-      <small>Long recordings can take a minute.</small>
+      <small>{t('app.cleaningHint')}</small>
     </div>
   ) : null
 
@@ -1683,8 +1687,8 @@ function App() {
         {/* Backend health warning */}
         {backendStatus === 'error' && (
           <div className="backend-warning">
-            Backend server is unreachable. Recording upload, rendering, and media processing will not work.
-            <button onClick={() => setBackendStatus('ok')}>Dismiss</button>
+            {t('app.backendDown')}
+            <button onClick={() => setBackendStatus('ok')}>{t('app.dismiss')}</button>
           </div>
         )}
 
@@ -1692,21 +1696,21 @@ function App() {
         <header className="app-branding">
           <div className="branding-left">
             <img src={logo3speak} alt="3Speak" className="branding-logo" />
-            <span className="branding-text">{audioMode ? 'Audio Editor' : isVerticalVideo ? 'Shorts Editor' : 'Video Editor'} <span className="branding-badge">beta</span></span>
+            <span className="branding-text">{audioMode ? t('app.branding.audioEditor') : isVerticalVideo ? t('app.branding.shortsEditor') : t('app.branding.videoEditor')} <span className="branding-badge">{t('app.branding.beta')}</span></span>
             {!audioMode && <ProjectFormat aspect={activeAspectRatio} onChange={(a) => { projectFormat.setAspect(a); setViewAspect(null) }} tracks={tracks} />}
             <span className="branding-info" onClick={() => setShowBackendInfo(prev => !prev)}>
               <Info size={14} />
               {showBackendInfo && (
-                <span className="branding-info-popup">Backend: {selectedBackendUrl || 'selecting...'}</span>
+                <span className="branding-info-popup">{selectedBackendUrl ? t('app.branding.backend', { url: selectedBackendUrl }) : t('app.branding.backendSelecting')}</span>
               )}
             </span>
             {audioMode && (
-              <button className="branding-help-btn" onClick={() => setShowTour(true)} title="Show the tour again" aria-label="Show the tour again">
+              <button className="branding-help-btn" onClick={() => setShowTour(true)} title={t('app.branding.showTour')} aria-label={t('app.branding.showTour')}>
                 <HelpCircle size={15} />
               </button>
             )}
             {isDesktop && (
-              <button className="branding-help-btn" onClick={() => shortcuts.setSheetOpen(true)} title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts">
+              <button className="branding-help-btn" onClick={() => shortcuts.setSheetOpen(true)} title={t('app.branding.shortcuts')} aria-label={t('app.branding.shortcutsLabel')}>
                 <Keyboard size={15} />
               </button>
             )}
@@ -1716,14 +1720,14 @@ function App() {
             <button
               className="branding-close-btn branding-fullscreen-btn"
               onClick={(e) => { e.currentTarget.blur(); toggleFullscreen() }}
-              title={isFullscreen ? 'Leave full screen (F)' : 'Full screen (F)'}
-              aria-label={isFullscreen ? 'Leave full screen' : 'Full screen'}
+              title={isFullscreen ? t('app.branding.leaveFullscreen') : t('app.branding.fullscreen')}
+              aria-label={isFullscreen ? t('app.branding.leaveFullscreenLabel') : t('app.branding.fullscreenLabel')}
               aria-pressed={isFullscreen}
             >
               {isFullscreen ? <Minimize size={15} /> : <Maximize size={15} />}
             </button>
           )}
-          <button className="branding-close-btn" onClick={handleCloseEditor} title="Close editor">
+          <button className="branding-close-btn" onClick={handleCloseEditor} title={t('app.branding.closeEditor')}>
             <X size={16} />
           </button>
         </header>
@@ -1734,7 +1738,7 @@ function App() {
             <button
               onClick={undo}
               disabled={!canUndo}
-              title="Undo (Ctrl+Z)"
+              title={t('app.menu.undo')}
               className="compact-btn"
             >
               <Undo2 size={16} />
@@ -1742,7 +1746,7 @@ function App() {
             <button
               onClick={redo}
               disabled={!canRedo}
-              title="Redo (Ctrl+Shift+Z)"
+              title={t('app.menu.redo')}
               className="compact-btn"
             >
               <Redo2 size={16} />
@@ -1753,10 +1757,10 @@ function App() {
               className={renderStatus?.status === 'completed' ? 'compact-download-btn' : 'compact-render-btn'}
               onClick={() => { clearRenderStatus(); requestRender() }}
               disabled={(audioMode ? audioClips.length === 0 : videoClips.length === 0) || (exporting || canvasExporting) || isBackendRendering || overLengthLimit || !!activeUpload || !!cutProgress}
-              title={overLengthLimit ? `Trim the timeline to ${MAX_TIMELINE_TEXT} or less to ${audioMode ? 'export' : 'render'}` : undefined}
+              title={overLengthLimit ? t(audioMode ? 'render.button.trimToExport' : 'render.button.trimToRender', { limit: maxTimelineText() }) : undefined}
             >
               {audioMode ? <AudioWaveform size={14} /> : <Clapperboard size={14} />}
-              <span>{isBackendRendering ? (audioMode ? 'Exporting...' : 'Rendering...') : activeUpload ? `Uploading ${Math.round(activeUpload.progress * 100)}%` : renderStatus?.status === 'completed' ? (audioMode ? 'Export again' : 'Re-render') : (audioMode ? 'Export' : 'Render')}</span>
+              <span>{isBackendRendering ? (audioMode ? t('render.button.exporting') : t('render.button.rendering')) : activeUpload ? t('render.button.uploading', { percent: percent(activeUpload.progress) }) : renderStatus?.status === 'completed' ? (audioMode ? t('render.button.exportAgain') : t('render.button.reRender')) : (audioMode ? t('common.export') : t('common.render'))}</span>
             </button>
             {!audioMode && (
               <button
@@ -1764,10 +1768,10 @@ function App() {
                 onClick={() => { setFormatsOpen(o => !o); setViewAspect(null) }}
                 disabled={videoClips.length === 0}
                 aria-pressed={formatsOpen}
-                title="Export as: the same project as a Short, a square or a landscape video, cut around the faces"
+                title={t('render.exportAs.title')}
               >
                 <Film size={14} />
-                <span>Export as</span>
+                <span>{t('render.exportAs.button')}</span>
               </button>
             )}
             {renderStatus?.status === 'completed' && renderStatus.outputUrl && (
@@ -1780,18 +1784,18 @@ function App() {
                   rel="noopener noreferrer"
                 >
                   <Download size={14} />
-                  <span>Download</span>
+                  <span>{t('render.done.download')}</span>
                 </a>
                 {audioMode && (
-                  <button className="compact-download-btn" onClick={() => setAudiogramOpen(true)} title="Short videos of pieces of the episode, to share or to post as Shorts with it">
+                  <button className="compact-download-btn" onClick={() => setAudiogramOpen(true)} title={t('render.done.audiogramsTitle')}>
                     <Film size={14} />
-                    <span>Audiograms{audiograms.length ? ` (${audiograms.length})` : ''}</span>
+                    <span>{audiograms.length ? t('render.done.audiogramsCount', { n: audiograms.length }) : t('render.done.audiograms')}</span>
                   </button>
                 )}
                 {audioMode && (
-                  <button className="compact-download-btn" onClick={() => setVideoPodcastOpen(true)} title="The whole episode as a 16:9 video with the cover, a waveform, captions and who is speaking">
+                  <button className="compact-download-btn" onClick={() => setVideoPodcastOpen(true)} title={t('render.done.videoPodcastTitle')}>
                     <Film size={14} />
-                    <span>Video podcast</span>
+                    <span>{t('render.done.videoPodcast')}</span>
                   </button>
                 )}
                 {isIframe && (
@@ -1800,7 +1804,7 @@ function App() {
                     onClick={() => setShowPreview(true)}
                   >
                     <Send size={14} />
-                    <span>{audioMode ? 'Use this audio' : 'Send Video'}</span>
+                    <span>{audioMode ? t('render.done.useAudio') : t('render.done.sendVideo')}</span>
                   </button>
                 )}
               </>
@@ -1810,56 +1814,56 @@ function App() {
             {audioMode && (
               <>
                 <button
-                  className="compact-btn compact-tool-btn"
+                  className="compact-btn compact-tool-btn tour-cut-silences"
                   onClick={openCutSilences}
                   disabled={!cuttableClips.length || !!cutProgress}
-                  title="Cut the silences out of the selected clip (or its group): find the pauses, cut them, close the gaps"
-                  aria-label="Cut silences"
+                  title={t('app.audioTools.cutSilencesTitle')}
+                  aria-label={t('app.audioTools.cutSilences')}
                 >
-                  <AudioWaveform size={15} /><span>Cut silences</span>
+                  <AudioWaveform size={15} /><span>{t('app.audioTools.cutSilences')}</span>
                 </button>
                 <button
-                  className={`compact-btn compact-tool-btn${appliedRoles(tracks).length ? ' active' : ''}`}
+                  className={`compact-btn compact-tool-btn tour-template${appliedRoles(tracks).length ? ' active' : ''}`}
                   onClick={() => setTemplateOpen(true)}
-                  title="Your template: intro, outro and music bed for every recording"
-                  aria-label="Template"
+                  title={t('app.audioTools.templateTitle')}
+                  aria-label={t('app.audioTools.template')}
                 >
-                  <LayoutTemplate size={15} /><span>Template</span>
+                  <LayoutTemplate size={15} /><span>{t('app.audioTools.template')}</span>
                 </button>
                 <button
-                  className={`compact-btn compact-tool-btn${master.loudness ? ' active' : ''}`}
+                  className={`compact-btn compact-tool-btn tour-normalize${master.loudness ? ' active' : ''}`}
                   onClick={() => setMaster(m => ({ ...m, loudness: !m.loudness }))}
                   aria-pressed={master.loudness}
-                  aria-label="Normalize loudness"
-                  title={master.loudness ? 'Normalize is on: the export is brought to an even -16 LUFS (the podcast standard)' : 'Normalize is off: the export keeps your levels as they are'}
+                  aria-label={t('app.audioTools.normalizeLabel')}
+                  title={master.loudness ? t('app.audioTools.normalizeOnTitle') : t('app.audioTools.normalizeOffTitle')}
                 >
-                  <Gauge size={15} /><span>{master.loudness ? 'Normalize: on' : 'Normalize: off'}</span>
+                  <Gauge size={15} /><span>{master.loudness ? t('app.audioTools.normalizeOn') : t('app.audioTools.normalizeOff')}</span>
                 </button>
                 <button
-                  className={`compact-btn compact-tool-btn${chapters.length ? ' active' : ''}`}
+                  className={`compact-btn compact-tool-btn tour-chapters${chapters.length ? ' active' : ''}`}
                   onClick={() => setChaptersOpen(true)}
-                  aria-label="Chapters"
-                  title="Chapters: mark where each part starts (M adds one at the playhead)"
+                  aria-label={t('app.audioTools.chapters')}
+                  title={t('app.audioTools.chaptersTitle')}
                 >
-                  <Bookmark size={15} /><span>{chapters.length ? `Chapters (${chapters.length})` : 'Chapters'}</span>
+                  <Bookmark size={15} /><span>{chapters.length ? t('app.audioTools.chaptersCount', { n: chapters.length }) : t('app.audioTools.chapters')}</span>
                 </button>
                 <button
                   className={`compact-btn compact-tool-btn${wordTools.transcriptOpen ? ' active' : ''}`}
                   onClick={wordTools.openTranscript}
                   aria-pressed={wordTools.transcriptOpen}
-                  aria-label="Transcript"
-                  title="Transcript: edit the show by its text, delete words to cut them"
+                  aria-label={t('app.audioTools.transcript')}
+                  title={t('app.audioTools.transcriptTitle')}
                 >
-                  <ScrollText size={15} /><span>Transcript</span>
+                  <ScrollText size={15} /><span>{t('app.audioTools.transcript')}</span>
                 </button>
                 <button
                   className="compact-btn compact-tool-btn"
                   onClick={() => wordTools.setFillersOpen(true)}
                   disabled={!audioClips.length}
-                  aria-label="Remove fillers"
-                  title="Remove fillers: find um, uh, you know and long pauses, review them, cut them"
+                  aria-label={t('app.audioTools.fillersLabel')}
+                  title={t('app.audioTools.fillersTitle')}
                 >
-                  <Wand2 size={15} /><span>Fillers</span>
+                  <Wand2 size={15} /><span>{t('app.audioTools.fillers')}</span>
                 </button>
               </>
             )}
@@ -1872,14 +1876,14 @@ function App() {
             {cutProgress.finished ? (
               <>
                 <span className="compact-render-progress-text">
-                  {cutProgress.failed} clip{cutProgress.failed === 1 ? '' : 's'} could not be read{activeUpload ? ' yet: try again when the upload is done' : ''}. The others were cut.
+                  {t(activeUpload ? 'app.cutSilences.failedUploading' : 'app.cutSilences.failed', { count: cutProgress.failed })}
                 </span>
-                <button className="compact-btn" onClick={() => setCutProgress(null)} title="Dismiss"><X size={12} /></button>
+                <button className="compact-btn" onClick={() => setCutProgress(null)} title={t('app.dismiss')}><X size={12} /></button>
               </>
             ) : (
               <>
                 <Loader2 size={14} className="encoding-notice-spin" />
-                <span className="compact-render-progress-text">Cutting silences: clip {cutProgress.done} of {cutProgress.total}</span>
+                <span className="compact-render-progress-text">{t('app.cutSilences.progress', { done: cutProgress.done, total: cutProgress.total })}</span>
               </>
             )}
           </div>
@@ -1887,16 +1891,16 @@ function App() {
         {groupNotice && (
           <div className="compact-render-progress audio-template-notice" role="status">
             <span className="compact-render-progress-text">{groupNotice}</span>
-            <button className="compact-btn" onClick={() => setGroupNotice(null)} title="Dismiss"><X size={12} /></button>
+            <button className="compact-btn" onClick={() => setGroupNotice(null)} title={t('app.dismiss')}><X size={12} /></button>
           </div>
         )}
         {templateNotice && (
           <div className="compact-render-progress audio-template-notice" role="status">
             <span className="compact-render-progress-text">
-              Template applied: {templateNotice.map(r => ({ intro: 'intro', outro: 'outro', bed: 'music bed' }[r])).filter(Boolean).join(', ')}.
+              {t('app.template.applied', { parts: formatList(templateNotice.filter(r => ['intro', 'outro', 'bed'].includes(r)).map(r => t(`app.template.${r}`))) })}
             </span>
-            <button className="compact-btn" onClick={() => { applyTracks(t => removeAudioTemplate(t)); setTemplateNotice(null) }}>Take it off</button>
-            <button className="compact-btn" onClick={() => setTemplateNotice(null)} title="Dismiss"><X size={12} /></button>
+            <button className="compact-btn" onClick={() => { applyTracks(t => removeAudioTemplate(t)); setTemplateNotice(null) }}>{t('app.template.takeOff')}</button>
+            <button className="compact-btn" onClick={() => setTemplateNotice(null)} title={t('app.dismiss')}><X size={12} /></button>
           </div>
         )}
 
@@ -1912,7 +1916,7 @@ function App() {
               />
             </div>
             <span className="compact-render-progress-text">
-              {renderStatus.phase || `${Math.round((renderStatus.progress || 0) * 100)}%`}
+              {renderStatus.phase || percent(renderStatus.progress || 0)}
             </span>
           </div>
         )}
@@ -1920,7 +1924,7 @@ function App() {
         {/* Render error */}
         {renderStatus?.status === 'failed' && (
           <div className="compact-render-error">
-            <span>Render failed: {renderStatus.error}</span>
+            <span>{t('render.failed', { error: renderStatus.error })}</span>
             <button onClick={clearRenderStatus}><X size={12} /></button>
           </div>
         )}
@@ -1964,22 +1968,22 @@ function App() {
           {audioMode && pickingRange && (
             <div className="range-pick-bar" role="status">
               <Scissors size={14} />
-              <span>Click where the audiogram's piece starts, then where it ends (up to 2 minutes). Pull its edges to adjust.</span>
+              <span>{t('app.rangePick.hint')}</span>
               {audiogramRange && (audiogramRange.end == null
-                ? <strong data-testid="range-pick-value">From {chapterTime(audiogramRange.start)}: now click where it ends</strong>
-                : <strong data-testid="range-pick-value">{chapterTime(audiogramRange.start)} – {chapterTime(audiogramRange.end)} · {Math.round(audiogramRange.end - audiogramRange.start)}s</strong>)}
+                ? <strong data-testid="range-pick-value">{t('app.rangePick.from', { start: chapterTime(audiogramRange.start) })}</strong>
+                : <strong data-testid="range-pick-value">{t('app.rangePick.span', { start: chapterTime(audiogramRange.start), end: chapterTime(audiogramRange.end), seconds: Math.round(audiogramRange.end - audiogramRange.start) })}</strong>)}
               <button
                 className={`compact-btn range-pick-play${rangePreview ? ' active' : ''}`}
                 onClick={toggleRangePreview}
                 disabled={!audiogramRange || audiogramRange.end == null || audiogramRange.end - audiogramRange.start < 3}
                 aria-pressed={rangePreview}
-                title="Listen to just this piece (Space)"
+                title={t('app.rangePick.listenTitle')}
               >
-                {rangePreview ? <Pause size={14} /> : <Play size={14} />} {rangePreview ? 'Stop' : 'Play the piece'}
+                {rangePreview ? <Pause size={14} /> : <Play size={14} />} {rangePreview ? t('app.rangePick.stop') : t('app.rangePick.play')}
               </button>
               <span className="range-pick-spacer" />
-              <button className="compact-btn" onClick={() => finishPickingRange(false)}>Cancel</button>
-              <button className="compact-render-btn" onClick={() => finishPickingRange(true)} disabled={!audiogramRange || audiogramRange.end == null || audiogramRange.end - audiogramRange.start < 3}>Use this piece</button>
+              <button className="compact-btn" onClick={() => finishPickingRange(false)}>{t('common.cancel')}</button>
+              <button className="compact-render-btn" onClick={() => finishPickingRange(true)} disabled={!audiogramRange || audiogramRange.end == null || audiogramRange.end - audiogramRange.start < 3}>{t('app.rangePick.use')}</button>
             </div>
           )}
           <Timeline
@@ -2047,8 +2051,8 @@ function App() {
           {reversingClipId && (
             <div className="hls-download-overlay">
               <div className="hls-download-modal">
-                <h3>Reversing clip...</h3>
-                <p>Processing on server, please wait.</p>
+                <h3>{t('app.reverse.title')}</h3>
+                <p>{t('app.reverse.body')}</p>
               </div>
             </div>
           )}
@@ -2107,7 +2111,7 @@ function App() {
             key={beatClip.id}
             clip={beatClip}
             source={beatSource}
-            unavailable={beatClip && !beatSource ? 'This clip is still streaming from 3Speak. Try again once its download has finished.' : null}
+            unavailable={beatClip && !beatSource ? t('app.clipStreaming') : null}
             onSetBeats={(fields) => updateClip(beatClip.id, fields)}
             onFitClips={fitClipsToBeats}
             onClose={() => setBeatClipId(null)}
@@ -2243,7 +2247,7 @@ function App() {
           <div className="hls-download-overlay">
             <div className="hls-download-modal">
               <Download size={32} className="hls-download-icon" />
-              <h3>Downloading Media</h3>
+              <h3>{t('app.hlsDownload.title')}</h3>
               <p className="hls-download-name">{activeHlsDownload.name}</p>
               <div className="hls-download-progress-bar">
                 <div
@@ -2251,8 +2255,8 @@ function App() {
                   style={{ width: `${Math.round(activeHlsDownload.progress * 100)}%` }}
                 />
               </div>
-              <p className="hls-download-percent">{Math.round(activeHlsDownload.progress * 100)}%</p>
-              <p className="hls-download-hint">Please wait while the media is being prepared...</p>
+              <p className="hls-download-percent">{percent(activeHlsDownload.progress)}</p>
+              <p className="hls-download-hint">{t('app.hlsDownload.hint')}</p>
             </div>
           </div>
         )}
@@ -2267,8 +2271,8 @@ function App() {
           <div className="video-preview-overlay">
             <div className="video-preview-modal">
               <div className="video-preview-header">
-                <h3>{audioMode ? 'Listen before you use it' : 'Preview your video'}</h3>
-                <button className="video-preview-close" onClick={() => setShowPreview(false)}>
+                <h3>{audioMode ? t('app.sendPreview.titleAudio') : t('app.sendPreview.titleVideo')}</h3>
+                <button className="video-preview-close" onClick={() => setShowPreview(false)} title={t('common.close')} aria-label={t('common.close')}>
                   <X size={18} />
                 </button>
               </div>
@@ -2288,22 +2292,22 @@ function App() {
               {askAudiograms ? (
                 // No audiograms for this audio yet: offer them before it goes (once per export)
                 <div className="video-preview-ask" role="alertdialog" aria-labelledby="ask-audiograms-title">
-                  <h4 id="ask-audiograms-title"><Film size={15} /> Make audiograms for Shorts?</h4>
-                  <p>Short videos of the best pieces of this audio, posted as 3Speak Shorts together with it, each linking back to it.</p>
+                  <h4 id="ask-audiograms-title"><Film size={15} /> {t('app.sendPreview.askTitle')}</h4>
+                  <p>{t('app.sendPreview.askBody')}</p>
                   <div className="video-preview-actions">
                     <button className="video-preview-back" onClick={() => { askedAudiogramsRef.current.add(renderStatus.outputUrl); setAskAudiograms(false); sendToHost() }}>
-                      No, use the audio
+                      {t('app.sendPreview.askNo')}
                     </button>
                     <button className="video-preview-send" onClick={() => { askedAudiogramsRef.current.add(renderStatus.outputUrl); setAskAudiograms(false); setShowPreview(false); setAudiogramOpen(true) }}>
                       <Film size={14} />
-                      <span>Make audiograms</span>
+                      <span>{t('app.sendPreview.askMake')}</span>
                     </button>
                   </div>
                 </div>
               ) : (
               <div className="video-preview-actions">
                 <button className="video-preview-back" onClick={() => setShowPreview(false)}>
-                  Back to Editor
+                  {t('app.sendPreview.back')}
                 </button>
                 <button
                   className="video-preview-send"
@@ -2313,7 +2317,7 @@ function App() {
                   }}
                 >
                   <Send size={14} />
-                  <span>{audioMode ? 'Use this audio' : 'Send Video'}</span>
+                  <span>{audioMode ? t('render.done.useAudio') : t('render.done.sendVideo')}</span>
                 </button>
               </div>
               )}
@@ -2330,8 +2334,8 @@ function App() {
       {/* Backend health warning */}
       {backendStatus === 'error' && (
         <div className="backend-warning">
-          Backend server is unreachable. Recording upload, rendering, and media processing will not work.
-          <button onClick={() => setBackendStatus('ok')}>Dismiss</button>
+          {t('app.backendDown')}
+          <button onClick={() => setBackendStatus('ok')}>{t('app.dismiss')}</button>
         </div>
       )}
 
@@ -2339,13 +2343,13 @@ function App() {
       <header className="app-branding">
         <div className="branding-left">
           <img src={logo3speak} alt="3Speak" className="branding-logo" />
-          <span className="branding-text">Shorts Editor <span className="branding-badge">beta</span></span>
-          <span className="branding-info" title={`Backend: ${window.location.origin}`}>
+          <span className="branding-text">{t('app.branding.shortsEditor')} <span className="branding-badge">{t('app.branding.beta')}</span></span>
+          <span className="branding-info" title={t('app.branding.backend', { url: window.location.origin })}>
             <Info size={14} />
           </span>
         </div>
         <DraftStatus drafts={drafts} canSignIn={canDraftSignIn} signInState={draftContext.reason} onSignIn={requestDraftSignIn} onOpenLimit={() => drafts.save()} />
-        <button className="branding-close-btn" onClick={handleCloseEditor} title="Close editor">
+        <button className="branding-close-btn" onClick={handleCloseEditor} title={t('app.branding.closeEditor')}>
           <X size={18} />
         </button>
       </header>
@@ -2356,7 +2360,7 @@ function App() {
           <div className={`collapsible-section ${previewOpen ? 'open' : 'closed'}`}>
             <button className="collapsible-header" onClick={() => setPreviewOpen(p => !p)}>
               {previewOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              <span>Preview</span>
+              <span>{t('common.preview')}</span>
             </button>
             {previewOpen && (
               <div className="collapsible-body">
@@ -2369,7 +2373,7 @@ function App() {
           <div className={`collapsible-section ${libraryOpen ? 'open' : 'closed'}`}>
             <button className="collapsible-header" onClick={() => setLibraryOpen(p => !p)}>
               {libraryOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              <span>Project Library</span>
+              <span>{t('app.legacy.projectLibrary')}</span>
             </button>
             {libraryOpen && (
               <div className="collapsible-body">
@@ -2389,7 +2393,7 @@ function App() {
           {/* FFmpeg Status - only show while loading */}
           {loading && (
             <div className="ffmpeg-status">
-              <span className="ffmpeg-loading">Loading FFmpeg... {Math.round(progress * 100)}%</span>
+              <span className="ffmpeg-loading">{t('app.legacy.loadingFfmpeg', { percent: percent(progress) })}</span>
             </div>
           )}
 
@@ -2448,7 +2452,7 @@ function App() {
               <button
                 onClick={undo}
                 disabled={!canUndo}
-                title="Undo (Ctrl+Z)"
+                title={t('app.menu.undo')}
                 className="undo-btn"
               >
                 <Undo2 size={16} />
@@ -2456,19 +2460,19 @@ function App() {
               <button
                 onClick={redo}
                 disabled={!canRedo}
-                title="Redo (Ctrl+Shift+Z)"
+                title={t('app.menu.redo')}
                 className="redo-btn"
               >
                 <Redo2 size={16} />
               </button>
             </div>
-            <button className="add-media-btn" onClick={handleAddMedia} title="Add media to library">
+            <button className="add-media-btn" onClick={handleAddMedia} title={t('app.legacy.addMediaTitle')}>
               <FolderPlus size={16} />
-              <span>Add Media</span>
+              <span>{t('app.legacy.addMedia')}</span>
             </button>
-            <button className="add-media-btn" onClick={openRecorder} title="Record video from camera">
+            <button className="add-media-btn" onClick={openRecorder} title={t('app.legacy.recordTitle')}>
               <Video size={16} />
-              <span>Record</span>
+              <span>{t('app.legacy.record')}</span>
             </button>
             <input
               ref={addMediaInputRef}
@@ -2538,8 +2542,8 @@ function App() {
         {reversingClipId && (
           <div className="hls-download-overlay">
             <div className="hls-download-modal">
-              <h3>Reversing clip...</h3>
-              <p>Processing on server, please wait.</p>
+              <h3>{t('app.reverse.title')}</h3>
+              <p>{t('app.reverse.body')}</p>
             </div>
           </div>
         )}
@@ -2574,7 +2578,7 @@ function App() {
             <div className={`collapsible-section properties-section ${propertiesOpen ? 'open' : 'closed'}`}>
               <button className="collapsible-header" onClick={() => setPropertiesOpen(p => !p)}>
                 {propertiesOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                <span>Properties{selectedClip ? ` — ${selectedClip.name}` : ''}</span>
+                <span>{selectedClip ? t('app.legacy.propertiesOf', { name: selectedClip.name }) : t('app.legacy.properties')}</span>
               </button>
               {propertiesOpen && selectedClip && (
                 <div className="collapsible-body">
@@ -2631,7 +2635,7 @@ function App() {
           key={beatClip.id}
           clip={beatClip}
           source={beatSource}
-          unavailable={beatClip && !beatSource ? 'This clip is still streaming from 3Speak. Try again once its download has finished.' : null}
+          unavailable={beatClip && !beatSource ? t('app.clipStreaming') : null}
           onSetBeats={(fields) => updateClip(beatClip.id, fields)}
           onFitClips={fitClipsToBeats}
           onClose={() => setBeatClipId(null)}
@@ -2677,7 +2681,7 @@ function App() {
         <div className="hls-download-overlay">
           <div className="hls-download-modal">
             <Download size={32} className="hls-download-icon" />
-            <h3>Downloading Media</h3>
+            <h3>{t('app.hlsDownload.title')}</h3>
             <p className="hls-download-name">{activeHlsDownload.name}</p>
             <div className="hls-download-progress-bar">
               <div
@@ -2685,8 +2689,8 @@ function App() {
                 style={{ width: `${Math.round(activeHlsDownload.progress * 100)}%` }}
               />
             </div>
-            <p className="hls-download-percent">{Math.round(activeHlsDownload.progress * 100)}%</p>
-            <p className="hls-download-hint">Please wait while the media is being prepared...</p>
+            <p className="hls-download-percent">{percent(activeHlsDownload.progress)}</p>
+            <p className="hls-download-hint">{t('app.hlsDownload.hint')}</p>
           </div>
         </div>
       )}

@@ -9,6 +9,9 @@ import { useRangePlayback } from '../hooks/useRangePlayback'
 import { rippleCutRanges, cutLength } from '../utils/ripple'
 import { newChapter, MAX_CHAPTERS } from '../utils/chapters'
 import { isHlsUrl } from '../utils/hlsHelper'
+import { useT, formatNumber } from '../i18n'
+
+const oneDecimal = (n) => formatNumber(n, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 
 /**
  * The editor's word tools in one place, so App only places them: the
@@ -17,12 +20,13 @@ import { isHlsUrl } from '../utils/hlsHelper'
  * (the audio template refitted to the new length) runs in the same step.
  */
 export function useWordTools({ tracks, buildAndUploadPayload, applyTracks, undo, fileStoreRef, previewControlRef, setChapters, refitRef, enabled = true }) {
+  const { t } = useT()
   const [transcriptOpen, setTranscriptOpen] = useState(false)
   const [fillersOpen, setFillersOpen] = useState(false)
   // the backend is asked whether it can transcribe when a tool opens (by then the editor has picked its backend)
   const tr = useTranscript({ tracks, buildAndUploadPayload, enabled: enabled && (transcriptOpen || fillersOpen) })
   const player = useRangePlayback(previewControlRef)
-  const [cutNotice, setCutNotice] = useState(null) // { what, seconds }
+  const [cutNotice, setCutNotice] = useState(null) // { what, seconds }; what: null | { kind: 'words' | 'found', count } | { kind: 'fillers', fillers, pauses }
   const tracksRef = useRef(tracks)
   tracksRef.current = tracks
 
@@ -32,8 +36,8 @@ export function useWordTools({ tracks, buildAndUploadPayload, applyTracks, undo,
     return () => clearTimeout(id)
   }, [cutNotice])
 
-  /** Cut timeline stretches out of every track and close them up (one undo step). */
-  const cutTimeline = useCallback((ranges, what = '') => {
+  /** Cut timeline stretches out of every track and close them up (one undo step). `what` says what was cut, for the notice. */
+  const cutTimeline = useCallback((ranges, what = null) => {
     if (!ranges?.length) return
     player.stop()
     applyTracks(prev => {
@@ -64,8 +68,8 @@ export function useWordTools({ tracks, buildAndUploadPayload, applyTracks, undo,
   const transcriptPanel = ({ playheadPosition, playing, onSeek }) => (transcriptOpen ? (
     <div className="compact-properties-panel captions-side transcript-side">
       <div className="compact-properties-header">
-        <span className="compact-properties-title">Transcript</span>
-        <button className="compact-btn compact-properties-close" onClick={() => setTranscriptOpen(false)} title="Close the transcript"><X size={14} /></button>
+        <span className="compact-properties-title">{t('words.panel.title')}</span>
+        <button className="compact-btn compact-properties-close" onClick={() => setTranscriptOpen(false)} title={t('words.panel.close')}><X size={14} /></button>
       </div>
       <TranscriptPanel tr={tr} playheadPosition={playheadPosition} playing={playing} onSeek={onSeek || seek} onCut={cutTimeline} onOpenFillers={() => setFillersOpen(true)} />
     </div>
@@ -77,11 +81,25 @@ export function useWordTools({ tracks, buildAndUploadPayload, applyTracks, undo,
     <ChapterSuggestions tracks={tracks} words={tr.words} language={tr.language} end={end} resolved={resolved} sourceOf={sourceOf} player={player} onAccept={addChapters} onSeek={seek} />
   )
 
+  const cutNoticeText = (n) => {
+    const seconds = oneDecimal(n.seconds)
+    const what = n.what
+    if (what?.kind === 'words') return t('words.cutNotice.words', { count: what.count, seconds })
+    if (what?.kind === 'found') return t('words.cutNotice.found', { count: what.count, seconds })
+    if (what?.kind === 'fillers') {
+      return t('words.cutNotice.fillers', {
+        fillers: t('words.fillers.fillerCount', { count: what.fillers }),
+        pauses: t('words.fillers.pauseCount', { count: what.pauses }),
+        seconds
+      })
+    }
+    return t('words.cutNotice.plain', { seconds })
+  }
   const cutNoticeBar = cutNotice ? (
     <div className="compact-render-progress audio-template-notice" role="status">
-      <span className="compact-render-progress-text">Cut {cutNotice.what ? `${cutNotice.what}: ` : ''}{cutNotice.seconds.toFixed(1)} s shorter.</span>
-      {undo && <button className="compact-btn" onClick={() => { undo(); setCutNotice(null) }}>Undo</button>}
-      <button className="compact-btn" onClick={() => setCutNotice(null)} title="Dismiss"><X size={12} /></button>
+      <span className="compact-render-progress-text">{cutNoticeText(cutNotice)}</span>
+      {undo && <button className="compact-btn" onClick={() => { undo(); setCutNotice(null) }}>{t('common.undo')}</button>}
+      <button className="compact-btn" onClick={() => setCutNotice(null)} title={t('words.cutNotice.dismiss')}><X size={12} /></button>
     </div>
   ) : null
 

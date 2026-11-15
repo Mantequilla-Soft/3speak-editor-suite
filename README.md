@@ -140,6 +140,19 @@ The same editor for podcasts, music and voice. 3Speak opens it from its share me
 - **Remove fillers** (Fillers): um, uh, "you know", "like" as a filler and their equivalents per language (`src/data/fillerWords.json`), plus pauses over a chosen length, in a review list (listen to each, untick to keep); then the fillers are cut and the pauses shortened to a chosen length. Whisper writes the fillers down because the transcript starts it from a line full of them in the spoken language (`backend/src/utils/verbatimPrompts.js`).
 - **Chapter suggestions** (Chapters, Suggest chapters): topic shifts in the transcript (TextTiling, no AI), long pauses (from the loudness without a transcript) and scene changes (`POST /api/clip/scenes`), titled with the words that set each part apart (`src/utils/chapterSuggest.js`). Add them one by one or all.
 
+## Languages
+
+The editor speaks the 21 languages of 3speak.tv (`src/i18n/languages.js`, the same list as the frontend). 3Speak opens it with `?lang=<code>` and sends `{ type: 'set-language', lang }` when the viewer switches while it is open (like `set-theme`); without either it follows the browser, then English. English is bundled; every other language is loaded on demand (one small chunk per area file), so the editor opens as fast as before. The teleprompter's voice language and the caption/transcript language names follow it too.
+
+Strings live in `src/locales/<lang>/<area>.json` (`timeline.json` holds `t('timeline...')`), in the frontend's format: `{{placeholders}}`, plural forms `_one`/`_other` (plus `_few`/`_many` for ru, uk, pl) picked from `{ count }` with `Intl.PluralRules`, and simple `<tag>`s for `tRich()`. The code is `src/i18n/index.js` (a small `t()`, no library): `const { t } = useT()` in a component, `import { t } from '../i18n'` elsewhere (called when the text is needed, never at module top level).
+
+Adding or changing a string:
+
+1. Add it to `src/locales/en/<area>.json` (a new feature can get its own area file) and use it: `t('area.key', { name })`. Whole sentences only, never glued from pieces; a changed meaning gets a new key.
+2. `npm run i18n:reuse -- --from ../new-3speak-tv` fills keys whose English text the 3Speak frontend already translates.
+3. `npm run i18n:todo -- --out /tmp/i18n-todo` writes one flat file per language with what is still missing (in that language's plural forms); translate the values, keeping every `{{placeholder}}` and `<tag>`, then `npm run i18n:merge -- --in /tmp/i18n-todo`.
+4. `npm run i18n:check` (also run by `tests/i18n.test.js`): every language has every key, the same placeholders, its own plural forms, and every key is used in `src/`.
+
 ## Tests
 
 ```bash
@@ -147,6 +160,8 @@ npm test                        # editor unit tests (Vitest)
 cd backend && npm test          # backend: routes, audio render through real ffmpeg, templates
 npm run test:e2e:audio          # the audio editor end to end in Chromium against a local backend
 npm run test:e2e:words          # transcript, fillers, chapter ideas, audiogram captions (a stand-in whisper)
+npm run test:e2e:language       # the editor, audio editor and Ad Wizard in the viewer's language (?lang=, set-language)
+npm run i18n:check              # the translations: all keys, placeholders, plural forms
 ```
 
 The end-to-end test needs `ffmpeg`/`ffprobe` on PATH and Chromium (`E2E_CHROME`, default Playwright's chromium-1148). It makes its own test audio, starts a backend on a free port with throwaway folders and token secret, builds the editor against it, plays the 3Speak side (`e2e/host.html`), and removes everything afterwards.

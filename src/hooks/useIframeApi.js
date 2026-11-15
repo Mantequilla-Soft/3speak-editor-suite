@@ -15,6 +15,7 @@ import { emojiUrlsOf } from '../utils/captionSources'
 import { loadCreditOf, isMusicLoad } from '../utils/loadCredit'
 import { reframeForRender, exportSizes } from '../utils/exportAs'
 import { submitRender, pollRender, statusPhase } from '../utils/renderQueue'
+import { t } from '../i18n'
 
 const isIframe = typeof window !== 'undefined' && window.parent !== window
 const GATEWAY_URL = (import.meta.env.VITE_GATEWAY_URL || '').replace(/\/+$/, '')
@@ -124,7 +125,7 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
             if (clipEnd != null || urlRange.clipEnd != null) {
               range.clipEnd = clipEnd != null ? clipEnd : urlRange.clipEnd
             }
-            const added = await addToLibraryAndTimeline(url, name || file?.name || 'Imported Media', mediaType, file ? { ...range, file } : range)
+            const added = await addToLibraryAndTimeline(url, name || file?.name || t('app.importedMedia'), mediaType, file ? { ...range, file } : range)
             // The remix picker (stitch / reaction / free edit) is for someone else's
             // video. The creator's own file just goes on the timeline.
             if (added && !file && mediaType === 'video' && range.clipStart == null && range.clipEnd == null) {
@@ -275,7 +276,7 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
     })
 
     if (!res.ok) {
-      throw new Error(`Upload failed: ${res.status}`)
+      throw new Error(t('errors.uploadFailed', { status: String(res.status) }))
     }
 
     const data = await res.json()
@@ -316,7 +317,9 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
 
     for (let i = 0; i < blobClips.length; i++) {
       const clip = blobClips[i]
-      onProgress(`Uploading ${clip.name || 'file'} (${i + 1}/${blobClips.length})...`)
+      onProgress(clip.name
+        ? t('render.phase.uploadingFile', { name: clip.name, index: i + 1, total: blobClips.length })
+        : t('render.phase.uploadingUnnamed', { index: i + 1, total: blobClips.length }))
       const serverUrl = await uploadFile(clip._file, clip.name)
       urlOverrides.set(clip.id, serverUrl)
     }
@@ -328,7 +331,7 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
       if (!localUrl || !/^(blob|data):/.test(localUrl)) return localUrl || null
       let url = uploadedPlatesRef.current.get(localUrl)
       if (!url) {
-        onProgress(`Uploading background frame for ${clip.name || 'clip'}...`)
+        onProgress(clip.name ? t('render.phase.uploadingPlate', { name: clip.name }) : t('render.phase.uploadingPlateUnnamed'))
         const blob = await (await fetch(localUrl)).blob()
         url = await uploadFile(blob, name)
         uploadedPlatesRef.current.set(localUrl, url)
@@ -568,7 +571,7 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
         get: () => fetch(pollUrl, { cache: 'no-store', signal }),
         signal,
         onStatus: (d) => setRenderStatus(prev => (d.reconnecting
-          ? { ...prev, phase: 'Reconnecting to the render server...' }
+          ? { ...prev, phase: t('render.phase.reconnecting') }
           : { ...d, status: d.status || 'processing', phase: statusPhase(d) || prev?.phase }))
       })
     } catch (err) {
@@ -615,13 +618,13 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
     const ac = new AbortController()
     pollAbortRef.current = ac
     try {
-      setRenderStatus({ status: 'submitting', progress: 0, phase: 'Preparing files...' })
+      setRenderStatus({ status: 'submitting', progress: 0, phase: t('render.phase.preparing') })
 
       const payload = await buildAndUploadPayload((phase) => {
         setRenderStatus(prev => ({ ...prev, phase }))
       })
 
-      setRenderStatus({ status: 'submitting', progress: 0, phase: 'Submitting render job...' })
+      setRenderStatus({ status: 'submitting', progress: 0, phase: t('render.phase.submitting') })
 
       const renderUrl = GATEWAY_URL ? `${GATEWAY_URL}/api/render` : api('/api/render')
       const body = JSON.stringify(payload)
@@ -631,14 +634,14 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
         onWait: ({ seconds, busy }) => setRenderStatus({
           status: 'submitting',
           progress: 0,
-          phase: busy ? `The render servers are busy. Trying again in ${seconds} s...` : `No connection to the render server. Trying again in ${seconds} s...`
+          phase: busy ? t('render.phase.busyRetry', { seconds }) : t('render.phase.offlineRetry', { seconds })
         })
       })
       if (!answer || ac.signal.aborted) return
 
       const { jobId, backendEndpoint } = answer
       activeJobRef.current = { jobId, backendEndpoint }
-      setRenderStatus({ jobId, status: answer.status === 'queued' ? 'queued' : 'processing', progress: 0, phase: statusPhase(answer) || 'Starting...', ...(answer.position ? { position: answer.position } : {}) })
+      setRenderStatus({ jobId, status: answer.status === 'queued' ? 'queued' : 'processing', progress: 0, phase: statusPhase(answer) || t('render.phase.starting'), ...(answer.position ? { position: answer.position } : {}) })
       await pollJobStatus(jobId, backendEndpoint, ac.signal)
     } catch (err) {
       if (ac.signal.aborted) return

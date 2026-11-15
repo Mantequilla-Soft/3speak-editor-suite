@@ -8,6 +8,7 @@ import { lockCamera, unlockCamera, applyCameraLock, describeCameraLock } from '.
 import { openCamera, mediaErrorMessage } from '../utils/mediaAccess'
 import ChromaKeyCanvas from './ChromaKeyCanvas'
 import Teleprompter from './Teleprompter/Teleprompter'
+import { useT } from '../i18n'
 
 // guide (remix modes, optional): { title, hint, maxDuration, sync }
 //   sync: true  -> only "record + play" (reaction), false -> only plain record (stitch)
@@ -19,6 +20,7 @@ import Teleprompter from './Teleprompter/Teleprompter'
 // reviewSync (reactions, optional): links the take's playback to the timeline
 //   preview: { start, playhead, previewPlaying, playFrom, seek, pause, getPosition }
 function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped, pipSize, onToggleSize, guide, reviewSync, boxStyle, boxLayout, onBoxPointerDown, layoutChoices, onChangeLayout }) {
+  const { t } = useT()
   const liveVideoRef = useRef(null)
   const playbackVideoRef = useRef(null)
   const streamRef = useRef(null)
@@ -139,7 +141,7 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
       } catch (err) {
         if (!cancelled) {
           console.warn('[recorder] camera failed:', err?.name, err?.message)
-          setError(mediaErrorMessage(err))
+          setError({ err })
         }
       }
     }
@@ -283,11 +285,11 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
       setPhase('previewing')
     } catch (err) {
       console.warn('[recorder] camera failed:', err?.name, err?.message)
-      setError(mediaErrorMessage(err))
+      setError({ err })
     }
   }, [playbackUrl])
 
-  const [uploadProgress, setUploadProgress] = useState('')
+  const [uploadProgress, setUploadProgress] = useState(null) // null | { stage: 'uploading' | 'converting', pct }
 
   // ---- Reviewing a reaction take in step with the original ----
   const review = phase === 'done' ? reviewSync : null
@@ -344,7 +346,7 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
 
     // Upload to backend for smooth playback
     setPhase('uploading')
-    setUploadProgress('Uploading...')
+    setUploadProgress({ stage: 'uploading' })
     const uploadStart = Date.now()
 
     try {
@@ -363,10 +365,10 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) {
             const pct = Math.round((e.loaded / e.total) * 100)
-            setUploadProgress(`Uploading... ${pct}%`)
+            setUploadProgress({ stage: 'uploading', pct })
           }
         }
-        xhr.upload.onload = () => setUploadProgress('Converting...')
+        xhr.upload.onload = () => setUploadProgress({ stage: 'converting' })
 
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) {
@@ -496,6 +498,10 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
     : phase === 'recording' ? 'recording'
     : (phase === 'done' || phase === 'uploading') ? 'done' : 'idle'
 
+  const uploadText = uploadProgress?.stage === 'converting' ? t('record.inline.converting')
+    : uploadProgress?.pct != null ? t('record.inline.uploadingPct', { pct: uploadProgress.pct })
+    : t('record.inline.uploading')
+
   const pipClassName = `inline-recorder-pip pip-${isSmall ? 'small' : isStage ? 'stage' : 'big'}`
   const pipStyle = isSmall ? { right: position.right, bottom: position.bottom } : {}
 
@@ -509,11 +515,11 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
         <span className="pip-title">
           {phase === 'recording'
             ? (maxDuration ? `${formatTime(elapsed)} / ${formatTime(Math.floor(maxDuration))}` : formatTime(elapsed))
-            : phase === 'uploading' ? (uploadProgress || 'Uploading...') : (guide?.title || 'Camera')}
+            : phase === 'uploading' ? uploadText : (guide?.title || t('record.inline.camera'))}
         </span>
         <div className="pip-header-actions">
           {onToggleSize && (
-            <button className="pip-size-btn" onClick={onToggleSize} title={isSmall ? 'Expand' : 'Shrink'}>
+            <button className="pip-size-btn" onClick={onToggleSize} title={isSmall ? t('record.inline.expand') : t('record.inline.shrink')}>
               {isSmall ? <Maximize2 size={10} /> : <Minimize2 size={10} />}
             </button>
           )}
@@ -535,7 +541,7 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
       >
         {error ? (
           <div className="pip-error" role="alert">
-            <p>{error}</p>
+            <p>{mediaErrorMessage(error.err)}</p>
             <button
               type="button"
               className="pip-error-retry"
@@ -543,7 +549,7 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
               onTouchStart={(e) => e.stopPropagation()}
               onClick={() => { setError(null); setPhase('starting'); setCameraTry(n => n + 1) }}
             >
-              Try again
+              {t('common.retry')}
             </button>
           </div>
         ) : (
@@ -580,7 +586,7 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
               style={{ ...stageMediaStyle(false), display: phase === 'done' || phase === 'uploading' ? 'block' : 'none' }}
             />
             {phase === 'uploading' && (
-              <div className="pip-uploading-overlay">{uploadProgress || 'Uploading...'}</div>
+              <div className="pip-uploading-overlay">{uploadText}</div>
             )}
           </>
         )}
@@ -588,12 +594,12 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
         {phase === 'recording' && (
           <div className="pip-timer">
             <span className="record-dot" />
-            REC
+            {t('record.inline.rec')}
           </div>
         )}
 
         {phase === 'starting' && !error && (
-          <div className="pip-loading">Starting...</div>
+          <div className="pip-loading">{t('record.inline.starting')}</div>
         )}
 
         {phase === 'countdown' && (
@@ -603,7 +609,7 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
         {plateCount != null && (
           <div className="pip-countdown pip-plate-countdown">
             {plateCount > 0 && <span>{plateCount}</span>}
-            <small>{plateCount > 0 ? 'Step out of the picture' : 'Shooting the background, stay out...'}</small>
+            <small>{plateCount > 0 ? t('record.inline.plateStepOut') : t('record.inline.plateShooting')}</small>
           </div>
         )}
       </div>
@@ -613,7 +619,7 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
           {guide.hint}
           {handleBoxPointerDown && (
             <span className="pip-guide-gestures">
-              Hold and drag a picture to reframe it, pinch to zoom{guide.mode === 'overlay' ? ', drag your camera box to move it' : ''}.
+              {guide.mode === 'overlay' ? t('record.inline.gesturesOverlay') : t('record.inline.gestures')}
             </span>
           )}
         </div>
@@ -635,9 +641,9 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
 
       {(phase === 'previewing' || phase === 'starting') && !error && (
         <div className="pip-greenscreen">
-          <div className="pip-greenscreen-modes" role="group" aria-label="Green screen">
-            <span className="pip-greenscreen-label">Green screen</span>
-            {[[null, 'Off'], ['green', 'Green'], ['blue', 'Blue'], ['static', 'Static']].map(([mode, label]) => (
+          <div className="pip-greenscreen-modes" role="group" aria-label={t('record.inline.greenScreen.label')}>
+            <span className="pip-greenscreen-label">{t('record.inline.greenScreen.label')}</span>
+            {[[null, 'off'], ['green', 'green'], ['blue', 'blue'], ['static', 'static']].map(([mode, label]) => (
               <button
                 key={label}
                 className={greenScreen === mode ? 'active' : ''}
@@ -645,9 +651,9 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
                   if (mode !== 'static') releaseCameraLock()
                   setGreenScreen(mode); setKeyTune(null); setKeyFailed(false)
                 }}
-                title={mode === 'static' ? 'Static background (experimental): removes whatever matches a shot of the empty background' : undefined}
+                title={mode === 'static' ? t('record.inline.greenScreen.staticTitle') : undefined}
               >
-                {label}
+                {t(`record.inline.greenScreen.${label}`)}
               </button>
             ))}
           </div>
@@ -657,8 +663,8 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
             const pct = (v) => Math.round(v * 100)
             return (
               <div className="pip-greenscreen-sliders">
-                <label title={greenScreen === 'static' ? 'Tolerance: higher ignores more change in the background (noise, light, focus) but can start to remove parts of you' : 'Higher removes more of the screen colour'}>
-                  <span>Threshold</span>
+                <label title={greenScreen === 'static' ? t('record.inline.greenScreen.thresholdStaticTitle') : t('record.inline.greenScreen.thresholdTitle')}>
+                  <span>{t('record.inline.greenScreen.threshold')}</span>
                   <input
                     type="range"
                     min={pct(range[0])}
@@ -667,8 +673,8 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
                     onChange={(e) => setKeyTune(t => ({ ...t, similarity: parseInt(e.target.value) / 100 }))}
                   />
                 </label>
-                <label title={greenScreen === 'static' ? 'Removes the wall colour from the edges' : `Removes the ${greenScreen} tint from the edges`}>
-                  <span>Despill</span>
+                <label title={greenScreen === 'static' ? t('record.inline.greenScreen.despillStaticTitle') : greenScreen === 'blue' ? t('record.inline.greenScreen.despillBlueTitle') : t('record.inline.greenScreen.despillGreenTitle')}>
+                  <span>{t('record.inline.greenScreen.despill')}</span>
                   <input
                     type="range"
                     min={0}
@@ -683,16 +689,16 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
           {greenScreen === 'static' && (
             <div className="pip-greenscreen-plate">
               <button onClick={capturePlate} disabled={plateCount != null}>
-                {plateUrl ? 'Retake empty background' : 'Shoot empty background'}
+                {plateUrl ? t('record.inline.greenScreen.retakePlate') : t('record.inline.greenScreen.shootPlate')}
               </button>
               <small>
                 {plateUrl
-                  ? (describeCameraLock(cameraLock?.result) || 'Experimental. Keep the camera and the light exactly as they are.')
-                  : 'Experimental. Fix the camera in place, press the button and step out of the picture.'}
+                  ? (describeCameraLock(cameraLock?.result) || t('record.inline.greenScreen.plateKeep'))
+                  : t('record.inline.greenScreen.plateHowTo')}
               </small>
             </div>
           )}
-          {keyFailed && <small>Live keying is not available here. The clip still gets the green screen setting.</small>}
+          {keyFailed && <small>{t('record.inline.greenScreen.keyFailed')}</small>}
         </div>
       )}
 
@@ -701,49 +707,49 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
           <button
             className={`pip-tp-btn${tpActive ? ' active' : ''}`}
             onClick={() => tpRef.current?.openEditor()}
-            title={tpActive ? 'Edit teleprompter text' : 'Add teleprompter text'}
+            title={tpActive ? t('record.inline.tpEdit') : t('record.inline.tpAdd')}
           >
             <ScrollText size={12} />
-            <span className="pip-tp-label">Teleprompter</span>
+            <span className="pip-tp-label">{t('record.inline.teleprompter')}</span>
           </button>
         )}
         {phase === 'previewing' && !guide && (
           <>
-            <button className="pip-record-btn" onClick={tpActive ? () => startWithCountdown(startRecording) : startRecording} title="Record only">
+            <button className="pip-record-btn" onClick={tpActive ? () => startWithCountdown(startRecording) : startRecording} title={t('record.inline.recordOnly')}>
               <Circle size={14} />
             </button>
             {onSyncRecord && (
-              <button className="pip-sync-btn" onClick={tpActive ? () => startWithCountdown(handleSyncRecord) : handleSyncRecord} title="Record + Play video">
+              <button className="pip-sync-btn" onClick={tpActive ? () => startWithCountdown(handleSyncRecord) : handleSyncRecord} title={t('record.inline.recordAndPlay')}>
                 <Circle size={10} />
-                <span className="sync-label">+ Play</span>
+                <span className="sync-label">{t('record.inline.plusPlay')}</span>
               </button>
             )}
           </>
         )}
         {phase === 'previewing' && guide && (
           guide.sync && onSyncRecord ? (
-            <button className="pip-sync-btn" onClick={() => startWithCountdown(handleSyncRecord)} title="Record while the original plays">
+            <button className="pip-sync-btn" onClick={() => startWithCountdown(handleSyncRecord)} title={t('record.inline.recordReactionTitle')}>
               <Circle size={10} />
-              <span className="sync-label">Record reaction</span>
+              <span className="sync-label">{t('record.inline.recordReaction')}</span>
             </button>
           ) : (
-            <button className="pip-sync-btn" onClick={() => startWithCountdown(startRecording)} title="Record">
+            <button className="pip-sync-btn" onClick={() => startWithCountdown(startRecording)} title={t('record.inline.record')}>
               <Circle size={10} />
-              <span className="sync-label">Record</span>
+              <span className="sync-label">{t('record.inline.record')}</span>
             </button>
           )
         )}
         {phase === 'recording' && (
-          <button className="pip-stop-btn" onClick={stopRecording} title="Stop">
+          <button className="pip-stop-btn" onClick={stopRecording} title={t('record.inline.stop')}>
             <Square size={12} />
           </button>
         )}
         {phase === 'done' && (
           <>
-            <button className="pip-retake-btn" onClick={handleRetake} title="Retake">
+            <button className="pip-retake-btn" onClick={handleRetake} title={t('record.inline.retake')}>
               <RotateCcw size={12} />
             </button>
-            <button className="pip-use-btn" onClick={handleUseClip} title="Use Clip">
+            <button className="pip-use-btn" onClick={handleUseClip} title={t('record.inline.useClip')}>
               <Check size={12} />
             </button>
           </>

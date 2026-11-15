@@ -7,6 +7,7 @@ import { detectScriptLang, modelIdToTag } from '../../utils/detectLang'
 import { webSpeechUsable, isAndroid, isChromium } from '../../utils/speechSupport'
 import { createSttStream } from '../../utils/sttClient'
 import { requestSttConfig } from '../../utils/sttBridge'
+import { useT } from '../../i18n'
 import './Teleprompter.css'
 
 // Teleprompter for the editor's camera recorder (InlineRecorder), ported from the
@@ -71,17 +72,32 @@ const langLabel = (tag) => LANG_OPTIONS.find((o) => o.value === tag)?.label || t
 // Recognizer errors that mean voice following is not going to work this take.
 const FATAL_SPEECH_ERRORS = ['network', 'not-allowed', 'service-not-allowed', 'audio-capture']
 
-function speechErrorLabel(err) {
+function speechErrorLabel(err, t) {
   switch (err) {
-    case 'network': return 'Speech service unreachable. Recognition needs an internet connection (Chrome sends audio to Google to transcribe).'
-    case 'audio-capture': return 'No audio reached recognition. The mic may be busy, try a headset.'
+    case 'network': return t('teleprompter.speechErrors.network')
+    case 'audio-capture': return t('teleprompter.speechErrors.audioCapture')
     case 'not-allowed':
-    case 'service-not-allowed': return 'Microphone permission is blocked for speech recognition.'
+    case 'service-not-allowed': return t('teleprompter.speechErrors.notAllowed')
+    case 'unsupported': return t('teleprompter.speechErrors.unsupported')
     case 'no-speech':
     case 'aborted':
     case '': return ''
-    default: return `Speech recognition error: ${err}`
+    default: return t('teleprompter.speechErrors.generic', { err: String(err) })
   }
+}
+
+// The STT client's status reasons ('error:<reason>'), in words; anything else as it came.
+const STT_REASONS = {
+  'no microphone': 'teleprompter.sttReason.noMic',
+  'audio unavailable': 'teleprompter.sttReason.audioUnavailable',
+  'connection failed': 'teleprompter.sttReason.connectionFailed',
+  unauthorized: 'teleprompter.sttReason.unauthorized',
+  closed: 'teleprompter.sttReason.closed',
+  'server error': 'teleprompter.sttReason.serverError'
+}
+function sttReason(raw, t) {
+  if (!raw) return t('teleprompter.sttReason.unreachable')
+  return STT_REASONS[raw] ? t(STT_REASONS[raw]) : raw
 }
 
 function hexToRgba(hex, a) {
@@ -188,7 +204,8 @@ const shieldProps = {
 }
 
 // `showLabel`: the script editor's main button (the audio recorder has no camera).
-const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', streamRef, onActiveChange, showLabel = 'Show on camera' }, ref) {
+const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', streamRef, onActiveChange, showLabel }, ref) {
+  const { t, lang, formatNumber } = useT()
   const [script, setScript] = useState(loadScript)
   const [enabled, setEnabled] = useState(false)
   const [editorOpen, setEditorOpen] = useState(false)
@@ -227,8 +244,8 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
     <div className="tp-speech-notice" role="note">
       <Info size={18} aria-hidden="true" />
       <div>
-        <strong>Voice following only works in Chromium browsers for now.</strong>
-        <span> Use Chrome, Edge, Brave or Opera to have the script scroll as you speak. In this browser it scrolls at a steady speed you can set.</span>
+        <strong>{t('teleprompter.speechNotice.title')}</strong>
+        <span> {t('teleprompter.speechNotice.body')}</span>
       </div>
     </div>
   )
@@ -269,8 +286,9 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
   )
   const availableLangs = serverLangs.length ? serverLangs : ALL_LANG_TAGS
   const detectedLang = useMemo(
-    () => detectScriptLang(script, { allowed: availableLangs }),
-    [script, availableLangs]
+    // an empty or unclear script falls back to the editor's own language
+    () => detectScriptLang(script, { allowed: availableLangs, prefer: lang }),
+    [script, availableLangs, lang]
   )
   // 'auto' (default) follows the script; an explicit pick is honoured only if the
   // recognizer supports it, else we fall back to the detected one.
@@ -464,7 +482,7 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
       const hadVideo = stream.getVideoTracks().length > 0
       const stillLive = L.streamRef?.current === stream && (!hadVideo || stream.getVideoTracks().some((t) => t.readyState === 'live'))
       if (!audio) {
-        setNotice('Recording without a microphone (mic unavailable).')
+        setNotice('noMic')
         return
       }
       if (!stillLive) { audio.getTracks().forEach((t) => t.stop()); return }
@@ -644,83 +662,83 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
   const scrollLocked = recState === 'countdown' || isRecording || recState === 'paused'
 
   const langOptions = [
-    { value: 'auto', label: `Auto-detect (${langLabel(detectedLang)})` },
+    { value: 'auto', label: t('teleprompter.autoDetect', { lang: langLabel(detectedLang) }) },
     ...LANG_OPTIONS.filter((o) => availableLangs.includes(o.value))
   ]
 
   const overlaySettingsPanel = (
     <>
       <div className="tp-presets">
-        <button type="button" onClick={() => applyPreset('frontcam')} title="Small strip under the selfie lens, least obvious that you're reading">
-          Front cam
+        <button type="button" onClick={() => applyPreset('frontcam')} title={t('teleprompter.presets.frontcamTitle')}>
+          {t('teleprompter.presets.frontcam')}
         </button>
-        <button type="button" onClick={() => applyPreset('max')} title="Large type for reading from a distance">
-          Max size
+        <button type="button" onClick={() => applyPreset('max')} title={t('teleprompter.presets.maxTitle')}>
+          {t('teleprompter.presets.max')}
         </button>
-        <button type="button" onClick={() => applyPreset('top')} title="Several lines across the top">
-          Top lines
+        <button type="button" onClick={() => applyPreset('top')} title={t('teleprompter.presets.topTitle')}>
+          {t('teleprompter.presets.top')}
         </button>
       </div>
 
       <div className="tp-set-row">
-        <span>Scroll</span>
-        <div className="tp-seg" role="group" aria-label="Scroll mode">
+        <span>{t('teleprompter.scroll.label')}</span>
+        <div className="tp-seg" role="group" aria-label={t('teleprompter.scroll.modeAria')}>
           <button
             type="button"
             className={effectiveMode === 'voice' ? 'is-on' : ''}
             disabled={!voiceVia || scrollLocked}
             onClick={() => { stopTest(); setSetting({ mode: 'voice' }) }}
-            title={voiceVia ? 'Scrolls as you read the script aloud' : 'Needs Chrome, Edge or another Chromium browser'}
+            title={voiceVia ? t('teleprompter.scroll.followVoiceTitle') : t('teleprompter.scroll.needsChromium')}
           >
-            Follow voice
+            {t('teleprompter.scroll.followVoice')}
           </button>
           <button
             type="button"
             className={effectiveMode === 'timed' ? 'is-on' : ''}
             disabled={scrollLocked}
             onClick={() => { stopTest(); setSetting({ mode: 'timed' }) }}
-            title="Scrolls at a steady speed"
+            title={t('teleprompter.scroll.timedTitle')}
           >
-            Timed
+            {t('teleprompter.scroll.timed')}
           </button>
         </div>
       </div>
       {chromium && !voiceVia && (
         <div className="tp-set-note">
-          {voiceForcedButMissing ? 'Voice following is not available here, using timed scroll. ' : ''}
-          Voice following is not available in this browser.
+          {voiceForcedButMissing ? `${t('teleprompter.scroll.voiceForcedMissing')} ` : ''}
+          {t('teleprompter.scroll.voiceUnavailable')}
         </div>
       )}
 
       <label className="tp-set-row">
-        <span>Font size</span>
+        <span>{t('teleprompter.style.fontSize')}</span>
         <input type="range" min="10" max="52" step="1" value={settings.fontSize}
           onChange={(e) => setSetting({ fontSize: Number(e.target.value) })} />
-        <span className="tp-set-val">{settings.fontSize}px</span>
+        <span className="tp-set-val">{t('teleprompter.style.fontSizeValue', { size: settings.fontSize })}</span>
       </label>
       <div className="tp-set-colors">
         <label className="tp-set-color">
-          <span>Text</span>
+          <span>{t('teleprompter.style.text')}</span>
           <input type="color" value={settings.fontColor} onChange={(e) => setSetting({ fontColor: e.target.value })} />
         </label>
         <label className="tp-set-color">
-          <span>Background</span>
+          <span>{t('teleprompter.style.background')}</span>
           <input type="color" value={settings.bgColor} onChange={(e) => setSetting({ bgColor: e.target.value })} />
         </label>
         <label className="tp-set-row tp-set-opacity">
-          <span>BG opacity</span>
+          <span>{t('teleprompter.style.bgOpacity')}</span>
           <input type="range" min="0" max="1" step="0.05" value={settings.bgOpacity}
             onChange={(e) => setSetting({ bgOpacity: Number(e.target.value) })} />
-          <span className="tp-set-val">{Math.round(settings.bgOpacity * 100)}%</span>
+          <span className="tp-set-val">{formatNumber(settings.bgOpacity, { style: 'percent', maximumFractionDigits: 0 })}</span>
         </label>
       </div>
       <label className="tp-set-check">
         <input type="checkbox" checked={!!settings.mirrorText} onChange={(e) => setSetting({ mirrorText: e.target.checked })} />
-        <span>Mirror text (for a teleprompter mirror)</span>
+        <span>{t('teleprompter.style.mirrorText')}</span>
       </label>
       {effectiveMode === 'voice' && (
         <label className="tp-set-row">
-          <span>Voice language</span>
+          <span>{t('teleprompter.style.voiceLanguage')}</span>
           <select
             className="tp-lang-select"
             value={langOptions.some((o) => o.value === settings.lang) ? settings.lang : 'auto'}
@@ -735,7 +753,7 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
 
   const settingsGearBtn = (
     <button type="button" className={`tp-gear${settingsOpen ? ' is-on' : ''}`} onClick={() => { askStt(); setSettingsOpen((o) => !o) }}>
-      <Sliders size={15} /> Text style
+      <Sliders size={15} /> {t('teleprompter.style.title')}
     </button>
   )
 
@@ -743,8 +761,8 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
     <div ref={settingsMov.ref} className="tp-settings-pop" style={{ left: settingsMov.pos.x, top: settingsMov.pos.y }} {...settingsMov.surfaceProps}>
       <div className="tp-pop-header" {...settingsMov.handleProps}>
         <GripHorizontal size={14} />
-        <span className="tp-pop-title">Text style</span>
-        <button type="button" className="tp-pop-close" onPointerDown={stopProp} onClick={() => setSettingsOpen(false)} aria-label="Close">
+        <span className="tp-pop-title">{t('teleprompter.style.title')}</span>
+        <button type="button" className="tp-pop-close" onPointerDown={stopProp} onClick={() => setSettingsOpen(false)} aria-label={t('common.close')}>
           <X size={15} />
         </button>
       </div>
@@ -759,30 +777,31 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
   let statusWarn = false
   if (voiceFailed && (isRecording || recState === 'paused')) {
     statusWarn = true
+    const voiceError = speechErrorLabel(tp.error, t)
     statusText = usingStt || voiceVia === 'stt'
-      ? `Speech server error (${sttStatus.slice(6) || 'unreachable'}). Switched to timed scroll.`
-      : `${speechErrorLabel(tp.error) || 'Voice following stopped.'} Switched to timed scroll.`
+      ? t('teleprompter.status.serverErrorSwitched', { reason: sttReason(sttStatus.slice(6), t) })
+      : (voiceError ? t('teleprompter.status.voiceErrorSwitched', { error: voiceError }) : t('teleprompter.status.voiceStoppedSwitched'))
   } else if (voiceLive) {
     if (usingStt && sttStatus.startsWith('error')) {
       statusWarn = true
-      statusText = `Speech server error (${sttStatus.slice(6) || 'unreachable'}).`
-    } else if (!usingStt && speechErrorLabel(tp.error)) {
+      statusText = t('teleprompter.status.serverError', { reason: sttReason(sttStatus.slice(6), t) })
+    } else if (!usingStt && speechErrorLabel(tp.error, t)) {
       statusWarn = true
-      statusText = speechErrorLabel(tp.error)
+      statusText = speechErrorLabel(tp.error, t)
     } else {
       statusText = tp.interimText
         || (usingStt
-          ? (sttStatus === 'connected' ? 'Listening (server), start reading' : 'Connecting to speech server…')
-          : (tp.listening ? 'Listening, start reading aloud' : 'Starting mic…'))
+          ? (sttStatus === 'connected' ? t('teleprompter.status.listeningServer') : t('teleprompter.status.connectingServer'))
+          : (tp.listening ? t('teleprompter.status.listening') : t('teleprompter.status.startingMic')))
     }
   } else if (timerDriven && (isRecording || recState === 'paused')) {
-    statusText = userPaused || recState === 'paused' ? 'Scroll paused' : `Timed scroll, ${settings.wpm} wpm`
+    statusText = userPaused || recState === 'paused' ? t('teleprompter.status.scrollPaused') : t('teleprompter.status.timedScroll', { wpm: settings.wpm })
   } else if (timerDriven && testing) {
-    statusText = `Scroll test, ${settings.wpm} wpm`
+    statusText = t('teleprompter.status.scrollTest', { wpm: settings.wpm })
   }
   if (notice && (isRecording || recState === 'countdown')) {
     statusWarn = true
-    statusText = notice
+    statusText = t('teleprompter.noMic') // the only notice
   }
   const showPill = isRecording || recState === 'paused' || testing
   // Timed scrolling (outside Chromium without an STT server) gets a prominent control
@@ -816,8 +835,8 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
       {editorOpen && (
         <div className="tp-script-phase">
           <div className="tp-script-head">
-            <button type="button" className="tp-icon-btn" onClick={closeEditor} aria-label="Close"><X size={22} /></button>
-            <span className="tp-title">Teleprompter</span>
+            <button type="button" className="tp-icon-btn" onClick={closeEditor} aria-label={t('common.close')}><X size={22} /></button>
+            <span className="tp-title">{t('teleprompter.title')}</span>
             <span style={{ width: 40 }} />
           </div>
           {speechNotice}
@@ -825,23 +844,23 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
             className="tp-script-full"
             value={script}
             onChange={(e) => setScript(e.target.value)}
-            placeholder="Write or paste your script here. While you record it scrolls as you read it aloud, or at a steady speed in timed mode."
+            placeholder={t('teleprompter.scriptPlaceholder')}
             autoFocus
           />
           <div className="tp-script-bar">
             <span className="tp-script-mode">
-              {effectiveMode === 'voice' ? 'Scroll: follows your voice' : `Scroll: timed, ${settings.wpm} wpm`}
+              {effectiveMode === 'voice' ? t('teleprompter.scriptModeVoice') : t('teleprompter.scriptModeTimed', { wpm: settings.wpm })}
             </span>
             {settingsGearBtn}
           </div>
           <div className="tp-script-controls">
             {enabled && (
               <button type="button" className="tp-btn tp-btn--ghost" onClick={hideTeleprompter}>
-                <EyeOff size={16} /> Hide
+                <EyeOff size={16} /> {t('teleprompter.hide')}
               </button>
             )}
             <button type="button" className="tp-btn tp-btn--accent" onClick={showOnCamera} disabled={!script.trim()}>
-              {showLabel}
+              {showLabel || t('teleprompter.showOnCamera')}
             </button>
           </div>
         </div>
@@ -877,10 +896,10 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
           </div>
           {/* small corner grip instead of a header bar, so the script can sit
               right under the front lens without an obvious UI strip above it */}
-          <div className="tp-grip" onPointerDown={beginDrag('move')} title="Drag to move">
+          <div className="tp-grip" onPointerDown={beginDrag('move')} title={t('teleprompter.dragToMove')}>
             <GripHorizontal size={13} />
           </div>
-          <div className="tp-resize" onPointerDown={beginDrag('resize')} title="Drag to resize" />
+          <div className="tp-resize" onPointerDown={beginDrag('resize')} title={t('teleprompter.dragToResize')} />
         </div>
       )}
 
@@ -900,8 +919,8 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
         <div ref={menu.ref} className="tp-menu" style={{ left: menu.pos.x, top: menu.pos.y }} {...menu.surfaceProps}>
           <div className="tp-menu-head" {...menu.handleProps}>
             <GripHorizontal size={14} />
-            <span className="tp-menu-title">Teleprompter</span>
-            <button type="button" className="tp-menu-collapse" onPointerDown={stopProp} onClick={() => setMenuCollapsed((c) => !c)} aria-label={menuCollapsed ? 'Expand menu' : 'Collapse menu'}>
+            <span className="tp-menu-title">{t('teleprompter.title')}</span>
+            <button type="button" className="tp-menu-collapse" onPointerDown={stopProp} onClick={() => setMenuCollapsed((c) => !c)} aria-label={menuCollapsed ? t('teleprompter.expandMenu') : t('teleprompter.collapseMenu')}>
               {menuCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
             </button>
           </div>
@@ -910,27 +929,27 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
               {recState === 'idle' && (
                 <>
                   <button type="button" className="tp-menu-btn" onClick={editScript}>
-                    <Pencil size={15} /> Edit script
+                    <Pencil size={15} /> {t('teleprompter.editScript')}
                   </button>
                   {effectiveMode === 'voice' && (
                     <button type="button" className={`tp-menu-btn${testing ? ' is-on' : ''}`} onClick={toggleVoiceTest}>
-                      <Mic size={15} /> {testing ? 'Stop voice test' : 'Test voice'}
+                      <Mic size={15} /> {testing ? t('teleprompter.stopVoiceTest') : t('teleprompter.testVoice')}
                     </button>
                   )}
                 </>
               )}
               {timerDriven && (
                 <div className="tp-menu-speed" onPointerDown={stopProp}>
-                  <span className="tp-menu-speed-label">Scroll speed</span>
+                  <span className="tp-menu-speed-label">{t('teleprompter.scrollSpeed')}</span>
                   <div className="tp-menu-speed-row">
-                    <button type="button" className="tp-sb-btn tp-sb-btn--sm" onClick={() => nudgeWpm(-WPM_STEP)} disabled={settings.wpm <= WPM_MIN} aria-label="Slower" title="Slower">
+                    <button type="button" className="tp-sb-btn tp-sb-btn--sm" onClick={() => nudgeWpm(-WPM_STEP)} disabled={settings.wpm <= WPM_MIN} aria-label={t('teleprompter.slower')} title={t('teleprompter.slower')}>
                       <Minus size={16} />
                     </button>
                     <span className="tp-sb-speed">
                       <strong>{settings.wpm}</strong>
-                      <small>words/min</small>
+                      <small>{t('teleprompter.wordsPerMin')}</small>
                     </span>
-                    <button type="button" className="tp-sb-btn tp-sb-btn--sm" onClick={() => nudgeWpm(WPM_STEP)} disabled={settings.wpm >= WPM_MAX} aria-label="Faster" title="Faster">
+                    <button type="button" className="tp-sb-btn tp-sb-btn--sm" onClick={() => nudgeWpm(WPM_STEP)} disabled={settings.wpm >= WPM_MAX} aria-label={t('teleprompter.faster')} title={t('teleprompter.faster')}>
                       <Plus size={16} />
                     </button>
                   </div>
@@ -938,18 +957,18 @@ const Teleprompter = forwardRef(function Teleprompter({ recState = 'idle', strea
               )}
               {recState === 'idle' && timerDriven && (
                 <button type="button" className={`tp-menu-btn${testing ? ' is-on' : ''}`} onClick={toggleScrollTest}>
-                  {testing ? <Pause size={15} /> : <Play size={15} />} {testing ? 'Stop scroll test' : 'Test scroll'}
+                  {testing ? <Pause size={15} /> : <Play size={15} />} {testing ? t('teleprompter.stopScrollTest') : t('teleprompter.testScroll')}
                 </button>
               )}
               {isRecording && timerDriven && (
                 <button type="button" className="tp-menu-btn" onClick={toggleUserPause}>
-                  {userPaused ? <Play size={15} /> : <Pause size={15} />} {userPaused ? 'Resume scroll' : 'Pause scroll'}
+                  {userPaused ? <Play size={15} /> : <Pause size={15} />} {userPaused ? t('teleprompter.resumeScroll') : t('teleprompter.pauseScroll')}
                 </button>
               )}
               {settingsGearBtn}
               {recState === 'idle' && (
                 <button type="button" className="tp-menu-btn" onClick={hideTeleprompter}>
-                  <EyeOff size={15} /> Hide teleprompter
+                  <EyeOff size={15} /> {t('teleprompter.hideTeleprompter')}
                 </button>
               )}
             </div>

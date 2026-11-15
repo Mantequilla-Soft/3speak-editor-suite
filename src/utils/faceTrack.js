@@ -1,3 +1,4 @@
+import { t as i18nT } from '../i18n'
 import { smoothPath } from './reframe'
 
 // Face tracking for automatic reframing (utils/reframe.js): MediaPipe's Face
@@ -119,7 +120,7 @@ export function mergeDetections(lists) {
 function seek(video, t) {
   return new Promise((resolve, reject) => {
     const done = () => { cleanup(); resolve() }
-    const fail = () => { cleanup(); reject(new Error('The video could not be read here')) }
+    const fail = () => { cleanup(); reject(new Error(i18nT('clip.reframe.readFailed'))) }
     const timer = setTimeout(done, SEEK_TIMEOUT_MS) // a slow seek: look at what is there
     const cleanup = () => {
       clearTimeout(timer)
@@ -140,7 +141,7 @@ function loadVideo(url) {
     video.preload = 'auto'
     if (!/^(blob|data):/.test(url)) video.crossOrigin = 'anonymous'
     const ok = () => { video.removeEventListener('error', bad); resolve(video) }
-    const bad = () => { video.removeEventListener('loadeddata', ok); reject(new Error('The video could not be opened for face tracking')) }
+    const bad = () => { video.removeEventListener('loadeddata', ok); reject(new Error(i18nT('clip.reframe.openFailed'))) }
     video.addEventListener('loadeddata', ok, { once: true })
     video.addEventListener('error', bad, { once: true })
     video.src = url

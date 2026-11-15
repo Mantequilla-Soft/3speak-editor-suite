@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { X, Search, Sticker } from './icons'
 import { TEXT_PRESETS, presetPreviewStyle } from '../utils/stickerPresets'
+import { useT, hasKey } from '../i18n'
 
 // Image stickers (emojis, badges, shapes, branding): library.json files built
 // by scripts/stickers/build_library.py, { categories, items: [{ id, category,
@@ -40,8 +41,9 @@ async function loadStickers() {
   return { categories: [...categories].map(([id, label]) => ({ id, label })), items }
 }
 
-const textItems = TEXT_PRESETS.map(p => ({
-  key: `text:${p.id}`, kind: 'text', category: 'text', title: p.title, keywords: p.text.toLowerCase(), preset: p
+// In the interface language (their titles and starting texts are read when called)
+const textItems = () => TEXT_PRESETS.map(p => ({
+  key: `text:${p.id}`, kind: 'text', category: 'text', title: p.title, keywords: p.text.toLowerCase(), preset: p, text: p.text
 }))
 
 /**
@@ -50,6 +52,7 @@ const textItems = TEXT_PRESETS.map(p => ({
  * the playhead (onPick gets the sticker for useTimeline.addStickerClip).
  */
 function StickerPicker({ onPick, onClose }) {
+  const { t, lang } = useT()
   const [data, setData] = useState(null)
   const [tab, setTab] = useState('emoji')
   const [query, setQuery] = useState('')
@@ -65,20 +68,22 @@ function StickerPicker({ onPick, onClose }) {
     const cats = data?.categories || []
     const emoji = cats.filter(c => c.id === 'emoji')
     const rest = cats.filter(c => c.id !== 'emoji')
-    return [...emoji, { id: 'text', label: 'Text boxes' }, ...rest]
-  }, [data])
+    // the library's own categories: translated when we know them, else its label
+    const named = (c) => ({ ...c, label: hasKey(`stickers.categories.${c.id}`) ? t(`stickers.categories.${c.id}`) : c.label })
+    return [...emoji.map(named), { id: 'text', label: t('stickers.textBoxes') }, ...rest.map(named)]
+  }, [data, lang, t])
 
   const visible = useMemo(() => {
-    const all = [...(data?.items || []).filter(i => i.category === 'emoji'), ...textItems, ...(data?.items || []).filter(i => i.category !== 'emoji')]
+    const all = [...(data?.items || []).filter(i => i.category === 'emoji'), ...textItems(), ...(data?.items || []).filter(i => i.category !== 'emoji')]
     // Searching looks through every kind at once; otherwise the open tab
     const q = query.trim().toLowerCase()
     if (q) return all.filter(i => i.title.toLowerCase().includes(q) || i.keywords.includes(q))
     return all.filter(i => i.category === tab)
-  }, [data, tab, query])
+  }, [data, tab, query, lang])
 
   const pick = (item) => {
     if (item.kind === 'text') {
-      onPick({ kind: 'text', name: item.title, text: item.preset.text, props: item.preset.props })
+      onPick({ kind: 'text', name: item.title, text: item.text, props: item.preset.props })
     } else {
       onPick({ kind: 'image', name: item.title, url: item.url, zoom: ZOOM[item.category] || 40 })
     }
@@ -90,38 +95,38 @@ function StickerPicker({ onPick, onClose }) {
       <div className="remix-picker music-library sticker-picker" role="dialog" aria-modal="true" aria-labelledby="sticker-picker-title" onClick={e => e.stopPropagation()}>
         <div className="remix-picker-header">
           <Sticker size={16} />
-          <h3 id="sticker-picker-title">Stickers</h3>
-          <button className="remix-picker-icon-btn" onClick={onClose} title="Close"><X size={16} /></button>
+          <h3 id="sticker-picker-title">{t('stickers.title')}</h3>
+          <button className="remix-picker-icon-btn" onClick={onClose} title={t('common.close')}><X size={16} /></button>
         </div>
 
         <div className="music-library-search">
           <Search size={14} />
-          <input type="search" placeholder="Search stickers" value={query} onChange={e => setQuery(e.target.value)} />
+          <input type="search" placeholder={t('stickers.search')} value={query} onChange={e => setQuery(e.target.value)} />
         </div>
 
         <div className="music-library-moods">
-          {tabs.map(t => (
-            <button key={t.id} className={tab === t.id && !query.trim() ? 'active' : ''} onClick={() => { setTab(t.id); setQuery('') }}>{t.label}</button>
+          {tabs.map(c => (
+            <button key={c.id} className={tab === c.id && !query.trim() ? 'active' : ''} onClick={() => { setTab(c.id); setQuery('') }}>{c.label}</button>
           ))}
         </div>
 
         <div className="sticker-grid">
-          {!data && <div className="music-library-empty">Loading stickers...</div>}
-          {data && visible.length === 0 && <div className="music-library-empty">No stickers match.</div>}
+          {!data && <div className="music-library-empty">{t('stickers.loading')}</div>}
+          {data && visible.length === 0 && <div className="music-library-empty">{t('stickers.noMatch')}</div>}
           {visible.map(item => (
             <button
               key={item.key}
               className={`sticker-tile${item.kind === 'text' ? ' text' : ''}${item.category === 'emoji' ? ' emoji' : ''}`}
               onClick={() => pick(item)}
-              title={`${item.title} (adds at the playhead)`}
+              title={t('stickers.tileTitle', { name: item.title })}
             >
               {item.kind === 'text'
-                ? <span className="sticker-text-preview" style={presetPreviewStyle(item.preset.props)}>{item.preset.text}</span>
+                ? <span className="sticker-text-preview" style={presetPreviewStyle(item.preset.props)}>{item.text}</span>
                 : <img src={item.url} alt={item.title} loading="lazy" draggable={false} />}
             </button>
           ))}
         </div>
-        <p className="music-library-note">Stickers go in at the playhead for 3 seconds. Drag, resize or trim them like any clip; text boxes stay editable.</p>
+        <p className="music-library-note">{t('stickers.note')}</p>
       </div>
     </div>
   )

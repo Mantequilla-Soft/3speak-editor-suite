@@ -3,13 +3,14 @@ import { LOOK_PRESETS, LOOK_DEFAULTS, applyPreset, matchPreset, normalizeLook } 
 import { grabVideoFrame } from '../utils/chromaKey'
 import { LookFilter } from './ClipColorFilters'
 import { RotateCcw } from './icons'
+import { useT } from '../i18n'
 import './LookControls.css'
 
 const EFFECT_SLIDERS = [
-  { key: 'blur', label: 'Blur', min: 0 },
-  { key: 'vignette', label: 'Vignette', min: 0 },
-  { key: 'sharpen', label: 'Sharpen', min: 0 },
-  { key: 'split', label: 'Teal & orange', min: -100 }
+  { key: 'blur', min: 0 },
+  { key: 'vignette', min: 0 },
+  { key: 'sharpen', min: 0 },
+  { key: 'split', min: -100 }
 ]
 const THUMB = 120 // px, long side of the frame grabbed for the preset strip
 
@@ -49,6 +50,7 @@ function useClipFrame(clip, playhead) {
  * The strip shows each preset on the clip's own frame.
  */
 function LookControls({ clip, onUpdateClip, playheadPosition = 0 }) {
+  const { t } = useT()
   const look = { ...LOOK_DEFAULTS, ...(normalizeLook(clip.look) || {}) }
   const active = matchPreset(clip.color, clip.look)
   const frame = useClipFrame(clip, playheadPosition)
@@ -62,9 +64,9 @@ function LookControls({ clip, onUpdateClip, playheadPosition = 0 }) {
   return (
     <div className="prop-group">
       <div className="prop-group-label color-group-label">
-        <span>Look</span>
+        <span>{t('look.title')}</span>
         {changed && (
-          <button className="prop-reset-btn" onClick={() => onUpdateClip({ look: null })} title="No effects">
+          <button className="prop-reset-btn" onClick={() => onUpdateClip({ look: null })} title={t('look.noEffects')}>
             <RotateCcw size={10} />
           </button>
         )}
@@ -78,7 +80,7 @@ function LookControls({ clip, onUpdateClip, playheadPosition = 0 }) {
           </defs>
         </svg>
       )}
-      <div className="look-strip" role="radiogroup" aria-label="Look presets">
+      <div className="look-strip" role="radiogroup" aria-label={t('look.presetsLabel')}>
         {thumbs.map(p => (
           <button
             key={p.id}
@@ -86,18 +88,20 @@ function LookControls({ clip, onUpdateClip, playheadPosition = 0 }) {
             aria-checked={active === p.id}
             className={`look-chip${active === p.id ? ' active' : ''}`}
             onClick={() => pick(p.id)}
-            title={p.label}
+            title={t(`look.presets.${p.id}`)}
           >
             <span className="look-chip-frame">
               {frame
                 ? <img src={frame.url} alt="" draggable={false} style={{ filter: `url(#${idBase}-${p.id})` }} />
                 : <span className="look-chip-blank" />}
             </span>
-            <span className="look-chip-label">{p.label}</span>
+            <span className="look-chip-label">{t(`look.presets.${p.id}`)}</span>
           </button>
         ))}
       </div>
-      {EFFECT_SLIDERS.map(({ key, label, min }) => (
+      {EFFECT_SLIDERS.map(({ key, min }) => {
+        const label = t(`look.sliders.${key}`)
+        return (
         <div className="property-group color-slider" key={key}>
           <label>{label}</label>
           <div className="property-slider">
@@ -108,13 +112,14 @@ function LookControls({ clip, onUpdateClip, playheadPosition = 0 }) {
               value={look[key]}
               onChange={(e) => set(key, parseInt(e.target.value))}
               onDoubleClick={() => set(key, 0)}
-              title="Double-click to reset"
+              title={t('look.doubleClickReset')}
               aria-label={label}
             />
             <span>{min < 0 && look[key] > 0 ? `+${look[key]}` : look[key]}</span>
           </div>
         </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { normalizeTextStroke, normalizeTextAnim, wordState } from '../utils/textAnim'
+import { t } from '../i18n'
 import './TextFx.css'
 
 // CSS for a text clip's outline: a stroke twice as wide, painted under the
@@ -26,8 +27,9 @@ export function animatedBoxStyle(clip) {
  * kept invisible (it sizes and wraps the box exactly as before) with one span
  * per word over it, registered so the playback loop moves them every frame.
  */
+// (no hook: it is also called as a plain function; it re-renders with the preview)
 export function AnimatedText({ clip, time, start, registry }) {
-  const text = clip.text || 'Text'
+  const text = clip.text || t('titles.textFx.defaultText')
   const anim = normalizeTextAnim(clip.textAnim)
   if (!anim) return text
   registry[clip.id] = { anim, start }
@@ -51,13 +53,13 @@ export function AnimatedText({ clip, time, start, registry }) {
 }
 
 // Every frame while playing: the words of the text clips coming in
-export function applyWordFrames(container, t, registry) {
+export function applyWordFrames(container, now, registry) {
   container?.querySelectorAll('[data-word]').forEach(el => {
     const at = el.dataset.word.lastIndexOf(':')
     const id = el.dataset.word.slice(0, at), i = el.dataset.word.slice(at + 1)
     const r = registry[id]
     if (!r) return
-    const css = wordCss(wordState(r.anim, +i, t - r.start))
+    const css = wordCss(wordState(r.anim, +i, now - r.start))
     el.style.opacity = String(css.opacity)
     el.style.transform = css.transform || ''
   })

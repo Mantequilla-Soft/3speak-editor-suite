@@ -11,6 +11,7 @@
 import STOPWORDS from '../data/stopwords.json'
 import FILLERS from '../data/fillerWords.json'
 import { normalWord, findPauses } from './fillers'
+import { t } from '../i18n'
 
 const NO_SPACES = new Set(['ja', 'zh', 'ko', 'th']) // whisper's "words" there are characters: no topic shifts
 const round3 = (t) => Math.round(t * 1000) / 1000
@@ -197,6 +198,6 @@ export function suggestChapters({ words = [], end, existing = [], pauses = null,
     at: c.at,
     reason: c.reason,
     reasons: c.reasons,
-    title: c.reason === 'start' ? 'Intro' : (titleAt.get(c.at) || `Part ${starts.indexOf(c.at) + 1}`)
+    title: c.reason === 'start' ? t('chapters.suggest.intro') : (titleAt.get(c.at) || t('chapters.suggest.part', { n: starts.indexOf(c.at) + 1 }))
   }))
 }

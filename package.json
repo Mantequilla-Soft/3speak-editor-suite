@@ -11,8 +11,13 @@
     "vision:assets": "node scripts/vision/copy-assets.mjs",
     "preview": "vite preview",
     "test": "vitest run",
+    "i18n:check": "node scripts/i18n/check.mjs",
+    "i18n:todo": "node scripts/i18n/todo.mjs",
+    "i18n:merge": "node scripts/i18n/merge.mjs",
+    "i18n:reuse": "node scripts/i18n/reuse.mjs",
     "test:e2e:audio": "node e2e/audio-editor.e2e.mjs",
-    "test:e2e:words": "node e2e/word-tools.e2e.mjs"
+    "test:e2e:words": "node e2e/word-tools.e2e.mjs",
+    "test:e2e:language": "node e2e/language.e2e.mjs"
   },
   "dependencies": {
     "@ffmpeg/core": "0.12.6",

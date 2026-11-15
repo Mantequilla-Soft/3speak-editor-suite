@@ -5,6 +5,8 @@
 // silently when the person already has a session there, after one wallet signature otherwise.
 //
 // Import this module early (main.jsx) so the first 'drafts-session' is not missed.
+import { t } from '../i18n'
+
 let token = null
 let pending = null // one sign-in request at a time, however many uploads ask
 
@@ -29,9 +31,7 @@ export function currentToken() {
 export function dropToken() { token = null }
 
 export function signInError(reason) {
-  const e = new Error(reason === 'logged-out'
-    ? 'Log in on 3Speak to use the editor.'
-    : 'Sign in on 3Speak to upload and render (the sign-in was cancelled or did not work).')
+  const e = new Error(reason === 'logged-out' ? t('errors.signIn.loggedOut') : t('errors.signIn.failed'))
   e.code = 'sign-in'
   e.reason = reason
   return e

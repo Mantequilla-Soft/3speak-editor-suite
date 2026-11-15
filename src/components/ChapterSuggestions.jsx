@@ -7,9 +7,10 @@ import { combineLoudness } from '../utils/groupSilence'
 import { voiceTracksOf } from '../utils/captionSources'
 import { api } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
+import { useT } from '../i18n'
 import './WordTools.css'
 
-const REASONS = { start: 'Start', topic: 'New topic', pause: 'Long pause', scene: 'Scene change' }
+// Reasons: t(`chapters.suggest.reason.${r}`) (start, topic, pause, scene)
 const pos = (c) => c.timelinePosition || 0
 
 /** Scene changes of the video clips on the timeline, in timeline seconds: [{ t, score }] (the backend's scores, POST /api/clip/scenes). */
@@ -51,6 +52,7 @@ export async function loudnessPauses(tracks, sourceOf, end, signal) {
  * lists them; each can be heard, renamed and added, or all at once.
  */
 export default function ChapterSuggestions({ tracks, words, language, end, resolved, sourceOf, player, onAccept, onSeek }) {
+  const { t } = useT()
   const [list, setList] = useState(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
@@ -71,7 +73,7 @@ export default function ChapterSuggestions({ tracks, words, language, end, resol
     }
   }
   const accept = (items) => {
-    onAccept(items.map(s => ({ at: s.at, title: cleanTitle(s.title) || 'Chapter' })))
+    onAccept(items.map(s => ({ at: s.at, title: cleanTitle(s.title) || t('chapters.defaultTitle') })))
     const ids = new Set(items.map(s => s.id))
     setList(l => l.filter(s => !ids.has(s.id)))
   }
@@ -80,15 +82,15 @@ export default function ChapterSuggestions({ tracks, words, language, end, resol
   return (
     <div className="chapter-suggest">
       <div className="chapter-suggest-head">
-        <strong>Suggestions</strong>
-        <button className="silence-cut-apply" onClick={find} disabled={busy || !(end > 30)} title="Find where parts likely start: new topics, long pauses, scene changes">
-          {busy ? <Loader2 size={14} className="encoding-notice-spin" /> : <Wand2 size={14} />} {list ? 'Look again' : 'Suggest chapters'}
+        <strong>{t('chapters.suggest.title')}</strong>
+        <button className="silence-cut-apply" onClick={find} disabled={busy || !(end > 30)} title={t('chapters.suggest.findTitle')}>
+          {busy ? <Loader2 size={14} className="encoding-notice-spin" /> : <Wand2 size={14} />} {list ? t('chapters.suggest.again') : t('chapters.suggest.suggest')}
         </button>
-        {list?.length > 1 && <button className="silence-cut-apply" onClick={() => accept(list)}><Check size={14} /> Add all {list.length}</button>}
+        {list?.length > 1 && <button className="silence-cut-apply" onClick={() => accept(list)}><Check size={14} /> {t('chapters.suggest.addAll', { n: list.length })}</button>}
       </div>
-      {!words.length && !list && <p className="audio-template-hint">With a transcript (the Transcript button), suggestions also follow the topics and get titles from what is said.</p>}
+      {!words.length && !list && <p className="audio-template-hint">{t('chapters.suggest.withTranscript')}</p>}
       {error && <p className="captions-error" role="alert">{error}</p>}
-      {list && list.length === 0 && <p className="audio-template-hint">No clear places found. The show may be short, or its parts flow into each other.</p>}
+      {list && list.length === 0 && <p className="audio-template-hint">{t('chapters.suggest.none')}</p>}
       {list && list.length > 0 && (
         <ol className="audio-chapters-list chapter-suggest-list">
           {list.map(s => {
@@ -96,13 +98,13 @@ export default function ChapterSuggestions({ tracks, words, language, end, resol
             const isPlaying = player?.playing?.key === key
             return (
               <li key={s.id}>
-                <button className="audio-chapters-time" onClick={() => (player ? player.play(s.at, s.at + 6, key) : onSeek(s.at))} title={isPlaying ? 'Stop' : 'Listen from here'}>
+                <button className="audio-chapters-time" onClick={() => (player ? player.play(s.at, s.at + 6, key) : onSeek(s.at))} title={isPlaying ? t('chapters.suggest.stop') : t('chapters.suggest.listen')}>
                   {isPlaying ? <Pause size={11} /> : <Play size={11} />} {chapterTime(s.at)}
                 </button>
-                <input value={s.title} maxLength={MAX_CHAPTER_TITLE} aria-label={`Suggested chapter at ${chapterTime(s.at)}`} onChange={(e) => rename(s.id, e.target.value)} />
-                <span className="filler-chip" title={s.reasons.map(r => REASONS[r]).join(' + ')}>{REASONS[s.reason]}{s.reasons.length > 1 ? ' +' : ''}</span>
-                <button className="audio-chapters-icon" onClick={() => accept([s])} title="Add this chapter" aria-label={`Add the chapter at ${chapterTime(s.at)}`}><Plus size={14} /></button>
-                <button className="audio-chapters-icon" onClick={() => setList(l => l.filter(x => x.id !== s.id))} title="Not this one" aria-label={`Drop the suggestion at ${chapterTime(s.at)}`}><X size={14} /></button>
+                <input value={s.title} maxLength={MAX_CHAPTER_TITLE} aria-label={t('chapters.suggest.titleLabel', { time: chapterTime(s.at) })} onChange={(e) => rename(s.id, e.target.value)} />
+                <span className="filler-chip" title={s.reasons.map(r => t(`chapters.suggest.reason.${r}`)).join(' + ')}>{t(`chapters.suggest.reason.${s.reason}`)}{s.reasons.length > 1 ? ' +' : ''}</span>
+                <button className="audio-chapters-icon" onClick={() => accept([s])} title={t('chapters.suggest.add')} aria-label={t('chapters.suggest.addLabel', { time: chapterTime(s.at) })}><Plus size={14} /></button>
+                <button className="audio-chapters-icon" onClick={() => setList(l => l.filter(x => x.id !== s.id))} title={t('chapters.suggest.drop')} aria-label={t('chapters.suggest.dropLabel', { time: chapterTime(s.at) })}><X size={14} /></button>
               </li>
             )
           })}

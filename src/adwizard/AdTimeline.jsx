@@ -1,9 +1,14 @@
 import { useRef, useLayoutEffect, useState } from 'react'
 import { Music, AudioLines, Film } from '../components/icons'
+import { useT } from '../i18n'
+import { sfxName } from './engine'
 
 // The ad's timeline: scenes (drag the right edge to change a scene's length), music, sound effects
 // (drag to move, click to select), playhead (click or drag anywhere to seek).
 export default function AdTimeline({ info, scenes, meta, time, selected, onSelect, onSeek, onDuration, music, sfx, selectedSfx, onSelectSfx, onMoveSfx }) {
+  const { t, formatNumber } = useT()
+  const n1 = v => formatNumber(v, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+  const n2 = v => formatNumber(v, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   const boxRef = useRef(null)
   const [w, setW] = useState(600)
   useLayoutEffect(() => {
@@ -48,28 +53,30 @@ export default function AdTimeline({ info, scenes, meta, time, selected, onSelec
 
   return (
     <div className="aw-tl" ref={boxRef} onPointerDown={dragSeek}>
-      <div className="aw-tl-ruler">{ticks.map(t => <span key={t} style={{ left: X(t) }}>{t}s</span>)}</div>
-      <div className="aw-tl-row" title="Scenes">
+      <div className="aw-tl-ruler">{ticks.map(s => <span key={s} style={{ left: X(s) }}>{t('adwizard.timeline.tick', { s })}</span>)}</div>
+      <div className="aw-tl-row" title={t('adwizard.timeline.scenes')}>
         <Film size={13} className="aw-tl-ic" />
         {(info?.scenes || []).map((s, i) => (
           <div key={i} className={`aw-tl-block${i === selected ? ' sel' : ''}`} style={{ left: X(s.start), width: Math.max(8, (s.end - s.start) * pps) }}
-            onPointerDown={e => { e.stopPropagation(); onSelect(i) }} title={`${s.type}: ${(s.end - s.start).toFixed(1)}s`}>
+            onPointerDown={e => { e.stopPropagation(); onSelect(i) }} title={t('adwizard.timeline.blockTitle', { type: s.type, length: n1(s.end - s.start) })}>
             <span>{i + 1}. {s.type}</span>
-            <i className="aw-tl-handle" onPointerDown={e => dragEdge(e, i)} title="Drag to change the length" />
+            <i className="aw-tl-handle" onPointerDown={e => dragEdge(e, i)} title={t('adwizard.timeline.dragLength')} />
           </div>))}
       </div>
-      <div className="aw-tl-row" title="Music">
+      <div className="aw-tl-row" title={t('adwizard.timeline.music')}>
         <Music size={13} className="aw-tl-ic" />
         {music?.url && <div className="aw-tl-music" style={{ left: X(0), width: dur * pps }}>
           <i className="aw-tl-fade in" style={{ width: (music.fadeIn || 0) * pps }} />
-          <span>{music.title || 'Music'}{music.volume != null ? ` · ${music.volume}%` : ''}</span>
+          <span>{music.volume != null
+            ? t('adwizard.timeline.musicVolume', { title: music.title || t('adwizard.timeline.music'), volume: formatNumber(music.volume / 100, { style: 'percent', maximumFractionDigits: 0 }) })
+            : (music.title || t('adwizard.timeline.music'))}</span>
           <i className="aw-tl-fade out" style={{ width: (music.fadeOut || 0) * pps }} />
         </div>}
       </div>
-      <div className="aw-tl-row aw-tl-sfxrow" title="Sound effects">
+      <div className="aw-tl-row aw-tl-sfxrow" title={t('adwizard.timeline.effects')}>
         <AudioLines size={13} className="aw-tl-ic" />
         {sfx.map(s => <i key={s.key || s.id} className={`aw-tl-sfx${s.auto ? ' auto' : ''}${(selectedSfx && (selectedSfx === s.key || selectedSfx === s.id)) ? ' sel' : ''}`}
-          style={{ left: X(s.at) }} onPointerDown={e => dragSfx(e, s)} title={`${s.name || s.kind} at ${s.at.toFixed(2)}s`} />)}
+          style={{ left: X(s.at) }} onPointerDown={e => dragSfx(e, s)} title={t('adwizard.timeline.sfxTitle', { name: sfxName(s), at: n2(s.at) })} />)}
       </div>
       <div className="aw-tl-head" style={{ left: X(time) }} />
     </div>

@@ -1,12 +1,14 @@
 import { X } from './icons'
-import { MAX_TIMELINE_SECONDS, MAX_TIMELINE_TEXT, RENDER_NOUN, formatLength } from '../utils/limits'
+import { MAX_TIMELINE_SECONDS, atMostText, formatLength } from '../utils/limits'
 import { isAudioMode } from '../utils/editorMode'
+import { useT } from '../i18n'
 
 /**
  * Shown after an import leaves the timeline longer than a short may be.
  * The footage stays whole; rendering waits until the creator trims it down.
  */
 function LengthLimitNotice({ length, onClose }) {
+  const { t } = useT()
   return (
     <div className="remix-picker-overlay" onClick={onClose}>
       <div
@@ -18,17 +20,15 @@ function LengthLimitNotice({ length, onClose }) {
       >
         <div className="remix-picker-header">
           <span className="remix-picker-icon-spacer" />
-          <h3 id="length-notice-title">Your timeline is {formatLength(length)} long</h3>
-          <button className="remix-picker-icon-btn" onClick={onClose} title="Close">
+          <h3 id="length-notice-title">{t('notices.length.title', { length: formatLength(length) })}</h3>
+          <button className="remix-picker-icon-btn" onClick={onClose} title={t('common.close')}>
             <X size={16} />
           </button>
         </div>
         <p className="length-notice-text">
-          {RENDER_NOUN} can be at most {MAX_TIMELINE_TEXT}. You can keep editing everything,
-          but {isAudioMode ? 'Export' : 'Render'} stays off until the timeline ends at the marked {formatLength(MAX_TIMELINE_SECONDS)} line.
-          Trim, split or delete clips to get there.
+          {t(isAudioMode ? 'notices.length.bodyAudio' : 'notices.length.body', { atMost: atMostText(), limitAt: formatLength(MAX_TIMELINE_SECONDS) })}
         </p>
-        <button className="length-notice-ok" onClick={onClose} autoFocus>Got it</button>
+        <button className="length-notice-ok" onClick={onClose} autoFocus>{t('common.gotIt')}</button>
       </div>
     </div>
   )

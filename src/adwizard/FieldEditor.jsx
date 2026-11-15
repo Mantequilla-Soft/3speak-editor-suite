@@ -1,11 +1,12 @@
 import { useRef, useState } from 'react'
 import { Plus, Trash2, ChevronUp, ChevronDown, Upload, X, RotateCcw, ClipboardPaste } from '../components/icons'
 import { uploadFile, absUrl } from './engine'
+import { useT } from '../i18n'
+import { fieldLabel, fieldHint } from './sceneText'
 
 // Forms generated from the scene engine's schema (lib/scene-meta.js): one field editor per field kind. Text stops at
 // the field's maxLen: the engine keeps no more, and every layout fits that much (scene engine check-layout).
-const nice = k => (k.charAt(0).toUpperCase() + k.slice(1)).replace(/([a-z])([A-Z])/g, '$1 $2')
-const labelOf = f => f.label || nice(f.k)
+const labelOf = fieldLabel
 const imgUrl = v => (v && typeof v === 'object' ? v.url : v) || ''
 
 export function Fields({ fields, value, onChange, icons, path = '' }) {
@@ -21,20 +22,21 @@ export function Fields({ fields, value, onChange, icons, path = '' }) {
 }
 
 function Field({ f, value, onChange, icons }) {
+  const { t } = useT()
   const head = (
     <div className="aw-f-head">
       <span>{labelOf(f)}{!f.opt && f.min !== 0 && <i className="aw-req">*</i>}</span>
-      {f.hint && <small>{f.hint}</small>}
+      {f.hint && <small>{fieldHint(f)}</small>}
     </div>
   )
   switch (f.kind) {
     case 'text':
       return <label className="aw-f">{head}
         <input type="text" value={value ?? ''} maxLength={f.maxLen || undefined} onChange={e => onChange(e.target.value)}
-          placeholder={f.dflt || (f.opt ? 'optional' : '')} /><Count v={value} max={f.maxLen} /></label>
+          placeholder={f.dflt || (f.opt ? t('adwizard.fields.optional') : '')} /><Count v={value} max={f.maxLen} /></label>
     case 'para':
       return <label className="aw-f">{head}
-        <textarea rows={3} value={value ?? ''} maxLength={f.maxLen || undefined} onChange={e => onChange(e.target.value)} placeholder={f.opt ? 'optional' : ''} /><Count v={value} max={f.maxLen} /></label>
+        <textarea rows={3} value={value ?? ''} maxLength={f.maxLen || undefined} onChange={e => onChange(e.target.value)} placeholder={f.opt ? t('adwizard.fields.optional') : ''} /><Count v={value} max={f.maxLen} /></label>
     case 'lines': case 'texts':
       return f.options ? <Options f={f} head={head} value={value} onChange={onChange} />
         : <StringList f={f} head={head} value={value} onChange={onChange} />
@@ -47,7 +49,7 @@ function Field({ f, value, onChange, icons }) {
       return <label className="aw-f">{head}
         <div className="aw-num">
           {ranged && <input type="range" min={min} max={max} step={step} value={shown ?? min} onChange={e => onChange(+e.target.value - o1)} />}
-          <input type="number" min={min} max={max} step={f.kind === 'int' ? 1 : 'any'} value={shown ?? ''} placeholder={f.opt ? 'auto' : ''}
+          <input type="number" min={min} max={max} step={f.kind === 'int' ? 1 : 'any'} value={shown ?? ''} placeholder={f.opt ? t('adwizard.fields.auto') : ''}
             onChange={e => onChange(e.target.value === '' ? undefined : +e.target.value - o1)} />
         </div></label>
     }
@@ -56,26 +58,26 @@ function Field({ f, value, onChange, icons }) {
     case 'enum':
       return <label className="aw-f">{head}
         <select value={value ?? ''} onChange={e => onChange(e.target.value || undefined)}>
-          {f.opt && <option value="">(none)</option>}
+          {f.opt && <option value="">{t('adwizard.fields.none')}</option>}
           {f.options.map(o => <option key={o} value={o}>{o}</option>)}
         </select></label>
     case 'icon':
       return <label className="aw-f">{head}
         <select value={value ?? ''} onChange={e => onChange(e.target.value || undefined)}>
-          {f.opt && <option value="">{f.dflt ? `default (${f.dflt})` : '(none)'}</option>}
+          {f.opt && <option value="">{f.dflt ? t('adwizard.fields.defaultIcon', { icon: f.dflt }) : t('adwizard.fields.none')}</option>}
           {icons.map(o => <option key={o} value={o}>{o}</option>)}
         </select></label>
     case 'color':
       return <label className="aw-f aw-f-inline">{labelOf(f)}
         <input type="color" value={value || '#ffffff'} onChange={e => onChange(e.target.value)} />
-        {value && <button type="button" className="aw-icon-btn" onClick={() => onChange(undefined)} title="Clear"><X size={14} /></button>}</label>
+        {value && <button type="button" className="aw-icon-btn" onClick={() => onChange(undefined)} title={t('adwizard.fields.clear')}><X size={14} /></button>}</label>
     case 'image':
       return <div className="aw-f">{head}<ImageField value={value} adjust={f.adjust !== false} onChange={onChange} /></div>
     case 'images':
       return <div className="aw-f">{head}<ImageList f={f} value={value} onChange={onChange} /></div>
     case 'object':
       if (!f.of.length) return <PairField f={f} head={head} value={value} onChange={onChange} />
-      return <fieldset className="aw-group"><legend>{labelOf(f)}{f.opt && <small> optional</small>}</legend>
+      return <fieldset className="aw-group"><legend>{labelOf(f)}{f.opt && <small> {t('adwizard.fields.optional')}</small>}</legend>
         <Fields fields={f.of} value={value} onChange={v => onChange(Object.keys(v).length ? v : undefined)} icons={icons} /></fieldset>
     case 'list':
       return <ObjectList f={f} value={value} onChange={onChange} icons={icons} />
@@ -91,20 +93,21 @@ function Count({ v, max }) {
 }
 
 function StringList({ f, head, value, onChange }) {
+  const { t } = useT()
   const arr = Array.isArray(value) ? value : []
   const max = f.max || 12
   const isInt = f.kindOf === 'int', o1 = isInt && f.from1 ? 1 : 0 // from1: stored from 0, shown from 1
   const set = (i, v) => onChange(arr.map((x, k) => (k === i ? v : x)))
   return <div className="aw-f">{head}
-    {f.kind === 'lines' && <small className="aw-tip">Wrap a word in *stars* for the accent colour, _underscores_ for the second accent.</small>}
+    {f.kind === 'lines' && <small className="aw-tip">{t('adwizard.fields.accentTip')}</small>}
     {arr.map((x, i) => (
       <div className="aw-row" key={i}>
         <input type={isInt ? 'number' : 'text'} min={isInt ? o1 : undefined} maxLength={!isInt && f.maxLen ? f.maxLen : undefined} value={isInt ? x + o1 : x} onChange={e => set(i, isInt ? +e.target.value - o1 : e.target.value)} />
-        <button type="button" className="aw-icon-btn" disabled={i === 0} onClick={() => onChange(swap(arr, i, i - 1))} title="Up"><ChevronUp size={14} /></button>
-        <button type="button" className="aw-icon-btn" disabled={arr.length <= (f.min || 0)} onClick={() => onChange(arr.filter((_, k) => k !== i))} title="Remove"><Trash2 size={14} /></button>
+        <button type="button" className="aw-icon-btn" disabled={i === 0} onClick={() => onChange(swap(arr, i, i - 1))} title={t('adwizard.fields.up')}><ChevronUp size={14} /></button>
+        <button type="button" className="aw-icon-btn" disabled={arr.length <= (f.min || 0)} onClick={() => onChange(arr.filter((_, k) => k !== i))} title={t('common.remove')}><Trash2 size={14} /></button>
       </div>))}
-    {arr.length < max && <button type="button" className="aw-add" onClick={() => onChange([...arr, isInt ? 0 : ''])}><Plus size={14} /> Add</button>}
-    {f.min > 0 && arr.length < f.min && <small className="aw-warn">needs at least {f.min}</small>}
+    {arr.length < max && <button type="button" className="aw-add" onClick={() => onChange([...arr, isInt ? 0 : ''])}><Plus size={14} /> {t('adwizard.fields.add')}</button>}
+    {f.min > 0 && arr.length < f.min && <small className="aw-warn">{t('adwizard.fields.needsAtLeast', { min: f.min })}</small>}
   </div>
 }
 
@@ -120,16 +123,18 @@ function Options({ f, head, value, onChange }) {
 }
 
 function PairField({ f, head, value, onChange }) {
+  const { t } = useT()
   const [x, y] = Array.isArray(value) ? value : ['', '']
   return <div className="aw-f">{head}
     <div className="aw-row">
-      <input type="number" min={0} max={100} placeholder="x %" value={x ?? ''} onChange={e => onChange([+e.target.value, y || 50])} />
-      <input type="number" min={0} max={100} placeholder="y %" value={y ?? ''} onChange={e => onChange([x || 50, +e.target.value])} />
+      <input type="number" min={0} max={100} placeholder={t('adwizard.fields.pairX')} value={x ?? ''} onChange={e => onChange([+e.target.value, y || 50])} />
+      <input type="number" min={0} max={100} placeholder={t('adwizard.fields.pairY')} value={y ?? ''} onChange={e => onChange([x || 50, +e.target.value])} />
       {value && <button type="button" className="aw-icon-btn" onClick={() => onChange(undefined)}><X size={14} /></button>}
     </div></div>
 }
 
 function ObjectList({ f, value, onChange, icons }) {
+  const { t } = useT()
   const arr = Array.isArray(value) ? value : []
   const max = f.max || 12
   const blank = () => Object.fromEntries(f.of.filter(x => !x.opt && (x.kind === 'text' || x.kind === 'para')).map(x => [x.k, '']))
@@ -139,14 +144,14 @@ function ObjectList({ f, value, onChange, icons }) {
       <div className="aw-item" key={i}>
         <div className="aw-item-bar">
           <b>{i + 1}</b>
-          <button type="button" className="aw-icon-btn" disabled={i === 0} onClick={() => onChange(swap(arr, i, i - 1))} title="Move up"><ChevronUp size={14} /></button>
-          <button type="button" className="aw-icon-btn" disabled={i === arr.length - 1} onClick={() => onChange(swap(arr, i, i + 1))} title="Move down"><ChevronDown size={14} /></button>
-          <button type="button" className="aw-icon-btn" disabled={arr.length <= (f.min || 0)} onClick={() => onChange(arr.filter((_, k) => k !== i))} title="Remove"><Trash2 size={14} /></button>
+          <button type="button" className="aw-icon-btn" disabled={i === 0} onClick={() => onChange(swap(arr, i, i - 1))} title={t('adwizard.fields.moveUp')}><ChevronUp size={14} /></button>
+          <button type="button" className="aw-icon-btn" disabled={i === arr.length - 1} onClick={() => onChange(swap(arr, i, i + 1))} title={t('adwizard.fields.moveDown')}><ChevronDown size={14} /></button>
+          <button type="button" className="aw-icon-btn" disabled={arr.length <= (f.min || 0)} onClick={() => onChange(arr.filter((_, k) => k !== i))} title={t('common.remove')}><Trash2 size={14} /></button>
         </div>
         <Fields fields={f.of} value={item} icons={icons} path={`${i}.`} onChange={v => onChange(arr.map((x, k) => (k === i ? v : x)))} />
       </div>))}
-    {arr.length < max && <button type="button" className="aw-add" onClick={() => onChange([...arr, blank()])}><Plus size={14} /> Add</button>}
-    {f.min > 0 && arr.length < f.min && <small className="aw-warn">needs {f.min}</small>}
+    {arr.length < max && <button type="button" className="aw-add" onClick={() => onChange([...arr, blank()])}><Plus size={14} /> {t('adwizard.fields.add')}</button>}
+    {f.min > 0 && arr.length < f.min && <small className="aw-warn">{t('adwizard.fields.needs', { min: f.min })}</small>}
   </fieldset>
 }
 
@@ -163,8 +168,9 @@ const clipboardImage = items => {
 const isLink = t => /^https:\/\/\S+$/i.test((t || '').trim())
 
 export function ImageField({ value, onChange, adjust = true, accept = 'image/*' }) {
+  const { t, formatNumber } = useT()
   const [busy, setBusy] = useState(null)
-  const [err, setErr] = useState(null)
+  const [err, setErr] = useState(null) // { key } (our own text) or { text } (an upload error)
   const [flash, setFlash] = useState(false)
   const fileRef = useRef(null)
   const padRef = useRef(null)
@@ -176,10 +182,10 @@ export function ImageField({ value, onChange, adjust = true, accept = 'image/*' 
 
   const pick = async file => {
     if (!file) return
-    if (!/^image\//.test(file.type)) { setErr('That is not a picture.'); return }
+    if (!/^image\//.test(file.type)) { setErr({ key: 'adwizard.image.notPicture' }); return }
     setErr(null); setBusy(0)
     try { setUrl(await uploadFile(file, p => setBusy(p))) }
-    catch (e) { setErr(e.message) } finally { setBusy(null) }
+    catch (e) { setErr({ text: e.message }) } finally { setBusy(null) }
   }
   // Ctrl/Cmd+V anywhere inside the field (it is focusable)
   const onPaste = e => {
@@ -200,9 +206,9 @@ export function ImageField({ value, onChange, adjust = true, accept = 'image/*' 
       }
       const text = await navigator.clipboard?.readText?.()
       if (isLink(text)) return setUrl(text.trim())
-      setErr('No picture on the clipboard. Copy one, or press Ctrl+V / Cmd+V here.')
+      setErr({ key: 'adwizard.image.noClipboardPicture' })
     } catch {
-      setErr('The browser did not allow reading the clipboard. Click here and press Ctrl+V / Cmd+V.')
+      setErr({ key: 'adwizard.image.clipboardBlocked' })
     }
   }
   const drag = e => {
@@ -220,19 +226,19 @@ export function ImageField({ value, onChange, adjust = true, accept = 'image/*' 
     onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); pick(e.dataTransfer.files[0]) }}>
     {url ? (
       <div className="aw-img-main">
-        <div className="aw-img-pad" ref={padRef} onPointerDown={adjust ? drag : undefined} title={adjust ? 'Drag to choose which part of the picture shows' : ''}>
+        <div className="aw-img-pad" ref={padRef} onPointerDown={adjust ? drag : undefined} title={adjust ? t('adwizard.image.dragToPlace') : ''}>
           <img src={absUrl(url)} alt="" draggable={false} />
           {adjust && <i className="aw-img-dot" style={{ left: `${50 + (o.x || 0) * 50}%`, top: `${50 + (o.y || 0) * 50}%` }} />}
         </div>
         <div className="aw-img-tools">
-          {adjust && <label className="aw-f-inline" title="Zooms into the picture inside its frame; the frame keeps its size">Zoom
+          {adjust && <label className="aw-f-inline" title={t('adwizard.image.zoomTitle')}>{t('adwizard.image.zoom')}
             <input type="range" min={1} max={4} step={0.05} value={zoom} onChange={e => set({ scale: +e.target.value })} />
-            <span>{zoom.toFixed(2)}x</span></label>}
+            <span>{t('adwizard.image.zoomValue', { zoom: formatNumber(zoom, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })}</span></label>}
           <div className="aw-row">
-            {adjust && <button type="button" className="aw-icon-btn" onClick={() => onChange({ url })} title="Reset placement"><RotateCcw size={14} /></button>}
-            <button type="button" className="aw-btn-small" onClick={() => fileRef.current?.click()}><Upload size={14} /> Replace</button>
-            <button type="button" className="aw-icon-btn" onClick={pasteButton} title="Paste from the clipboard"><ClipboardPaste size={14} /></button>
-            <button type="button" className="aw-icon-btn" onClick={() => onChange(undefined)} title="Remove"><Trash2 size={14} /></button>
+            {adjust && <button type="button" className="aw-icon-btn" onClick={() => onChange({ url })} title={t('adwizard.image.resetPlacement')}><RotateCcw size={14} /></button>}
+            <button type="button" className="aw-btn-small" onClick={() => fileRef.current?.click()}><Upload size={14} /> {t('adwizard.image.replace')}</button>
+            <button type="button" className="aw-icon-btn" onClick={pasteButton} title={t('adwizard.image.pasteTitle')}><ClipboardPaste size={14} /></button>
+            <button type="button" className="aw-icon-btn" onClick={() => onChange(undefined)} title={t('common.remove')}><Trash2 size={14} /></button>
           </div>
         </div>
       </div>
@@ -240,13 +246,13 @@ export function ImageField({ value, onChange, adjust = true, accept = 'image/*' 
       <div className="aw-img-empty">
         <div className="aw-row">
           <button type="button" className="aw-btn-small" onClick={() => fileRef.current?.click()} disabled={busy != null}>
-            <Upload size={14} /> {busy != null ? `Uploading ${Math.round(busy * 100)}%` : 'Upload'}</button>
-          <button type="button" className="aw-btn-small" onClick={pasteButton} disabled={busy != null}><ClipboardPaste size={14} /> Paste</button>
+            <Upload size={14} /> {busy != null ? t('adwizard.image.uploadingPct', { pct: Math.round(busy * 100) }) : t('adwizard.image.upload')}</button>
+          <button type="button" className="aw-btn-small" onClick={pasteButton} disabled={busy != null}><ClipboardPaste size={14} /> {t('adwizard.image.paste')}</button>
         </div>
-        <input type="url" placeholder="or paste an https:// link, or a picture (Ctrl+V)" onBlur={e => isLink(e.target.value) && setUrl(e.target.value.trim())} />
+        <input type="url" placeholder={t('adwizard.image.linkPlaceholder')} onBlur={e => isLink(e.target.value) && setUrl(e.target.value.trim())} />
       </div>
     )}
-    {err && <small className="aw-warn">{err}</small>}
+    {err && <small className="aw-warn">{err.key ? t(err.key) : err.text}</small>}
     <input ref={fileRef} type="file" accept={accept} hidden onChange={e => { pick(e.target.files[0]); e.target.value = '' }} />
   </div>
 }

@@ -1,0 +1,184 @@
+{
+  "title": "Audiograms",
+  "tour": {
+    "again": "Show the tour again",
+    "againLabel": "Show the audiogram tour again"
+  },
+  "saveAndClose": "Save and close",
+  "saveAndCloseTitle": "Your audiograms stay with this audio and go out with it as Shorts",
+  "loadError": "The audiogram settings could not be loaded: {{error}}",
+  "loadingLook": "Loading your audiogram look…",
+  "start": {
+    "title": "Pick a piece of the episode",
+    "text_one": "An audiogram is a short video of a piece of your episode, up to {{count}} minute. It goes out as a 3Speak Short together with the audio. Start by marking its start and end on the timeline.",
+    "text_other": "An audiogram is a short video of a piece of your episode, up to {{count}} minutes. It goes out as a 3Speak Short together with the audio. Start by marking its start and end on the timeline.",
+    "choose": "Choose on the timeline"
+  },
+  "stage": {
+    "label": "Audiogram preview: drag the parts to move them, the corners to resize, the round handle to turn",
+    "frameTitle": "Audiogram preview",
+    "turned": "{{name}} · {{angle}}°",
+    "rotate": "Turn (Shift: 15° steps). Double-click: straight",
+    "hint": "Drag the parts, pull a corner to resize (Shift keeps the shape), the round handle to turn. Arrow keys nudge, [ and ] turn.",
+    "hintTemplate": "Drag the parts, pull a corner to resize (Shift keeps the shape), the round handle to turn. Arrow keys nudge, [ and ] turn. Your last audiogram is the starting point."
+  },
+  "layer": {
+    "logo": {
+      "name": "3Speak logo",
+      "drag": "3Speak logo: drag to move",
+      "dragSelected": "3Speak logo: drag to move, corners to resize, the round handle to turn"
+    },
+    "cover": {
+      "name": "Picture",
+      "drag": "Picture: drag to move",
+      "dragSelected": "Picture: drag to move, corners to resize, the round handle to turn",
+      "hide": "Hide Picture",
+      "show": "Show Picture",
+      "forward": "Bring Picture forward",
+      "back": "Send Picture back"
+    },
+    "title": {
+      "name": "Title",
+      "drag": "Title: drag to move",
+      "dragSelected": "Title: drag to move, corners to resize, the round handle to turn",
+      "hide": "Hide Title",
+      "show": "Show Title",
+      "forward": "Bring Title forward",
+      "back": "Send Title back"
+    },
+    "line": {
+      "name": "Line",
+      "drag": "Line: drag to move",
+      "dragSelected": "Line: drag to move, corners to resize, the round handle to turn",
+      "hide": "Hide Line",
+      "show": "Show Line",
+      "forward": "Bring Line forward",
+      "back": "Send Line back"
+    },
+    "wave": {
+      "name": "Waveform",
+      "drag": "Waveform: drag to move",
+      "dragSelected": "Waveform: drag to move, corners to resize, the round handle to turn",
+      "hide": "Hide Waveform",
+      "show": "Show Waveform",
+      "forward": "Bring Waveform forward",
+      "back": "Send Waveform back"
+    }
+  },
+  "piece": {
+    "label": "Piece of the episode",
+    "range": "{{from}} – {{to}} · {{seconds}}s",
+    "inChapter": "in “{{title}}”",
+    "change": "Change the piece"
+  },
+  "look": {
+    "title": "Title",
+    "titleLabel": "Title on the video",
+    "line": "Line under it <small>(*stars* make it red)</small>",
+    "lineLabel": "Line on the video",
+    "branding": "3Speak branding",
+    "logoGroup": "Logo",
+    "picture": "Picture",
+    "waveform": "Waveform",
+    "waveType": "Waveform type",
+    "waveColour": "Waveform colour",
+    "colour": "Colour {{colour}}",
+    "anyColour": "Any colour",
+    "anyWaveColour": "Any waveform colour"
+  },
+  "logo": {
+    "mark": "3S logo",
+    "full": "3Speak logo"
+  },
+  "wave": {
+    "bars": "Bars",
+    "centered": "Centered",
+    "line": "Line",
+    "dots": "Thin",
+    "circle": "Circle",
+    "ring": "Circle wave"
+  },
+  "picture": {
+    "upload": "Upload a picture",
+    "yours": "Your picture",
+    "coverOf": "Cover of “{{title}}”",
+    "playlistCover": "Playlist cover",
+    "noCovers": "Your playlists have no covers yet.",
+    "signIn": "Sign in on 3Speak to add a picture."
+  },
+  "parts": {
+    "title": "Parts <small>(front to back)</small>",
+    "logoLocked": "The 3Speak logo is always shown, in front, and never smaller than a set size",
+    "alwaysShown": "Always shown",
+    "hide": "Hide",
+    "show": "Show",
+    "forward": "Forward",
+    "back": "Back",
+    "tidy": "Tidy arrangement"
+  },
+  "make": {
+    "starting": "Starting...",
+    "working": "Working...",
+    "noWords": "the words of this piece could not be found (switch captions off to make it without)",
+    "failedPlain": "failed",
+    "signIn": "Sign in on 3Speak to make an audiogram.",
+    "failed": "The audiogram could not be made: {{error}}",
+    "make": "Make audiogram",
+    "another": "Make another audiogram"
+  },
+  "made": {
+    "title": "Your audiograms",
+    "hint": "They go out as 3Speak Shorts together with the audio, each with a link to the audio’s post, snap or comment.",
+    "fallbackTitle": "Audiogram {{n}}",
+    "length": "{{at}} · {{seconds}}s",
+    "textPlaceholder": "Text for the Short (optional). A link to the audio is added for you.",
+    "textLabel": "Text for Short {{n}}",
+    "editText": "Edit text",
+    "writeText": "Write text",
+    "download": "Download",
+    "removeLabel": "Remove audiogram {{n}}"
+  },
+  "confirm": {
+    "title": "Close without making it?",
+    "text": "Your changes to the look are not in an audiogram yet. They are lost when you close.",
+    "stays_one": "The audiogram you made stays with this audio.",
+    "stays_other": "The {{count}} audiograms you made stay with this audio.",
+    "keep": "Keep editing"
+  },
+  "captions": {
+    "label": "Captions",
+    "drag": "Captions: drag to move",
+    "dragSelected": "Captions: drag to move, pull a side to change the width",
+    "sample": "Your words show up here as they are said",
+    "show": "Show what is said, word by word",
+    "checking": "Checking the server...",
+    "unavailable": "Captions are not available on this editor server right now.",
+    "listening": "Listening...",
+    "getWords": "Get the words",
+    "wordCount_one": "{{count}} word in this piece.",
+    "wordCount_other": "{{count}} words in this piece.",
+    "noSpeech": "No speech found in this piece.",
+    "fix": "Fix words",
+    "doneFixing": "Done fixing",
+    "word": "Word {{n}}",
+    "removeWord": "Remove this word",
+    "removeWordLabel": "Remove {{word}}",
+    "style": "Caption style",
+    "preset": {
+      "karaoke": "Karaoke",
+      "pop": "Pop",
+      "plain": "Subtitles"
+    },
+    "wordsAtATime": "Words at a time",
+    "perPage_one": "{{count}} word at a time",
+    "perPage_other": "{{count}} words at a time",
+    "font": "Caption font",
+    "size": "Caption size",
+    "textColour": "Caption text colour",
+    "textColourSwatch": "Text colour {{colour}}",
+    "highlightColour": "Highlight colour",
+    "highlight": "Highlight",
+    "highlightSwatch": "Highlight {{colour}}",
+    "capitals": "Capital letters"
+  }
+}

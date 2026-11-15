@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import { coreSources } from '../utils/ffmpegCore'
+import { t } from '../i18n'
 
 // FFmpeg.wasm (the legacy layout's exports, whole-HLS downloads in the
 // browser) is loaded on first use, never when the editor opens: its code is
@@ -67,16 +68,16 @@ export function useFFmpeg() {
       const blob = await response.blob()
       return new Uint8Array(await blob.arrayBuffer())
     }
-    throw new Error('No valid file source for clip: ' + clip.name)
+    throw new Error(t('errors.export.noSource', { name: clip.name }))
   }
 
   const processVideo = useCallback(async (clips, backgroundMusic, options = {}) => {
     if (!ffmpegRef.current || !loaded) {
-      throw new Error('FFmpeg not loaded')
+      throw new Error(t('errors.export.ffmpegNotLoaded'))
     }
 
     if (!clips || clips.length === 0) {
-      throw new Error('No clips to export')
+      throw new Error(t('errors.export.noClips'))
     }
 
     const ffmpeg = ffmpegRef.current
@@ -90,7 +91,7 @@ export function useFFmpeg() {
     const execWithCheck = async (args, allowFailure = false) => {
       const exitCode = await ffmpeg.exec(args)
       if (exitCode !== 0 && !allowFailure) {
-        throw new Error(`FFmpeg command failed with exit code ${exitCode}`)
+        throw new Error(t('errors.export.ffmpegFailed', { code: String(exitCode) }))
       }
       return exitCode
     }

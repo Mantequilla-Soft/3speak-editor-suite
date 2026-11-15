@@ -1,0 +1,67 @@
+{
+  "language": {
+    "label": "Spoken language",
+    "auto": "Detect automatically"
+  },
+  "intro": {
+    "title": "Auto captions",
+    "text": "Turn what is said into captions that follow every word, burnt into your Short and sent to 3Speak as subtitles too.",
+    "checking": "Checking the server...",
+    "unavailable": "Auto captions are not available on this editor server right now. Your Short renders as usual without them.",
+    "go": "Auto captions"
+  },
+  "presets": {
+    "karaoke": "Karaoke",
+    "pop": "Pop",
+    "plain": "Subtitles"
+  },
+  "presetHints": {
+    "karaoke": "A few words at a time, the word being said in the highlight colour",
+    "pop": "One word (or a few) at a time, popping in",
+    "plain": "Classic subtitle lines on a dark box"
+  },
+  "style": {
+    "title": "Style",
+    "presetsLabel": "Caption style",
+    "wordsAtATime": "Words at a time",
+    "font": "Font",
+    "size": "Size",
+    "sizeLabel": "Caption size",
+    "position": "Position",
+    "positionLabel": "Caption height in the picture",
+    "top": "Top",
+    "middle": "Middle",
+    "low": "Low",
+    "textColour": "Text colour",
+    "highlight": "Highlight",
+    "highlightLabel": "Highlight colour",
+    "uppercase": "Capital letters",
+    "emoji": "Emoji accents (above words like \"fire\" or \"love\")",
+    "burn": "Show in the video (off: only as subtitles on 3Speak)"
+  },
+  "words": {
+    "title": "Words ({{n}})",
+    "hint": "Fix what was misheard; clear a word to drop it. Moved or cut clips? Run Auto captions again.",
+    "goThere": "Go there",
+    "word": "Word {{n}}",
+    "changeEmoji": "Change or remove its emoji",
+    "addEmoji": "Add an emoji",
+    "remove": "Remove this word",
+    "removeNamed": "Remove {{word}}"
+  },
+  "actions": {
+    "again": "Again",
+    "againTitle": "Listen again (replaces the words)",
+    "remove": "Remove captions"
+  },
+  "videoSound": "Video sound",
+  "job": {
+    "preparing": "Preparing the sound...",
+    "listening": "Listening...",
+    "noTracks": "There is no speech to caption: add a clip with sound first.",
+    "serverAnswered": "The server answered {{status}}",
+    "lost": "The captions job was lost (the server restarted?)",
+    "noSpeech": "No speech found. Is the voice on an audio track that is not muted (music tracks are left out)?",
+    "failed": "Speech recognition failed"
+  }
+}

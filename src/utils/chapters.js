@@ -7,6 +7,7 @@
 // file. Cut silences, a trim or a template intro move the recording around, and
 // the chapter moves with it (resolveChapters). Without an anchor (placed over
 // nothing, or on a template part) it stays at `at`.
+import { t } from '../i18n'
 
 export const MAX_CHAPTERS = 100
 export const MAX_CHAPTER_TITLE = 80
@@ -65,7 +66,7 @@ export function resolveChapters(tracks, chapters, end = Infinity) {
   const out = (chapters || []).map(ch => {
     const p = anchorPosition(tracks, ch.anchor)
     const at = Math.min(Math.max(0, p ?? (+ch.at || 0)), Math.max(0, end))
-    return { id: ch.id, title: cleanTitle(ch.title) || 'Chapter', at: Math.round(at * 1000) / 1000 }
+    return { id: ch.id, title: cleanTitle(ch.title) || t('chapters.defaultTitle'), at: Math.round(at * 1000) / 1000 }
   })
   return out.sort((a, b) => a.at - b.at)
 }

@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "line": "{{clips}} · {{length}} · {{edited}}",
+    "audioLine": "Audio · {{clips}} · {{length}} · {{edited}}",
+    "clips_one": "{{count}} clip",
+    "clips_other": "{{count}} clips",
+    "edited": {
+      "justNow": "edited just now",
+      "minutes_one": "edited {{count}} min ago",
+      "minutes_other": "edited {{count}} min ago",
+      "hours_one": "edited {{count}} h ago",
+      "hours_other": "edited {{count}} h ago",
+      "days_one": "edited {{count}} day ago",
+      "days_other": "edited {{count}} days ago"
+    }
+  },
+  "prompt": {
+    "titleOne": "Continue your draft?",
+    "titleMany": "Continue a draft?",
+    "keptUntil": "Kept until {{date}}",
+    "open": "Open",
+    "startNew": "Start a new project",
+    "singleNote": "You can keep one draft. Starting a new project replaces this one as soon as you edit. 3Speak Pro keeps 3 drafts for 30 days."
+  },
+  "limit": {
+    "titleOne": "Replace your saved draft?",
+    "titleMany": "You already have {{n}} saved projects",
+    "skipTitle": "Do not save this project",
+    "noteOne": "You can keep one draft. Saving this project replaces the one below.",
+    "noteMany": "You can keep up to {{n}}. Pick one this project replaces:",
+    "replace": "Replace",
+    "skip": "Don't save this project"
+  },
+  "close": {
+    "saveTitle": "Save your project?",
+    "closeTitle": "Close the editor?",
+    "keepEditing": "Keep editing",
+    "signInFailed": "That did not work. Approve the sign-in request in your wallet and try again, or log out of 3Speak and in again.",
+    "signInToKeep": "Sign in once to keep this project as a draft, so you can continue later.",
+    "signedOutLost": "Your edits will be lost. Log in to 3Speak to keep drafts of your projects.",
+    "lost": "Your edits will be lost.",
+    "signingIn": "Signing in…",
+    "signInToSave": "Sign in to save",
+    "withoutSaving": "Close without saving",
+    "keepTitle": "Keep this project?",
+    "keepDays_one": "We keep it for {{count}} day",
+    "keepDays_other": "We keep it for {{count}} days",
+    "keepHours_one": "We keep it for {{count}} hour",
+    "keepHours_other": "We keep it for {{count}} hours",
+    "until": "until {{date}}",
+    "uploadingOne": "{{name}} is still uploading ({{percent}}). You can save once it is done.",
+    "uploadingFiles_one": "{{count}} file is still uploading ({{percent}}). You can save once it is done.",
+    "uploadingFiles_other": "{{count}} files are still uploading ({{percent}}). You can save once it is done.",
+    "name": "Project name",
+    "namePlaceholder": "Untitled project",
+    "saveError": "Could not save. Check your connection and try again.",
+    "saveAndClose": "Save and close",
+    "afterUpload": "Available once the upload is done",
+    "deleteAndClose": "Delete it and close"
+  },
+  "pro": {
+    "title": "More with 3Speak Pro",
+    "text": "Keep up to 3 projects for 30 days each, instead of 1 for 7 days.",
+    "get": "Get Pro"
+  },
+  "status": {
+    "signingIn": "Signing in… check your wallet",
+    "signInTitle": "Sign in once to save your project as a draft",
+    "signInFailed": "Sign-in failed · try again",
+    "saveDrafts": "Save drafts",
+    "notSavedTitle": "This project is not saved yet",
+    "chooseSlot": "Not saved: choose a slot",
+    "saving": "Saving…",
+    "notSaved": "Draft not saved",
+    "keptUntil": "Draft kept until {{date}}",
+    "savedUntil": "Draft saved · until {{date}}"
+  },
+  "library": {
+    "title": "Project Library",
+    "addFiles": "Add files",
+    "groups": {
+      "videos": "Videos",
+      "images": "Images",
+      "sounds": "Sounds"
+    },
+    "empty": {
+      "videos": "No videos",
+      "images": "No images",
+      "sounds": "No sounds"
+    },
+    "dropToAdd": "Drop files to add",
+    "hint": "Drop files here or drag items to timeline",
+    "downloading": "Downloading... {{percent}}",
+    "downloaded": "Downloaded locally",
+    "local": "local",
+    "uploadingTitle": "Uploading in the background. Render waits until it is done.",
+    "converting": "converting",
+    "convertingTitle": "This browser cannot show this video's format. The preview switches to a 480p copy once it is ready.",
+    "noPreview": "no preview",
+    "noPreviewTitle": "Could not make a playable copy. The preview may stay black, rendering still works.",
+    "encodedTitle": "Encoded to 480p on server",
+    "encoding": "Encoding...",
+    "addToTimeline": "Add to timeline",
+    "remove": "Remove from library"
+  }
+}

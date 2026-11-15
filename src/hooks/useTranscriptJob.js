@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
+import { t } from '../i18n'
 
 const POLL_MS = 1500
 
@@ -43,7 +44,7 @@ export function useTranscriptJob({ enabled = true } = {}) {
     if (prev && !prev.cancelled) prev.cancelled = true
     const run = { cancelled: false, jobId: null }
     runRef.current = run
-    setJob({ status: 'running', progress: 0, phase: 'Starting...' })
+    setJob({ status: 'running', progress: 0, phase: t('transcript.job.starting') })
     try {
       const res = await authFetch(api('/api/transcript'), {
         method: 'POST',
@@ -51,7 +52,7 @@ export function useTranscriptJob({ enabled = true } = {}) {
         body: JSON.stringify({ sources, language, verbatim })
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || `The server answered ${res.status}`)
+      if (!res.ok) throw new Error(data.error || t('transcript.job.serverAnswered', { status: String(res.status) }))
       run.jobId = data.jobId
       let next = 0
       for (;;) {
@@ -59,17 +60,17 @@ export function useTranscriptJob({ enabled = true } = {}) {
         if (run.cancelled) return false
         const r = await fetch(api(`/api/transcript/${data.jobId}?from=${next}`), { cache: 'no-store' })
         const s = await r.json().catch(() => ({}))
-        if (!r.ok) throw new Error(s.error || 'The transcript job was lost (the server restarted?)')
+        if (!r.ok) throw new Error(s.error || t('transcript.job.lost'))
         if (run.cancelled) return false
         for (const chunk of s.chunks || []) onChunk?.(chunk, s.language || null)
         next = s.next ?? next
         if (s.status === 'completed') { setJob(null); return true }
-        if (s.status === 'failed') throw new Error(s.error || 'Speech recognition failed')
+        if (s.status === 'failed') throw new Error(s.error || t('transcript.job.failed'))
         if (s.status === 'cancelled') { setJob(null); return false }
-        setJob({ status: 'running', progress: s.progress || 0, phase: s.phase || 'Listening...' })
+        setJob({ status: 'running', progress: s.progress || 0, phase: s.phase || t('transcript.job.listening') })
       }
     } catch (err) {
-      if (!run.cancelled) setJob({ status: 'failed', progress: 0, error: err?.code === 'sign-in' ? 'Sign in on 3Speak to make a transcript.' : err.message })
+      if (!run.cancelled) setJob({ status: 'failed', progress: 0, error: err?.code === 'sign-in' ? t('transcript.job.signIn') : err.message })
       return false
     }
   }, [])

@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { SCENE_HOST_URL, SCENE_CHROME_CSS, SCENE_TRANSPARENT_CSS, sceneDoc, sceneLength } from '../utils/titleScenes'
+import { useT } from '../i18n'
 
 // The scene time a title clip shows at a timeline moment (held at its ends)
 export const sceneTimeAt = (clip, position) =>
@@ -12,6 +13,7 @@ export const sceneTimeAt = (clip, position) =>
  * no background. The playback loop seeks it every frame through `registry`.
  */
 export default function SceneLayer({ clip, time, frame, style, registry, ...rest }) {
+  const { t } = useT()
   const boxRef = useRef(null)
   const frameRef = useRef(null)
   const [scale, setScale] = useState(0)
@@ -61,7 +63,7 @@ export default function SceneLayer({ clip, time, frame, style, registry, ...rest
     <div ref={boxRef} style={{ ...style, overflow: 'hidden' }} {...rest}>
       <iframe
         ref={frameRef}
-        title={clip.name || 'Title'}
+        title={clip.name || t('titles.scene.layerTitle')}
         src={SCENE_HOST_URL}
         tabIndex={-1}
         aria-hidden="true"

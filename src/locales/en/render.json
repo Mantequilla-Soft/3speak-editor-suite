@@ -1,0 +1,83 @@
+{
+  "button": {
+    "rendering": "Rendering...",
+    "exporting": "Exporting...",
+    "uploading": "Uploading {{percent}}",
+    "reRender": "Re-render",
+    "exportAgain": "Export again",
+    "trimToRender": "Trim the timeline to {{limit}} or less to render",
+    "trimToExport": "Trim the timeline to {{limit}} or less to export"
+  },
+  "exportAs": {
+    "button": "Export as",
+    "title": "Export as: the same project as a Short, a square or a landscape video, cut around the faces",
+    "close": "Close Export as",
+    "waitUpload": "Wait for the upload to finish."
+  },
+  "done": {
+    "download": "Download",
+    "audiograms": "Audiograms",
+    "audiogramsCount": "Audiograms ({{n}})",
+    "audiogramsTitle": "Short videos of pieces of the episode, to share or to post as Shorts with it",
+    "videoPodcast": "Video podcast",
+    "videoPodcastTitle": "The whole episode as a 16:9 video with the cover, a waveform, captions and who is speaking",
+    "useAudio": "Use this audio",
+    "sendVideo": "Send Video"
+  },
+  "failed": "Render failed: {{error}}",
+  "phase": {
+    "preparing": "Preparing files...",
+    "submitting": "Submitting render job...",
+    "busyRetry": "The render servers are busy. Trying again in {{seconds}} s...",
+    "offlineRetry": "No connection to the render server. Trying again in {{seconds}} s...",
+    "starting": "Starting...",
+    "reconnecting": "Reconnecting to the render server...",
+    "uploadingFile": "Uploading {{name}} ({{index}}/{{total}})...",
+    "uploadingUnnamed": "Uploading file ({{index}}/{{total}})...",
+    "uploadingPlate": "Uploading background frame for {{name}}...",
+    "uploadingPlateUnnamed": "Uploading background frame for clip..."
+  },
+  "queue": {
+    "next": "You are next",
+    "inLine": {
+      "one": "You are {{n}}st in line",
+      "two": "You are {{n}}nd in line",
+      "few": "You are {{n}}rd in line",
+      "other": "You are {{n}}th in line"
+    },
+    "waiting": "Waiting for a free render place..."
+  },
+  "legacy": {
+    "exportVideo": "Export Video",
+    "cancelTitle": "Cancel export",
+    "settingsTitle": "Export settings",
+    "uploadingRender": "Uploading {{name}} ({{percent}}). Keep editing; Render unlocks when it is done.",
+    "uploadingExport": "Uploading {{name}} ({{percent}}). Keep editing; Export unlocks when it is done.",
+    "lengthRender": "Timeline is {{length}}. Trim it to {{limit}} or less to render.",
+    "lengthExport": "Timeline is {{length}}. Trim it to {{limit}} or less to export.",
+    "method": "Export Method",
+    "methodCanvas": "Canvas (WYSIWYG)",
+    "methodFast": "Fast (no effects)",
+    "canvasHint": "Captures all visual effects exactly as shown in preview",
+    "fastHint": "Faster export but ignores zoom, position, crop, text overlays",
+    "quality": "Quality",
+    "qualityHigh": "High (larger file)",
+    "qualityMedium": "Medium (recommended)",
+    "qualityLow": "Low (smaller file)",
+    "processing": "Processing... {{percent}}",
+    "renderingPercent": "Rendering... {{percent}}",
+    "downloadRendered": "Download Rendered Video",
+    "ffmpegLoading": "Loading FFmpeg...",
+    "ffmpegNotLoaded": "FFmpeg not loaded",
+    "addClips": "Add clips to the timeline to export"
+  },
+  "canvas": {
+    "loadingMedia": "Loading media...",
+    "renderingFrames": "Rendering frames...",
+    "encodingVideo": "Encoding video...",
+    "processingAudio": "Processing audio...",
+    "convertingMp4": "Converting to MP4...",
+    "preparingDownload": "Preparing download...",
+    "complete": "Complete!"
+  }
+}

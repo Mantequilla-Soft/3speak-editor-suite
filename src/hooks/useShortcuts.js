@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { isTypingTarget } from '../utils/keyboard'
 import '../styles/shortcuts.css'
+import { t } from '../i18n'
 import { shortcutAction, nextShuttleSpeed, stepFrames, neighbourClip, clipLabel, FRAME_RATE } from '../utils/shortcuts'
 
 // The shuttle moves the playhead itself (the preview paused) at 2x and more,
@@ -72,7 +73,7 @@ export function useShortcuts({ previewRef, playing, tracks, duration, selectedCl
     sel(id)
     const track = ts.find(t => t.clips.some(c => c.id === id))
     const clip = track?.clips.find(c => c.id === id)
-    say(`Selected ${clipLabel(clip, track)}`)
+    say(t('shortcuts.announce.selected', { clip: clipLabel(clip, track) }))
     // the clip itself gets the focus (screen readers read it), in view
     requestAnimationFrame(() => {
       const el = document.querySelector(`.timeline-clip-v2[data-clip-id="${CSS.escape(id)}"]`)
@@ -108,7 +109,7 @@ export function useShortcuts({ previewRef, playing, tracks, duration, selectedCl
         e.preventDefault()
         const speed = nextShuttleSpeed(speedRef.current === 1 && !live.current.playing ? 0 : speedRef.current, action.slice(-1))
         runShuttle(speed)
-        say(speed === 0 ? 'Stopped' : `${speed < 0 ? 'Backward' : 'Forward'} ${Math.abs(speed)}x`)
+        say(speed === 0 ? t('shortcuts.announce.stopped') : t(speed < 0 ? 'shortcuts.announce.backward' : 'shortcuts.announce.forward', { speed: Math.abs(speed) }))
         return
       }
       if (action === 'frame-back' || action === 'frame-forward') {

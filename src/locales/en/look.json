@@ -1,0 +1,53 @@
+{
+  "title": "Look",
+  "noEffects": "No effects",
+  "presetsLabel": "Look presets",
+  "doubleClickReset": "Double-click to reset",
+  "presets": {
+    "original": "Original",
+    "warm": "Warm",
+    "cool": "Cool",
+    "vivid": "Vivid",
+    "matte": "Matte",
+    "bw": "B&W",
+    "vintage": "Vintage",
+    "tealorange": "Teal & Orange",
+    "fade": "Fade",
+    "noir": "Noir",
+    "sunset": "Sunset"
+  },
+  "sliders": {
+    "blur": "Blur",
+    "vignette": "Vignette",
+    "sharpen": "Sharpen",
+    "split": "Teal & orange"
+  },
+  "transition": {
+    "title": "Transition",
+    "none": "None",
+    "types": {
+      "crossfade": "Crossfade",
+      "dissolve": "Dip to black",
+      "slideleft": "Slide left",
+      "slideright": "Slide right",
+      "slideup": "Slide up",
+      "zoom": "Zoom",
+      "whip": "Whip"
+    },
+    "length": "Transition length (seconds)",
+    "fades": "Fades",
+    "noFades": "No fades",
+    "in": "In",
+    "out": "Out",
+    "fadeInSeconds": "Fade in (seconds)",
+    "fadeOutSeconds": "Fade out (seconds)",
+    "intoNext": "Into the next clip",
+    "needNext": "Put a clip right after this one on the same track to add a transition.",
+    "fromTo": "{{from}} into {{to}}",
+    "fromUnnamed": "Clip into {{to}}",
+    "toUnnamed": "{{from}} into the next clip",
+    "bothUnnamed": "Clip into the next clip",
+    "add": "Add a transition",
+    "cutLabel": "{{type}}, {{seconds}}s"
+  }
+}

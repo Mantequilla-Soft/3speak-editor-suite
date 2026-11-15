@@ -5,16 +5,14 @@ import { cutLength } from '../utils/ripple'
 import { rowOffsets, visibleRows, estimateHeight } from '../utils/virtualList'
 import { normalWord } from '../utils/fillers'
 import './WordTools.css'
+import { useT, t, languageName as nameOf, formatNumber } from '../i18n'
 
-let languageNames = null
-function languageName(code) {
-  if (code === 'auto') return 'Detect automatically'
-  try {
-    languageNames = languageNames || new Intl.DisplayNames(['en'], { type: 'language' })
-    return languageNames.of(code) || code
-  } catch { return code }
-}
-const minutes = (sec) => (sec < 90 ? `${Math.max(1, Math.round(sec))} s` : `${Math.round(sec / 60)} min`)
+// a spoken language's name in the interface language ('auto': let the server find it)
+const languageName = (code) => (code === 'auto' ? t('transcript.language.auto') : nameOf(code))
+// a length of recording in a sentence: the seconds key under 90 s, else the minutes key, with { n }
+const lengthText = (secondsKey, minutesKey, sec) => (sec < 90
+  ? t(secondsKey, { n: Math.max(1, Math.round(sec)) })
+  : t(minutesKey, { n: Math.round(sec / 60) }))
 // (useLayoutEffect in the page; tests draw it on the server, where it would only warn)
 const useLayout = typeof window === 'undefined' ? useEffect : useLayoutEffect
 const FOLLOW_PAUSE_MS = 4000 // after the person scrolls, the view stops following the playback this long
@@ -22,6 +20,7 @@ const FOLLOW_PAUSE_MS = 4000 // after the person scrolls, the view stops followi
 // One paragraph: the speaker, its time, its words (memoised: only the ones whose
 // active word or selection changed are drawn again while the show plays)
 const Paragraph = memo(function Paragraph({ p, words, active, selFrom, selTo, matches, onWordDown, onWordEnter, onSeek }) {
+  const { t } = useT()
   const list = []
   for (let i = p.from; i <= p.to; i++) {
     const w = words[i]
@@ -32,7 +31,7 @@ const Paragraph = memo(function Paragraph({ p, words, active, selFrom, selTo, ma
     <div className={`transcript-para speaker-${p.speakerIndex % 4}`}>
       <div className="transcript-para-head">
         <span className="transcript-speaker">{p.speaker}</span>
-        <button className="transcript-time" onClick={() => onSeek(p.start)} title="Go there">{transcriptTime(p.start)}</button>
+        <button className="transcript-time" onClick={() => onSeek(p.start)} title={t('transcript.goThere')}>{transcriptTime(p.start)}</button>
       </div>
       <p className="transcript-text">{list}</p>
     </div>
@@ -50,6 +49,7 @@ const Paragraph = memo(function Paragraph({ p, words, active, selFrom, selTo, ma
  * `tr`: useTranscript; onCut(ranges, what) does the cut.
  */
 export default function TranscriptPanel({ tr, playheadPosition = 0, playing = false, onSeek, onCut, onOpenFillers }) {
+  const { t } = useT()
   const { words, paragraphs, job, status } = tr
   const [language, setLanguage] = useState('auto')
   const [sel, setSel] = useState(null) // { anchor, focus } word indexes
@@ -176,12 +176,12 @@ export default function TranscriptPanel({ tr, playheadPosition = 0, playing = fa
   const cutSelection = () => {
     if (!selected) return
     const idx = Array.from({ length: selected }, (_, k) => selFrom + k)
-    onCut(cutRangesForWords(words, idx), `${selected} word${selected === 1 ? '' : 's'}`)
+    onCut(cutRangesForWords(words, idx), { kind: 'words', count: selected })
     setSel(null)
   }
   const cutMatches = () => {
     if (!matches.length) return
-    onCut(cutRangesForWords(words, matches.flatMap(([a, b]) => Array.from({ length: b - a + 1 }, (_, k) => a + k))), `${matches.length} found`)
+    onCut(cutRangesForWords(words, matches.flatMap(([a, b]) => Array.from({ length: b - a + 1 }, (_, k) => a + k))), { kind: 'found', count: matches.length })
   }
   const onKeyDown = (e) => {
     if ((e.key === 'Delete' || e.key === 'Backspace') && selected) {
@@ -222,15 +222,15 @@ export default function TranscriptPanel({ tr, playheadPosition = 0, playing = fa
   }
 
   const languagePicker = (
-    <select className="font-select transcript-language" value={language} onChange={e => setLanguage(e.target.value)} disabled={running} aria-label="Spoken language">
+    <select className="font-select transcript-language" value={language} onChange={e => setLanguage(e.target.value)} disabled={running} aria-label={t('transcript.language.label')}>
       {(status?.languages || ['auto']).map(l => <option key={l} value={l}>{languageName(l)}</option>)}
     </select>
   )
   const progress = running && (
     <div className="captions-progress" role="status" aria-live="polite">
       <div className="captions-progress-bar"><div style={{ width: `${Math.round((job.progress || 0) * 100)}%` }} /></div>
-      <span><Loader2 size={13} className="encoding-notice-spin" /> {job.phase || 'Listening...'}</span>
-      <button className="silence-cut-cancel" onClick={tr.cancel}>Stop</button>
+      <span><Loader2 size={13} className="encoding-notice-spin" /> {job.phase || t('transcript.listening')}</span>
+      <button className="silence-cut-cancel" onClick={tr.cancel}>{t('transcript.stop')}</button>
     </div>
   )
   const failed = job?.status === 'failed' && <p className="captions-error" role="alert">{job.error}</p>
@@ -239,21 +239,21 @@ export default function TranscriptPanel({ tr, playheadPosition = 0, playing = fa
     return (
       <div className="transcript-panel">
         <div className="prop-group">
-          <div className="prop-group-label">Edit by text</div>
-          <p className="captions-text">Turn what is said into text with every voice by name, then edit the recording like a document: select words and press Delete to cut them out.</p>
+          <div className="prop-group-label">{t('transcript.intro.title')}</div>
+          <p className="captions-text">{t('transcript.intro.text')}</p>
           {status === null ? (
-            <p className="captions-text"><Loader2 size={13} className="encoding-notice-spin" /> Checking the server...</p>
+            <p className="captions-text"><Loader2 size={13} className="encoding-notice-spin" /> {t('transcript.intro.checking')}</p>
           ) : !available ? (
-            <p className="captions-error" role="status">Transcripts are not available on this editor server right now.</p>
+            <p className="captions-error" role="status">{t('transcript.intro.unavailable')}</p>
           ) : tr.missingSeconds <= 0 && tr.count === 0 ? (
-            <p className="captions-text">Add a recording with speech first.</p>
+            <p className="captions-text">{t('transcript.intro.noSpeech')}</p>
           ) : (
             <>
-              <label className="transcript-field"><span>Spoken language</span>{languagePicker}</label>
+              <label className="transcript-field"><span>{t('transcript.language.label')}</span>{languagePicker}</label>
               <button className="silence-cut-apply captions-go" onClick={() => tr.transcribe(language)}>
-                <Wand2 size={16} /> Transcribe ({minutes(tr.missingSeconds)} of recording)
+                <Wand2 size={16} /> {lengthText('transcript.intro.transcribeSeconds', 'transcript.intro.transcribeMinutes', tr.missingSeconds)}
               </button>
-              {tr.missingSeconds > 1800 && <p className="captions-text">A long show takes a while: the words show up part by part, and you can start editing the first ones.</p>}
+              {tr.missingSeconds > 1800 && <p className="captions-text">{t('transcript.intro.longShow')}</p>}
             </>
           )}
           {failed}
@@ -272,39 +272,39 @@ export default function TranscriptPanel({ tr, playheadPosition = 0, playing = fa
           <input
             type="search"
             className="text-input"
-            placeholder="Find words"
+            placeholder={t('transcript.search.placeholder')}
             value={query}
             onChange={(e) => { setQuery(e.target.value); setMatchAt(0) }}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); gotoMatch(e.shiftKey ? matchAt - 1 : (sel ? matchAt + 1 : matchAt)) } }}
-            aria-label="Find words in the transcript"
+            aria-label={t('transcript.search.label')}
           />
           {query.trim() && (
             <>
               <span className="transcript-count" aria-live="polite">{matches.length ? `${matchAt + 1}/${matches.length}` : '0'}</span>
-              <button className="transcript-icon" onClick={() => gotoMatch(matchAt - 1)} disabled={!matches.length} title="Previous" aria-label="Previous match"><ChevronUp size={14} /></button>
-              <button className="transcript-icon" onClick={() => gotoMatch(matchAt + 1)} disabled={!matches.length} title="Next" aria-label="Next match"><ChevronDown size={14} /></button>
+              <button className="transcript-icon" onClick={() => gotoMatch(matchAt - 1)} disabled={!matches.length} title={t('transcript.search.previous')} aria-label={t('transcript.search.previousLabel')}><ChevronUp size={14} /></button>
+              <button className="transcript-icon" onClick={() => gotoMatch(matchAt + 1)} disabled={!matches.length} title={t('transcript.search.next')} aria-label={t('transcript.search.nextLabel')}><ChevronDown size={14} /></button>
             </>
           )}
         </div>
         <div className="transcript-actions">
           {selected > 0 ? (
             <>
-              <span className="transcript-count">{selected} word{selected === 1 ? '' : 's'} · {cutLength(cutRangesForWords(words, Array.from({ length: selected }, (_, k) => selFrom + k))).toFixed(1)} s</span>
-              <button className="compact-render-btn transcript-cut" onClick={cutSelection} title="Cut the selected words out of the recording (Delete)"><Scissors size={14} /> Cut</button>
-              <button className="transcript-icon" onClick={() => setSel(null)} title="Clear the selection (Esc)" aria-label="Clear the selection"><X size={14} /></button>
+              <span className="transcript-count">{t('transcript.selection.count', { count: selected, seconds: formatNumber(cutLength(cutRangesForWords(words, Array.from({ length: selected }, (_, k) => selFrom + k))), { minimumFractionDigits: 1, maximumFractionDigits: 1 }) })}</span>
+              <button className="compact-render-btn transcript-cut" onClick={cutSelection} title={t('transcript.selection.cutTitle')}><Scissors size={14} /> {t('transcript.selection.cut')}</button>
+              <button className="transcript-icon" onClick={() => setSel(null)} title={t('transcript.selection.clearTitle')} aria-label={t('transcript.selection.clearLabel')}><X size={14} /></button>
             </>
           ) : query.trim() && matches.length > 0 ? (
-            <button className="silence-cut-apply" onClick={cutMatches} title="Cut every place found out of the recording"><Scissors size={14} /> Cut all {matches.length}</button>
+            <button className="silence-cut-apply" onClick={cutMatches} title={t('transcript.found.cutAllTitle')}><Scissors size={14} /> {t('transcript.found.cutAll', { count: matches.length })}</button>
           ) : (
             <>
-              {onOpenFillers && <button className="silence-cut-apply" onClick={onOpenFillers} title="Find um, uh, you know and long pauses"><Wand2 size={14} /> Fillers</button>}
-              <button className="transcript-icon" onClick={copy} title="Copy the transcript" aria-label="Copy the transcript">{copied ? <Check size={14} /> : <Copy size={14} />}</button>
+              {onOpenFillers && <button className="silence-cut-apply" onClick={onOpenFillers} title={t('transcript.fillersTitle')}><Wand2 size={14} /> {t('transcript.fillers')}</button>}
+              <button className="transcript-icon" onClick={copy} title={t('transcript.copy')} aria-label={t('transcript.copy')}>{copied ? <Check size={14} /> : <Copy size={14} />}</button>
             </>
           )}
         </div>
       </div>
       {speakers.length > 1 && (
-        <div className="transcript-speakers" aria-label="Speakers">
+        <div className="transcript-speakers" aria-label={t('transcript.speakers')}>
           {speakers.map(([i, name]) => <span key={i} className={`transcript-speaker speaker-${i % 4}`}>{name}</span>)}
         </div>
       )}
@@ -312,8 +312,8 @@ export default function TranscriptPanel({ tr, playheadPosition = 0, playing = fa
       {failed}
       {!running && tr.missingSeconds > 1 && available && (
         <div className="transcript-missing">
-          <span>{minutes(tr.missingSeconds)} of recording has no text yet.</span>
-          <button className="silence-cut-cancel" onClick={() => tr.transcribe(tr.language || language)}><RotateCcw size={12} /> Transcribe it</button>
+          <span>{lengthText('transcript.missing.seconds', 'transcript.missing.minutes', tr.missingSeconds)}</span>
+          <button className="silence-cut-cancel" onClick={() => tr.transcribe(tr.language || language)}><RotateCcw size={12} /> {t('transcript.missing.transcribe')}</button>
         </div>
       )}
 
@@ -325,7 +325,7 @@ export default function TranscriptPanel({ tr, playheadPosition = 0, playing = fa
         onWheel={markUserScroll}
         onTouchMove={markUserScroll}
         onKeyDown={onKeyDown}
-        aria-label="Transcript: click a word to go there, drag over words to select them, Delete cuts them"
+        aria-label={t('transcript.scrollLabel')}
       >
         <div className="transcript-rows" style={{ height: offsets[paragraphs.length] }}>
           <div ref={rowsRef} className="transcript-window" style={{ transform: `translateY(${offsets[from] || 0}px)` }}>
@@ -347,7 +347,7 @@ export default function TranscriptPanel({ tr, playheadPosition = 0, playing = fa
           </div>
         </div>
       </div>
-      <p className="transcript-hint">{words.length.toLocaleString('en')} words. Click a word to go there; drag or Shift+click to select; Delete cuts. Undo brings it back.</p>
+      <p className="transcript-hint">{t('transcript.hint', { count: words.length })}</p>
     </div>
   )
 }

@@ -3,56 +3,66 @@
 // `?` sheet shows (components/ShortcutSheet.jsx), the older App.jsx and
 // Timeline.jsx shortcuts included so the sheet is the one place to look.
 
+import { t } from '../i18n'
+
 export const FRAME_RATE = 30 // the editor renders 30 fps (Shorts and audiograms)
 export const SHUTTLE_SPEEDS = [1, 2, 4, 8]
 
 const isMac = () => typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || '')
-export const modKey = () => (isMac() ? '⌘' : 'Ctrl')
+export const modKey = () => (isMac() ? '⌘' : t('shortcuts.keys.ctrl'))
 
 /**
  * Every shortcut, grouped, for the sheet. `only`: 'audio' / 'video' (the
- * audio editor or the Shorts editor), else both.
+ * audio editor or the Shorts editor), else both. Built when called, in the
+ * interface language (key names too: Space, Enter...).
  */
 export function shortcutList(mod = modKey()) {
+  const k = (name) => t(`shortcuts.keys.${name}`)
+  const item = (keys, name, only) => ({ id: name, keys, label: t(`shortcuts.items.${name}`), ...(only ? { only } : {}) })
+  const shift = k('shift')
+  const alt = k('alt')
   return [
     {
-      title: 'Playback',
+      id: 'playback',
+      title: t('shortcuts.groups.playback'),
       items: [
-        { keys: ['Space'], label: 'Play / pause' },
-        { keys: ['L'], label: 'Play forward; press again for 2x, 4x, 8x' },
-        { keys: ['J'], label: 'Play backward; press again for faster' },
-        { keys: ['K'], label: 'Stop' },
-        { keys: [',', '.'], label: 'One frame back / forward (Shift: 10 frames)' },
-        { keys: ['←', '→'], label: 'Move the playhead 0.1 s (Shift: 1 s)' },
-        { keys: ['F'], label: 'Full screen on / off' }
+        item([k('space')], 'playPause'),
+        item(['L'], 'playForward'),
+        item(['J'], 'playBackward'),
+        item(['K'], 'stop'),
+        item([',', '.'], 'frameStep'),
+        item(['←', '→'], 'nudge'),
+        item(['F'], 'fullscreen')
       ]
     },
     {
-      title: 'Clips',
+      id: 'clips',
+      title: t('shortcuts.groups.clips'),
       items: [
-        { keys: ['Tab', 'Shift+Tab'], label: 'Select the next / previous clip' },
-        { keys: ['Alt+←', 'Alt+→'], label: 'Previous / next clip on the same track' },
-        { keys: ['Alt+↑', 'Alt+↓'], label: 'Clip on the track above / below' },
-        { keys: ['Enter'], label: 'Open the selected clip\'s settings' },
-        { keys: ['Esc'], label: 'Select nothing' },
-        { keys: [`${mod}+A`], label: 'Select every clip' },
-        { keys: ['Delete'], label: 'Remove the selected clip(s)' },
-        { keys: [`${mod}+R`], label: 'Split the selected clip at the playhead' },
-        { keys: [`${mod}+D`], label: 'Duplicate the selected clip' },
-        { keys: [`${mod}+Shift+G`], label: 'Ungroup clips' },
-        { keys: ['G'], label: 'Close the gap at the playhead' },
-        { keys: ['T'], label: 'Add text at the playhead', only: 'video' }
+        item([k('tab'), `${shift}+${k('tab')}`], 'nextPrevClip'),
+        item([`${alt}+←`, `${alt}+→`], 'clipLeftRight'),
+        item([`${alt}+↑`, `${alt}+↓`], 'clipUpDown'),
+        item([k('enter')], 'openClip'),
+        item([k('esc')], 'selectNone'),
+        item([`${mod}+A`], 'selectAll'),
+        item([k('delete')], 'remove'),
+        item([`${mod}+R`], 'split'),
+        item([`${mod}+D`], 'duplicate'),
+        item([`${mod}+${shift}+G`], 'ungroup'),
+        item(['G'], 'closeGap'),
+        item(['T'], 'addText', 'video')
       ]
     },
     {
-      title: 'Project',
+      id: 'project',
+      title: t('shortcuts.groups.project'),
       items: [
-        { keys: [`${mod}+Z`], label: 'Undo' },
-        { keys: [`${mod}+Shift+Z`, `${mod}+Y`], label: 'Redo' },
-        { keys: ['B'], label: 'Add a flag at the playhead' },
-        { keys: ['M'], label: 'Add a chapter at the playhead', only: 'audio' },
-        { keys: [`${mod}+=`, `${mod}+-`], label: 'Zoom the timeline in / out' },
-        { keys: ['?'], label: 'Show these shortcuts' }
+        item([`${mod}+Z`], 'undo'),
+        item([`${mod}+${shift}+Z`, `${mod}+Y`], 'redo'),
+        item(['B'], 'addFlag'),
+        item(['M'], 'addChapter', 'audio'),
+        item([`${mod}+=`, `${mod}+-`], 'zoom'),
+        item(['?'], 'showSheet')
       ]
     }
   ]
@@ -161,19 +171,22 @@ const fmt = (s) => {
 }
 export { fmt as formatSpokenTime }
 
-/** A track's name for screen readers ("Voice", "Video track 2"). */
+/** A track's name for screen readers ("Voice (audio track)", "Video track 2"). */
 export function trackAriaLabel(track, index = 0) {
-  const kind = track?.type === 'audio' ? (track.music ? 'Music track' : 'Audio track') : 'Video track'
-  return track?.name ? `${track.name} (${kind.toLowerCase()})` : `${kind} ${index + 1}`
+  const kind = track?.type === 'audio' ? (track.music ? 'music' : 'audio') : 'video'
+  return track?.name
+    ? t(`timeline.track.aria.named.${kind}`, { name: track.name })
+    : t(`timeline.track.aria.numbered.${kind}`, { number: index + 1 })
 }
 
-const KIND = { video: 'Video clip', audio: 'Sound clip', image: 'Image', text: 'Text', color: 'Colour' }
+const KIND = { video: 'video', audio: 'audio', image: 'image', text: 'text', color: 'color' }
 
 /** What a screen reader says for a clip ("Video clip intro.mp4, 0:03.0 to 0:08.0"). */
 export function clipLabel(clip, track = null) {
   if (!clip) return ''
-  const kind = KIND[clip.type] || 'Clip'
-  const name = clip.type === 'text' ? (clip.text || clip.name || '') : (clip.name || '')
-  const where = track?.name ? ` on ${track.name}` : ''
-  return `${kind}${name ? ` ${String(name).slice(0, 60)}` : ''}${where}, ${fmt(start(clip))} to ${fmt(end(clip))}`
+  const kind = t(`timeline.clip.kind.${KIND[clip.type] || 'other'}`)
+  const name = String(clip.type === 'text' ? (clip.text || clip.name || '') : (clip.name || '')).slice(0, 60)
+  const vars = { kind, name, track: track?.name || '', from: fmt(start(clip)), to: fmt(end(clip)) }
+  const form = name ? (track?.name ? 'namedOnTrack' : 'named') : (track?.name ? 'onTrack' : 'plain')
+  return t(`timeline.clip.aria.${form}`, vars)
 }

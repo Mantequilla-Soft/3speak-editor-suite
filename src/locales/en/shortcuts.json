@@ -1,0 +1,53 @@
+{
+  "sheet": {
+    "title": "Keyboard shortcuts"
+  },
+  "groups": {
+    "playback": "Playback",
+    "clips": "Clips",
+    "project": "Project"
+  },
+  "items": {
+    "playPause": "Play / pause",
+    "playForward": "Play forward; press again for 2x, 4x, 8x",
+    "playBackward": "Play backward; press again for faster",
+    "stop": "Stop",
+    "frameStep": "One frame back / forward (Shift: 10 frames)",
+    "nudge": "Move the playhead 0.1 s (Shift: 1 s)",
+    "fullscreen": "Full screen on / off",
+    "nextPrevClip": "Select the next / previous clip",
+    "clipLeftRight": "Previous / next clip on the same track",
+    "clipUpDown": "Clip on the track above / below",
+    "openClip": "Open the selected clip's settings",
+    "selectNone": "Select nothing",
+    "selectAll": "Select every clip",
+    "remove": "Remove the selected clip(s)",
+    "split": "Split the selected clip at the playhead",
+    "duplicate": "Duplicate the selected clip",
+    "ungroup": "Ungroup clips",
+    "closeGap": "Close the gap at the playhead",
+    "addText": "Add text at the playhead",
+    "undo": "Undo",
+    "redo": "Redo",
+    "addFlag": "Add a flag at the playhead",
+    "addChapter": "Add a chapter at the playhead",
+    "zoom": "Zoom the timeline in / out",
+    "showSheet": "Show these shortcuts"
+  },
+  "keys": {
+    "space": "Space",
+    "tab": "Tab",
+    "shift": "Shift",
+    "alt": "Alt",
+    "ctrl": "Ctrl",
+    "enter": "Enter",
+    "esc": "Esc",
+    "delete": "Delete"
+  },
+  "announce": {
+    "selected": "Selected {{clip}}",
+    "stopped": "Stopped",
+    "forward": "Forward {{speed}}x",
+    "backward": "Backward {{speed}}x"
+  }
+}

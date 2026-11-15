@@ -4,6 +4,7 @@ import { MAX_CLIP_VOLUME } from '../utils/audioGain'
 import { AUDIO_NOISE_LEVELS, recordingSource, canCleanClip, cleanVoiceChanges } from './ClipProperties'
 import { useCleaningStatus, cleaningText } from '../utils/cleaningStatus'
 import { commonValue, sourcesOf } from '../utils/multiSelect'
+import { useT } from '../i18n'
 
 /**
  * Settings for several selected clips at once (box select on the timeline):
@@ -16,6 +17,7 @@ import { commonValue, sourcesOf } from '../utils/multiSelect'
  * groups); onUpdateClipsEach([{ id, updates }]) gives each its own fields.
  */
 export default function MultiClipProperties({ clips, audioMode = false, onUpdateClips, voiceTargets = null, onUpdateClipsEach = null, onRemove, count }) {
+  const { t } = useT()
   const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
   const running = useCleaningStatus()
@@ -40,7 +42,7 @@ export default function MultiClipProperties({ clips, audioMode = false, onUpdate
     try {
       onUpdateClipsEach(await cleanVoiceChanges(targets, id))
     } catch {
-      setError('Cleaning up the voice failed. Try again.')
+      setError(t('clip.multi.failed'))
     } finally {
       setBusy(null)
     }
@@ -51,9 +53,9 @@ export default function MultiClipProperties({ clips, audioMode = false, onUpdate
       <div className="property-group">
         <label>
           <Volume2 size={12} />
-          Volume{volume == null ? ' (mixed)' : ''}
+          {volume == null ? t('clip.multi.volumeMixed') : t('clip.multi.volume')}
           {(volume !== 100 || allMuted) && (
-            <button className="prop-reset-btn" onClick={() => onUpdateClips({ volume: 100, audioEnabled: true })} title="Reset volume">
+            <button className="prop-reset-btn" onClick={() => onUpdateClips({ volume: 100, audioEnabled: true })} title={t('clip.volume.reset')}>
               <RotateCcw size={10} />
             </button>
           )}
@@ -65,23 +67,23 @@ export default function MultiClipProperties({ clips, audioMode = false, onUpdate
             max={maxVolume}
             value={Math.min(maxVolume, shownVolume)}
             onChange={(e) => onUpdateClips({ volume: parseInt(e.target.value) })}
-            aria-label="Volume of all selected clips"
+            aria-label={t('clip.multi.volumeAll')}
           />
           <span>{volume == null ? '-' : `${volume}%`}</span>
         </div>
         <button className={`mute-btn ${allMuted ? 'muted' : ''}`} onClick={() => onUpdateClips({ audioEnabled: allMuted })}>
-          {allMuted ? 'Unmute all' : 'Mute all'}
+          {allMuted ? t('clip.multi.unmuteAll') : t('clip.multi.muteAll')}
         </button>
       </div>
 
       {audioMode && onUpdateClipsEach && (
         <div className="property-group">
-          <label>Clean up the voice</label>
+          <label>{t('clip.multi.cleanVoice')}</label>
           {sources.length ? (
-            <div className="noise-levels" role="radiogroup" aria-label="Voice clean-up for all selected clips">
+            <div className="noise-levels" role="radiogroup" aria-label={t('clip.multi.cleanGroup')}>
               {levels.map(({ id, label, title }) => (
                 <button
-                  key={label}
+                  key={String(id)}
                   title={title}
                   role="radio"
                   aria-checked={level === id}
@@ -89,20 +91,20 @@ export default function MultiClipProperties({ clips, audioMode = false, onUpdate
                   disabled={!!busy || !!running}
                   onClick={() => chooseLevel(id)}
                 >
-                  {busy && busy === (id ?? 'off') ? <Loader2 size={12} className="encoding-notice-spin" aria-label="Working" /> : label}
+                  {busy && busy === (id ?? 'off') ? <Loader2 size={12} className="encoding-notice-spin" aria-label={t('clip.noise.working')} /> : label}
                 </button>
               ))}
             </div>
           ) : (
-            <p className="noise-hint">Available once these clips have finished uploading.</p>
+            <p className="noise-hint">{t('clip.multi.afterUpload')}</p>
           )}
           {(busy || running) && (
-            <p className="noise-busy" role="status"><Loader2 size={14} className="encoding-notice-spin" /> {running ? cleaningText(running) : 'Working…'}</p>
+            <p className="noise-busy" role="status"><Loader2 size={14} className="encoding-notice-spin" /> {running ? cleaningText(running) : t('clip.noise.workingDots')}</p>
           )}
           {sources.length > 0 && (
             <p className="noise-hint">
-              Applies to the {clips.length} selected clips{extra > 0 ? ` and the ${extra} other clip${extra === 1 ? '' : 's'} in their groups` : ''}.
-              {waiting ? ' Clips still uploading are left as they are.' : ''}
+              {extra > 0 ? t('clip.multi.appliesWithGroups', { selected: clips.length, count: extra }) : t('clip.multi.applies', { count: clips.length })}
+              {waiting ? ` ${t('clip.multi.stillUploading')}` : ''}
             </p>
           )}
           {error && <p className="noise-hint error">{error}</p>}
@@ -112,7 +114,7 @@ export default function MultiClipProperties({ clips, audioMode = false, onUpdate
       {onRemove && (
         <div className="property-group">
           <button className="multi-action-btn multi-remove-btn" onClick={onRemove}>
-            <Trash2 size={13} /> Remove {count ?? clips.length} clips
+            <Trash2 size={13} /> {t('clip.multi.remove', { count: count ?? clips.length })}
           </button>
         </div>
       )}

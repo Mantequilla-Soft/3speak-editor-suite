@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ChevronLeft, X } from './icons'
+import { useT } from '../i18n'
 
 // Mini 9:16 diagrams of each arrangement. "S" = the original, "R" = your recording.
 function Frame({ children, dashed }) {
@@ -59,28 +60,22 @@ const DIAGRAMS = {
   )
 }
 
-const MODES = [
-  { id: 'stitch', title: 'Stitch', text: 'Record a clip that plays before or after the original.' },
-  { id: 'reaction', title: 'Reaction', text: 'Record yourself while the original plays.' },
-  { id: 'free', title: 'Free edit', text: 'Open the editor with the original on the timeline.' }
-]
+// Each option's title and text: remix.options.<id>.title / .text
+const MODES = [{ id: 'stitch' }, { id: 'reaction' }, { id: 'free' }]
 
 const STITCH_ORDER = [
-  { id: 'stitchBefore', diagram: 'stitchBefore', title: 'Before the original', text: 'Your clip plays first, then the original.' },
-  { id: 'stitchAfter', diagram: 'stitch', title: 'After the original', text: 'The original plays first, then your clip.' }
+  { id: 'stitchBefore', diagram: 'stitchBefore' },
+  { id: 'stitchAfter', diagram: 'stitch' }
 ]
 
-const REACTION_LAYOUTS = [
-  { id: 'overlay', title: 'Overlay', text: 'Your camera in a small box on top of the original. Drag it anywhere.' },
-  { id: 'tileTop', title: 'Tile above', text: 'Original shrinks to the bottom half, you on top.' },
-  { id: 'tileBottom', title: 'Tile below', text: 'Original shrinks to the top half, you below.' }
-]
+const REACTION_LAYOUTS = [{ id: 'overlay' }, { id: 'tileTop' }, { id: 'tileBottom' }]
 
 /**
  * Shown when a whole video arrives for remixing. Calls onChoose with
  * 'stitchBefore' | 'stitchAfter' | 'overlay' | 'tileTop' | 'tileBottom' | 'free'.
  */
 function RemixModePicker({ onChoose }) {
+  const { t } = useT()
   const [step, setStep] = useState('mode') // mode | stitch | reaction
 
   const options = step === 'mode' ? MODES : step === 'stitch' ? STITCH_ORDER : REACTION_LAYOUTS
@@ -88,21 +83,19 @@ function RemixModePicker({ onChoose }) {
     if (id === 'reaction' || id === 'stitch') setStep(id)
     else onChoose(id)
   }
-  const title = step === 'mode'
-    ? 'How do you want to remix?'
-    : step === 'stitch' ? 'Where should your clip go?' : 'Where should your reaction go?'
+  const title = t(`remix.titles.${step}`) // mode | stitch | reaction
 
   return (
     <div className="remix-picker-overlay">
       <div className="remix-picker" role="dialog" aria-modal="true" aria-labelledby="remix-picker-title">
         <div className="remix-picker-header">
           {step !== 'mode' ? (
-            <button className="remix-picker-icon-btn" onClick={() => setStep('mode')} title="Back">
+            <button className="remix-picker-icon-btn" onClick={() => setStep('mode')} title={t('common.back')}>
               <ChevronLeft size={16} />
             </button>
           ) : <span className="remix-picker-icon-spacer" />}
           <h3 id="remix-picker-title">{title}</h3>
-          <button className="remix-picker-icon-btn" onClick={() => onChoose('free')} title="Skip, free edit">
+          <button className="remix-picker-icon-btn" onClick={() => onChoose('free')} title={t('remix.skip')}>
             <X size={16} />
           </button>
         </div>
@@ -112,8 +105,8 @@ function RemixModePicker({ onChoose }) {
             <button key={opt.id} className="remix-picker-option" onClick={() => pick(opt.id)}>
               <span className="remix-picker-diagram">{DIAGRAMS[opt.diagram || opt.id]}</span>
               <span className="remix-picker-copy">
-                <strong>{opt.title}</strong>
-                <small>{opt.text}</small>
+                <strong>{t(`remix.options.${opt.id}.title`)}</strong>
+                <small>{t(`remix.options.${opt.id}.text`)}</small>
               </span>
             </button>
           ))}

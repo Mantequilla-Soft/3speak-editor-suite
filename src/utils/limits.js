@@ -1,4 +1,5 @@
 import { EDITOR_MODE } from './editorMode'
+import { t, formatNumber } from '../i18n'
 import { MAX_VIDEO_SECONDS, isShortAspect, readProjectAspect } from './projectFormat'
 
 // Length limit for a rendered short. The timeline itself can run longer
@@ -26,34 +27,29 @@ export const MAX_IMPORT_BYTES = 2 * 1024 * 1024 * 1024
 // Beat sync): decoding needs several times the file size in RAM
 export const MAX_ANALYSE_BYTES = 300 * 1024 * 1024
 
-// "15.2 GB" / "380 MB"
-export const formatBytes = (n) => (n >= 1024 ** 3 ? `${(n / 1024 ** 3).toFixed(1)} GB` : `${Math.round(n / 1024 ** 2)} MB`)
+// "15.2 GB" / "380 MB" (the number in the interface language: "15,2 GB" in German)
+export const formatBytes = (n) => (n >= 1024 ** 3 ? `${formatNumber(Math.round(n / 1024 ** 3 * 10) / 10, { maximumFractionDigits: 1 })} GB` : `${formatNumber(Math.round(n / 1024 ** 2))} MB`)
 
-// "2 minutes" / "2-minute" / "3 hours" for user-facing messages, derived from the number.
+// "2 minutes" / "3 hours" / "90 seconds" in the interface language, derived from the number.
 export function limitText(seconds) {
   const hours = seconds / 3600
-  if (Number.isInteger(hours)) return `${hours} hour${hours === 1 ? '' : 's'}`
+  if (Number.isInteger(hours)) return t('common.duration.hours', { count: hours })
   const minutes = seconds / 60
-  return Number.isInteger(minutes) ? `${minutes} minute${minutes === 1 ? '' : 's'}` : `${seconds} seconds`
+  return Number.isInteger(minutes) ? t('common.duration.minutes', { count: minutes }) : t('common.duration.seconds', { count: seconds })
 }
-export function limitAdjective(seconds) {
-  const hours = seconds / 3600
-  if (Number.isInteger(hours)) return `${hours}-hour`
-  const minutes = seconds / 60
-  return Number.isInteger(minutes) ? `${minutes}-minute` : `${seconds}-second`
-}
-export let MAX_TIMELINE_TEXT = limitText(MAX_TIMELINE_SECONDS)
-export let MAX_TIMELINE_ADJ = limitAdjective(MAX_TIMELINE_SECONDS)
-// What a render of this project is called in messages ("A short can be at most...")
-export let RENDER_NOUN = EDITOR_MODE === 'audio' ? 'An export' : isShortAspect(readProjectAspect()) ? 'A short' : 'A video'
+// What a render of this project is: 'audio' (an export), 'short' or 'video'. Messages
+// pick a whole sentence by it (common.limits.atMost.<kind>), never glue a noun in.
+export let RENDER_KIND = EDITOR_MODE === 'audio' ? 'audio' : isShortAspect(readProjectAspect()) ? 'short' : 'video'
+// Read at call time, so they follow the language and the project's shape
+export const maxTimelineText = () => limitText(MAX_TIMELINE_SECONDS)
+/** "A Short can be at most 2 minutes." for this project. */
+export const atMostText = () => t(`common.limits.atMost.${RENDER_KIND}`, { limit: maxTimelineText() })
 
 /** The video project's shape changed: its limit follows (2 minutes for a Short, else 10). */
 export function setProjectLimit(aspect) {
   if (EDITOR_MODE === 'audio') return MAX_TIMELINE_SECONDS
   MAX_TIMELINE_SECONDS = maxSecondsFor(EDITOR_MODE, aspect)
-  MAX_TIMELINE_TEXT = limitText(MAX_TIMELINE_SECONDS)
-  MAX_TIMELINE_ADJ = limitAdjective(MAX_TIMELINE_SECONDS)
-  RENDER_NOUN = isShortAspect(aspect) ? 'A short' : 'A video'
+  RENDER_KIND = isShortAspect(aspect) ? 'short' : 'video'
   return MAX_TIMELINE_SECONDS
 }
 

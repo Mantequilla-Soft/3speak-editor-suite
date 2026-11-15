@@ -5,6 +5,8 @@
 // pollRender() follows the job ("You are 2nd in line", then the progress)
 // and stops at the first hard error instead of asking forever.
 
+import { t, hasKey, getLanguage } from '../i18n'
+
 export const SUBMIT_GIVE_UP_MS = 10 * 60 * 1000 // trying to submit for this long: give up
 export const POLL_GIVE_UP_MS = 2 * 60 * 1000 // no answer to status polls for this long: give up
 export const POLL_INTERVAL_MS = 1500
@@ -31,15 +33,18 @@ export function retryDelay(attempt, retryAfterSec = null) {
 /** "You are next" / "You are 2nd in line" (1 = the next to start). */
 export function positionText(position) {
   if (!(position >= 1)) return null
-  if (position === 1) return 'You are next'
+  if (position === 1) return t('render.queue.next')
   const n = Math.floor(position)
-  const suffix = (n % 100 >= 11 && n % 100 <= 13) ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th')
-  return `You are ${n}${suffix} in line`
+  // 2nd / 3rd / 4th: the language's ordinal form (render.queue.inLine.<one|two|few|other>)
+  let form = 'other'
+  try { form = new Intl.PluralRules(getLanguage(), { type: 'ordinal' }).select(n) } catch { /* old browser */ }
+  const key = hasKey(`render.queue.inLine.${form}`) ? `render.queue.inLine.${form}` : 'render.queue.inLine.other'
+  return t(key, { n })
 }
 
 /** The line shown for a job status from the server. */
 export function statusPhase(data) {
-  if (data?.status === 'queued') return positionText(data.position) || 'Waiting for a free render place...'
+  if (data?.status === 'queued') return positionText(data.position) || t('render.queue.waiting')
   return data?.phase || null
 }
 
@@ -71,12 +76,10 @@ export async function submitRender({ send, onWait = () => {}, signal = null, sle
     if (signal?.aborted) return null
     const r = await call(send)
     if (r.ok) return r.data
-    if (!isRetryable(r.status)) throw new Error(r.data?.error || `Server responded with ${r.status}`)
+    if (!isRetryable(r.status)) throw new Error(r.data?.error || t('errors.render.serverStatus', { status: String(r.status) }))
     const wait = retryDelay(attempt, r.data?.retryAfter)
     if (now() - started + wait > giveUpMs) {
-      throw new Error(r.status === 0
-        ? 'The render server cannot be reached. Check your connection and render again.'
-        : 'The render servers are still busy. Please render again in a few minutes.')
+      throw new Error(r.status === 0 ? t('errors.render.unreachable') : t('errors.render.stillBusy'))
     }
     onWait({ seconds: Math.round(wait / 1000), busy: r.status !== 0 })
     await sleep(wait, signal)
@@ -106,11 +109,11 @@ export async function pollRender({ get, onStatus = () => {}, signal = null, slee
       await sleep(interval, signal)
       continue
     }
-    if (r.status === 404) throw new Error('The render server no longer knows this render (it may have restarted). Please render again.')
-    if (!isRetryable(r.status) && r.status !== 500) throw new Error(r.data?.error || `Server responded with ${r.status}`)
+    if (r.status === 404) throw new Error(t('errors.render.unknownJob'))
+    if (!isRetryable(r.status) && r.status !== 500) throw new Error(r.data?.error || t('errors.render.serverStatus', { status: String(r.status) }))
     failures++
     failingSince ??= now()
-    if (now() - failingSince > giveUpMs) throw new Error('Lost contact with the render server. Please render again.')
+    if (now() - failingSince > giveUpMs) throw new Error(t('errors.render.lostContact'))
     onStatus({ reconnecting: true })
     await sleep(Math.min(retryDelay(failures), 10000), signal)
   }

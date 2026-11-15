@@ -3,6 +3,7 @@ import { hasLayout, coverSourceRect, layoutPan, layoutZoom } from '../utils/remi
 import { getClipChromaKey, createKeyer } from '../utils/chromaKey'
 import { clipColorFilter } from '../components/ClipColorFilters'
 import { motionAt, pivotPoint } from '../utils/stickerMotion'
+import { t } from '../i18n'
 
 const EXPORT_WIDTH = 1280
 const EXPORT_HEIGHT = 720
@@ -388,13 +389,13 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
   // Main export function
   const exportCanvas = useCallback(async (tracks, backgroundMusic, options = {}) => {
     if (!ffmpegLoaded || !ffmpeg) {
-      throw new Error('FFmpeg not loaded')
+      throw new Error(t('errors.export.ffmpegNotLoaded'))
     }
 
     abortRef.current = false
     setExporting(true)
     setExportProgress(0)
-    setExportPhase('Loading media...')
+    setExportPhase(t('render.canvas.loadingMedia'))
 
     // Measure the preview container to calculate scale factor
     // Clip properties (fontSize, positionX/Y) are in preview-pixel coords
@@ -417,7 +418,7 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
       }
 
       if (totalDuration === 0) {
-        throw new Error('No clips to export')
+        throw new Error(t('errors.export.noClips'))
       }
 
       // Build clip to track index map
@@ -439,7 +440,7 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
       const ctx = canvas.getContext('2d')
       canvasRef.current = canvas
 
-      setExportPhase('Rendering frames...')
+      setExportPhase(t('render.canvas.renderingFrames'))
 
       // Capture stream and set up MediaRecorder
       const stream = canvas.captureStream(EXPORT_FPS)
@@ -462,7 +463,7 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
       }
 
       if (!selectedMimeType) {
-        throw new Error('No supported video codec found for MediaRecorder')
+        throw new Error(t('errors.export.noCodec'))
       }
 
       const mediaRecorder = new MediaRecorder(stream, {
@@ -487,7 +488,7 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
       for (let frame = 0; frame < frameCount; frame++) {
         if (abortRef.current) {
           mediaRecorder.stop()
-          throw new Error('Export cancelled')
+          throw new Error(t('errors.export.cancelled'))
         }
 
         const currentTime = frame * frameDuration
@@ -517,7 +518,7 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
       }
 
       // Stop recording and wait for data
-      setExportPhase('Encoding video...')
+      setExportPhase(t('render.canvas.encodingVideo'))
 
       const videoBlob = await new Promise((resolve) => {
         mediaRecorder.onstop = () => {
@@ -527,7 +528,7 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
       })
 
       setExportProgress(0.75)
-      setExportPhase('Processing audio...')
+      setExportPhase(t('render.canvas.processingAudio'))
 
       // Determine file extension based on mime type
       const isMP4 = selectedMimeType.includes('mp4')
@@ -582,7 +583,7 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
       }
 
       setExportProgress(0.9)
-      setExportPhase('Converting to MP4...')
+      setExportPhase(t('render.canvas.convertingMp4'))
 
       // Convert to MP4 for better compatibility (pad ensures even dimensions for libx264)
       await ffmpeg.exec([
@@ -598,7 +599,7 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
       await ffmpeg.deleteFile(finalOutput)
 
       setExportProgress(0.95)
-      setExportPhase('Preparing download...')
+      setExportPhase(t('render.canvas.preparingDownload'))
 
       // Read and download
       const data = await ffmpeg.readFile('final.mp4')
@@ -623,7 +624,7 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
       }
 
       setExportProgress(1)
-      setExportPhase('Complete!')
+      setExportPhase(t('render.canvas.complete'))
 
       return true
 

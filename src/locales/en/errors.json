@@ -1,0 +1,28 @@
+{
+  "render": {
+    "unreachable": "The render server cannot be reached. Check your connection and render again.",
+    "stillBusy": "The render servers are still busy. Please render again in a few minutes.",
+    "unknownJob": "The render server no longer knows this render (it may have restarted). Please render again.",
+    "lostContact": "Lost contact with the render server. Please render again.",
+    "serverStatus": "Server responded with {{status}}"
+  },
+  "uploadFailed": "Upload failed: {{status}}",
+  "signIn": {
+    "loggedOut": "Log in on 3Speak to use the editor.",
+    "failed": "Sign in on 3Speak to upload and render (the sign-in was cancelled or did not work)."
+  },
+  "export": {
+    "failed": "Export failed",
+    "ffmpegNotLoaded": "FFmpeg not loaded",
+    "noClips": "No clips to export",
+    "noCodec": "No supported video codec found for MediaRecorder",
+    "cancelled": "Export cancelled",
+    "noSource": "No valid file source for clip: {{name}}",
+    "ffmpegFailed": "FFmpeg command failed with exit code {{code}}"
+  },
+  "reverse": {
+    "failed": "Reverse processing failed",
+    "timedOut": "Reverse processing timed out",
+    "statusCheck": "Status check failed: {{status}}"
+  }
+}

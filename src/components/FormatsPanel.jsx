@@ -1,14 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Crosshair, Download, Send, Loader2, Check, RotateCcw, Film } from './icons'
 import { AspectDiagram } from './ProjectFormat'
-import { ASPECT_INFO, isShortAspect } from '../utils/projectFormat'
+import { ASPECT_INFO, aspectLabel, isShortAspect } from '../utils/projectFormat'
 import { EXPORT_ASPECTS, runRenderJob } from '../utils/exportAs'
 import { isReframable, normalizeReframe } from '../utils/reframe'
 import { trackClipFaces } from '../utils/faceTrack'
 import { maxSecondsFor, limitText } from '../utils/limits'
 import { isHlsUrl } from '../utils/hlsHelper'
-
-const label = (a) => `${ASPECT_INFO[a]?.label || a} ${a}`
+import { useT } from '../i18n'
 
 // A clip's footage the face tracker can open here: its own file, else the
 // editing copy on our backend (an HLS stream can not be read frame by frame)
@@ -33,6 +32,8 @@ export default function FormatsPanel({
   projectAspect, viewAspect, onViewAspect, tracks, fileStore, onUpdateClip, selectedClipId, onSelectClip,
   timelineEnd, buildPayload, canRender, renderBlocked, canSend, onSend
 }) {
+  const { t, formatNumber } = useT()
+  const percent = (p) => formatNumber(p, { style: 'percent', maximumFractionDigits: 0 })
   const shown = viewAspect || projectAspect
   const clips = useMemo(() => tracks
     .filter(t => t.type === 'video' && t.visible !== false)
@@ -60,7 +61,7 @@ export default function FormatsPanel({
         const clip = list[i]
         setTracking({ id: clip.id, progress: 0, done: i, total: list.length })
         const src = trackableUrl(clip, fileStore)
-        if (!src) { setTrackError(`${clip.name || 'A clip'} is a stream: it is cut around its middle.`); continue }
+        if (!src) { setTrackError(clip.name ? t('formats.faces.streamNamed', { name: clip.name }) : t('formats.faces.streamUnnamed')); continue }
         try {
           const r = await trackClipFaces({
             url: src.url,
@@ -76,7 +77,7 @@ export default function FormatsPanel({
         }
       }
     } catch (err) {
-      if (err?.name !== 'AbortError') setTrackError(`Face tracking did not work here: ${err.message}`)
+      if (err?.name !== 'AbortError') setTrackError(t('formats.faces.failed', { error: err.message }))
     } finally {
       setTracking(null)
       stopRef.current = null
@@ -94,16 +95,16 @@ export default function FormatsPanel({
     const ctrl = new AbortController()
     stopRef.current = ctrl
     const list = EXPORT_ASPECTS.filter(a => targets.includes(a) && !tooLongFor(a))
-    setJobs(Object.fromEntries(list.map(a => [a, { status: 'waiting', progress: 0, phase: 'Waiting...' }])))
+    setJobs(Object.fromEntries(list.map(a => [a, { status: 'waiting', progress: 0, phase: t('formats.job.waiting') }])))
     for (const a of list) {
       const set = (patch) => setJobs(j => ({ ...j, [a]: { ...j[a], ...patch } }))
       try {
-        set({ status: 'running', phase: 'Preparing files...' })
+        set({ status: 'running', phase: t('formats.job.preparing') })
         const payload = await buildPayload(a, (phase) => set({ phase }))
         const r = await runRenderJob(payload, { signal: ctrl.signal, onStatus: (s) => set(s) })
-        set({ status: 'completed', progress: 1, phase: 'Done', outputUrl: r.outputUrl, subtitles: r.subtitles || null })
+        set({ status: 'completed', progress: 1, phase: t('formats.job.done'), outputUrl: r.outputUrl, subtitles: r.subtitles || null })
       } catch (err) {
-        if (err?.name === 'AbortError') { set({ status: 'stopped', phase: 'Stopped' }); break }
+        if (err?.name === 'AbortError') { set({ status: 'stopped', phase: t('formats.job.stopped') }); break }
         set({ status: 'failed', error: err.message })
       }
     }
@@ -113,35 +114,35 @@ export default function FormatsPanel({
   return (
     <div className="formats-panel">
       <section className="formats-section">
-        <h4>Preview in</h4>
-        <div className="formats-chips" role="group" aria-label="Preview in">
+        <h4>{t('formats.preview.heading')}</h4>
+        <div className="formats-chips" role="group" aria-label={t('formats.preview.heading')}>
           {EXPORT_ASPECTS.map(a => (
             <button key={a} className="formats-chip" aria-pressed={shown === a} onClick={() => onViewAspect(a === projectAspect ? null : a)}>
-              <AspectDiagram aspect={a} size={22} />{a}{a === projectAspect ? ' (yours)' : ''}
+              <AspectDiagram aspect={a} size={22} />{a === projectAspect ? t('formats.preview.yours', { aspect: a }) : a}
             </button>
           ))}
         </div>
-        <p>Your project is {label(projectAspect)}. In another shape, footage fills the frame, cut around the face in it.</p>
+        <p>{t(`formats.preview.projectIs.${ASPECT_INFO[projectAspect]?.id || 'short'}`)}</p>
       </section>
 
       <section className="formats-section">
-        <h4>Follow faces</h4>
+        <h4>{t('formats.faces.heading')}</h4>
         {clips.length === 0 ? (
-          <p>No footage to reframe yet. Moved or zoomed clips keep their own framing.</p>
+          <p>{t('formats.faces.noFootage')}</p>
         ) : (
           <>
-            <p>The face is found in your browser, a few frames a second. Without a face the middle stays in view.</p>
+            <p>{t('formats.faces.hint')}</p>
             <ul className="formats-clips">
               {clips.map(c => {
                 const r = normalizeReframe(c.reframe)
                 const state = tracking?.id === c.id
-                  ? `${Math.round(tracking.progress * 100)}%`
-                  : r?.aspect ? (r.path.length ? 'Face found' : 'No face: middle') : 'Middle'
+                  ? percent(tracking.progress)
+                  : r?.aspect ? (r.path.length ? t('formats.faces.found') : t('formats.faces.noFace')) : t('formats.faces.middle')
                 return (
                   <li key={c.id}>
                     <button className="formats-clip" aria-pressed={c.id === selectedClipId} onClick={() => onSelectClip(c.id)}>
                       <Film size={14} />
-                      <span className="formats-clip-name">{c.name || 'Clip'}</span>
+                      <span className="formats-clip-name">{c.name || t('formats.clipFallback')}</span>
                       <span className="formats-clip-state">{state}</span>
                     </button>
                   </li>
@@ -149,32 +150,32 @@ export default function FormatsPanel({
               })}
             </ul>
             {tracking && (
-              <div className="formats-progress" aria-label="Finding faces"><span style={{ width: `${Math.round(((tracking.done + tracking.progress) / tracking.total) * 100)}%` }} /></div>
+              <div className="formats-progress" aria-label={t('formats.faces.finding')}><span style={{ width: `${Math.round(((tracking.done + tracking.progress) / tracking.total) * 100)}%` }} /></div>
             )}
             <div className="formats-row">
               {tracking ? (
-                <button className="formats-btn" onClick={() => stopRef.current?.abort()}>Stop</button>
+                <button className="formats-btn" onClick={() => stopRef.current?.abort()}>{t('formats.stop')}</button>
               ) : (
                 <button className="formats-btn" onClick={() => findFaces(clips)} disabled={busy}>
-                  <Crosshair size={14} />{clips.length === 1 ? 'Find the face' : `Find faces in ${clips.length} clips`}
+                  <Crosshair size={14} />{clips.length === 1 ? t('formats.faces.findOne') : t('formats.faces.findMany', { count: clips.length })}
                 </button>
               )}
             </div>
             {trackError && <p className="formats-error" role="alert">{trackError}</p>}
             {selected && (
               <div className="formats-section">
-                <h4>{selected.name || 'Clip'}: move the window</h4>
+                <h4>{t('formats.faces.moveWindow', { name: selected.name || t('formats.clipFallback') })}</h4>
                 <div className="formats-shift">
-                  <span>Left</span>
-                  <input type="range" min="-0.5" max="0.5" step="0.01" value={reframe?.offsetX || 0} onChange={e => shift('offsetX', +e.target.value)} aria-label="Move the window left or right" />
-                  <span>Right</span>
-                  <span>Up</span>
-                  <input type="range" min="-0.5" max="0.5" step="0.01" value={reframe?.offsetY || 0} onChange={e => shift('offsetY', +e.target.value)} aria-label="Move the window up or down" />
-                  <span>Down</span>
+                  <span>{t('formats.faces.left')}</span>
+                  <input type="range" min="-0.5" max="0.5" step="0.01" value={reframe?.offsetX || 0} onChange={e => shift('offsetX', +e.target.value)} aria-label={t('formats.faces.moveX')} />
+                  <span>{t('formats.faces.right')}</span>
+                  <span>{t('formats.faces.up')}</span>
+                  <input type="range" min="-0.5" max="0.5" step="0.01" value={reframe?.offsetY || 0} onChange={e => shift('offsetY', +e.target.value)} aria-label={t('formats.faces.moveY')} />
+                  <span>{t('formats.faces.down')}</span>
                 </div>
                 <div className="formats-row">
-                  <button className="formats-btn" onClick={() => findFaces([selected])} disabled={busy}><Crosshair size={14} />Find the face again</button>
-                  <button className="formats-btn" onClick={() => onUpdateClip(selected.id, { reframe: null })} disabled={busy}><RotateCcw size={14} />Middle, no shift</button>
+                  <button className="formats-btn" onClick={() => findFaces([selected])} disabled={busy}><Crosshair size={14} />{t('formats.faces.findAgain')}</button>
+                  <button className="formats-btn" onClick={() => onUpdateClip(selected.id, { reframe: null })} disabled={busy}><RotateCcw size={14} />{t('formats.faces.reset')}</button>
                 </div>
               </div>
             )}
@@ -183,23 +184,23 @@ export default function FormatsPanel({
       </section>
 
       <section className="formats-section">
-        <h4>Render as</h4>
-        <div className="formats-chips" role="group" aria-label="Render as">
+        <h4>{t('formats.render.heading')}</h4>
+        <div className="formats-chips" role="group" aria-label={t('formats.render.heading')}>
           {EXPORT_ASPECTS.map(a => (
             <button key={a} className="formats-chip" aria-pressed={targets.includes(a)} disabled={tooLongFor(a) || rendering} onClick={() => toggleTarget(a)}
-              title={tooLongFor(a) ? `${isShortAspect(a) ? 'A Short' : 'A video'} can be at most ${limitText(maxSecondsFor('video', a))}` : undefined}>
-              {targets.includes(a) ? <Check size={14} /> : <AspectDiagram aspect={a} size={22} />}{label(a)}
+              title={tooLongFor(a) ? t(isShortAspect(a) ? 'common.limits.atMost.short' : 'common.limits.atMost.video', { limit: limitText(maxSecondsFor('video', a)) }) : undefined}>
+              {targets.includes(a) ? <Check size={14} /> : <AspectDiagram aspect={a} size={22} />}{aspectLabel(a)}
             </button>
           ))}
         </div>
-        {EXPORT_ASPECTS.some(tooLongFor) && <p>Shorts are at most {limitText(maxSecondsFor('video', '9:16'))}: trim the timeline to render a 9:16 one.</p>}
+        {EXPORT_ASPECTS.some(tooLongFor) && <p>{t('formats.render.shortsLimit', { limit: limitText(maxSecondsFor('video', '9:16')) })}</p>}
         {renderBlocked && <p className="formats-error">{renderBlocked}</p>}
         <div className="formats-row">
           {rendering ? (
-            <button className="formats-btn" onClick={() => stopRef.current?.abort()}>Stop</button>
+            <button className="formats-btn" onClick={() => stopRef.current?.abort()}>{t('formats.stop')}</button>
           ) : (
             <button className="formats-btn primary" onClick={render} disabled={!canRender || !!tracking || renderCount === 0}>
-              <Film size={14} />{renderCount === 1 ? 'Render 1 video' : `Render ${renderCount} videos`}
+              <Film size={14} />{t('formats.render.button', { count: renderCount })}
             </button>
           )}
         </div>
@@ -209,18 +210,18 @@ export default function FormatsPanel({
             <div key={a} className="formats-result">
               <div className="formats-result-head">
                 <AspectDiagram aspect={a} size={22} />
-                <span>{label(a)}</span>
+                <span>{aspectLabel(a)}</span>
                 {j.status === 'running' && <Loader2 size={14} className="encoding-notice-spin" />}
-                <span className="formats-result-phase">{j.status === 'running' ? `${j.phase || ''} ${Math.round((j.progress || 0) * 100)}%` : j.status === 'failed' ? '' : j.phase}</span>
+                <span className="formats-result-phase">{j.status === 'running' ? `${j.phase || ''} ${percent(j.progress || 0)}` : j.status === 'failed' ? '' : j.phase}</span>
               </div>
               {j.status === 'running' && <div className="formats-progress"><span style={{ width: `${Math.round((j.progress || 0) * 100)}%` }} /></div>}
-              {j.status === 'failed' && <span className="formats-error">Render failed: {j.error}</span>}
+              {j.status === 'failed' && <span className="formats-error">{t('formats.render.failed', { error: j.error })}</span>}
               {j.status === 'completed' && (
                 <div className="formats-row">
-                  <a className="formats-btn" href={j.outputUrl} download target="_blank" rel="noopener noreferrer"><Download size={14} />Download</a>
+                  <a className="formats-btn" href={j.outputUrl} download target="_blank" rel="noopener noreferrer"><Download size={14} />{t('formats.render.download')}</a>
                   {canSend && (
                     <button className="formats-btn" onClick={() => onSend({ outputUrl: j.outputUrl, aspect: a, subtitles: j.subtitles })}>
-                      <Send size={14} />{isShortAspect(a) ? 'Post as a Short' : 'Post as a video'}
+                      <Send size={14} />{isShortAspect(a) ? t('formats.render.postShort') : t('formats.render.postVideo')}
                     </button>
                   )}
                 </div>

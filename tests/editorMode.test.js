@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { readEditorMode } from '../src/utils/editorMode'
-import { maxSecondsFor, MAX_SHORT_SECONDS, MAX_AUDIO_SECONDS, limitText, limitAdjective, formatLength, MAX_TIMELINE_SECONDS } from '../src/utils/limits'
+import { maxSecondsFor, MAX_SHORT_SECONDS, MAX_AUDIO_SECONDS, limitText, formatLength, MAX_TIMELINE_SECONDS } from '../src/utils/limits'
 
 describe('editor mode', () => {
   it('audio only for ?mode=audio, video otherwise', () => {
@@ -21,8 +21,6 @@ describe('editor mode', () => {
     expect(limitText(10800)).toBe('3 hours')
     expect(limitText(3600)).toBe('1 hour')
     expect(limitText(90)).toBe('90 seconds')
-    expect(limitAdjective(10800)).toBe('3-hour')
-    expect(limitAdjective(120)).toBe('2-minute')
   })
   it('lengths over an hour show hours', () => {
     expect(formatLength(65)).toBe('1:05')

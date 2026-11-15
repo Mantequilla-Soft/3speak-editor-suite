@@ -4,6 +4,7 @@ import { outputSize } from './outputSize'
 import { isReframable, normalizeReframe } from './reframe'
 import { cleanAspect } from './projectFormat'
 import { submitRender, pollRender, statusPhase } from './renderQueue'
+import { t } from '../i18n'
 
 // "Export as": one project rendered in other shapes too (9:16, 1:1, 16:9, 4:3).
 // Footage framed as it came (utils/reframe.js isReframable) is cut to the new
@@ -66,10 +67,10 @@ export async function runRenderJob(payload, { onStatus = () => {}, signal = null
   const job = await submitRender({
     send: () => authFetch(renderUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, signal }),
     signal,
-    onWait: ({ seconds, busy }) => onStatus({ progress: 0, phase: busy ? `The render servers are busy. Trying again in ${seconds} s...` : `No connection to the render server. Trying again in ${seconds} s...` })
+    onWait: ({ seconds, busy }) => onStatus({ progress: 0, phase: t(busy ? 'formats.job.busy' : 'formats.job.offline', { seconds }) })
   })
   if (!job) throw new DOMException('Stopped', 'AbortError')
-  onStatus({ progress: 0, phase: statusPhase(job) || 'Starting...' })
+  onStatus({ progress: 0, phase: statusPhase(job) || t('formats.job.starting') })
   const abort = () => {
     const tok = currentToken()
     fetch(jobUrl(job.jobId, job.backendEndpoint, '/abort'), { method: 'POST', keepalive: true, headers: tok ? { Authorization: `Bearer ${tok}` } : {} }).catch(() => {})
@@ -79,10 +80,10 @@ export async function runRenderJob(payload, { onStatus = () => {}, signal = null
     const data = await pollRender({
       get: () => fetch(jobUrl(job.jobId, job.backendEndpoint), { cache: 'no-store', signal }),
       signal,
-      onStatus: (d) => { if (!d.reconnecting) onStatus({ progress: Number(d.progress) || 0, phase: statusPhase(d) || 'Rendering...' }) }
+      onStatus: (d) => { if (!d.reconnecting) onStatus({ progress: Number(d.progress) || 0, phase: statusPhase(d) || t('formats.job.rendering') }) }
     })
     if (!data) throw new DOMException('Stopped', 'AbortError')
-    if (data.status !== 'completed') throw new Error(data.error || 'The render failed')
+    if (data.status !== 'completed') throw new Error(data.error || t('formats.job.failed'))
     const base = job.backendEndpoint || getBackendUrl() || window.location.origin
     const abs = (u) => new URL(u, base).href
     return {

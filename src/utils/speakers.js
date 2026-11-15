@@ -2,6 +2,7 @@
 // track's loudness over the timeline (from the same peaks the waveforms show,
 // utils/peakCache.js), then the loudest voice that clearly stands out, held a
 // moment so a cough or a "mm" from the other side does not flip the name.
+import { t as tr } from '../i18n'
 
 export const LEVEL_STEP = 0.25 // seconds per window
 
@@ -113,6 +114,7 @@ export async function projectSpeakers(tracks, names, end, getPeaks) {
       if (!envs.has(c.url)) envs.set(c.url, await getPeaks(c.url, { analysisUrl: c.serverUrl || null }).catch(() => null))
     }
   }
-  const levels = voices.map(t => ({ name: String(names?.[t.id] || t.name || 'Voice').trim() || 'Voice', values: trackLevels(t, c => envs.get(c.url), end) }))
+  const fallback = tr('transcript.speaker.default')
+  const levels = voices.map(t => ({ name: String(names?.[t.id] || t.name || fallback).trim() || fallback, values: trackLevels(t, c => envs.get(c.url), end) }))
   return speakerSegments(levels)
 }

@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
 import { normalizeCaptions } from '../utils/captions'
+import { t, getLanguage } from '../i18n'
+import { stripPart } from '../utils/partName'
 
 const AUTOSAVE_DELAY = 2500
 const LOCAL = /^(blob|data):/
@@ -330,31 +332,21 @@ export function defaultName(tracks, mode = 'video') {
   const first = mode === 'audio'
     ? tracks.filter(t => !t.music).flatMap(t => t.clips).find(c => c.type === 'audio' && !c.templateRole)
     : tracks.flatMap(t => t.clips).find(c => c.type === 'video' || c.type === 'image')
-  const base = (first?.name || (mode === 'audio' ? 'Episode' : 'Project')).replace(/^Part \d+ · /, '').replace(/\.[a-z0-9]{2,4}$/i, '')
+  const base = stripPart(first?.name || (mode === 'audio' ? t('app.drafts.episode') : t('app.drafts.project'))).replace(/\.[a-z0-9]{2,4}$/i, '')
   const d = new Date()
-  return `${base.slice(0, 40)} · ${d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`
+  return `${base.slice(0, 40)} · ${d.toLocaleDateString(getLanguage(), { month: 'short', day: 'numeric' })}`
 }
 
 // "until Thu, 22 Oct, 14:05"
 // One formatter, made once: toLocaleString builds a new one on every call, and
-// the draft status shows this on every render (20 times a second while playing)
+// the draft status shows this on every render (20 times a second while playing).
+// Made again only when the interface language changes.
 let untilFormat = null
+let untilLang = null
 export function formatUntil(ms) {
-  if (!untilFormat) untilFormat = new Intl.DateTimeFormat(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  if (!untilFormat || untilLang !== getLanguage()) {
+    untilLang = getLanguage()
+    untilFormat = new Intl.DateTimeFormat(untilLang, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  }
   return untilFormat.format(new Date(ms))
-}
-
-// "7 days" / "30 days" (whole days from 2 days up, else hours)
-export function formatKeep(ttlHours) {
-  if (!ttlHours) return ''
-  return ttlHours >= 48 && ttlHours % 24 === 0 ? `${ttlHours / 24} days` : `${ttlHours} hours`
-}
-
-// "2 h ago"
-export function formatAgo(ms) {
-  const s = Math.max(0, (Date.now() - ms) / 1000)
-  if (s < 90) return 'just now'
-  if (s < 3600) return `${Math.round(s / 60)} min ago`
-  if (s < 86400) return `${Math.round(s / 3600)} h ago`
-  return `${Math.round(s / 86400)} days ago`
 }

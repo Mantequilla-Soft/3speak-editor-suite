@@ -1,43 +1,47 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import './OnboardingTour.css'
+import { useT } from '../i18n'
+
+// Step text is a key (tour.json), looked up when the step shows, so it follows the
+// interface language. Targets are class names: an aria-label changes with the language.
 
 // The shorts editor's tour (the default).
 export const TOUR_STEPS = [
   {
     target: '.app-branding',
-    title: 'Welcome!',
-    text: 'Welcome to the 3Speak Shorts Editor. Let\'s take a quick tour of the key features.',
+    titleKey: 'tour.shorts.welcome.title',
+    textKey: 'tour.shorts.welcome.text',
     position: 'below'
   },
   {
     target: '.compact-global-preview',
-    title: 'Preview',
-    text: 'This is your video preview. You can drag clips to reposition them and pinch to zoom.',
+    titleKey: 'tour.shorts.preview.title',
+    textKey: 'tour.shorts.preview.text',
     position: 'below'
   },
   {
     target: '.compact-timeline-section',
-    title: 'Timeline',
-    text: 'Arrange your clips here. Drag to reorder, resize the edges to trim.',
+    titleKey: 'tour.shorts.timeline.title',
+    textKey: 'tour.shorts.timeline.text',
     position: 'above'
   },
   {
     target: '.track-add-btn',
-    title: 'Add Media',
-    text: 'Tap + to add video, images, text, audio, or color clips to your tracks.',
+    titleKey: 'tour.shorts.addMedia.title',
+    textKey: 'tour.shorts.addMedia.text',
     position: 'above'
   },
   {
     target: '.clip-settings-btn, .action-btn',
-    title: 'Clip Settings',
-    text: 'Select a clip and tap the gear icon to edit its properties like scale, position, and opacity.',
+    titleKey: 'tour.shorts.clipSettings.title',
+    textKey: 'tour.shorts.clipSettings.text',
     position: 'above',
     fallbackTarget: '.compact-timeline-section'
   },
   {
     target: '.compact-render-btn',
-    title: 'Render',
-    text: 'When you\'re done editing, hit Render to export your video. You can then download or send it.',
+    titleKey: 'tour.shorts.render.title',
+    textKey: 'tour.shorts.render.text',
     position: 'below'
   }
 ]
@@ -48,57 +52,57 @@ export const TOUR_STEPS = [
 export const AUDIO_TOUR_STEPS = [
   {
     target: '.app-branding',
-    title: 'Welcome to the Audio Editor',
-    text: 'Cut, clean up and level a podcast, a song or a voice note, then post it on 3Speak. Here is a quick look at what it can do.',
+    titleKey: 'tour.audio.welcome.title',
+    textKey: 'tour.audio.welcome.text',
     position: 'below'
   },
   {
     target: '.compact-global-preview',
-    title: 'Add your audio',
-    text: 'Add a recording, record right here, or pick music from the library. Video files work too: the editor keeps only the sound. Up to 3 hours.',
+    titleKey: 'tour.audio.addAudio.title',
+    textKey: 'tour.audio.addAudio.text',
     position: 'below'
   },
   {
     target: '.compact-timeline-section',
-    title: 'Voice and music tracks',
-    text: 'Recordings go on voice tracks, music on its own track. Drag a clip to move it, pull its edges to trim. Zoom with the slider, or tap Fit to see the whole thing.',
+    titleKey: 'tour.audio.tracks.title',
+    textKey: 'tour.audio.tracks.text',
     position: 'above'
   },
   {
     target: '.compact-side',
-    title: 'Clip settings',
-    text: 'Select a clip to see its settings. Clean up the voice (Strong takes out noise and rumble and makes it clearer and more even), and Duck: the clip goes down while another track plays. Group voices that were recorded together to keep them in sync.',
+    titleKey: 'tour.audio.clipSettings.title',
+    textKey: 'tour.audio.clipSettings.text',
     position: 'below',
     fallbackTarget: '.compact-timeline-section'
   },
   {
-    target: '[aria-label="Cut silences"]',
-    title: 'Cut silences',
-    text: 'Finds the pauses in your voice tracks, cuts them out and closes the gaps. Grouped voices are only cut where everyone is quiet.',
+    target: '.tour-cut-silences',
+    titleKey: 'tour.audio.cutSilences.title',
+    textKey: 'tour.audio.cutSilences.text',
     position: 'below'
   },
   {
-    target: '[aria-label="Template"]',
-    title: 'Your template',
-    text: 'Set up an intro, an outro and a music bed once. They go onto every new recording, and your template is kept for good.',
+    target: '.tour-template',
+    titleKey: 'tour.audio.template.title',
+    textKey: 'tour.audio.template.text',
     position: 'below'
   },
   {
-    target: '[aria-label="Normalize loudness"]',
-    title: 'Normalize',
-    text: 'Brings the export to an even podcast loudness (-16 LUFS), so every episode sounds as loud as the last. Turn it off to keep your own levels.',
+    target: '.tour-normalize',
+    titleKey: 'tour.audio.normalize.title',
+    textKey: 'tour.audio.normalize.text',
     position: 'below'
   },
   {
-    target: '[aria-label="Chapters"]',
-    title: 'Chapters',
-    text: 'Mark where each part starts (press M to add one at the playhead). Chapters go into the MP3 and into your episode\'s description.',
+    target: '.tour-chapters',
+    titleKey: 'tour.audio.chapters.title',
+    textKey: 'tour.audio.chapters.text',
     position: 'below'
   },
   {
     target: '.compact-render-btn',
-    title: 'Export',
-    text: 'Export makes an MP3. Listen to it, then use it for your upload or download it. Signed in, your project is kept as a draft while you work.',
+    titleKey: 'tour.audio.export.title',
+    textKey: 'tour.audio.export.text',
     position: 'below'
   }
 ]
@@ -107,44 +111,44 @@ export const AUDIO_TOUR_STEPS = [
 export const AUDIOGRAM_TOUR_STEPS = [
   {
     target: '.audiogram-studio .remix-picker-header',
-    title: 'Audiograms',
-    text: 'Short videos of a piece of your episode: a moving waveform, your title and picture, with the 3Speak look. They go out as 3Speak Shorts together with the episode.',
+    titleKey: 'tour.audiogram.intro.title',
+    textKey: 'tour.audiogram.intro.text',
     position: 'below'
   },
   {
     target: '.audiogram-pick',
-    title: 'Your piece',
-    text: 'The piece you picked on the timeline, up to 2 minutes. Change it here any time.',
+    titleKey: 'tour.audiogram.piece.title',
+    textKey: 'tour.audiogram.piece.text',
     position: 'below'
   },
   {
     target: '.audiogram-stage',
-    title: 'Arrange it your way',
-    text: 'Drag any part to move it, pull a corner to resize it (Shift keeps the shape), and turn it with the round handle under it. The 3Speak logo always stays in, as the 3S or the full logo.',
+    titleKey: 'tour.audiogram.arrange.title',
+    textKey: 'tour.audiogram.arrange.text',
     position: 'below'
   },
   {
-    target: '[aria-label="Picture"]',
-    title: 'A picture',
-    text: 'Upload one or take the cover of one of your playlists. It shows as a card you can move and resize like the other parts.',
+    target: '.audiogram-pictures',
+    titleKey: 'tour.audiogram.picture.title',
+    textKey: 'tour.audiogram.picture.text',
     position: 'below'
   },
   {
-    target: '[aria-label="Waveform type"]',
-    title: 'The waveform',
-    text: 'Bars, lines, a circle or a circle wave, in the 3Speak red or any colour you like.',
+    target: '.audiogram-wave-types',
+    titleKey: 'tour.audiogram.waveform.title',
+    textKey: 'tour.audiogram.waveform.text',
     position: 'below'
   },
   {
     target: '.audiogram-layers',
-    title: 'Parts',
-    text: 'Hide a part, or bring it forward or send it back when parts overlap.',
+    titleKey: 'tour.audiogram.parts.title',
+    textKey: 'tour.audiogram.parts.text',
     position: 'above'
   },
   {
     target: '.audiogram-make',
-    title: 'Make it',
-    text: 'Make as many as you like: each goes out as a Short with the episode, with its own text and a link to it. Your last look is kept as your template for the next one.',
+    titleKey: 'tour.audiogram.make.title',
+    textKey: 'tour.audiogram.make.text',
     position: 'above'
   }
 ]
@@ -153,26 +157,26 @@ export const AUDIOGRAM_TOUR_STEPS = [
 export const RANGE_PICK_TOUR_STEPS = [
   {
     target: '.timeline-content',
-    title: 'Click the start, then the end',
-    text: 'Click where the piece should start, then where it ends: up to 2 minutes. Pull its edges to adjust it, or drag across the tracks to draw a whole piece. A new click starts over.',
+    titleKey: 'tour.rangePick.startEnd.title',
+    textKey: 'tour.rangePick.startEnd.text',
     position: 'above'
   },
   {
     target: '.timeline-toolbar .toolbar-center',
-    title: 'Move around',
-    text: 'Drag the ruler or scroll to move along the episode. Zoom in with the slider for a precise start, or tap Fit to see the whole episode.',
+    titleKey: 'tour.rangePick.moveAround.title',
+    textKey: 'tour.rangePick.moveAround.text',
     position: 'above'
   },
   {
     target: '.range-pick-play',
-    title: 'Listen to it',
-    text: 'Play the piece (or Space) plays just the part you picked, then goes back to its start.',
+    titleKey: 'tour.rangePick.listen.title',
+    textKey: 'tour.rangePick.listen.text',
     position: 'above'
   },
   {
     target: '.range-pick-bar',
-    title: 'Use it',
-    text: 'Use this piece (or Enter) takes it back to your audiogram, Cancel (or Escape) keeps the old one. Until then the rest of the editor is locked, so nothing else changes by accident.',
+    titleKey: 'tour.rangePick.use.title',
+    textKey: 'tour.rangePick.use.text',
     position: 'above'
   }
 ]
@@ -194,6 +198,7 @@ export function useFirstTimeTour(key, when = true) {
 }
 
 export default function OnboardingTour({ onComplete, steps = TOUR_STEPS }) {
+  const { t } = useT()
   const [step, setStep] = useState(0)
   const [rect, setRect] = useState(null)
   const tooltipRef = useRef(null)
@@ -228,7 +233,7 @@ export default function OnboardingTour({ onComplete, steps = TOUR_STEPS }) {
         height: r.height + padding * 2
       })
     } else {
-      // No element found — show centered without spotlight
+      // No element found: show centered without spotlight
       setRect(null)
     }
   }, [currentStep, step])
@@ -309,8 +314,8 @@ export default function OnboardingTour({ onComplete, steps = TOUR_STEPS }) {
         className="tour-tooltip"
         style={tooltipStyle}
       >
-        <div className="tour-tooltip-title">{currentStep.title}</div>
-        <div className="tour-tooltip-text">{currentStep.text}</div>
+        <div className="tour-tooltip-title">{t(currentStep.titleKey)}</div>
+        <div className="tour-tooltip-text">{t(currentStep.textKey)}</div>
         <div className="tour-tooltip-footer">
           <div className="tour-dots">
             {steps.map((_, i) => (
@@ -318,9 +323,9 @@ export default function OnboardingTour({ onComplete, steps = TOUR_STEPS }) {
             ))}
           </div>
           <div className="tour-buttons">
-            <button className="tour-skip-btn" onClick={handleSkip}>Skip</button>
+            <button className="tour-skip-btn" onClick={handleSkip}>{t('common.skip')}</button>
             <button className="tour-next-btn" onClick={handleNext}>
-              {step === steps.length - 1 ? 'Got it!' : 'Next'}
+              {step === steps.length - 1 ? t('tour.buttons.done') : t('common.next')}
             </button>
           </div>
         </div>
