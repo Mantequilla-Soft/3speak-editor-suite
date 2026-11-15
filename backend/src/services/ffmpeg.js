@@ -26,7 +26,8 @@ const clipVolume = clip => (Number.isFinite(+clip.volume) ? Math.max(0, +clip.vo
 const CLIP_CACHE_VERSION = 2
 export const RENDER_CACHE_DIR = path.join(process.env.WORK_DIR || '/app/work', 'cache')
 const CLIP_CACHE_DIR = path.join(RENDER_CACHE_DIR, 'clips')
-const NOT_IN_CLIP_RENDER = new Set(['id', 'name', 'timelinePosition', 'trackId', 'libraryId', 'groupId', 'credit', 'sticker'])
+// (a transition into the next clip is drawn in the composite, not in the clip's own file)
+const NOT_IN_CLIP_RENDER = new Set(['id', 'name', 'timelinePosition', 'trackId', 'libraryId', 'groupId', 'credit', 'sticker', 'transition'])
 
 function clipCacheKey(clip, inputFile, w, h, fps, scaleFactor) {
   const shape = {}
