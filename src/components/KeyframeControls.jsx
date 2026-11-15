@@ -1,7 +1,11 @@
-import { ChevronLeft, ChevronRight } from './icons'
+import { useState } from 'react'
+import { ChevronLeft, ChevronRight, ZoomIn, Loader2 } from './icons'
 import { KEYFRAME_PROPS, VISUAL_PROPS, propsFor, keyframesOf, normalizeKeyframes } from '../utils/keyframes'
 import { clipTimeAtPlayhead, keyframeIndexAt, setKeyframe, toggleKeyframe, setKeyframeEase, clearKeyframes, valueAtPlayhead, KEN_BURNS, kenBurns } from '../utils/motionEdits'
+import { planPunchIns, punchInUpdates, hasPunchIns, removePunchIns } from '../utils/punchIns'
+import { loadLoudness } from '../utils/silenceDetect'
 import { hasLayout } from '../utils/remixLayout'
+import { isHlsUrl } from '../utils/hlsHelper'
 import './ClipMotion.css'
 
 const NEAR = 1 / 30
@@ -12,10 +16,11 @@ const shown = (v, unit) => `${Math.round(v)}${unit}`
  * image, text) and volume (audio; a video's volume is its linked sound's).
  * The diamond adds or removes a keyframe at the playhead, the arrows jump to
  * the previous / next one, the slider sets the value at the playhead.
- * Presets: Ken Burns (images).
- * `kit` = { setPlayhead }.
+ * Presets: Ken Burns (images), automatic punch-ins (video).
+ * `kit` = { setPlayhead, captions, fileStoreRef }.
  */
 function KeyframeControls({ clip, playheadPosition, onUpdateClip, linkedAudio = null, onUpdateLinkedAudio = null, kit = null }) {
+  const [punch, setPunch] = useState(null) // { busy } | { note }
   const visual = hasLayout(clip) ? [] : VISUAL_PROPS
   const props = propsFor(clip.type).filter(p => p === 'volume' || visual.includes(p))
   if (!props.length) return null
@@ -45,6 +50,24 @@ function KeyframeControls({ clip, playheadPosition, onUpdateClip, linkedAudio = 
   const clearAll = () => {
     if (normalizeKeyframes(clip.keyframes)) onUpdateClip(clearKeyframes(clip))
     if (soundTarget && soundTarget !== clip && normalizeKeyframes(soundTarget.keyframes)) onUpdateLinkedAudio(clearKeyframes(soundTarget))
+  }
+
+  const runPunchIns = async () => {
+    setPunch({ busy: true })
+    const words = kit?.captions?.words?.length ? kit.captions.words : null
+    let loudness = null
+    const sound = soundTarget || clip
+    const source = kit?.fileStoreRef?.current.get(sound.id) || (isHlsUrl(sound.url) ? null : sound.url)
+    try {
+      if (source || sound.serverUrl) loudness = await loadLoudness(source || sound.serverUrl, { analysisUrl: sound.serverUrl || null })
+    } catch { loudness = null }
+    const plan = planPunchIns(clip, { words, loudness })
+    if (!plan.moments.length) {
+      setPunch({ note: words || loudness ? 'No sentence starts or loud words found in this clip.' : 'The sound of this clip could not be read. Add auto captions first, then try again.' })
+      return
+    }
+    onUpdateClip(punchInUpdates(clip, plan.moments))
+    setPunch({ note: `${plan.moments.length} punch-in${plan.moments.length === 1 ? '' : 's'} added, from the ${plan.from === 'captions' ? 'captions' : 'sound'}. They are ordinary keyframes on Scale.` })
   }
 
   return (
@@ -111,6 +134,22 @@ function KeyframeControls({ clip, playheadPosition, onUpdateClip, linkedAudio = 
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {clip.type === 'video' && visual.length > 0 && (
+        <div className="property-group">
+          <label><ZoomIn size={12} /> Punch-ins</label>
+          <span className="motion-hint">Quick zoom-ins at the start of sentences and on loud words, from the captions if there are any, else from the sound.</span>
+          <div className="motion-row">
+            <button className="mute-btn" onClick={runPunchIns} disabled={!!punch?.busy}>
+              {punch?.busy ? <><Loader2 size={12} className="encoding-notice-spin" /> Listening...</> : 'Auto punch-ins'}
+            </button>
+            {hasPunchIns(clip) && (
+              <button className="mute-btn" onClick={() => { onUpdateClip(removePunchIns(clip)); setPunch(null) }}>Remove punch-ins</button>
+            )}
+          </div>
+          {punch?.note && <span className="motion-hint" role="status">{punch.note}</span>}
         </div>
       )}
 
