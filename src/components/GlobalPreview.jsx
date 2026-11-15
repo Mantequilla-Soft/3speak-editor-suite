@@ -76,6 +76,9 @@ import { REMIX_LAYOUTS, hasLayout, clampLayout, layoutPan, layoutZoom, LAYOUT_ZO
 import { getClipChromaKey } from '../utils/chromaKey'
 import ChromaKeyCanvas from './ChromaKeyCanvas'
 import CaptionsOverlay from './CaptionsOverlay'
+import SceneLayer, { seekSceneLayers } from './SceneLayer'
+import { outputSize } from '../utils/outputSize'
+import { AnimatedText, applyWordFrames, textStrokeStyle, animatedBoxStyle } from './TextFx'
 import { withTransitions, mediaTimeAt, holdTransitionFrame, transitionLayerProps, applyTransitionFrames, withAudioCrossfades, crossfadeGain } from '../utils/previewTransitions'
 
 // In stitch mode the preview sits in its own column with its own controls;
@@ -156,6 +159,8 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   const layerContainerRef = useRef(null)
   const motionClipsRef = useRef({}) // clip id -> { motion, start, duration, kind, opacity }
   const transClipsRef = useRef({}) // clip id -> { clip, base } of layers in a transition or fade
+  const wordClipsRef = useRef({}) // clip id -> { anim, start } of text clips with a word entrance
+  const sceneClipsRef = useRef({}) // clip id -> { seek } of titles (scene clips) on screen
   // Natural sizes of image clips (for an off-centre pivot), learned on load
   const imageSizeRef = useRef({})
   const [, setImageSizeTick] = useState(0)
@@ -732,6 +737,10 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
 
       // Transitions and fades: the layers' opacity, slide, zoom, blur at this moment
       applyTransitionFrames(layerContainerRef.current, newPosition, frameH, CANVAS, transClipsRef.current)
+      // Text coming in word by word
+      applyWordFrames(layerContainerRef.current, newPosition, wordClipsRef.current)
+      // Titles (motion scenes) to this moment
+      seekSceneLayers(newPosition, sceneClipsRef.current)
 
       // Pre-roll clips about to start (see PREROLL): hidden video / silent audio
       const { videoClips: allVideoClips, audioClips: preAudioClips } = latestRef.current
@@ -1497,6 +1506,22 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                     />
                   ) : null
 
+                  // Titles: a motion scene in the engine's host page (SceneLayer.jsx)
+                  if (clip.type === 'scene') {
+                    return (
+                      <SceneLayer
+                        key={clip.id}
+                        clip={clip}
+                        time={playheadPosition}
+                        frame={outputSize(activeAspectRatio || '9:16')}
+                        style={layerStyle}
+                        registry={sceneClipsRef.current}
+                        onMouseDown={(e) => handleClipPointerDown(e, clip)}
+                        onTouchStart={(e) => handleClipPointerDown(e, clip)}
+                      />
+                    )
+                  }
+
                   if (clip.type === 'text') {
                     const hAlign = clip.textHAlign || 'center'
                     const textStyle = {
@@ -1512,6 +1537,8 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                       padding: '20px',
                       boxSizing: 'border-box',
                       textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                      // Outline (utils/textAnim.js; the render's drawtext border)
+                      ...textStrokeStyle(clip),
                       // The render (and the line measurement it gets) use 1.2;
                       // inherited "normal" is ~1.5 for some fonts
                       lineHeight: 1.2,
@@ -1547,6 +1574,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                             clip.textBoxPadding, clip.textBoxBorderWidth, clip.textHAlign].join('|')}
                           style={{
                             ...boxStyle,
+                            ...animatedBoxStyle(clip),
                             pointerEvents: 'auto',
                             // Text turns (and moves) its own box, around the box's centre
                             ...((clip.rotation || motion) ? { transform: `${clip.rotation ? `rotate(${clip.rotation}deg)` : ''} ${motionNow}`.trim() } : {}),
@@ -1558,7 +1586,8 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                           onMouseDown={(e) => handleClipPointerDown(e, clip)}
                           onTouchStart={(e) => handleClipPointerDown(e, clip)}
                         >
-                          {clip.text || 'Text'}
+                          {/* word by word entrance: one span per word (TextFx.jsx) */}
+                          <AnimatedText clip={clip} time={playheadPosition} start={clip.timelineStart} registry={wordClipsRef.current} />
                         </FitTextBox>
                       </div>
                     )

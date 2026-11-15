@@ -6,10 +6,13 @@ import { createStaticMasker, staticMaskSize } from '../utils/staticKeyMask.js'
 import { ffmpegGradeFilter } from '../utils/clipLook.js'
 import { clipFxFilter } from '../utils/lookFx.js'
 import { transitionPlan, clipExtent } from '../utils/transitions.js'
+import { normalizeTextAnim } from '../utils/textAnim.js'
+import { strokeOption, wordDrawtexts } from '../utils/textFx.js'
 import { transitionLayer, transitionAudioSources } from '../utils/transitionRender.js'
 import crypto from 'crypto'
 import { ffmpegMotionFilter, normalizeMotion, pivotPoint, activeEffects } from '../utils/stickerMotion.js'
 import { captionBurn } from './captionBurn.js'
+import { renderSceneClip } from './sceneClip.js'
 
 // clip volume 0..100 -> gain. 0 means silent: `volume || 100` used to turn it into full volume.
 const clipVolume = clip => (Number.isFinite(+clip.volume) ? Math.max(0, +clip.volume) : 100) / 100
@@ -95,8 +98,8 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
     const clip = allClips[i]
     const inputFile = downloadedFiles.get(clip.id)
 
-    // Text and color clips don't need downloaded files
-    if (!inputFile && clip.type !== 'text' && clip.type !== 'color') continue
+    // Text, color and title (scene) clips don't need downloaded files
+    if (!inputFile && clip.type !== 'text' && clip.type !== 'color' && clip.type !== 'scene') continue
 
     // Detect image type from file extension if not set correctly
     if (inputFile && (!clip.type || clip.type === 'video')) {
@@ -117,7 +120,7 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
     onProgress((i / allClips.length) * 0.4, `Processing clip ${i + 1}/${allClips.length}: ${clip.name || 'clip'}`)
 
     // Use .mov for images and text to preserve transparency, .mp4 for others (including color)
-    const ext = (clip.type === 'image' || clip.type === 'text') ? '.mov' : '.mp4'
+    const ext = (clip.type === 'image' || clip.type === 'text' || clip.type === 'scene') ? '.mov' : '.mp4'
     // Unchanged since an earlier render: reuse its processed file
     const cacheKey = clipCacheKey(clip, inputFile, outputWidth, outputHeight, fps, scaleFactor)
     const cachedPath = path.join(CLIP_CACHE_DIR, `${cacheKey}${ext}`)
@@ -276,7 +279,7 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
       const out = i === overlayClips.length - 1 ? '[outv]' : `[tmp${i}]`
       // Text/image/color clips have position baked into their canvas → overlay at 0:0
       // Video clips need position applied here
-      const isFullCanvas = oc.clip.type === 'text' || oc.clip.type === 'image' || oc.clip.type === 'color'
+      const isFullCanvas = oc.clip.type === 'text' || oc.clip.type === 'image' || oc.clip.type === 'color' || oc.clip.type === 'scene'
       const basePos = isFullCanvas ? '0:0' : getOverlayPosition(oc.clip, outputWidth, outputHeight, scaleFactor, cropSources.get(oc.clip.id))
       // Transitions and fades: the layer's opacity, slide, zoom, blur (utils/transitionRender.js)
       const { label: clipLabel, pos: overlayPos } = transitionLayer(filterParts, i, clipLabels[i], basePos, oc.clip, plan.get(oc.clip.id),
@@ -377,6 +380,9 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
  */
 async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scaleFactor = 1) {
   const duration = clip.endTime - clip.startTime
+
+  // Titles: a motion scene recorded in Chromium (services/sceneClip.js)
+  if (clip.type === 'scene') return renderSceneClip(clip, outputPath, w, h, fps, signal, scaleFactor)
 
   // Handle text clips
   if (clip.type === 'text') {
@@ -645,10 +651,17 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
       const lineY = baseY + i * lineHeight + textYOffset
 
       drawTextFilters.push(
-        `drawtext=textfile='${escapedLineFile}':fontfile='${escapedFontFile}':fontsize=${fontSize}:fontcolor=${fontColor}:x=${xExpr}:y=${lineY}:shadowcolor=black@0.8:shadowx=${shadowX}:shadowy=${shadowY}`
+        `drawtext=textfile='${escapedLineFile}':fontfile='${escapedFontFile}':fontsize=${fontSize}:fontcolor=${fontColor}:x=${xExpr}:y=${lineY}:shadowcolor=black@0.8:shadowx=${shadowX}:shadowy=${shadowY}${strokeOption(clip, scaleFactor * zoom)}`
       )
     }
-    const filterChain = drawTextFilters.join(',')
+    // Word by word entrances (utils/textFx.js): each word its own drawtext
+    const wordFilters = await wordDrawtexts(clip, {
+      lines: wrappedLines, lineY: (i) => baseY + i * lineHeight + (textBoxEnabled ? Math.round(boxPadding / 2) : 0),
+      fontSize, scale: scaleFactor * zoom, w, padding, posX: scaledPosX, hAlign: textHAlign, font: escapedFontFile, fontColor,
+      shadow: `:shadowcolor=black@0.8:shadowx=${shadowX}:shadowy=${shadowY}`, stroke: strokeOption(clip, scaleFactor * zoom),
+      basePath: outputPath.replace(/\.[^.]+$/, '')
+    })
+    const filterChain = (wordFilters || drawTextFilters).join(',')
 
     console.log(`[DEBUG] Text scaleFactor=${scaleFactor.toFixed(2)}, zoom=${zoom}, fontSize=${fontSize}, hAlign=${textHAlign}, vAlign=${textAlign}, lines=${wrappedLines.length}, textBox=${textBoxEnabled}`)
     console.log('[DEBUG] Output path:', outputPath)
@@ -708,8 +721,8 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
       : `[0:v]format=rgba,colorchannelmixer=aa=0,${filterChain}${rotateTail}`
     return runFFmpeg([
       '-f', 'lavfi',
-      // A moving sticker counts frames: give the layer the timeline's rate
-      '-i', `color=c=black@0:s=${w}x${h}:d=${duration}${appliedMotion(clip) ? `:r=${fps}` : ''}`,
+      // A moving sticker (or words coming in) counts frames: give the layer the timeline's rate
+      '-i', `color=c=black@0:s=${w}x${h}:d=${duration}${appliedMotion(clip) || normalizeTextAnim(clip.textAnim) ? `:r=${fps}` : ''}`,
       ...boxInputArgs,
       '-filter_complex', filterComplex,
       '-map', '[outv]',

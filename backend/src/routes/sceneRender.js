@@ -104,31 +104,50 @@ async function localise(doc) {
 }
 
 // ---- render ----
-async function renderJob(job) {
+// headless: false + --headless=new: current Chromium builds (Alpine's) no longer have the old headless mode
+// that this playwright-core version would ask for
+export async function launchSceneBrowser() {
   const { chromium } = await import('playwright-core')
-  const out = path.join(RENDERED_DIR, `scene-${job.id}.mp4`)
-  // headless: false + --headless=new: current Chromium builds (Alpine's) no longer have the old headless mode
-  // that this playwright-core version would ask for
-  const browser = await chromium.launch({ executablePath: chromiumPath(), headless: false,
+  return chromium.launch({ executablePath: chromiumPath(), headless: false,
     args: ['--headless=new', '--no-sandbox', '--font-render-hinting=none', '--disable-dev-shm-usage', '--hide-scrollbars', '--mute-audio'] })
+}
+
+// A page with the doc loaded in the engine's host (css: extra rules, e.g. a title's transparent stage).
+// Resolves with { page, meta } (meta: duration, fps, size...).
+export async function openScenePage(browser, doc, { css = '' } = {}) {
+  const page = await browser.newPage({ viewport: { width: doc.width, height: doc.height }, deviceScaleFactor: 1 })
+  // the page may load: the engine files, Google Fonts, this backend's uploads, data: URIs. Nothing else.
+  await page.route('**/*', route => {
+    const u = route.request().url()
+    const ok = u.startsWith('file://' + ENGINE_DIR + '/') || u.startsWith('data:')
+      || /^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(u) || u.startsWith(`http://127.0.0.1:${PORT}/api/upload/files/`)
+    return ok ? route.continue() : route.abort()
+  })
+  page.on('pageerror', e => console.warn('[scene-render] page error:', e.message))
+  await page.addInitScript(d => { window.__DOC__ = d }, doc)
+  await page.goto(HOST, { waitUntil: 'networkidle', timeout: 60000 })
+  const meta = await page.evaluate(async () => {
+    const info = await window.hostReady
+    if (!info) throw new Error('scene host did not load the doc')
+    return info
+  })
+  if (css) await page.addStyleTag({ content: css })
+  return { page, meta }
+}
+
+// One Chromium at a time (~0.5-1 GB): the Ad Wizard's renders and the editor's titles take turns
+export function enqueueScene(fn) {
+  const run = queue.then(fn, fn)
+  queue = run.catch(() => {})
+  return run
+}
+
+async function renderJob(job) {
+  const out = path.join(RENDERED_DIR, `scene-${job.id}.mp4`)
+  const browser = await launchSceneBrowser()
   const kill = setTimeout(() => { job.error = 'timed out'; browser.close().catch(() => {}) }, JOB_TIMEOUT_MS)
   try {
-    const page = await browser.newPage({ viewport: { width: job.doc.width, height: job.doc.height }, deviceScaleFactor: 1 })
-    // the page may load: the engine files, Google Fonts, this backend's uploads, data: URIs. Nothing else.
-    await page.route('**/*', route => {
-      const u = route.request().url()
-      const ok = u.startsWith('file://' + ENGINE_DIR + '/') || u.startsWith('data:')
-        || /^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(u) || u.startsWith(`http://127.0.0.1:${PORT}/api/upload/files/`)
-      return ok ? route.continue() : route.abort()
-    })
-    page.on('pageerror', e => console.warn('[scene-render] page error:', e.message))
-    await page.addInitScript(d => { window.__DOC__ = d }, job.doc)
-    await page.goto(HOST, { waitUntil: 'networkidle', timeout: 60000 })
-    const meta = await page.evaluate(async () => {
-      const info = await window.hostReady
-      if (!info) throw new Error('scene host did not load the doc')
-      return info
-    })
+    const { page, meta } = await openScenePage(browser, job.doc)
     if (meta.duration > MAX_SECONDS) throw new Error(`ad is ${meta.duration.toFixed(1)} s, the limit is ${MAX_SECONDS} s`)
     job.duration = meta.duration
     const fps = meta.fps || 30, frames = Math.round(meta.duration * fps)
@@ -191,4 +210,4 @@ router.get('/:id', (req, res) => {
 // forget finished jobs after an hour (the files themselves follow the rendered-files cleanup)
 setInterval(() => { const cut = Date.now() - 3600e3; for (const [k, j] of jobs) if (j.createdAt < cut && j.status !== 'processing') jobs.delete(k) }, 600e3).unref()
 
-export { router as sceneRenderRouter, privateAddress }
+export { router as sceneRenderRouter, privateAddress, SceneMeta, localise }

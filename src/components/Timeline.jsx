@@ -491,10 +491,11 @@ const TimelineClip = memo(function TimelineClip({
               <span className="clip-duration">{formatTime(clipDuration)}</span>
             </div>
           </div>
-        ) : isText ? (
+        ) : isText || clip.type === 'scene' ? (
           <div className="clip-text-preview">
             <Type size={16} />
-            <span className="text-preview">{clip.text?.substring(0, 20) || 'Text'}{clip.text?.length > 20 ? '...' : ''}</span>
+            {/* a title (motion scene) shows its name */}
+            <span className="text-preview">{clip.type === 'scene' ? clip.name : <>{clip.text?.substring(0, 20) || 'Text'}{clip.text?.length > 20 ? '...' : ''}</>}</span>
           </div>
         ) : isColor ? (
           <div className="clip-color-preview" style={{
@@ -625,6 +626,8 @@ function Timeline({
   onOpenMusic,
   onOpenSfx,
   onOpenStickers,
+  // Titles from motion scenes (TitleTemplates.jsx)
+  onOpenTitles,
   // Auto captions panel (Shorts editor); captionsActive: it is open or the Short has captions
   onOpenCaptions,
   captionsActive = false,
@@ -1471,6 +1474,11 @@ function Timeline({
                   <Sticker size={14} /> Stickers
                 </button>
               )}
+              {onOpenTitles && (
+                <button onClick={() => { onOpenTitles(); setShowAddMenu(false) }}>
+                  <Type size={14} /> Titles
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -1728,6 +1736,11 @@ function Timeline({
                         {onOpenStickers && (
                           <button onClick={() => { onOpenStickers(); setTrackAddPopup(null) }}>
                             <Sticker size={14} /> Stickers
+                          </button>
+                        )}
+                        {onOpenTitles && (
+                          <button onClick={() => { onOpenTitles(); setTrackAddPopup(null) }}>
+                            <Type size={14} /> Titles
                           </button>
                         )}
                       </div>

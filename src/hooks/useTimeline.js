@@ -886,7 +886,10 @@ export function useTimeline() {
     }
     const clip = sticker.kind === 'text'
       ? { ...base, type: 'text', name: sticker.name, text: sticker.text, textAlign: 'center', backgroundColor: 'transparent', ...sticker.props }
-      : { ...base, type: 'image', name: sticker.name, url: sticker.url, serverUrl: null, file: null, zoom: sticker.zoom || 40 }
+      : sticker.kind === 'scene'
+        // a title from a motion scene (utils/titleScenes.js): its own type, look and length
+        ? { ...base, sticker: false, ...sticker.props }
+        : { ...base, type: 'image', name: sticker.name, url: sticker.url, serverUrl: null, file: null, zoom: sticker.zoom || 40 }
     setTracksWithHistory(prev => {
       // From a track's + menu: that track (or a new one below it), at the playhead
       if (trackId) {

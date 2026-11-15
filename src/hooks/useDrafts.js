@@ -65,7 +65,7 @@ export function serializeProject(tracks, library, plates = new Map(), { mode = '
   const outTracks = tracks.map(t => ({
     ...t,
     clips: t.clips.flatMap(c => {
-      if (c.type === 'text' || c.type === 'color') return [stripLocal(c)]
+      if (c.type === 'text' || c.type === 'color' || c.type === 'scene') return [stripLocal(c)]
       const url = serverRef(c)
       if (!url) { pending++; return [] }
       let source = { ...c, url }

@@ -13,6 +13,8 @@ import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
 import LookControls from './LookControls'
 import TransitionControls from './TransitionControls'
+import TextFxControls from './TextFxControls'
+import SceneControls from './SceneControls'
 import './GreenScreen.css'
 
 // Green screen (chroma key) on a video clip: keyed pixels turn transparent, so
@@ -885,8 +887,11 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
       )}
 
       <div className={`properties-groups${tabbed ? ' tabbed' : ''}`} ref={groupsRef}>
-        {/* GROUP 1: Content / Audio (images have no sound: no such section) */}
-        {!isImage && (
+        {/* Titles (motion scenes): their words, colours, length */}
+        {clip.type === 'scene' && <SceneControls clip={clip} onUpdateClip={onUpdateClip} />}
+
+        {/* GROUP 1: Content / Audio (images have no sound: no such section; titles have their own) */}
+        {!isImage && clip.type !== 'scene' && (
         <div className="prop-group">
           <div className="prop-group-label">
             {isText ? 'Content' : isColor ? 'Color' : isAudio ? 'Audio' : 'Audio'}
@@ -1355,6 +1360,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
               </div>
             </div>
 
+            {clip.type !== 'scene' && (
             <div className="property-group">
               <label>
                 <Crop size={12} />
@@ -1400,6 +1406,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                 />
               </div>
             </div>
+            )}
 
             {!isText && (
               <div className="property-group">
@@ -1426,6 +1433,9 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
             )}
           </div>
         )}
+
+        {/* Text outline and word by word entrance */}
+        {isText && <TextFxControls clip={clip} onUpdateClip={onUpdateClip} />}
 
         {/* Motion (stickers: image and text clips) */}
         {(isImage || isText) && <MotionControls clip={clip} onUpdateClip={onUpdateClip} />}

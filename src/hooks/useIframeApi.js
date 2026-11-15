@@ -6,6 +6,7 @@ import { getClipChromaKey } from '../utils/chromaKey'
 import { normalizeColor } from '../utils/clipColor'
 import { normalizeMotion } from '../utils/stickerMotion'
 import { renderExtras } from '../utils/renderExtras'
+import { measureWordLayout } from '../utils/textMeasure'
 import { duckPlans, localDuckPlan } from '../utils/duck'
 import { outputSize } from '../utils/outputSize'
 import { normalizeCaptions } from '../utils/captions'
@@ -386,7 +387,7 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
         if (color) baseClip.color = color
 
         // Looks, transitions, video fades, text outline and word animation (utils/renderExtras.js)
-        Object.assign(baseClip, renderExtras(clip))
+        Object.assign(baseClip, renderExtras(clip, { frame: outputSize(activeAspectRatio || '16:9') }))
 
         // Sticker motion (utils/stickerMotion.js), image and text clips
         const motion = (clip.type === 'image' || clip.type === 'text') ? normalizeMotion(clip.motion) : null
@@ -473,6 +474,8 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
               // Store as ratio of preview width so backend can scale
               baseClip.measuredMaxLineWidth = maxLineWidth
               baseClip.measuredPreviewWidth = previewWidth
+              // Word by word entrance: where each word sits (utils/textMeasure.js)
+              if (baseClip.textAnim) baseClip.wordLayout = measureWordLayout(baseClip)
             }
             document.body.removeChild(measurer)
           }

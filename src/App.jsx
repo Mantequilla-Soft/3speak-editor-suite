@@ -41,6 +41,7 @@ import { audiogramsToPost } from './utils/audiogramLayers'
 import { audioFileName } from './utils/audioTemplate'
 import BeatSyncModal from './components/BeatSyncModal'
 import StickerPicker from './components/StickerPicker'
+import TitleTemplates from './components/TitleTemplates'
 import EncodingNotice from './components/EncodingNotice'
 import ClipColorFilters from './components/ClipColorFilters'
 import { outputSize } from './utils/outputSize'
@@ -743,6 +744,7 @@ function App() {
     else setRecordingAudioOpen(true)
   }, [])
   const [stickersOpen, setStickersOpen] = useState(false)
+  const [titlesOpen, setTitlesOpen] = useState(false) // Titles: motion scene templates
   const [inlineRecordingOpen, setInlineRecordingOpen] = useState(false)
   const [recorderSize, setRecorderSize] = useState('small') // 'small' | 'big'
 
@@ -915,6 +917,12 @@ function App() {
     const id = addTextClip(trackId)
     if (id) selectClip(id)
   }, [addTextClip, selectClip])
+
+  // A title (motion scene) at the playhead, above the footage
+  const handleAddTitle = useCallback((props) => {
+    const clipId = addStickerClip({ kind: 'scene', props }, playheadPosition, props.endTime - props.startTime)
+    if (clipId) selectClip(clipId)
+  }, [addStickerClip, selectClip, playheadPosition])
 
   const handlePickSticker = useCallback((sticker) => {
     const clipId = addStickerClip(sticker, playheadPosition)
@@ -1871,6 +1879,7 @@ function App() {
             onOpenMusic={(trackId) => openAdd('music', trackId)}
             onOpenSfx={(trackId) => openAdd('sfx', trackId)}
             onOpenStickers={audioMode ? undefined : () => setStickersOpen(true)}
+            onOpenTitles={audioMode ? undefined : () => setTitlesOpen(true)}
             onOpenCaptions={audioMode ? undefined : () => setCaptionsOpen(o => !o)}
             captionsActive={captionsOpen || !!captions}
             onRecordVideo={audioMode ? undefined : openRecorder}
@@ -2032,6 +2041,7 @@ function App() {
         {sfxOpen && <MusicLibrary kind="sfx" onPick={handlePickSfx} onClose={() => setSfxOpen(false)} />}
 
         {stickersOpen && <StickerPicker onPick={handlePickSticker} onClose={() => setStickersOpen(false)} />}
+        {titlesOpen && <TitleTemplates onAdd={handleAddTitle} onClose={() => setTitlesOpen(false)} frame={outputSize(activeAspectRatio)} />}
 
         {/* Record Video Modal */}
         {recordingOpen && (
@@ -2330,6 +2340,7 @@ function App() {
               onOpenMusic={(trackId) => openAdd('music', trackId)}
               onOpenSfx={(trackId) => openAdd('sfx', trackId)}
               onOpenStickers={() => setStickersOpen(true)}
+              onOpenTitles={() => setTitlesOpen(true)}
               onOpenCaptions={() => setCaptionsOpen(o => !o)}
               captionsActive={captionsOpen || !!captions}
               onRecordVideo={openRecorder}
@@ -2460,6 +2471,7 @@ function App() {
       {sfxOpen && <MusicLibrary kind="sfx" onPick={handlePickSfx} onClose={() => setSfxOpen(false)} />}
 
       {stickersOpen && <StickerPicker onPick={handlePickSticker} onClose={() => setStickersOpen(false)} />}
+      {titlesOpen && <TitleTemplates onAdd={handleAddTitle} onClose={() => setTitlesOpen(false)} frame={outputSize(activeAspectRatio)} />}
 
       {/* Record Video Modal */}
       {recordingOpen && (
