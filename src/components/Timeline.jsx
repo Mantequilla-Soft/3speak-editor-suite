@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo, memo } from 'react'
 import { boxFrom, clipIdsInBox, toggleInSelection, clipIdsInRange } from '../utils/marquee'
 import { trackNumbers } from '../utils/trackNumbers'
-import { Trash2, Flag, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker, Maximize2, ListChecks } from './icons'
+import { Trash2, Flag, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker, Maximize2, ListChecks, Subtitles } from './icons'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 import { getGroupColor } from '../hooks/useTimeline'
 import { MAX_TIMELINE_SECONDS } from '../utils/limits'
@@ -624,6 +624,9 @@ function Timeline({
   onOpenMusic,
   onOpenSfx,
   onOpenStickers,
+  // Auto captions panel (Shorts editor); captionsActive: it is open or the Short has captions
+  onOpenCaptions,
+  captionsActive = false,
   onRecordVideo,
   onReverseClip,
   onUpdateTrack,
@@ -1523,6 +1526,16 @@ function Timeline({
           >
             <ArrowLeftToLine size={14} /> <span>Ripple</span>
           </button>
+          {onOpenCaptions && (
+            <button
+              className={`action-btn captions-btn${captionsActive ? ' active' : ''}`}
+              onClick={onOpenCaptions}
+              aria-pressed={captionsActive}
+              title="Captions: turn what is said into word-by-word captions"
+            >
+              <Subtitles size={14} /> <span>Captions</span>
+            </button>
+          )}
           {onAddFlag && (
             <button
               className="action-btn"

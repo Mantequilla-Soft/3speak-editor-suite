@@ -8,6 +8,7 @@ import { renderAudioTimeline, audioTimelineEnd } from '../services/audioRender.j
 import crypto from 'crypto'
 import { requireSignIn } from '../auth.js'
 import { renderUrlOf } from '../utils/uploadFiles.js'
+import { emojiDownloads, emojiKey, writeSubtitleFiles } from '../services/captionBurn.js'
 
 const router = Router()
 const RENDERED_DIR = process.env.RENDERED_DIR || '/app/rendered'
@@ -140,7 +141,8 @@ router.get('/:jobId', (req, res) => {
     progress: job.progress,
     phase: job.phase,
     outputUrl: job.outputUrl,
-    error: job.error
+    error: job.error,
+    ...(job.subtitles && { subtitles: job.subtitles })
   })
 })
 
@@ -195,6 +197,15 @@ async function processJob(jobId, jobDir) {
 
     const { timeline } = job
 
+    // Auto captions: the words as WebVTT / SRT next to the video (whether or
+    // not they are burnt in), for 3Speak's own captions
+    try {
+      const subs = await writeSubtitleFiles(timeline, RENDERED_DIR, jobId)
+      if (subs) job.subtitles = { language: subs.language, vttUrl: `/rendered/${subs.vtt}`, srtUrl: `/rendered/${subs.srt}`, cues: subs.cues }
+    } catch (err) {
+      console.warn(`[render] Job ${jobId}: subtitle files failed: ${err.message}`)
+    }
+
     // Nothing changed since an earlier render of this exact timeline
     const audioOnly = timeline.output === 'audio'
     const ext = audioOnly ? '.mp3' : '.mp4'
@@ -245,6 +256,15 @@ async function processJob(jobId, jobDir) {
         } catch (err) {
           console.warn(`[render] ${suffix} image for ${clip.id} could not be downloaded: ${err.message}`)
         }
+      }
+    }
+
+    // Emoji accents of the captions (sticker images, by URL); a missing one is left out
+    for (const { cp, url } of emojiDownloads(timeline)) {
+      try {
+        downloadedFiles.set(emojiKey(cp), await cachedDownload(url, jobDir, dl))
+      } catch (err) {
+        console.warn(`[render] emoji ${cp} could not be downloaded: ${err.message}`)
       }
     }
 

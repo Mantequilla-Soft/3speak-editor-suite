@@ -45,6 +45,10 @@ import EncodingNotice from './components/EncodingNotice'
 import ClipColorFilters from './components/ClipColorFilters'
 import { DraftsPrompt, DraftLimitPicker, CloseDialog, DraftStatus } from './components/DraftsDialogs'
 import { useDrafts, savedPlayhead } from './hooks/useDrafts'
+import { useAutoCaptions } from './hooks/useAutoCaptions'
+import CaptionsPanel from './components/CaptionsPanel'
+import { normalizeCaptions, suggestEmojis, DEFAULT_CAPTION_STYLE } from './utils/captions'
+import { voiceTracksOf } from './utils/captionSources'
 import ConfirmDialog from './components/ConfirmDialog'
 import { useCleaningStatus, cleaningText } from './utils/cleaningStatus'
 import { isTypingTarget } from './utils/keyboard'
@@ -242,6 +246,10 @@ function App() {
   const isVerticalVideo = true
   const [orientationOverride, setOrientationOverride] = useState(null)
 
+  // Auto captions of a Short (utils/captions.js): { words, language, style, burn } or null
+  const [captions, setCaptions] = useState(null)
+  const [captionsOpen, setCaptionsOpen] = useState(false)
+
   // Imperative handle into GlobalPreview: { togglePlay, pause, playFromStart }
   const previewControlRef = useRef(null)
   const togglePreviewPlay = useCallback(() => previewControlRef.current?.togglePlay(), [])
@@ -268,8 +276,21 @@ function App() {
     clearRemixPrompt,
     playlistCovers,
     requestPlaylistCovers,
-    editTextInHost
-  } = useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay, audioMode, master, title: audioTitle, chapters: chapterList })
+    editTextInHost,
+    buildAndUploadPayload
+  } = useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay, audioMode, master, title: audioTitle, chapters: chapterList, captions: audioMode ? null : captions })
+
+  // Auto captions: speech to text on the backend, then the words go on screen
+  const autoCaptions = useAutoCaptions({ enabled: !audioMode })
+  const transcribeCaptions = useCallback(async (language) => {
+    const voiceTracks = voiceTracksOf(tracks)
+    const r = await autoCaptions.start((onPhase) => buildAndUploadPayload(onPhase, { voiceTracks }), language)
+    if (!r) return
+    setCaptions(c => {
+      const style = { ...DEFAULT_CAPTION_STYLE, ...(c?.style || {}) }
+      return { words: style.emoji ? suggestEmojis(r.words) : r.words, language: r.language, style, burn: c?.burn !== false }
+    })
+  }, [tracks, autoCaptions.start, buildAndUploadPayload]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Apply theme to document on mount and changes
   useEffect(() => {
@@ -1033,6 +1054,7 @@ function App() {
     if (state?.master) setMaster(masterOf(state.master))
     setChapters(Array.isArray(state?.chapters) ? state.chapters.slice(0, MAX_CHAPTERS) : [])
     setFlags(cleanFlags(state?.flags))
+    setCaptions(normalizeCaptions(state?.captions) ? { ...state.captions, ...normalizeCaptions(state.captions) } : null)
     // a remix draft: its export posts under the original again
     restoreRemixSource(state?.remix || null)
     // and the clip(s) that were selected (those still on the timeline)
@@ -1055,7 +1077,8 @@ function App() {
     zoom: timelineZoom,
     flags,
     selected: selectedClipIds.length ? selectedClipIds : (selectedClipId ? [selectedClipId] : []),
-    remix: remixing ? remixSource : null
+    remix: remixing ? remixSource : null,
+    captions: audioMode ? null : captions
   })
   const canDraftSignIn = isIframe && !draftSession && ['sign-in-needed', 'sign-in-failed', 'signing-in'].includes(draftContext.reason)
 
@@ -1471,12 +1494,35 @@ function App() {
           </div>
   ) : null
 
+  // Auto captions (Shorts editor): in the clip settings' place while open, so
+  // the canvas stays in sight and shows every change live
+  const captionsPanel = captionsOpen && !audioMode ? (
+    <div className="compact-properties-panel captions-side">
+      <div className="compact-properties-header">
+        <span className="compact-properties-title">Captions</span>
+        <button className="compact-btn compact-properties-close" onClick={() => setCaptionsOpen(false)} title="Close captions">
+          <X size={14} />
+        </button>
+      </div>
+      <CaptionsPanel
+        captions={captions}
+        onChange={setCaptions}
+        status={autoCaptions.status}
+        job={autoCaptions.job}
+        onTranscribe={transcribeCaptions}
+        onCancel={autoCaptions.cancel}
+        onSeek={setPlayheadPosition}
+        playheadPosition={playheadPosition}
+      />
+    </div>
+  ) : null
+
   // Desktop: the selected clip's settings in a sidebar. The audio editor puts
   // it beside the stage only, so the timeline gets the full width below.
   const sideBesideStage = isDesktop && audioMode
   const sidePanel = (
     <aside className="compact-side">
-      {multiPanel || (sideClip ? compactPropertiesPanel : (
+      {captionsPanel || multiPanel || (sideClip ? compactPropertiesPanel : (
         <div className="compact-side-empty">
           <MousePointerClick size={28} />
           <strong>No clip selected</strong>
@@ -1517,7 +1563,9 @@ function App() {
       // The audiograms: 3Speak posts them as Shorts linking to the episode
       ...(audioMode && audiogramsToPost(audiograms).length > 0 && { audiograms: audiogramsToPost(audiograms) }),
       ...(remixSource && { remixSource }),
-      ...(musicCredits.length > 0 && { musicCredits })
+      ...(musicCredits.length > 0 && { musicCredits }),
+      // Auto captions as subtitles: { language, vttUrl, srtUrl, cues: [{ start, end, text }] }
+      ...(!audioMode && renderStatus.subtitles && { subtitles: renderStatus.subtitles })
     })
   }
 
@@ -1753,6 +1801,7 @@ function App() {
           recorderSize={recorderSize}
           onSetRecorderSize={setRecorderSize}
           onPlayingChange={setPreviewPlaying}
+          captions={audioMode ? null : captions}
         />
         {sideBesideStage && sidePanel}
         </div>
@@ -1820,6 +1869,8 @@ function App() {
             onOpenMusic={(trackId) => openAdd('music', trackId)}
             onOpenSfx={(trackId) => openAdd('sfx', trackId)}
             onOpenStickers={audioMode ? undefined : () => setStickersOpen(true)}
+            onOpenCaptions={audioMode ? undefined : () => setCaptionsOpen(o => !o)}
+            captionsActive={captionsOpen || !!captions}
             onRecordVideo={audioMode ? undefined : openRecorder}
             onReverseClip={audioMode ? undefined : handleReverseClip}
             onUpdateTrack={updateTrack}
@@ -1847,7 +1898,7 @@ function App() {
           )}
 
           {/* Compact properties panel (phones: over the timeline; desktop: the sidebar) */}
-          {!isDesktop && (multiPanel || compactPropertiesPanel)}
+          {!isDesktop && (captionsPanel || multiPanel || compactPropertiesPanel)}
         </div>
         </div>
         {/* Desktop shorts editor: the selected clip's settings beside preview and timeline */}
@@ -2277,6 +2328,8 @@ function App() {
               onOpenMusic={(trackId) => openAdd('music', trackId)}
               onOpenSfx={(trackId) => openAdd('sfx', trackId)}
               onOpenStickers={() => setStickersOpen(true)}
+              onOpenCaptions={() => setCaptionsOpen(o => !o)}
+              captionsActive={captionsOpen || !!captions}
               onRecordVideo={openRecorder}
               onReverseClip={handleReverseClip}
               onUpdateTrack={updateTrack}
@@ -2299,6 +2352,7 @@ function App() {
 
         {/* Right panel: properties for horizontal, timeline preview for vertical */}
         <div className="right-panel">
+          {captionsPanel}
           {isVerticalVideo ? (
             <GlobalPreview
               emptyActions={emptyTimelineActions}
@@ -2320,6 +2374,7 @@ function App() {
               controlRef={previewControlRef}
               recorderSize={recorderSize}
               onSetRecorderSize={setRecorderSize}
+              captions={captions}
             />
           ) : (
             <div className={`collapsible-section properties-section ${propertiesOpen ? 'open' : 'closed'}`}>

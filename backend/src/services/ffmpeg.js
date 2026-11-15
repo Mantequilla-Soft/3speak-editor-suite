@@ -6,6 +6,7 @@ import { createStaticMasker, staticMaskSize } from '../utils/staticKeyMask.js'
 import { ffmpegColorFilter } from '../utils/clipColor.js'
 import crypto from 'crypto'
 import { ffmpegMotionFilter, normalizeMotion, pivotPoint, activeEffects } from '../utils/stickerMotion.js'
+import { captionBurn } from './captionBurn.js'
 
 // clip volume 0..100 -> gain. 0 means silent: `volume || 100` used to turn it into full volume.
 const clipVolume = clip => (Number.isFinite(+clip.volume) ? Math.max(0, +clip.volume) : 100) / 100
@@ -263,6 +264,15 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
 
       filterParts.push(`[${prev}]${clipLabel}overlay=${overlayPos}:eof_action=pass:format=auto${out}`)
       prev = `tmp${i}`
+    }
+
+    // Auto captions over everything (services/captionBurn.js; the preview draws the same)
+    const burn = await captionBurn(timeline, { width: outputWidth, height: outputHeight }, jobDir, downloadedFiles, nextInput)
+    if (burn) {
+      const last = filterParts.length - 1
+      filterParts[last] = filterParts[last].replace(/\[outv\]$/, '[precap]')
+      compArgs.push(...burn.inputArgs)
+      filterParts.push(...burn.filters('precap', 'outv'))
     }
 
     compArgs.push('-filter_complex', filterParts.join(';'))

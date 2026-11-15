@@ -87,8 +87,9 @@ The editor follows 3Speak's v2 design (the `design_handoff_3speak_v2` package in
 
 Quality presets: High (CRF 18), Medium (CRF 23), Low (CRF 28).
 
-### Render quality (Shorts)
+### Render quality and captions (Shorts)
 - Shorts render at **1080x1920** from the uploaded **originals**: the 480p copy of a video upload is only the editing proxy the preview plays (`GET /api/upload/files/<name>`); renders ask for `?for=render` (backend/src/utils/uploadFiles.js). Originals that are HDR, larger than 1920 on the long side or in an unusual codec get a `_master.mp4` render copy (fit 1920, never upscaled, SDR) that replaces them. Old uploads that only have their 480p file still render from it.
+- **Auto captions** (Captions button on the timeline): speech to text with word times (whisper.cpp in the backend image), styles Karaoke (the spoken word highlighted), Pop (one or a few words at a time) and Subtitles, optional emoji accents, an editable words list. Burnt in with libass exactly where the preview draws them (src/utils/captions.js, shared with the backend), and written as WebVTT / SRT next to the render; `post-to-3speak` carries them as `subtitles`.
 
 ### Other
 - Drag-and-drop or file-picker media import with categorized library (Videos, Images, Sounds)
@@ -329,6 +330,12 @@ All variables are configured in `.env` (see `.env.example`).
 | `CLEANUP_MAX_AGE_HOURS` | `2` | Auto-cleanup files older than this |
 | `CLEANUP_INTERVAL_MINUTES` | `30` | Cleanup frequency |
 | `MAX_PARALLEL_ENCODES` | `2` | Upload encodes (480p proxy, render master) at a time |
+| `WHISPER_BIN` | `/opt/whisper/whisper-cli` | Auto captions: whisper.cpp CLI (built into the image) |
+| `WHISPER_MODEL` | `/opt/whisper/ggml-base.bin` | Auto captions: ggml model (image build arg `WHISPER_MODEL`: tiny, base, small) |
+| `WHISPER_THREADS` | `2` | CPU threads per transcription (one runs at a time) |
+| `CAPTIONS_ENABLED` | `true` | `false` hides auto captions on this backend |
+| `CAPTIONS_MAX_SECONDS` | `600` | Longest timeline auto captions transcribe |
+| `CAPTION_FONTS_DIR` | `/usr/share/fonts/google` | Fonts libass burns captions with |
 
 ### Gateway
 
@@ -350,6 +357,9 @@ All variables are configured in `.env` (see `.env.example`).
 | `GET` | `/api/health` | Health check with active/max job counts |
 | `POST` | `/api/upload` | Upload file (multipart, 2GB max) |
 | `GET` | `/api/upload/files/:filename` | Serve uploaded file (the 480p proxy once there; `?for=render`: the original or its master) |
+| `GET` | `/api/captions/status` | Can this backend do auto captions (whisper, libass) |
+| `POST` | `/api/captions/transcribe` | Start speech to text of a timeline's voice tracks |
+| `GET` | `/api/captions/:jobId` | Poll it: words with times, language |
 | `POST` | `/api/render` | Submit render job (timeline JSON) |
 | `GET` | `/api/render/:jobId` | Poll render job status |
 | `POST` | `/api/clip/prepare` | Submit HLS clip preparation |

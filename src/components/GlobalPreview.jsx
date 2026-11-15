@@ -75,6 +75,7 @@ import usePhoneLayout from '../hooks/usePhoneLayout'
 import { REMIX_LAYOUTS, hasLayout, clampLayout, layoutPan, layoutZoom, LAYOUT_ZOOM_MIN, LAYOUT_ZOOM_MAX } from '../utils/remixLayout'
 import { getClipChromaKey } from '../utils/chromaKey'
 import ChromaKeyCanvas from './ChromaKeyCanvas'
+import CaptionsOverlay from './CaptionsOverlay'
 
 // In stitch mode the preview sits in its own column with its own controls;
 // otherwise this renders the preview as-is.
@@ -146,7 +147,7 @@ function FitTextBox({ measureKey, children, ...rest }) {
   return <span ref={ref} {...rest}>{children}</span>
 }
 
-function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVideo, activeAspectRatio, aspectRatioOverride, onSetAspectRatio, selectedClipId, onUpdateClip, onSelectClip, compact, inlineRecording, onRecordedInline, onCloseInlineRecorder, recorderSize, onSetRecorderSize, recorderGuide, onChangeRemixMode, onChangeStageLayout, controlRef, emptyActions, audioMode = false, duck = null, chapters = null, onPlayingChange }) {
+function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVideo, activeAspectRatio, aspectRatioOverride, onSetAspectRatio, selectedClipId, onUpdateClip, onSelectClip, compact, inlineRecording, onRecordedInline, onCloseInlineRecorder, recorderSize, onSetRecorderSize, recorderGuide, onChangeRemixMode, onChangeStageLayout, controlRef, emptyActions, audioMode = false, duck = null, chapters = null, onPlayingChange, captions = null }) {
   const videoRefs = useRef({}) // Map of clip ID to video element
   // Sticker motion: the layer container (= the frame) and the moving clips,
   // which the playback loop moves every frame (React renders only ~20/s)
@@ -1676,6 +1677,21 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                 })
               ) : (
                 <div className="no-clip-at-position">No clip at this position</div>
+              )}
+
+              {/* Auto captions, drawn as the render burns them in (utils/captions.js) */}
+              {captions && (
+                <div
+                  className="captions-canvas"
+                  style={{
+                    left: `calc((100cqw - ${CANVAS_W}) / 2)`,
+                    top: `calc((100cqh - ${CANVAS_H}) / 2)`,
+                    width: CANVAS_W,
+                    height: CANVAS_H
+                  }}
+                >
+                  <CaptionsOverlay captions={captions} time={playheadPosition} />
+                </div>
               )}
 
               {inlineRecording && recSize === 'stage' && (

@@ -7,11 +7,14 @@ import { normalizeColor } from '../utils/clipColor'
 import { normalizeMotion } from '../utils/stickerMotion'
 import { duckPlans, localDuckPlan } from '../utils/duck'
 import { outputSize } from '../utils/outputSize'
+import { normalizeCaptions } from '../utils/captions'
+import { emojiUrlsOf } from '../utils/captionSources'
 
 const isIframe = typeof window !== 'undefined' && window.parent !== window
 const GATEWAY_URL = (import.meta.env.VITE_GATEWAY_URL || '').replace(/\/+$/, '')
 
-export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay, audioMode = false, master = null, title = null, chapters = null }) {
+export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay, audioMode = false, master = null, title = null, chapters = null, captions = null }) {
+  const allTracks = tracks
   const parentOriginRef = useRef('*')
   const [renderStatus, setRenderStatus] = useState(null)
   const [theme, setTheme] = useState('dark')
@@ -265,8 +268,11 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
 
   /**
    * Upload all blob: files and build the timeline payload with server URLs.
+   * `voiceTracks` (auto captions, utils/captionSources.js voiceTracksOf): only
+   * these tracks, as an audio timeline for speech to text.
    */
-  const buildAndUploadPayload = useCallback(async (onProgress) => {
+  const buildAndUploadPayload = useCallback(async (onProgress, { voiceTracks = null } = {}) => {
+    const tracks = voiceTracks || allTracks
     const fileStore = fileStoreRef?.current
     // Collect clips that have blob: URLs but NO serverUrl (need upload)
     // Clips with a serverUrl already have a backend-accessible path
@@ -458,6 +464,9 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
       })
     }))
 
+    // Auto captions: the speech, as an audio timeline (backend routes/captions.js)
+    if (voiceTracks) return { timeline: { output: 'audio', tracks: trackData.filter(t => t.type === 'audio') } }
+
     // The audio editor renders an MP3 of the audio tracks (backend audioRender.js)
     if (audioMode) {
       // Ducked clips (their own Duck, or the top bar's for music) carry their
@@ -488,6 +497,13 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     const previewWidth = previewEl ? previewEl.clientWidth : outputWidth
     const previewHeight = previewEl ? previewEl.clientHeight : outputHeight
 
+    // Auto captions: burnt in (unless switched off) and written as subtitle
+    // files by the backend (services/captionBurn.js); emoji pictures by URL
+    const caps = normalizeCaptions(captions)
+    const captionsPayload = caps
+      ? { ...caps, burn: captions.burn !== false, ...(caps.style.emoji ? { emojiUrls: emojiUrlsOf(caps.words) } : {}) }
+      : null
+
     return {
       timeline: {
         tracks: trackData,
@@ -495,11 +511,12 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
         outputHeight,
         previewWidth,
         previewHeight,
-        fps: 30
+        fps: 30,
+        ...(captionsPayload ? { captions: captionsPayload } : {})
       },
       mediaUrls
     }
-  }, [tracks, uploadFile, activeAspectRatio, audioMode, master, title, chapters])
+  }, [allTracks, uploadFile, activeAspectRatio, audioMode, master, title, chapters, captions])
 
   // Poll job status
   const pollJobStatus = useCallback((jobId, backendEndpoint) => {
@@ -522,13 +539,18 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
           // selected backend, not this page's own origin)
           const base = backendEndpoint || getBackendUrl() || window.location.origin
           const fullUrl = new URL(data.outputUrl, base).href
-          setRenderStatus({ ...data, outputUrl: fullUrl })
+          // Auto captions' subtitle files sit next to the video
+          const subtitles = data.subtitles
+            ? { ...data.subtitles, vttUrl: new URL(data.subtitles.vttUrl, base).href, srtUrl: new URL(data.subtitles.srtUrl, base).href }
+            : undefined
+          setRenderStatus({ ...data, outputUrl: fullUrl, subtitles })
           clearInterval(pollIntervalRef.current)
           pollIntervalRef.current = null
           activeJobRef.current = null
           if (isIframe) {
             sendToParent('render-complete', {
               outputUrl: fullUrl,
+              ...(subtitles && { subtitles }),
               ...(remixSourceRef.current && { remixSource: remixSourceRef.current })
             })
           }
@@ -656,6 +678,8 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     draftContext,
     closeRequest,
     answerClose,
-    requestDraftSignIn
+    requestDraftSignIn,
+    // Uploads what still needs it and builds a render payload (auto captions use it for the speech)
+    buildAndUploadPayload
   }
 }

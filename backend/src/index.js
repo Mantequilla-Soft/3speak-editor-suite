@@ -10,6 +10,7 @@ import { sceneRenderRouter } from './routes/sceneRender.js'
 import { adDraftsRouter } from './routes/adDrafts.js'
 import { templatesRouter } from './routes/templates.js'
 import { audiogramRouter } from './routes/audiogram.js'
+import { captionsRouter } from './routes/captions.js'
 import { pinnedUploads, uploadBase } from './utils/pinnedUploads.js'
 import { RENDER_CACHE_DIR } from './services/ffmpeg.js'
 
@@ -44,6 +45,8 @@ app.use('/api/projects', projectsRouter)
 app.use('/api/templates', templatesRouter)
 // Audiogram videos of an exported episode (the audio editor's share clip)
 app.use('/api/audiogram', audiogramRouter)
+// Auto captions: speech to text with word times (whisper.cpp, services/stt.js)
+app.use('/api/captions', captionsRouter)
 
 // Ad Wizard: scene-engine docs -> silent scene video (headless Chromium), and its drafts
 app.use('/api/scene-render', sceneRenderRouter)
