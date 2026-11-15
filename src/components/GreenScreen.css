@@ -157,3 +157,35 @@
   margin: 0;
   accent-color: var(--accent-primary);
 }
+
+/* Background removal without a green screen (PersonKeyControls.jsx) */
+.person-key-progress {
+  height: 4px;
+  margin-top: 6px;
+  border-radius: var(--r-bar, 2px);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.person-key-progress span {
+  display: block;
+  height: 100%;
+  background: var(--cyan);
+  transition: width var(--t-fast, 120ms) linear;
+}
+
+.person-key-color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.person-key-color input[type="color"] {
+  width: 32px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: var(--r-sm);
+  background: none;
+}

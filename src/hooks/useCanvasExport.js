@@ -1,6 +1,8 @@
 import { useState, useCallback, useRef } from 'react'
 import { hasLayout, coverSourceRect, layoutPan, layoutZoom } from '../utils/remixLayout'
 import { getClipChromaKey, createKeyer } from '../utils/chromaKey'
+import { maskFrame, maskFrameIndex } from '../utils/personMask'
+import { loadMaskTrack } from '../utils/personMaskJobs'
 import { clipColorFilter } from '../components/ClipColorFilters'
 import { motionAt, pivotPoint } from '../utils/stickerMotion'
 import { t } from '../i18n'
@@ -107,6 +109,12 @@ export function useCanvasExport(ffmpeg, ffmpegLoaded) {
         const plate = await load(key.plateUrl)
         if (plate) keyer.setPlate(plate)
         keyer.setNoise?.(await load(key.noiseUrl))
+      }
+      // Background removal: the clip's matte track (made before the export starts)
+      if (key.mode === 'person') {
+        const track = await loadMaskTrack(key.maskUrl)
+        if (!track) continue
+        keyer.setPersonMask?.((src, time) => ({ mask: maskFrame(track, maskFrameIndex(track.header, time)), w: track.header.w, h: track.header.h }))
       }
       keyers.set(id, { keyer, key })
     }

@@ -17,7 +17,8 @@
       "musicLibrary": "Music Library",
       "soundEffects": "Sound Effects",
       "stickers": "Stickers",
-      "titles": "Titles"
+      "titles": "Titles",
+      "stock": "Stock media"
     },
     "zoomTitle": "Zoom: {{value}}px/s",
     "fit": {

@@ -12,6 +12,7 @@ import { transitionLayer, transitionAudioSources } from '../utils/transitionRend
 import crypto from 'crypto'
 import { ffmpegMotionFilter, normalizeMotion, pivotPoint, activeEffects } from '../utils/stickerMotion.js'
 import { captionBurn } from './captionBurn.js'
+import { normalizePersonKey, writePersonMaskStream, buildPersonKeyFilter, personKeyForSize } from './personKey.js'
 import { renderSceneClip } from './sceneClip.js'
 import { reframeFilter, normalizeReframe } from '../utils/reframe.js'
 import { ffmpegVideoTiming, ffmpegAudioTiming, timeMap, sourceAt } from '../utils/clipSpeed.js'
@@ -97,6 +98,7 @@ export async function buildAndRunFFmpeg({ timeline: given, downloadedFiles, outp
 
   const processedClips = new Map()
   const processedPlates = new Map() // clip id -> clean plate PNG (static-background key)
+  const personMasks = new Map() // clip id -> matte stream (background removal, services/personKey.js)
   const cropSources = new Map() // clip id -> display size of a free-cropped video
   const keyedFx = new Map() // clip id -> look effects of a keyed clip (utils/lookFx.js)
   let reusedClips = 0
@@ -176,6 +178,19 @@ export async function buildAndRunFFmpeg({ timeline: given, downloadedFiles, outp
         console.warn(`[ffmpeg] Clip ${clip.id}: static background key without a plate, rendering unkeyed`)
       }
     }
+    // Background removal (person key): its matte, one frame per output frame
+    if (ck?.mode === 'person') {
+      const maskFile = downloadedFiles.get(`${clip.id}__mask`)
+      const size = maskFile ? await probeVideoSize(processedPath) : null
+      const mask = size
+        ? await writePersonMaskStream(clip, maskFile, path.join(jobDir, `pmask_${clip.id}.gray`), fps).catch((err) => {
+          console.warn(`[ffmpeg] Clip ${clip.id}: matte unusable: ${err.message}`)
+          return null
+        })
+        : null
+      if (mask) personMasks.set(clip.id, { ...mask, size })
+      else console.warn(`[ffmpeg] Clip ${clip.id}: background removal without a matte, rendering unkeyed`)
+    }
   }
 
   if (reusedClips) console.log(`[ffmpeg] ${reusedClips}/${allClips.length} clips unchanged since an earlier render, reused`)
@@ -230,6 +245,13 @@ export async function buildAndRunFFmpeg({ timeline: given, downloadedFiles, outp
       }
       plateInputs.set(i, entry)
     })
+    const personInputs = new Map() // overlay index -> { mask input, size }
+    overlayClips.forEach((oc, i) => {
+      const m = personMasks.get(oc.clip.id)
+      if (!m) return
+      personInputs.set(i, { input: nextInput++, size: m.size })
+      compArgs.push('-f', 'rawvideo', '-pix_fmt', 'gray', '-video_size', `${m.w}x${m.h}`, '-framerate', String(fps), '-i', m.path)
+    })
 
     // Build the filter graph:
     // 1. Key green / blue screen (or a static background) out of keyed clips
@@ -262,7 +284,25 @@ export async function buildAndRunFFmpeg({ timeline: given, downloadedFiles, outp
         src = `ext${i}`
       }
 
-      if (key && key.mode === 'static' && plateInputs.has(i)) {
+      if (key && key.mode === 'person' && personInputs.has(i)) {
+        // Background removal: the matte (one frame per output frame, at the clip's
+        // media time) is framed like the clip (reframe included), held like it at a
+        // transition, then keyed; the look goes on after, keyframes after that
+        const pi = personInputs.get(i)
+        filterParts.push(...buildPersonKeyFilter({
+          clipLabel: src,
+          maskLabel: `${pi.input}:v`,
+          // The matte covers the whole source frame: frame it exactly like the clip
+          maskTransform: `${withScaleFlags(buildTransformFilter(oc.clip, outputWidth, outputHeight), 'bilinear')},scale=${pi.size.width}:${pi.size.height}:flags=bilinear,setsar=1`,
+          hold: hold && !animated ? hold : null,
+          key: personKeyForSize(key, pi.size.height), i, delay, outLabel: `v${i}`
+        }))
+        clipLabels.push(keyedColor(oc.clip, i, filterParts, keyedFx.get(oc.clip.id)))
+      } else if (key && key.mode === 'person') {
+        // no matte (it could not be made or downloaded): the clip unkeyed, with its look
+        filterParts.push(`[${src}]${delay || 'null'}[v${i}]`)
+        clipLabels.push(keyedColor(oc.clip, i, filterParts, keyedFx.get(oc.clip.id)))
+      } else if (key && key.mode === 'static' && plateInputs.has(i)) {
         const pi = plateInputs.get(i)
         filterParts.push(...buildStaticKeyFilter({
           clipLabel: `${i + 1}:v`,
@@ -1197,6 +1237,7 @@ const KEY_RANGES = {
 function getChromaKey(clip) {
   const ck = clip?.chromaKey
   if (!ck || typeof ck !== 'object' || ck.enabled === false) return null
+  if (ck.color === 'person') return normalizePersonKey(ck)
   const mode = ck.color === 'blue' ? 'blue' : ck.color === 'static' ? 'static' : 'green'
   const kind = mode === 'static' ? 'static' : 'chroma'
   const d = KEY_DEFAULTS[kind]

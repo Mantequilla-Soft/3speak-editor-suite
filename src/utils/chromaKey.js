@@ -24,9 +24,14 @@
  *     with the backend), upscaled bilinearly
  *   alpha = clamp(pa + 2m - 1, 0, 1)   (mask decides inside / outside, pa the outline)
  *   color = clamp((C - (1 - alpha) * spill * P) / alpha)   (unmix the wall from the edge)
+ *
+ * Person (no green screen, utils/personMask.js): alpha from a matte the
+ * segmenter made, the background optionally a blur of the clip or a colour.
+ *   { color: 'person', threshold, softness, maskUrl?, background? }
  */
 import { isHlsUrl, attachHls, destroyHls } from './hlsHelper'
 import { createStaticMasker, staticMaskSize, plateNoiseFromFrames } from './staticKeyMask'
+import { normalizePersonKey, personAlphaRange, personAlpha, blurSigma, PERSON_DEFAULTS } from './personMask'
 
 export const KEY_DEFAULTS = {
   chroma: { similarity: 0.75, blend: 0.15, spill: 0.8 },
@@ -40,6 +45,7 @@ export const KEY_RANGES = {
 /** Normalized key settings of a chromaKey value, or null when keying is off. */
 export function normalizeChromaKey(ck) {
   if (!ck || typeof ck !== 'object' || ck.enabled === false) return null
+  if (ck.color === 'person') return normalizePersonKey(ck)
   const mode = ck.color === 'blue' ? 'blue' : ck.color === 'static' ? 'static' : 'green'
   const kind = mode === 'static' ? 'static' : 'chroma'
   const d = KEY_DEFAULTS[kind]
@@ -57,6 +63,7 @@ export function normalizeChromaKey(ck) {
 
 /** A fresh chromaKey value for a mode, with that mode's defaults. */
 export function defaultChromaKey(mode = 'green', plateUrl = null, noiseUrl = null) {
+  if (mode === 'person') return { color: 'person', threshold: PERSON_DEFAULTS.threshold, softness: PERSON_DEFAULTS.softness, background: { kind: 'none' } }
   const d = mode === 'static' ? KEY_DEFAULTS.static : KEY_DEFAULTS.chroma
   return mode === 'static'
     ? { color: 'static', similarity: d.similarity, blend: d.blend, spill: d.spill, ...(plateUrl ? { plateUrl } : {}), ...(noiseUrl ? { noiseUrl } : {}) }
@@ -67,7 +74,47 @@ export function getClipChromaKey(clip) {
   return clip && clip.type === 'video' ? normalizeChromaKey(clip.chromaKey) : null
 }
 
-const keySignature = (k) => (k ? `${k.mode}:${k.similarity}:${k.blend}:${k.spill}` : 'off')
+const keySignature = (k) => (!k ? 'off' : k.mode === 'person'
+  ? `person:${k.threshold}:${k.softness}:${k.background.kind}:${k.background.blur}:${k.background.color}:${k.maskUrl || ''}`
+  : `${k.mode}:${k.similarity}:${k.blend}:${k.spill}`)
+
+const hexRgb = (hex) => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16))
+
+/**
+ * Person key: the blurred background picture of a frame, a small canvas (the
+ * keyer scales it up). The blur is applied at a quarter of the source size, so
+ * sigma is a quarter too; without canvas filters (older Safari) the strong
+ * downscale alone softens it.
+ */
+function createBlurrer() {
+  let canvas = null
+  let ctx = null
+  const hasFilter = typeof CanvasRenderingContext2D !== 'undefined' && 'filter' in CanvasRenderingContext2D.prototype
+  return {
+    draw(src, sw, sh, background) {
+      const k = hasFilter ? 4 : 16
+      const w = Math.max(2, Math.round(sw / k))
+      const h = Math.max(2, Math.round(sh / k))
+      if (!canvas) {
+        canvas = document.createElement('canvas')
+        ctx = canvas.getContext('2d')
+      }
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w
+        canvas.height = h
+      }
+      const sigma = blurSigma(background, sh) / k
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'high'
+      // drawn a little larger, so the blur does not pull in the transparent edge
+      const pad = hasFilter ? Math.ceil(sigma * 2) : 0
+      if (hasFilter) ctx.filter = `blur(${sigma.toFixed(2)}px)`
+      ctx.drawImage(src, -pad, -pad, w + 2 * pad, h + 2 * pad)
+      if (hasFilter) ctx.filter = 'none'
+      return canvas
+    }
+  }
+}
 
 function sourceSize(src) {
   if (!src) return [0, 0]
@@ -164,6 +211,10 @@ uniform float u_blend;
 uniform float u_spill;
 uniform float u_minDiff;   // static: floor(765 * similarity)
 uniform float u_sblend;    // static: blend
+uniform float u_lo;        // person: matte value where alpha starts (0-255)
+uniform float u_hi;        // person: matte value where alpha is 1
+uniform int u_bg;          // person: 0 see-through, 1 colour, 2 blur (picture in u_plate)
+uniform vec3 u_bgColor;
 varying vec2 v_uv;
 
 vec3 yuv601(vec3 c) {
@@ -187,6 +238,11 @@ void main() {
     float m = floor(texture2D(u_mask, v_uv).r * 255.0 + 0.5);
     a = clamp(pa + 2.0 * m - 255.0, 0.0, 255.0) / 255.0;
     if (a > 0.0) rgb = clamp((rgb - (1.0 - a) * u_spill * P) / a, 0.0, 1.0);
+  } else if (u_mode == 4) {
+    float m = texture2D(u_mask, v_uv).r * 255.0;
+    a = clamp((m - u_lo) / (u_hi - u_lo), 0.0, 1.0);
+    if (u_bg == 1) { rgb = mix(u_bgColor, rgb, a); a = 1.0; }
+    else if (u_bg == 2) { rgb = mix(texture2D(u_plate, v_uv).rgb, rgb, a); a = 1.0; }
   } else if (u_mode < 2) {
     float x = floor((u_mode == 1 ? rgb.b : rgb.g) * 255.0 + 0.5);
     float y = floor((u_mode == 1 ? max(rgb.r, rgb.g) : max(rgb.r, rgb.b)) * 255.0 + 0.5);
@@ -208,6 +264,7 @@ function createWebGLKeyer(canvas, { preserveDrawingBuffer = false } = {}) {
 
   const compile = (type, src) => {
     const s = gl.createShader(type)
+    if (!s) return null // context lost (too many WebGL canvases): the 2D keyer takes over
     gl.shaderSource(s, src)
     gl.compileShader(s)
     if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
@@ -257,16 +314,26 @@ function createWebGLKeyer(canvas, { preserveDrawingBuffer = false } = {}) {
   const uSpill = u('u_spill')
   const uMinDiff = u('u_minDiff')
   const uSBlend = u('u_sblend')
+  const uLo = u('u_lo')
+  const uHi = u('u_hi')
+  const uBg = u('u_bg')
+  const uBgColor = u('u_bgColor')
   gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false)
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
   gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1) // the mask rows are not 4-byte aligned
 
   let plate = null
   let noiseImg = null
+  let personMask = null // (src, time) -> { mask, w, h } | null
   const low = createLowResMasker()
+  const blurrer = createBlurrer()
 
   return {
     kind: 'webgl',
+    // Person key: where its matte comes from (a track made by the segmenter, or live)
+    setPersonMask(fn) {
+      personMask = fn || null
+    },
     canvas,
     setPlate(img) {
       gl.activeTexture(gl.TEXTURE1)
@@ -290,7 +357,32 @@ function createWebGLKeyer(canvas, { preserveDrawingBuffer = false } = {}) {
       gl.activeTexture(gl.TEXTURE0)
       gl.bindTexture(gl.TEXTURE_2D, tex)
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src)
-      const mode = !key ? 3 : key.mode === 'static' ? (plate ? 2 : 3) : key.mode === 'blue' ? 1 : 0
+      let mode = !key ? 3 : key.mode === 'static' ? (plate ? 2 : 3) : key.mode === 'blue' ? 1 : key.mode === 'person' ? 4 : 0
+      if (mode === 4) {
+        const pm = personMask ? personMask(src, frameTime(src, time)) : null
+        if (!pm) {
+          mode = 3 // no matte yet: the picture as it is
+        } else {
+          gl.activeTexture(gl.TEXTURE2)
+          gl.bindTexture(gl.TEXTURE_2D, maskTex)
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, pm.w, pm.h, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, pm.mask)
+          const { lo, hi } = personAlphaRange(key)
+          gl.uniform1f(uLo, lo)
+          gl.uniform1f(uHi, hi)
+          const bg = key.background
+          gl.uniform1i(uBg, bg.kind === 'color' ? 1 : bg.kind === 'blur' ? 2 : 0)
+          gl.uniform3f(uBgColor, ...hexRgb(bg.color).map(c => c / 255))
+          if (bg.kind === 'blur') {
+            gl.activeTexture(gl.TEXTURE1)
+            gl.bindTexture(gl.TEXTURE_2D, plateTex)
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, blurrer.draw(src, w, h, bg))
+          } else if (plate) {
+            // the static key's plate lives in the same texture unit: put it back
+            gl.activeTexture(gl.TEXTURE1)
+            gl.bindTexture(gl.TEXTURE_2D, plateTex)
+          }
+        }
+      }
       if (mode === 2) {
         const { mask, lw, lh } = low.compute(src, plate, noiseImg, key, w, h, frameTime(src, time))
         gl.activeTexture(gl.TEXTURE2)
@@ -298,7 +390,7 @@ function createWebGLKeyer(canvas, { preserveDrawingBuffer = false } = {}) {
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, lw, lh, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, mask)
       }
       gl.uniform1i(uMode, mode)
-      if (key) {
+      if (key && mode !== 4) {
         gl.uniform1f(uThr, 1 - key.similarity)
         gl.uniform1f(uBlend, Math.max(0.001, key.blend))
         gl.uniform1f(uSpill, key.spill)
@@ -324,7 +416,9 @@ function create2DKeyer(canvas, { maxSide = 640 } = {}) {
   let plateImg = null
   let plateData = null // ImageData of the plate at the current canvas size
   let noiseImg = null
+  let personMask = null
   const low = createLowResMasker()
+  const blurrer = createBlurrer()
 
   const yuv = (r, g, b) => [
     16 + 0.256788 * r + 0.504129 * g + 0.097906 * b,
@@ -335,6 +429,9 @@ function create2DKeyer(canvas, { maxSide = 640 } = {}) {
   return {
     kind: '2d',
     canvas,
+    setPersonMask(fn) {
+      personMask = fn || null
+    },
     setPlate(img) {
       plateImg = img || null
       plateData = null
@@ -356,9 +453,42 @@ function create2DKeyer(canvas, { maxSide = 640 } = {}) {
       ctx.clearRect(0, 0, w, h)
       ctx.drawImage(src, 0, 0, w, h)
       if (!key || (key.mode === 'static' && !plateImg)) return true
+      const pm = key.mode === 'person' && personMask ? personMask(src, frameTime(src, time)) : null
+      if (key.mode === 'person' && !pm) return true
+      let bgData = null
+      if (pm && key.background.kind === 'blur') {
+        ctx.drawImage(blurrer.draw(src, sw, sh, key.background), 0, 0, w, h)
+        bgData = ctx.getImageData(0, 0, w, h).data
+        ctx.drawImage(src, 0, 0, w, h)
+      }
       const img = ctx.getImageData(0, 0, w, h) // throws when tainted
       const p = img.data
-      if (key.mode === 'static') {
+      if (pm) {
+        const range = personAlphaRange(key)
+        const bg = key.background
+        const col = hexRgb(bg.color)
+        const { mask, w: lw, h: lh } = pm
+        for (let y = 0, i = 0; y < h; y++) {
+          const my = Math.min(lh - 1, Math.max(0, (y + 0.5) * lh / h - 0.5))
+          const y0 = Math.floor(my), y1 = Math.min(lh - 1, y0 + 1), fy = my - y0
+          for (let x = 0; x < w; x++, i += 4) {
+            const mx = Math.min(lw - 1, Math.max(0, (x + 0.5) * lw / w - 0.5))
+            const x0 = Math.floor(mx), x1 = Math.min(lw - 1, x0 + 1), fx = mx - x0
+            const top = mask[y0 * lw + x0] * (1 - fx) + mask[y0 * lw + x1] * fx
+            const bot = mask[y1 * lw + x0] * (1 - fx) + mask[y1 * lw + x1] * fx
+            const al = personAlpha(top * (1 - fy) + bot * fy, range)
+            if (bg.kind === 'none') {
+              p[i + 3] = al
+            } else {
+              for (let c = 0; c < 3; c++) {
+                const under = bg.kind === 'color' ? col[c] : bgData[i + c]
+                p[i + c] = Math.round((p[i + c] * al + under * (255 - al)) / 255)
+              }
+              p[i + 3] = 255
+            }
+          }
+        }
+      } else if (key.mode === 'static') {
         const { mask, lw, lh } = low.compute(src, plateImg, noiseImg, key, sw, sh, frameTime(src, time))
         if (!plateData) {
           ctx.drawImage(plateImg, 0, 0, w, h)

@@ -34,6 +34,8 @@ function localPlateUrls(tracks) {
   for (const t of tracks) {
     for (const c of t.clips) {
       const ck = c.chromaKey
+      // background removal (person key): its matte file
+      if (ck?.color === 'person' && ck.maskUrl && LOCAL.test(ck.maskUrl)) urls.add(ck.maskUrl)
       if (ck?.color !== 'static') continue
       if (ck.plateUrl && LOCAL.test(ck.plateUrl)) urls.add(ck.plateUrl)
       if (ck.noiseUrl && LOCAL.test(ck.noiseUrl)) urls.add(ck.noiseUrl)
@@ -75,6 +77,10 @@ export function serializeProject(tracks, library, plates = new Map(), { mode = '
       if (c.chromaKey?.color === 'static') {
         const swap = (u) => (u && LOCAL.test(u) ? plates.get(u) || u : u)
         source = { ...source, chromaKey: { ...c.chromaKey, plateUrl: swap(c.chromaKey.plateUrl), noiseUrl: swap(c.chromaKey.noiseUrl) } }
+      }
+      // A person key: its matte as the uploaded copy (without one it is made again on open)
+      if (c.chromaKey?.color === 'person' && c.chromaKey.maskUrl && LOCAL.test(c.chromaKey.maskUrl)) {
+        source = { ...source, chromaKey: { ...c.chromaKey, maskUrl: plates.get(c.chromaKey.maskUrl) || c.chromaKey.maskUrl } }
       }
       const clip = stripLocal(source)
       // Without its plate (upload failed) the static key cannot work: save the clip unkeyed
@@ -169,7 +175,8 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
     for (const local of localPlateUrls(tracks)) {
       if (platesRef.current.has(local)) continue
       try {
-        platesRef.current.set(local, await uploadLocalImage(local, 'background-plate.png'))
+        const isMask = tracks.some(t => t.clips.some(c => c.chromaKey?.color === 'person' && c.chromaKey.maskUrl === local))
+        platesRef.current.set(local, await uploadLocalImage(local, isMask ? 'person-mask.gz' : 'background-plate.png'))
       } catch (err) {
         console.warn('[drafts] green-screen plate not uploaded:', err.message)
       }

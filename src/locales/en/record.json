@@ -47,8 +47,10 @@
       "off": "Off",
       "green": "Green",
       "blue": "Blue",
+      "person": "Person",
       "static": "Static",
       "staticTitle": "Static background (experimental): removes whatever matches a shot of the empty background",
+      "personTitle": "No green screen needed: finds you in the picture",
       "threshold": "Threshold",
       "thresholdStaticTitle": "Tolerance: higher ignores more change in the background (noise, light, focus) but can start to remove parts of you",
       "thresholdTitle": "Higher removes more of the screen colour",
@@ -60,7 +62,8 @@
       "shootPlate": "Shoot empty background",
       "plateKeep": "Experimental. Keep the camera and the light exactly as they are.",
       "plateHowTo": "Experimental. Fix the camera in place, press the button and step out of the picture.",
-      "keyFailed": "Live keying is not available here. The clip still gets the green screen setting."
+      "keyFailed": "Live keying is not available here. The clip still gets the green screen setting.",
+      "personHowTo": "No green screen needed: the editor finds you in the picture. The take is recorded as it is and cut out on the timeline, where you pick what goes behind you."
     },
     "tpEdit": "Edit teleprompter text",
     "tpAdd": "Add teleprompter text",

@@ -49,7 +49,9 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
   // Green screen: the take is recorded RAW (no keying baked in); the clip it
   // becomes gets the key, and the camera view shows the keyed picture meanwhile.
   // 'static' compares against a frame of the empty background (the plate).
-  const [greenScreen, setGreenScreen] = useState(null) // null | 'green' | 'blue' | 'static'
+  // 'person' needs no screen: the segmenter finds the person live (ChromaKeyCanvas),
+  // the take is recorded clean and the clip makes its matte afterwards (usePersonMasks)
+  const [greenScreen, setGreenScreen] = useState(null) // null | 'green' | 'blue' | 'static' | 'person'
   const [plateUrl, setPlateUrl] = useState(null)
   const [noiseUrl, setNoiseUrl] = useState(null) // how much each spot of the plate flickers
   // Camera lock while a plate is in use: { result, applied, track }
@@ -643,7 +645,7 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
         <div className="pip-greenscreen">
           <div className="pip-greenscreen-modes" role="group" aria-label={t('record.inline.greenScreen.label')}>
             <span className="pip-greenscreen-label">{t('record.inline.greenScreen.label')}</span>
-            {[[null, 'off'], ['green', 'green'], ['blue', 'blue'], ['static', 'static']].map(([mode, label]) => (
+            {[[null, 'off'], ['green', 'green'], ['blue', 'blue'], ['person', 'person'], ['static', 'static']].map(([mode, label]) => (
               <button
                 key={label}
                 className={greenScreen === mode ? 'active' : ''}
@@ -651,13 +653,16 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
                   if (mode !== 'static') releaseCameraLock()
                   setGreenScreen(mode); setKeyTune(null); setKeyFailed(false)
                 }}
-                title={mode === 'static' ? t('record.inline.greenScreen.staticTitle') : undefined}
+                title={mode === 'static' ? t('record.inline.greenScreen.staticTitle') : mode === 'person' ? t('record.inline.greenScreen.personTitle') : undefined}
               >
                 {t(`record.inline.greenScreen.${label}`)}
               </button>
             ))}
           </div>
-          {chromaKey && (() => {
+          {greenScreen === 'person' && (
+            <small>{t('record.inline.greenScreen.personHowTo')}</small>
+          )}
+          {chromaKey && greenScreen !== 'person' && (() => {
             const kc = normalizeChromaKey(chromaKey)
             const range = (greenScreen === 'static' ? KEY_RANGES.static : KEY_RANGES.chroma).similarity
             const pct = (v) => Math.round(v * 100)

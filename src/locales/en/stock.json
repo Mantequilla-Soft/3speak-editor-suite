@@ -1,0 +1,53 @@
+{
+  "title": "Stock media",
+  "titleBackground": "Pick a background",
+  "search": "Search videos, photos and GIFs",
+  "searchProvider": "Search {{provider}}",
+  "searchProviderTitle": "Search {{provider}} (free to use, copied to our server when you pick one)",
+  "kind": "Kind",
+  "category": "Category",
+  "everything": "Everything",
+  "types": {
+    "all": "All",
+    "video": "Videos",
+    "image": "Photos",
+    "gif": "GIFs"
+  },
+  "categories": {
+    "nature": "Nature",
+    "city": "City",
+    "people": "People",
+    "animals": "Animals",
+    "food": "Food",
+    "tech": "Tech",
+    "sports": "Sports",
+    "space": "Space",
+    "abstract": "Abstract",
+    "backgrounds": "Backgrounds"
+  },
+  "loading": "Loading the library...",
+  "typeToSearch": "Type what you are looking for to search {{provider}}.",
+  "nothingFound": "Nothing found.",
+  "searching": "Searching...",
+  "loadFailed": "The stock library could not be loaded.",
+  "nothingMatches": "Nothing matches.",
+  "adding": "Adding...",
+  "byAuthor": "{{title}} ({{author}})",
+  "licenceOnline": "From {{provider}}: free to use, also commercially, no credit needed. The file is copied to 3Speak's server when you pick it.",
+  "licence": "Free to use, also commercially, no credit needed (CC0 / public domain from Wikimedia Commons).",
+  "placeBackground": "It goes behind you, on its own track, as long as your clip.",
+  "placeAdd": "It goes in at the playhead: on an empty timeline as your video, otherwise over it as b-roll.",
+  "errors": {
+    "notCopied": "That file could not be copied.",
+    "notAdded": "That file could not be added.",
+    "tooMany": "Too many searches, wait a moment.",
+    "searchFailed": "The search did not work, try again.",
+    "copyFailed": "That file could not be copied to the server."
+  },
+  "trackName": {
+    "background": "Background",
+    "backgroundNumbered": "Background {{number}}",
+    "broll": "B-roll",
+    "brollNumbered": "B-roll {{number}}"
+  }
+}

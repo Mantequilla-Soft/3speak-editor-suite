@@ -107,17 +107,20 @@
     "modes": {
       "green": "Green",
       "blue": "Blue",
+      "person": "Person",
       "static": "Static (experimental)"
     },
     "modeTitles": {
       "green": "Green screen",
       "blue": "Blue screen",
+      "person": "No green screen needed: finds you in the picture and removes the rest",
       "static": "Static background (experimental): removes whatever matches a frame of the empty background"
     },
     "staticHint": "Removes everything that looks like a few frames of the empty background. Small changes (noise, light, focus) are ignored and parts of you that match the wall are kept inside your outline. Needs a camera that does not move; shadows you cast stay visible. If parts of the room keep showing, raise Threshold.",
     "hint": {
       "green": "Removes the green backdrop so the clips on the tracks below show through.",
-      "blue": "Removes the blue backdrop so the clips on the tracks below show through."
+      "blue": "Removes the blue backdrop so the clips on the tracks below show through.",
+      "person": "No green screen needed: the editor finds the person in every frame and removes the rest. Works best with one person, fully lit, in front of the camera."
     },
     "plate": "Empty background frame",
     "plateAlt": "Empty background",
@@ -281,5 +284,25 @@
   "reframe": {
     "readFailed": "The video could not be read here",
     "openFailed": "The video could not be opened for face tracking"
+  },
+  "personKey": {
+    "ready": "Ready: you are cut out in every frame. The render looks like the preview.",
+    "failed": "Could not find a person in this clip ({{error}}).",
+    "finding": "Finding you in every frame... The preview already shows it live meanwhile.",
+    "findingProgress": "Finding you in every frame: {{percent}} The preview already shows it live meanwhile.",
+    "behind": "Behind you",
+    "backgrounds": {
+      "none": "See-through",
+      "noneTitle": "The clips on the tracks below show behind you",
+      "blur": "Blur",
+      "blurTitle": "Your own background, blurred",
+      "color": "Colour",
+      "colorTitle": "A plain colour behind you"
+    },
+    "pickStock": "Put a stock picture or video behind",
+    "colour": "Colour",
+    "blur": "Blur",
+    "resetBlur": "Reset blur",
+    "thresholdTitle": "Higher keeps less around you, lower keeps more"
   }
 }

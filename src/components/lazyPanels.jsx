@@ -18,6 +18,7 @@ export const AudioTemplateDialog = lazyPanel(() => import('./AudioTemplateDialog
 export const ChaptersDialog = lazyPanel(() => import('./ChaptersDialog'))
 export const BeatSyncModal = lazyPanel(() => import('./BeatSyncModal'))
 export const StickerPicker = lazyPanel(() => import('./StickerPicker'))
+export const StockLibrary = lazyPanel(() => import('./StockLibrary'))
 export const MusicLibrary = lazyPanel(() => import('./MusicLibrary'))
 export const RecordVideo = lazyPanel(() => import('./RecordVideo'))
 export const RecordAudio = lazyPanel(() => import('./RecordAudio'))

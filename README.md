@@ -109,6 +109,10 @@ Quality presets: High (CRF 18), Medium (CRF 23), Low (CRF 28).
 - **Titles** (+ menu > Titles): lower thirds, titles over the video and intro / outro cards from the Ad Wizard's motion scenes (`src/utils/titleScenes.js`). A title is a clip of type `scene`: the preview plays the scene engine's host page (`SceneLayer.jsx`), the render records the same page in Chromium (`backend/src/services/sceneClip.js`), with a transparent background over the video.
 - The browser (canvas) export (standalone editor only) uses the same SVG filter for looks, but does not draw transitions, word entrances or titles: those need the backend render, which 3Speak always uses.
 
+### Stock media and background removal (Shorts)
+- **Stock media** (timeline + menu, "Stock media"): b-roll videos, photos and GIFs that are free to use with no credit (CC0 / public domain, licence checked per file), built onto our server by `scripts/stock/build_library.py OUT_DIR` and served at `/stock/` (host nginx, like `/music/` and `/stickers/`; `VITE_STOCK_SOURCES` overrides `/stock/library.json`). On an empty timeline a pick becomes the video, otherwise it goes over it as b-roll (a `B-roll` track, `stock: 'broll'`, no sound). With `PEXELS_API_KEY` / `PIXABAY_API_KEY` on the backend the sheet also searches Pexels / Pixabay (`/api/stock/*`); a pick is copied to our uploads first.
+- **Background removal without a green screen** ("Person" in a video clip's Green screen box, and in the camera recorder): MediaPipe's selfie segmenter finds the person in every frame in the browser (self-hosted, `public/vision/`), the matte goes to the server as one file (`src/utils/personMask.js`, shared with the backend) and the render keys with it exactly like the preview. Behind the person: the tracks below (a stock picture or clip can be put there in one click), a blur of the clip, or a colour.
+
 ### Other
 - Drag-and-drop or file-picker media import with categorized library (Videos, Images, Sounds)
 - HLS stream support with automatic download and progress tracking
@@ -387,6 +391,8 @@ All variables are configured in `.env` (see `.env.example`).
 | `CAPTIONS_ENABLED` | `true` | `false` hides auto captions on this backend |
 | `CAPTIONS_MAX_SECONDS` | `600` | Longest timeline auto captions transcribe |
 | `CAPTION_FONTS_DIR` | `/usr/share/fonts/google` | Fonts libass burns captions with |
+| `PEXELS_API_KEY` | (unset) | Stock sheet: live Pexels search (the key stays on the server) |
+| `PIXABAY_API_KEY` | (unset) | Stock sheet: live Pixabay search (the key stays on the server) |
 
 ### Gateway
 

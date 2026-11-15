@@ -16,6 +16,7 @@ import TransitionControls from './TransitionControls'
 import TextFxControls from './TextFxControls'
 import SceneControls from './SceneControls'
 import './GreenScreen.css'
+import PersonKeyControls from './PersonKeyControls'
 import SpeedControls from './SpeedControls'
 import KeyframeControls from './KeyframeControls'
 import { useT, hasKey, t as i18nT } from '../i18n'
@@ -474,19 +475,20 @@ function DuckControls({ duckInfo, onUpdateClip }) {
   )
 }
 
-function GreenScreenControls({ clip, onUpdateClip, playheadPosition }) {
+function GreenScreenControls({ clip, onUpdateClip, playheadPosition, onPickBackground }) {
   const { t } = useT()
   const [grabbing, setGrabbing] = useState(false)
   const [grabError, setGrabError] = useState(null)
   const key = normalizeChromaKey(clip.chromaKey)
   const isStatic = key?.mode === 'static'
+  const isPerson = key?.mode === 'person'
   const ranges = isStatic ? KEY_RANGES.static : KEY_RANGES.chroma
 
   const setKey = (patch) => onUpdateClip({ chromaKey: { ...clip.chromaKey, ...patch } })
   const setMode = (mode) => {
     if (!key || mode === key.mode) return
-    // Green <-> blue keep the sliders; static uses its own scale
-    if (mode !== 'static' && !isStatic) setKey({ color: mode })
+    // Green <-> blue keep the sliders; static and person use their own scales
+    if (mode !== 'static' && mode !== 'person' && !isStatic && !isPerson) setKey({ color: mode })
     else onUpdateClip({ chromaKey: defaultChromaKey(mode, mode === 'static' ? clip.chromaKey?.plateUrl : null, mode === 'static' ? clip.chromaKey?.noiseUrl : null) })
   }
 
@@ -531,7 +533,7 @@ function GreenScreenControls({ clip, onUpdateClip, playheadPosition }) {
         {key && (
           <>
             <div className="text-align-buttons chroma-mode-buttons">
-              {['green', 'blue', 'static'].map((mode) => (
+              {['green', 'blue', 'person', 'static'].map((mode) => (
                 <button
                   key={mode}
                   className={`text-align-btn ${key.mode === mode ? 'active' : ''}`}
@@ -543,7 +545,7 @@ function GreenScreenControls({ clip, onUpdateClip, playheadPosition }) {
               ))}
             </div>
             <small className="layout-hint">
-              {isStatic ? t('clip.greenScreen.staticHint') : key.mode === 'blue' ? t('clip.greenScreen.hint.blue') : t('clip.greenScreen.hint.green')}
+              {isPerson ? t('clip.greenScreen.hint.person') : isStatic ? t('clip.greenScreen.staticHint') : key.mode === 'blue' ? t('clip.greenScreen.hint.blue') : t('clip.greenScreen.hint.green')}
             </small>
           </>
         )}
@@ -564,7 +566,9 @@ function GreenScreenControls({ clip, onUpdateClip, playheadPosition }) {
         </div>
       )}
 
-      {key && (
+      {isPerson && <PersonKeyControls clip={clip} onUpdateClip={onUpdateClip} onPickBackground={onPickBackground} />}
+
+      {key && !isPerson && (
         <>
           <div className="property-group">
             <label title={isStatic ? t('clip.greenScreen.thresholdStaticTitle') : t('clip.greenScreen.thresholdTitle')}>
@@ -830,7 +834,7 @@ function PositionDragHandle({ positionX, positionY, onChange }) {
 // The tab a phone user last picked, kept across clips (if the next clip has it)
 let lastTab = null
 
-function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, voiceTargets = null, onUpdateClipsEach = null, duckInfo = null, motionKit = null, tracks = null }) {
+function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, voiceTargets = null, onUpdateClipsEach = null, duckInfo = null, motionKit = null, tracks = null, onPickBackground = null }) {
   // Phones (tabbed): one section at a time, a tab per section. The sections
   // differ per clip type and come from several components, so the tabs are
   // read from the rendered sections (.prop-group and its label) after render.
@@ -1469,7 +1473,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
 
         {/* Green screen (video clips: camera takes, imports, library clips) */}
         {clip.type === 'video' && (
-          <GreenScreenControls clip={clip} onUpdateClip={onUpdateClip} playheadPosition={playheadPosition} />
+          <GreenScreenControls clip={clip} onUpdateClip={onUpdateClip} playheadPosition={playheadPosition} onPickBackground={onPickBackground} />
         )}
 
         {/* GROUP 3: Timing */}

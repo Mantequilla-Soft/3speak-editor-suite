@@ -11,7 +11,7 @@ import { selectBackend, getBackendUrl, api } from './utils/backendSelector'
 import Timeline from './components/Timeline'
 import GlobalPreview from './components/GlobalPreview'
 // opened on demand, each its own chunk (components/lazyPanels.jsx)
-import { ProjectLibrary, VideoPreview, ExportButton, RecordVideo, RecordAudio, RemixModePicker, MusicLibrary, AudioTemplateDialog, ChaptersDialog, AudiogramDialog, BeatSyncModal, StickerPicker, CaptionsPanel, ShortcutSheet, TitleTemplates } from './components/lazyPanels'
+import { ProjectLibrary, VideoPreview, ExportButton, RecordVideo, RecordAudio, RemixModePicker, MusicLibrary, AudioTemplateDialog, ChaptersDialog, AudiogramDialog, BeatSyncModal, StickerPicker, StockLibrary, CaptionsPanel, ShortcutSheet, TitleTemplates } from './components/lazyPanels'
 import ClipProperties from './components/ClipProperties'
 import { routeAnimatedEdits, mediaView, mediaPartsToClip } from './utils/motionEdits'
 import OnboardingTour, { AUDIO_TOUR_STEPS, RANGE_PICK_TOUR_STEPS, useFirstTimeTour } from './components/OnboardingTour'
@@ -33,6 +33,7 @@ import { combineLoudness, groupSpan, overlappingVoices } from './utils/groupSile
 import { isAudioMode } from './utils/editorMode'
 import { audiogramsToPost } from './utils/audiogramLayers'
 import { audioFileName } from './utils/audioTemplate'
+import { usePersonMasks } from './hooks/usePersonMasks'
 import EncodingNotice from './components/EncodingNotice'
 import ClipColorFilters from './components/ClipColorFilters'
 import { outputSize } from './utils/outputSize'
@@ -101,6 +102,7 @@ function App() {
     addMusicClip,
     addSfxClip,
     addStickerClip,
+    addStockClip,
     fitClipsToBeats,
     loadProjectState,
     addRemixRecording,
@@ -766,6 +768,8 @@ function App() {
     else setRecordingAudioOpen(true)
   }, [])
   const [stickersOpen, setStickersOpen] = useState(false)
+  // Stock media sheet: null closed, {} adding at the playhead, { underClipId } a background for that clip
+  const [stockOpen, setStockOpen] = useState(null)
   const [titlesOpen, setTitlesOpen] = useState(false) // Titles: motion scene templates
   const [inlineRecordingOpen, setInlineRecordingOpen] = useState(false)
   const [recorderSize, setRecorderSize] = useState('small') // 'small' | 'big'
@@ -950,6 +954,18 @@ function App() {
     const clipId = addStickerClip(sticker, playheadPosition)
     if (clipId) selectClip(clipId)
   }, [addStickerClip, selectClip, playheadPosition])
+
+  // Stock media (utils/stockPlacement.js): at the playhead, or behind a clip whose background is removed
+  const handlePickStock = useCallback(async (item) => {
+    const under = stockOpen?.underClipId || null
+    const clipId = await addStockClip(item, playheadPosition, { underClipId: under })
+    if (!clipId) return false
+    if (!under) selectClip(clipId)
+    return true
+  }, [addStockClip, selectClip, playheadPosition, stockOpen])
+
+  // Background removal without a green screen: mattes for the clips that have it on
+  usePersonMasks(tracks, updateClip)
 
   // Sound effects go in at the playhead
   const handlePickSfx = useCallback(async (track) => {
@@ -1541,6 +1557,7 @@ function App() {
               playheadPosition={playheadPosition}
               tabbed={!isDesktop}
               motionKit={audioMode ? null : motionKit}
+              onPickBackground={(clipId) => setStockOpen({ underClipId: clipId })}
             />
           </div>
   ) : null
@@ -2026,6 +2043,7 @@ function App() {
             onOpenMusic={(trackId) => openAdd('music', trackId)}
             onOpenSfx={(trackId) => openAdd('sfx', trackId)}
             onOpenStickers={audioMode ? undefined : () => setStickersOpen(true)}
+            onOpenStock={audioMode ? undefined : () => setStockOpen({})}
             onOpenTitles={audioMode ? undefined : () => setTitlesOpen(true)}
             onOpenCaptions={audioMode ? undefined : () => { wordTools.setTranscriptOpen(false); setCaptionsOpen(o => !o) }}
             captionsActive={captionsOpen || !!captions}
@@ -2225,6 +2243,8 @@ function App() {
 
         {stickersOpen && <StickerPicker onPick={handlePickSticker} onClose={() => setStickersOpen(false)} />}
         {titlesOpen && <TitleTemplates onAdd={handleAddTitle} onClose={() => setTitlesOpen(false)} frame={outputSize(activeAspectRatio)} />}
+
+        {stockOpen && <StockLibrary purpose={stockOpen.underClipId ? 'background' : 'add'} onPick={handlePickStock} onClose={() => setStockOpen(null)} />}
 
         {/* Record Video Modal */}
         {recordingOpen && (
@@ -2523,6 +2543,7 @@ function App() {
               onOpenMusic={(trackId) => openAdd('music', trackId)}
               onOpenSfx={(trackId) => openAdd('sfx', trackId)}
               onOpenStickers={() => setStickersOpen(true)}
+              onOpenStock={() => setStockOpen({})}
               onOpenTitles={() => setTitlesOpen(true)}
               onOpenCaptions={() => { wordTools.setTranscriptOpen(false); setCaptionsOpen(o => !o) }}
               captionsActive={captionsOpen || !!captions}
@@ -2591,6 +2612,7 @@ function App() {
                     onSplit={(time) => selectedClipId && splitClip(selectedClipId, time)}
                     playheadPosition={playheadPosition}
                     motionKit={audioMode ? null : motionKit}
+                    onPickBackground={(clipId) => setStockOpen({ underClipId: clipId })}
                   />
                 </div>
               )}
@@ -2659,6 +2681,8 @@ function App() {
 
       {stickersOpen && <StickerPicker onPick={handlePickSticker} onClose={() => setStickersOpen(false)} />}
       {titlesOpen && <TitleTemplates onAdd={handleAddTitle} onClose={() => setTitlesOpen(false)} frame={outputSize(activeAspectRatio)} />}
+
+      {stockOpen && <StockLibrary purpose={stockOpen.underClipId ? 'background' : 'add'} onPick={handlePickStock} onClose={() => setStockOpen(null)} />}
 
       {/* Record Video Modal */}
       {recordingOpen && (

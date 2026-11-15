@@ -11,6 +11,7 @@ import { adDraftsRouter } from './routes/adDrafts.js'
 import { templatesRouter } from './routes/templates.js'
 import { audiogramRouter } from './routes/audiogram.js'
 import { captionsRouter } from './routes/captions.js'
+import { stockRouter } from './routes/stock.js'
 import { transcriptRouter } from './routes/transcript.js'
 import { videoPodcastRouter, getVideoPodcastStats } from './routes/videoPodcast.js'
 import { pinnedUploads, uploadBase } from './utils/pinnedUploads.js'
@@ -55,6 +56,9 @@ app.use('/api/captions', captionsRouter)
 app.use('/api/transcript', transcriptRouter)
 // Video podcasts: a whole episode as a 16:9 video (cover, waveform, captions, speaker names)
 app.use('/api/video-podcast', videoPodcastRouter)
+
+// Stock media: live Pexels / Pixabay search when their keys are set (our own library is static, /stock/)
+app.use('/api/stock', stockRouter)
 
 // Ad Wizard: scene-engine docs -> silent scene video (headless Chromium), and its drafts
 app.use('/api/scene-render', sceneRenderRouter)
