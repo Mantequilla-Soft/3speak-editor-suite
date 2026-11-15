@@ -13,7 +13,6 @@ import crypto from 'crypto'
 import { ffmpegMotionFilter, normalizeMotion, pivotPoint, activeEffects } from '../utils/stickerMotion.js'
 import { captionBurn } from './captionBurn.js'
 import { normalizePersonKey, writePersonMaskStream, buildPersonKeyFilter, personKeyForSize } from './personKey.js'
-import { renderSceneClip } from './sceneClip.js'
 import { reframeFilter, normalizeReframe } from '../utils/reframe.js'
 import { ffmpegVideoTiming, ffmpegAudioTiming, timeMap, sourceAt } from '../utils/clipSpeed.js'
 import { keyframeBase, hasVisualKeyframes, layerPivot, ffmpegVolumeFilter } from '../utils/keyframes.js'
@@ -442,7 +441,12 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
   const duration = clip.endTime - clip.startTime
 
   // Titles: a motion scene recorded in Chromium (services/sceneClip.js)
-  if (clip.type === 'scene') return renderSceneClip(clip, outputPath, w, h, fps, signal, scaleFactor)
+  // Loaded on demand: sceneClip pulls in routes/sceneRender.js (express, Chromium), which
+  // pure helpers that import this file (audioRender duckExpr, frontend tests) must not need.
+  if (clip.type === 'scene') {
+    const { renderSceneClip } = await import('./sceneClip.js')
+    return renderSceneClip(clip, outputPath, w, h, fps, signal, scaleFactor)
+  }
 
   // Handle text clips
   if (clip.type === 'text') {
