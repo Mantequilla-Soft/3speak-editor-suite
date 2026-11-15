@@ -3,6 +3,7 @@ import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download
 import { useFFmpeg } from './hooks/useFFmpeg'
 import { useCanvasExport } from './hooks/useCanvasExport'
 import { useTimeline } from './hooks/useTimeline'
+import { useUndoableState } from './hooks/useHistory'
 import { useIframeApi } from './hooks/useIframeApi'
 import { isHlsUrl } from './utils/hlsHelper'
 import { reverseClipOnBackend } from './utils/reverseClip'
@@ -146,6 +147,7 @@ function App() {
     redo,
     canUndo,
     canRedo,
+    history,
     lengthNotice,
     dismissLengthNotice,
     rejectedFiles,
@@ -212,9 +214,10 @@ function App() {
   const audioMode = isAudioMode
   // Finishing settings of the audio editor (sent with the render, kept in drafts
   // and in the template): loudness levelling, music ducked under the voices
-  const [master, setMaster] = useState(() => masterOf(null))
+  // (these and the tracks are under undo: hooks/useHistory.js)
+  const [master, setMaster, setMasterSilently] = useUndoableState(history, 'master', () => masterOf(null))
   // Chapters (utils/chapters.js): pinned to the recording, resolved to where they are now
-  const [chapters, setChapters] = useState([])
+  const [chapters, setChapters, setChaptersSilently] = useUndoableState(history, 'chapters', [])
   // The preview is playing (the timeline then keeps the playhead in the middle)
   const [previewPlaying, setPreviewPlaying] = useState(false)
   // The timeline's zoom (px per second): saved with the draft, and handed back
@@ -223,7 +226,7 @@ function App() {
   const [restoreZoom, setRestoreZoom] = useState(null)
   const resolvedChapters = useMemo(() => (audioMode ? resolveChapters(tracks, chapters, timelineEnd) : []), [audioMode, tracks, chapters, timelineEnd])
   // Flags: the creator's own numbered markers (utils/flags.js), kept with the draft
-  const [flags, setFlags] = useState([])
+  const [flags, setFlags, setFlagsSilently] = useUndoableState(history, 'flags', [])
   const resolvedFlags = useMemo(() => resolveFlags(tracks, flags, Math.max(timelineEnd, 0)), [tracks, flags, timelineEnd])
   const tracksNowRef = useRef(tracks)
   tracksNowRef.current = tracks
@@ -247,7 +250,7 @@ function App() {
   const [orientationOverride, setOrientationOverride] = useState(null)
 
   // Auto captions of a Short (utils/captions.js): { words, language, style, burn } or null
-  const [captions, setCaptions] = useState(null)
+  const [captions, setCaptions, setCaptionsSilently] = useUndoableState(history, 'captions', null)
   const [captionsOpen, setCaptionsOpen] = useState(false)
 
   // Imperative handle into GlobalPreview: { togglePlay, pause, playFromStart }
@@ -1051,17 +1054,18 @@ function App() {
     // Back where the playhead was when the draft was saved, at the zoom it had
     setPlayheadPosition(savedPlayhead(state))
     if (Number.isFinite(+state?.zoom) && +state.zoom > 0) setRestoreZoom({ value: +state.zoom, key: Date.now() })
-    if (state?.master) setMaster(masterOf(state.master))
-    setChapters(Array.isArray(state?.chapters) ? state.chapters.slice(0, MAX_CHAPTERS) : [])
-    setFlags(cleanFlags(state?.flags))
-    setCaptions(normalizeCaptions(state?.captions) ? { ...state.captions, ...normalizeCaptions(state.captions) } : null)
+    // (silently: the opened draft is the first undo step, see loadProjectState)
+    if (state?.master) setMasterSilently(masterOf(state.master))
+    setChaptersSilently(Array.isArray(state?.chapters) ? state.chapters.slice(0, MAX_CHAPTERS) : [])
+    setFlagsSilently(cleanFlags(state?.flags))
+    setCaptionsSilently(normalizeCaptions(state?.captions) ? { ...state.captions, ...normalizeCaptions(state.captions) } : null)
     // a remix draft: its export posts under the original again
     restoreRemixSource(state?.remix || null)
     // and the clip(s) that were selected (those still on the timeline)
     const ids = new Set((state?.tracks || []).flatMap(t => (t.clips || []).map(c => c.id)))
     const sel = Array.isArray(state?.selected) ? state.selected.filter(id => ids.has(id)) : []
     if (sel.length) selectClips(sel)
-  }, [loadProjectState, setPlayheadPosition, selectClips, restoreRemixSource])
+  }, [loadProjectState, setPlayheadPosition, selectClips, restoreRemixSource, setMasterSilently, setChaptersSilently, setFlagsSilently, setCaptionsSilently])
   const drafts = useDrafts({
     session: draftSession,
     hasMedia: draftContext.hasMedia,
@@ -1309,6 +1313,8 @@ function App() {
     if (!audioMode || !master.duck) return
     applyTracks(ts => applyMasterDuck(ts, master))
     setMaster(m => ({ ...m, duck: false }))
+    // part of the step that brought the Duck (a draft, a template), not one of its own
+    history.amend()
   }, [audioMode, master.duck]) // eslint-disable-line react-hooks/exhaustive-deps
   const [chapterFocus, setChapterFocus] = useState(null)
   const addChapter = useCallback((at) => {

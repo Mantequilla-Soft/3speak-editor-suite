@@ -50,7 +50,7 @@ The editor follows 3Speak's v2 design (the `design_handoff_3speak_v2` package in
 - Duplicate clips
 - Linked video+audio clips via group IDs -- operations propagate to both
 - Group/ungroup clips
-- Undo/redo with 20-level history
+- Undo/redo, 200 steps: every clip setting, plus chapters, flags, captions and the audio settings (src/utils/history.js keeps steps small by sharing what did not change; quick repeats such as a slider drag are one step)
 - Timeline zoom (10-200 px/s) with adaptive ruler
 
 ### Media Support

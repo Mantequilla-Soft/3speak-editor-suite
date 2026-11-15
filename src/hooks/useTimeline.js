@@ -7,6 +7,7 @@ import { downloadHlsToMp4 } from '../utils/hlsDownloader'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authHeaders, authFetch, dropToken } from '../utils/editorAuth'
 import { MAX_TIMELINE_SECONDS, MAX_IMPORT_BYTES, getTimelineEnd } from '../utils/limits'
+import { useHistoryStore, useUndoableState } from './useHistory'
 import { createSHA256 } from 'hash-wasm'
 import { isAudioMode } from '../utils/editorMode'
 import { applyGroupCut } from '../utils/groupSilence'
@@ -169,8 +170,6 @@ function getGroupColor(groupId) {
   const hash = groupId.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
   return GROUP_COLORS[hash % GROUP_COLORS.length]
 }
-
-const MAX_HISTORY = 20
 
 // Duration, and whether this browser can show the picture: HEVC (iPhone) or
 // 10-bit video loads in some browsers with sound but no image (or not at all).
@@ -394,8 +393,12 @@ export function useTimeline() {
   // Library: array of { id, file, url, name, duration, type }
   const [library, setLibrary] = useState([])
 
-  // Tracks: array of { id, type: 'video' | 'audio', clips: [] }
-  const [tracks, setTracks] = useState(initialTracks)
+  // Undo / redo (utils/history.js): the tracks and every other project state
+  // that joins with useUndoableState (App: chapters, flags, master, captions).
+  // Tracks: array of { id, type: 'video' | 'audio', clips: [] }; setTracksWithHistory
+  // makes an undo step, setTracks does not (background fixes, opened drafts)
+  const history = useHistoryStore()
+  const [tracks, setTracksWithHistory, setTracks] = useUndoableState(history, 'tracks', initialTracks)
   const [selectedClipId, setSelectedClipId] = useState(null)
 
   // The audio editor always has a voice track: a project that lost its last
@@ -435,61 +438,10 @@ export function useTimeline() {
   // Map<clipId, File> — survives JSON.parse(JSON.stringify()) in undo/redo
   const fileStoreRef = useRef(new Map())
 
-  // Undo/Redo history
-  const historyRef = useRef([])
-  const historyIndexRef = useRef(-1)
-  const isUndoRedoRef = useRef(false)
-
-  // Save state to history
-  const saveToHistory = useCallback((newTracks) => {
-    if (isUndoRedoRef.current) {
-      isUndoRedoRef.current = false
-      return
-    }
-    // Remove any future history if we're not at the end
-    const newHistory = historyRef.current.slice(0, historyIndexRef.current + 1)
-    newHistory.push(JSON.parse(JSON.stringify(newTracks)))
-    // Limit history size
-    if (newHistory.length > MAX_HISTORY) {
-      newHistory.shift()
-    } else {
-      historyIndexRef.current++
-    }
-    historyRef.current = newHistory
-  }, [])
-
-  // Wrapper for setTracks that saves to history
-  const setTracksWithHistory = useCallback((updater) => {
-    setTracks(prev => {
-      const newTracks = typeof updater === 'function' ? updater(prev) : updater
-      saveToHistory(newTracks)
-      return newTracks
-    })
-  }, [saveToHistory])
-
-  // Undo action
-  const undo = useCallback(() => {
-    if (historyIndexRef.current > 0) {
-      historyIndexRef.current--
-      isUndoRedoRef.current = true
-      const prevState = historyRef.current[historyIndexRef.current]
-      setTracks(JSON.parse(JSON.stringify(prevState)))
-    }
-  }, [])
-
-  // Redo action
-  const redo = useCallback(() => {
-    if (historyIndexRef.current < historyRef.current.length - 1) {
-      historyIndexRef.current++
-      isUndoRedoRef.current = true
-      const nextState = historyRef.current[historyIndexRef.current]
-      setTracks(JSON.parse(JSON.stringify(nextState)))
-    }
-  }, [])
-
-  // Check if undo/redo are available
-  const canUndo = historyIndexRef.current > 0
-  const canRedo = historyIndexRef.current < historyRef.current.length - 1
+  const undo = useCallback(() => { history.undo() }, [history])
+  const redo = useCallback(() => { history.redo() }, [history])
+  const canUndo = history.canUndo
+  const canRedo = history.canRedo
 
   // Find clip by ID across all tracks
   const findClip = useCallback((clipId) => {
@@ -546,7 +498,7 @@ export function useTimeline() {
       ...t,
       clips: t.clips.map(c => (c.libraryId === libraryId ? { ...c, url, serverUrl: url } : c))
     }))
-    historyRef.current = historyRef.current.map(patch)
+    history.patchAll('tracks', patch)
     setTracks(prev => patch(prev))
     setLibrary(prev => prev.map(i => (i.id === libraryId ? { ...i, url, serverUrl: url, converting: false } : i)))
   }, [])
@@ -562,7 +514,7 @@ export function useTimeline() {
           ? { ...c, duration: info.duration, endTime: info.duration }
           : c))
       }))
-      historyRef.current = historyRef.current.map(fix)
+      history.patchAll('tracks', fix)
       setTracks(prev => fix(prev))
       setLibrary(prev => prev.map(i => (i.id === libraryId ? { ...i, duration: info.duration } : i)))
     }
@@ -614,7 +566,7 @@ export function useTimeline() {
       ...track,
       clips: track.clips.map(clip => (clip.libraryId === libraryId && !clip.serverUrl ? { ...clip, serverUrl } : clip))
     }))
-    historyRef.current = historyRef.current.map(patch)
+    history.patchAll('tracks', patch)
     setTracks(prev => patch(prev))
   }, [])
 
@@ -810,13 +762,13 @@ export function useTimeline() {
     const nextTracks = Array.isArray(state?.tracks) && state.tracks.length
       ? state.tracks
       : initialTracks()
-    historyRef.current = [JSON.parse(JSON.stringify(nextTracks))]
-    historyIndexRef.current = 0
+    // the opened project is the first step (with what App loads alongside: chapters, flags...)
+    history.reset()
     setTracks(nextTracks)
     setLibrary(Array.isArray(state?.library) ? state.library : [])
     setSelectedClipId(null)
     setSelectedClipIds([])
-  }, [])
+  }, [history])
 
   /**
    * Beat sync: lay the clips of the first video track (in order) on the beat,
@@ -2177,8 +2129,9 @@ export function useTimeline() {
       }
       return updated
     }))
-    // Update tracks directly (not through history) to avoid polluting undo stack
-    setTracks(prev => prev.map(track => ({
+    // Not an undo step: the history snapshots get it too, so undo never brings
+    // the stream back after its download finished
+    const patch = (list) => list.map(track => ({
       ...track,
       clips: track.clips.map(clip => {
         if (clip.libraryId !== libraryId) return clip
@@ -2189,8 +2142,10 @@ export function useTimeline() {
         }
         return { ...clip, url: newUrl, originalUrl, serverUrl: serverUrl || null }
       })
-    })))
-  }, [])
+    }))
+    history.patchAll('tracks', patch)
+    setTracks(prev => patch(prev))
+  }, [history])
 
   // Start downloading an HLS stream in the background
   const startHlsDownload = useCallback(async (libraryId, hlsUrl, ffmpeg) => {
@@ -2321,6 +2276,8 @@ export function useTimeline() {
     redo,
     canUndo,
     canRedo,
+    // the history itself: more project state joins it with useUndoableState(history, key, initial)
+    history,
 
     // Over-the-limit notice after an import
     lengthNotice,
