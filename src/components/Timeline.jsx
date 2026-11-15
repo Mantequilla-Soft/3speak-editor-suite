@@ -7,6 +7,7 @@ import { getGroupColor } from '../hooks/useTimeline'
 import { MAX_TIMELINE_SECONDS } from '../utils/limits'
 import { timelineBeats } from '../utils/beatDetect'
 import { getPeaks, peaksForRange } from '../utils/peakCache'
+import TransitionCuts from './TransitionCuts'
 import { clipLabel, trackAriaLabel, formatSpokenTime } from '../utils/shortcuts'
 import { maxEndTime, sourceRange } from '../utils/clipSpeed'
 import KeyframeMarks from './KeyframeMarks'
@@ -500,10 +501,11 @@ const TimelineClip = memo(function TimelineClip({
               <span className="clip-duration">{formatTime(clipDuration)}</span>
             </div>
           </div>
-        ) : isText ? (
+        ) : isText || clip.type === 'scene' ? (
           <div className="clip-text-preview">
             <Type size={16} />
-            <span className="text-preview">{clip.text?.substring(0, 20) || 'Text'}{clip.text?.length > 20 ? '...' : ''}</span>
+            {/* a title (motion scene) shows its name */}
+            <span className="text-preview">{clip.type === 'scene' ? clip.name : <>{clip.text?.substring(0, 20) || 'Text'}{clip.text?.length > 20 ? '...' : ''}</>}</span>
           </div>
         ) : isColor ? (
           <div className="clip-color-preview" style={{
@@ -635,6 +637,8 @@ function Timeline({
   onOpenMusic,
   onOpenSfx,
   onOpenStickers,
+  // Titles from motion scenes (TitleTemplates.jsx)
+  onOpenTitles,
   // Auto captions panel (Shorts editor); captionsActive: it is open or the Short has captions
   onOpenCaptions,
   captionsActive = false,
@@ -1485,6 +1489,11 @@ function Timeline({
                   <Sticker size={14} /> Stickers
                 </button>
               )}
+              {onOpenTitles && (
+                <button onClick={() => { onOpenTitles(); setShowAddMenu(false) }}>
+                  <Type size={14} /> Titles
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -1754,6 +1763,11 @@ function Timeline({
                             <Sticker size={14} /> Stickers
                           </button>
                         )}
+                        {onOpenTitles && (
+                          <button onClick={() => { onOpenTitles(); setTrackAddPopup(null) }}>
+                            <Type size={14} /> Titles
+                          </button>
+                        )}
                       </div>
                     )}
                     <input
@@ -1990,6 +2004,8 @@ function Timeline({
               {crossTrackGhost && crossTrackGhost.trackId === track.id && (
                 <div className="clip-ghost" style={{ left: `${crossTrackGhost.left}px`, width: `${crossTrackGhost.width}px` }} />
               )}
+              {/* Transitions: a button on each cut between two clips */}
+              {!audioMode && <TransitionCuts track={track} pixelsPerSecond={pixelsPerSecond} onUpdateClip={onUpdateClip} />}
             </div>
           ))}
 

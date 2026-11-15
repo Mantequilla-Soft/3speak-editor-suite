@@ -3,10 +3,16 @@ import path from 'path'
 import fs from 'fs/promises'
 import { createWriteStream } from 'fs'
 import { createStaticMasker, staticMaskSize } from '../utils/staticKeyMask.js'
-import { ffmpegColorFilter } from '../utils/clipColor.js'
+import { ffmpegGradeFilter } from '../utils/clipLook.js'
+import { clipFxFilter } from '../utils/lookFx.js'
+import { transitionPlan, clipExtent } from '../utils/transitions.js'
+import { normalizeTextAnim } from '../utils/textAnim.js'
+import { strokeOption, wordDrawtexts } from '../utils/textFx.js'
+import { transitionLayer, transitionAudioSources } from '../utils/transitionRender.js'
 import crypto from 'crypto'
 import { ffmpegMotionFilter, normalizeMotion, pivotPoint, activeEffects } from '../utils/stickerMotion.js'
 import { captionBurn } from './captionBurn.js'
+import { renderSceneClip } from './sceneClip.js'
 import { reframeFilter, normalizeReframe } from '../utils/reframe.js'
 import { ffmpegVideoTiming, ffmpegAudioTiming, timeMap, sourceAt } from '../utils/clipSpeed.js'
 import { keyframeBase, hasVisualKeyframes, layerPivot, ffmpegVolumeFilter } from '../utils/keyframes.js'
@@ -24,7 +30,8 @@ const clipVolume = clip => (Number.isFinite(+clip.volume) ? Math.max(0, +clip.vo
 const CLIP_CACHE_VERSION = 2
 export const RENDER_CACHE_DIR = path.join(process.env.WORK_DIR || '/app/work', 'cache')
 const CLIP_CACHE_DIR = path.join(RENDER_CACHE_DIR, 'clips')
-const NOT_IN_CLIP_RENDER = new Set(['id', 'name', 'timelinePosition', 'trackId', 'libraryId', 'groupId', 'credit', 'sticker'])
+// (a transition into the next clip is drawn in the composite, not in the clip's own file)
+const NOT_IN_CLIP_RENDER = new Set(['id', 'name', 'timelinePosition', 'trackId', 'libraryId', 'groupId', 'credit', 'sticker', 'transition'])
 
 function clipCacheKey(clip, inputFile, w, h, fps, scaleFactor) {
   const shape = {}
@@ -91,14 +98,15 @@ export async function buildAndRunFFmpeg({ timeline: given, downloadedFiles, outp
   const processedClips = new Map()
   const processedPlates = new Map() // clip id -> clean plate PNG (static-background key)
   const cropSources = new Map() // clip id -> display size of a free-cropped video
+  const keyedFx = new Map() // clip id -> look effects of a keyed clip (utils/lookFx.js)
   let reusedClips = 0
 
   for (let i = 0; i < allClips.length; i++) {
     const clip = allClips[i]
     const inputFile = downloadedFiles.get(clip.id)
 
-    // Text and color clips don't need downloaded files
-    if (!inputFile && clip.type !== 'text' && clip.type !== 'color') continue
+    // Text, color and title (scene) clips don't need downloaded files
+    if (!inputFile && clip.type !== 'text' && clip.type !== 'color' && clip.type !== 'scene') continue
 
     // Detect image type from file extension if not set correctly
     if (inputFile && (!clip.type || clip.type === 'video')) {
@@ -119,7 +127,7 @@ export async function buildAndRunFFmpeg({ timeline: given, downloadedFiles, outp
     onProgress((i / allClips.length) * 0.4, `Processing clip ${i + 1}/${allClips.length}: ${clip.name || 'clip'}`)
 
     // Use .mov for images and text to preserve transparency, .mp4 for others (including color)
-    const ext = (clip.type === 'image' || clip.type === 'text') ? '.mov' : '.mp4'
+    const ext = (clip.type === 'image' || clip.type === 'text' || clip.type === 'scene') ? '.mov' : '.mp4'
     // Unchanged since an earlier render: reuse its processed file
     const cacheKey = clipCacheKey(clip, inputFile, outputWidth, outputHeight, fps, scaleFactor)
     const cachedPath = path.join(CLIP_CACHE_DIR, `${cacheKey}${ext}`)
@@ -144,6 +152,10 @@ export async function buildAndRunFFmpeg({ timeline: given, downloadedFiles, outp
       }
     }
     processedClips.set(clip.id, processedPath)
+    // A keyed clip's look effects go on after the key, in the composite (LKTAG: its label)
+    if (clip.trackType === 'video' && getChromaKey(clip)) {
+      keyedFx.set(clip.id, await clipFxFilter(clip, inputFile, outputWidth, outputHeight, { alpha: true, tag: 'LKTAG', probe: probeDisplaySize }))
+    }
 
     // Static-background key: bring the clean plate into the processed clip's geometry
     const ck = clip.trackType === 'video' ? getChromaKey(clip) : null
@@ -226,15 +238,29 @@ export async function buildAndRunFFmpeg({ timeline: given, downloadedFiles, outp
     //    Keyed clips carry alpha, so overlay lets the lower layers show through.
     const filterParts = []
     const clipLabels = []
+    // Transitions (utils/transitions.js): a clip in one shows a little before
+    // its start / after its end, held on its first / last frame
+    const plan = transitionPlan(timeline.tracks)
+    const layerStarts = []
 
     for (let i = 0; i < overlayClips.length; i++) {
       const oc = overlayClips[i]
-      const pos = oc.clip.timelinePosition || 0
-      // Keyframed video: animated on a full frame first, delayed after that
+      const key = oc.clip.type === 'video' ? getChromaKey(oc.clip) : null
+      const ext = key?.mode === 'static' ? { head: 0, tail: 0 } : clipExtent(plan.get(oc.clip.id))
+      const pos = Math.max(0, (oc.clip.timelinePosition || 0) - ext.head)
+      layerStarts.push(pos)
+      // Keyframed video: animated on a full frame first, held / delayed after that
       const animated = oc.clip.type === 'video' && hasVisualKeyframes(oc.clip)
       const clipDelay = pos > 0.01 ? `setpts=PTS+${pos.toFixed(3)}/TB` : null
       const delay = animated ? null : clipDelay
-      const key = oc.clip.type === 'video' ? getChromaKey(oc.clip) : null
+      const hold = ext.head || ext.tail
+        ? `tpad=start_mode=clone:start_duration=${ext.head.toFixed(3)}:stop_mode=clone:stop_duration=${ext.tail.toFixed(3)}`
+        : null
+      let src = `${i + 1}:v`
+      if (hold && !animated) {
+        filterParts.push(`[${src}]${hold}[ext${i}]`)
+        src = `ext${i}`
+      }
 
       if (key && key.mode === 'static' && plateInputs.has(i)) {
         const pi = plateInputs.get(i)
@@ -248,19 +274,20 @@ export async function buildAndRunFFmpeg({ timeline: given, downloadedFiles, outp
             : null,
           key, i, delay, outLabel: `v${i}`
         }))
-        clipLabels.push(keyedColor(oc.clip, i, filterParts))
+        clipLabels.push(keyedColor(oc.clip, i, filterParts, keyedFx.get(oc.clip.id)))
       } else if (key && key.mode !== 'static') {
-        filterParts.push(...buildChromaKeyFilter(`${i + 1}:v`, key, i, delay, `v${i}`))
-        clipLabels.push(keyedColor(oc.clip, i, filterParts))
+        filterParts.push(...buildChromaKeyFilter(src, key, i, delay, `v${i}`))
+        clipLabels.push(keyedColor(oc.clip, i, filterParts, keyedFx.get(oc.clip.id)))
       } else if (delay) {
-        filterParts.push(`[${i + 1}:v]${delay}[v${i}]`)
+        filterParts.push(`[${src}]${delay}[v${i}]`)
         clipLabels.push(`[v${i}]`)
       } else {
-        clipLabels.push(`[${i + 1}:v]`)
+        clipLabels.push(`[${src}]`)
       }
       if (animated) {
         const overlayPos = getOverlayPosition(oc.clip, outputWidth, outputHeight, scaleFactor, cropSources.get(oc.clip.id))
-        const kf = videoKeyframeGraph(oc.clip, clipLabels[i], i, { w: outputWidth, h: outputHeight, fps, overlayPos, s: scaleFactor, delay: clipDelay })
+        // a transition's overlap holds the animated layer's first / last frame, then it goes to its place
+        const kf = videoKeyframeGraph(oc.clip, clipLabels[i], i, { w: outputWidth, h: outputHeight, fps, overlayPos, s: scaleFactor, delay: [hold, clipDelay].filter(Boolean).join(',') || null })
         filterParts.push(...kf.parts)
         clipLabels[i] = kf.label
       }
@@ -270,12 +297,13 @@ export async function buildAndRunFFmpeg({ timeline: given, downloadedFiles, outp
     for (let i = 0; i < overlayClips.length; i++) {
       const oc = overlayClips[i]
       const out = i === overlayClips.length - 1 ? '[outv]' : `[tmp${i}]`
-      const clipLabel = clipLabels[i]
-
       // Text/image/color clips have position baked into their canvas → overlay at 0:0
       // Video clips need position applied here
-      const isFullCanvas = oc.clip.type === 'text' || oc.clip.type === 'image' || oc.clip.type === 'color' || (oc.clip.type === 'video' && hasVisualKeyframes(oc.clip))
-      const overlayPos = isFullCanvas ? '0:0' : getOverlayPosition(oc.clip, outputWidth, outputHeight, scaleFactor, cropSources.get(oc.clip.id))
+      const isFullCanvas = oc.clip.type === 'text' || oc.clip.type === 'image' || oc.clip.type === 'color' || oc.clip.type === 'scene' || (oc.clip.type === 'video' && hasVisualKeyframes(oc.clip))
+      const basePos = isFullCanvas ? '0:0' : getOverlayPosition(oc.clip, outputWidth, outputHeight, scaleFactor, cropSources.get(oc.clip.id))
+      // Transitions and fades: the layer's opacity, slide, zoom, blur (utils/transitionRender.js)
+      const { label: clipLabel, pos: overlayPos } = transitionLayer(filterParts, i, clipLabels[i], basePos, oc.clip, plan.get(oc.clip.id),
+        { frameH: outputHeight, zoom: clipZoom(oc.clip), fps, start: layerStarts[i] })
 
       filterParts.push(`[${prev}]${clipLabel}overlay=${overlayPos}:eof_action=pass:format=auto${out}`)
       prev = `tmp${i}`
@@ -318,7 +346,8 @@ export async function buildAndRunFFmpeg({ timeline: given, downloadedFiles, outp
       audioSources.push({
         file: audioPath,
         volume: clipVolume(clip),
-        offset: clip.timelinePosition || 0
+        offset: clip.timelinePosition || 0,
+        clipId: clip.id
       })
     }
   }
@@ -332,11 +361,22 @@ export async function buildAndRunFFmpeg({ timeline: given, downloadedFiles, outp
         audioSources.push({
           file: processedClips.get(clip.id),
           volume: clipVolume(clip),
-          offset: clip.timelinePosition || 0
+          offset: clip.timelinePosition || 0,
+          clipId: clip.id
         })
       }
     }
   }
+
+  // Sound crossfades at transitions (utils/transitionRender.js): ramps, and the
+  // bits of media past the cut
+  await transitionAudioSources(timeline.tracks, audioSources, async (piece) => {
+    const file = downloadedFiles.get(piece.id.split('~')[0])
+    if (!file) throw new Error('no source file')
+    const out = path.join(jobDir, `xfade_${piece.id.replace(/[^\w-]/g, '_')}.m4a`)
+    await processClip(piece, file, out, outputWidth, outputHeight, fps, signal, scaleFactor)
+    return out
+  })
 
   // STEP 5: Final encode
   onProgress(0.85, 'Encoding final output...')
@@ -360,6 +400,9 @@ export async function buildAndRunFFmpeg({ timeline: given, downloadedFiles, outp
  */
 async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scaleFactor = 1) {
   const duration = clip.endTime - clip.startTime
+
+  // Titles: a motion scene recorded in Chromium (services/sceneClip.js)
+  if (clip.type === 'scene') return renderSceneClip(clip, outputPath, w, h, fps, signal, scaleFactor)
 
   // Handle text clips
   if (clip.type === 'text') {
@@ -628,10 +671,17 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
       const lineY = baseY + i * lineHeight + textYOffset
 
       drawTextFilters.push(
-        `drawtext=textfile='${escapedLineFile}':fontfile='${escapedFontFile}':fontsize=${fontSize}:fontcolor=${fontColor}:x=${xExpr}:y=${lineY}:shadowcolor=black@0.8:shadowx=${shadowX}:shadowy=${shadowY}`
+        `drawtext=textfile='${escapedLineFile}':fontfile='${escapedFontFile}':fontsize=${fontSize}:fontcolor=${fontColor}:x=${xExpr}:y=${lineY}:shadowcolor=black@0.8:shadowx=${shadowX}:shadowy=${shadowY}${strokeOption(clip, scaleFactor * zoom)}`
       )
     }
-    const filterChain = drawTextFilters.join(',')
+    // Word by word entrances (utils/textFx.js): each word its own drawtext
+    const wordFilters = await wordDrawtexts(clip, {
+      lines: wrappedLines, lineY: (i) => baseY + i * lineHeight + (textBoxEnabled ? Math.round(boxPadding / 2) : 0),
+      fontSize, scale: scaleFactor * zoom, w, padding, posX: scaledPosX, hAlign: textHAlign, font: escapedFontFile, fontColor,
+      shadow: `:shadowcolor=black@0.8:shadowx=${shadowX}:shadowy=${shadowY}`, stroke: strokeOption(clip, scaleFactor * zoom),
+      basePath: outputPath.replace(/\.[^.]+$/, '')
+    })
+    const filterChain = (wordFilters || drawTextFilters).join(',')
 
     console.log(`[DEBUG] Text scaleFactor=${scaleFactor.toFixed(2)}, zoom=${zoom}, fontSize=${fontSize}, hAlign=${textHAlign}, vAlign=${textAlign}, lines=${wrappedLines.length}, textBox=${textBoxEnabled}`)
     console.log('[DEBUG] Output path:', outputPath)
@@ -695,8 +745,8 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
     clip, { w, h, fps, cx: blockCentre?.x ?? w / 2, cy: blockCentre?.y ?? h / 2, s: scaleFactor, duration })
     return runFFmpeg([
       '-f', 'lavfi',
-      // A moving sticker counts frames: give the layer the timeline's rate
-      '-i', `color=c=black@0:s=${w}x${h}:d=${duration}${appliedMotion(clip) || animated ? `:r=${fps}` : ''}`,
+      // A moving sticker, keyframes or words coming in count frames: give the layer the timeline's rate
+      '-i', `color=c=black@0:s=${w}x${h}:d=${duration}${appliedMotion(clip) || animated || normalizeTextAnim(clip.textAnim) ? `:r=${fps}` : ''}`,
       ...boxInputArgs,
       ...await filterGraphArgs(filterComplex, `${outputPath}.graph`),
       '-map', '[outv]',
@@ -754,7 +804,9 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
   }
 
   if (clip.type === 'image') {
-    let filterChain = withColor(clip, buildTransformFilter(clip, w, h))
+    // Look effects (blur, vignette, sharpen) keep the picture's transparency
+    const fx = await clipFxFilter(clip, inputFile, w, h, { alpha: true, tag: 'lkimg', probe: probeDisplaySize })
+    let filterChain = withColor(clip, buildTransformFilter(clip, w, h), fx)
     // Rotation (degrees, clockwise like the preview's CSS rotate): turn the scaled
     // image inside a box that fits it, transparent around it. The box keeps the
     // image's centre, so the centred overlay below still lands it where it was.
@@ -844,7 +896,9 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
   }
 
   // Video clip — scale/crop (and colour, unless keyed), composited onto canvas later
-  let filterChain = getChromaKey(clip) ? buildTransformFilter(clip, w, h, fps) : withColor(clip, buildTransformFilter(clip, w, h, fps))
+  let filterChain = getChromaKey(clip)
+    ? buildTransformFilter(clip, w, h, fps)
+    : withColor(clip, buildTransformFilter(clip, w, h, fps), await clipFxFilter(clip, inputFile, w, h, { probe: probeDisplaySize }))
   // Speed, ramp or still (utils/clipSpeed.js): read from the right media second, retimed first
   const timing = ffmpegVideoTiming(clip)
   if (timing) filterChain = `${timing.filter},${filterChain}`
@@ -872,19 +926,21 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
  * Not part of buildTransformFilter: that one also frames a clean plate and a
  * static-key mask, which must stay untouched.
  */
-function withColor(clip, filterChain) {
-  const color = ffmpegColorFilter(clip.color)
-  return color ? `${color},${filterChain}` : filterChain
+function withColor(clip, filterChain, fx = '') {
+  const color = ffmpegGradeFilter(clip.color, clip.look)
+  const chain = color ? `${color},${filterChain}` : filterChain
+  return fx ? `${chain},${fx}` : chain
 }
 
 /**
  * A keyed clip's colour goes on after the key (as in the preview, where the
  * keyed picture is what gets the filter). Returns the label to overlay.
  */
-function keyedColor(clip, i, filterParts) {
-  const color = ffmpegColorFilter(clip.color)
-  if (!color) return `[v${i}]`
-  filterParts.push(`[v${i}]${color}[v${i}c]`)
+function keyedColor(clip, i, filterParts, fx = '') {
+  const color = ffmpegGradeFilter(clip.color, clip.look)
+  const chain = [color, fx ? fx.replace(/LKTAG/g, `lk${i}`) : ''].filter(Boolean).join(',')
+  if (!chain) return `[v${i}]`
+  filterParts.push(`[v${i}]${chain}[v${i}c]`)
   return `[v${i}c]`
 }
 
@@ -1651,6 +1707,8 @@ async function combineVideoAudio(videoPath, allSources, outputPath, fps, signal)
     const delayMs = Math.round(offset * 1000)
 
     const filters = []
+    // a crossfade's volume ramp, in the source's own time (before the delay)
+    if (src.gain) filters.push(src.gain)
     if (delayMs > 0) {
       filters.push(`adelay=${delayMs}|${delayMs}`)
     }

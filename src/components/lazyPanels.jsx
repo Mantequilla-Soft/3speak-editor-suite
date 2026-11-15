@@ -24,6 +24,7 @@ export const RecordAudio = lazyPanel(() => import('./RecordAudio'))
 export const CaptionsPanel = lazyPanel(() => import('./CaptionsPanel'))
 export const RemixModePicker = lazyPanel(() => import('./RemixModePicker'))
 export const ShortcutSheet = lazyPanel(() => import('./ShortcutSheet'))
+export const TitleTemplates = lazyPanel(() => import('./TitleTemplates'))
 // the word tools (components/WordTools.jsx): transcript, Remove fillers, chapter ideas
 export const TranscriptPanel = lazyPanel(() => import('./TranscriptPanel'))
 export const FillerReviewDialog = lazyPanel(() => import('./FillerReviewDialog'))

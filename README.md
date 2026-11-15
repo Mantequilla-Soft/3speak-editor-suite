@@ -102,6 +102,13 @@ Quality presets: High (CRF 18), Medium (CRF 23), Low (CRF 28).
 - **Keyframes** (Keyframes section): position, scale, rotation and opacity of video, image and text clips, volume of sound; a diamond adds or removes one at the playhead, arrows jump between them, linear or eased. With keyframes, a slider or a drag on the preview sets the keyframe at the playhead. **Ken Burns** presets for images. `clip.keyframes` in clip time (src/utils/keyframes.js, shared with the backend: CSS transform in the preview, perspective filter, alpha multiply and `volume` expressions in the render).
 - **Auto punch-ins** (video clips): quick 115% zoom-ins at sentence starts and loud words, from the auto captions' word times or else the clip's loudness; ordinary Scale keyframes that **Remove punch-ins** takes off again (src/utils/punchIns.js).
 
+### Looks, transitions and titles (Shorts)
+- **Looks** (a clip's Look section): one-tap presets (Warm, Cool, Vivid, Matte, B&W, Vintage, Teal & Orange, Fade, Noir, Sunset) shown on the clip's own frame. A preset sets the Color sliders, so it can be adjusted from there; plus Blur, Vignette, Sharpen and a teal and orange split tone (`clip.look`). Preview (SVG filter) and render (ffmpeg lutrgb, convolution, gblur, vignette) share `src/utils/clipLook.js`.
+- **Transitions** (the button on a cut between two clips, or a clip's Transition section): crossfade, dip to black, slide left / right / up, zoom and whip, 0.2 to 1.5 s, centred on the cut (`clip.transition = { type, duration, to }` on the outgoing clip; it only applies while `to` is the very next clip). The clips' linked sound crossfades too. Fade in / out on video, image and colour clips (`fadeIn` / `fadeOut`, the linked sound fades with it). Shared maths: `src/utils/transitions.js`.
+- **Text** (a text clip's Text effects): an outline (`textStroke`) and words that come in one by one (`textAnim`: pop, fade up, typewriter, slide); `src/utils/textAnim.js`.
+- **Titles** (+ menu > Titles): lower thirds, titles over the video and intro / outro cards from the Ad Wizard's motion scenes (`src/utils/titleScenes.js`). A title is a clip of type `scene`: the preview plays the scene engine's host page (`SceneLayer.jsx`), the render records the same page in Chromium (`backend/src/services/sceneClip.js`), with a transparent background over the video.
+- The browser (canvas) export (standalone editor only) uses the same SVG filter for looks, but does not draw transitions, word entrances or titles: those need the backend render, which 3Speak always uses.
+
 ### Other
 - Drag-and-drop or file-picker media import with categorized library (Videos, Images, Sounds)
 - HLS stream support with automatic download and progress tracking

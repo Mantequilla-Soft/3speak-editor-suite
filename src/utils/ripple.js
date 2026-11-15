@@ -3,6 +3,8 @@
 // gap there). Other tracks stay where they are, except clips grouped with the
 // ones that move (voices recorded together keep in sync).
 
+import { splitPair, nextClipOf } from './transitions.js'
+
 const EPS = 0.01
 const startOf = (c) => c.timelinePosition || 0
 const endOf = (c) => startOf(c) + (c.endTime - c.startTime)
@@ -69,7 +71,7 @@ const cutGroupId = () => `group_cut_${++cutIds}_${Date.now()}`
 // lose exactly the stretch that was cut.
 const continuous = (track, clip) => (track.type === 'audio' && (track.music || track.sfx)) || (track.type === 'video' && clip.type !== 'video')
 
-function cutOne(tracks, a, b, copies, newId, newGroupId) {
+function cutOne(tracks, a, b, copies, newId, newGroupId, touchedIds) {
   const d = b - a
   const groupMap = new Map() // old group -> the group of the pieces after the cut
   const groupAfter = (g) => {
@@ -85,6 +87,7 @@ function cutOne(tracks, a, b, copies, newId, newGroupId) {
       const e = endOf(c)
       if (e <= a + EPS / 10) { clips.push(c); continue }
       touched = true
+      touchedIds.add(c.id)
       if (s >= b - EPS / 10) { clips.push({ ...c, timelinePosition: Math.max(0, s - d) }); continue }
       const overlap = Math.min(e, b) - Math.max(s, a)
       if (continuous(track, c)) {
@@ -96,11 +99,13 @@ function cutOne(tracks, a, b, copies, newId, newGroupId) {
       const after = e > b + 0.02
         ? { ...c, id: before ? newId() : c.id, startTime: c.startTime + (b - s), timelinePosition: a, fadeIn: 0, groupId: before ? groupAfter(c.groupId) : c.groupId }
         : null
-      if (before) clips.push(before)
-      if (after) {
-        if (before) copies.push([after.id, c.id])
-        clips.push(after)
-      }
+      if (before && after) {
+        // a split (utils/transitions.js): the transition into the next clip goes with the second half
+        copies.push([after.id, c.id])
+        touchedIds.add(after.id)
+        clips.push(...splitPair(before, after))
+      } else if (before) clips.push(before)
+      else if (after) clips.push(after)
     }
     return touched ? { ...track, clips } : track
   })
@@ -128,8 +133,10 @@ export function rippleCutRanges(tracks, ranges, { newId = cutClipId, newGroupId 
     else merged.push([x, y])
   }
   const copies = []
+  const touchedIds = new Set()
   let out = tracks
-  for (let i = merged.length - 1; i >= 0; i--) out = cutOne(out, merged[i][0], merged[i][1], copies, newId, newGroupId)
+  for (let i = merged.length - 1; i >= 0; i--) out = cutOne(out, merged[i][0], merged[i][1], copies, newId, newGroupId, touchedIds)
+  out = mendTransitions(out, touchedIds)
   // a piece copied from a piece made earlier in this call needs the first original's file
   const origin = new Map(copies)
   const resolved = copies.map(([id, from]) => {
@@ -138,6 +145,28 @@ export function rippleCutRanges(tracks, ranges, { newId = cutClipId, newGroupId 
     return [id, f]
   })
   return { tracks: out, copies: resolved }
+}
+
+/**
+ * After a cut, a transition (utils/transitions.js) of a clip the cut reached,
+ * or into one, goes into the clip that now follows it: the same one when the
+ * cut only moved or trimmed it, the next one when the cut took it away
+ * altogether. With no clip touching it any more, it goes.
+ */
+function mendTransitions(tracks, touchedIds) {
+  if (!touchedIds.size) return tracks
+  return tracks.map(track => {
+    if (track.type !== 'video' || !track.clips.some(c => c.transition && (touchedIds.has(c.id) || touchedIds.has(c.transition.to)))) return track
+    return {
+      ...track,
+      clips: track.clips.map(c => {
+        if (!c.transition || !(touchedIds.has(c.id) || touchedIds.has(c.transition.to))) return c
+        const next = nextClipOf(track, c.id)
+        if (!next) { const { transition, ...rest } = c; return rest }
+        return next.id === c.transition.to ? c : { ...c, transition: { ...c.transition, to: next.id } }
+      })
+    }
+  })
 }
 
 /** Seconds a set of ranges takes out (overlaps counted once). */

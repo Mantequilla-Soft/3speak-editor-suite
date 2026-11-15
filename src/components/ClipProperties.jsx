@@ -11,6 +11,10 @@ import { Eye, EyeOff } from './icons'
 import { autoColor } from '../utils/autoColor'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
+import LookControls from './LookControls'
+import TransitionControls from './TransitionControls'
+import TextFxControls from './TextFxControls'
+import SceneControls from './SceneControls'
 import './GreenScreen.css'
 import SpeedControls from './SpeedControls'
 import KeyframeControls from './KeyframeControls'
@@ -821,7 +825,7 @@ function PositionDragHandle({ positionX, positionY, onChange }) {
 // The tab a phone user last picked, kept across clips (if the next clip has it)
 let lastTab = null
 
-function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, voiceTargets = null, onUpdateClipsEach = null, duckInfo = null, motionKit = null }) {
+function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, voiceTargets = null, onUpdateClipsEach = null, duckInfo = null, motionKit = null, tracks = null }) {
   // Phones (tabbed): one section at a time, a tab per section. The sections
   // differ per clip type and come from several components, so the tabs are
   // read from the rendered sections (.prop-group and its label) after render.
@@ -885,8 +889,11 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
       )}
 
       <div className={`properties-groups${tabbed ? ' tabbed' : ''}`} ref={groupsRef}>
-        {/* GROUP 1: Content / Audio (images have no sound: no such section) */}
-        {!isImage && (
+        {/* Titles (motion scenes): their words, colours, length */}
+        {clip.type === 'scene' && <SceneControls clip={clip} onUpdateClip={onUpdateClip} />}
+
+        {/* GROUP 1: Content / Audio (images have no sound: no such section; titles have their own) */}
+        {!isImage && clip.type !== 'scene' && (
         <div className="prop-group">
           <div className="prop-group-label">
             {isText ? 'Content' : isColor ? 'Color' : isAudio ? 'Audio' : 'Audio'}
@@ -1355,6 +1362,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
               </div>
             </div>
 
+            {clip.type !== 'scene' && (
             <div className="property-group">
               <label>
                 <Crop size={12} />
@@ -1400,6 +1408,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                 />
               </div>
             </div>
+            )}
 
             {!isText && (
               <div className="property-group">
@@ -1427,12 +1436,25 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
           </div>
         )}
 
+        {/* Text outline and word by word entrance */}
+        {isText && <TextFxControls clip={clip} onUpdateClip={onUpdateClip} />}
+
         {/* Motion (stickers: image and text clips) */}
         {(isImage || isText) && <MotionControls clip={clip} onUpdateClip={onUpdateClip} />}
 
         {/* Speed, ramps and freeze frames (video), keyframes (Shorts editor) */}
         {motionKit && <SpeedControls clip={clip} playheadPosition={playheadPosition} kit={motionKit} onUpdateClip={onUpdateClip} />}
         {motionKit && <KeyframeControls clip={clip} playheadPosition={playheadPosition} onUpdateClip={onUpdateClip} linkedAudio={linkedAudio} onUpdateLinkedAudio={onUpdateLinkedAudio} kit={motionKit} />}
+
+        {/* Fades and the transition into the next clip (video, image and colour clips on a video track) */}
+        {tracks && (clip.type === 'video' || isImage || isColor) && (
+          <TransitionControls clip={clip} tracks={tracks} onUpdateClip={onUpdateClip} linkedAudio={linkedAudio} onUpdateLinkedAudio={onUpdateLinkedAudio} />
+        )}
+
+        {/* Looks: presets, blur, vignette, sharpen (video and image clips) */}
+        {(clip.type === 'video' || isImage) && (
+          <LookControls clip={clip} onUpdateClip={onUpdateClip} playheadPosition={playheadPosition} />
+        )}
 
         {/* Colour adjustments (video and image clips) */}
         {(clip.type === 'video' || isImage) && (

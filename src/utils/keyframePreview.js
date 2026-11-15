@@ -6,8 +6,9 @@ import { sourceAt, speedAt, isFrozen, timeMap } from './clipSpeed'
 import { cssKeyframeTransform, hasVisualKeyframes, relativeAt, keyframeBase, staticValue, propAt } from './keyframes'
 import { hasLayout } from './remixLayout'
 
-/** Clip time at timeline position t (clip.timelineStart = where it starts) */
-export const clipTimeOf = (clip, t) => clip.startTime + (t - (clip.timelineStart ?? clip.timelinePosition ?? 0))
+/** Clip time at timeline position t (clip.timelineStart = where it starts; a
+ * clip a transition shows early, previewTransitions.js, keeps its own start in mediaStart) */
+export const clipTimeOf = (clip, t) => clip.startTime + (t - (clip.mediaStart ?? clip.timelineStart ?? clip.timelinePosition ?? 0))
 
 /** Media second an element should be at for timeline position t */
 export const mediaTimeAt = (clip, t) => sourceAt(clip, clipTimeOf(clip, t))

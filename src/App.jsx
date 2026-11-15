@@ -11,7 +11,7 @@ import { selectBackend, getBackendUrl, api } from './utils/backendSelector'
 import Timeline from './components/Timeline'
 import GlobalPreview from './components/GlobalPreview'
 // opened on demand, each its own chunk (components/lazyPanels.jsx)
-import { ProjectLibrary, VideoPreview, ExportButton, RecordVideo, RecordAudio, RemixModePicker, MusicLibrary, AudioTemplateDialog, ChaptersDialog, AudiogramDialog, BeatSyncModal, StickerPicker, CaptionsPanel, ShortcutSheet } from './components/lazyPanels'
+import { ProjectLibrary, VideoPreview, ExportButton, RecordVideo, RecordAudio, RemixModePicker, MusicLibrary, AudioTemplateDialog, ChaptersDialog, AudiogramDialog, BeatSyncModal, StickerPicker, CaptionsPanel, ShortcutSheet, TitleTemplates } from './components/lazyPanels'
 import ClipProperties from './components/ClipProperties'
 import { routeAnimatedEdits, mediaView, mediaPartsToClip } from './utils/motionEdits'
 import OnboardingTour, { AUDIO_TOUR_STEPS, RANGE_PICK_TOUR_STEPS, useFirstTimeTour } from './components/OnboardingTour'
@@ -35,6 +35,7 @@ import { audiogramsToPost } from './utils/audiogramLayers'
 import { audioFileName } from './utils/audioTemplate'
 import EncodingNotice from './components/EncodingNotice'
 import ClipColorFilters from './components/ClipColorFilters'
+import { outputSize } from './utils/outputSize'
 import { DraftsPrompt, DraftLimitPicker, CloseDialog, DraftStatus } from './components/DraftsDialogs'
 import { useDrafts, savedPlayhead } from './hooks/useDrafts'
 import { useAutoCaptions } from './hooks/useAutoCaptions'
@@ -761,6 +762,7 @@ function App() {
     else setRecordingAudioOpen(true)
   }, [])
   const [stickersOpen, setStickersOpen] = useState(false)
+  const [titlesOpen, setTitlesOpen] = useState(false) // Titles: motion scene templates
   const [inlineRecordingOpen, setInlineRecordingOpen] = useState(false)
   const [recorderSize, setRecorderSize] = useState('small') // 'small' | 'big'
 
@@ -933,6 +935,12 @@ function App() {
     const id = addTextClip(trackId)
     if (id) selectClip(id)
   }, [addTextClip, selectClip])
+
+  // A title (motion scene) at the playhead, above the footage
+  const handleAddTitle = useCallback((props) => {
+    const clipId = addStickerClip({ kind: 'scene', props }, playheadPosition, props.endTime - props.startTime)
+    if (clipId) selectClip(clipId)
+  }, [addStickerClip, selectClip, playheadPosition])
 
   const handlePickSticker = useCallback((sticker) => {
     const clipId = addStickerClip(sticker, playheadPosition)
@@ -1519,6 +1527,7 @@ function App() {
             <ClipProperties
               clip={sideClip}
               linkedAudio={linkedAudioOf(sideClip)}
+              tracks={audioMode ? null : tracks}
               onUpdateLinkedAudio={(u) => { const a = linkedAudioOf(sideClip); if (a) updateClip(a.id, u) }}
               onUpdateClip={(updates) => updateClip(sideClip.id, updates)}
               onSplit={() => splitClip(sideClip.id)}
@@ -1670,7 +1679,7 @@ function App() {
 
   return (
       <div className={`app compact${isDesktop ? ' desktop' : ''}${audioMode && pickingRange ? ' picking-range' : ''}`}>
-        <ClipColorFilters tracks={tracks} />
+        <ClipColorFilters tracks={tracks} frame={outputSize(activeAspectRatio)} />
         {/* Backend health warning */}
         {backendStatus === 'error' && (
           <div className="backend-warning">
@@ -2013,6 +2022,7 @@ function App() {
             onOpenMusic={(trackId) => openAdd('music', trackId)}
             onOpenSfx={(trackId) => openAdd('sfx', trackId)}
             onOpenStickers={audioMode ? undefined : () => setStickersOpen(true)}
+            onOpenTitles={audioMode ? undefined : () => setTitlesOpen(true)}
             onOpenCaptions={audioMode ? undefined : () => { wordTools.setTranscriptOpen(false); setCaptionsOpen(o => !o) }}
             captionsActive={captionsOpen || !!captions}
             onOpenTranscript={audioMode ? undefined : () => { setCaptionsOpen(false); wordTools.openTranscript() }}
@@ -2210,6 +2220,7 @@ function App() {
         {sfxOpen && <MusicLibrary kind="sfx" onPick={handlePickSfx} onClose={() => setSfxOpen(false)} />}
 
         {stickersOpen && <StickerPicker onPick={handlePickSticker} onClose={() => setStickersOpen(false)} />}
+        {titlesOpen && <TitleTemplates onAdd={handleAddTitle} onClose={() => setTitlesOpen(false)} frame={outputSize(activeAspectRatio)} />}
 
         {/* Record Video Modal */}
         {recordingOpen && (
@@ -2315,7 +2326,7 @@ function App() {
 
   return (
     <div className="app">
-      <ClipColorFilters tracks={tracks} />
+      <ClipColorFilters tracks={tracks} frame={outputSize(activeAspectRatio)} />
       {/* Backend health warning */}
       {backendStatus === 'error' && (
         <div className="backend-warning">
@@ -2508,6 +2519,7 @@ function App() {
               onOpenMusic={(trackId) => openAdd('music', trackId)}
               onOpenSfx={(trackId) => openAdd('sfx', trackId)}
               onOpenStickers={() => setStickersOpen(true)}
+              onOpenTitles={() => setTitlesOpen(true)}
               onOpenCaptions={() => { wordTools.setTranscriptOpen(false); setCaptionsOpen(o => !o) }}
               captionsActive={captionsOpen || !!captions}
               onOpenTranscript={() => { setCaptionsOpen(false); wordTools.openTranscript() }}
@@ -2569,6 +2581,7 @@ function App() {
                   <ClipProperties
                     clip={selectedClip}
                     linkedAudio={linkedAudioOf(selectedClip)}
+                    tracks={audioMode ? null : tracks}
                     onUpdateLinkedAudio={(u) => { const a = linkedAudioOf(selectedClip); if (a) updateClip(a.id, u) }}
                     onUpdateClip={(updates) => selectedClipId && updateClip(selectedClipId, updates)}
                     onSplit={(time) => selectedClipId && splitClip(selectedClipId, time)}
@@ -2641,6 +2654,7 @@ function App() {
       {sfxOpen && <MusicLibrary kind="sfx" onPick={handlePickSfx} onClose={() => setSfxOpen(false)} />}
 
       {stickersOpen && <StickerPicker onPick={handlePickSticker} onClose={() => setStickersOpen(false)} />}
+      {titlesOpen && <TitleTemplates onAdd={handleAddTitle} onClose={() => setTitlesOpen(false)} frame={outputSize(activeAspectRatio)} />}
 
       {/* Record Video Modal */}
       {recordingOpen && (

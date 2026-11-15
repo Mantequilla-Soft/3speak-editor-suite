@@ -220,3 +220,32 @@ describe('the window of a long list', () => {
     expect(estimateHeight(100)).toBeGreaterThan(estimateHeight(10))
   })
 })
+
+describe('rippleCutRanges and transitions', () => {
+  const v = (id, at, from, to, extra = {}) => ({ id, type: 'video', libraryId: 'L', timelinePosition: at, startTime: from, endTime: to, ...extra })
+  const tr = (to) => ({ type: 'crossfade', duration: 0.5, to })
+  const find = (tracks, id) => tracks[0].clips.find(c => c.id === id)
+
+  it('a cut inside a clip: the transition into the next clip goes with the second half, still pointing at it', () => {
+    const tracks = [{ id: 'vt', type: 'video', clips: [v('a', 0, 0, 10, { transition: tr('b'), fadeIn: 1 }), v('b', 10, 0, 5)] }]
+    const { tracks: out } = rippleCutRanges(tracks, [[3, 5]], { newId: () => 'a2', newGroupId: () => 'g' })
+    expect(find(out, 'a').transition).toBeUndefined()
+    expect(find(out, 'a').fadeIn).toBe(1)
+    expect(find(out, 'a2').transition).toEqual(tr('b'))
+    expect(find(out, 'b').timelinePosition).toBe(8)
+  })
+  it('a cut across the join keeps the transition between what is left of both; one that removes the next clip moves it to the clip after', () => {
+    const tracks = () => [{ id: 'vt', type: 'video', clips: [v('a', 0, 0, 10, { transition: tr('b') }), v('b', 10, 0, 5, { transition: tr('c') }), v('c', 15, 0, 5)] }]
+    const across = rippleCutRanges(tracks(), [[9, 11]]).tracks
+    expect(find(across, 'a').transition.to).toBe('b')
+    expect(find(across, 'b').timelinePosition).toBe(9)
+    const gone = rippleCutRanges(tracks(), [[10, 15]]).tracks
+    expect(gone[0].clips.map(c => c.id)).toEqual(['a', 'c'])
+    expect(find(gone, 'a').transition.to).toBe('c')
+    // the last clip's end cut away with nothing after it: its transition goes
+    const end = rippleCutRanges([{ id: 'vt', type: 'video', clips: [v('a', 0, 0, 10, { transition: tr('b') }), v('b', 10, 0, 5)] }], [[12, 15]]).tracks
+    expect(find(end, 'a').transition.to).toBe('b')
+    const last = rippleCutRanges([{ id: 'vt', type: 'video', clips: [v('a', 0, 0, 10, { transition: tr('b') }), v('b', 10, 0, 5)] }], [[10, 15]]).tracks
+    expect(find(last, 'a').transition).toBeUndefined()
+  })
+})

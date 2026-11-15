@@ -5,6 +5,7 @@
 
 import { retime, rampUpdates, sourceAt, clipTimeAt, timeMap } from './clipSpeed'
 import { KEYFRAME_PROPS, normalizeKeyframes, propAt, staticValue, keyframesOf } from './keyframes'
+import { splitPair } from './transitions'
 
 const pos = (c) => c.timelinePosition || 0
 const len = (c) => c.endTime - c.startTime
@@ -103,7 +104,9 @@ export function insertFreezeFrame(tracks, clipId, playhead, seconds = 1) {
   // The still keeps how the clip looked at that moment (animated values frozen too)
   const still = { ...target, id: newClipId(), name: `Still · ${(target.name || 'clip').replace(/^Still · /, '')}`,
     startTime: 0, endTime: N, timelinePosition: playhead, freezeAt: Number(sourceAt(target, c).toFixed(4)),
-    groupId: undefined, audioEnabled: false, speed: undefined, speedRamp: undefined, keyframes: undefined }
+    groupId: undefined, audioEnabled: false, speed: undefined, speedRamp: undefined, keyframes: undefined,
+    // no fades or transition of its own (utils/transitions.js): those stay at the clip's outer ends
+    fadeIn: 0, fadeOut: 0, transition: undefined }
   for (const p of KEYFRAME_PROPS) if (keyframesOf(target, p.id).length && p.id !== 'volume') still[p.field] = Number(propAt(target, p.id, c).toFixed(3))
   copies.push([still.id, target.id])
 
@@ -120,7 +123,8 @@ export function insertFreezeFrame(tracks, clipId, playhead, seconds = 1) {
       if (atEnd || cm >= m.endTime - EPS) { clips.push(m); continue }
       const second = { ...m, id: newClipId(), startTime: cm, timelinePosition: playhead + N, groupId: secondGroup }
       copies.push([second.id, m.id])
-      clips.push({ ...m, endTime: cm }, second)
+      // fades stay at the outer ends, a transition goes with the second part (utils/transitions.js)
+      clips.push(...splitPair({ ...m, endTime: cm }, second))
     }
     if (track.clips.some(m => m.id === target.id)) clips.push(still)
     return { ...track, clips }
