@@ -5,6 +5,7 @@ import { hasLayout } from '../utils/remixLayout'
 import { getClipChromaKey } from '../utils/chromaKey'
 import { normalizeColor } from '../utils/clipColor'
 import { normalizeMotion } from '../utils/stickerMotion'
+import { renderExtras } from '../utils/renderExtras'
 import { duckPlans, localDuckPlan } from '../utils/duck'
 import { outputSize } from '../utils/outputSize'
 import { normalizeCaptions } from '../utils/captions'
@@ -383,6 +384,9 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
         // Colour adjustments (utils/clipColor.js), same maths as the preview
         const color = (clip.type === 'video' || clip.type === 'image') ? normalizeColor(clip.color) : null
         if (color) baseClip.color = color
+
+        // Looks, transitions, video fades, text outline and word animation (utils/renderExtras.js)
+        Object.assign(baseClip, renderExtras(clip))
 
         // Sticker motion (utils/stickerMotion.js), image and text clips
         const motion = (clip.type === 'image' || clip.type === 'text') ? normalizeMotion(clip.motion) : null

@@ -7,7 +7,7 @@ import path from 'path'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 let failed = false
-for (const file of ['staticKeyMask.js', 'clipColor.js', 'stickerMotion.js', 'captions.js']) {
+for (const file of ['staticKeyMask.js', 'clipColor.js', 'stickerMotion.js', 'captions.js', 'clipLook.js']) {
   const a = `src/utils/${file}`
   const b = `backend/src/utils/${file}`
   if (readFileSync(path.join(root, a), 'utf8') !== readFileSync(path.join(root, b), 'utf8')) {

@@ -3,7 +3,8 @@ import path from 'path'
 import fs from 'fs/promises'
 import { createWriteStream } from 'fs'
 import { createStaticMasker, staticMaskSize } from '../utils/staticKeyMask.js'
-import { ffmpegColorFilter } from '../utils/clipColor.js'
+import { ffmpegGradeFilter } from '../utils/clipLook.js'
+import { clipFxFilter } from '../utils/lookFx.js'
 import crypto from 'crypto'
 import { ffmpegMotionFilter, normalizeMotion, pivotPoint, activeEffects } from '../utils/stickerMotion.js'
 import { captionBurn } from './captionBurn.js'
@@ -85,6 +86,7 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
   const processedClips = new Map()
   const processedPlates = new Map() // clip id -> clean plate PNG (static-background key)
   const cropSources = new Map() // clip id -> display size of a free-cropped video
+  const keyedFx = new Map() // clip id -> look effects of a keyed clip (utils/lookFx.js)
   let reusedClips = 0
 
   for (let i = 0; i < allClips.length; i++) {
@@ -138,6 +140,10 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
       }
     }
     processedClips.set(clip.id, processedPath)
+    // A keyed clip's look effects go on after the key, in the composite (LKTAG: its label)
+    if (clip.trackType === 'video' && getChromaKey(clip)) {
+      keyedFx.set(clip.id, await clipFxFilter(clip, inputFile, outputWidth, outputHeight, { alpha: true, tag: 'LKTAG', probe: probeDisplaySize }))
+    }
 
     // Static-background key: bring the clean plate into the processed clip's geometry
     const ck = clip.trackType === 'video' ? getChromaKey(clip) : null
@@ -239,10 +245,10 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
             : null,
           key, i, delay, outLabel: `v${i}`
         }))
-        clipLabels.push(keyedColor(oc.clip, i, filterParts))
+        clipLabels.push(keyedColor(oc.clip, i, filterParts, keyedFx.get(oc.clip.id)))
       } else if (key && key.mode !== 'static') {
         filterParts.push(...buildChromaKeyFilter(`${i + 1}:v`, key, i, delay, `v${i}`))
-        clipLabels.push(keyedColor(oc.clip, i, filterParts))
+        clipLabels.push(keyedColor(oc.clip, i, filterParts, keyedFx.get(oc.clip.id)))
       } else if (delay) {
         filterParts.push(`[${i + 1}:v]${delay}[v${i}]`)
         clipLabels.push(`[v${i}]`)
@@ -735,7 +741,9 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
   }
 
   if (clip.type === 'image') {
-    let filterChain = withColor(clip, buildTransformFilter(clip, w, h))
+    // Look effects (blur, vignette, sharpen) keep the picture's transparency
+    const fx = await clipFxFilter(clip, inputFile, w, h, { alpha: true, tag: 'lkimg', probe: probeDisplaySize })
+    let filterChain = withColor(clip, buildTransformFilter(clip, w, h), fx)
     // Rotation (degrees, clockwise like the preview's CSS rotate): turn the scaled
     // image inside a box that fits it, transparent around it. The box keeps the
     // image's centre, so the centred overlay below still lands it where it was.
@@ -812,7 +820,9 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
   }
 
   // Video clip — scale/crop (and colour, unless keyed), composited onto canvas later
-  let filterChain = getChromaKey(clip) ? buildTransformFilter(clip, w, h, fps) : withColor(clip, buildTransformFilter(clip, w, h, fps))
+  let filterChain = getChromaKey(clip)
+    ? buildTransformFilter(clip, w, h, fps)
+    : withColor(clip, buildTransformFilter(clip, w, h, fps), await clipFxFilter(clip, inputFile, w, h, { probe: probeDisplaySize }))
 
   const args = []
   if (clip.startTime > 0) args.push('-ss', clip.startTime.toString())
@@ -836,19 +846,21 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
  * Not part of buildTransformFilter: that one also frames a clean plate and a
  * static-key mask, which must stay untouched.
  */
-function withColor(clip, filterChain) {
-  const color = ffmpegColorFilter(clip.color)
-  return color ? `${color},${filterChain}` : filterChain
+function withColor(clip, filterChain, fx = '') {
+  const color = ffmpegGradeFilter(clip.color, clip.look)
+  const chain = color ? `${color},${filterChain}` : filterChain
+  return fx ? `${chain},${fx}` : chain
 }
 
 /**
  * A keyed clip's colour goes on after the key (as in the preview, where the
  * keyed picture is what gets the filter). Returns the label to overlay.
  */
-function keyedColor(clip, i, filterParts) {
-  const color = ffmpegColorFilter(clip.color)
-  if (!color) return `[v${i}]`
-  filterParts.push(`[v${i}]${color}[v${i}c]`)
+function keyedColor(clip, i, filterParts, fx = '') {
+  const color = ffmpegGradeFilter(clip.color, clip.look)
+  const chain = [color, fx ? fx.replace(/LKTAG/g, `lk${i}`) : ''].filter(Boolean).join(',')
+  if (!chain) return `[v${i}]`
+  filterParts.push(`[v${i}]${chain}[v${i}c]`)
   return `[v${i}c]`
 }
 

@@ -43,6 +43,7 @@ import BeatSyncModal from './components/BeatSyncModal'
 import StickerPicker from './components/StickerPicker'
 import EncodingNotice from './components/EncodingNotice'
 import ClipColorFilters from './components/ClipColorFilters'
+import { outputSize } from './utils/outputSize'
 import { DraftsPrompt, DraftLimitPicker, CloseDialog, DraftStatus } from './components/DraftsDialogs'
 import { useDrafts, savedPlayhead } from './hooks/useDrafts'
 import { useAutoCaptions } from './hooks/useAutoCaptions'
@@ -1571,7 +1572,7 @@ function App() {
 
   return (
       <div className={`app compact${isDesktop ? ' desktop' : ''}${audioMode && pickingRange ? ' picking-range' : ''}`}>
-        <ClipColorFilters tracks={tracks} />
+        <ClipColorFilters tracks={tracks} frame={outputSize(activeAspectRatio)} />
         {/* Backend health warning */}
         {backendStatus === 'error' && (
           <div className="backend-warning">
@@ -2135,7 +2136,7 @@ function App() {
 
   return (
     <div className="app">
-      <ClipColorFilters tracks={tracks} />
+      <ClipColorFilters tracks={tracks} frame={outputSize(activeAspectRatio)} />
       {/* Backend health warning */}
       {backendStatus === 'error' && (
         <div className="backend-warning">

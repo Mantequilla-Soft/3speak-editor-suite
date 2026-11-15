@@ -11,6 +11,7 @@ import { Eye, EyeOff } from './icons'
 import { autoColor } from '../utils/autoColor'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
+import LookControls from './LookControls'
 import './GreenScreen.css'
 
 // Green screen (chroma key) on a video clip: keyed pixels turn transparent, so
@@ -1427,6 +1428,11 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
 
         {/* Motion (stickers: image and text clips) */}
         {(isImage || isText) && <MotionControls clip={clip} onUpdateClip={onUpdateClip} />}
+
+        {/* Looks: presets, blur, vignette, sharpen (video and image clips) */}
+        {(clip.type === 'video' || isImage) && (
+          <LookControls clip={clip} onUpdateClip={onUpdateClip} playheadPosition={playheadPosition} />
+        )}
 
         {/* Colour adjustments (video and image clips) */}
         {(clip.type === 'video' || isImage) && (
