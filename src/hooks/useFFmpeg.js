@@ -1,6 +1,11 @@
 import { useState, useRef, useCallback } from 'react'
-import { FFmpeg } from '@ffmpeg/ffmpeg'
-import { fetchFile } from '@ffmpeg/util'
+import { coreSources } from '../utils/ffmpegCore'
+
+// FFmpeg.wasm (the legacy layout's exports, whole-HLS downloads in the
+// browser) is loaded on first use, never when the editor opens: its code is
+// its own chunk and the ~31 MB core comes from this server (utils/ffmpegCore.js).
+const loadLibs = () => Promise.all([import('@ffmpeg/ffmpeg'), import('@ffmpeg/util')])
+let fetchFile = null
 
 export function useFFmpeg() {
   const [loaded, setLoaded] = useState(false)
@@ -8,51 +13,49 @@ export function useFFmpeg() {
   const [progress, setProgress] = useState(0)
   const [exportProgress, setExportProgress] = useState(0)
   const [exporting, setExporting] = useState(false)
+  const [ffmpeg, setFfmpeg] = useState(null)
   const ffmpegRef = useRef(null)
+  const loadingRef = useRef(null) // the load in progress: one load however many callers
 
-  const loadFFmpeg = useCallback(async () => {
-    if (loaded || loading) return
-
+  // Resolves with the loaded FFmpeg instance (null when it cannot load)
+  const loadFFmpeg = useCallback(() => {
+    if (ffmpegRef.current) return Promise.resolve(ffmpegRef.current)
+    if (loadingRef.current) return loadingRef.current
     setLoading(true)
     setProgress(0)
-
-    try {
-      const ffmpeg = new FFmpeg()
-      ffmpegRef.current = ffmpeg
-
-      ffmpeg.on('log', ({ message }) => {
-        console.log('[FFmpeg]', message)
-      })
-
-      ffmpeg.on('progress', ({ progress: p }) => {
-        setExportProgress(p)
-      })
-
-      // Use esm build with direct URLs
-      const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm'
-
-      // Fetch and create blob URLs to avoid CORS issues
-      const coreResponse = await fetch(`${baseURL}/ffmpeg-core.js`)
-      const coreBlob = new Blob([await coreResponse.text()], { type: 'text/javascript' })
-      const coreURL = URL.createObjectURL(coreBlob)
-
-      const wasmResponse = await fetch(`${baseURL}/ffmpeg-core.wasm`)
-      const wasmBlob = new Blob([await wasmResponse.arrayBuffer()], { type: 'application/wasm' })
-      const wasmURL = URL.createObjectURL(wasmBlob)
-
-      await ffmpeg.load({
-        coreURL,
-        wasmURL,
-      })
-
-      setLoaded(true)
-    } catch (error) {
-      console.error('Failed to load FFmpeg:', error)
-      // Don't throw - just log the error so the app continues to work
-    } finally {
-      setLoading(false)
-    }
-  }, [loaded, loading])
+    loadingRef.current = (async () => {
+      try {
+        const [{ FFmpeg }, util] = await loadLibs()
+        fetchFile = util.fetchFile
+        for (const src of coreSources(import.meta.env.BASE_URL)) {
+          const instance = new FFmpeg()
+          instance.on('log', ({ message }) => console.log('[FFmpeg]', message))
+          instance.on('progress', ({ progress: p }) => setExportProgress(p))
+          try {
+            await instance.load({ coreURL: src.coreURL, wasmURL: src.wasmURL })
+            if (!src.own) console.warn('[FFmpeg] loaded from unpkg: this server has no copy (see scripts/viteFfmpegCore.js)')
+            ffmpegRef.current = instance
+            setFfmpeg(instance)
+            setLoaded(true)
+            return instance
+          } catch (err) {
+            console.warn(`[FFmpeg] could not load the core from ${src.coreURL}:`, err?.message || err)
+            try { instance.terminate() } catch {}
+          }
+        }
+        throw new Error('no FFmpeg core could be loaded')
+      } catch (error) {
+        console.error('Failed to load FFmpeg:', error)
+        // Don't throw - the app works on without it
+        return null
+      } finally {
+        setLoading(false)
+        setProgress(1)
+        loadingRef.current = null
+      }
+    })()
+    return loadingRef.current
+  }, [])
 
   // Helper to get file data from either File object or blob URL
   const getFileData = async (clip) => {
@@ -279,7 +282,7 @@ export function useFFmpeg() {
   }, [loaded])
 
   return {
-    ffmpeg: ffmpegRef.current,
+    ffmpeg,
     loaded,
     loading,
     progress,

@@ -8,26 +8,19 @@ import { useIframeApi } from './hooks/useIframeApi'
 import { isHlsUrl } from './utils/hlsHelper'
 import { reverseClipOnBackend } from './utils/reverseClip'
 import { selectBackend, getBackendUrl, api } from './utils/backendSelector'
-import ProjectLibrary from './components/ProjectLibrary'
 import Timeline from './components/Timeline'
-import VideoPreview from './components/VideoPreview'
 import GlobalPreview from './components/GlobalPreview'
+// opened on demand, each its own chunk (components/lazyPanels.jsx)
+import { ProjectLibrary, VideoPreview, ExportButton, RecordVideo, RecordAudio, RemixModePicker, MusicLibrary, AudioTemplateDialog, ChaptersDialog, AudiogramDialog, BeatSyncModal, StickerPicker, CaptionsPanel } from './components/lazyPanels'
 import ClipProperties from './components/ClipProperties'
-import ExportButton from './components/ExportButton'
-import RecordVideo from './components/RecordVideo'
-import RecordAudio from './components/RecordAudio'
 import OnboardingTour, { AUDIO_TOUR_STEPS, RANGE_PICK_TOUR_STEPS, useFirstTimeTour } from './components/OnboardingTour'
 import MultiClipProperties from './components/MultiClipProperties'
 import { soundTargets } from './utils/multiSelect'
-import RemixModePicker from './components/RemixModePicker'
-import MusicLibrary from './components/MusicLibrary'
 import { REMIX_LAYOUTS, hasLayout, clampLayout } from './utils/remixLayout'
 import { MAX_TIMELINE_SECONDS, MAX_TIMELINE_ADJ, MAX_TIMELINE_TEXT, getTimelineEnd } from './utils/limits'
 import LengthLimitNotice from './components/LengthLimitNotice'
 import TooLargeNotice from './components/TooLargeNotice'
 import SilenceCutModal, { loadSettings as loadAutoCutSettings } from './components/SilenceCutModal'
-import AudioTemplateDialog from './components/AudioTemplateDialog'
-import ChaptersDialog from './components/ChaptersDialog'
 import { newChapter, moveChapter, resolveChapters, chapterSpans, chapterTime, MAX_CHAPTERS } from './utils/chapters'
 import { duckPlans, clipDuckSetting, applyMasterDuck, DUCK_DEPTHS, DUCK_DEFAULT_DB } from './utils/duck'
 import { trackNumbers, trackLabel } from './utils/trackNumbers'
@@ -37,17 +30,13 @@ import { applyAudioTemplate, removeAudioTemplate, appliedRoles, hasSlots } from 
 import { loadLoudness, planCuts } from './utils/silenceDetect'
 import { combineLoudness, groupSpan, overlappingVoices } from './utils/groupSilence'
 import { isAudioMode } from './utils/editorMode'
-import AudiogramDialog from './components/AudiogramDialog'
 import { audiogramsToPost } from './utils/audiogramLayers'
 import { audioFileName } from './utils/audioTemplate'
-import BeatSyncModal from './components/BeatSyncModal'
-import StickerPicker from './components/StickerPicker'
 import EncodingNotice from './components/EncodingNotice'
 import ClipColorFilters from './components/ClipColorFilters'
 import { DraftsPrompt, DraftLimitPicker, CloseDialog, DraftStatus } from './components/DraftsDialogs'
 import { useDrafts, savedPlayhead } from './hooks/useDrafts'
 import { useAutoCaptions } from './hooks/useAutoCaptions'
-import CaptionsPanel from './components/CaptionsPanel'
 import { normalizeCaptions, suggestEmojis, DEFAULT_CAPTION_STYLE } from './utils/captions'
 import { voiceTracksOf } from './utils/captionSources'
 import ConfirmDialog from './components/ConfirmDialog'
@@ -479,11 +468,10 @@ function App() {
     return () => window.removeEventListener('beforeunload', handler)
   }, [])
 
-  // Auto-load FFmpeg on mount
-  useEffect(() => {
-    loadFFmpeg()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // FFmpeg.wasm is for the legacy layout's exports and whole-HLS downloads
+  // only: loaded when one of them needs it, never on open (hooks/useFFmpeg.js)
+  const legacyLayout = !compactMode && !audioMode
+  useEffect(() => { if (legacyLayout) loadFFmpeg() }, [legacyLayout, loadFFmpeg])
 
   // Auto-download HLS streams when new HLS library items appear
   // If clipStart/clipEnd are set → backend prepares the clip (no FFmpeg needed client-side)
@@ -500,14 +488,14 @@ function App() {
           // Backend path: download 480p + trim on server
           downloadedHlsRef.current.add(item.id)
           startBackendClipPreparation(item.id, item.url, item.clipStart, item.clipEnd)
-        } else if (loaded && ffmpeg) {
-          // Client-side path: download full HLS in browser
+        } else {
+          // Client-side path: download full HLS in browser (FFmpeg.wasm loads for it)
           downloadedHlsRef.current.add(item.id)
-          startHlsDownload(item.id, item.url, ffmpeg)
+          loadFFmpeg().then(ff => { if (ff) startHlsDownload(item.id, item.url, ff) })
         }
       }
     }
-  }, [library, loaded, ffmpeg, hlsDownloads, startHlsDownload, startBackendClipPreparation])
+  }, [library, hlsDownloads, loadFFmpeg, startHlsDownload, startBackendClipPreparation])
 
   // Keyboard shortcuts
   useEffect(() => {

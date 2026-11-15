@@ -98,6 +98,7 @@ Quality presets: High (CRF 18), Medium (CRF 23), Low (CRF 28).
 - First-time onboarding tour
 - Light and dark theme support
 - Iframe embedding API with postMessage communication
+- Opens light: FFmpeg.wasm (only the legacy layout's exports and whole-HLS downloads in the browser use it) is served by the editor itself (`/ffmpeg/<version>/`, copied from `@ffmpeg/core` at build by `scripts/viteFfmpegCore.js`, gzipped) and loaded on first use; hls.js and the dialogs are their own chunks (`src/components/lazyPanels.jsx`)
 
 ### Audio editor (`?mode=audio`)
 The same editor for podcasts, music and voice. 3Speak opens it from its share menu (standalone) and from the audio upload ("Edit audio" on a track).
