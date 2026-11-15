@@ -12,7 +12,7 @@ re-encoded to an editing size, and listed in library.json next to it.
 The folder is served at /stock/ on the editor domains (host nginx, like /music/
 and /stickers/) and the editor reads /stock/library.json. Re-running only
 fetches what is missing; items removed from the source or listed in
-OUT/exclude.txt (one id per line) are dropped from the list.
+scripts/stock/exclude.txt or OUT/exclude.txt (one id per line) are dropped.
 
 Source: Wikimedia Commons (API, no key). Every file's licence is checked on its
 own file page metadata before it is taken:
@@ -131,7 +131,7 @@ SKIP_WORDS = re.compile(r'\b(?:' + '|'.join([
     'toddler', 'schoolchildren', 'pupils', 'minor', 'minors', 'slaughter', 'hunting', 'butcher',
     'inmate', 'inmates', 'prisoner', 'prisoners', 'shackles', 'handcuffs', 'wreck', 'wreckage', 'disaster',
     'fire', 'fires', 'wildfire', 'wildfires', 'smoke', 'flood', 'hurricane', 'tornado', 'earthquake',
-    'ntsb', 'usda', 'careers',
+    'ntsb', 'usda', 'careers', 'dressing', 'undressing', 'bathing', 'bath', 'locomotion', 'muybridge',
 ]) + r')\b', re.I)
 
 TAG_STOP = {'the', 'a', 'an', 'of', 'in', 'on', 'and', 'at', 'to', 'with', 'from', 'by', 'for', 'file',
@@ -403,11 +403,13 @@ def main():
                 old = {it['id']: it for it in json.load(f).get('items', [])}
         except (OSError, ValueError):
             old = {}
-        try:
-            with open(os.path.join(out, 'exclude.txt'), encoding='utf-8') as f:
-                exclude = {ln.strip() for ln in f if ln.strip() and not ln.startswith('#')}
-        except OSError:
-            pass
+        # left out by hand: scripts/stock/exclude.txt (reviewed list) plus OUT/exclude.txt (local)
+        for ex in (os.path.join(os.path.dirname(os.path.abspath(__file__)), 'exclude.txt'), os.path.join(out, 'exclude.txt')):
+            try:
+                with open(ex, encoding='utf-8') as f:
+                    exclude |= {ln.strip() for ln in f if ln.strip() and not ln.startswith('#')}
+            except OSError:
+                pass
 
     items = []
     seen = set()
