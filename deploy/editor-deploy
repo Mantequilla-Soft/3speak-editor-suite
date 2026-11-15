@@ -27,7 +27,8 @@
 #   a human merges it by hand. Any other local edit to a tracked file: refused.
 # - Only services whose code changed are rebuilt. Images are built while the old containers
 #   keep serving; the previous image is kept as <image>:rollback.
-# - A backend is swapped only when it runs no render job (activeJobs 0, waits up to 30 min).
+# - A backend is swapped only when it renders nothing and nothing waits in its queue
+#   (activeJobs 0 and queuedJobs 0 in /api/health, waits up to 30 min).
 # - Swap order: gateway, backend, frontend (a new frontend never meets an old backend here).
 # - Any failed smoke test rolls the swapped services back to their previous images.
 set -euo pipefail
@@ -118,13 +119,22 @@ wait_healthy() { # <service>
     || { log "$1 restarted within ${STABLE_SECONDS}s of answering"; return 1; }
   out=$("smoke_$1") || { log "$1 second smoke failed: $out"; return 1; }
 }
-active_jobs() { curl -s --max-time 15 "$BACKEND_URL/api/health" | grep -oE '"activeJobs":[0-9]+' | cut -d: -f2; }
+# Jobs on the backend: rendering + waiting in its queue ("activeJobs+queuedJobs"; an older
+# backend without a queue reports no queuedJobs, which counts as 0). Empty when unreachable.
+backend_jobs() {
+  local body a q
+  body=$(curl -s --max-time 15 "$BACKEND_URL/api/health" || true)
+  a=$(grep -oE '"activeJobs":[0-9]+' <<<"$body" | cut -d: -f2)
+  [ -n "$a" ] || return 0
+  q=$(grep -oE '"queuedJobs":[0-9]+' <<<"$body" | cut -d: -f2)
+  echo "$((a + ${q:-0}))"
+}
 wait_idle() {
   local deadline=$((SECONDS + IDLE_WAIT_SECONDS)) n
   while :; do
-    n=$(active_jobs || true)
+    n=$(backend_jobs || true)
     [ "$n" = 0 ] && return 0
-    [ $SECONDS -ge $deadline ] && { log "backend still busy (activeJobs ${n:-?}) after ${IDLE_WAIT_SECONDS}s"; return 1; }
+    [ $SECONDS -ge $deadline ] && { log "backend still busy (${n:-?} render jobs running or queued) after ${IDLE_WAIT_SECONDS}s"; return 1; }
     sleep 5
   done
 }
@@ -135,7 +145,7 @@ services_for() {
   while IFS= read -r f; do
     [ -n "$f" ] || continue
     case "$f" in
-      *.md|LICENSE|.github/*|deploy/*|e2e/*|tests/*|backend/test/*|docs/*|docker-compose.override.example.yml|vitest.config.js) ;;
+      *.md|LICENSE|.github/*|deploy/*|e2e/*|tests/*|backend/test/*|gateway/test/*|docs/*|docker-compose.override.example.yml|vitest.config.js) ;;
       docker-compose.yml) need_b=yes; need_g=yes; need_f=yes ;;
       backend/*) need_b=yes ;;
       gateway/*) need_g=yes ;;

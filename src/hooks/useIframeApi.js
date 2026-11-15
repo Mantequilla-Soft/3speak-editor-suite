@@ -10,6 +10,7 @@ import { outputSize } from '../utils/outputSize'
 import { normalizeCaptions } from '../utils/captions'
 import { emojiUrlsOf } from '../utils/captionSources'
 import { loadCreditOf, isMusicLoad } from '../utils/loadCredit'
+import { submitRender, pollRender, statusPhase } from '../utils/renderQueue'
 
 const isIframe = typeof window !== 'undefined' && window.parent !== window
 const GATEWAY_URL = (import.meta.env.VITE_GATEWAY_URL || '').replace(/\/+$/, '')
@@ -23,7 +24,7 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
     // Default: use own viewport when not in iframe, false in iframe until parent tells us
     return !isIframe && typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches
   })
-  const pollIntervalRef = useRef(null)
+  const pollAbortRef = useRef(null) // stops the submit retries / status polls of the render
   const uploadedPlatesRef = useRef(new Map()) // local clean-plate URL -> server URL
   const activeJobRef = useRef(null) // { jobId, backendEndpoint }
   const remixSourceRef = useRef(null) // { parentAuthor, parentPermlink } when remixing a short
@@ -238,10 +239,8 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
     fetch(abortUrl, { method: 'POST', keepalive: true, headers: tok ? { Authorization: `Bearer ${tok}` } : {} }).catch(() => {})
 
     activeJobRef.current = null
-    if (pollIntervalRef.current) {
-      clearInterval(pollIntervalRef.current)
-      pollIntervalRef.current = null
-    }
+    pollAbortRef.current?.abort()
+    pollAbortRef.current = null
   }, [])
 
   // Abort on page close / unmount
@@ -252,7 +251,7 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
     return () => {
       window.removeEventListener('beforeunload', onBeforeUnload)
       abortActiveJob()
-      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
+      pollAbortRef.current?.abort()
     }
   }, [abortActiveJob])
 
@@ -532,69 +531,64 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
     }
   }, [allTracks, uploadFile, activeAspectRatio, audioMode, master, title, chapters, captions])
 
-  // Poll job status
-  const pollJobStatus = useCallback((jobId, backendEndpoint) => {
-    if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
-
-    pollIntervalRef.current = setInterval(async () => {
-      try {
-        let pollUrl
-        if (GATEWAY_URL && backendEndpoint) {
-          pollUrl = `${GATEWAY_URL}/api/render/${jobId}?backend=${encodeURIComponent(backendEndpoint)}`
-        } else {
-          pollUrl = api(`/api/render/${jobId}`)
-        }
-
-        const res = await fetch(pollUrl)
-        const data = await res.json()
-
-        if (data.status === 'completed') {
-          // Build full URL from the backend that rendered it (no gateway: the
-          // selected backend, not this page's own origin)
-          const base = backendEndpoint || getBackendUrl() || window.location.origin
-          const fullUrl = new URL(data.outputUrl, base).href
-          // Auto captions' subtitle files sit next to the video. `burnedIn`: the
-          // words are in the picture too ("Show in the video"), so 3Speak keeps
-          // CC off for them by default; the backend says (it knows when it could
-          // not draw them), an older one does not, then the option decides.
-          const subtitles = data.subtitles
-            ? {
-                ...data.subtitles,
-                vttUrl: new URL(data.subtitles.vttUrl, base).href,
-                srtUrl: new URL(data.subtitles.srtUrl, base).href,
-                burnedIn: typeof data.subtitles.burnedIn === 'boolean' ? data.subtitles.burnedIn : captionsBurnRef.current
-              }
-            : undefined
-          setRenderStatus({ ...data, outputUrl: fullUrl, subtitles })
-          clearInterval(pollIntervalRef.current)
-          pollIntervalRef.current = null
-          activeJobRef.current = null
-          if (isIframe) {
-            sendToParent('render-complete', {
-              outputUrl: fullUrl,
-              ...(subtitles && { subtitles }),
-              ...(remixSourceRef.current && { remixSource: remixSourceRef.current })
-            })
+  // Follow the job until it is done (utils/renderQueue.js: its place in the
+  // line, then the progress; a hard error ends it, a short outage does not)
+  const pollJobStatus = useCallback(async (jobId, backendEndpoint, signal) => {
+    const pollUrl = GATEWAY_URL && backendEndpoint
+      ? `${GATEWAY_URL}/api/render/${jobId}?backend=${encodeURIComponent(backendEndpoint)}`
+      : api(`/api/render/${jobId}`)
+    let data
+    try {
+      data = await pollRender({
+        get: () => fetch(pollUrl, { cache: 'no-store', signal }),
+        signal,
+        onStatus: (d) => setRenderStatus(prev => (d.reconnecting
+          ? { ...prev, phase: 'Reconnecting to the render server...' }
+          : { ...d, status: d.status || 'processing', phase: statusPhase(d) || prev?.phase }))
+      })
+    } catch (err) {
+      if (signal.aborted) return
+      data = { jobId, status: 'failed', error: err.message, progress: 0 }
+    }
+    if (!data || signal.aborted) return
+    activeJobRef.current = null
+    if (data.status === 'completed') {
+      // Build full URL from the backend that rendered it (no gateway: the
+      // selected backend, not this page's own origin)
+      const base = backendEndpoint || getBackendUrl() || window.location.origin
+      const fullUrl = new URL(data.outputUrl, base).href
+      // Auto captions' subtitle files sit next to the video. `burnedIn`: the
+      // words are in the picture too ("Show in the video"), so 3Speak keeps
+      // CC off for them by default; the backend says (it knows when it could
+      // not draw them), an older one does not, then the option decides.
+      const subtitles = data.subtitles
+        ? {
+            ...data.subtitles,
+            vttUrl: new URL(data.subtitles.vttUrl, base).href,
+            srtUrl: new URL(data.subtitles.srtUrl, base).href,
+            burnedIn: typeof data.subtitles.burnedIn === 'boolean' ? data.subtitles.burnedIn : captionsBurnRef.current
           }
-        } else if (data.status === 'failed' || data.status === 'aborted') {
-          setRenderStatus(data)
-          clearInterval(pollIntervalRef.current)
-          pollIntervalRef.current = null
-          activeJobRef.current = null
-          if (isIframe) {
-            sendToParent('render-failed', { error: data.error })
-          }
-        } else {
-          setRenderStatus(data)
-        }
-      } catch (err) {
-        console.error('[useIframeApi] Poll error:', err)
+        : undefined
+      setRenderStatus({ ...data, outputUrl: fullUrl, subtitles })
+      if (isIframe) {
+        sendToParent('render-complete', {
+          outputUrl: fullUrl,
+          ...(subtitles && { subtitles }),
+          ...(remixSourceRef.current && { remixSource: remixSourceRef.current })
+        })
       }
-    }, 1500)
+    } else {
+      setRenderStatus(data)
+      if (isIframe) sendToParent('render-failed', { error: data.error })
+    }
   }, [sendToParent])
 
-  // Submit render job to backend (or gateway if configured)
+  // Submit render job to backend (or gateway if configured). A busy server is
+  // waited for: the job goes in line, or the editor tries again by itself.
   const requestRender = useCallback(async () => {
+    pollAbortRef.current?.abort()
+    const ac = new AbortController()
+    pollAbortRef.current = ac
     try {
       setRenderStatus({ status: 'submitting', progress: 0, phase: 'Preparing files...' })
 
@@ -605,27 +599,31 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
       setRenderStatus({ status: 'submitting', progress: 0, phase: 'Submitting render job...' })
 
       const renderUrl = GATEWAY_URL ? `${GATEWAY_URL}/api/render` : api('/api/render')
-      const res = await authFetch(renderUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+      const body = JSON.stringify(payload)
+      const answer = await submitRender({
+        send: () => authFetch(renderUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }),
+        signal: ac.signal,
+        onWait: ({ seconds, busy }) => setRenderStatus({
+          status: 'submitting',
+          progress: 0,
+          phase: busy ? `The render servers are busy. Trying again in ${seconds} s...` : `No connection to the render server. Trying again in ${seconds} s...`
+        })
       })
+      if (!answer || ac.signal.aborted) return
 
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}))
-        throw new Error(errData.error || `Server responded with ${res.status}`)
-      }
-
-      const { jobId, backendEndpoint } = await res.json()
+      const { jobId, backendEndpoint } = answer
       activeJobRef.current = { jobId, backendEndpoint }
-      setRenderStatus({ jobId, status: 'processing', progress: 0, phase: 'Starting...' })
-      pollJobStatus(jobId, backendEndpoint)
+      setRenderStatus({ jobId, status: answer.status === 'queued' ? 'queued' : 'processing', progress: 0, phase: statusPhase(answer) || 'Starting...', ...(answer.position ? { position: answer.position } : {}) })
+      await pollJobStatus(jobId, backendEndpoint, ac.signal)
     } catch (err) {
+      if (ac.signal.aborted) return
       console.error('[useIframeApi] Render request failed:', err)
       setRenderStatus({ status: 'failed', error: err.message, progress: 0 })
       if (isIframe) {
         sendToParent('render-failed', { error: err.message })
       }
+    } finally {
+      if (pollAbortRef.current === ac) pollAbortRef.current = null
     }
   }, [buildAndUploadPayload, pollJobStatus, sendToParent])
 

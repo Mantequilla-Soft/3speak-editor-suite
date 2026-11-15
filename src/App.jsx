@@ -42,6 +42,7 @@ import { voiceTracksOf } from './utils/captionSources'
 import ConfirmDialog from './components/ConfirmDialog'
 import { useCleaningStatus, cleaningText } from './utils/cleaningStatus'
 import { isTypingTarget } from './utils/keyboard'
+import { isRenderActive } from './utils/renderQueue'
 import logo3speak from './assets/3speak.png'
 
 // Audio editor: the talking = clips on audio tracks that are not music and not template parts
@@ -1350,7 +1351,8 @@ function App() {
     else setCloseDialog('parent')
   }, [closeRequest]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isBackendRendering = renderStatus && (renderStatus.status === 'submitting' || renderStatus.status === 'processing')
+  // waiting in the render queue counts too (utils/renderQueue.js)
+  const isBackendRendering = !!renderStatus && isRenderActive(renderStatus.status)
 
   // Preview modal state — user must preview rendered video before sending
   const [showPreview, setShowPreview] = useState(false)
