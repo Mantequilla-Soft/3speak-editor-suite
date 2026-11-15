@@ -1,4 +1,5 @@
 import { cleanLayers, defaultLayers, DEFAULT_LINE, SIZES, CIRCLE_SHAPES, IMAGE_LAYOUTS, LOGO_STYLES } from './audiogramPage.js'
+import { cleanAudiogramCaptionLook } from '../utils/audiogramCaptions.js'
 
 /**
  * Audiogram: a short video of a piece of an episode for sharing (3Speak Shorts,
@@ -86,7 +87,8 @@ export function cleanAudiogramStyle(input = {}) {
     background: { image, imageLayout: pick(b.imageLayout, IMAGE_LAYOUTS, d.background.imageLayout) },
     line: typeof s.line === 'string' ? s.line.replace(/\s+/g, ' ').trim().slice(0, MAX_LINE) : d.line,
     logo,
-    layouts
+    layouts,
+    captions: cleanAudiogramCaptionLook(s.captions)
   }
 }
 
@@ -213,9 +215,10 @@ export function waveFilter(type, w, h, color) {
  * under the waveform (input 1), the waveform at `box` { cx, cy, w, h, r } (its
  * middle, size, degrees; or none), the still over it (input 2, transparent
  * PNG, or none), faded in and out. A round waveform needs `maps` { x, y }
- * (files of circleMaps).
+ * (files of circleMaps). `captionsFilter`: a filter drawing the captions over
+ * it all (services/audiogramCaptions.js), or none.
  */
-export function audiogramArgs({ input, below, above = null, box, maps = null, output, start, duration, style = DEFAULT_STYLE }) {
+export function audiogramArgs({ input, below, above = null, box, maps = null, output, start, duration, style = DEFAULT_STYLE, captionsFilter = null }) {
   const st = cleanAudiogramStyle(style)
   const fade = Math.min(0.5, duration / 4).toFixed(3)
   const out = (duration - +fade).toFixed(3)
@@ -249,7 +252,8 @@ export function audiogramArgs({ input, below, above = null, box, maps = null, ou
     v = 'bt'
   }
   parts.push(
-    `[${v}]fade=t=in:st=0:d=${fade},fade=t=out:st=${out}:d=${fade},format=yuv420p[v]`,
+    // captions (utils/audiogramCaptions.js) over everything, faded with the rest
+    `[${v}]${captionsFilter ? `${captionsFilter},` : ''}fade=t=in:st=0:d=${fade},fade=t=out:st=${out}:d=${fade},format=yuv420p[v]`,
     `[ao]afade=t=in:st=0:d=${fade},afade=t=out:st=${out}:d=${fade}[a]`
   )
   const still = (file) => ['-loop', '1', '-framerate', String(FPS), '-t', String(duration), '-i', file]

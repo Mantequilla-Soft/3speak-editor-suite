@@ -8,6 +8,9 @@ import {
   setLogoStyle, dragAngle, AUDIOGRAM_MAX_SECONDS, ROUND_WAVES
 } from '../utils/audiogramLayers'
 import OnboardingTour, { AUDIOGRAM_TOUR_STEPS, useFirstTimeTour } from './OnboardingTour'
+import { AudiogramCaptionsLayer, AudiogramCaptionsField } from './AudiogramCaptions'
+import { cleanAudiogramCaptionLook, captionBox, clampCaptionBox } from '../utils/audiogramCaptions'
+import { useAudiogramCaptions } from '../hooks/useAudiogramCaptions'
 
 const WAVES = [
   { id: 'bars', label: 'Bars' },
@@ -92,7 +95,7 @@ export default function AudiogramDialog({
         if (gone) return
         setDefaults(d)
         setHasTemplate(!!tpl)
-        const look = asLook(tpl ? { duration: tpl.duration, wave: tpl.wave, background: tpl.background, line: tpl.line, logo: tpl.logo, layouts: tpl.layouts } : d.style)
+        const look = asLook(tpl ? { duration: tpl.duration, wave: tpl.wave, background: tpl.background, line: tpl.line, logo: tpl.logo, layouts: tpl.layouts, captions: tpl.captions } : d.style)
         // a template from before the logo was fixed: it shows again (the backend does the same)
         const own = look.layouts?.[FORMAT] || d.style.layouts[FORMAT]
         look.layouts = { [FORMAT]: { ...own, logo: { ...own.logo, on: true } } }
@@ -116,6 +119,11 @@ export default function AudiogramDialog({
   const picked = !!(range && range.end != null && range.end - range.start >= 3)
   const piece = pieceOf(picked ? range : null, length, 0)
   const seconds = Math.round((piece.end - piece.start) * 10) / 10
+  // Captions (utils/audiogramCaptions.js): their look in the style, their box kept clear of the logo
+  const capLook = useMemo(() => cleanAudiogramCaptionLook(style?.captions), [style?.captions])
+  const capBox = useMemo(() => (layers ? captionBox(capLook, format, size, layers) : null), [capLook, format, size, layers])
+  const setCapLook = (patch) => setStyle(s => ({ ...s, captions: { ...cleanAudiogramCaptionLook(s.captions), ...patch } }))
+  const ag = useAudiogramCaptions({ outputUrl, piece })
   // The look is not in an audiogram yet (closing asks first)
   const dirty = !!style && savedLookRef.current !== null && lookKey(style, text) !== savedLookRef.current
 
@@ -225,6 +233,15 @@ export default function AudiogramDialog({
   }
   const nudge = (e) => {
     if (!selected || !layers) return
+    if (selected === 'captions') {
+      const step = e.shiftKey ? 10 : 1
+      const d = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key]
+      if (d && capBox) {
+        e.preventDefault()
+        setCapLook({ boxes: { ...capLook.boxes, [format]: clampCaptionBox({ ...capBox, x: capBox.x + d[0], y: capBox.y + d[1] }, capLook, size) } })
+      }
+      return
+    }
     if (e.key === '[' || e.key === ']') {
       e.preventDefault()
       const by = (e.key === ']' ? 1 : -1) * (e.shiftKey ? 15 : 1)
@@ -267,10 +284,14 @@ export default function AudiogramDialog({
     const used = { ...style, duration: Math.round(seconds) }
     const usedKey = lookKey(style, text)
     try {
+      // captions on: the piece's words (listened to first when they are not there yet)
+      const words = capLook.on ? (ag.ready ? ag.words : await ag.transcribe()) : null
+      if (capLook.on && !words) throw new Error('the words of this piece could not be found (switch captions off to make it without)')
+      setJob({ status: 'processing', progress: 0, phase: 'Starting...' })
       const res = await authFetch(api('/api/audiogram'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: outputUrl, start: piece.start, duration: seconds, format, title: text, style: used })
+        body: JSON.stringify({ url: outputUrl, start: piece.start, duration: seconds, format, title: text, style: used, ...(words?.length ? { captions: { words, language: ag.language } } : {}) })
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`)
@@ -405,6 +426,18 @@ export default function AudiogramDialog({
                   style={{ transform: `scale(${scale})` }}
                 />
                 {guide === 'x' && <div className="audiogram-guide" />}
+                {capLook.on && capBox && (
+                  <AudiogramCaptionsLayer
+                    look={capLook}
+                    box={capBox}
+                    size={size}
+                    scale={scale}
+                    words={ag.words}
+                    selected={selected === 'captions'}
+                    onSelect={() => setSelected('captions')}
+                    onBox={(b) => setCapLook({ boxes: { ...capLook.boxes, [format]: b } })}
+                  />
+                )}
                 {LAYERS.filter(l => shown(l.id)).map(({ id, name }) => {
                   const b = layers[id]
                   return (
@@ -504,6 +537,8 @@ export default function AudiogramDialog({
                   </label>
                 </div>
               </div>
+
+              <AudiogramCaptionsField look={capLook} onChange={setCapLook} ag={ag} disabled={busy} />
 
               <div className="audiogram-field">
                 <span>Parts <small>(front to back)</small></span>
