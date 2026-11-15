@@ -388,6 +388,8 @@ def main():
     ap.add_argument('--list', action='store_true', help='only list what would be taken')
     ap.add_argument('--per-query', type=int, default=2, help='items taken per search (default 2)')
     ap.add_argument('--max-items', type=int, default=300, help='stop after this many items (default 300)')
+    ap.add_argument('--offline', action='store_true',
+                    help='download nothing: rebuild the list from the items already in OUT (after editing exclude.txt)')
     args = ap.parse_args()
     if not args.list and not args.out:
         ap.error('give the output folder, or --list')
@@ -415,7 +417,12 @@ def main():
     seen = set()
     taken = {}  # (kind, category, query) -> count
     skipped = 0
-    for kind, cat, q, page in candidates(args.per_query):
+    if args.offline:
+        if not out:
+            ap.error('--offline needs the output folder')
+        items = [it for it in old.values() if it['id'] not in exclude and
+                 all(os.path.exists(os.path.join(out, it[k])) for k in ('file', 'thumb', 'preview') if it.get(k))]
+    for kind, cat, q, page in ([] if args.offline else candidates(args.per_query)):
         if len(items) >= args.max_items:
             break
         key = (kind, cat, q)
@@ -423,7 +430,11 @@ def main():
             continue
         pid = page.get('pageid')
         iid = f'wm{pid}'
-        if not pid or iid in seen or iid in exclude:
+        if not pid or iid in seen:
+            continue
+        if iid in exclude:
+            # its slot stays empty: a left-out item is not replaced by the next (usually weaker) result
+            taken[key] = taken.get(key, 0) + 1
             continue
         why = acceptable(page, kind)
         if why:
@@ -489,7 +500,9 @@ def main():
         items.append(item)
         taken[key] = taken.get(key, 0) + 1
         # written as it goes, so an interrupted build still leaves a usable list
-        write_library(out, items)
+        # (with the items of the last build it has not come to yet)
+        done = {it['id'] for it in items}
+        write_library(out, items + [o for o in old.values() if o['id'] not in done and o['id'] not in exclude])
 
     if args.list:
         log(f'{len(items)} items, {skipped} skipped')
