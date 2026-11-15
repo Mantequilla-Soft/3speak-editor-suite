@@ -9,6 +9,9 @@
  * (backend/src/routes/stock.js) and gives items of the same shape.
  */
 
+// Off until the owner is happy with the library: VITE_STOCK_LIBRARY=true at build time shows it.
+export const STOCK_ENABLED = import.meta.env?.VITE_STOCK_LIBRARY === 'true'
+
 export const STOCK_SOURCES = (import.meta.env?.VITE_STOCK_SOURCES || '/stock/library.json')
   .split(',').map(s => s.trim()).filter(Boolean)
 

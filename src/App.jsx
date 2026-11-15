@@ -5,6 +5,7 @@ import { useCanvasExport } from './hooks/useCanvasExport'
 import { useTimeline } from './hooks/useTimeline'
 import { useUndoableState } from './hooks/useHistory'
 import { useIframeApi } from './hooks/useIframeApi'
+import { STOCK_ENABLED } from './utils/stockLibrary'
 import { isHlsUrl } from './utils/hlsHelper'
 import { reverseClipOnBackend } from './utils/reverseClip'
 import { selectBackend, getBackendUrl, api } from './utils/backendSelector'
@@ -1557,7 +1558,7 @@ function App() {
               playheadPosition={playheadPosition}
               tabbed={!isDesktop}
               motionKit={audioMode ? null : motionKit}
-              onPickBackground={(clipId) => setStockOpen({ underClipId: clipId })}
+              onPickBackground={STOCK_ENABLED ? (clipId) => setStockOpen({ underClipId: clipId }) : null}
             />
           </div>
   ) : null
@@ -2043,7 +2044,7 @@ function App() {
             onOpenMusic={(trackId) => openAdd('music', trackId)}
             onOpenSfx={(trackId) => openAdd('sfx', trackId)}
             onOpenStickers={audioMode ? undefined : () => setStickersOpen(true)}
-            onOpenStock={audioMode ? undefined : () => setStockOpen({})}
+            onOpenStock={audioMode || !STOCK_ENABLED ? undefined : () => setStockOpen({})}
             onOpenTitles={audioMode ? undefined : () => setTitlesOpen(true)}
             onOpenCaptions={audioMode ? undefined : () => { wordTools.setTranscriptOpen(false); setCaptionsOpen(o => !o) }}
             captionsActive={captionsOpen || !!captions}
@@ -2543,7 +2544,7 @@ function App() {
               onOpenMusic={(trackId) => openAdd('music', trackId)}
               onOpenSfx={(trackId) => openAdd('sfx', trackId)}
               onOpenStickers={() => setStickersOpen(true)}
-              onOpenStock={() => setStockOpen({})}
+              onOpenStock={STOCK_ENABLED ? () => setStockOpen({}) : undefined}
               onOpenTitles={() => setTitlesOpen(true)}
               onOpenCaptions={() => { wordTools.setTranscriptOpen(false); setCaptionsOpen(o => !o) }}
               captionsActive={captionsOpen || !!captions}
@@ -2612,7 +2613,7 @@ function App() {
                     onSplit={(time) => selectedClipId && splitClip(selectedClipId, time)}
                     playheadPosition={playheadPosition}
                     motionKit={audioMode ? null : motionKit}
-                    onPickBackground={(clipId) => setStockOpen({ underClipId: clipId })}
+                    onPickBackground={STOCK_ENABLED ? (clipId) => setStockOpen({ underClipId: clipId }) : null}
                   />
                 </div>
               )}
