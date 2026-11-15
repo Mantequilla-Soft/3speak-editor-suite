@@ -1,4 +1,5 @@
 import { EDITOR_MODE } from './editorMode'
+import { MAX_VIDEO_SECONDS, isShortAspect, readProjectAspect } from './projectFormat'
 
 // Length limit for a rendered short. The timeline itself can run longer
 // (the creator trims it down in the editor); rendering is disabled until it fits.
@@ -9,9 +10,14 @@ export const MAX_SHORT_SECONDS = 120
 // renders (MAX_AUDIO_RENDER_SECONDS in backend/src/routes/render.js); keep in step.
 export const MAX_AUDIO_SECONDS = 3 * 60 * 60
 
-export const maxSecondsFor = (mode) => (mode === 'audio' ? MAX_AUDIO_SECONDS : MAX_SHORT_SECONDS)
-// The limit of this page's editor (the mode is fixed per page, see editorMode.js)
-export const MAX_TIMELINE_SECONDS = maxSecondsFor(EDITOR_MODE)
+// Landscape, classic and square videos (utils/projectFormat.js): up to 10 minutes
+export { MAX_VIDEO_SECONDS }
+
+export const maxSecondsFor = (mode, aspect = '9:16') => (mode === 'audio' ? MAX_AUDIO_SECONDS : isShortAspect(aspect) ? MAX_SHORT_SECONDS : MAX_VIDEO_SECONDS)
+// The limit of this page's editor: its mode is fixed per page (editorMode.js),
+// the video editor's shape can change (setProjectLimit). Live bindings: every
+// module that imports them reads the current value.
+export let MAX_TIMELINE_SECONDS = maxSecondsFor(EDITOR_MODE, readProjectAspect())
 
 // Biggest file the editor takes: the backend accepts uploads up to 2 GB, and a
 // bigger file could never be rendered (or held by the browser for long)
@@ -36,8 +42,20 @@ export function limitAdjective(seconds) {
   const minutes = seconds / 60
   return Number.isInteger(minutes) ? `${minutes}-minute` : `${seconds}-second`
 }
-export const MAX_TIMELINE_TEXT = limitText(MAX_TIMELINE_SECONDS)
-export const MAX_TIMELINE_ADJ = limitAdjective(MAX_TIMELINE_SECONDS)
+export let MAX_TIMELINE_TEXT = limitText(MAX_TIMELINE_SECONDS)
+export let MAX_TIMELINE_ADJ = limitAdjective(MAX_TIMELINE_SECONDS)
+// What a render of this project is called in messages ("A short can be at most...")
+export let RENDER_NOUN = EDITOR_MODE === 'audio' ? 'An export' : isShortAspect(readProjectAspect()) ? 'A short' : 'A video'
+
+/** The video project's shape changed: its limit follows (2 minutes for a Short, else 10). */
+export function setProjectLimit(aspect) {
+  if (EDITOR_MODE === 'audio') return MAX_TIMELINE_SECONDS
+  MAX_TIMELINE_SECONDS = maxSecondsFor(EDITOR_MODE, aspect)
+  MAX_TIMELINE_TEXT = limitText(MAX_TIMELINE_SECONDS)
+  MAX_TIMELINE_ADJ = limitAdjective(MAX_TIMELINE_SECONDS)
+  RENDER_NOUN = isShortAspect(aspect) ? 'A short' : 'A video'
+  return MAX_TIMELINE_SECONDS
+}
 
 // Where the last clip on any track ends, i.e. how long a render would be.
 // The timeline itself is not capped; only rendering is held to the limit.

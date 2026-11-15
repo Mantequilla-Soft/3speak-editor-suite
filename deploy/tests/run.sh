@@ -37,7 +37,8 @@ for a in "$@"; do [ "$a" = '%{http_code}' ] && code=1; done
 case "$url" in
   */api/health)
     if [ -e "$F/backend_live_new" ] && [ -e "$F/new_backend_bad" ]; then body='{"status":"broken"}'
-    elif [ -e "$F/busy" ]; then body='{"status":"ok","activeJobs":1}'
+    elif [ -e "$F/busy" ]; then body='{"status":"ok","activeJobs":1,"queuedJobs":0}'
+    elif [ -e "$F/queued" ]; then body='{"status":"ok","activeJobs":0,"maxConcurrentJobs":2,"queuedJobs":2,"maxQueuedJobs":20}'
     else body='{"status":"ok","activeJobs":0}'; fi; c=200 ;;
   */api/upload|*/api/render) c=401; body="no" ;;
   */health) c=200; body=ok ;;
@@ -114,6 +115,10 @@ rm -f "$FLAGS/new_backend_bad" "$FLAGS/backend_live_new"
 touch "$FLAGS/busy"
 expect "backend busy rendering: never swapped, rolled back" '[ "$(run deploy $c4)" = 1 ] && head_is $c3 && ! dlog | grep -q "up -d"'
 rm -f "$FLAGS/busy"
+
+touch "$FLAGS/queued"
+expect "nothing rendering but jobs waiting in the queue: never swapped, rolled back" '[ "$(run deploy $c4)" = 1 ] && head_is $c3 && ! dlog | grep -q "up -d" && grep -q "2 render jobs running or queued" "$T/deploy.log"'
+rm -f "$FLAGS/queued"
 
 expect "then idle: deploys" '[ "$(run deploy $c4)" = 0 ] && head_is $c4'
 rm -f "$FLAGS/backend_live_new"

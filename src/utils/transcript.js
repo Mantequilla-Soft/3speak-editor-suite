@@ -9,8 +9,11 @@
 //   w        the words, by start, seconds in that file
 //   covered  the stretches of the file that were listened to (words or not)
 // The speaker of a word is the track its clip is on (each voice its own track).
+// A retimed clip (utils/clipSpeed.js: speed, ramp) maps its words through its
+// time map, so at 2x they come twice as fast; a freeze frame has no words.
 
 import { voiceTracksOf } from './captionSources'
+import { sourceAt, clipTimeAt, isFrozen } from './clipSpeed'
 
 const EPS = 0.001
 const MAX_WORD_CHARS = 40
@@ -113,7 +116,7 @@ export function speechClips(tracks) {
   voiceTracksOf(tracks).forEach((t, i) => {
     const speaker = String(t.name || '').trim() || `Voice ${i + 1}`
     for (const clip of t.clips) {
-      if (!clip.libraryId || len(clip) <= 0) continue
+      if (!clip.libraryId || len(clip) <= 0 || isFrozen(clip)) continue
       out.push({ clip, trackId: t.id, speaker, speakerIndex: i })
     }
   })
@@ -129,7 +132,8 @@ export function neededRanges(tracks, transcript, pad = 1) {
   const bySource = new Map()
   for (const { clip } of speechClips(tracks)) {
     const e = bySource.get(clip.libraryId) || { libraryId: clip.libraryId, clipId: clip.id, ranges: [] }
-    e.ranges.push([Math.max(0, clip.startTime - pad), clip.endTime + pad])
+    // in the file's own seconds (a retimed clip shows more or less of its file than its length)
+    e.ranges.push([Math.max(0, sourceAt(clip, clip.startTime) - pad), sourceAt(clip, clip.endTime) + pad])
     bySource.set(clip.libraryId, e)
   }
   const out = []
@@ -171,14 +175,18 @@ export function placeWords(tracks, transcript) {
     if (!s?.w?.length) continue
     const p = pos(clip)
     const clipEnd = p + len(clip)
-    for (let k = firstFrom(s.w, clip.startTime - EPS); k < s.w.length; k++) {
+    // the clip's stretch of its file, and file seconds -> timeline seconds through its time map
+    const from = sourceAt(clip, clip.startTime)
+    const to = sourceAt(clip, clip.endTime)
+    const at = (x) => p + (clipTimeAt(clip, x) - clip.startTime)
+    for (let k = firstFrom(s.w, from - EPS); k < s.w.length; k++) {
       const [text, a, b] = s.w[k]
-      if (a >= clip.endTime - 0.05) break
-      const start = round3(p + (a - clip.startTime))
+      if (a >= to - 0.05) break
+      const start = round3(at(a))
       const key = `${clip.libraryId}:${Math.round(start * 100)}`
       if (seen.has(key)) continue // the same recording twice at the same moment (a video and its own sound)
       seen.add(key)
-      out.push({ text, start, end: round3(Math.min(clipEnd, Math.max(start + 0.05, p + (b - clip.startTime)))), speaker, speakerIndex, trackId, clipId: clip.id, libraryId: clip.libraryId, src: a })
+      out.push({ text, start, end: round3(Math.min(clipEnd, Math.max(start + 0.05, at(Math.min(b, to))))), speaker, speakerIndex, trackId, clipId: clip.id, libraryId: clip.libraryId, src: a })
     }
   }
   return out.sort((x, y) => x.start - y.start || x.speakerIndex - y.speakerIndex)

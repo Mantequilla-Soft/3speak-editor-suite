@@ -201,6 +201,23 @@ try {
     assert.deepEqual(await wordsIn(frame), ['Hello', 'everyone,', 'welcome', 'back.', 'Bye.'])
   })
 
+  await step('Video podcast: the transcript\'s words go along as its captions (no listening again)', async () => {
+    const page = frame.page()
+    await frame.getByRole('button', { name: /^Export$/ }).click()
+    await frame.getByRole('button', { name: 'Use this audio' }).first().waitFor({ timeout: 90000 })
+    await frame.getByRole('button', { name: 'Video podcast' }).click()
+    const dialog = frame.getByRole('dialog', { name: 'Video podcast' })
+    await dialog.waitFor()
+    assert.match(await dialog.innerText(), /The words of your transcript/)
+    const req = page.waitForRequest(r => r.method() === 'POST' && new URL(r.url()).pathname === '/api/video-podcast')
+    await dialog.getByRole('button', { name: 'Make video podcast' }).click()
+    const body = (await req).postDataJSON()
+    assert.equal(body.captions.on, true)
+    assert.deepEqual(body.captions.words.map(w => w.text), ['Hello', 'everyone,', 'welcome', 'back.', 'Bye.'])
+    await until(() => /\[video-podcast\] \S+: .* 5 words/.test(backendLog), 'the video podcast made with those 5 words', 120000)
+    await dialog.getByRole('button', { name: 'Close' }).first().click().catch(() => {})
+  })
+
   await step('phone layout: the transcript fits, no sideways scrolling', async () => {
     const p = await openEditor({ file: 'speech.wav', viewport: { width: 390, height: 844 } })
     await p.frame.getByRole('button', { name: 'Transcript' }).click()

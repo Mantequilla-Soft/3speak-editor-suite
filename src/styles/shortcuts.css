@@ -1,0 +1,87 @@
+/* Keyboard shortcuts (hooks/useShortcuts.js): the `?` sheet, the keyboard
+   focus on timeline clips, and the line screen readers hear */
+.remix-picker.shortcut-sheet {
+  max-width: 640px;
+  max-height: 86vh;
+  overflow-y: auto;
+}
+
+.shortcut-sheet-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px 24px;
+}
+
+.shortcut-sheet-group h4 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.shortcut-sheet-group dl {
+  margin: 0;
+}
+
+.shortcut-sheet-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.shortcut-sheet-row:last-child {
+  border-bottom: none;
+}
+
+.shortcut-sheet-row dt {
+  flex: 0 0 auto;
+  min-width: 96px;
+  white-space: nowrap;
+}
+
+.shortcut-sheet-row dd {
+  margin: 0;
+  color: var(--text);
+}
+
+.shortcut-sheet-row kbd {
+  display: inline-block;
+  min-width: 18px;
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  background: var(--surface-2);
+  font: 600 12px/1.4 inherit;
+  text-align: center;
+}
+
+.shortcut-sheet-or {
+  color: var(--text-secondary);
+}
+
+/* a clip reached with the keyboard (Tab, Alt+arrows) */
+.timeline-clip-v2:focus {
+  outline: none;
+}
+
+.timeline-clip-v2:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 1px;
+}
+
+.editor-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

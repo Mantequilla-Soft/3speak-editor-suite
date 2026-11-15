@@ -126,6 +126,24 @@ describe('the transcript, pinned to the recordings', () => {
     expect(cutRangesForWords(words, [])).toEqual([])
   })
 
+  it('a retimed clip maps its words through its time map (2x: twice as fast); a freeze frame has none', () => {
+    const t = addChunk(null, { source: 'lib_v', from: 0, to: 40, words: [W('one', 2, 2.4), W('two', 10, 10.4), W('three', 30, 30.4)] })
+    // 2x from media 0..20: clip time 0..10, on the timeline at 5
+    const fast = [{ id: 'a1', type: 'audio', name: 'Voice', clips: [{ ...clip('c', 'lib_v', 5, 0, 10), speed: 2 }] }]
+    const words = placeWords(fast, t)
+    expect(words.map(w => [w.text, w.start, w.end])).toEqual([['one', 6, 6.2], ['two', 10, 10.2]])
+    // what is still to listen to is in the file's seconds: 0..20 (plus the pad)
+    expect(neededRanges(fast, null)[0].ranges).toEqual([[0, 21]])
+    // a cut over "two" lands on the timeline where it shows, and the words after it move
+    const ranges = cutRangesForWords(words, [1])
+    expect(ranges[0][0]).toBeGreaterThan(9.9)
+    const after = rippleCutRanges(fast, [[9.97, 10.3]]).tracks
+    expect(placeWords(after, t).map(w => w.text)).toEqual(['one'])
+    const frozen = [{ id: 'a1', type: 'audio', name: 'Voice', clips: [{ ...clip('c', 'lib_v', 0, 0, 10), freezeAt: 10 }] }]
+    expect(placeWords(frozen, t)).toEqual([])
+    expect(neededRanges(frozen, null)).toEqual([])
+  })
+
   it('old drafts and broken data: no transcript', () => {
     expect(cleanTranscript(null)).toBe(null)
     expect(cleanTranscript({ sources: 'x' })).toBe(null)

@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { X } from './icons'
-import TranscriptPanel from './TranscriptPanel'
-import FillerReviewDialog from './FillerReviewDialog'
-import ChapterSuggestions from './ChapterSuggestions'
+// opened on demand, each its own chunk (components/lazyPanels.jsx); the styles
+// load at once (they also keep the phone toolbar on screen)
+import { TranscriptPanel, FillerReviewDialog, ChapterSuggestions } from './lazyPanels'
+import './WordTools.css'
 import { useTranscript } from '../hooks/useTranscript'
 import { useRangePlayback } from '../hooks/useRangePlayback'
 import { rippleCutRanges, cutLength } from '../utils/ripple'

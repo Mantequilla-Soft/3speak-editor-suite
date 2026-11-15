@@ -1,13 +1,14 @@
 // Fails (exit 1) when the frontend and backend copies of a shared module differ.
 // The preview (src/) and the backend render (backend/src/) must run the same code:
-// the static-background mask, the clip colour adjustments, sticker motion, captions and audiogram captions.
+// the static-background mask, the clip colour adjustments, sticker motion, captions, reframing,
+// speed (clipSpeed.js), keyframes (keyframes.js) and audiogram captions.
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
 import path from 'path'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 let failed = false
-for (const file of ['staticKeyMask.js', 'clipColor.js', 'stickerMotion.js', 'captions.js', 'audiogramCaptions.js']) {
+for (const file of ['staticKeyMask.js', 'clipColor.js', 'stickerMotion.js', 'captions.js', 'reframe.js', 'clipSpeed.js', 'keyframes.js', 'audiogramCaptions.js']) {
   const a = `src/utils/${file}`
   const b = `backend/src/utils/${file}`
   if (readFileSync(path.join(root, a), 'utf8') !== readFileSync(path.join(root, b), 'utf8')) {

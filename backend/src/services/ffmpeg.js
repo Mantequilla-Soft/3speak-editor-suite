@@ -7,6 +7,10 @@ import { ffmpegColorFilter } from '../utils/clipColor.js'
 import crypto from 'crypto'
 import { ffmpegMotionFilter, normalizeMotion, pivotPoint, activeEffects } from '../utils/stickerMotion.js'
 import { captionBurn } from './captionBurn.js'
+import { reframeFilter, normalizeReframe } from '../utils/reframe.js'
+import { ffmpegVideoTiming, ffmpegAudioTiming, timeMap, sourceAt } from '../utils/clipSpeed.js'
+import { keyframeBase, hasVisualKeyframes, layerPivot, ffmpegVolumeFilter } from '../utils/keyframes.js'
+import { withKeyframeTail, videoKeyframeGraph, filterGraphArgs } from '../utils/keyframeRender.js'
 
 // clip volume 0..100 -> gain. 0 means silent: `volume || 100` used to turn it into full volume.
 const clipVolume = clip => (Number.isFinite(+clip.volume) ? Math.max(0, +clip.volume) : 100) / 100
@@ -40,7 +44,9 @@ const appliedMotion = (clip) => (activeEffects(clip.motion).length ? normalizeMo
 /**
  * Build and execute FFmpeg commands to render the timeline.
  */
-export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath, jobDir, onProgress, signal }) {
+export async function buildAndRunFFmpeg({ timeline: given, downloadedFiles, outputPath, jobDir, onProgress, signal }) {
+  // Animated clips are laid out from their reference values, the keyframes move them from there (utils/keyframes.js)
+  const timeline = { ...given, tracks: given.tracks.map(t => ({ ...t, clips: (t.clips || []).map(keyframeBase) })) }
   const outputWidth = timeline.outputWidth || 854
   const outputHeight = timeline.outputHeight || 480
   const fps = timeline.fps || 30
@@ -224,7 +230,10 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
     for (let i = 0; i < overlayClips.length; i++) {
       const oc = overlayClips[i]
       const pos = oc.clip.timelinePosition || 0
-      const delay = pos > 0.01 ? `setpts=PTS+${pos.toFixed(3)}/TB` : null
+      // Keyframed video: animated on a full frame first, delayed after that
+      const animated = oc.clip.type === 'video' && hasVisualKeyframes(oc.clip)
+      const clipDelay = pos > 0.01 ? `setpts=PTS+${pos.toFixed(3)}/TB` : null
+      const delay = animated ? null : clipDelay
       const key = oc.clip.type === 'video' ? getChromaKey(oc.clip) : null
 
       if (key && key.mode === 'static' && plateInputs.has(i)) {
@@ -249,6 +258,12 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
       } else {
         clipLabels.push(`[${i + 1}:v]`)
       }
+      if (animated) {
+        const overlayPos = getOverlayPosition(oc.clip, outputWidth, outputHeight, scaleFactor, cropSources.get(oc.clip.id))
+        const kf = videoKeyframeGraph(oc.clip, clipLabels[i], i, { w: outputWidth, h: outputHeight, fps, overlayPos, s: scaleFactor, delay: clipDelay })
+        filterParts.push(...kf.parts)
+        clipLabels[i] = kf.label
+      }
     }
 
     let prev = '0:v'
@@ -259,7 +274,7 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
 
       // Text/image/color clips have position baked into their canvas → overlay at 0:0
       // Video clips need position applied here
-      const isFullCanvas = oc.clip.type === 'text' || oc.clip.type === 'image' || oc.clip.type === 'color'
+      const isFullCanvas = oc.clip.type === 'text' || oc.clip.type === 'image' || oc.clip.type === 'color' || (oc.clip.type === 'video' && hasVisualKeyframes(oc.clip))
       const overlayPos = isFullCanvas ? '0:0' : getOverlayPosition(oc.clip, outputWidth, outputHeight, scaleFactor, cropSources.get(oc.clip.id))
 
       filterParts.push(`[${prev}]${clipLabel}overlay=${overlayPos}:eof_action=pass:format=auto${out}`)
@@ -275,7 +290,7 @@ export async function buildAndRunFFmpeg({ timeline, downloadedFiles, outputPath,
       filterParts.push(...burn.filters('precap', 'outv'))
     }
 
-    compArgs.push('-filter_complex', filterParts.join(';'))
+    compArgs.push(...await filterGraphArgs(filterParts.join(';'), path.join(jobDir, 'composite.graph')))
     compArgs.push('-map', '[outv]')
     compArgs.push('-c:v', 'libx264', '-crf', '23', '-preset', 'fast', '-pix_fmt', 'yuv420p')
     compArgs.push('-t', totalDuration.toFixed(3))
@@ -628,7 +643,9 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
     // centre lands where it was.
     let rotateTail = '[outv]'
     const motion = appliedMotion(clip)
-    if (clip.rotation || motion) {
+    const animated = hasVisualKeyframes(clip)
+    let blockCentre = null // keyframes move the text around its block's centre
+    if (clip.rotation || motion || animated) {
       const textW = textBoxEnabled
         ? estTextWidth
         : (clip.measuredMaxLineWidth
@@ -640,6 +657,7 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
           ? w - padding + scaledPosX - textW / 2
           : w / 2 + scaledPosX
       const cy = baseY + totalTextHeight / 2
+      blockCentre = { x: cx, y: cy }
       // Motion (stickers): the finished layer moves around its pivot, a point of
       // the text block (or its box), turned with the block's rotation
       let pivot = { x: cx, y: cy }
@@ -671,15 +689,16 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
     }
 
     // Use QuickTime Animation codec to preserve transparency
-    const filterComplex = textBoxEnabled
+    const filterComplex = withKeyframeTail(textBoxEnabled
       ? `${boxOverlayPrefix}${filterChain}${rotateTail}`
-      : `[0:v]format=rgba,colorchannelmixer=aa=0,${filterChain}${rotateTail}`
+      : `[0:v]format=rgba,colorchannelmixer=aa=0,${filterChain}${rotateTail}`,
+    clip, { w, h, fps, cx: blockCentre?.x ?? w / 2, cy: blockCentre?.y ?? h / 2, s: scaleFactor, duration })
     return runFFmpeg([
       '-f', 'lavfi',
       // A moving sticker counts frames: give the layer the timeline's rate
-      '-i', `color=c=black@0:s=${w}x${h}:d=${duration}${appliedMotion(clip) ? `:r=${fps}` : ''}`,
+      '-i', `color=c=black@0:s=${w}x${h}:d=${duration}${appliedMotion(clip) || animated ? `:r=${fps}` : ''}`,
       ...boxInputArgs,
-      '-filter_complex', filterComplex,
+      ...await filterGraphArgs(filterComplex, `${outputPath}.graph`),
       '-map', '[outv]',
       '-c:v', 'qtrle',
       '-pix_fmt', 'argb',
@@ -771,13 +790,21 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
       motionChain = `,${ffmpegMotionFilter(motion, { w, h, fps, cx: pivot.x, cy: pivot.y, zoom: z, duration })}`
     }
 
+    // Keyframes (utils/keyframes.js) move the finished layer around the image's centre
+    const animated = layoutBoxFree(clip, w, h) && hasVisualKeyframes(clip)
+    const moving = motion || animated
+    const pivot = layerPivot(clip, w, h, scaleFactor)
+    const graph = withKeyframeTail(
+      `color=c=black@0.0:s=${w}x${h}:d=${duration}${moving ? `:r=${fps}` : ''}[bg];[0:v]${filterChain}[scaled];[bg][scaled]overlay=${overlayPos}${moving ? ':format=auto' : ''}${motionChain}[outv]`,
+      animated ? clip : {}, { w, h, fps, cx: pivot.x, cy: pivot.y, s: scaleFactor, duration })
+
     // Use QuickTime Animation codec to preserve transparency
     return runFFmpeg([
       '-loop', '1',
-      ...(motion ? ['-framerate', String(fps)] : []),
+      ...(moving ? ['-framerate', String(fps)] : []),
       '-i', inputFile,
       '-t', duration.toString(),
-      '-filter_complex', `color=c=black@0.0:s=${w}x${h}:d=${duration}${motion ? `:r=${fps}` : ''}[bg];[0:v]${filterChain}[scaled];[bg][scaled]overlay=${overlayPos}${motion ? ':format=auto' : ''}${motionChain}[outv]`,
+      ...await filterGraphArgs(graph, `${outputPath}.graph`),
       '-map', '[outv]',
       '-c:v', 'qtrle',
       '-pix_fmt', 'argb',
@@ -787,7 +814,8 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
   }
 
   if (clip.trackType === 'audio' || clip.type === 'audio') {
-    if (!(await hasAudioStream(inputFile))) {
+    const timing = ffmpegAudioTiming(clip) // speed / ramp (utils/clipSpeed.js); a still is silent
+    if (timing?.silent || !(await hasAudioStream(inputFile))) {
       // No audio stream — generate silence so the pipeline doesn't break
       console.log(`[DEBUG] Audio clip ${clip.id} has no audio stream, generating silence`)
       return runFFmpeg([
@@ -799,11 +827,15 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
     }
 
     const args = []
-    if (clip.startTime > 0) args.push('-ss', clip.startTime.toString())
+    const seek = timing ? timing.seek : clip.startTime
+    if (seek > 0) args.push('-ss', seek.toString())
     args.push('-i', inputFile, '-t', duration.toString())
     // optional fades (Ad Wizard music); absent on editor clips, so their render is unchanged
     const fi = Math.max(0, +clip.fadeIn || 0), fo = Math.max(0, +clip.fadeOut || 0)
     const fades = []
+    if (timing?.filter) fades.push(timing.filter)
+    const kfVolume = ffmpegVolumeFilter(clip)
+    if (kfVolume) fades.push(kfVolume)
     if (fi > 0) fades.push(`afade=t=in:st=0:d=${Math.min(fi, duration).toFixed(3)}`)
     if (fo > 0) fades.push(`afade=t=out:st=${Math.max(0, duration - fo).toFixed(3)}:d=${Math.min(fo, duration).toFixed(3)}`)
     if (fades.length) args.push('-af', fades.join(','))
@@ -813,9 +845,13 @@ async function processClip(clip, inputFile, outputPath, w, h, fps, signal, scale
 
   // Video clip — scale/crop (and colour, unless keyed), composited onto canvas later
   let filterChain = getChromaKey(clip) ? buildTransformFilter(clip, w, h, fps) : withColor(clip, buildTransformFilter(clip, w, h, fps))
+  // Speed, ramp or still (utils/clipSpeed.js): read from the right media second, retimed first
+  const timing = ffmpegVideoTiming(clip)
+  if (timing) filterChain = `${timing.filter},${filterChain}`
 
   const args = []
-  if (clip.startTime > 0) args.push('-ss', clip.startTime.toString())
+  const seek = timing ? timing.seek : clip.startTime
+  if (seek > 0) args.push('-ss', seek.toString())
   args.push('-i', inputFile, '-t', duration.toString())
   // Keyed clips are keyed in the composite step: keep this intermediate cleaner
   // so a second round of compression does not chew up the key edges
@@ -855,6 +891,22 @@ function keyedColor(clip, i, filterParts) {
 /**
  * Build FFmpeg filter chain for zoom/crop/position transforms
  */
+// The face path is in media seconds; a retimed clip's frames carry clip time
+// from 0 (ffmpegVideoTiming), so map t back: exact for a constant speed and a
+// still, a straight line from the first to the last media second for a ramp.
+function reframeMediaTime(clip) {
+  const secs = (v) => String(Math.round(v * 1e6) / 1e6)
+  const m = timeMap(clip)
+  if (m.kind === 'none') return null
+  if (m.kind === 'freeze') return secs(m.at)
+  const start = clip.startTime || 0
+  const from = sourceAt(clip, start)
+  if (m.kind === 'speed') return `(${secs(from)}+t*${secs(m.speed)})`
+  const length = Math.max(0.001, (clip.endTime || 0) - start)
+  const rate = (sourceAt(clip, start + length) - from) / length
+  return `(${secs(from)}+t*${secs(rate)})`
+}
+
 function buildTransformFilter(clip, w, h, fps = null) {
   const filters = []
 
@@ -869,6 +921,11 @@ function buildTransformFilter(clip, w, h, fps = null) {
     if (fps) filters.push(`fps=${fps}`)
     return filters.join(',')
   }
+
+  // Reframed ("Export as" another shape, utils/reframe.js): cover the frame,
+  // the window follows the clip's face path. zoom/crop/position are ignored.
+  const reframe = reframeFilter(clip.reframe, { w, h, startTime: clip.startTime || 0, mediaTime: reframeMediaTime(clip) })
+  if (reframe) return fps ? `${reframe},fps=${fps}` : reframe
 
   // Free crop, as in the preview (see freeCrop): contain-fit the media in the
   // canvas, cut the crop rect (canvas pixels; the media starts (W-iw)/2 into the
@@ -997,7 +1054,7 @@ function clipZoom(clip) {
  * clips keep the old path.
  */
 function freeCrop(clip, w, h) {
-  if (getLayoutBox(clip, w, h) || clip.crop || clip.width || clip.height) return null
+  if (getLayoutBox(clip, w, h) || normalizeReframe(clip.reframe) || clip.crop || clip.width || clip.height) return null
   const x = (clip.cropX || 0) / 100
   const y = (clip.cropY || 0) / 100
   const cw = (clip.cropWidth || 100) / 100
@@ -1272,9 +1329,12 @@ async function computeStaticMaskFile(clip, inputFile, plateFile, noiseFile, outP
   const masker = createStaticMasker()
 
   const args = ['-v', 'error']
-  if (clip.startTime > 0) args.push('-ss', clip.startTime.toString())
+  // The frames the clip shows: retimed like the clip itself (speed, ramp, still)
+  const timing = ffmpegVideoTiming(clip)
+  const seek = timing ? timing.seek : clip.startTime
+  if (seek > 0) args.push('-ss', seek.toString())
   args.push('-i', inputFile, '-t', (clip.endTime - clip.startTime).toString(), '-an',
-    '-vf', `fps=${fps},${scale}`, '-f', 'rawvideo', 'pipe:1')
+    '-vf', `${timing ? `${timing.filter},` : ''}fps=${fps},${scale}`, '-f', 'rawvideo', 'pipe:1')
 
   const out = createWriteStream(outPath)
   const frame = Buffer.allocUnsafe(frameBytes)
@@ -1349,6 +1409,7 @@ async function processPlate(clip, plateFile, processedClipPath, outPath, w, h, s
 function getOverlayPosition(clip, w, h, scaleFactor = 1, src = null) {
   const box = getLayoutBox(clip, w, h)
   if (box) return `${box.x}:${box.y}`
+  if (normalizeReframe(clip.reframe)) return '0:0' // the whole frame (buildTransformFilter)
   const cropped = freeCropOverlay(clip, w, h, scaleFactor, src)
   if (cropped) return cropped
 

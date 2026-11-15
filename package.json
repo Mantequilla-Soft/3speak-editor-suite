@@ -4,16 +4,21 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/vision/copy-assets.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/vision/copy-assets.mjs",
     "build": "vite build",
+    "vision:assets": "node scripts/vision/copy-assets.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "test:e2e:audio": "node e2e/audio-editor.e2e.mjs",
     "test:e2e:words": "node e2e/word-tools.e2e.mjs"
   },
   "dependencies": {
+    "@ffmpeg/core": "0.12.6",
     "@ffmpeg/ffmpeg": "^0.12.10",
     "@ffmpeg/util": "^0.12.1",
+    "@mediapipe/tasks-vision": "1.2.0",
     "fix-webm-duration": "1.0.6",
     "hash-wasm": "^4.12.0",
     "hls.js": "^1.6.15",

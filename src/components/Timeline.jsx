@@ -7,6 +7,9 @@ import { getGroupColor } from '../hooks/useTimeline'
 import { MAX_TIMELINE_SECONDS } from '../utils/limits'
 import { timelineBeats } from '../utils/beatDetect'
 import { getPeaks, peaksForRange } from '../utils/peakCache'
+import { clipLabel, trackAriaLabel, formatSpokenTime } from '../utils/shortcuts'
+import { maxEndTime, sourceRange } from '../utils/clipSpeed'
+import KeyframeMarks from './KeyframeMarks'
 
 function formatTime(seconds) {
   const s = Math.floor(seconds)
@@ -213,9 +216,11 @@ const TimelineClip = memo(function TimelineClip({
   }, [isAudio, clip.url, clip.serverUrl])
 
   // This clip's own stretch of the file (trim / zoom only re-read it)
+  // (its media seconds: a sped-up clip covers more of the file, utils/clipSpeed.js)
+  const [mediaFrom, mediaTo] = sourceRange(clip)
   const realWaveform = useMemo(
-    () => peaksForRange(peakEnvelope, clip.startTime, clip.endTime, barCount),
-    [peakEnvelope, clip.startTime, clip.endTime, barCount]
+    () => peaksForRange(peakEnvelope, mediaFrom, mediaTo, barCount),
+    [peakEnvelope, mediaFrom, mediaTo, barCount]
   )
 
   const [waveformFailed, setWaveformFailed] = useState(false)
@@ -404,7 +409,7 @@ const TimelineClip = memo(function TimelineClip({
         onTrimStart(newStartTime, newPosition)
       } else if (isDragging === 'trimEnd') {
         const minEnd = initialValues.startTime + 0.1
-        const maxEnd = (isImage || isText || isColor) ? 600 : initialValues.duration
+        const maxEnd = (isImage || isText || isColor) ? 600 : maxEndTime(clip, initialValues.duration)
         const newEndTime = Math.max(minEnd, Math.min(initialValues.endTime + deltaTime, maxEnd))
         const newClipEnd = (initialValues.timelinePosition || 0) + (newEndTime - initialValues.startTime)
 
@@ -458,6 +463,11 @@ const TimelineClip = memo(function TimelineClip({
         ...(clip.groupId ? { borderLeftColor: getGroupColor(clip.groupId), borderLeftWidth: '3px', borderLeftStyle: 'solid' } : {})
       }}
       data-clip-id={clip.id}
+      role="button"
+      aria-roledescription="clip"
+      aria-label={clipLabel(clip, allTracks?.find(t => t.id === trackId))}
+      aria-pressed={isSelected}
+      tabIndex={isSelected ? 0 : -1}
       onClick={(e) => { e.stopPropagation(); onSelect(e) }}
     >
       {/* Trim handle - start */}
@@ -515,7 +525,7 @@ const TimelineClip = memo(function TimelineClip({
                   const spriteTime = i * spriteData.interval
                   const spriteEndTime = (i + 1) * spriteData.interval
                   // Only show sprites that overlap with the trimmed region
-                  if (spriteEndTime < clip.startTime || spriteTime > clip.endTime) return null
+                  if (spriteEndTime < mediaFrom || spriteTime > mediaTo) return null
                   return src ? (
                     <img key={i} src={src} alt="" className="sprite-frame" />
                   ) : (
@@ -536,6 +546,7 @@ const TimelineClip = memo(function TimelineClip({
             <span className="clip-duration">{formatTime(clipDuration)}</span>
           </div>
         )}
+        <KeyframeMarks clip={clip} pixelsPerSecond={pixelsPerSecond} selected={isSelected} />
         {/* Group indicator */}
         {clip.groupId && (
           <div className="group-indicator" style={{ backgroundColor: getGroupColor(clip.groupId) }}>
@@ -1073,6 +1084,7 @@ function Timeline({
         <div
           key={t}
           className="ruler-mark"
+          aria-hidden="true"
           style={{ left: `${t * pixelsPerSecond}px` }}
         >
           <div className="ruler-tick" />
@@ -1085,7 +1097,7 @@ function Timeline({
     const spacing = beats.length > 1 ? ((beats[beats.length - 1] - beats[0]) / (beats.length - 1)) * pixelsPerSecond : 0
     if (spacing >= 4) {
       for (const b of beats) {
-        marks.push(<div key={`beat-${b}`} className="ruler-beat" style={{ left: `${b * pixelsPerSecond}px` }} />)
+        marks.push(<div key={`beat-${b}`} className="ruler-beat" aria-hidden="true" style={{ left: `${b * pixelsPerSecond}px` }} />)
       }
     }
     // Chapter flags (audio editor): click to go there, double click for the list
@@ -1832,6 +1844,8 @@ function Timeline({
 
         <div
           className="timeline-content"
+          role="region"
+          aria-label="Timeline"
           ref={timelineContentRef}
           onMouseDown={handleContentMouseDown}
           onMouseDownCapture={rangePicking ? pickCapture : undefined}
@@ -1846,6 +1860,8 @@ function Timeline({
           {/* Ruler */}
           <div
             className={`timeline-ruler${isDraggingRuler ? ' dragging' : ''}`}
+            role="group"
+            aria-label="Time ruler: click to move the playhead"
             ref={rulerRef}
             style={{ width: `${timelineWidth}px` }}
             onClick={handleRulerClick}
@@ -1911,6 +1927,13 @@ function Timeline({
           {/* Playhead */}
           <div
             className="timeline-playhead"
+            role="slider"
+            tabIndex={0}
+            aria-label="Playhead"
+            aria-valuemin={0}
+            aria-valuemax={Math.round(Math.max(maxClipEnd || 0, playheadPosition) * 10) / 10}
+            aria-valuenow={Math.round(playheadPosition * 10) / 10}
+            aria-valuetext={formatSpokenTime(playheadPosition)}
             style={{ left: `${playheadLeft}px`, height: `${contentHeight}px` }}
             onMouseDown={handlePlayheadMouseDown}
             onTouchStart={handlePlayheadTouchStart}
@@ -1934,6 +1957,8 @@ function Timeline({
               key={track.id}
               className="timeline-track-v2"
               data-track-id={track.id}
+              role="group"
+              aria-label={trackAriaLabel(track, trackIndex)}
               style={{ width: `${timelineWidth}px`, height: `${heightOf(track)}px` }}
               onDragOver={(e) => handleTrackDragOver(e, track.id)}
               onDrop={(e) => handleTrackDrop(e, track.id)}
@@ -1976,6 +2001,8 @@ function Timeline({
               key={track.id}
               className="timeline-track-v2 audio"
               data-track-id={track.id}
+              role="group"
+              aria-label={trackAriaLabel(track, trackIndex)}
               style={{ width: `${timelineWidth}px`, height: `${heightOf(track)}px` }}
               onDragOver={(e) => handleTrackDragOver(e, track.id)}
               onDrop={(e) => handleTrackDrop(e, track.id)}
