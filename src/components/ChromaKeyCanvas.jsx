@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { createKeyer, keySignature } from '../utils/chromaKey'
+import { maskFrameIndex, maskFrame } from '../utils/personMask'
+import { cachedMaskTrack, loadMaskTrack } from '../utils/personMaskJobs'
 import './GreenScreen.css'
 
 /**
@@ -12,6 +14,11 @@ import './GreenScreen.css'
  *
  * keyConfig: normalized key (normalizeChromaKey) or null; onFail() is called
  * once when keying is impossible (no WebGL / 2D context, cross-origin video).
+ *
+ * Person key (background removal without a green screen): the matte comes from
+ * the clip's track (keyConfig.maskUrl, utils/personMaskJobs.js) and, until that
+ * exists, from the segmenter running on the frame shown (the camera recorder
+ * always works that way).
  */
 export default function ChromaKeyCanvas({ getSource, keyConfig, style, className, onFail }) {
   const canvasRef = useRef(null)
@@ -24,6 +31,10 @@ export default function ChromaKeyCanvas({ getSource, keyConfig, style, className
   onFailRef.current = onFail
   const plateVersionRef = useRef(0)
   const plateUrl = keyConfig?.mode === 'static' ? keyConfig.plateUrl : null
+  const isPerson = keyConfig?.mode === 'person'
+  const maskUrl = isPerson ? keyConfig.maskUrl : null
+  const maskTrackRef = useRef(null)
+  const liveMatteRef = useRef(null)
   const noiseUrl = keyConfig?.mode === 'static' ? keyConfig.noiseUrl : null
 
   // One keyer per canvas, plus the draw loop
@@ -36,6 +47,12 @@ export default function ChromaKeyCanvas({ getSource, keyConfig, style, className
       return
     }
     keyerRef.current = keyer
+    // Person key: the clip's matte track at the frame's media time, else live
+    keyer.setPersonMask?.((src, time) => {
+      const track = maskTrackRef.current
+      if (track) return { mask: maskFrame(track, maskFrameIndex(track.header, time)), w: track.header.w, h: track.header.h }
+      return liveMatteRef.current ? liveMatteRef.current.get(src) : null
+    })
 
     let raf = 0
     let failed = false
@@ -63,7 +80,8 @@ export default function ChromaKeyCanvas({ getSource, keyConfig, style, className
       bind(src || null)
       if (!src || src.readyState < 2) return
       const sig = keySignature(keyRef.current)
-      const live = !!src.srcObject
+      // a person key without its track segments live: redraw while playing
+      const live = !!src.srcObject || (keyRef.current?.mode === 'person' && !maskTrackRef.current && !src.paused)
       if (!dirty && !live && src.paused && src.currentTime === last.t &&
           sig === last.sig && plateVersionRef.current === last.plate) return
       try {
@@ -89,6 +107,28 @@ export default function ChromaKeyCanvas({ getSource, keyConfig, style, className
       keyerRef.current = null
     }
   }, [])
+
+  // Person key: its matte track, or the live segmenter until there is one
+  useEffect(() => {
+    if (!isPerson) {
+      maskTrackRef.current = null
+      return
+    }
+    let cancelled = false
+    const bump = () => { plateVersionRef.current++ }
+    maskTrackRef.current = cachedMaskTrack(maskUrl)
+    if (!maskTrackRef.current && maskUrl) {
+      loadMaskTrack(maskUrl).then((t) => { if (!cancelled) { maskTrackRef.current = t; bump() } })
+    }
+    if (!maskTrackRef.current && !liveMatteRef.current) {
+      import('../utils/personSegmenter').then(({ createLiveMatte }) => {
+        if (!cancelled && !liveMatteRef.current) liveMatteRef.current = createLiveMatte({ onReady: bump })
+        bump()
+      }).catch(() => onFailRef.current?.())
+    }
+    bump()
+    return () => { cancelled = true }
+  }, [isPerson, maskUrl])
 
   // Clean plate for the static-background key
   useEffect(() => {

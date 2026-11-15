@@ -8,3 +8,6 @@ docker-compose.override.yml
 
 # Build output: the frontend image builds its own (frontend/Dockerfile)
 dist/
+
+# MediaPipe wasm runtime, copied from node_modules by scripts/vision/copy-assets.mjs
+public/vision/wasm/

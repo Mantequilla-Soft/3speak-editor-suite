@@ -4,8 +4,11 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/vision/copy-assets.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/vision/copy-assets.mjs",
     "build": "vite build",
+    "vision:assets": "node scripts/vision/copy-assets.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "test:e2e:audio": "node e2e/audio-editor.e2e.mjs"

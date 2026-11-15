@@ -1,5 +1,7 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react'
 import { fitAt, placeOnTrack } from '../utils/placement'
+import { placeStockClip } from '../utils/stockPlacement'
+import { STOCK_IMAGE_SECONDS } from '../utils/stockLibrary'
 import { rippleTrackId, rippleTrack } from '../utils/ripple'
 import { finiteDuration, isUsableDuration, pickDuration } from '../utils/mediaDuration'
 import { isHlsUrl, getHlsDuration } from '../utils/hlsHelper'
@@ -315,8 +317,8 @@ function getMediaMetadataFromURL(url, mediaType) {
 // Video tracks are prepended (newest first), audio tracks are appended (oldest first),
 // so we use mirror indexing: videoTracks[i] pairs with audioTracks[last - i].
 function findPairedAudioTrack(tracks, videoTrackId) {
-  // Sticker tracks carry no sound: they never pair with an audio track
-  const videoTracks = tracks.filter(t => t.type === 'video' && !t.stickers)
+  // Sticker and stock tracks carry no sound: they never pair with an audio track
+  const videoTracks = tracks.filter(t => t.type === 'video' && !t.stickers && !t.stock)
   // Music tracks (music library) never pair with a video track
   const audioTracks = tracks.filter(t => t.type === 'audio' && !t.music)
   const videoIndex = videoTracks.findIndex(t => t.id === videoTrackId)
@@ -356,7 +358,7 @@ function createLinkedAudioClip(videoClip, groupId) {
 
 // Ensure there's a paired audio track for every video track
 function ensurePairedAudioTracks(tracks) {
-  const videoTracks = tracks.filter(t => t.type === 'video' && !t.stickers)
+  const videoTracks = tracks.filter(t => t.type === 'video' && !t.stickers && !t.stock)
   const audioTracks = tracks.filter(t => t.type === 'audio' && !t.music)
 
   if (audioTracks.length >= videoTracks.length) return tracks
@@ -895,6 +897,42 @@ export function useTimeline() {
       // Stickers go above everything
       return placeOverlay(prev, clip, start, end)
     })
+    return clipId
+  }, [setTracksWithHistory])
+
+  /**
+   * Stock media (utils/stockLibrary.js item: a video, photo or GIF) at
+   * `position` (the playhead), placed by utils/stockPlacement.js: on an empty
+   * timeline as the main footage, else as b-roll over it; with underClipId as
+   * the background of that clip (background removal). Videos and GIFs are
+   * silent clips; a photo stays STOCK_IMAGE_SECONDS. The licence travels as
+   * `stockCredit` (no credit is needed, it is kept for the record).
+   */
+  const addStockClip = useCallback(async (item, position, { underClipId = null } = {}) => {
+    const isPhoto = item.type === 'image'
+    let duration = STOCK_IMAGE_SECONDS
+    let meta = {}
+    if (!isPhoto) {
+      meta = await getMediaMetadataFromURL(item.url, 'video')
+      duration = isUsableDuration(meta.duration) ? meta.duration : item.duration
+      if (!isUsableDuration(duration)) return null
+    }
+    const libraryId = generateLibraryId()
+    const type = isPhoto ? 'image' : 'video'
+    setLibrary(prev => [...prev, {
+      id: libraryId, file: null, url: item.url, name: item.title, duration, type,
+      videoWidth: meta.videoWidth || item.width || undefined, videoHeight: meta.videoHeight || item.height || undefined
+    }])
+    const clipId = generateClipId()
+    const clip = {
+      id: clipId, file: null, url: item.url, serverUrl: null, name: item.title, duration,
+      startTime: 0, endTime: duration, timelinePosition: 0,
+      audioEnabled: false, type, libraryId, groupId: null,
+      videoWidth: meta.videoWidth || item.width || undefined, videoHeight: meta.videoHeight || item.height || undefined,
+      zoom: 100, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100, positionX: 0, positionY: 0, volume: 100,
+      ...(item.credit ? { stockCredit: item.credit } : {})
+    }
+    setTracksWithHistory(prev => placeStockClip(prev, clip, { at: position, underClipId, newTrackId: generateTrackId }).tracks)
     return clipId
   }, [setTracksWithHistory])
 
@@ -2306,6 +2344,7 @@ export function useTimeline() {
     uploadFileToServer,
     addSfxClip,
     addStickerClip,
+    addStockClip,
     fitClipsToBeats,
     loadProjectState,
     findClip,

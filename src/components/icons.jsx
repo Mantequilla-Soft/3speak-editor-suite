@@ -90,6 +90,7 @@ export const MATERIAL = {
   Sliders: 'tune',
   Square: 'stop',
   Sticker: 'mood',
+  Stock: 'photo_library',
   Subtitles: 'subtitles',
   SunMedium: 'light_mode',
   Trash2: 'delete',
@@ -202,6 +203,7 @@ export const SkipBack = make('SkipBack')
 export const Sliders = make('Sliders')
 export const Square = make('Square')
 export const Sticker = make('Sticker')
+export const Stock = make('Stock')
 export const Subtitles = make('Subtitles')
 export const SunMedium = make('SunMedium')
 export const Trash2 = make('Trash2')

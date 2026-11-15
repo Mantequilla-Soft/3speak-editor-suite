@@ -47,7 +47,9 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
   // Green screen: the take is recorded RAW (no keying baked in); the clip it
   // becomes gets the key, and the camera view shows the keyed picture meanwhile.
   // 'static' compares against a frame of the empty background (the plate).
-  const [greenScreen, setGreenScreen] = useState(null) // null | 'green' | 'blue' | 'static'
+  // 'person' needs no screen: the segmenter finds the person live (ChromaKeyCanvas),
+  // the take is recorded clean and the clip makes its matte afterwards (usePersonMasks)
+  const [greenScreen, setGreenScreen] = useState(null) // null | 'green' | 'blue' | 'static' | 'person'
   const [plateUrl, setPlateUrl] = useState(null)
   const [noiseUrl, setNoiseUrl] = useState(null) // how much each spot of the plate flickers
   // Camera lock while a plate is in use: { result, applied, track }
@@ -637,7 +639,7 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
         <div className="pip-greenscreen">
           <div className="pip-greenscreen-modes" role="group" aria-label="Green screen">
             <span className="pip-greenscreen-label">Green screen</span>
-            {[[null, 'Off'], ['green', 'Green'], ['blue', 'Blue'], ['static', 'Static']].map(([mode, label]) => (
+            {[[null, 'Off'], ['green', 'Green'], ['blue', 'Blue'], ['person', 'Person'], ['static', 'Static']].map(([mode, label]) => (
               <button
                 key={label}
                 className={greenScreen === mode ? 'active' : ''}
@@ -645,13 +647,16 @@ function InlineRecorder({ onRecorded, onClose, onSyncRecord, onRecordingStopped,
                   if (mode !== 'static') releaseCameraLock()
                   setGreenScreen(mode); setKeyTune(null); setKeyFailed(false)
                 }}
-                title={mode === 'static' ? 'Static background (experimental): removes whatever matches a shot of the empty background' : undefined}
+                title={mode === 'static' ? 'Static background (experimental): removes whatever matches a shot of the empty background' : mode === 'person' ? 'No green screen needed: finds you in the picture' : undefined}
               >
                 {label}
               </button>
             ))}
           </div>
-          {chromaKey && (() => {
+          {greenScreen === 'person' && (
+            <small>No green screen needed: the editor finds you in the picture. The take is recorded as it is and cut out on the timeline, where you pick what goes behind you.</small>
+          )}
+          {chromaKey && greenScreen !== 'person' && (() => {
             const kc = normalizeChromaKey(chromaKey)
             const range = (greenScreen === 'static' ? KEY_RANGES.static : KEY_RANGES.chroma).similarity
             const pct = (v) => Math.round(v * 100)

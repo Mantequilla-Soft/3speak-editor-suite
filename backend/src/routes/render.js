@@ -259,6 +259,17 @@ async function processJob(jobId, jobDir) {
       }
     }
 
+    // Background removal (person key): the matte the editor made travels as its own file
+    for (const clip of allClips) {
+      const u = clip.chromaKey?.color === 'person' ? clip.chromaKey.maskUrl : null
+      if (!u || typeof u !== 'string' || /^(blob|data):/.test(u)) continue
+      try {
+        downloadedFiles.set(`${clip.id}__mask`, await cachedDownload(u, jobDir, dl))
+      } catch (err) {
+        console.warn(`[render] matte for ${clip.id} could not be downloaded: ${err.message}`)
+      }
+    }
+
     // Emoji accents of the captions (sticker images, by URL); a missing one is left out
     for (const { cp, url } of emojiDownloads(timeline)) {
       try {

@@ -1,0 +1,99 @@
+/* Stock media sheet (StockLibrary.jsx): the music / sticker sheet, wider, with a grid of thumbnails */
+.remix-picker.music-library.stock-library {
+  max-width: 640px;
+  max-height: min(720px, 88vh);
+}
+
+.stock-library-divider {
+  flex-shrink: 0;
+  width: 1px;
+  margin: 2px 2px;
+  background: var(--border-color);
+}
+
+.stock-grid {
+  flex: 1 1 auto;
+  min-height: 140px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  grid-auto-rows: 88px;
+  gap: 8px;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.stock-grid .music-library-empty {
+  grid-column: 1 / -1;
+}
+
+.stock-tile {
+  position: relative;
+  min-width: 0;
+  padding: 0;
+  background: var(--surface-2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.stock-tile:hover,
+.stock-tile:focus-visible {
+  border-color: var(--text-primary);
+}
+
+.stock-tile:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.stock-tile img,
+.stock-tile video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.stock-tile-badges {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  display: flex;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.stock-badge {
+  padding: 1px 6px;
+  border-radius: var(--r-sm);
+  background: var(--media-scrim);
+  color: var(--on-media);
+  font-size: var(--fs-10);
+  font-weight: var(--fw-bold);
+  line-height: 16px;
+}
+
+.stock-tile-busy {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--media-scrim);
+  color: var(--on-media);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-bold);
+}
+
+.stock-library-error {
+  color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .stock-grid {
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    grid-auto-rows: 72px;
+  }
+}

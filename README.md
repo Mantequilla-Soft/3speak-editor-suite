@@ -91,6 +91,10 @@ Quality presets: High (CRF 18), Medium (CRF 23), Low (CRF 28).
 - Shorts render at **1080x1920** from the uploaded **originals**: the 480p copy of a video upload is only the editing proxy the preview plays (`GET /api/upload/files/<name>`); renders ask for `?for=render` (backend/src/utils/uploadFiles.js). Originals that are HDR, larger than 1920 on the long side or in an unusual codec get a `_master.mp4` render copy (fit 1920, never upscaled, SDR) that replaces them. Old uploads that only have their 480p file still render from it.
 - **Auto captions** (Captions button on the timeline): speech to text with word times (whisper.cpp in the backend image), styles Karaoke (the spoken word highlighted), Pop (one or a few words at a time) and Subtitles, optional emoji accents, an editable words list. Burnt in with libass exactly where the preview draws them (src/utils/captions.js, shared with the backend), and written as WebVTT / SRT next to the render; `post-to-3speak` carries them as `subtitles` (`{ language, vttUrl, srtUrl, cues, burnedIn }`; `burnedIn` = "Show in the video" was on and the backend drew them, so 3Speak keeps CC off for them by default).
 
+### Stock media and background removal (Shorts)
+- **Stock media** (timeline + menu, "Stock media"): b-roll videos, photos and GIFs that are free to use with no credit (CC0 / public domain, licence checked per file), built onto our server by `scripts/stock/build_library.py OUT_DIR` and served at `/stock/` (host nginx, like `/music/` and `/stickers/`; `VITE_STOCK_SOURCES` overrides `/stock/library.json`). On an empty timeline a pick becomes the video, otherwise it goes over it as b-roll (a `B-roll` track, `stock: 'broll'`, no sound). With `PEXELS_API_KEY` / `PIXABAY_API_KEY` on the backend the sheet also searches Pexels / Pixabay (`/api/stock/*`); a pick is copied to our uploads first.
+- **Background removal without a green screen** ("Person" in a video clip's Green screen box, and in the camera recorder): MediaPipe's selfie segmenter finds the person in every frame in the browser (self-hosted, `public/vision/`), the matte goes to the server as one file (`src/utils/personMask.js`, shared with the backend) and the render keys with it exactly like the preview. Behind the person: the tracks below (a stock picture or clip can be put there in one click), a blur of the clip, or a colour.
+
 ### Other
 - Drag-and-drop or file-picker media import with categorized library (Videos, Images, Sounds)
 - HLS stream support with automatic download and progress tracking
@@ -336,6 +340,8 @@ All variables are configured in `.env` (see `.env.example`).
 | `CAPTIONS_ENABLED` | `true` | `false` hides auto captions on this backend |
 | `CAPTIONS_MAX_SECONDS` | `600` | Longest timeline auto captions transcribe |
 | `CAPTION_FONTS_DIR` | `/usr/share/fonts/google` | Fonts libass burns captions with |
+| `PEXELS_API_KEY` | (unset) | Stock sheet: live Pexels search (the key stays on the server) |
+| `PIXABAY_API_KEY` | (unset) | Stock sheet: live Pixabay search (the key stays on the server) |
 
 ### Gateway
 

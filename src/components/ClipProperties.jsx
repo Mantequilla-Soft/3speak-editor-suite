@@ -12,6 +12,7 @@ import { autoColor } from '../utils/autoColor'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
 import './GreenScreen.css'
+import PersonKeyControls from './PersonKeyControls'
 
 // Green screen (chroma key) on a video clip: keyed pixels turn transparent, so
 // the clips on the tracks below show through. See utils/chromaKey.js.
@@ -463,18 +464,19 @@ function DuckControls({ duckInfo, onUpdateClip }) {
   )
 }
 
-function GreenScreenControls({ clip, onUpdateClip, playheadPosition }) {
+function GreenScreenControls({ clip, onUpdateClip, playheadPosition, onPickBackground }) {
   const [grabbing, setGrabbing] = useState(false)
   const [grabError, setGrabError] = useState(null)
   const key = normalizeChromaKey(clip.chromaKey)
   const isStatic = key?.mode === 'static'
+  const isPerson = key?.mode === 'person'
   const ranges = isStatic ? KEY_RANGES.static : KEY_RANGES.chroma
 
   const setKey = (patch) => onUpdateClip({ chromaKey: { ...clip.chromaKey, ...patch } })
   const setMode = (mode) => {
     if (!key || mode === key.mode) return
-    // Green <-> blue keep the sliders; static uses its own scale
-    if (mode !== 'static' && !isStatic) setKey({ color: mode })
+    // Green <-> blue keep the sliders; static and person use their own scales
+    if (mode !== 'static' && mode !== 'person' && !isStatic && !isPerson) setKey({ color: mode })
     else onUpdateClip({ chromaKey: defaultChromaKey(mode, mode === 'static' ? clip.chromaKey?.plateUrl : null, mode === 'static' ? clip.chromaKey?.noiseUrl : null) })
   }
 
@@ -519,19 +521,21 @@ function GreenScreenControls({ clip, onUpdateClip, playheadPosition }) {
         {key && (
           <>
             <div className="text-align-buttons chroma-mode-buttons">
-              {[['green', 'Green'], ['blue', 'Blue'], ['static', 'Static (experimental)']].map(([mode, label]) => (
+              {[['green', 'Green'], ['blue', 'Blue'], ['person', 'Person'], ['static', 'Static (experimental)']].map(([mode, label]) => (
                 <button
                   key={mode}
                   className={`text-align-btn ${key.mode === mode ? 'active' : ''}`}
                   onClick={() => setMode(mode)}
-                  title={mode === 'static' ? 'Static background (experimental): removes whatever matches a frame of the empty background' : `${label} screen`}
+                  title={mode === 'static' ? 'Static background (experimental): removes whatever matches a frame of the empty background' : mode === 'person' ? 'No green screen needed: finds you in the picture and removes the rest' : `${label} screen`}
                 >
                   {label}
                 </button>
               ))}
             </div>
             <small className="layout-hint">
-              {isStatic
+              {isPerson
+                ? 'No green screen needed: the editor finds the person in every frame and removes the rest. Works best with one person, fully lit, in front of the camera.'
+                : isStatic
                 ? 'Removes everything that looks like a few frames of the empty background. Small changes (noise, light, focus) are ignored and parts of you that match the wall are kept inside your outline. Needs a camera that does not move; shadows you cast stay visible. If parts of the room keep showing, raise Threshold.'
                 : `Removes the ${key.mode} backdrop so the clips on the tracks below show through.`}
             </small>
@@ -554,7 +558,9 @@ function GreenScreenControls({ clip, onUpdateClip, playheadPosition }) {
         </div>
       )}
 
-      {key && (
+      {isPerson && <PersonKeyControls clip={clip} onUpdateClip={onUpdateClip} onPickBackground={onPickBackground} />}
+
+      {key && !isPerson && (
         <>
           <div className="property-group">
             <label title={isStatic ? 'Tolerance: higher ignores more change in the background (noise, light, focus) but can start to remove parts of you' : 'Higher removes more of the screen colour'}>
@@ -819,7 +825,7 @@ function PositionDragHandle({ positionX, positionY, onChange }) {
 // The tab a phone user last picked, kept across clips (if the next clip has it)
 let lastTab = null
 
-function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, voiceTargets = null, onUpdateClipsEach = null, duckInfo = null }) {
+function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, voiceTargets = null, onUpdateClipsEach = null, duckInfo = null, onPickBackground = null }) {
   // Phones (tabbed): one section at a time, a tab per section. The sections
   // differ per clip type and come from several components, so the tabs are
   // read from the rendered sections (.prop-group and its label) after render.
@@ -1435,7 +1441,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
 
         {/* Green screen (video clips: camera takes, imports, library clips) */}
         {clip.type === 'video' && (
-          <GreenScreenControls clip={clip} onUpdateClip={onUpdateClip} playheadPosition={playheadPosition} />
+          <GreenScreenControls clip={clip} onUpdateClip={onUpdateClip} playheadPosition={playheadPosition} onPickBackground={onPickBackground} />
         )}
 
         {/* GROUP 3: Timing */}

@@ -3,6 +3,7 @@ import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch, currentToken } from '../utils/editorAuth'
 import { hasLayout } from '../utils/remixLayout'
 import { getClipChromaKey } from '../utils/chromaKey'
+import { uploadPersonMasks, personKeyPayload } from '../utils/personRender'
 import { normalizeColor } from '../utils/clipColor'
 import { normalizeMotion } from '../utils/stickerMotion'
 import { duckPlans, localDuckPlan } from '../utils/duck'
@@ -326,6 +327,9 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
       }
       return url
     }
+    // Background removal without a green screen: each clip's matte (made in
+    // this browser; waited for when it is still being made) goes up once
+    const maskUrls = await uploadPersonMasks(tracks, toServer, onProgress)
     for (const track of tracks) {
       for (const clip of track.clips) {
         const key = getClipChromaKey(clip)
@@ -391,7 +395,9 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
         // Green screen: keyed out in the render, over the tracks below
         const key = getClipChromaKey(clip)
         if (key) {
-          baseClip.chromaKey = key.mode === 'static'
+          baseClip.chromaKey = key.mode === 'person'
+            ? personKeyPayload(key, maskUrls.get(clip.id))
+            : key.mode === 'static'
             ? { color: 'static', similarity: key.similarity, blend: key.blend, spill: key.spill, plateUrl: plateUrls.get(clip.id)?.plateUrl || null, noiseUrl: plateUrls.get(clip.id)?.noiseUrl || null }
             : { color: key.mode, similarity: key.similarity, blend: key.blend, spill: key.spill }
         }
