@@ -237,6 +237,8 @@ function getMediaMetadataFromURL(url, mediaType) {
   // Use HLS.js for .m3u8 streams - get duration, then probe dimensions separately
   if (isHlsUrl(url)) {
     return getHlsDuration(url).then(duration => {
+      // A sound (3Speak's "Use this sound": a Short's HLS rendition): no picture to measure
+      if (mediaType === 'audio') return { duration, videoWidth: 0, videoHeight: 0 }
       // Probe HLS video dimensions via a hidden video element
       return new Promise((resolve) => {
         const video = document.createElement('video')

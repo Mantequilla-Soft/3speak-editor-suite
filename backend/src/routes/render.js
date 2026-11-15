@@ -201,7 +201,7 @@ async function processJob(jobId, jobDir) {
     // not they are burnt in), for 3Speak's own captions
     try {
       const subs = await writeSubtitleFiles(timeline, RENDERED_DIR, jobId)
-      if (subs) job.subtitles = { language: subs.language, vttUrl: `/rendered/${subs.vtt}`, srtUrl: `/rendered/${subs.srt}`, cues: subs.cues }
+      if (subs) job.subtitles = { language: subs.language, vttUrl: `/rendered/${subs.vtt}`, srtUrl: `/rendered/${subs.srt}`, cues: subs.cues, burnedIn: subs.burnedIn }
     } catch (err) {
       console.warn(`[render] Job ${jobId}: subtitle files failed: ${err.message}`)
     }

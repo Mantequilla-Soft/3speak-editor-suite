@@ -19,7 +19,8 @@ function VideoPreview({ clip, isVerticalVideo }) {
       hlsRef.current = null
     }
 
-    if (clip.type !== 'audio' && clip.type !== 'image' && isHlsUrl(clip.url)) {
+    // hls.js for an .m3u8 video, and for a sound by HLS (3Speak's "Use this sound")
+    if (clip.type !== 'image' && isHlsUrl(clip.url)) {
       const hls = attachHls(el, clip.url)
       if (hls) {
         hlsRef.current = hls

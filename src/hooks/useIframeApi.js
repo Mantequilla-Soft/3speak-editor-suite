@@ -9,11 +9,12 @@ import { duckPlans, localDuckPlan } from '../utils/duck'
 import { outputSize } from '../utils/outputSize'
 import { normalizeCaptions } from '../utils/captions'
 import { emojiUrlsOf } from '../utils/captionSources'
+import { loadCreditOf, isMusicLoad } from '../utils/loadCredit'
 
 const isIframe = typeof window !== 'undefined' && window.parent !== window
 const GATEWAY_URL = (import.meta.env.VITE_GATEWAY_URL || '').replace(/\/+$/, '')
 
-export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay, audioMode = false, master = null, title = null, chapters = null, captions = null }) {
+export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay, audioMode = false, master = null, title = null, chapters = null, captions = null }) {
   const allTracks = tracks
   const parentOriginRef = useRef('*')
   const [renderStatus, setRenderStatus] = useState(null)
@@ -31,6 +32,9 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
   const [remixPrompt, setRemixPrompt] = useState(null)
   const onTogglePlayRef = useRef(onTogglePlay)
   onTogglePlayRef.current = onTogglePlay
+  // The captions' "Show in the video" (on unless switched off), for the poll below
+  const captionsBurnRef = useRef(true)
+  captionsBurnRef.current = !!captions && captions.burn !== false
 
   // Compact mode: default to true in iframe, controllable via URL param or postMessage
   // ?compact=true forces it on even outside iframe; ?compact=false disables it in iframe
@@ -94,6 +98,12 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
           // with its own blob URL and the File kept for the render upload.
           const file = data.file instanceof Blob ? data.file : null
           const url = file ? URL.createObjectURL(file) : data.url
+          // "Use this sound" on 3Speak: the sound goes on the music track with
+          // its credit, which goes back with the post while the clip is used
+          if (addMusicClip && isMusicLoad(data, file)) {
+            await addMusicClip(url, String(name || 'Sound').slice(0, 200), loadCreditOf(data.credit))
+            break
+          }
           if (url && mediaType) {
             // Track remix source so rendered output posts as a comment under the original short
             if (parentAuthor && parentPermlink) {
@@ -193,9 +203,11 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
 
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
-  }, [addToLibraryAndTimeline, tracks, library, playheadPosition, sendToParent])
+  }, [addToLibraryAndTimeline, addMusicClip, tracks, library, playheadPosition, sendToParent])
 
-  // Notify parent that editor is ready
+  // Notify parent that editor is ready (once: a boolean, not the callback, so a
+  // new addMusicClip identity never sends it again)
+  const canLoadSound = !!addMusicClip
   useEffect(() => {
     if (!isIframe) return
     // `canLoadFile`: load-media takes a `file`. A parent with a local file checks
@@ -204,8 +216,10 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     // (request-close) before closing; an older editor gets the plain confirm.
     // `mode` / `canEditAudio`: this is the audio editor (opened with ?mode=audio);
     // it answers "Use this audio" with post-to-3speak { mediaType: 'audio' }.
-    sendToParent('editor-ready', { canLoadFile: true, canSaveDrafts: true, ...(audioMode ? { mode: 'audio', canEditAudio: true } : {}) })
-  }, [sendToParent, audioMode])
+    // `canLoadSound`: load-media { music: true, credit } puts a sound on the music
+    // track with its credit, and musicCredits only names the songs still used.
+    sendToParent('editor-ready', { canLoadFile: true, canSaveDrafts: true, ...(canLoadSound ? { canLoadSound: true } : {}), ...(audioMode ? { mode: 'audio', canEditAudio: true } : {}) })
+  }, [sendToParent, audioMode, canLoadSound])
 
   // Abort an active render job
   const abortActiveJob = useCallback(() => {
@@ -539,9 +553,17 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
           // selected backend, not this page's own origin)
           const base = backendEndpoint || getBackendUrl() || window.location.origin
           const fullUrl = new URL(data.outputUrl, base).href
-          // Auto captions' subtitle files sit next to the video
+          // Auto captions' subtitle files sit next to the video. `burnedIn`: the
+          // words are in the picture too ("Show in the video"), so 3Speak keeps
+          // CC off for them by default; the backend says (it knows when it could
+          // not draw them), an older one does not, then the option decides.
           const subtitles = data.subtitles
-            ? { ...data.subtitles, vttUrl: new URL(data.subtitles.vttUrl, base).href, srtUrl: new URL(data.subtitles.srtUrl, base).href }
+            ? {
+                ...data.subtitles,
+                vttUrl: new URL(data.subtitles.vttUrl, base).href,
+                srtUrl: new URL(data.subtitles.srtUrl, base).href,
+                burnedIn: typeof data.subtitles.burnedIn === 'boolean' ? data.subtitles.burnedIn : captionsBurnRef.current
+              }
             : undefined
           setRenderStatus({ ...data, outputUrl: fullUrl, subtitles })
           clearInterval(pollIntervalRef.current)

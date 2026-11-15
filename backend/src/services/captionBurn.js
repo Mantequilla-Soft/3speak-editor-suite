@@ -93,7 +93,9 @@ export async function captionBurn(timeline, frame, jobDir, downloadedFiles, firs
 /**
  * The captions' words as subtitle files in `dir` (<name>.vtt, <name>.srt), for
  * any video render with captions (burnt in or not). Resolves
- * { language, vtt, srt, cues } (file names) or null.
+ * { language, vtt, srt, cues, burnedIn } (file names) or null. `burnedIn`: the
+ * words are also in the picture (burn on and this ffmpeg can draw them), so
+ * 3Speak keeps its own CC off for them by default.
  */
 export async function writeSubtitleFiles(timeline, dir, name) {
   if (!timeline || timeline.output === 'audio') return null
@@ -103,5 +105,6 @@ export async function writeSubtitleFiles(timeline, dir, name) {
   const srt = `${name}.srt`
   await fs.writeFile(path.join(dir, vtt), toVtt(c), 'utf8')
   await fs.writeFile(path.join(dir, srt), toSrt(c), 'utf8')
-  return { language: c.language, vtt, srt, cues: subtitleCues(c) }
+  const burnedIn = !!burnCaptionsOf(timeline) && (await hasAssFilter())
+  return { language: c.language, vtt, srt, cues: subtitleCues(c), burnedIn }
 }

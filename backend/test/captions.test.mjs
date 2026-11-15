@@ -141,6 +141,10 @@ test('subtitle files: WebVTT and SRT cues in the spoken case', async () => {
   const r = await writeSubtitleFiles({ captions: caps() }, out, 'job1')
   assert.deepEqual([r.language, r.vtt, r.srt, r.cues.length], ['en', 'job1.vtt', 'job1.srt', 2])
   assert.equal(fs.readFileSync(path.join(out, 'job1.vtt'), 'utf8'), vtt)
+  // burnt in when burn is on (and this ffmpeg can draw them); off = only subtitles on 3Speak
+  assert.equal(r.burnedIn, await hasAssFilter())
+  const notBurnt = await writeSubtitleFiles({ captions: { ...caps(), burn: false } }, out, 'job2')
+  assert.equal(notBurnt.burnedIn, false)
   assert.equal(await writeSubtitleFiles({ output: 'audio', captions: caps() }, out, 'x'), null)
 })
 

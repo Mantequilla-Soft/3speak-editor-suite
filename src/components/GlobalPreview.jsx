@@ -293,11 +293,21 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
     try { el._boostGain?.disconnect() } catch { /* already */ }
     el._boostSource = null
     el._boostGain = null
+    if (el._hls) { destroyHls(el._hls); el._hls = null; el._hlsUrl = null }
     try {
       el.pause()
       el.removeAttribute('src')
       el.load()
     } catch { /* gone */ }
+  }
+  // A sound by HLS (3Speak's "Use this sound": a Short's .m3u8 rendition) plays
+  // through hls.js like a video clip; any other URL is the element's own src.
+  // Once per element and URL (the ref runs on every render).
+  const attachAudioSource = (el, url) => {
+    if (!isHlsUrl(url) || el._hlsUrl === url) return
+    if (el._hls) destroyHls(el._hls)
+    el._hls = attachHls(el, url)
+    el._hlsUrl = url
   }
   const audioClips = useMemo(() => {
     return (tracks || [])
@@ -1733,13 +1743,13 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                 ref={el => {
                   // React clears the old ref (null) before it sets a new one for
                   // the same clip, so null always means this clip's element left
-                  if (el) { audioRefs.current[clip.id] = el; liveAudioElsRef.current.add(el) } else delete audioRefs.current[clip.id]
+                  if (el) { audioRefs.current[clip.id] = el; liveAudioElsRef.current.add(el); attachAudioSource(el, clip.url) } else delete audioRefs.current[clip.id]
                 }}
                 preload="auto"
                 crossOrigin={boosted ? 'anonymous' : undefined}
                 data-boost={boosted ? '1' : undefined}
                 data-clip-id={clip.id}
-                src={clip.url}
+                src={isHlsUrl(clip.url) ? undefined : clip.url}
               />
             )
           })}

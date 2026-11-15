@@ -278,7 +278,7 @@ function App() {
     requestPlaylistCovers,
     editTextInHost,
     buildAndUploadPayload
-  } = useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay, audioMode, master, title: audioTitle, chapters: chapterList, captions: audioMode ? null : captions })
+  } = useIframeApi({ addToLibraryAndTimeline, addMusicClip, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay, audioMode, master, title: audioTitle, chapters: chapterList, captions: audioMode ? null : captions })
 
   // Auto captions: speech to text on the backend, then the words go on screen
   const autoCaptions = useAutoCaptions({ enabled: !audioMode })
