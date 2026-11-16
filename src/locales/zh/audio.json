@@ -1,0 +1,8 @@
+{
+  "cleaning": {
+    "voice_other": "正在清理 {{count}} 个片段的人声…",
+    "voiceRecording_other": "正在清理 {{count}} 个片段的人声 · 第 {{at}} / {{total}} 段录音",
+    "back_other": "正在将 {{count}} 个片段切换回原声…",
+    "backRecording_other": "正在将 {{count}} 个片段切换回原声 · 第 {{at}} / {{total}} 段录音"
+  }
+}

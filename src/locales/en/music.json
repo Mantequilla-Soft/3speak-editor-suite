@@ -1,0 +1,26 @@
+{
+  "music": {
+    "title": "Music",
+    "search": "Search songs",
+    "loading": "Loading songs...",
+    "failed": "The music library could not be loaded.",
+    "none": "No songs match.",
+    "note": "The song credit is added to your post automatically. Picking a 3Speak creator's sound gives them 5% of the post rewards.",
+    "addTitle": "Add to video"
+  },
+  "sfx": {
+    "title": "Sound effects",
+    "search": "Search sounds",
+    "loading": "Loading sounds...",
+    "failed": "The sound effects could not be loaded.",
+    "none": "No sounds match.",
+    "note": "Sounds go in at the playhead. Free to use (CC0, Kenney.nl), no credit needed.",
+    "addTitle": "Add at the playhead"
+  },
+  "all": "All",
+  "timeline": "Timeline: {{title}}",
+  "seconds": "{{seconds}}s",
+  "stop": "Stop",
+  "listen": "Listen",
+  "add": "Add"
+}

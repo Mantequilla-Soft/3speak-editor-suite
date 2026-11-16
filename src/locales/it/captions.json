@@ -1,0 +1,67 @@
+{
+  "language": {
+    "label": "Lingua parlata",
+    "auto": "Rileva automaticamente"
+  },
+  "intro": {
+    "title": "Sottotitoli automatici",
+    "text": "Trasforma ciò che viene detto in sottotitoli che seguono ogni parola, impressi nel tuo Short e inviati anche a 3Speak come sottotitoli.",
+    "checking": "Verifica del server...",
+    "unavailable": "I sottotitoli automatici non sono disponibili su questo server dell'editor al momento. Il tuo Short viene renderizzato normalmente, senza.",
+    "go": "Sottotitoli automatici"
+  },
+  "presets": {
+    "karaoke": "Karaoke",
+    "pop": "Pop",
+    "plain": "Sottotitoli"
+  },
+  "presetHints": {
+    "karaoke": "Poche parole alla volta, la parola pronunciata nel colore di evidenziazione",
+    "pop": "Una parola (o poche) alla volta, che compare di scatto",
+    "plain": "Righe di sottotitoli classiche su un riquadro scuro"
+  },
+  "style": {
+    "title": "Stile",
+    "presetsLabel": "Stile dei sottotitoli",
+    "wordsAtATime": "Parole alla volta",
+    "font": "Carattere",
+    "size": "Dimensione",
+    "sizeLabel": "Dimensione dei sottotitoli",
+    "position": "Posizione",
+    "positionLabel": "Altezza dei sottotitoli nell'immagine",
+    "top": "In alto",
+    "middle": "Al centro",
+    "low": "In basso",
+    "textColour": "Colore del testo",
+    "highlight": "Evidenziazione",
+    "highlightLabel": "Colore di evidenziazione",
+    "uppercase": "Maiuscole",
+    "emoji": "Emoji di accento (sopra parole come \"fuoco\" o \"amore\")",
+    "burn": "Mostra nel video (disattivato: solo come sottotitoli su 3Speak)"
+  },
+  "words": {
+    "title": "Parole ({{n}})",
+    "hint": "Correggi ciò che è stato capito male; svuota una parola per toglierla. Hai spostato o tagliato clip? Rilancia i sottotitoli automatici.",
+    "goThere": "Vai lì",
+    "word": "Parola {{n}}",
+    "changeEmoji": "Cambia o rimuovi la sua emoji",
+    "addEmoji": "Aggiungi un'emoji",
+    "remove": "Rimuovi questa parola",
+    "removeNamed": "Rimuovi {{word}}"
+  },
+  "actions": {
+    "again": "Di nuovo",
+    "againTitle": "Riascolta (sostituisce le parole)",
+    "remove": "Rimuovi i sottotitoli"
+  },
+  "videoSound": "Audio del video",
+  "job": {
+    "preparing": "Preparazione dell'audio...",
+    "listening": "Ascolto...",
+    "noTracks": "Non c'è parlato da sottotitolare: aggiungi prima una clip con audio.",
+    "serverAnswered": "Il server ha risposto {{status}}",
+    "lost": "Il lavoro sui sottotitoli è andato perso (il server si è riavviato?)",
+    "noSpeech": "Nessun parlato trovato. La voce è su una traccia audio non silenziata (le tracce musicali sono escluse)?",
+    "failed": "Riconoscimento vocale non riuscito"
+  }
+}

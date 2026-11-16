@@ -1,0 +1,25 @@
+{
+  "length": {
+    "title": "Your timeline is {{length}} long",
+    "body": "{{atMost}} You can keep editing everything, but Render stays off until the timeline ends at the marked {{limitAt}} line. Trim, split or delete clips to get there.",
+    "bodyAudio": "{{atMost}} You can keep editing everything, but Export stays off until the timeline ends at the marked {{limitAt}} line. Trim, split or delete clips to get there."
+  },
+  "tooLarge": {
+    "title_one": "This file is too big",
+    "title_other": "These files are too big",
+    "body": "The editor takes files up to {{size}}. Shorten or compress the video first (a phone or any video app can export a smaller copy), then add it again."
+  },
+  "encoding": {
+    "title": "This video needs converting first",
+    "videos_one": "{{count}} video",
+    "videos_other": "{{count}} videos",
+    "next": "Next",
+    "waiting_one": "Waiting for {{count}} other video",
+    "waiting_other": "Waiting for {{count}} other videos",
+    "starting": "Starting…",
+    "upload": "Upload",
+    "convert": "Convert to a playable copy",
+    "hint": "This browser cannot play this video's format (HEVC or HDR, common from phones), so it shows black until the playable copy is ready. The preview then switches to it by itself. You can keep editing meanwhile.",
+    "hide": "Hide"
+  }
+}

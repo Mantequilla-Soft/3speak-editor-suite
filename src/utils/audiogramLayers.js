@@ -10,11 +10,11 @@
 // Vertical only: the shape of a Short
 export const SIZES = { vertical: { w: 1080, h: 1920 } }
 export const LAYERS = [
-  { id: 'logo', name: '3Speak logo' },
-  { id: 'cover', name: 'Picture' },
-  { id: 'title', name: 'Title' },
-  { id: 'line', name: 'Line' },
-  { id: 'wave', name: 'Waveform' }
+  { id: 'logo', nameKey: 'audiogram.layer.logo.name' },
+  { id: 'cover', nameKey: 'audiogram.layer.cover.name' },
+  { id: 'title', nameKey: 'audiogram.layer.title.name' },
+  { id: 'line', nameKey: 'audiogram.layer.line.name' },
+  { id: 'wave', nameKey: 'audiogram.layer.wave.name' }
 ]
 export const MIN_BOX = 16
 export const AUDIOGRAM_MIN_SECONDS = 3
@@ -191,14 +191,23 @@ export function pieceOf(range, length, playhead = 0) {
 /** Can this audiogram go out as a Short? Vertical and at most 2 minutes. */
 export const canBeShort = (a) => a.format === 'vertical' && a.duration <= AUDIOGRAM_MAX_SECONDS
 
-/** What goes to 3Speak with "Use this audio": every audiogram (posting them as Shorts with it is what they are for). */
+/**
+ * What goes to 3Speak with "Use this audio": every audiogram (posting them as
+ * Shorts with it is what they are for). `start` (seconds into the edited audio,
+ * which is the episode 3Speak posts) and `duration` make the Short a soundbite
+ * of the episode in its podcast feed.
+ */
 export function audiogramsToPost(list) {
-  return (list || []).filter(a => canBeShort(a) && a.url).map(a => ({
-    url: a.url,
-    description: String(a.description || '').trim().slice(0, 5000),
-    title: a.title || '',
-    duration: a.duration,
-    width: 1080,
-    height: 1920
-  }))
+  return (list || []).filter(a => canBeShort(a) && a.url).map(a => {
+    const start = Number(a.start)
+    return {
+      url: a.url,
+      description: String(a.description || '').trim().slice(0, 5000),
+      title: a.title || '',
+      duration: a.duration,
+      ...(a.start != null && Number.isFinite(start) && start >= 0 ? { start: Math.round(start * 10) / 10 } : {}),
+      width: 1080,
+      height: 1920
+    }
+  })
 }

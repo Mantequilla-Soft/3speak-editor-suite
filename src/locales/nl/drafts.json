@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "line": "{{clips}} · {{length}} · {{edited}}",
+    "audioLine": "Audio · {{clips}} · {{length}} · {{edited}}",
+    "clips_one": "{{count}} clip",
+    "clips_other": "{{count}} clips",
+    "edited": {
+      "justNow": "zojuist bewerkt",
+      "minutes_one": "{{count}} min geleden bewerkt",
+      "minutes_other": "{{count}} min geleden bewerkt",
+      "hours_one": "{{count}} u geleden bewerkt",
+      "hours_other": "{{count}} u geleden bewerkt",
+      "days_one": "{{count}} dag geleden bewerkt",
+      "days_other": "{{count}} dagen geleden bewerkt"
+    }
+  },
+  "prompt": {
+    "titleOne": "Verder met je concept?",
+    "titleMany": "Verder met een concept?",
+    "keptUntil": "Bewaard tot {{date}}",
+    "open": "Openen",
+    "startNew": "Een nieuw project beginnen",
+    "singleNote": "Je kunt één concept bewaren. Een nieuw project vervangt dit zodra je iets bewerkt. 3Speak Pro bewaart 3 concepten voor 30 dagen."
+  },
+  "limit": {
+    "titleOne": "Je opgeslagen concept vervangen?",
+    "titleMany": "Je hebt al {{n}} opgeslagen projecten",
+    "skipTitle": "Dit project niet opslaan",
+    "noteOne": "Je kunt één concept bewaren. Als je dit project opslaat, vervangt het het concept hieronder.",
+    "noteMany": "Je kunt er maximaal {{n}} bewaren. Kies er een die dit project vervangt:",
+    "replace": "Vervangen",
+    "skip": "Dit project niet opslaan"
+  },
+  "close": {
+    "saveTitle": "Je project opslaan?",
+    "closeTitle": "De editor sluiten?",
+    "keepEditing": "Verder bewerken",
+    "signInFailed": "Dat werkte niet. Keur het inlogverzoek goed in je wallet en probeer het opnieuw, of log uit bij 3Speak en weer in.",
+    "signInToKeep": "Log één keer in om dit project als concept te bewaren, zodat je later verder kunt.",
+    "signedOutLost": "Je wijzigingen gaan verloren. Log in op 3Speak om concepten van je projecten te bewaren.",
+    "lost": "Je wijzigingen gaan verloren.",
+    "signingIn": "Inloggen…",
+    "signInToSave": "Log in om op te slaan",
+    "withoutSaving": "Sluiten zonder opslaan",
+    "keepTitle": "Dit project bewaren?",
+    "keepDays_one": "We bewaren het {{count}} dag",
+    "keepDays_other": "We bewaren het {{count}} dagen",
+    "keepHours_one": "We bewaren het {{count}} uur",
+    "keepHours_other": "We bewaren het {{count}} uur",
+    "until": "tot {{date}}",
+    "uploadingOne": "{{name}} wordt nog geüpload ({{percent}}). Je kunt opslaan zodra dat klaar is.",
+    "uploadingFiles_one": "{{count}} bestand wordt nog geüpload ({{percent}}). Je kunt opslaan zodra dat klaar is.",
+    "uploadingFiles_other": "{{count}} bestanden worden nog geüpload ({{percent}}). Je kunt opslaan zodra dat klaar is.",
+    "name": "Projectnaam",
+    "namePlaceholder": "Project zonder titel",
+    "saveError": "Opslaan mislukt. Controleer je verbinding en probeer het opnieuw.",
+    "saveAndClose": "Opslaan en sluiten",
+    "afterUpload": "Beschikbaar zodra de upload klaar is",
+    "deleteAndClose": "Verwijderen en sluiten"
+  },
+  "pro": {
+    "title": "Meer met 3Speak Pro",
+    "text": "Bewaar tot 3 projecten voor elk 30 dagen, in plaats van 1 voor 7 dagen.",
+    "get": "Pro nemen"
+  },
+  "status": {
+    "signingIn": "Inloggen… kijk in je wallet",
+    "signInTitle": "Log één keer in om je project als concept op te slaan",
+    "signInFailed": "Inloggen mislukt · probeer opnieuw",
+    "saveDrafts": "Concepten opslaan",
+    "notSavedTitle": "Dit project is nog niet opgeslagen",
+    "chooseSlot": "Niet opgeslagen: kies een plek",
+    "saving": "Opslaan…",
+    "notSaved": "Concept niet opgeslagen",
+    "keptUntil": "Concept bewaard tot {{date}}",
+    "savedUntil": "Concept opgeslagen · tot {{date}}"
+  },
+  "library": {
+    "title": "Projectbibliotheek",
+    "addFiles": "Bestanden toevoegen",
+    "groups": {
+      "videos": "Video's",
+      "images": "Afbeeldingen",
+      "sounds": "Geluiden"
+    },
+    "empty": {
+      "videos": "Geen video's",
+      "images": "Geen afbeeldingen",
+      "sounds": "Geen geluiden"
+    },
+    "dropToAdd": "Zet bestanden neer om ze toe te voegen",
+    "hint": "Zet bestanden hier neer of sleep items naar de tijdlijn",
+    "downloading": "Downloaden... {{percent}}",
+    "downloaded": "Lokaal gedownload",
+    "local": "lokaal",
+    "uploadingTitle": "Uploaden op de achtergrond. Renderen wacht tot het klaar is.",
+    "converting": "omzetten",
+    "convertingTitle": "Deze browser kan het formaat van deze video niet tonen. Het voorbeeld schakelt over naar een 480p-kopie zodra die klaar is.",
+    "noPreview": "geen voorbeeld",
+    "noPreviewTitle": "Er kon geen afspeelbare kopie worden gemaakt. Het voorbeeld blijft misschien zwart, renderen werkt nog wel.",
+    "encodedTitle": "Op de server gecodeerd naar 480p",
+    "encoding": "Coderen...",
+    "addToTimeline": "Aan tijdlijn toevoegen",
+    "remove": "Uit bibliotheek verwijderen"
+  }
+}

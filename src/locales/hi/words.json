@@ -1,0 +1,59 @@
+{
+  "panel": {
+    "title": "ट्रांसक्रिप्ट",
+    "close": "ट्रांसक्रिप्ट बंद करें"
+  },
+  "cutNotice": {
+    "plain": "काटा गया: {{seconds}} सेकंड छोटा।",
+    "words_one": "{{count}} शब्द काटा गया: {{seconds}} सेकंड छोटा।",
+    "words_other": "{{count}} शब्द काटे गए: {{seconds}} सेकंड छोटा।",
+    "found_one": "मिली {{count}} जगह काटी गई: {{seconds}} सेकंड छोटा।",
+    "found_other": "मिली {{count}} जगहें काटी गईं: {{seconds}} सेकंड छोटा।",
+    "fillers": "{{fillers}}, {{pauses}} काटे गए: {{seconds}} सेकंड छोटा।",
+    "dismiss": "हटाएँ"
+  },
+  "fillers": {
+    "title": "फ़िलर और विराम हटाएँ",
+    "emptyHint": "यह ट्रांसक्रिप्ट से काम करता है: शो की भाषा में अं, उह, मतलब जैसे शब्द और लंबे विराम ढूँढता है।",
+    "listening": "सुन रहे हैं...",
+    "transcribeFirst": "पहले शो को ट्रांसक्राइब करें",
+    "checking": "सर्वर जाँचा जा रहा है...",
+    "unavailable": "इस एडिटर सर्वर पर अभी ट्रांसक्रिप्ट उपलब्ध नहीं हैं।",
+    "intro": "{{language}} में फ़िलर। हर एक को सुनें, जो रहना चाहिए उसका निशान हटाएँ।",
+    "introNoList": "{{language}} में फ़िलर (सिर्फ़ अं, उह और ऐसे ही: इस भाषा की सूची अभी नहीं है)। हर एक को सुनें, जो रहना चाहिए उसका निशान हटाएँ।",
+    "stillTranscribing": "शो का बाकी हिस्सा अभी ट्रांसक्राइब हो रहा है।",
+    "fillerWords": "फ़िलर शब्द",
+    "longPauses": "लंबे विराम",
+    "minPause": "<strong>{{seconds}} से.</strong> से लंबा विराम",
+    "keepPause": "विराम को <strong>{{seconds}} से.</strong> तक छोटा करें",
+    "keepPauseTitle": "कट के बाद लंबे विराम का कितना हिस्सा बचे",
+    "fillerCount_one": "{{count}} फ़िलर",
+    "fillerCount_other": "{{count}} फ़िलर",
+    "pauseCount_one": "{{count}} विराम",
+    "pauseCount_other": "{{count}} विराम",
+    "summary": "{{fillers}}, {{pauses}} चुने गए · {{seconds}} से. कटेगा",
+    "nothingFound": "इन सेटिंग से कुछ नहीं मिला।",
+    "tickAllFillers": "सभी फ़िलर चुनें",
+    "untickAllFillers": "सभी फ़िलर का निशान हटाएँ",
+    "tickAllPauses": "सभी विराम चुनें",
+    "untickAllPauses": "सभी विराम का निशान हटाएँ",
+    "listLabel": "क्या कटेगा",
+    "item": {
+      "keepPause": "यह विराम रखें",
+      "cutPause": "यह विराम काटें",
+      "keepFiller": "{{text}} रखें",
+      "cutFiller": "{{text}} काटें",
+      "stop": "रोकें",
+      "listenTitle": "सुनें (आसपास के एक सेकंड के साथ)",
+      "listenAt": "{{time}} पर सुनें",
+      "pause": "विराम",
+      "pauseLength": "{{length}} से. → {{kept}} से.",
+      "filler": "फ़िलर",
+      "fillerTitle": "हिचकिचाहट की आवाज़",
+      "maybe": "शायद",
+      "maybeTitle": "यहाँ एक फ़िलर (विराम या कॉमा से अलग): पहले सुनें"
+    },
+    "cut": "काटें",
+    "cutCount": "{{n}} काटें ({{seconds}} से.)"
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "aspect": {
+    "short": {
+      "label": "Short",
+      "hint": "Staand, tot 2 minuten, geplaatst als Short"
+    },
+    "landscape": {
+      "label": "Liggend",
+      "hint": "Breedbeeldvideo, tot 10 minuten"
+    },
+    "classic": {
+      "label": "Klassiek",
+      "hint": "4:3-video, tot 10 minuten"
+    },
+    "square": {
+      "label": "Vierkant",
+      "hint": "Vierkante video, tot 10 minuten"
+    }
+  },
+  "chip": {
+    "title": "Vorm van dit project: {{shape}}. Klik om te wijzigen",
+    "aria": "Projectvorm: {{shape}}"
+  },
+  "picker": {
+    "title": "Wat ga je maken?",
+    "tooLong": "je tijdlijn duurt {{length}}, kort hem in tot {{limit}} om te renderen",
+    "note": "De vorm bepaalt hoe het naar 3Speak gaat: 9:16 als Short, de andere als gewone video. Exporteren als rendert het ook in andere vormen."
+  },
+  "preview": {
+    "heading": "Voorbeeld in",
+    "yours": "{{aspect}} (de jouwe)",
+    "projectIs": {
+      "short": "Je project is Short 9:16. In een andere vorm vult het beeldmateriaal het kader, uitgesneden rond het gezicht erin.",
+      "landscape": "Je project is Liggend 16:9. In een andere vorm vult het beeldmateriaal het kader, uitgesneden rond het gezicht erin.",
+      "classic": "Je project is Klassiek 4:3. In een andere vorm vult het beeldmateriaal het kader, uitgesneden rond het gezicht erin.",
+      "square": "Je project is Vierkant 1:1. In een andere vorm vult het beeldmateriaal het kader, uitgesneden rond het gezicht erin."
+    }
+  },
+  "faces": {
+    "heading": "Gezichten volgen",
+    "noFootage": "Nog geen beeldmateriaal om opnieuw te kaderen. Verplaatste of ingezoomde clips houden hun eigen kader.",
+    "hint": "Het gezicht wordt in je browser gezocht, een paar beelden per seconde. Zonder gezicht blijft het midden in beeld.",
+    "found": "Gezicht gevonden",
+    "noFace": "Geen gezicht: midden",
+    "middle": "Midden",
+    "finding": "Gezichten zoeken",
+    "findOne": "Het gezicht zoeken",
+    "findMany_one": "Gezichten zoeken in {{count}} clip",
+    "findMany_other": "Gezichten zoeken in {{count}} clips",
+    "streamNamed": "{{name}} is een stream: hij wordt rond het midden uitgesneden.",
+    "streamUnnamed": "Een clip is een stream: hij wordt rond het midden uitgesneden.",
+    "failed": "Gezichtsvolging werkte hier niet: {{error}}",
+    "moveWindow": "{{name}}: het venster verplaatsen",
+    "left": "Links",
+    "right": "Rechts",
+    "up": "Omhoog",
+    "down": "Omlaag",
+    "moveX": "Het venster naar links of rechts verplaatsen",
+    "moveY": "Het venster omhoog of omlaag verplaatsen",
+    "findAgain": "Het gezicht opnieuw zoeken",
+    "reset": "Midden, geen verschuiving"
+  },
+  "clipFallback": "Clip",
+  "stop": "Stoppen",
+  "render": {
+    "heading": "Renderen als",
+    "shortsLimit": "Shorts duren maximaal {{limit}}: kort de tijdlijn in om een 9:16-versie te renderen.",
+    "button_one": "{{count}} video renderen",
+    "button_other": "{{count}} video's renderen",
+    "failed": "Renderen mislukt: {{error}}",
+    "download": "Downloaden",
+    "postShort": "Plaatsen als Short",
+    "postVideo": "Plaatsen als video"
+  },
+  "job": {
+    "waiting": "Wachten...",
+    "preparing": "Bestanden voorbereiden...",
+    "starting": "Starten...",
+    "rendering": "Renderen...",
+    "done": "Klaar",
+    "stopped": "Gestopt",
+    "busy": "De renderservers zijn bezet. Opnieuw proberen over {{seconds}} s...",
+    "offline": "Geen verbinding met de renderserver. Opnieuw proberen over {{seconds}} s...",
+    "failed": "Het renderen is mislukt"
+  }
+}

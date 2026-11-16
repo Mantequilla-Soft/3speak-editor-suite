@@ -1,0 +1,53 @@
+{
+  "title": "Stockmedia",
+  "titleBackground": "Kies een achtergrond",
+  "search": "Video's, foto's en GIF's zoeken",
+  "searchProvider": "{{provider}} doorzoeken",
+  "searchProviderTitle": "{{provider}} doorzoeken (vrij te gebruiken, gekopieerd naar onze server als je iets kiest)",
+  "kind": "Soort",
+  "category": "Categorie",
+  "everything": "Alles",
+  "types": {
+    "all": "Alles",
+    "video": "Video's",
+    "image": "Foto's",
+    "gif": "GIF's"
+  },
+  "categories": {
+    "nature": "Natuur",
+    "city": "Stad",
+    "people": "Mensen",
+    "animals": "Dieren",
+    "food": "Eten",
+    "tech": "Techniek",
+    "sports": "Sport",
+    "space": "Ruimte",
+    "abstract": "Abstract",
+    "backgrounds": "Achtergronden"
+  },
+  "loading": "De bibliotheek laden...",
+  "typeToSearch": "Typ wat je zoekt om {{provider}} te doorzoeken.",
+  "nothingFound": "Niets gevonden.",
+  "searching": "Zoeken...",
+  "loadFailed": "De stockbibliotheek kon niet worden geladen.",
+  "nothingMatches": "Niets gevonden.",
+  "adding": "Toevoegen...",
+  "byAuthor": "{{title}} ({{author}})",
+  "licenceOnline": "Van {{provider}}: vrij te gebruiken, ook commercieel, geen vermelding nodig. Het bestand wordt naar de server van 3Speak gekopieerd als je het kiest.",
+  "licence": "Vrij te gebruiken, ook commercieel, geen vermelding nodig (CC0 / publiek domein van Wikimedia Commons).",
+  "placeBackground": "Het komt achter jou, op een eigen spoor, even lang als je clip.",
+  "placeAdd": "Het komt op de afspeelkop: op een lege tijdlijn als je video, anders eroverheen als B-roll.",
+  "errors": {
+    "notCopied": "Dat bestand kon niet worden gekopieerd.",
+    "notAdded": "Dat bestand kon niet worden toegevoegd.",
+    "tooMany": "Te veel zoekopdrachten, wacht even.",
+    "searchFailed": "Het zoeken werkte niet, probeer het opnieuw.",
+    "copyFailed": "Dat bestand kon niet naar de server worden gekopieerd."
+  },
+  "trackName": {
+    "background": "Achtergrond",
+    "backgroundNumbered": "Achtergrond {{number}}",
+    "broll": "B-roll",
+    "brollNumbered": "B-roll {{number}}"
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "textFx": {
+    "title": "Mga text effect",
+    "outline": "Outline",
+    "outlineColour": "Kulay ng outline",
+    "outlineWidth": "Kapal ng outline",
+    "wordsComeIn": "Pagpasok ng mga salita",
+    "allAtOnce": "Sabay-sabay lahat",
+    "atOnce": "Sabay-sabay",
+    "anims": {
+      "pop": "Pop",
+      "fadeUp": "Fade pataas",
+      "typewriter": "Makinilya",
+      "slide": "Dausdos"
+    },
+    "gap": "Pagitan",
+    "gapSeconds": "Oras sa pagitan ng mga salita (segundo)",
+    "defaultText": "Text"
+  },
+  "templates": {
+    "dialogTitle": "Mga Pamagat",
+    "allTitles": "Lahat ng pamagat",
+    "overVideo": "Sa ibabaw ng video",
+    "ownBackground": "Sariling background",
+    "starsHint": "Lagyan ng *bituin* ang paligid ng salita para kulayan ito.",
+    "addTitle": "Magdagdag ng pamagat",
+    "groups": {
+      "lower": "Mga lower third",
+      "title": "Mga pamagat sa ibabaw ng video",
+      "card": "Mga intro at outro card"
+    },
+    "fields": {
+      "name": "Pangalan",
+      "role": "Tungkulin",
+      "lines": "Mga linya",
+      "words": "Mga salita",
+      "lineUnder": "Linya sa ilalim ng mga ito",
+      "lineInFront": "Linya sa harap",
+      "rows": "Mga hanay",
+      "headline": "Headline",
+      "lineUnderIt": "Linya sa ilalim nito",
+      "tagline": "Tagline",
+      "cta": "Call to action",
+      "smallPrint": "Maliit na print"
+    },
+    "items": {
+      "lowerName": {
+        "label": "Pangalan at tungkulin",
+        "sub": "Creator sa 3Speak"
+      },
+      "lowerStatement": {
+        "label": "Maikling pahayag",
+        "lines": "Tatlong bagay na\n*natutunan* ko ngayon"
+      },
+      "titleWords": {
+        "label": "Isang salita bawat labas",
+        "words": "Magplano.\nMag-film.\n*Mag-post.*",
+        "line": "Ang linggo ko sa 3Speak"
+      },
+      "titleKinetic": {
+        "label": "Bumabagsak na salita",
+        "words": "Mabilis\nSimple\nSa iyo",
+        "line": "Ginawa sa *3Speak*"
+      },
+      "titlePoster": {
+        "label": "Malalaking salitang nakapatong",
+        "words": "Unang\naraw.",
+        "sub": "Nagsisimula sa wala"
+      },
+      "titleMarquee": {
+        "label": "Umiikot na hanay",
+        "rows": "Magplano\nMag-film\nMag-post\nUlitin",
+        "line": "Bawat *linggo*"
+      },
+      "cardHook": {
+        "label": "Intro: pambungad na linya",
+        "lines": "Paano ko\ni-edit ang\n*Shorts* ko",
+        "sub": "Sa loob ng wala pang isang minuto"
+      },
+      "cardEnd": {
+        "label": "Outro: i-follow ako",
+        "tagline": "Bagong Shorts *bawat linggo*",
+        "cta": "I-follow sa 3Speak"
+      },
+      "cardPoster": {
+        "label": "Outro: malalaking salita",
+        "words": "Kita\ntayo\n*ulit.*",
+        "cta": "I-follow sa 3Speak"
+      }
+    }
+  },
+  "scene": {
+    "title": "Pamagat",
+    "onePerLine": "Isa bawat linya",
+    "colours": "Mga kulay",
+    "font": "Font",
+    "overVideo": "Sa ibabaw ng video",
+    "length": "Haba",
+    "lengthSeconds": "Haba (segundo)",
+    "defaultName": "Ako",
+    "layerTitle": "Pamagat"
+  },
+  "colors": {
+    "ember": "Baga",
+    "amber": "Amber",
+    "ocean": "Karagatan",
+    "forest": "Kagubatan",
+    "berry": "Berry",
+    "paper": "Papel"
+  }
+}

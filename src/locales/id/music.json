@@ -1,0 +1,26 @@
+{
+  "music": {
+    "title": "Musik",
+    "search": "Cari lagu",
+    "loading": "Memuat lagu...",
+    "failed": "Pustaka musik tidak dapat dimuat.",
+    "none": "Tidak ada lagu yang cocok.",
+    "note": "Kredit lagu ditambahkan ke postinganmu secara otomatis. Memilih suara dari kreator 3Speak memberi mereka 5% dari reward postingan.",
+    "addTitle": "Tambahkan ke video"
+  },
+  "sfx": {
+    "title": "Efek suara",
+    "search": "Cari suara",
+    "loading": "Memuat suara...",
+    "failed": "Efek suara tidak dapat dimuat.",
+    "none": "Tidak ada suara yang cocok.",
+    "note": "Suara ditaruh di playhead. Gratis dipakai (CC0, Kenney.nl), tanpa perlu kredit.",
+    "addTitle": "Tambahkan di playhead"
+  },
+  "all": "Semua",
+  "timeline": "Linimasa: {{title}}",
+  "seconds": "{{seconds}} dtk",
+  "stop": "Berhenti",
+  "listen": "Dengarkan",
+  "add": "Tambah"
+}

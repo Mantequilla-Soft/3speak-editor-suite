@@ -1,0 +1,22 @@
+{
+  "length": {
+    "title": "Dòng thời gian của bạn dài {{length}}",
+    "body": "{{atMost}} Bạn vẫn có thể tiếp tục chỉnh sửa mọi thứ, nhưng nút Kết xuất sẽ tắt cho đến khi dòng thời gian kết thúc tại vạch {{limitAt}} đã đánh dấu. Hãy cắt gọt, tách hoặc xóa clip để đạt mức đó.",
+    "bodyAudio": "{{atMost}} Bạn vẫn có thể tiếp tục chỉnh sửa mọi thứ, nhưng nút Xuất sẽ tắt cho đến khi dòng thời gian kết thúc tại vạch {{limitAt}} đã đánh dấu. Hãy cắt gọt, tách hoặc xóa clip để đạt mức đó."
+  },
+  "tooLarge": {
+    "title_other": "Các tệp này quá lớn",
+    "body": "Trình chỉnh sửa nhận tệp tối đa {{size}}. Hãy rút ngắn hoặc nén video trước (điện thoại hay ứng dụng video bất kỳ đều có thể xuất bản nhỏ hơn), rồi thêm lại."
+  },
+  "encoding": {
+    "title": "Video này cần được chuyển đổi trước",
+    "videos_other": "{{count}} video",
+    "next": "Tiếp",
+    "waiting_other": "Đang chờ {{count}} video khác",
+    "starting": "Đang bắt đầu…",
+    "upload": "Tải lên",
+    "convert": "Chuyển thành bản phát được",
+    "hint": "Trình duyệt này không phát được định dạng của video (HEVC hoặc HDR, thường gặp ở video quay bằng điện thoại), nên nó hiển thị màu đen cho đến khi bản phát được sẵn sàng. Sau đó bản xem trước sẽ tự chuyển sang bản đó. Trong lúc chờ bạn vẫn có thể chỉnh sửa.",
+    "hide": "Ẩn"
+  }
+}

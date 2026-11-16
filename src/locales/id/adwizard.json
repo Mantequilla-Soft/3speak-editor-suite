@@ -1,0 +1,232 @@
+{
+  "title": "Ad Wizard",
+  "beta": "beta",
+  "loading": "Memuat mesin adegan…",
+  "untitled": "Iklan tanpa judul",
+  "seconds": "{{s}} dtk",
+  "lengthOfMax": "{{length}} dtk / maks. {{max}} dtk",
+  "maxOnly": "/ maks. {{max}} dtk",
+  "steps": {
+    "format": "Format",
+    "brand": "Brand",
+    "scenes": "Adegan",
+    "sound": "Suara",
+    "render": "Render"
+  },
+  "formats": {
+    "landscape": "Lanskap 16:9",
+    "landscapeSub": "iklan dalam video, situs web",
+    "portrait": "Potret 9:16",
+    "portraitSub": "Shorts, story, reels"
+  },
+  "palettes": {
+    "ember": "Bara",
+    "amber": "Amber",
+    "ocean": "Samudra",
+    "forest": "Hutan",
+    "berry": "Beri",
+    "paper": "Kertas"
+  },
+  "roles": {
+    "all": "Semua",
+    "opener": "Pembuka",
+    "middle": "Tengah",
+    "closer": "Penutup"
+  },
+  "defaults": {
+    "brandName": "Brand-mu",
+    "brandFallback": "Brand",
+    "adName": "Iklan"
+  },
+  "errors": {
+    "engineLoad": "tidak dapat memuat {{src}}",
+    "uploadFailedStatus": "unggahan gagal ({{status}})",
+    "uploadFailed": "unggahan gagal",
+    "notSignedIn": "belum masuk",
+    "drafts": "draf {{status}}"
+  },
+  "stage": {
+    "empty": "Iklanmu tampil di sini.",
+    "addFirst": "Tambahkan adegan pertama",
+    "toStart": "Kembali ke awal",
+    "playPause": "Putar / jeda (spasi)",
+    "time": "{{time}} / {{duration}} dtk",
+    "tooLong": "Iklan maksimal {{max}} dtk",
+    "properties": "Properti",
+    "propertiesHint": "Pilih adegan di daftar atau di linimasa untuk mengeditnya di sini."
+  },
+  "drafts": {
+    "logInToKeep": "Masuk di 3Speak untuk menyimpan draf",
+    "inBrowser": "Draf tetap di browser ini",
+    "signingIn": "Sedang masuk…",
+    "saveDrafts": "Simpan draf",
+    "status": {
+      "saving": "Menyimpan…",
+      "saved": "Tersimpan",
+      "error": "Tidak tersimpan",
+      "limit": "Batas draf tercapai",
+      "idle": "Draf"
+    },
+    "open": "Draf",
+    "title": "Drafmu",
+    "listInfo_other": "{{n}} dari {{max}} · masing-masing disimpan {{count}} hari setelah perubahan terakhir",
+    "draftInfo_other": "{{count}} adegan · disimpan {{saved}} · sampai {{until}}",
+    "isOpen": "terbuka",
+    "openDraft": "Buka",
+    "confirmDelete": "Hapus \"{{name}}\"?",
+    "empty": "Belum ada draf. Draf tersimpan otomatis selagi kamu bekerja.",
+    "newAd": "Iklan baru",
+    "limitTitle_other": "Kamu sudah punya {{count}} draf",
+    "limitHint": "Pilih satu untuk diganti dengan iklan ini, atau tutup ini dan lanjutkan tanpa menyimpan.",
+    "savedAt": "disimpan {{date}}",
+    "replace": "Ganti"
+  },
+  "format": {
+    "locked": "Pemesananmu tayang sebagai <b>{{format}}</b>, hingga {{max}} dtk.",
+    "where": "Di mana iklan akan tayang? Kamu bisa menggantinya nanti; setiap adegan cocok untuk keduanya.",
+    "sceneChange": "Pergantian adegan",
+    "tip": "Iklan yang mudah dibaca: sekitar 3 dtk per adegan, total 15-30 dtk, kalimat pembuka terbaca dalam detik pertama.",
+    "confirmNew": "Mulai iklan baru? Draf yang tersimpan tetap ada."
+  },
+  "brand": {
+    "name": "Nama",
+    "logo": "Logo",
+    "logoHint": "persegi paling bagus; tanpa logo, huruf pertama yang dipakai",
+    "monogram": "Monogram",
+    "monogramHint": "huruf yang dipakai jika tidak ada logo",
+    "colours": "Warna",
+    "colors": {
+      "bg": "Latar",
+      "ink": "Teks",
+      "mute": "Teks redup",
+      "accent": "Aksen",
+      "accent2": "Aksen 2",
+      "accent3": "Aksen 3"
+    },
+    "coloursTip": "Pakai aksen untuk sorotan (*bintang* di teks). Tombol ajakan bertindak digambar sebagai garis luar.",
+    "fonts": "Font",
+    "headlines": "Judul utama",
+    "text": "Teks",
+    "ownFont": "File font milikmu",
+    "fontNamePlaceholder": "Nama font, mis. Acme Display",
+    "fontRights": "Saya berhak memakai font ini di video",
+    "uploading": "Mengunggah…",
+    "uploadFont": "Unggah TTF / OTF / WOFF"
+  },
+  "scenes": {
+    "duplicate": "Duplikat",
+    "add": "Tambahkan adegan",
+    "tip": "Teks, gambar, dan durasi adegan terpilih ada di sebelah kanan."
+  },
+  "sound": {
+    "music": "Musik",
+    "startInSong": "Mulai di bagian lagu",
+    "volume": "Volume",
+    "fadeIn": "Fade in",
+    "fadeOut": "Fade out",
+    "noMusic": "Belum ada musik.",
+    "library": "Pustaka musik",
+    "uploading": "Mengunggah…",
+    "uploadSong": "Unggah lagu",
+    "songRights": "Saya memiliki atau punya lisensi atas lagu yang saya unggah",
+    "effects": "Efek suara",
+    "auto": "Suara otomatis (pergantian adegan, kata yang muncul)",
+    "autoLevel": "Level suara otomatis",
+    "db": "{{gain}} dB",
+    "restore_other": "Pulihkan {{count}} suara otomatis yang dihapus",
+    "addAt": "Tambahkan suara di {{time}} dtk",
+    "listen": "Dengarkan",
+    "autoTag": "otomatis",
+    "tip": "Seret suara di linimasa untuk memindahkannya. Memindahkan suara otomatis menjadikannya milikmu.",
+    "kinds": {
+      "trans": "Transisi",
+      "whoosh": "Wus",
+      "swish": "Sret",
+      "tick": "Tik",
+      "click": "Klik",
+      "type": "Mengetik",
+      "hit": "Pukulan"
+    }
+  },
+  "render": {
+    "drawing": "Menggambar adegan…",
+    "mixing": "Mencampur suara…",
+    "sceneRenderFailed": "render adegan: {{status}}",
+    "renderFailed": "render: {{status}}",
+    "scenesLength_other": "{{count}} adegan, {{length}} dtk",
+    "scenesLengthTooLong_other": "{{count}} adegan, {{length}} dtk (terlalu panjang, maks. {{max}} dtk)",
+    "toFill_other": "{{count}} hal yang perlu diisi",
+    "allFilled": "Semua kolom wajib sudah diisi",
+    "music": "Musik: {{title}}",
+    "noMusic": "Tanpa musik (opsional)",
+    "effects_other": "{{count}} efek suara",
+    "issue": "Adegan {{n}}, {{field}}: {{msg}}",
+    "button": "Render iklan ({{size}})",
+    "progress": "{{phase}} {{percent}}",
+    "sent": "Terkirim ke kampanyemu",
+    "useForCampaign": "Pakai untuk kampanyeku",
+    "download": "Unduh",
+    "again": "Render lagi"
+  },
+  "props": {
+    "length": "Durasi",
+    "fieldIssue": "{{field}}: {{msg}}",
+    "soundEffect": "Efek suara",
+    "autoNote": "{{name}} (otomatis: pindahkan atau ubah agar jadi milikmu)",
+    "makeMine": "Jadikan milikku",
+    "at": "Di",
+    "secondsUnit": "dtk",
+    "volume": "Volume"
+  },
+  "picker": {
+    "search": "Cari",
+    "look": "Tampilan",
+    "all": "Semua",
+    "nothing": "Tidak ada yang cocok."
+  },
+  "fields": {
+    "optional": "opsional",
+    "auto": "otomatis",
+    "none": "(tidak ada)",
+    "defaultIcon": "bawaan ({{icon}})",
+    "clear": "Kosongkan",
+    "accentTip": "Apit kata dengan *bintang* untuk warna aksen, _garis bawah_ untuk aksen kedua.",
+    "up": "Naik",
+    "moveUp": "Naikkan",
+    "moveDown": "Turunkan",
+    "add": "Tambah",
+    "needsAtLeast": "perlu minimal {{min}}",
+    "needs": "perlu {{min}}",
+    "pairX": "x %",
+    "pairY": "y %"
+  },
+  "image": {
+    "notPicture": "Itu bukan gambar.",
+    "noClipboardPicture": "Tidak ada gambar di papan klip. Salin satu, atau tekan Ctrl+V / Cmd+V di sini.",
+    "clipboardBlocked": "Browser tidak mengizinkan membaca papan klip. Klik di sini lalu tekan Ctrl+V / Cmd+V.",
+    "dragToPlace": "Seret untuk memilih bagian gambar yang tampil",
+    "zoom": "Zoom",
+    "zoomTitle": "Memperbesar gambar di dalam bingkainya; ukuran bingkai tetap",
+    "zoomValue": "{{zoom}}x",
+    "resetPlacement": "Atur ulang posisi",
+    "replace": "Ganti",
+    "pasteTitle": "Tempel dari papan klip",
+    "uploadingPct": "Mengunggah {{pct}}%",
+    "upload": "Unggah",
+    "paste": "Tempel",
+    "linkPlaceholder": "atau tempel tautan https://, atau gambar (Ctrl+V)"
+  },
+  "timeline": {
+    "tick": "{{s}}d",
+    "scenes": "Adegan",
+    "blockTitle": "{{type}}: {{length}} dtk",
+    "dragLength": "Seret untuk mengubah durasi",
+    "music": "Musik",
+    "musicVolume": "{{title}} · {{volume}}",
+    "effects": "Efek suara",
+    "sfxTitle": "{{name}} di {{at}} dtk"
+  },
+  "preview": {
+    "frameTitle": "Pratinjau iklan"
+  }
+}

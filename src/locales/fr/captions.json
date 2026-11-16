@@ -1,0 +1,67 @@
+{
+  "language": {
+    "label": "Langue parlée",
+    "auto": "Détecter automatiquement"
+  },
+  "intro": {
+    "title": "Sous-titres auto",
+    "text": "Transformez ce qui est dit en sous-titres qui suivent chaque mot, incrustés dans votre Short et aussi envoyés à 3Speak comme sous-titres.",
+    "checking": "Vérification du serveur...",
+    "unavailable": "Les sous-titres auto ne sont pas disponibles sur ce serveur d'édition pour le moment. Votre Short est rendu normalement, sans eux.",
+    "go": "Sous-titres auto"
+  },
+  "presets": {
+    "karaoke": "Karaoké",
+    "pop": "Pop",
+    "plain": "Sous-titres"
+  },
+  "presetHints": {
+    "karaoke": "Quelques mots à la fois, le mot prononcé dans la couleur de surlignage",
+    "pop": "Un mot (ou quelques-uns) à la fois, qui apparaît d'un coup",
+    "plain": "Lignes de sous-titres classiques sur un fond sombre"
+  },
+  "style": {
+    "title": "Style",
+    "presetsLabel": "Style des sous-titres",
+    "wordsAtATime": "Mots à la fois",
+    "font": "Police",
+    "size": "Taille",
+    "sizeLabel": "Taille des sous-titres",
+    "position": "Position",
+    "positionLabel": "Hauteur des sous-titres dans l'image",
+    "top": "Haut",
+    "middle": "Milieu",
+    "low": "Bas",
+    "textColour": "Couleur du texte",
+    "highlight": "Surlignage",
+    "highlightLabel": "Couleur de surlignage",
+    "uppercase": "Majuscules",
+    "emoji": "Emojis d'accent (au-dessus de mots comme « feu » ou « amour »)",
+    "burn": "Afficher dans la vidéo (désactivé : seulement en sous-titres sur 3Speak)"
+  },
+  "words": {
+    "title": "Mots ({{n}})",
+    "hint": "Corrigez ce qui a été mal compris ; videz un mot pour le supprimer. Clips déplacés ou coupés ? Relancez les sous-titres auto.",
+    "goThere": "Y aller",
+    "word": "Mot {{n}}",
+    "changeEmoji": "Changer ou retirer son emoji",
+    "addEmoji": "Ajouter un emoji",
+    "remove": "Retirer ce mot",
+    "removeNamed": "Retirer {{word}}"
+  },
+  "actions": {
+    "again": "Relancer",
+    "againTitle": "Réécouter (remplace les mots)",
+    "remove": "Retirer les sous-titres"
+  },
+  "videoSound": "Son de la vidéo",
+  "job": {
+    "preparing": "Préparation du son...",
+    "listening": "Écoute...",
+    "noTracks": "Il n'y a aucune parole à sous-titrer : ajoutez d'abord un clip avec du son.",
+    "serverAnswered": "Le serveur a répondu {{status}}",
+    "lost": "La tâche de sous-titrage a été perdue (le serveur a redémarré ?)",
+    "noSpeech": "Aucune parole trouvée. La voix est-elle sur une piste audio non coupée (les pistes de musique sont ignorées) ?",
+    "failed": "La reconnaissance vocale a échoué"
+  }
+}

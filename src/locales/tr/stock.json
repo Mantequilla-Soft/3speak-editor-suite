@@ -1,0 +1,53 @@
+{
+  "title": "Hazır medya",
+  "titleBackground": "Bir arka plan seç",
+  "search": "Video, fotoğraf ve GIF ara",
+  "searchProvider": "{{provider}} içinde ara",
+  "searchProviderTitle": "{{provider}} içinde ara (ücretsiz kullanılabilir, seçtiğinde sunucumuza kopyalanır)",
+  "kind": "Tür",
+  "category": "Kategori",
+  "everything": "Her şey",
+  "types": {
+    "all": "Tümü",
+    "video": "Videolar",
+    "image": "Fotoğraflar",
+    "gif": "GIF'ler"
+  },
+  "categories": {
+    "nature": "Doğa",
+    "city": "Şehir",
+    "people": "Kişiler",
+    "animals": "Hayvanlar",
+    "food": "Yemek",
+    "tech": "Teknoloji",
+    "sports": "Spor",
+    "space": "Uzay",
+    "abstract": "Soyut",
+    "backgrounds": "Arka planlar"
+  },
+  "loading": "Kitaplık yükleniyor...",
+  "typeToSearch": "{{provider}} içinde aramak için ne aradığını yaz.",
+  "nothingFound": "Hiçbir şey bulunamadı.",
+  "searching": "Aranıyor...",
+  "loadFailed": "Hazır medya kitaplığı yüklenemedi.",
+  "nothingMatches": "Eşleşen bir şey yok.",
+  "adding": "Ekleniyor...",
+  "byAuthor": "{{title}} ({{author}})",
+  "licenceOnline": "Kaynak: {{provider}}. Ticari dahil ücretsiz kullanılabilir, kaynak belirtmek gerekmez. Seçtiğinde dosya 3Speak sunucusuna kopyalanır.",
+  "licence": "Ticari dahil ücretsiz kullanılabilir, kaynak belirtmek gerekmez (Wikimedia Commons'tan CC0 / kamu malı).",
+  "placeBackground": "Arkana, kendi kanalına, klibin kadar uzun yerleşir.",
+  "placeAdd": "Oynatma kafasına yerleşir: boş zaman çizelgesinde videon olarak, değilse üzerine ara görüntü olarak.",
+  "errors": {
+    "notCopied": "Bu dosya kopyalanamadı.",
+    "notAdded": "Bu dosya eklenemedi.",
+    "tooMany": "Çok fazla arama yapıldı, biraz bekle.",
+    "searchFailed": "Arama çalışmadı, tekrar dene.",
+    "copyFailed": "Bu dosya sunucuya kopyalanamadı."
+  },
+  "trackName": {
+    "background": "Arka plan",
+    "backgroundNumbered": "Arka plan {{number}}",
+    "broll": "Ara görüntü",
+    "brollNumbered": "Ara görüntü {{number}}"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "title": "Kapitel",
+  "intro": "Markiere, wo jeder Teil der Folge beginnt. Podcast-Apps zeigen sie an, und 3Speak listet sie in der Beschreibung. Sie bleiben bei deiner Aufnahme, wenn du sie schneidest. Tastenkürzel: <kbd>M</kbd> setzt eins am Abspielkopf.",
+  "empty": "Noch keine Kapitel. Setz den Abspielkopf dorthin, wo ein Teil beginnt, und füge eins hinzu.",
+  "goThere": "Hinspringen",
+  "nameLabel": "Name von Kapitel {{n}}",
+  "moveHere": "Zum Abspielkopf verschieben",
+  "moveLabel": "Kapitel {{n}} zum Abspielkopf verschieben",
+  "removeLabel": "Kapitel {{n}} entfernen",
+  "leftOut": "Kapitel mit weniger als einer Sekunde Abstand oder ganz am Ende werden beim Export ausgelassen.",
+  "tipZero": "Tipp: Viele Apps erwarten das erste Kapitel bei 0:00.",
+  "addAt": "Bei {{time}} hinzufügen",
+  "copyTitle": "Liste kopieren (für eine Beschreibung)",
+  "copied": "Kopiert",
+  "copy": "Liste kopieren",
+  "defaultTitle": "Kapitel",
+  "suggest": {
+    "title": "Vorschläge",
+    "findTitle": "Finde, wo Teile wahrscheinlich beginnen: neue Themen, lange Pausen, Szenenwechsel",
+    "again": "Erneut suchen",
+    "suggest": "Kapitel vorschlagen",
+    "addAll": "Alle {{n}} hinzufügen",
+    "withTranscript": "Mit einem Transkript (der Transkript-Button) folgen die Vorschläge auch den Themen und bekommen Titel aus dem Gesagten.",
+    "none": "Keine klaren Stellen gefunden. Die Sendung ist vielleicht kurz, oder ihre Teile gehen ineinander über.",
+    "stop": "Stopp",
+    "listen": "Ab hier anhören",
+    "titleLabel": "Vorgeschlagenes Kapitel bei {{time}}",
+    "add": "Dieses Kapitel hinzufügen",
+    "addLabel": "Kapitel bei {{time}} hinzufügen",
+    "drop": "Dieses nicht",
+    "dropLabel": "Vorschlag bei {{time}} verwerfen",
+    "reason": {
+      "start": "Start",
+      "topic": "Neues Thema",
+      "pause": "Lange Pause",
+      "scene": "Szenenwechsel"
+    },
+    "intro": "Intro",
+    "part": "Teil {{n}}"
+  }
+}

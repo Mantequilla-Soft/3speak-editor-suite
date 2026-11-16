@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "line": "{{clips}} · {{length}} · {{edited}}",
+    "audioLine": "Ses · {{clips}} · {{length}} · {{edited}}",
+    "clips_one": "{{count}} klip",
+    "clips_other": "{{count}} klip",
+    "edited": {
+      "justNow": "az önce düzenlendi",
+      "minutes_one": "{{count}} dk önce düzenlendi",
+      "minutes_other": "{{count}} dk önce düzenlendi",
+      "hours_one": "{{count}} sa önce düzenlendi",
+      "hours_other": "{{count}} sa önce düzenlendi",
+      "days_one": "{{count}} gün önce düzenlendi",
+      "days_other": "{{count}} gün önce düzenlendi"
+    }
+  },
+  "prompt": {
+    "titleOne": "Taslağına devam edilsin mi?",
+    "titleMany": "Bir taslağa devam edilsin mi?",
+    "keptUntil": "Saklanma bitişi: {{date}}",
+    "open": "Aç",
+    "startNew": "Yeni proje başlat",
+    "singleNote": "Bir taslak saklayabilirsin. Yeni bir proje, düzenlemeye başladığın anda bunun yerini alır. 3Speak Pro 3 taslağı 30 gün saklar."
+  },
+  "limit": {
+    "titleOne": "Kayıtlı taslağın değiştirilsin mi?",
+    "titleMany": "Zaten {{n}} kayıtlı projen var",
+    "skipTitle": "Bu projeyi kaydetme",
+    "noteOne": "Bir taslak saklayabilirsin. Bu projeyi kaydetmek aşağıdakinin yerini alır.",
+    "noteMany": "En fazla {{n}} saklayabilirsin. Bu projenin yerini alacağı birini seç:",
+    "replace": "Değiştir",
+    "skip": "Bu projeyi kaydetme"
+  },
+  "close": {
+    "saveTitle": "Projen kaydedilsin mi?",
+    "closeTitle": "Düzenleyici kapatılsın mı?",
+    "keepEditing": "Düzenlemeye devam et",
+    "signInFailed": "Bu işe yaramadı. Cüzdanındaki oturum açma isteğini onayla ve tekrar dene ya da 3Speak'ten çıkış yapıp yeniden gir.",
+    "signInToKeep": "Bu projeyi taslak olarak saklayıp sonra devam etmek için bir kez oturum aç.",
+    "signedOutLost": "Düzenlemelerin kaybolacak. Projelerinin taslaklarını saklamak için 3Speak'te oturum aç.",
+    "lost": "Düzenlemelerin kaybolacak.",
+    "signingIn": "Giriş yapılıyor…",
+    "signInToSave": "Kaydetmek için oturum aç",
+    "withoutSaving": "Kaydetmeden kapat",
+    "keepTitle": "Bu proje saklansın mı?",
+    "keepDays_one": "{{count}} gün saklarız",
+    "keepDays_other": "{{count}} gün saklarız",
+    "keepHours_one": "{{count}} saat saklarız",
+    "keepHours_other": "{{count}} saat saklarız",
+    "until": "bitiş: {{date}}",
+    "uploadingOne": "{{name}} hâlâ yükleniyor ({{percent}}). Bitince kaydedebilirsin.",
+    "uploadingFiles_one": "{{count}} dosya hâlâ yükleniyor ({{percent}}). Bitince kaydedebilirsin.",
+    "uploadingFiles_other": "{{count}} dosya hâlâ yükleniyor ({{percent}}). Bitince kaydedebilirsin.",
+    "name": "Proje adı",
+    "namePlaceholder": "Adsız proje",
+    "saveError": "Kaydedilemedi. Bağlantını kontrol et ve tekrar dene.",
+    "saveAndClose": "Kaydet ve kapat",
+    "afterUpload": "Yükleme bitince kullanılabilir",
+    "deleteAndClose": "Sil ve kapat"
+  },
+  "pro": {
+    "title": "3Speak Pro ile daha fazlası",
+    "text": "7 gün boyunca 1 proje yerine, her biri 30 gün olmak üzere 3 projeye kadar sakla.",
+    "get": "Pro'ya geç"
+  },
+  "status": {
+    "signingIn": "Giriş yapılıyor… cüzdanını kontrol et",
+    "signInTitle": "Projeni taslak olarak kaydetmek için bir kez oturum aç",
+    "signInFailed": "Oturum açılamadı · tekrar dene",
+    "saveDrafts": "Taslakları kaydet",
+    "notSavedTitle": "Bu proje henüz kaydedilmedi",
+    "chooseSlot": "Kaydedilmedi: bir yer seç",
+    "saving": "Kaydediliyor…",
+    "notSaved": "Taslak kaydedilmedi",
+    "keptUntil": "Taslak saklanma bitişi: {{date}}",
+    "savedUntil": "Taslak kaydedildi · bitiş: {{date}}"
+  },
+  "library": {
+    "title": "Proje Kitaplığı",
+    "addFiles": "Dosya ekle",
+    "groups": {
+      "videos": "Videolar",
+      "images": "Görseller",
+      "sounds": "Sesler"
+    },
+    "empty": {
+      "videos": "Video yok",
+      "images": "Görsel yok",
+      "sounds": "Ses yok"
+    },
+    "dropToAdd": "Eklemek için dosyaları bırak",
+    "hint": "Dosyaları buraya bırak ya da öğeleri zaman çizelgesine sürükle",
+    "downloading": "İndiriliyor... {{percent}}",
+    "downloaded": "Yerel olarak indirildi",
+    "local": "yerel",
+    "uploadingTitle": "Arka planda yükleniyor. İşleme, bitene kadar bekler.",
+    "converting": "dönüştürülüyor",
+    "convertingTitle": "Bu tarayıcı bu videonun biçimini gösteremiyor. Önizleme, hazır olduğunda 480p kopyaya geçer.",
+    "noPreview": "önizleme yok",
+    "noPreviewTitle": "Oynatılabilir bir kopya yapılamadı. Önizleme siyah kalabilir, işleme yine de çalışır.",
+    "encodedTitle": "Sunucuda 480p olarak kodlandı",
+    "encoding": "Kodlanıyor...",
+    "addToTimeline": "Zaman çizelgesine ekle",
+    "remove": "Kitaplıktan kaldır"
+  }
+}

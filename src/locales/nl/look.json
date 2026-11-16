@@ -1,0 +1,53 @@
+{
+  "title": "Look",
+  "noEffects": "Geen effecten",
+  "presetsLabel": "Look-voorinstellingen",
+  "doubleClickReset": "Dubbelklik om te resetten",
+  "presets": {
+    "original": "Origineel",
+    "warm": "Warm",
+    "cool": "Koel",
+    "vivid": "Fel",
+    "matte": "Mat",
+    "bw": "Z/W",
+    "vintage": "Vintage",
+    "tealorange": "Teal & oranje",
+    "fade": "Vervaagd",
+    "noir": "Noir",
+    "sunset": "Zonsondergang"
+  },
+  "sliders": {
+    "blur": "Vervaging",
+    "vignette": "Vignet",
+    "sharpen": "Verscherpen",
+    "split": "Teal & oranje"
+  },
+  "transition": {
+    "title": "Overgang",
+    "none": "Geen",
+    "types": {
+      "crossfade": "Overvloeien",
+      "dissolve": "Via zwart",
+      "slideleft": "Naar links schuiven",
+      "slideright": "Naar rechts schuiven",
+      "slideup": "Omhoog schuiven",
+      "zoom": "Zoom",
+      "whip": "Zwiep"
+    },
+    "length": "Duur van de overgang (seconden)",
+    "fades": "Fades",
+    "noFades": "Geen fades",
+    "in": "In",
+    "out": "Uit",
+    "fadeInSeconds": "Infaden (seconden)",
+    "fadeOutSeconds": "Uitfaden (seconden)",
+    "intoNext": "Naar de volgende clip",
+    "needNext": "Zet een clip direct na deze op hetzelfde spoor om een overgang toe te voegen.",
+    "fromTo": "{{from}} naar {{to}}",
+    "fromUnnamed": "Clip naar {{to}}",
+    "toUnnamed": "{{from}} naar de volgende clip",
+    "bothUnnamed": "Clip naar de volgende clip",
+    "add": "Overgang toevoegen",
+    "cutLabel": "{{type}}, {{seconds}}s"
+  }
+}

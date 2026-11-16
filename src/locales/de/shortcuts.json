@@ -1,0 +1,53 @@
+{
+  "sheet": {
+    "title": "Tastenkürzel"
+  },
+  "groups": {
+    "playback": "Wiedergabe",
+    "clips": "Clips",
+    "project": "Projekt"
+  },
+  "items": {
+    "playPause": "Abspielen / Pause",
+    "playForward": "Vorwärts abspielen; erneut drücken für 2x, 4x, 8x",
+    "playBackward": "Rückwärts abspielen; erneut drücken für schneller",
+    "stop": "Stopp",
+    "frameStep": "Ein Bild zurück / vor (Umschalt: 10 Bilder)",
+    "nudge": "Abspielkopf um 0,1 s verschieben (Umschalt: 1 s)",
+    "fullscreen": "Vollbild an / aus",
+    "nextPrevClip": "Nächsten / vorherigen Clip auswählen",
+    "clipLeftRight": "Vorheriger / nächster Clip auf derselben Spur",
+    "clipUpDown": "Clip auf der Spur darüber / darunter",
+    "openClip": "Einstellungen des gewählten Clips öffnen",
+    "selectNone": "Nichts auswählen",
+    "selectAll": "Alle Clips auswählen",
+    "remove": "Gewählte(n) Clip(s) entfernen",
+    "split": "Gewählten Clip am Abspielkopf teilen",
+    "duplicate": "Gewählten Clip duplizieren",
+    "ungroup": "Gruppierung der Clips aufheben",
+    "closeGap": "Lücke am Abspielkopf schließen",
+    "addText": "Text am Abspielkopf hinzufügen",
+    "undo": "Rückgängig",
+    "redo": "Wiederholen",
+    "addFlag": "Markierung am Abspielkopf setzen",
+    "addChapter": "Kapitel am Abspielkopf hinzufügen",
+    "zoom": "Zeitleiste vergrößern / verkleinern",
+    "showSheet": "Diese Tastenkürzel anzeigen"
+  },
+  "keys": {
+    "space": "Leertaste",
+    "tab": "Tab",
+    "shift": "Umschalt",
+    "alt": "Alt",
+    "ctrl": "Strg",
+    "enter": "Eingabe",
+    "esc": "Esc",
+    "delete": "Entf"
+  },
+  "announce": {
+    "selected": "{{clip}} ausgewählt",
+    "stopped": "Gestoppt",
+    "forward": "Vorwärts {{speed}}x",
+    "backward": "Rückwärts {{speed}}x"
+  }
+}

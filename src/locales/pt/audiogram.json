@@ -1,0 +1,188 @@
+{
+  "title": "Audiogramas",
+  "tour": {
+    "again": "Ver o tour de novo",
+    "againLabel": "Ver de novo o tour dos audiogramas"
+  },
+  "saveAndClose": "Salvar e fechar",
+  "saveAndCloseTitle": "Seus audiogramas ficam com este áudio e saem com ele como Shorts",
+  "loadError": "Não foi possível carregar as configurações do audiograma: {{error}}",
+  "loadingLook": "Carregando o visual do seu audiograma…",
+  "start": {
+    "title": "Escolha um trecho do episódio",
+    "text_one": "Um audiograma é um vídeo curto de um trecho do seu episódio, de até {{count}} minuto. Ele sai como um Short do 3Speak junto com o áudio. Comece marcando o início e o fim na linha do tempo.",
+    "text_many": "Um audiograma é um vídeo curto de um trecho do seu episódio, de até {{count}} de minutos. Ele sai como um Short do 3Speak junto com o áudio. Comece marcando o início e o fim na linha do tempo.",
+    "text_other": "Um audiograma é um vídeo curto de um trecho do seu episódio, de até {{count}} minutos. Ele sai como um Short do 3Speak junto com o áudio. Comece marcando o início e o fim na linha do tempo.",
+    "choose": "Escolher na linha do tempo"
+  },
+  "stage": {
+    "label": "Prévia do audiograma: arraste as partes para movê-las, os cantos para redimensionar, a alça redonda para girar",
+    "frameTitle": "Prévia do audiograma",
+    "turned": "{{name}} · {{angle}}°",
+    "rotate": "Girar (Shift: passos de 15°). Clique duplo: reto",
+    "hint": "Arraste as partes, puxe um canto para redimensionar (Shift mantém a forma), a alça redonda para girar. As setas movem um pouco, [ e ] giram.",
+    "hintTemplate": "Arraste as partes, puxe um canto para redimensionar (Shift mantém a forma), a alça redonda para girar. As setas movem um pouco, [ e ] giram. Seu último audiograma é o ponto de partida."
+  },
+  "layer": {
+    "logo": {
+      "name": "Logo do 3Speak",
+      "drag": "Logo do 3Speak: arraste para mover",
+      "dragSelected": "Logo do 3Speak: arraste para mover, os cantos para redimensionar, a alça redonda para girar"
+    },
+    "cover": {
+      "name": "Imagem",
+      "drag": "Imagem: arraste para mover",
+      "dragSelected": "Imagem: arraste para mover, os cantos para redimensionar, a alça redonda para girar",
+      "hide": "Ocultar imagem",
+      "show": "Mostrar imagem",
+      "forward": "Trazer a imagem para frente",
+      "back": "Enviar a imagem para trás"
+    },
+    "title": {
+      "name": "Título",
+      "drag": "Título: arraste para mover",
+      "dragSelected": "Título: arraste para mover, os cantos para redimensionar, a alça redonda para girar",
+      "hide": "Ocultar título",
+      "show": "Mostrar título",
+      "forward": "Trazer o título para frente",
+      "back": "Enviar o título para trás"
+    },
+    "line": {
+      "name": "Linha",
+      "drag": "Linha: arraste para mover",
+      "dragSelected": "Linha: arraste para mover, os cantos para redimensionar, a alça redonda para girar",
+      "hide": "Ocultar linha",
+      "show": "Mostrar linha",
+      "forward": "Trazer a linha para frente",
+      "back": "Enviar a linha para trás"
+    },
+    "wave": {
+      "name": "Forma de onda",
+      "drag": "Forma de onda: arraste para mover",
+      "dragSelected": "Forma de onda: arraste para mover, os cantos para redimensionar, a alça redonda para girar",
+      "hide": "Ocultar forma de onda",
+      "show": "Mostrar forma de onda",
+      "forward": "Trazer a forma de onda para frente",
+      "back": "Enviar a forma de onda para trás"
+    }
+  },
+  "piece": {
+    "label": "Trecho do episódio",
+    "range": "{{from}} – {{to}} · {{seconds}} s",
+    "inChapter": "em “{{title}}”",
+    "change": "Mudar o trecho"
+  },
+  "look": {
+    "title": "Título",
+    "titleLabel": "Título no vídeo",
+    "line": "Linha embaixo <small>(*asteriscos* deixam em vermelho)</small>",
+    "lineLabel": "Linha no vídeo",
+    "branding": "Marca 3Speak",
+    "logoGroup": "Logo",
+    "picture": "Imagem",
+    "waveform": "Forma de onda",
+    "waveType": "Tipo de forma de onda",
+    "waveColour": "Cor da forma de onda",
+    "colour": "Cor {{colour}}",
+    "anyColour": "Qualquer cor",
+    "anyWaveColour": "Qualquer cor de forma de onda"
+  },
+  "logo": {
+    "mark": "Logo 3S",
+    "full": "Logo do 3Speak"
+  },
+  "wave": {
+    "bars": "Barras",
+    "centered": "Centralizada",
+    "line": "Linha",
+    "dots": "Fina",
+    "circle": "Círculo",
+    "ring": "Onda circular"
+  },
+  "picture": {
+    "upload": "Enviar uma imagem",
+    "yours": "Sua imagem",
+    "coverOf": "Capa de “{{title}}”",
+    "playlistCover": "Capa da playlist",
+    "noCovers": "Suas playlists ainda não têm capas.",
+    "signIn": "Entre no 3Speak para adicionar uma imagem."
+  },
+  "parts": {
+    "title": "Partes <small>(da frente para trás)</small>",
+    "logoLocked": "O logo do 3Speak sempre aparece, na frente, e nunca menor que um tamanho fixo",
+    "alwaysShown": "Sempre visível",
+    "hide": "Ocultar",
+    "show": "Mostrar",
+    "forward": "Para frente",
+    "back": "Para trás",
+    "tidy": "Organizar"
+  },
+  "make": {
+    "starting": "Iniciando...",
+    "working": "Processando...",
+    "noWords": "não foi possível encontrar as palavras deste trecho (desligue as legendas para criar sem elas)",
+    "failedPlain": "falhou",
+    "signIn": "Entre no 3Speak para criar um audiograma.",
+    "failed": "Não foi possível criar o audiograma: {{error}}",
+    "make": "Criar audiograma",
+    "another": "Criar outro audiograma"
+  },
+  "made": {
+    "title": "Seus audiogramas",
+    "hint": "Eles saem como Shorts do 3Speak junto com o áudio, cada um com um link para o post, snap ou comentário do áudio.",
+    "fallbackTitle": "Audiograma {{n}}",
+    "length": "{{at}} · {{seconds}} s",
+    "textPlaceholder": "Texto do Short (opcional). Um link para o áudio é adicionado automaticamente.",
+    "textLabel": "Texto do Short {{n}}",
+    "editText": "Editar texto",
+    "writeText": "Escrever texto",
+    "download": "Baixar",
+    "removeLabel": "Remover o audiograma {{n}}"
+  },
+  "confirm": {
+    "title": "Fechar sem criar?",
+    "text": "Suas mudanças no visual ainda não estão em um audiograma. Elas se perdem ao fechar.",
+    "stays_one": "O audiograma que você criou fica com este áudio.",
+    "stays_many": "Os {{count}} de audiogramas que você criou ficam com este áudio.",
+    "stays_other": "Os {{count}} audiogramas que você criou ficam com este áudio.",
+    "keep": "Continuar editando"
+  },
+  "captions": {
+    "label": "Legendas",
+    "drag": "Legendas: arraste para mover",
+    "dragSelected": "Legendas: arraste para mover, puxe uma lateral para mudar a largura",
+    "sample": "Suas palavras aparecem aqui conforme são ditas",
+    "show": "Mostrar o que é dito, palavra por palavra",
+    "checking": "Verificando o servidor...",
+    "unavailable": "As legendas não estão disponíveis neste servidor do editor agora.",
+    "listening": "Ouvindo...",
+    "getWords": "Obter as palavras",
+    "wordCount_one": "{{count}} palavra neste trecho.",
+    "wordCount_many": "{{count}} de palavras neste trecho.",
+    "wordCount_other": "{{count}} palavras neste trecho.",
+    "noSpeech": "Nenhuma fala encontrada neste trecho.",
+    "fix": "Corrigir palavras",
+    "doneFixing": "Correção concluída",
+    "word": "Palavra {{n}}",
+    "removeWord": "Remover esta palavra",
+    "removeWordLabel": "Remover {{word}}",
+    "style": "Estilo das legendas",
+    "preset": {
+      "karaoke": "Karaokê",
+      "pop": "Pop",
+      "plain": "Legendas"
+    },
+    "wordsAtATime": "Palavras por vez",
+    "perPage_one": "{{count}} palavra por vez",
+    "perPage_many": "{{count}} de palavras por vez",
+    "perPage_other": "{{count}} palavras por vez",
+    "font": "Fonte das legendas",
+    "size": "Tamanho das legendas",
+    "textColour": "Cor do texto das legendas",
+    "textColourSwatch": "Cor do texto {{colour}}",
+    "highlightColour": "Cor de destaque",
+    "highlight": "Destaque",
+    "highlightSwatch": "Destaque {{colour}}",
+    "capitals": "Letras maiúsculas"
+  }
+}

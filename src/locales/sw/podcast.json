@@ -1,0 +1,86 @@
+{
+  "video": {
+    "title": "Podikasti ya video",
+    "intro": "Kipindi kizima ({{length}}) kama video ya 16:9: picha, mawimbi ya sauti yanayosogea, manukuu na anayezungumza. Kwa podikasti za video za 3Speak, YouTube na Spotify.",
+    "unavailable": "Seva hii ya kihariri bado haiwezi kutengeneza podikasti za video.",
+    "tooLong": "Podikasti za video zinaweza kuwa na urefu wa hadi {{length}}.",
+    "preview": "Onyesho la awali la podikasti ya video",
+    "sampleCaption": "Maneno <b>yako</b> yanaonekana hapa",
+    "stageHint": "Mawimbi ya sauti yanasogea pamoja na sauti, manukuu na jina vinafuata kipindi.",
+    "defaultLine": "Tazama na usikilize kwenye *3speak.tv*",
+    "captions": "Manukuu",
+    "captionsTranscript": "Maneno ya nakala yako.",
+    "captionsNoStt": "Kubadilisha usemi kuwa maandishi hakupatikani kwenye seva hii.",
+    "captionsStt": "Maneno, yaliyopatikana kwa kubadilisha usemi kuwa maandishi kwenye seva. Vipindi virefu vinachukua muda.",
+    "whoSpeaks": "Anayezungumza",
+    "noVoices": "Hakuna njia ya sauti ya mazungumzo ya kuchukua majina.",
+    "speaker": "Mzungumzaji {{n}}",
+    "speakerLabel": "Jina la njia ya sauti ya mazungumzo {{n}}",
+    "loudest": "Kila sauti kwenye njia yake: jina la sauti kubwa zaidi linaonyeshwa.",
+    "frameRate": "Kasi ya fremu",
+    "fps15": "fps 15 (ndogo zaidi, haraka zaidi)",
+    "fps24": "fps 24 (laini zaidi)",
+    "finding": "Inatafuta nani anazungumza lini...",
+    "sending": "Inatuma...",
+    "working": "Inafanya kazi...",
+    "serverAnswered": "Seva ilijibu {{status}}",
+    "lost": "Kazi imepotea (seva ilianzishwa upya?)",
+    "stopped": "Imesimamishwa",
+    "signIn": "Ingia kwenye 3Speak ili kutengeneza podikasti ya video.",
+    "failed": "Podikasti ya video haikuweza kutengenezwa: {{error}}",
+    "stop": "Simamisha",
+    "make": "Tengeneza podikasti ya video",
+    "again": "Itengeneze tena",
+    "download": "Pakua MP4",
+    "subtitles": "Manukuu (SRT)",
+    "post": "Chapisha kwenye 3Speak kama video"
+  },
+  "template": {
+    "title": "Kiolezo chako",
+    "signedOutIntro": "Hifadhi utangulizi, hitimisho na muziki wa usuli mara moja, na kila rekodi mpya inazipata kwa kubofya mara moja. Kiolezo chako kinahifadhiwa daima, kwa hiyo kinahitaji uingie kwenye 3Speak.",
+    "signIn": "Ingia ili kutumia kiolezo",
+    "logIn": "Ingia kwenye 3Speak ili kutumia kiolezo.",
+    "intro": "Kiolezo kimoja, kinachohifadhiwa daima. Kuhifadhi kunabadilisha kile ulichokuwa nacho.",
+    "role": {
+      "intro": {
+        "title": "Utangulizi",
+        "hint": "Kinacheza kwanza, kabla ya rekodi yako.",
+        "clear": "Bila utangulizi"
+      },
+      "outro": {
+        "title": "Hitimisho",
+        "hint": "Kinacheza mara baada ya rekodi yako kuisha.",
+        "clear": "Bila hitimisho"
+      },
+      "bed": {
+        "title": "Muziki wa usuli",
+        "hint": "Muziki wa chini chini katika rekodi nzima, unarudiwa ili utoshee, unafifia mwishoni.",
+        "clear": "Bila muziki wa usuli"
+      }
+    },
+    "useSelected": "Tumia \"{{name}}\" (sehemu uliyoipunguza)",
+    "selectFirst": "Chagua klipu ya sauti iliyopakiwa kwenye mfuatano wa muda kwanza",
+    "selectedClip": "Klipu iliyochaguliwa",
+    "file": "Faili",
+    "volume": "Kiwango cha sauti",
+    "bedVolume": "Kiwango cha sauti cha muziki wa usuli",
+    "loop": "Rudia ili kujaza rekodi nzima",
+    "cutSilences": "Kata ukimya kutoka kila rekodi mpya <small>(kwa mipangilio yako ya Kata ukimya)</small>",
+    "loudness": "Sawazisha sauti kwa ajili ya podikasti <small>(-16 LUFS, inatumika wakati wa kuhamisha)</small>",
+    "duck": "Fifisha muziki mtu anapozungumza <small>({{db}} dB kwenye muziki wa usuli; ibadilishe kwenye mipangilio ya klipu)</small>",
+    "autoApply": "Kitumie chenyewe ninapofungua rekodi",
+    "signInUpload": "Ingia kwenye 3Speak ili kupakia.",
+    "uploadFailed": "Faili hilo halikuweza kupakiwa. Jaribu jingine.",
+    "deleteForGood": "Kifute kabisa",
+    "delete": "Futa kiolezo",
+    "saveApply": "Hifadhi na utumie",
+    "voiceTrack": "Sauti ya mazungumzo",
+    "bedTrack": "Muziki wa usuli"
+  },
+  "stage": {
+    "empty": "Ongeza rekodi, rekodi moja, au chagua muziki ili kuanza.",
+    "chapter": "Sura",
+    "position": "Mahali katika kipindi",
+    "positionText": "{{at}} kati ya {{total}}"
+  }
+}

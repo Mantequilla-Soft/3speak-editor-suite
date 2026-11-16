@@ -1,0 +1,36 @@
+{
+  "cancel": "キャンセル",
+  "close": "閉じる",
+  "ok": "OK",
+  "gotIt": "OK",
+  "done": "完了",
+  "save": "保存",
+  "delete": "削除",
+  "remove": "削除",
+  "back": "戻る",
+  "next": "次へ",
+  "skip": "スキップ",
+  "retry": "もう一度試す",
+  "reset": "リセット",
+  "none": "なし",
+  "off": "オフ",
+  "auto": "自動",
+  "play": "再生",
+  "pause": "一時停止",
+  "undo": "元に戻す",
+  "preview": "プレビュー",
+  "render": "レンダリング",
+  "export": "書き出し",
+  "duration": {
+    "seconds_other": "{{count}} 秒",
+    "minutes_other": "{{count}} 分",
+    "hours_other": "{{count}} 時間"
+  },
+  "limits": {
+    "atMost": {
+      "short": "ショートは最大 {{limit}} までです。",
+      "video": "動画は最大 {{limit}} までです。",
+      "audio": "書き出しは最大 {{limit}} までです。"
+    }
+  }
+}

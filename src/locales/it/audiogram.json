@@ -1,0 +1,188 @@
+{
+  "title": "Audiogrammi",
+  "tour": {
+    "again": "Mostra di nuovo il tour",
+    "againLabel": "Mostra di nuovo il tour degli audiogrammi"
+  },
+  "saveAndClose": "Salva e chiudi",
+  "saveAndCloseTitle": "I tuoi audiogrammi restano con questo audio e vengono pubblicati con esso come Shorts",
+  "loadError": "Impossibile caricare le impostazioni dell'audiogramma: {{error}}",
+  "loadingLook": "Caricamento dello stile del tuo audiogramma…",
+  "start": {
+    "title": "Scegli un pezzo dell'episodio",
+    "text_one": "Un audiogramma è un breve video di un pezzo del tuo episodio, fino a {{count}} minuto. Viene pubblicato come Short di 3Speak insieme all'audio. Inizia segnando l'inizio e la fine sulla timeline.",
+    "text_many": "Un audiogramma è un breve video di un pezzo del tuo episodio, fino a {{count}} minuti. Viene pubblicato come Short di 3Speak insieme all'audio. Inizia segnando l'inizio e la fine sulla timeline.",
+    "text_other": "Un audiogramma è un breve video di un pezzo del tuo episodio, fino a {{count}} minuti. Viene pubblicato come Short di 3Speak insieme all'audio. Inizia segnando l'inizio e la fine sulla timeline.",
+    "choose": "Scegli sulla timeline"
+  },
+  "stage": {
+    "label": "Anteprima dell'audiogramma: trascina gli elementi per spostarli, gli angoli per ridimensionarli, la maniglia rotonda per ruotarli",
+    "frameTitle": "Anteprima dell'audiogramma",
+    "turned": "{{name}} · {{angle}}°",
+    "rotate": "Ruota (Maiusc: a scatti di 15°). Doppio clic: dritto",
+    "hint": "Trascina gli elementi, tira un angolo per ridimensionare (Maiusc mantiene le proporzioni), la maniglia rotonda per ruotare. Le frecce spostano di poco, [ e ] ruotano.",
+    "hintTemplate": "Trascina gli elementi, tira un angolo per ridimensionare (Maiusc mantiene le proporzioni), la maniglia rotonda per ruotare. Le frecce spostano di poco, [ e ] ruotano. Il tuo ultimo audiogramma è il punto di partenza."
+  },
+  "layer": {
+    "logo": {
+      "name": "Logo 3Speak",
+      "drag": "Logo 3Speak: trascina per spostare",
+      "dragSelected": "Logo 3Speak: trascina per spostare, gli angoli per ridimensionare, la maniglia rotonda per ruotare"
+    },
+    "cover": {
+      "name": "Immagine",
+      "drag": "Immagine: trascina per spostare",
+      "dragSelected": "Immagine: trascina per spostare, gli angoli per ridimensionare, la maniglia rotonda per ruotare",
+      "hide": "Nascondi l'immagine",
+      "show": "Mostra l'immagine",
+      "forward": "Porta avanti l'immagine",
+      "back": "Porta indietro l'immagine"
+    },
+    "title": {
+      "name": "Titolo",
+      "drag": "Titolo: trascina per spostare",
+      "dragSelected": "Titolo: trascina per spostare, gli angoli per ridimensionare, la maniglia rotonda per ruotare",
+      "hide": "Nascondi il titolo",
+      "show": "Mostra il titolo",
+      "forward": "Porta avanti il titolo",
+      "back": "Porta indietro il titolo"
+    },
+    "line": {
+      "name": "Riga",
+      "drag": "Riga: trascina per spostare",
+      "dragSelected": "Riga: trascina per spostare, gli angoli per ridimensionare, la maniglia rotonda per ruotare",
+      "hide": "Nascondi la riga",
+      "show": "Mostra la riga",
+      "forward": "Porta avanti la riga",
+      "back": "Porta indietro la riga"
+    },
+    "wave": {
+      "name": "Forma d'onda",
+      "drag": "Forma d'onda: trascina per spostare",
+      "dragSelected": "Forma d'onda: trascina per spostare, gli angoli per ridimensionare, la maniglia rotonda per ruotare",
+      "hide": "Nascondi la forma d'onda",
+      "show": "Mostra la forma d'onda",
+      "forward": "Porta avanti la forma d'onda",
+      "back": "Porta indietro la forma d'onda"
+    }
+  },
+  "piece": {
+    "label": "Pezzo dell'episodio",
+    "range": "{{from}} – {{to}} · {{seconds}} s",
+    "inChapter": "in “{{title}}”",
+    "change": "Cambia il pezzo"
+  },
+  "look": {
+    "title": "Titolo",
+    "titleLabel": "Titolo sul video",
+    "line": "Riga sotto <small>(gli *asterischi* la rendono rossa)</small>",
+    "lineLabel": "Riga sul video",
+    "branding": "Branding 3Speak",
+    "logoGroup": "Logo",
+    "picture": "Immagine",
+    "waveform": "Forma d'onda",
+    "waveType": "Tipo di forma d'onda",
+    "waveColour": "Colore della forma d'onda",
+    "colour": "Colore {{colour}}",
+    "anyColour": "Altro colore",
+    "anyWaveColour": "Altro colore della forma d'onda"
+  },
+  "logo": {
+    "mark": "Logo 3S",
+    "full": "Logo 3Speak"
+  },
+  "wave": {
+    "bars": "Barre",
+    "centered": "Centrata",
+    "line": "Linea",
+    "dots": "Sottile",
+    "circle": "Cerchio",
+    "ring": "Onda circolare"
+  },
+  "picture": {
+    "upload": "Carica un'immagine",
+    "yours": "La tua immagine",
+    "coverOf": "Copertina di “{{title}}”",
+    "playlistCover": "Copertina della playlist",
+    "noCovers": "Le tue playlist non hanno ancora copertine.",
+    "signIn": "Accedi su 3Speak per aggiungere un'immagine."
+  },
+  "parts": {
+    "title": "Elementi <small>(dal davanti al dietro)</small>",
+    "logoLocked": "Il logo 3Speak è sempre visibile, in primo piano, e mai più piccolo di una dimensione fissa",
+    "alwaysShown": "Sempre visibile",
+    "hide": "Nascondi",
+    "show": "Mostra",
+    "forward": "Porta avanti",
+    "back": "Porta indietro",
+    "tidy": "Riordina la disposizione"
+  },
+  "make": {
+    "starting": "Avvio...",
+    "working": "Elaborazione...",
+    "noWords": "impossibile trovare le parole di questo pezzo (disattiva i sottotitoli per crearlo senza)",
+    "failedPlain": "non riuscito",
+    "signIn": "Accedi su 3Speak per creare un audiogramma.",
+    "failed": "Impossibile creare l'audiogramma: {{error}}",
+    "make": "Crea audiogramma",
+    "another": "Crea un altro audiogramma"
+  },
+  "made": {
+    "title": "I tuoi audiogrammi",
+    "hint": "Vengono pubblicati come Shorts di 3Speak insieme all'audio, ognuno con un link al post, allo snap o al commento dell'audio.",
+    "fallbackTitle": "Audiogramma {{n}}",
+    "length": "{{at}} · {{seconds}} s",
+    "textPlaceholder": "Testo dello Short (facoltativo). Un link all'audio viene aggiunto automaticamente.",
+    "textLabel": "Testo dello Short {{n}}",
+    "editText": "Modifica il testo",
+    "writeText": "Scrivi un testo",
+    "download": "Scarica",
+    "removeLabel": "Rimuovi l'audiogramma {{n}}"
+  },
+  "confirm": {
+    "title": "Chiudere senza crearlo?",
+    "text": "Le modifiche allo stile non sono ancora in un audiogramma. Andranno perse se chiudi.",
+    "stays_one": "L'audiogramma che hai creato resta con questo audio.",
+    "stays_many": "I {{count}} audiogrammi che hai creato restano con questo audio.",
+    "stays_other": "I {{count}} audiogrammi che hai creato restano con questo audio.",
+    "keep": "Continua a modificare"
+  },
+  "captions": {
+    "label": "Sottotitoli",
+    "drag": "Sottotitoli: trascina per spostare",
+    "dragSelected": "Sottotitoli: trascina per spostare, tira un lato per cambiare la larghezza",
+    "sample": "Le tue parole appaiono qui mentre vengono dette",
+    "show": "Mostra ciò che viene detto, parola per parola",
+    "checking": "Verifica del server...",
+    "unavailable": "I sottotitoli non sono disponibili su questo server dell'editor al momento.",
+    "listening": "Ascolto...",
+    "getWords": "Ottieni le parole",
+    "wordCount_one": "{{count}} parola in questo pezzo.",
+    "wordCount_many": "{{count}} parole in questo pezzo.",
+    "wordCount_other": "{{count}} parole in questo pezzo.",
+    "noSpeech": "Nessun parlato trovato in questo pezzo.",
+    "fix": "Correggi le parole",
+    "doneFixing": "Correzione finita",
+    "word": "Parola {{n}}",
+    "removeWord": "Rimuovi questa parola",
+    "removeWordLabel": "Rimuovi {{word}}",
+    "style": "Stile dei sottotitoli",
+    "preset": {
+      "karaoke": "Karaoke",
+      "pop": "Pop",
+      "plain": "Sottotitoli"
+    },
+    "wordsAtATime": "Parole alla volta",
+    "perPage_one": "{{count}} parola alla volta",
+    "perPage_many": "{{count}} parole alla volta",
+    "perPage_other": "{{count}} parole alla volta",
+    "font": "Carattere dei sottotitoli",
+    "size": "Dimensione dei sottotitoli",
+    "textColour": "Colore del testo dei sottotitoli",
+    "textColourSwatch": "Colore del testo {{colour}}",
+    "highlightColour": "Colore di evidenziazione",
+    "highlight": "Evidenziazione",
+    "highlightSwatch": "Evidenziazione {{colour}}",
+    "capitals": "Maiuscole"
+  }
+}

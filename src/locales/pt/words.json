@@ -1,0 +1,63 @@
+{
+  "panel": {
+    "title": "Transcrição",
+    "close": "Fechar a transcrição"
+  },
+  "cutNotice": {
+    "plain": "Cortado: {{seconds}} s mais curto.",
+    "words_one": "{{count}} palavra cortada: {{seconds}} s mais curto.",
+    "words_many": "{{count}} de palavras cortadas: {{seconds}} s mais curto.",
+    "words_other": "{{count}} palavras cortadas: {{seconds}} s mais curto.",
+    "found_one": "{{count}} resultado cortado: {{seconds}} s mais curto.",
+    "found_many": "{{count}} de resultados cortados: {{seconds}} s mais curto.",
+    "found_other": "{{count}} resultados cortados: {{seconds}} s mais curto.",
+    "fillers": "Cortados {{fillers}}, {{pauses}}: {{seconds}} s mais curto.",
+    "dismiss": "Dispensar"
+  },
+  "fillers": {
+    "title": "Remover muletas e pausas",
+    "emptyHint": "Funciona a partir da transcrição: encontra \"hã\", \"é\", \"tipo\" e parecidos no idioma do programa, e as pausas longas.",
+    "listening": "Ouvindo...",
+    "transcribeFirst": "Transcreva o programa primeiro",
+    "checking": "Verificando o servidor...",
+    "unavailable": "As transcrições não estão disponíveis neste servidor do editor agora.",
+    "intro": "Muletas em {{language}}. Ouça cada uma e desmarque o que deve ficar.",
+    "introNoList": "Muletas em {{language}} (só \"hã\", \"hum\" e parecidos: ainda não há lista para este idioma). Ouça cada uma e desmarque o que deve ficar.",
+    "stillTranscribing": "O resto do programa ainda está sendo transcrito.",
+    "fillerWords": "Muletas",
+    "longPauses": "Pausas longas",
+    "minPause": "Pausa maior que <strong>{{seconds}} s</strong>",
+    "keepPause": "Encurtar pausas para <strong>{{seconds}} s</strong>",
+    "keepPauseTitle": "O que sobra de uma pausa longa depois do corte",
+    "fillerCount_one": "{{count}} muleta",
+    "fillerCount_many": "{{count}} de muletas",
+    "fillerCount_other": "{{count}} muletas",
+    "pauseCount_one": "{{count}} pausa",
+    "pauseCount_many": "{{count}} de pausas",
+    "pauseCount_other": "{{count}} pausas",
+    "summary": "{{fillers}}, {{pauses}} marcadas · corta {{seconds}} s",
+    "nothingFound": "Nada encontrado com estas configurações.",
+    "tickAllFillers": "Marcar todas as muletas",
+    "untickAllFillers": "Desmarcar todas as muletas",
+    "tickAllPauses": "Marcar todas as pausas",
+    "untickAllPauses": "Desmarcar todas as pausas",
+    "listLabel": "O que seria cortado",
+    "item": {
+      "keepPause": "Manter esta pausa",
+      "cutPause": "Cortar esta pausa",
+      "keepFiller": "Manter {{text}}",
+      "cutFiller": "Cortar {{text}}",
+      "stop": "Parar",
+      "listenTitle": "Ouvir (com um segundo em volta)",
+      "listenAt": "Ouvir em {{time}}",
+      "pause": "Pausa",
+      "pauseLength": "{{length}} s → {{kept}} s",
+      "filler": "Muleta",
+      "fillerTitle": "Um som de hesitação",
+      "maybe": "Talvez",
+      "maybeTitle": "Possível muleta (entre pausas ou vírgulas): ouça primeiro"
+    },
+    "cut": "Cortar",
+    "cutCount": "Cortar {{n}} ({{seconds}} s)"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "render": {
+    "unreachable": "Server render tidak dapat dijangkau. Periksa koneksimu lalu render lagi.",
+    "stillBusy": "Server render masih sibuk. Silakan render lagi dalam beberapa menit.",
+    "unknownJob": "Server render tidak lagi mengenali render ini (mungkin baru dimulai ulang). Silakan render lagi.",
+    "lostContact": "Kontak dengan server render terputus. Silakan render lagi.",
+    "serverStatus": "Server merespons dengan {{status}}"
+  },
+  "uploadFailed": "Unggahan gagal: {{status}}",
+  "signIn": {
+    "loggedOut": "Masuk di 3Speak untuk memakai editor.",
+    "failed": "Masuk di 3Speak untuk mengunggah dan me-render (proses masuk dibatalkan atau tidak berhasil)."
+  },
+  "export": {
+    "failed": "Ekspor gagal",
+    "ffmpegNotLoaded": "FFmpeg belum dimuat",
+    "noClips": "Tidak ada klip untuk diekspor",
+    "noCodec": "Tidak ditemukan codec video yang didukung untuk MediaRecorder",
+    "cancelled": "Ekspor dibatalkan",
+    "noSource": "Tidak ada sumber file yang valid untuk klip: {{name}}",
+    "ffmpegFailed": "Perintah FFmpeg gagal dengan kode keluar {{code}}"
+  },
+  "reverse": {
+    "failed": "Pemrosesan balik gagal",
+    "timedOut": "Pemrosesan balik melewati batas waktu",
+    "statusCheck": "Pemeriksaan status gagal: {{status}}"
+  }
+}

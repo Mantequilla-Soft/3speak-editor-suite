@@ -1,0 +1,181 @@
+{
+  "aria": {
+    "timeline": "Zeitleiste",
+    "ruler": "Zeitlineal: klicken, um den Abspielkopf zu verschieben",
+    "playhead": "Abspielkopf",
+    "zoom": "Zoom"
+  },
+  "split": {
+    "title": "Clip am Abspielkopf teilen (Strg+R)",
+    "label": "Teilen"
+  },
+  "toolbar": {
+    "add": {
+      "title": "Spur oder Clip hinzufügen",
+      "videoTrack": "Videospur",
+      "audioTrack": "Audiospur",
+      "musicLibrary": "Musikbibliothek",
+      "soundEffects": "Soundeffekte",
+      "stickers": "Sticker",
+      "titles": "Titel",
+      "stock": "Stock-Medien"
+    },
+    "zoomTitle": "Zoom: {{value}} px/s",
+    "fit": {
+      "title": "Ganze Zeitleiste anzeigen",
+      "label": "Einpassen"
+    },
+    "select": {
+      "titleStart": "Mehrere Clips auswählen: tippe jeden an",
+      "titleDone": "Auswahl fertig",
+      "label": "Auswählen"
+    },
+    "ripple": {
+      "titleTrack": "Lücke am Abspielkopf auf Spur {{number}} schließen (G). Andere Spuren bleiben, wie sie sind.",
+      "titleNoGap": "Keine Lücke am Abspielkopf auf der Spur des gewählten Clips",
+      "title": "Lücke am Abspielkopf entfernen (G)",
+      "label": "Lücke schließen"
+    },
+    "captions": {
+      "title": "Untertitel: mach aus dem Gesagten Untertitel Wort für Wort",
+      "label": "Untertitel"
+    },
+    "transcript": {
+      "title": "Transkript: über den Text bearbeiten, Wörter löschen, um sie herauszuschneiden",
+      "label": "Transkript"
+    },
+    "flag": {
+      "title": "Markierung am Abspielkopf setzen (B): deine eigene Markierung, nummeriert und farbig, wird nie exportiert",
+      "label": "Markierung"
+    },
+    "autoCut": {
+      "title": "Pausen finden und dort schneiden",
+      "label": "Auto-Schnitt"
+    },
+    "beats": {
+      "title": "Beat finden: daran einrasten, Clips darauf legen",
+      "label": "Beats"
+    },
+    "delete": {
+      "title": "Gewählten Clip löschen (Entf)",
+      "titleMany": "Gewählte Clips löschen (Entf)",
+      "labelMany": "{{number}} löschen"
+    },
+    "options": "Optionen",
+    "ungroup": {
+      "titleOne": "Gruppierung aufheben: seine Clips werden wieder einzeln verschoben und gekürzt",
+      "titleMany": "Gruppierung aufheben: diese Clips werden wieder einzeln verschoben und gekürzt",
+      "label": "Gruppierung aufheben"
+    },
+    "group": {
+      "title": "Gruppieren: diese Clips werden zusammen verschoben und gekürzt",
+      "label": "{{number}} gruppieren"
+    },
+    "more": {
+      "title": "Weitere Clip-Aktionen",
+      "duplicate": "Duplizieren",
+      "groupVoicesTitle": "Mit dem gruppieren, was gleichzeitig auf den anderen Sprachspuren läuft: sie werden zusammen verschoben, gekürzt und von Stille befreit",
+      "groupVoices": "Mit anderen Stimmen gruppieren",
+      "reverse": "Umkehren",
+      "unreverse": "Umkehren rückgängig",
+      "snapOn": "Einrasten an",
+      "snapOff": "Einrasten aus"
+    }
+  },
+  "selectHint": {
+    "count_one": "{{count}} Clip ausgewählt: tippe weitere an oder Fertig",
+    "count_other": "{{count}} Clips ausgewählt: tippe weitere an oder Fertig",
+    "none": "Tippe jeden Clip an, den du auswählen willst",
+    "clear": "Leeren"
+  },
+  "clip": {
+    "settings": "Clip-Einstellungen",
+    "textFallback": "Text",
+    "layer": "E{{number}}",
+    "kind": {
+      "video": "Video-Clip",
+      "audio": "Sound-Clip",
+      "image": "Bild",
+      "text": "Text",
+      "color": "Farbe",
+      "other": "Clip"
+    },
+    "aria": {
+      "plain": "{{kind}}, {{from}} bis {{to}}",
+      "named": "{{kind}} {{name}}, {{from}} bis {{to}}",
+      "onTrack": "{{kind}} auf {{track}}, {{from}} bis {{to}}",
+      "namedOnTrack": "{{kind}} {{name}} auf {{track}}, {{from}} bis {{to}}"
+    }
+  },
+  "track": {
+    "show": "Spur anzeigen",
+    "hide": "Spur ausblenden",
+    "mute": "Spur stummschalten",
+    "unmute": "Ton der Spur an",
+    "remove": "Spur entfernen",
+    "addVisual": "Video, Bild oder Text hinzufügen",
+    "addAudio": "Audio hinzufügen",
+    "addFile": "Datei hinzufügen",
+    "addText": "Text hinzufügen",
+    "addColor": "Farbe hinzufügen",
+    "recordVideo": "Video aufnehmen",
+    "addAudioFile": "Audiodatei hinzufügen",
+    "recordAudio": "Audio aufnehmen",
+    "resize": {
+      "aria": "Höhe von {{name}}",
+      "ariaUnnamed": "Höhe dieser Spur",
+      "title": "Ziehen, um die Spur höher oder niedriger zu machen (Doppelklick: zurück auf normal)"
+    },
+    "aria": {
+      "named": {
+        "video": "{{name}} (Videospur)",
+        "audio": "{{name}} (Audiospur)",
+        "music": "{{name}} (Musikspur)"
+      },
+      "numbered": {
+        "video": "Videospur {{number}}",
+        "audio": "Audiospur {{number}}",
+        "music": "Musikspur {{number}}"
+      }
+    }
+  },
+  "trackName": {
+    "voice": "Stimme",
+    "voiceNumbered": "Stimme {{number}}",
+    "music": "Musik",
+    "musicNumbered": "Musik {{number}}",
+    "video": "Video",
+    "videoNumbered": "Video {{number}}",
+    "audioNumbered": "Audio {{number}}",
+    "stickers": "Sticker",
+    "stickersNumbered": "Sticker {{number}}",
+    "sfx": "SFX",
+    "sfxNumbered": "SFX {{number}}"
+  },
+  "clipName": {
+    "text": "Textebene",
+    "color": "Farbe",
+    "imported": "Importierte Medien",
+    "linkedAudio": "{{name}} (Audio)"
+  },
+  "textClip": {
+    "defaultText": "Text hier eingeben"
+  },
+  "flag": {
+    "aria": "Markierung {{number}} bei {{time}}",
+    "title": "Markierung {{number}} · {{time}}: klicken, um hinzuspringen, ziehen zum Verschieben, Rechtsklick zum Entfernen"
+  },
+  "range": {
+    "label": "{{from}} – {{to}} · {{seconds}} s",
+    "startOnly": "{{time}} · klick, wo es endet",
+    "dragStart": "Ziehen, um den Anfang zu verschieben",
+    "dragEnd": "Ziehen, um das Ende zu verschieben"
+  },
+  "pastLimit": "Über dem Render-Limit",
+  "backgroundMusic": {
+    "title": "Hintergrundmusik",
+    "add": "Hintergrundmusik hinzufügen",
+    "remove": "Musik entfernen"
+  },
+  "partName": "Teil {{n}} · {{name}}"
+}

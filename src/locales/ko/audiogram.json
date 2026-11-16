@@ -1,0 +1,180 @@
+{
+  "title": "오디오그램",
+  "tour": {
+    "again": "둘러보기 다시 보기",
+    "againLabel": "오디오그램 둘러보기 다시 보기"
+  },
+  "saveAndClose": "저장하고 닫기",
+  "saveAndCloseTitle": "오디오그램은 이 오디오와 함께 보관되고, 쇼츠로 함께 게시돼요",
+  "loadError": "오디오그램 설정을 불러오지 못했어요: {{error}}",
+  "loadingLook": "오디오그램 디자인 불러오는 중…",
+  "start": {
+    "title": "에피소드의 한 부분 고르기",
+    "text_other": "오디오그램은 에피소드의 한 부분(최대 {{count}}분)으로 만든 짧은 동영상이에요. 오디오와 함께 3Speak 쇼츠로 게시돼요. 먼저 타임라인에서 시작과 끝을 표시하세요.",
+    "choose": "타임라인에서 고르기"
+  },
+  "stage": {
+    "label": "오디오그램 미리보기: 요소를 드래그해 옮기고, 모서리로 크기를 바꾸고, 둥근 핸들로 회전하세요",
+    "frameTitle": "오디오그램 미리보기",
+    "turned": "{{name}} · {{angle}}°",
+    "rotate": "회전 (Shift: 15° 단위). 더블클릭: 똑바로",
+    "hint": "요소를 드래그해 옮기고, 모서리를 당겨 크기를 바꾸고(Shift는 비율 유지), 둥근 핸들로 회전하세요. 화살표 키로 미세 이동, [ 와 ]로 회전.",
+    "hintTemplate": "요소를 드래그해 옮기고, 모서리를 당겨 크기를 바꾸고(Shift는 비율 유지), 둥근 핸들로 회전하세요. 화살표 키로 미세 이동, [ 와 ]로 회전. 마지막 오디오그램이 시작점이 돼요."
+  },
+  "layer": {
+    "logo": {
+      "name": "3Speak 로고",
+      "drag": "3Speak 로고: 드래그해서 이동",
+      "dragSelected": "3Speak 로고: 드래그해서 이동, 모서리로 크기 조정, 둥근 핸들로 회전"
+    },
+    "cover": {
+      "name": "사진",
+      "drag": "사진: 드래그해서 이동",
+      "dragSelected": "사진: 드래그해서 이동, 모서리로 크기 조정, 둥근 핸들로 회전",
+      "hide": "사진 숨기기",
+      "show": "사진 보기",
+      "forward": "사진을 앞으로",
+      "back": "사진을 뒤로"
+    },
+    "title": {
+      "name": "제목",
+      "drag": "제목: 드래그해서 이동",
+      "dragSelected": "제목: 드래그해서 이동, 모서리로 크기 조정, 둥근 핸들로 회전",
+      "hide": "제목 숨기기",
+      "show": "제목 보기",
+      "forward": "제목을 앞으로",
+      "back": "제목을 뒤로"
+    },
+    "line": {
+      "name": "부제",
+      "drag": "부제: 드래그해서 이동",
+      "dragSelected": "부제: 드래그해서 이동, 모서리로 크기 조정, 둥근 핸들로 회전",
+      "hide": "부제 숨기기",
+      "show": "부제 보기",
+      "forward": "부제를 앞으로",
+      "back": "부제를 뒤로"
+    },
+    "wave": {
+      "name": "파형",
+      "drag": "파형: 드래그해서 이동",
+      "dragSelected": "파형: 드래그해서 이동, 모서리로 크기 조정, 둥근 핸들로 회전",
+      "hide": "파형 숨기기",
+      "show": "파형 보기",
+      "forward": "파형을 앞으로",
+      "back": "파형을 뒤로"
+    }
+  },
+  "piece": {
+    "label": "에피소드의 한 부분",
+    "range": "{{from}} – {{to}} · {{seconds}}초",
+    "inChapter": "“{{title}}” 안",
+    "change": "부분 바꾸기"
+  },
+  "look": {
+    "title": "제목",
+    "titleLabel": "동영상의 제목",
+    "line": "그 아래 줄 <small>(*별표*는 빨간색이 돼요)</small>",
+    "lineLabel": "동영상의 부제",
+    "branding": "3Speak 브랜딩",
+    "logoGroup": "로고",
+    "picture": "사진",
+    "waveform": "파형",
+    "waveType": "파형 종류",
+    "waveColour": "파형 색상",
+    "colour": "색상 {{colour}}",
+    "anyColour": "원하는 색상",
+    "anyWaveColour": "원하는 파형 색상"
+  },
+  "logo": {
+    "mark": "3S 로고",
+    "full": "3Speak 로고"
+  },
+  "wave": {
+    "bars": "막대",
+    "centered": "가운데",
+    "line": "선",
+    "dots": "가는 선",
+    "circle": "원",
+    "ring": "원형 파동"
+  },
+  "picture": {
+    "upload": "사진 업로드",
+    "yours": "내 사진",
+    "coverOf": "“{{title}}”의 커버",
+    "playlistCover": "재생목록 커버",
+    "noCovers": "재생목록에 아직 커버가 없어요.",
+    "signIn": "사진을 추가하려면 3Speak에 로그인하세요."
+  },
+  "parts": {
+    "title": "요소 <small>(앞에서 뒤로)</small>",
+    "logoLocked": "3Speak 로고는 항상 맨 앞에 표시되고, 정해진 크기보다 작아지지 않아요",
+    "alwaysShown": "항상 표시",
+    "hide": "숨기기",
+    "show": "보기",
+    "forward": "앞으로",
+    "back": "뒤로 보내기",
+    "tidy": "배치 정리"
+  },
+  "make": {
+    "starting": "시작하는 중...",
+    "working": "처리 중...",
+    "noWords": "이 부분의 말을 찾지 못했어요 (자막을 끄면 자막 없이 만들 수 있어요)",
+    "failedPlain": "실패",
+    "signIn": "오디오그램을 만들려면 3Speak에 로그인하세요.",
+    "failed": "오디오그램을 만들지 못했어요: {{error}}",
+    "make": "오디오그램 만들기",
+    "another": "오디오그램 하나 더 만들기"
+  },
+  "made": {
+    "title": "내 오디오그램",
+    "hint": "오디오와 함께 3Speak 쇼츠로 게시되고, 각각 오디오의 게시물, 스냅 또는 댓글로 연결돼요.",
+    "fallbackTitle": "오디오그램 {{n}}",
+    "length": "{{at}} · {{seconds}}초",
+    "textPlaceholder": "쇼츠 텍스트 (선택). 오디오 링크는 자동으로 추가됩니다.",
+    "textLabel": "쇼츠 {{n}} 텍스트",
+    "editText": "텍스트 편집",
+    "writeText": "텍스트 쓰기",
+    "download": "다운로드",
+    "removeLabel": "오디오그램 {{n}} 제거"
+  },
+  "confirm": {
+    "title": "만들지 않고 닫을까요?",
+    "text": "디자인 변경 사항이 아직 오디오그램에 반영되지 않았어요. 닫으면 사라져요.",
+    "stays_other": "만든 오디오그램 {{count}}개는 이 오디오에 남아요.",
+    "keep": "계속 편집"
+  },
+  "captions": {
+    "label": "자막",
+    "drag": "자막: 드래그해서 이동",
+    "dragSelected": "자막: 드래그해서 이동, 옆면을 당겨 너비 변경",
+    "sample": "말하는 대로 여기에 단어가 나타나요",
+    "show": "말하는 내용을 단어별로 표시",
+    "checking": "서버 확인 중...",
+    "unavailable": "지금은 이 편집기 서버에서 자막을 사용할 수 없어요.",
+    "listening": "듣는 중...",
+    "getWords": "단어 가져오기",
+    "wordCount_other": "이 부분에 단어가 {{count}}개 있어요.",
+    "noSpeech": "이 부분에서 말소리를 찾지 못했어요.",
+    "fix": "단어 수정",
+    "doneFixing": "수정 완료",
+    "word": "단어 {{n}}",
+    "removeWord": "이 단어 제거",
+    "removeWordLabel": "{{word}} 제거",
+    "style": "자막 스타일",
+    "preset": {
+      "karaoke": "노래방",
+      "pop": "팝",
+      "plain": "자막"
+    },
+    "wordsAtATime": "한 번에 표시할 단어 수",
+    "perPage_other": "한 번에 {{count}}단어",
+    "font": "자막 글꼴",
+    "size": "자막 크기",
+    "textColour": "자막 글자 색상",
+    "textColourSwatch": "글자 색상 {{colour}}",
+    "highlightColour": "강조 색상",
+    "highlight": "강조",
+    "highlightSwatch": "강조 {{colour}}",
+    "capitals": "대문자"
+  }
+}

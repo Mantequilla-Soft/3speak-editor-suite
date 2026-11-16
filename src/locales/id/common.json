@@ -1,0 +1,36 @@
+{
+  "cancel": "Batal",
+  "close": "Tutup",
+  "ok": "OK",
+  "gotIt": "Mengerti",
+  "done": "Selesai",
+  "save": "Simpan",
+  "delete": "Hapus",
+  "remove": "Hapus",
+  "back": "Kembali",
+  "next": "Berikutnya",
+  "skip": "Lewati",
+  "retry": "Coba lagi",
+  "reset": "Atur ulang",
+  "none": "Tidak ada",
+  "off": "Mati",
+  "auto": "Otomatis",
+  "play": "Putar",
+  "pause": "Jeda",
+  "undo": "Urungkan",
+  "preview": "Pratinjau",
+  "render": "Render",
+  "export": "Ekspor",
+  "duration": {
+    "seconds_other": "{{count}} detik",
+    "minutes_other": "{{count}} menit",
+    "hours_other": "{{count}} jam"
+  },
+  "limits": {
+    "atMost": {
+      "short": "Short maksimal {{limit}}.",
+      "video": "Video maksimal {{limit}}.",
+      "audio": "Ekspor maksimal {{limit}}."
+    }
+  }
+}

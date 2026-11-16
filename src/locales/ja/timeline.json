@@ -1,0 +1,180 @@
+{
+  "aria": {
+    "timeline": "タイムライン",
+    "ruler": "時間ルーラー：クリックで再生ヘッドを移動",
+    "playhead": "再生ヘッド",
+    "zoom": "ズーム"
+  },
+  "split": {
+    "title": "再生ヘッドの位置でクリップを分割（Ctrl+R）",
+    "label": "分割"
+  },
+  "toolbar": {
+    "add": {
+      "title": "トラックまたはクリップを追加",
+      "videoTrack": "動画トラック",
+      "audioTrack": "音声トラック",
+      "musicLibrary": "音楽ライブラリ",
+      "soundEffects": "効果音",
+      "stickers": "ステッカー",
+      "titles": "タイトル",
+      "stock": "ストック素材"
+    },
+    "zoomTitle": "ズーム：{{value}}px/秒",
+    "fit": {
+      "title": "タイムライン全体を表示",
+      "label": "全体表示"
+    },
+    "select": {
+      "titleStart": "複数のクリップを選択：1つずつタップ",
+      "titleDone": "選択を終了",
+      "label": "選択"
+    },
+    "ripple": {
+      "titleTrack": "トラック {{number}} の再生ヘッドの位置の隙間を詰めます（G）。他のトラックはそのままです。",
+      "titleNoGap": "選択したクリップのトラックには、再生ヘッドの位置に隙間がありません",
+      "title": "再生ヘッドの位置の隙間を削除（G）",
+      "label": "リップル"
+    },
+    "captions": {
+      "title": "字幕：話した内容を1語ずつの字幕にします",
+      "label": "字幕"
+    },
+    "transcript": {
+      "title": "文字起こし：テキストで編集し、単語を削除するとその部分がカットされます",
+      "label": "文字起こし"
+    },
+    "flag": {
+      "title": "再生ヘッドの位置にフラグを設定（B）：番号と色が付いた自分用の目印で、書き出されません",
+      "label": "フラグ"
+    },
+    "autoCut": {
+      "title": "間を見つけてそこでカット",
+      "label": "自動カット"
+    },
+    "beats": {
+      "title": "ビートを検出：ビートに吸着させ、クリップを並べます",
+      "label": "ビート"
+    },
+    "delete": {
+      "title": "選択したクリップを削除（Del）",
+      "titleMany": "選択したクリップを削除（Del）",
+      "labelMany": "{{number}} 個を削除"
+    },
+    "options": "オプション",
+    "ungroup": {
+      "titleOne": "グループ解除：クリップは再び個別に移動・トリムされます",
+      "titleMany": "グループ解除：これらのクリップは再び個別に移動・トリムされます",
+      "label": "グループ解除"
+    },
+    "group": {
+      "title": "グループ化：これらのクリップは一緒に移動・トリムされます",
+      "label": "{{number}} 個をグループ化"
+    },
+    "more": {
+      "title": "その他のクリップ操作",
+      "duplicate": "複製",
+      "groupVoicesTitle": "他の音声トラックで同時に再生されているものとグループ化：移動、トリム、無音カットが一緒に行われます",
+      "groupVoices": "他の声とグループ化",
+      "reverse": "逆再生",
+      "unreverse": "逆再生を解除",
+      "snapOn": "スナップ：オン",
+      "snapOff": "スナップ：オフ"
+    }
+  },
+  "selectHint": {
+    "count_other": "{{count}} 個のクリップを選択中：さらにタップするか、完了を押してください",
+    "none": "選択したいクリップを1つずつタップしてください",
+    "clear": "クリア"
+  },
+  "clip": {
+    "settings": "クリップの設定",
+    "textFallback": "テキスト",
+    "layer": "L{{number}}",
+    "kind": {
+      "video": "動画クリップ",
+      "audio": "サウンドクリップ",
+      "image": "画像",
+      "text": "テキスト",
+      "color": "カラー",
+      "other": "クリップ"
+    },
+    "aria": {
+      "plain": "{{kind}}、{{from}} から {{to}}",
+      "named": "{{kind}} {{name}}、{{from}} から {{to}}",
+      "onTrack": "{{track}} の{{kind}}、{{from}} から {{to}}",
+      "namedOnTrack": "{{track}} の{{kind}} {{name}}、{{from}} から {{to}}"
+    }
+  },
+  "track": {
+    "show": "トラックを表示",
+    "hide": "トラックを隠す",
+    "mute": "トラックをミュート",
+    "unmute": "トラックのミュートを解除",
+    "remove": "トラックを削除",
+    "addVisual": "動画、画像、テキストを追加",
+    "addAudio": "音声を追加",
+    "addFile": "ファイルを追加",
+    "addText": "テキストを追加",
+    "addColor": "カラーを追加",
+    "recordVideo": "動画を録画",
+    "addAudioFile": "音声ファイルを追加",
+    "recordAudio": "音声を録音",
+    "resize": {
+      "aria": "{{name}} の高さ",
+      "ariaUnnamed": "このトラックの高さ",
+      "title": "ドラッグしてトラックの高さを変更（ダブルクリック：元に戻す）"
+    },
+    "aria": {
+      "named": {
+        "video": "{{name}}（動画トラック）",
+        "audio": "{{name}}（音声トラック）",
+        "music": "{{name}}（音楽トラック）"
+      },
+      "numbered": {
+        "video": "動画トラック {{number}}",
+        "audio": "音声トラック {{number}}",
+        "music": "音楽トラック {{number}}"
+      }
+    }
+  },
+  "trackName": {
+    "voice": "ボイス",
+    "voiceNumbered": "ボイス {{number}}",
+    "music": "音楽",
+    "musicNumbered": "音楽 {{number}}",
+    "video": "動画",
+    "videoNumbered": "動画 {{number}}",
+    "audioNumbered": "音声 {{number}}",
+    "stickers": "ステッカー",
+    "stickersNumbered": "ステッカー {{number}}",
+    "sfx": "効果音",
+    "sfxNumbered": "効果音 {{number}}"
+  },
+  "clipName": {
+    "text": "テキストレイヤー",
+    "color": "色",
+    "imported": "読み込んだメディア",
+    "linkedAudio": "{{name}}（音声）"
+  },
+  "textClip": {
+    "defaultText": "ここにテキストを入力"
+  },
+  "flag": {
+    "aria": "{{time}} のフラグ {{number}}",
+    "title": "フラグ {{number}} · {{time}}：クリックでジャンプ、ドラッグで移動、右クリックで削除"
+  },
+  "range": {
+    "label": "{{from}} – {{to}} · {{seconds}}秒",
+    "startOnly": "{{time}} · 終了位置をクリック",
+    "dragStart": "ドラッグして開始位置を移動",
+    "dragEnd": "ドラッグして終了位置を移動"
+  },
+  "pastLimit": "レンダリングの上限を超えています",
+  "backgroundMusic": {
+    "title": "BGM",
+    "add": "BGM を追加",
+    "remove": "音楽を削除"
+  },
+  "partName": "パート {{n}} · {{name}}"
+}

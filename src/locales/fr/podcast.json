@@ -1,0 +1,86 @@
+{
+  "video": {
+    "title": "Podcast vidéo",
+    "intro": "L'épisode entier ({{length}}) en vidéo 16:9 : l'image, une forme d'onde animée, les sous-titres et le nom de la personne qui parle. Pour les podcasts vidéo sur 3Speak, YouTube et Spotify.",
+    "unavailable": "Ce serveur d'édition ne peut pas encore créer de podcasts vidéo.",
+    "tooLong": "Les podcasts vidéo peuvent durer jusqu'à {{length}}.",
+    "preview": "Aperçu du podcast vidéo",
+    "sampleCaption": "<b>Vos</b> mots s'affichent ici",
+    "stageHint": "La forme d'onde bouge avec le son, les sous-titres et le nom suivent l'épisode.",
+    "defaultLine": "À regarder et écouter sur *3speak.tv*",
+    "captions": "Sous-titres",
+    "captionsTranscript": "Les mots de votre transcription.",
+    "captionsNoStt": "La reconnaissance vocale n'est pas disponible sur ce serveur.",
+    "captionsStt": "Les mots, trouvés par reconnaissance vocale sur le serveur. Les longs épisodes prennent du temps.",
+    "whoSpeaks": "Qui parle",
+    "noVoices": "Aucune piste de voix d'où tirer des noms.",
+    "speaker": "Intervenant {{n}}",
+    "speakerLabel": "Nom pour la piste de voix {{n}}",
+    "loudest": "Chaque voix sur sa propre piste : le nom de la plus forte s'affiche.",
+    "frameRate": "Fréquence d'images",
+    "fps15": "15 i/s (plus léger, plus rapide)",
+    "fps24": "24 i/s (plus fluide)",
+    "finding": "Recherche de qui parle quand...",
+    "sending": "Envoi...",
+    "working": "En cours...",
+    "serverAnswered": "Le serveur a répondu {{status}}",
+    "lost": "La tâche a été perdue (le serveur a redémarré ?)",
+    "stopped": "Arrêté",
+    "signIn": "Connectez-vous sur 3Speak pour créer un podcast vidéo.",
+    "failed": "Impossible de créer le podcast vidéo : {{error}}",
+    "stop": "Arrêter",
+    "make": "Créer le podcast vidéo",
+    "again": "Le recréer",
+    "download": "Télécharger le MP4",
+    "subtitles": "Sous-titres (SRT)",
+    "post": "Publier sur 3Speak en vidéo"
+  },
+  "template": {
+    "title": "Votre modèle",
+    "signedOutIntro": "Enregistrez votre intro, votre outro et votre fond musical une seule fois, et chaque nouvel enregistrement les reçoit en un clic. Votre modèle est gardé pour de bon, il faut donc vous connecter à 3Speak.",
+    "signIn": "Se connecter pour utiliser un modèle",
+    "logIn": "Connectez-vous sur 3Speak pour utiliser un modèle.",
+    "intro": "Un seul modèle, gardé pour de bon. Enregistrer remplace celui que vous aviez.",
+    "role": {
+      "intro": {
+        "title": "Intro",
+        "hint": "Passe en premier, avant votre enregistrement.",
+        "clear": "Pas d'intro"
+      },
+      "outro": {
+        "title": "Outro",
+        "hint": "Passe juste après la fin de votre enregistrement.",
+        "clear": "Pas d'outro"
+      },
+      "bed": {
+        "title": "Fond musical",
+        "hint": "Une musique discrète sous tout l'enregistrement, en boucle pour remplir, avec un fondu à la fin.",
+        "clear": "Pas de fond musical"
+      }
+    },
+    "useSelected": "Utiliser « {{name}} » (la partie à laquelle vous l'avez coupé)",
+    "selectFirst": "Sélectionnez d'abord un clip audio envoyé sur la chronologie",
+    "selectedClip": "Clip sélectionné",
+    "file": "Fichier",
+    "volume": "Volume",
+    "bedVolume": "Volume du fond musical",
+    "loop": "En boucle pour remplir tout l'enregistrement",
+    "cutSilences": "Couper les silences de chaque nouvel enregistrement <small>(avec vos réglages de Couper les silences)</small>",
+    "loudness": "Normaliser le volume pour les podcasts <small>(-16 LUFS, appliqué à l'export)</small>",
+    "duck": "Baisser la musique quand quelqu'un parle <small>({{db}} dB sur le fond musical ; modifiable dans les réglages du clip)</small>",
+    "autoApply": "L'appliquer tout seul quand j'ouvre un enregistrement",
+    "signInUpload": "Connectez-vous sur 3Speak pour envoyer.",
+    "uploadFailed": "Ce fichier n'a pas pu être envoyé. Essayez-en un autre.",
+    "deleteForGood": "Le supprimer définitivement",
+    "delete": "Supprimer le modèle",
+    "saveApply": "Enregistrer et appliquer",
+    "voiceTrack": "Voix",
+    "bedTrack": "Fond musical"
+  },
+  "stage": {
+    "empty": "Ajoutez un enregistrement, enregistrez-en un ou choisissez une musique pour commencer.",
+    "chapter": "Chapitre",
+    "position": "Position dans l'émission",
+    "positionText": "{{at}} sur {{total}}"
+  }
+}

@@ -1,0 +1,207 @@
+/* The project's shape (ProjectFormat.jsx) and "Export as" (FormatsPanel.jsx) */
+.project-format-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  height: var(--h-28);
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  font: var(--fw-medium) var(--fs-12) / 1 var(--font-sans);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.project-format-chip:hover { border-color: var(--cyan); }
+.aspect-diagram rect {
+  fill: var(--cyan-tint);
+  stroke: var(--cyan);
+  stroke-width: 2;
+}
+.remix-picker-option.project-format-current {
+  border-color: var(--cyan);
+  background: var(--cyan-tint);
+}
+.project-format-note {
+  margin: var(--sp-5) 0 0;
+  color: var(--muted);
+  font-size: var(--fs-12);
+  line-height: 1.4;
+}
+
+.formats-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-7);
+  padding: var(--sp-5);
+  overflow-y: auto;
+  font-size: var(--fs-13);
+}
+.formats-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.formats-section h4 {
+  margin: 0;
+  font: var(--fw-bold) var(--fs-13) / 1.2 var(--font-sans);
+}
+.formats-section p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--fs-12);
+  line-height: 1.4;
+}
+.formats-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+.formats-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  height: var(--h-32);
+  padding: 0 var(--sp-4) 0 var(--sp-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text);
+  font: var(--fw-medium) var(--fs-12) / 1 var(--font-sans);
+  cursor: pointer;
+}
+.formats-chip[aria-pressed="true"] {
+  border-color: var(--cyan);
+  background: var(--cyan-tint);
+}
+.formats-chip .aspect-diagram { flex: none; }
+.formats-clips {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.formats-clip {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: var(--h-36);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+  font: inherit;
+  width: 100%;
+}
+.formats-clip[aria-pressed="true"] { border-color: var(--cyan); }
+.formats-clip-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.formats-clip-state { color: var(--muted); font-size: var(--fs-11); white-space: nowrap; }
+.formats-shift {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-12);
+}
+.formats-shift input[type="range"] { width: 100%; accent-color: var(--cyan); }
+.formats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+.formats-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  height: var(--h-32);
+  padding: 0 var(--sp-5);
+  border: 0;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--text);
+  font: var(--fw-bold) var(--fs-12) / 1 var(--font-sans);
+  cursor: pointer;
+  text-decoration: none;
+}
+.formats-btn:disabled { opacity: .5; cursor: default; }
+.formats-btn.primary { background: var(--accent); color: var(--on-accent); }
+.formats-progress {
+  height: 4px;
+  border-radius: var(--r-bar);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.formats-progress > span {
+  display: block;
+  height: 100%;
+  background: var(--cyan);
+  transition: width var(--t-base) var(--ease);
+}
+.formats-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+.formats-result-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  font-weight: var(--fw-bold);
+}
+.formats-result-phase { color: var(--muted); font-size: var(--fs-11); font-weight: var(--fw-regular); }
+.formats-error { color: var(--accent); font-size: var(--fs-12); }
+
+/* Video podcast (VideoPodcastDialog.jsx): the 16:9 stage and the burnt-in parts shown over the preview page */
+.video-podcast-studio .audiogram-stage { overflow: hidden; flex: none; }
+.video-podcast-speaker {
+  position: absolute;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: var(--on-media);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.video-podcast-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  text-align: center;
+  color: var(--on-media);
+  font-weight: var(--fw-bold);
+  text-shadow: 0 0 3px var(--media-scrim), 0 1px 2px var(--media-scrim);
+  pointer-events: none;
+}
+.video-podcast-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+.video-podcast-toggle > span { display: inline-flex; align-items: center; gap: var(--sp-2); }
+.video-podcast-toggle input[type="checkbox"] { accent-color: var(--cyan); width: 18px; height: 18px; }
+.video-podcast-video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--r-md);
+  background: var(--media-bg, var(--frame));
+}

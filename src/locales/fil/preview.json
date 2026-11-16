@@ -1,0 +1,29 @@
+{
+  "header": "Preview ng timeline",
+  "smaller": "Mas maliit",
+  "larger": "Mas malaki",
+  "loopOn": "Loop: Naka-on",
+  "loopOff": "Loop: Naka-off",
+  "aspect": {
+    "title": "Aspect ratio: {{ratio}}",
+    "titleAuto": "Aspect ratio: Auto ({{ratio}})",
+    "auto": "Auto"
+  },
+  "fullSize": "Buong laki",
+  "halfSize": "Kalahating laki",
+  "fullscreen": "Fullscreen",
+  "noClipHere": "Walang clip sa posisyong ito",
+  "noClips": "Walang clip sa timeline",
+  "source": {
+    "hls": "(HLS stream)",
+    "uploaded": "(na-upload)",
+    "local": "(lokal)",
+    "file": "(file)"
+  },
+  "stageLayout": {
+    "tileTop": "Tile sa itaas",
+    "tileBottom": "Tile sa ibaba",
+    "overlay": "Overlay"
+  },
+  "selectClip": "Pumili ng clip na ipe-preview"
+}

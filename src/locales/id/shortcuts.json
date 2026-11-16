@@ -1,0 +1,53 @@
+{
+  "sheet": {
+    "title": "Pintasan keyboard"
+  },
+  "groups": {
+    "playback": "Pemutaran",
+    "clips": "Klip",
+    "project": "Proyek"
+  },
+  "items": {
+    "playPause": "Putar / jeda",
+    "playForward": "Putar maju; tekan lagi untuk 2x, 4x, 8x",
+    "playBackward": "Putar mundur; tekan lagi untuk lebih cepat",
+    "stop": "Berhenti",
+    "frameStep": "Satu frame mundur / maju (Shift: 10 frame)",
+    "nudge": "Geser playhead 0,1 dtk (Shift: 1 dtk)",
+    "fullscreen": "Layar penuh aktif / mati",
+    "nextPrevClip": "Pilih klip berikutnya / sebelumnya",
+    "clipLeftRight": "Klip sebelumnya / berikutnya di trek yang sama",
+    "clipUpDown": "Klip di trek atas / bawah",
+    "openClip": "Buka pengaturan klip terpilih",
+    "selectNone": "Batalkan semua pilihan",
+    "selectAll": "Pilih semua klip",
+    "remove": "Hapus klip terpilih",
+    "split": "Bagi klip terpilih di playhead",
+    "duplicate": "Duplikat klip terpilih",
+    "ungroup": "Pisahkan grup klip",
+    "closeGap": "Rapatkan celah di playhead",
+    "addText": "Tambahkan teks di playhead",
+    "undo": "Urungkan",
+    "redo": "Ulangi",
+    "addFlag": "Tambahkan penanda di playhead",
+    "addChapter": "Tambahkan bab di playhead",
+    "zoom": "Perbesar / perkecil linimasa",
+    "showSheet": "Tampilkan pintasan ini"
+  },
+  "keys": {
+    "space": "Spasi",
+    "tab": "Tab",
+    "shift": "Shift",
+    "alt": "Alt",
+    "ctrl": "Ctrl",
+    "enter": "Enter",
+    "esc": "Esc",
+    "delete": "Delete"
+  },
+  "announce": {
+    "selected": "{{clip}} dipilih",
+    "stopped": "Dihentikan",
+    "forward": "Maju {{speed}}x",
+    "backward": "Mundur {{speed}}x"
+  }
+}

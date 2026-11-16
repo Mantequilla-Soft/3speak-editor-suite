@@ -1,0 +1,53 @@
+{
+  "sheet": {
+    "title": "Skróty klawiszowe"
+  },
+  "groups": {
+    "playback": "Odtwarzanie",
+    "clips": "Klipy",
+    "project": "Projekt"
+  },
+  "items": {
+    "playPause": "Odtwórz / pauza",
+    "playForward": "Odtwarzaj do przodu; naciśnij ponownie dla 2x, 4x, 8x",
+    "playBackward": "Odtwarzaj do tyłu; naciśnij ponownie, aby przyspieszyć",
+    "stop": "Stop",
+    "frameStep": "Jedna klatka wstecz / do przodu (Shift: 10 klatek)",
+    "nudge": "Przesuń głowicę o 0,1 s (Shift: 1 s)",
+    "fullscreen": "Pełny ekran wł. / wył.",
+    "nextPrevClip": "Wybierz następny / poprzedni klip",
+    "clipLeftRight": "Poprzedni / następny klip na tej samej ścieżce",
+    "clipUpDown": "Klip na ścieżce powyżej / poniżej",
+    "openClip": "Otwórz ustawienia wybranego klipu",
+    "selectNone": "Odznacz wszystko",
+    "selectAll": "Zaznacz wszystkie klipy",
+    "remove": "Usuń wybrane klipy",
+    "split": "Podziel wybrany klip w miejscu głowicy",
+    "duplicate": "Duplikuj wybrany klip",
+    "ungroup": "Rozgrupuj klipy",
+    "closeGap": "Zamknij przerwę w miejscu głowicy",
+    "addText": "Dodaj tekst w miejscu głowicy",
+    "undo": "Cofnij",
+    "redo": "Ponów",
+    "addFlag": "Dodaj znacznik w miejscu głowicy",
+    "addChapter": "Dodaj rozdział w miejscu głowicy",
+    "zoom": "Przybliż / oddal oś czasu",
+    "showSheet": "Pokaż te skróty"
+  },
+  "keys": {
+    "space": "Spacja",
+    "tab": "Tab",
+    "shift": "Shift",
+    "alt": "Alt",
+    "ctrl": "Ctrl",
+    "enter": "Enter",
+    "esc": "Esc",
+    "delete": "Delete"
+  },
+  "announce": {
+    "selected": "Wybrano {{clip}}",
+    "stopped": "Zatrzymano",
+    "forward": "Do przodu {{speed}}x",
+    "backward": "Do tyłu {{speed}}x"
+  }
+}

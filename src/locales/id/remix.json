@@ -1,0 +1,42 @@
+{
+  "titles": {
+    "mode": "Bagaimana kamu ingin me-remix?",
+    "stitch": "Di mana klipmu ditaruh?",
+    "reaction": "Di mana reaksimu ditaruh?"
+  },
+  "skip": "Lewati, edit bebas",
+  "options": {
+    "stitch": {
+      "title": "Sambung",
+      "text": "Rekam klip yang diputar sebelum atau sesudah video asli."
+    },
+    "reaction": {
+      "title": "Reaksi",
+      "text": "Rekam dirimu selagi video asli diputar."
+    },
+    "free": {
+      "title": "Edit bebas",
+      "text": "Buka editor dengan video asli di linimasa."
+    },
+    "stitchBefore": {
+      "title": "Sebelum video asli",
+      "text": "Klipmu diputar duluan, lalu video asli."
+    },
+    "stitchAfter": {
+      "title": "Sesudah video asli",
+      "text": "Video asli diputar duluan, lalu klipmu."
+    },
+    "overlay": {
+      "title": "Overlay",
+      "text": "Kameramu di kotak kecil di atas video asli. Seret ke mana saja."
+    },
+    "tileTop": {
+      "title": "Susun di atas",
+      "text": "Video asli mengecil ke separuh bawah, kamu di atas."
+    },
+    "tileBottom": {
+      "title": "Susun di bawah",
+      "text": "Video asli mengecil ke separuh atas, kamu di bawah."
+    }
+  }
+}

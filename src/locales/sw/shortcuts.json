@@ -1,0 +1,53 @@
+{
+  "sheet": {
+    "title": "Njia za mkato za kibodi"
+  },
+  "groups": {
+    "playback": "Uchezaji",
+    "clips": "Klipu",
+    "project": "Mradi"
+  },
+  "items": {
+    "playPause": "Cheza / sitisha",
+    "playForward": "Cheza mbele; bonyeza tena kwa 2x, 4x, 8x",
+    "playBackward": "Cheza nyuma; bonyeza tena kwa kasi zaidi",
+    "stop": "Simamisha",
+    "frameStep": "Fremu moja nyuma / mbele (Shift: fremu 10)",
+    "nudge": "Sogeza kiashiria cha kucheza sek 0.1 (Shift: sek 1)",
+    "fullscreen": "Skrini nzima washa / zima",
+    "nextPrevClip": "Chagua klipu inayofuata / iliyotangulia",
+    "clipLeftRight": "Klipu iliyotangulia / inayofuata kwenye njia ile ile",
+    "clipUpDown": "Klipu kwenye njia ya juu / chini",
+    "openClip": "Fungua mipangilio ya klipu iliyochaguliwa",
+    "selectNone": "Usichague chochote",
+    "selectAll": "Chagua kila klipu",
+    "remove": "Ondoa klipu iliyochaguliwa",
+    "split": "Gawanya klipu iliyochaguliwa kwenye kiashiria cha kucheza",
+    "duplicate": "Nakili klipu iliyochaguliwa",
+    "ungroup": "Tenganisha kikundi cha klipu",
+    "closeGap": "Ziba pengo kwenye kiashiria cha kucheza",
+    "addText": "Ongeza maandishi kwenye kiashiria cha kucheza",
+    "undo": "Tendua",
+    "redo": "Rudia",
+    "addFlag": "Ongeza bendera kwenye kiashiria cha kucheza",
+    "addChapter": "Ongeza sura kwenye kiashiria cha kucheza",
+    "zoom": "Kuza mfuatano wa muda ndani / nje",
+    "showSheet": "Onyesha njia hizi za mkato"
+  },
+  "keys": {
+    "space": "Nafasi",
+    "tab": "Tab",
+    "shift": "Shift",
+    "alt": "Alt",
+    "ctrl": "Ctrl",
+    "enter": "Enter",
+    "esc": "Esc",
+    "delete": "Delete"
+  },
+  "announce": {
+    "selected": "{{clip}} imechaguliwa",
+    "stopped": "Imesimamishwa",
+    "forward": "Mbele {{speed}}x",
+    "backward": "Nyuma {{speed}}x"
+  }
+}

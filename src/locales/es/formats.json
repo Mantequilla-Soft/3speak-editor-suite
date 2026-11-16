@@ -1,0 +1,88 @@
+{
+  "aspect": {
+    "short": {
+      "label": "Short",
+      "hint": "Vertical, hasta 2 minutos, publicado como Short"
+    },
+    "landscape": {
+      "label": "Horizontal",
+      "hint": "Video panorámico, hasta 10 minutos"
+    },
+    "classic": {
+      "label": "Clásico",
+      "hint": "Video 4:3, hasta 10 minutos"
+    },
+    "square": {
+      "label": "Cuadrado",
+      "hint": "Video cuadrado, hasta 10 minutos"
+    }
+  },
+  "chip": {
+    "title": "Formato de este proyecto: {{shape}}. Haz clic para cambiarlo",
+    "aria": "Formato del proyecto: {{shape}}"
+  },
+  "picker": {
+    "title": "¿Qué vas a crear?",
+    "tooLong": "tu línea de tiempo dura {{length}}, recórtala a {{limit}} para renderizar",
+    "note": "El formato decide cómo llega a 3Speak: 9:16 como Short, los demás como un video normal. Exportar como también lo renderiza en otros formatos."
+  },
+  "preview": {
+    "heading": "Vista previa en",
+    "yours": "{{aspect}} (el tuyo)",
+    "projectIs": {
+      "short": "Tu proyecto es Short 9:16. En otro formato, la imagen llena el cuadro, recortada alrededor de la cara.",
+      "landscape": "Tu proyecto es Horizontal 16:9. En otro formato, la imagen llena el cuadro, recortada alrededor de la cara.",
+      "classic": "Tu proyecto es Clásico 4:3. En otro formato, la imagen llena el cuadro, recortada alrededor de la cara.",
+      "square": "Tu proyecto es Cuadrado 1:1. En otro formato, la imagen llena el cuadro, recortada alrededor de la cara."
+    }
+  },
+  "faces": {
+    "heading": "Seguir caras",
+    "noFootage": "Aún no hay imágenes para reencuadrar. Los clips movidos o con zoom mantienen su propio encuadre.",
+    "hint": "La cara se detecta en tu navegador, unos pocos fotogramas por segundo. Sin cara, se mantiene el centro a la vista.",
+    "found": "Cara encontrada",
+    "noFace": "Sin cara: centro",
+    "middle": "Centro",
+    "finding": "Buscando caras",
+    "findOne": "Buscar la cara",
+    "findMany_one": "Buscar caras en {{count}} clip",
+    "findMany_many": "Buscar caras en {{count}} de clips",
+    "findMany_other": "Buscar caras en {{count}} clips",
+    "streamNamed": "{{name}} es un stream: se recorta alrededor de su centro.",
+    "streamUnnamed": "Un clip es un stream: se recorta alrededor de su centro.",
+    "failed": "El seguimiento de caras no funcionó aquí: {{error}}",
+    "moveWindow": "{{name}}: mover el encuadre",
+    "left": "Izquierda",
+    "right": "Derecha",
+    "up": "Arriba",
+    "down": "Abajo",
+    "moveX": "Mover el encuadre a la izquierda o a la derecha",
+    "moveY": "Mover el encuadre arriba o abajo",
+    "findAgain": "Volver a buscar la cara",
+    "reset": "Centro, sin desplazamiento"
+  },
+  "clipFallback": "Clip",
+  "stop": "Detener",
+  "render": {
+    "heading": "Renderizar como",
+    "shortsLimit": "Los Shorts duran como máximo {{limit}}: recorta la línea de tiempo para renderizar uno en 9:16.",
+    "button_one": "Renderizar {{count}} video",
+    "button_many": "Renderizar {{count}} de videos",
+    "button_other": "Renderizar {{count}} videos",
+    "failed": "Falló el renderizado: {{error}}",
+    "download": "Descargar",
+    "postShort": "Publicar como Short",
+    "postVideo": "Publicar como video"
+  },
+  "job": {
+    "waiting": "Esperando...",
+    "preparing": "Preparando archivos...",
+    "starting": "Iniciando...",
+    "rendering": "Renderizando...",
+    "done": "Listo",
+    "stopped": "Detenido",
+    "busy": "Los servidores de renderizado están ocupados. Se vuelve a intentar en {{seconds}} s...",
+    "offline": "Sin conexión con el servidor de renderizado. Se vuelve a intentar en {{seconds}} s...",
+    "failed": "Falló el renderizado"
+  }
+}

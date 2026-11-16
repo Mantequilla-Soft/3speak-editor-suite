@@ -1,0 +1,42 @@
+{
+  "titles": {
+    "mode": "Jak chcesz zrobić remiks?",
+    "stitch": "Gdzie ma trafić twój klip?",
+    "reaction": "Gdzie ma trafić twoja reakcja?"
+  },
+  "skip": "Pomiń, swobodna edycja",
+  "options": {
+    "stitch": {
+      "title": "Doklejka",
+      "text": "Nagraj klip, który odtworzy się przed oryginałem lub po nim."
+    },
+    "reaction": {
+      "title": "Reakcja",
+      "text": "Nagraj siebie, gdy odtwarza się oryginał."
+    },
+    "free": {
+      "title": "Swobodna edycja",
+      "text": "Otwórz edytor z oryginałem na osi czasu."
+    },
+    "stitchBefore": {
+      "title": "Przed oryginałem",
+      "text": "Najpierw twój klip, potem oryginał."
+    },
+    "stitchAfter": {
+      "title": "Po oryginale",
+      "text": "Najpierw oryginał, potem twój klip."
+    },
+    "overlay": {
+      "title": "Nakładka",
+      "text": "Twoja kamera w małym okienku na oryginale. Przeciągnij ją w dowolne miejsce."
+    },
+    "tileTop": {
+      "title": "Kafelek nad",
+      "text": "Oryginał zmniejsza się do dolnej połowy, ty jesteś na górze."
+    },
+    "tileBottom": {
+      "title": "Kafelek pod",
+      "text": "Oryginał zmniejsza się do górnej połowy, ty jesteś na dole."
+    }
+  }
+}

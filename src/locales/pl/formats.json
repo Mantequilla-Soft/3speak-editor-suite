@@ -1,0 +1,90 @@
+{
+  "aspect": {
+    "short": {
+      "label": "Short",
+      "hint": "Pionowy, do 2 minut, publikowany jako Short"
+    },
+    "landscape": {
+      "label": "Poziomo",
+      "hint": "Film panoramiczny, do 10 minut"
+    },
+    "classic": {
+      "label": "Klasyczny",
+      "hint": "Film 4:3, do 10 minut"
+    },
+    "square": {
+      "label": "Kwadrat",
+      "hint": "Film kwadratowy, do 10 minut"
+    }
+  },
+  "chip": {
+    "title": "Kształt tego projektu: {{shape}}. Kliknij, aby zmienić",
+    "aria": "Kształt projektu: {{shape}}"
+  },
+  "picker": {
+    "title": "Co tworzysz?",
+    "tooLong": "twoja oś czasu ma {{length}}, przytnij ją do {{limit}}, aby renderować",
+    "note": "Kształt decyduje, jak trafi do 3Speak: 9:16 jako Short, pozostałe jako zwykły film. „Renderuj jako” renderuje go też w innych kształtach."
+  },
+  "preview": {
+    "heading": "Podgląd w",
+    "yours": "{{aspect}} (twój)",
+    "projectIs": {
+      "short": "Twój projekt to Short 9:16. W innym kształcie materiał wypełnia kadr, przycięty wokół widocznej twarzy.",
+      "landscape": "Twój projekt to Poziomo 16:9. W innym kształcie materiał wypełnia kadr, przycięty wokół widocznej twarzy.",
+      "classic": "Twój projekt to Klasyczny 4:3. W innym kształcie materiał wypełnia kadr, przycięty wokół widocznej twarzy.",
+      "square": "Twój projekt to Kwadrat 1:1. W innym kształcie materiał wypełnia kadr, przycięty wokół widocznej twarzy."
+    }
+  },
+  "faces": {
+    "heading": "Śledź twarze",
+    "noFootage": "Brak materiału do przekadrowania. Przesunięte lub powiększone klipy zachowują własny kadr.",
+    "hint": "Twarz jest wykrywana w twojej przeglądarce, kilka klatek na sekundę. Bez twarzy w kadrze zostaje środek.",
+    "found": "Znaleziono twarz",
+    "noFace": "Brak twarzy: środek",
+    "middle": "Środek",
+    "finding": "Szukanie twarzy",
+    "findOne": "Znajdź twarz",
+    "findMany_one": "Znajdź twarze w {{count}} klipie",
+    "findMany_few": "Znajdź twarze w {{count}} klipach",
+    "findMany_many": "Znajdź twarze w {{count}} klipach",
+    "findMany_other": "Znajdź twarze w {{count}} klipu",
+    "streamNamed": "{{name}} to transmisja: jest przycinana wokół środka.",
+    "streamUnnamed": "Jeden z klipów to transmisja: jest przycinany wokół środka.",
+    "failed": "Śledzenie twarzy tu nie zadziałało: {{error}}",
+    "moveWindow": "{{name}}: przesuń okno",
+    "left": "Lewo",
+    "right": "Prawo",
+    "up": "Góra",
+    "down": "Dół",
+    "moveX": "Przesuń okno w lewo lub w prawo",
+    "moveY": "Przesuń okno w górę lub w dół",
+    "findAgain": "Znajdź twarz ponownie",
+    "reset": "Środek, bez przesunięcia"
+  },
+  "clipFallback": "Klip",
+  "stop": "Stop",
+  "render": {
+    "heading": "Renderuj jako",
+    "shortsLimit": "Shorty mają maksymalnie {{limit}}: przytnij oś czasu, aby wyrenderować wersję 9:16.",
+    "button_one": "Renderuj {{count}} film",
+    "button_few": "Renderuj {{count}} filmy",
+    "button_many": "Renderuj {{count}} filmów",
+    "button_other": "Renderuj {{count}} filmu",
+    "failed": "Renderowanie nie powiodło się: {{error}}",
+    "download": "Pobierz",
+    "postShort": "Opublikuj jako Short",
+    "postVideo": "Opublikuj jako film"
+  },
+  "job": {
+    "waiting": "Oczekiwanie...",
+    "preparing": "Przygotowywanie plików...",
+    "starting": "Rozpoczynanie...",
+    "rendering": "Renderowanie...",
+    "done": "Gotowe",
+    "stopped": "Zatrzymano",
+    "busy": "Serwery renderowania są zajęte. Ponowna próba za {{seconds}} s...",
+    "offline": "Brak połączenia z serwerem renderowania. Ponowna próba za {{seconds}} s...",
+    "failed": "Renderowanie nie powiodło się"
+  }
+}

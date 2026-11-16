@@ -1,0 +1,88 @@
+{
+  "title": "Máy nhắc chữ",
+  "showOnCamera": "Hiện trên camera",
+  "speechNotice": {
+    "title": "Hiện tại tính năng theo giọng nói chỉ hoạt động trên trình duyệt Chromium.",
+    "body": "Dùng Chrome, Edge, Brave hoặc Opera để kịch bản tự cuộn khi bạn nói. Trên trình duyệt này, kịch bản cuộn với tốc độ cố định mà bạn có thể đặt."
+  },
+  "speechErrors": {
+    "network": "Không kết nối được dịch vụ giọng nói. Nhận dạng cần kết nối internet (Chrome gửi âm thanh đến Google để chép lời).",
+    "audioCapture": "Không có âm thanh nào đến được bộ nhận dạng. Micrô có thể đang bận, hãy thử tai nghe có micrô.",
+    "notAllowed": "Quyền micrô cho nhận dạng giọng nói đang bị chặn.",
+    "unsupported": "Trình duyệt này không có nhận dạng giọng nói.",
+    "generic": "Lỗi nhận dạng giọng nói: {{err}}"
+  },
+  "noMic": "Đang quay không có micrô (micrô không khả dụng).",
+  "autoDetect": "Tự phát hiện ({{lang}})",
+  "presets": {
+    "frontcam": "Camera trước",
+    "frontcamTitle": "Dải nhỏ ngay dưới ống kính selfie, khó nhận ra nhất là bạn đang đọc",
+    "max": "Cỡ tối đa",
+    "maxTitle": "Chữ lớn để đọc từ xa",
+    "top": "Dòng phía trên",
+    "topTitle": "Nhiều dòng ở phía trên"
+  },
+  "scroll": {
+    "label": "Cuộn",
+    "modeAria": "Chế độ cuộn",
+    "followVoice": "Theo giọng nói",
+    "followVoiceTitle": "Cuộn khi bạn đọc to kịch bản",
+    "needsChromium": "Cần Chrome, Edge hoặc một trình duyệt Chromium khác",
+    "timed": "Hẹn giờ",
+    "timedTitle": "Cuộn với tốc độ cố định",
+    "voiceForcedMissing": "Không thể theo giọng nói ở đây, đang dùng cuộn hẹn giờ.",
+    "voiceUnavailable": "Trình duyệt này không hỗ trợ theo giọng nói."
+  },
+  "style": {
+    "title": "Kiểu chữ",
+    "fontSize": "Cỡ chữ",
+    "fontSizeValue": "{{size}}px",
+    "text": "Văn bản",
+    "background": "Nền",
+    "bgOpacity": "Độ mờ đục nền",
+    "mirrorText": "Lật chữ (cho gương máy nhắc chữ)",
+    "voiceLanguage": "Ngôn ngữ giọng nói"
+  },
+  "status": {
+    "serverErrorSwitched": "Lỗi máy chủ giọng nói ({{reason}}). Đã chuyển sang cuộn hẹn giờ.",
+    "voiceErrorSwitched": "{{error}} Đã chuyển sang cuộn hẹn giờ.",
+    "voiceStoppedSwitched": "Đã dừng theo giọng nói. Đã chuyển sang cuộn hẹn giờ.",
+    "serverError": "Lỗi máy chủ giọng nói ({{reason}}).",
+    "listeningServer": "Đang nghe (máy chủ)… hãy bắt đầu đọc",
+    "connectingServer": "Đang kết nối máy chủ giọng nói…",
+    "listening": "Đang nghe… hãy bắt đầu đọc to",
+    "startingMic": "Đang bật micrô…",
+    "scrollPaused": "Đã tạm dừng cuộn",
+    "timedScroll": "Cuộn hẹn giờ, {{wpm}} từ/phút",
+    "scrollTest": "Thử cuộn, {{wpm}} từ/phút"
+  },
+  "sttReason": {
+    "unreachable": "không kết nối được",
+    "noMic": "không có micrô",
+    "audioUnavailable": "âm thanh không khả dụng",
+    "connectionFailed": "kết nối thất bại",
+    "unauthorized": "không được phép",
+    "closed": "đã đóng",
+    "serverError": "lỗi máy chủ"
+  },
+  "scriptPlaceholder": "Viết hoặc dán kịch bản của bạn vào đây. Khi quay, nó sẽ cuộn theo lúc bạn đọc to, hoặc với tốc độ cố định ở chế độ hẹn giờ.",
+  "scriptModeVoice": "Cuộn: theo giọng của bạn",
+  "scriptModeTimed": "Cuộn: hẹn giờ, {{wpm}} từ/phút",
+  "hide": "Ẩn",
+  "dragToMove": "Kéo để di chuyển",
+  "dragToResize": "Kéo để đổi kích thước",
+  "expandMenu": "Mở rộng menu",
+  "collapseMenu": "Thu gọn menu",
+  "editScript": "Chỉnh sửa kịch bản",
+  "testVoice": "Thử giọng",
+  "stopVoiceTest": "Dừng thử",
+  "scrollSpeed": "Tốc độ cuộn",
+  "slower": "Chậm hơn",
+  "faster": "Nhanh hơn",
+  "wordsPerMin": "từ/phút",
+  "testScroll": "Thử cuộn",
+  "stopScrollTest": "Dừng thử cuộn",
+  "pauseScroll": "Tạm dừng cuộn",
+  "resumeScroll": "Tiếp tục cuộn",
+  "hideTeleprompter": "Ẩn máy nhắc chữ"
+}

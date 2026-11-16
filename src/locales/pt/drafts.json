@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "line": "{{clips}} · {{length}} · {{edited}}",
+    "audioLine": "Áudio · {{clips}} · {{length}} · {{edited}}",
+    "clips_one": "{{count}} clipe",
+    "clips_many": "{{count}} clipes",
+    "clips_other": "{{count}} clipes",
+    "edited": {
+      "justNow": "editado agora mesmo",
+      "minutes_one": "editado há {{count}} min",
+      "minutes_many": "editado há {{count}} de min",
+      "minutes_other": "editado há {{count}} min",
+      "hours_one": "editado há {{count}} h",
+      "hours_many": "editado há {{count}} de h",
+      "hours_other": "editado há {{count}} h",
+      "days_one": "editado há {{count}} dia",
+      "days_many": "editado há {{count}} de dias",
+      "days_other": "editado há {{count}} dias"
+    }
+  },
+  "prompt": {
+    "titleOne": "Continuar seu rascunho?",
+    "titleMany": "Continuar um rascunho?",
+    "keptUntil": "Guardado até {{date}}",
+    "open": "Abrir",
+    "startNew": "Começar um projeto novo",
+    "singleNote": "Você pode guardar um rascunho. Começar um projeto novo substitui este assim que você editar. O 3Speak Pro guarda 3 rascunhos por 30 dias."
+  },
+  "limit": {
+    "titleOne": "Substituir seu rascunho salvo?",
+    "titleMany": "Você já tem {{n}} projetos salvos",
+    "skipTitle": "Não salvar este projeto",
+    "noteOne": "Você pode guardar um rascunho. Salvar este projeto substitui o de baixo.",
+    "noteMany": "Você pode guardar até {{n}}. Escolha qual este projeto substitui:",
+    "replace": "Substituir",
+    "skip": "Não salvar este projeto"
+  },
+  "close": {
+    "saveTitle": "Salvar seu projeto?",
+    "closeTitle": "Fechar o editor?",
+    "keepEditing": "Continuar editando",
+    "signInFailed": "Não funcionou. Aprove o pedido de login na sua carteira e tente de novo, ou saia do 3Speak e entre de novo.",
+    "signInToKeep": "Entre uma vez para guardar este projeto como rascunho e continuar depois.",
+    "signedOutLost": "Suas edições serão perdidas. Entre no 3Speak para guardar rascunhos dos seus projetos.",
+    "lost": "Suas edições serão perdidas.",
+    "signingIn": "Entrando…",
+    "signInToSave": "Entrar para salvar",
+    "withoutSaving": "Fechar sem salvar",
+    "keepTitle": "Guardar este projeto?",
+    "keepDays_one": "Guardamos por {{count}} dia",
+    "keepDays_many": "Guardamos por {{count}} de dias",
+    "keepDays_other": "Guardamos por {{count}} dias",
+    "keepHours_one": "Guardamos por {{count}} hora",
+    "keepHours_many": "Guardamos por {{count}} de horas",
+    "keepHours_other": "Guardamos por {{count}} horas",
+    "until": "até {{date}}",
+    "uploadingOne": "{{name}} ainda está sendo enviado ({{percent}}). Você pode salvar quando terminar.",
+    "uploadingFiles_one": "{{count}} arquivo ainda está sendo enviado ({{percent}}). Você pode salvar quando terminar.",
+    "uploadingFiles_many": "{{count}} de arquivos ainda estão sendo enviados ({{percent}}). Você pode salvar quando terminar.",
+    "uploadingFiles_other": "{{count}} arquivos ainda estão sendo enviados ({{percent}}). Você pode salvar quando terminar.",
+    "name": "Nome do projeto",
+    "namePlaceholder": "Projeto sem título",
+    "saveError": "Não foi possível salvar. Verifique sua conexão e tente de novo.",
+    "saveAndClose": "Salvar e fechar",
+    "afterUpload": "Disponível quando o envio terminar",
+    "deleteAndClose": "Excluir e fechar"
+  },
+  "pro": {
+    "title": "Mais com o 3Speak Pro",
+    "text": "Guarde até 3 projetos por 30 dias cada, em vez de 1 por 7 dias.",
+    "get": "Assinar o Pro"
+  },
+  "status": {
+    "signingIn": "Entrando… confira sua carteira",
+    "signInTitle": "Entre uma vez para salvar seu projeto como rascunho",
+    "signInFailed": "Falha no login · tente de novo",
+    "saveDrafts": "Salvar rascunhos",
+    "notSavedTitle": "Este projeto ainda não foi salvo",
+    "chooseSlot": "Não salvo: escolha um espaço",
+    "saving": "Salvando…",
+    "notSaved": "Rascunho não salvo",
+    "keptUntil": "Rascunho guardado até {{date}}",
+    "savedUntil": "Rascunho salvo · até {{date}}"
+  },
+  "library": {
+    "title": "Biblioteca do projeto",
+    "addFiles": "Adicionar arquivos",
+    "groups": {
+      "videos": "Vídeos",
+      "images": "Imagens",
+      "sounds": "Sons"
+    },
+    "empty": {
+      "videos": "Nenhum vídeo",
+      "images": "Nenhuma imagem",
+      "sounds": "Nenhum som"
+    },
+    "dropToAdd": "Solte arquivos para adicionar",
+    "hint": "Solte arquivos aqui ou arraste itens para a linha do tempo",
+    "downloading": "Baixando... {{percent}}",
+    "downloaded": "Baixado localmente",
+    "local": "local",
+    "uploadingTitle": "Enviando em segundo plano. A renderização espera até terminar.",
+    "converting": "convertendo",
+    "convertingTitle": "Este navegador não consegue mostrar o formato deste vídeo. A prévia muda para uma cópia em 480p quando ela estiver pronta.",
+    "noPreview": "sem prévia",
+    "noPreviewTitle": "Não foi possível criar uma cópia reproduzível. A prévia pode ficar preta, mas a renderização continua funcionando.",
+    "encodedTitle": "Codificado em 480p no servidor",
+    "encoding": "Codificando...",
+    "addToTimeline": "Adicionar à linha do tempo",
+    "remove": "Remover da biblioteca"
+  }
+}

@@ -5,10 +5,10 @@ import { AD_DRAFTS_DIR } from '../routes/adDrafts.js'
 import { TEMPLATES_DIR } from '../routes/templates.js'
 
 // An upload's name without its derived suffixes: the original, its 480p copy,
-// cleaned audio and scene cache all share it
+// its render master, cleaned audio and scene cache all share it
 export const uploadBase = (name) => path.basename(name, path.extname(name))
   .replace(/\.(scenes|audio)$/, '')
-  .replace(/(_480p|_dn-(light|medium|strong))(\.part)?$/, '')
+  .replace(/(_480p|_master|_dn-(light|medium|strong))(\.part)?$/, '')
 
 // Files saved projects, Ad Wizard drafts and templates still use (by upload base); expired
 // ones go here. Templates have no expiresAt: their files stay as long as the template does.

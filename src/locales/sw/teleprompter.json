@@ -1,0 +1,88 @@
+{
+  "title": "Teleprompter",
+  "showOnCamera": "Onyesha kwenye kamera",
+  "speechNotice": {
+    "title": "Kufuata sauti kunafanya kazi kwenye vivinjari vya Chromium pekee kwa sasa.",
+    "body": "Tumia Chrome, Edge, Brave au Opera ili maandishi yasogee unapozungumza. Kwenye kivinjari hiki yanasogea kwa kasi thabiti unayoweza kuweka."
+  },
+  "speechErrors": {
+    "network": "Huduma ya usemi haifikiki. Utambuzi unahitaji muunganisho wa intaneti (Chrome inatuma sauti kwa Google ili kuandikwa).",
+    "audioCapture": "Hakuna sauti iliyofika kwenye utambuzi. Maikrofoni inaweza kuwa inatumika, jaribu vipokea sauti vyenye maikrofoni.",
+    "notAllowed": "Ruhusa ya maikrofoni imezuiwa kwa utambuzi wa usemi.",
+    "unsupported": "Kivinjari hiki hakina utambuzi wa usemi.",
+    "generic": "Hitilafu ya utambuzi wa usemi: {{err}}"
+  },
+  "noMic": "Inarekodi bila maikrofoni (maikrofoni haipatikani).",
+  "autoDetect": "Gundua kiotomatiki ({{lang}})",
+  "presets": {
+    "frontcam": "Kamera ya mbele",
+    "frontcamTitle": "Ukanda mdogo chini ya lenzi ya selfie, haionekani sana kwamba unasoma",
+    "max": "Ukubwa wa juu",
+    "maxTitle": "Herufi kubwa za kusoma ukiwa mbali",
+    "top": "Mistari ya juu",
+    "topTitle": "Mistari kadhaa sehemu ya juu"
+  },
+  "scroll": {
+    "label": "Kusogeza",
+    "modeAria": "Hali ya kusogeza",
+    "followVoice": "Fuata sauti",
+    "followVoiceTitle": "Inasogea unaposoma maandishi kwa sauti",
+    "needsChromium": "Inahitaji Chrome, Edge au kivinjari kingine cha Chromium",
+    "timed": "Kwa muda",
+    "timedTitle": "Inasogea kwa kasi thabiti",
+    "voiceForcedMissing": "Kufuata sauti hakupatikani hapa, inatumia kusogeza kwa muda.",
+    "voiceUnavailable": "Kufuata sauti hakupatikani kwenye kivinjari hiki."
+  },
+  "style": {
+    "title": "Mtindo wa maandishi",
+    "fontSize": "Ukubwa wa fonti",
+    "fontSizeValue": "{{size}}px",
+    "text": "Maandishi",
+    "background": "Mandharinyuma",
+    "bgOpacity": "Uangavu wa mandharinyuma",
+    "mirrorText": "Geuza maandishi kama kioo (kwa kioo cha teleprompter)",
+    "voiceLanguage": "Lugha ya sauti"
+  },
+  "status": {
+    "serverErrorSwitched": "Hitilafu ya seva ya usemi ({{reason}}). Imebadilisha kwenda kusogeza kwa muda.",
+    "voiceErrorSwitched": "{{error}} Imebadilisha kwenda kusogeza kwa muda.",
+    "voiceStoppedSwitched": "Kufuata sauti kumesimama. Imebadilisha kwenda kusogeza kwa muda.",
+    "serverError": "Hitilafu ya seva ya usemi ({{reason}}).",
+    "listeningServer": "Inasikiliza (seva)… anza kusoma",
+    "connectingServer": "Inaunganisha na seva ya usemi…",
+    "listening": "Inasikiliza… anza kusoma kwa sauti",
+    "startingMic": "Inawasha maikrofoni…",
+    "scrollPaused": "Kusogeza kumesitishwa",
+    "timedScroll": "Kusogeza kwa muda, maneno {{wpm}} kwa dakika",
+    "scrollTest": "Jaribio la kusogeza, maneno {{wpm}} kwa dakika"
+  },
+  "sttReason": {
+    "unreachable": "haifikiki",
+    "noMic": "hakuna maikrofoni",
+    "audioUnavailable": "sauti haipatikani",
+    "connectionFailed": "muunganisho umeshindwa",
+    "unauthorized": "hakuna idhini",
+    "closed": "imefungwa",
+    "serverError": "hitilafu ya seva"
+  },
+  "scriptPlaceholder": "Andika au bandika maandishi yako hapa. Unaporekodi yanasogea unaposoma kwa sauti, au kwa kasi thabiti katika hali ya muda.",
+  "scriptModeVoice": "Kusogeza: inafuata sauti yako",
+  "scriptModeTimed": "Kusogeza: kwa muda, maneno {{wpm}} kwa dakika",
+  "hide": "Ficha",
+  "dragToMove": "Buruta ili kusogeza",
+  "dragToResize": "Buruta ili kubadilisha ukubwa",
+  "expandMenu": "Panua menyu",
+  "collapseMenu": "Kunja menyu",
+  "editScript": "Hariri maandishi",
+  "testVoice": "Jaribu sauti",
+  "stopVoiceTest": "Acha jaribio",
+  "scrollSpeed": "Kasi ya kusogeza",
+  "slower": "Polepole zaidi",
+  "faster": "Haraka zaidi",
+  "wordsPerMin": "maneno/dakika",
+  "testScroll": "Jaribu kusogeza",
+  "stopScrollTest": "Acha jaribio la kusogeza",
+  "pauseScroll": "Sitisha kusogeza",
+  "resumeScroll": "Endelea kusogeza",
+  "hideTeleprompter": "Ficha teleprompter"
+}

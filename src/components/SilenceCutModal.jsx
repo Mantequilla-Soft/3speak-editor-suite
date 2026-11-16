@@ -7,6 +7,7 @@ import { formatLength } from '../utils/limits'
 import { isAudioMode } from '../utils/editorMode'
 import { groupSpan, combineLoudness } from '../utils/groupSilence'
 import { GroupPlayer } from '../utils/groupPlayer'
+import { useT, formatNumber } from '../i18n'
 
 // The audio editor keeps its own settings: there "Cut silences" means cutting
 // the pauses out (podcasts), with a little more air around the words
@@ -38,7 +39,9 @@ const clock = (t) => {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 }
 
-const seconds = (s) => (s < 10 ? s.toFixed(1) : String(Math.round(s))) + 's'
+// Seconds as the interface language writes them: one decimal under 10 s ("2.5", "2,5")
+const secondsValue = (s) => formatNumber(s, { minimumFractionDigits: s < 10 ? 1 : 0, maximumFractionDigits: s < 10 ? 1 : 0 })
+const oneDecimal = (s) => formatNumber(s, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 
 /**
  * "Auto cut" popup: finds the pauses (or the scene changes) in a clip and shows where it would cut,
@@ -48,8 +51,11 @@ const seconds = (s) => (s < 10 ? s.toFixed(1) : String(Math.round(s))) + 's'
  * playback skips what would be cut, so the result can be heard first.
  */
 function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onApply, onApplyAll = null, allCount = 0, group = null, onClose }) {
+  const { t, tRich } = useT()
   const [loudness, setLoudness] = useState(null)
-  const [error, setError] = useState(unavailable || null)
+  // Our own errors are silence.error.* keys (shown in the current language); `unavailable` comes as text
+  const [errorKey, setError] = useState(null)
+  const error = unavailable || (errorKey ? t(errorKey) : null)
   const [settings, setSettings] = useState(loadSettings)
   const canvasRef = useRef(null)
   const wrapRef = useRef(null)
@@ -82,7 +88,7 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
     const members = groupRef.current
     Promise.all(members.map(m => loadLoudness(m.source || m.analysisUrl, { signal: controller.signal, analysisUrl: m.analysisUrl })))
       .then(list => { if (!controller.signal.aborted) setLoudness(combineLoudness(members.map((m, i) => ({ clip: m.clip, loudness: list[i] })))) })
-      .catch(() => { if (!controller.signal.aborted) setError('Could not read the audio of every voice in this group. Try again once the uploads have finished.') })
+      .catch(() => { if (!controller.signal.aborted) setError('silence.error.group') })
     return () => controller.abort()
   }, [groupMode, groupKey])
 
@@ -111,9 +117,9 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
         if (controller.signal.aborted) return
         setError(err.message === 'too-large'
           ? (analysisUrl
-            ? 'Could not read the audio of this clip.'
-            : 'This file is too big to analyse in the browser (over 300 MB). It can be analysed once it has finished uploading.')
-          : 'Could not read the audio of this clip.')
+            ? 'silence.error.readClip'
+            : 'silence.error.tooBigUpload')
+          : 'silence.error.readClip')
       })
     return () => controller.abort()
   }, [source, analysisUrl, unavailable, groupMode])
@@ -124,11 +130,12 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
   // (audio clips have no picture: always pauses there, whatever was used last)
   const scenesMode = settings.cutAt === 'scenes' && clip.type === 'video'
   const [sceneScores, setSceneScores] = useState(null)
-  const [sceneError, setSceneError] = useState(null)
+  const [sceneErrorKey, setSceneError] = useState(null)
+  const sceneError = sceneErrorKey ? t(sceneErrorKey) : null
   const uploaded = !!clip.serverUrl && /\/api\/upload\/files\//.test(clip.serverUrl)
   useEffect(() => {
     if (!scenesMode || sceneScores || !isVideo) return
-    if (!uploaded) { setSceneError('Scene changes can be found once this clip has finished uploading.'); return }
+    if (!uploaded) { setSceneError('silence.error.sceneUpload'); return }
     const controller = new AbortController()
     setSceneError(null)
     authFetch(api('/api/clip/scenes'), {
@@ -139,7 +146,7 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
     })
       .then(res => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
       .then(d => setSceneScores(d.scores || []))
-      .catch(err => { if (err.name !== 'AbortError') setSceneError('Could not look for scene changes.') })
+      .catch(err => { if (err.name !== 'AbortError') setSceneError('silence.error.sceneFailed') })
     return () => controller.abort()
   }, [scenesMode, sceneScores, uploaded, clip.serverUrl, isVideo])
 
@@ -346,12 +353,12 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
   let summary = ''
   if (plan && scenesMode) {
     summary = canApply
-      ? `${plan.parts.length} parts at ${plan.cuts.length} scene change${plan.cuts.length === 1 ? '' : 's'}. Nothing is removed.`
-      : 'No scene changes found with these settings.'
+      ? t('silence.sceneSummary', { parts: plan.parts.length, count: plan.cuts.length })
+      : t('silence.noScenes')
   } else if (plan) {
     summary = canApply
-      ? `${plan.parts.length} part${plan.parts.length === 1 ? '' : 's'}, cuts ${seconds((to - from) - kept)}. New length ${formatLength(kept)} (was ${formatLength(to - from)}).`
-      : 'No pauses found with these settings.'
+      ? t('silence.summary', { count: plan.parts.length, cut: t('silence.seconds', { seconds: secondsValue((to - from) - kept) }), length: formatLength(kept), was: formatLength(to - from) })
+      : t('silence.noPauses')
   }
 
   return (
@@ -365,21 +372,21 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
       >
         <div className="remix-picker-header">
           <span className="remix-picker-icon-spacer" />
-          <h3 id="silence-cut-title">{groupMode ? `Cut silences: ${group.length} voices together` : isAudioMode ? 'Cut silences' : 'Auto cut'}</h3>
-          <button className="remix-picker-icon-btn" onClick={onClose} title="Close">
+          <h3 id="silence-cut-title">{groupMode ? t('silence.titleGroup', { count: group.length }) : isAudioMode ? t('silence.title') : t('silence.titleVideo')}</h3>
+          <button className="remix-picker-icon-btn" onClick={onClose} title={t('common.close')}>
             <X size={16} />
           </button>
         </div>
 
         {isVideo && (
-          <div className="silence-cut-modes silence-cut-at" role="radiogroup" aria-label="Where to cut">
+          <div className="silence-cut-modes silence-cut-at" role="radiogroup" aria-label={t('silence.cutAt')}>
             <button
               role="radio"
               aria-checked={!scenesMode}
               className={!scenesMode ? 'active' : ''}
               onClick={() => setSettings(s => ({ ...s, cutAt: 'pauses' }))}
             >
-              Pauses
+              {t('silence.pauses')}
             </button>
             <button
               role="radio"
@@ -387,20 +394,20 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
               className={scenesMode ? 'active' : ''}
               onClick={() => setSettings(s => ({ ...s, cutAt: 'scenes' }))}
             >
-              Scene changes
+              {t('silence.scenes')}
             </button>
           </div>
         )}
 
         {!scenesMode && (<>
-        <div className="silence-cut-modes" role="radiogroup" aria-label="What to do at each pause">
+        <div className="silence-cut-modes" role="radiogroup" aria-label={t('silence.atEachPause')}>
           <button
             role="radio"
             aria-checked={settings.mode === 'split'}
             className={settings.mode === 'split' ? 'active' : ''}
             onClick={() => setSettings(s => ({ ...s, mode: 'split' }))}
           >
-            Split at pauses
+            {t('silence.split')}
           </button>
           <button
             role="radio"
@@ -408,24 +415,24 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
             className={settings.mode === 'remove' ? 'active' : ''}
             onClick={() => setSettings(s => ({ ...s, mode: 'remove' }))}
           >
-            Cut pauses out
+            {t('silence.remove')}
           </button>
         </div>
         <p className="silence-cut-mode-hint">
           {settings.mode === 'split'
-            ? `Splits into parts of at least ${settings.minPart.toFixed(1)}s and cuts the pause out at each split. Shorter pauses inside a part stay.`
-            : 'Cuts out every pause; each piece of speech becomes its own part.'}
+            ? t('silence.splitHint', { seconds: oneDecimal(settings.minPart) })
+            : t('silence.removeHint')}
         </p>
         </>)}
         {scenesMode && (
           <p className="silence-cut-mode-hint">
-            Splits where the picture changes (a new shot or angle), into parts of at least {settings.minPart.toFixed(1)}s. Nothing is removed.
+            {t('silence.sceneHint', { seconds: oneDecimal(settings.minPart) })}
           </p>
         )}
 
         {groupMode && (
           <p className="silence-cut-mode-hint silence-cut-group-hint">
-            A pause is only cut where everyone is quiet, and the same cut goes through every voice, so they stay in sync.
+            {t('silence.groupHint')}
           </p>
         )}
 
@@ -466,7 +473,7 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
           {(scenesMode ? sceneError : error) ? (
             <p className="silence-cut-status">{scenesMode ? sceneError : error}</p>
           ) : !ready ? (
-            <p className="silence-cut-status">{scenesMode ? 'Looking for scene changes…' : 'Reading the audio…'}</p>
+            <p className="silence-cut-status">{scenesMode ? t('silence.lookingScenes') : t('silence.reading')}</p>
           ) : (
             <>
               <canvas ref={canvasRef} />
@@ -480,7 +487,7 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
             className="silence-cut-play"
             onClick={togglePlay}
             disabled={!ready}
-            title={playing ? 'Pause (Space)' : 'Play the result, skipping what gets cut (Space)'}
+            title={playing ? t('silence.pauseTitle') : t('silence.playTitle')}
           >
             {playing ? <Pause size={14} /> : <Play size={14} />}
           </button>
@@ -490,62 +497,62 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
 
         {scenesMode ? (
           <div className="silence-cut-controls">
-            <label title="Higher finds softer changes too (camera moves, lighting); lower only hard cuts">
-              <span>Sensitivity <strong>{settings.sensitivity}</strong></span>
+            <label title={t('silence.sensitivityTitle')}>
+              <span>{tRich('silence.sensitivity', { value: settings.sensitivity }, { strong: <strong /> })}</span>
               <input type="range" min={0} max={100} step={1} value={settings.sensitivity} onChange={set('sensitivity')} disabled={!ready} />
             </label>
             <label>
-              <span>Shortest part <strong>{settings.minPart.toFixed(1)}s</strong></span>
+              <span>{tRich('silence.shortest', { seconds: oneDecimal(settings.minPart) }, { strong: <strong /> })}</span>
               <input type="range" min={0.5} max={30} step={0.5} value={settings.minPart} onChange={set('minPart')} disabled={!ready} />
             </label>
           </div>
         ) : (
         <div className="silence-cut-controls">
           <label>
-            <span>Silence below <strong>{settings.thresholdDb} dB</strong></span>
+            <span>{tRich('silence.below', { db: settings.thresholdDb }, { strong: <strong /> })}</span>
             <span className="silence-cut-row">
               <input type="range" min={-70} max={-20} step={1} value={settings.thresholdDb} onChange={set('thresholdDb')} disabled={!loudness} />
               <button
                 className="silence-cut-auto"
                 disabled={!loudness}
                 onClick={() => setSettings(s => ({ ...s, thresholdDb: suggestThreshold(loudness, from, to) }))}
-                title="Set just above this clip's background noise"
+                title={t('silence.autoTitle')}
               >
-                Auto
+                {t('common.auto')}
               </button>
             </span>
           </label>
           <label>
-            <span>Pause at least <strong>{settings.minSilence.toFixed(1)}s</strong></span>
+            <span>{tRich('silence.minPause', { seconds: oneDecimal(settings.minSilence) }, { strong: <strong /> })}</span>
             <input type="range" min={0.2} max={3} step={0.1} value={settings.minSilence} onChange={set('minSilence')} disabled={!loudness} />
           </label>
           {settings.mode === 'split' && (
             <label>
-              <span>Shortest part <strong>{settings.minPart.toFixed(1)}s</strong></span>
+              <span>{tRich('silence.shortest', { seconds: oneDecimal(settings.minPart) }, { strong: <strong /> })}</span>
               <input type="range" min={0.5} max={30} step={0.5} value={settings.minPart} onChange={set('minPart')} disabled={!loudness} />
             </label>
           )}
-          <label title="How much of the pause stays after the words before a cut">
-            <span>Keep at pause start <strong>{settings.keepStartMs} ms</strong></span>
+          <label title={t('silence.keepStartTitle')}>
+            <span>{tRich('silence.keepStart', { ms: settings.keepStartMs }, { strong: <strong /> })}</span>
             <input type="range" min={0} max={1000} step={10} value={settings.keepStartMs} onChange={set('keepStartMs')} disabled={!loudness} />
           </label>
-          <label title="How much of the pause stays before the words after a cut">
-            <span>Keep at pause end <strong>{settings.keepEndMs} ms</strong></span>
+          <label title={t('silence.keepEndTitle')}>
+            <span>{tRich('silence.keepEnd', { ms: settings.keepEndMs }, { strong: <strong /> })}</span>
             <input type="range" min={0} max={1000} step={10} value={settings.keepEndMs} onChange={set('keepEndMs')} disabled={!loudness} />
           </label>
         </div>
         )}
 
         <div className="silence-cut-actions">
-          <button className="silence-cut-cancel" onClick={onClose}>Cancel</button>
+          <button className="silence-cut-cancel" onClick={onClose}>{t('common.cancel')}</button>
           {onApplyAll && allCount > 1 && !scenesMode && (
             <button
               className="silence-cut-apply silence-cut-apply-all"
               disabled={!loudness}
               onClick={() => onApplyAll(settings)}
-              title="The same settings for every clip on the voice tracks (music stays as it is)"
+              title={t('silence.allTitle')}
             >
-              <Wand2 size={14} /> Cut all {allCount} voice clips
+              <Wand2 size={14} /> {t('silence.all', { count: allCount })}
             </button>
           )}
           <button
@@ -553,7 +560,7 @@ function SilenceCutModal({ clip, source, analysisUrl = null, unavailable, onAppl
             disabled={!canApply}
             onClick={() => onApply(plan.parts, { closeGaps: true })}
           >
-            <Wand2 size={14} /> {groupMode ? 'Cut this group' : allCount > 1 ? 'This clip only' : 'Edit for me'}
+            <Wand2 size={14} /> {groupMode ? t('silence.cutGroup') : allCount > 1 ? t('silence.thisClip') : t('silence.apply')}
           </button>
         </div>
       </div>

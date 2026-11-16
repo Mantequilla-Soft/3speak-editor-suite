@@ -1,0 +1,53 @@
+{
+  "title": "Tampilan",
+  "noEffects": "Tanpa efek",
+  "presetsLabel": "Preset tampilan",
+  "doubleClickReset": "Klik dua kali untuk mengatur ulang",
+  "presets": {
+    "original": "Asli",
+    "warm": "Hangat",
+    "cool": "Sejuk",
+    "vivid": "Cerah",
+    "matte": "Matte",
+    "bw": "H&P",
+    "vintage": "Vintage",
+    "tealorange": "Teal & Oranye",
+    "fade": "Pudar",
+    "noir": "Noir",
+    "sunset": "Senja"
+  },
+  "sliders": {
+    "blur": "Blur",
+    "vignette": "Vinyet",
+    "sharpen": "Pertajam",
+    "split": "Teal & oranye"
+  },
+  "transition": {
+    "title": "Transisi",
+    "none": "Tidak ada",
+    "types": {
+      "crossfade": "Crossfade",
+      "dissolve": "Memudar ke hitam",
+      "slideleft": "Geser ke kiri",
+      "slideright": "Geser ke kanan",
+      "slideup": "Geser ke atas",
+      "zoom": "Zoom",
+      "whip": "Sabet"
+    },
+    "length": "Durasi transisi (detik)",
+    "fades": "Fade",
+    "noFades": "Tanpa fade",
+    "in": "Masuk",
+    "out": "Keluar",
+    "fadeInSeconds": "Fade in (detik)",
+    "fadeOutSeconds": "Fade out (detik)",
+    "intoNext": "Ke klip berikutnya",
+    "needNext": "Taruh klip tepat setelah klip ini di trek yang sama untuk menambahkan transisi.",
+    "fromTo": "{{from}} ke {{to}}",
+    "fromUnnamed": "Klip ke {{to}}",
+    "toUnnamed": "{{from}} ke klip berikutnya",
+    "bothUnnamed": "Klip ke klip berikutnya",
+    "add": "Tambahkan transisi",
+    "cutLabel": "{{type}}, {{seconds}} dtk"
+  }
+}

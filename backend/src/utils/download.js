@@ -4,6 +4,7 @@ import fs from 'fs/promises'
 import https from 'https'
 import http from 'http'
 import path from 'path'
+import { renderSource, pendingMasters } from './uploadFiles.js'
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || '/app/uploads'
 const RENDERED_DIR = process.env.RENDERED_DIR || '/app/rendered'
@@ -11,19 +12,21 @@ const RENDERED_DIR = process.env.RENDERED_DIR || '/app/rendered'
 /**
  * Download a media file from a URL to a local path.
  * Handles: local uploads (/api/upload/files/...), rendered clips (/rendered/...), HLS (.m3u8), direct URLs.
+ * `info` (optional) is filled with { final: false } when the file is a stand-in
+ * that a better one replaces soon (an upload whose master is still being made),
+ * so callers do not cache it.
  */
-export async function downloadMedia(url, clipId, workDir) {
+export async function downloadMedia(url, clipId, workDir, info = {}) {
   // Local uploaded file — just copy from uploads dir
   if (url.startsWith('/api/upload/files/')) {
     const filename = path.basename(url.split('?')[0])
-    // The original, or its 480p copy (which replaces the original once it is
-    // done, and is what the GET route serves then)
-    const encoded = `${path.basename(filename, path.extname(filename))}_480p.mp4`
-    let srcPath = path.join(UPLOAD_DIR, filename)
-    try { await fs.access(srcPath) } catch {
-      const alt = path.join(UPLOAD_DIR, encoded)
-      try { await fs.access(alt); srcPath = alt } catch { /* copyFile reports the missing original */ }
-    }
+    // What renders read (utils/uploadFiles.js): the master, the original, or
+    // the 480p copy of an upload from before originals were kept
+    const pending = pendingMasters.get(filename)
+    const src = await renderSource(UPLOAD_DIR, filename, { pendingMaster: !!pending, hdr: !!pending?.hdr })
+    const srcPath = src ? src.path : path.join(UPLOAD_DIR, filename) // missing: copyFile reports it
+    info.final = src ? src.final : true
+    if (src) info.kind = src.kind
     const ext = path.extname(srcPath) || '.bin'
     const destPath = path.join(workDir, `${clipId}${ext}`)
     await fs.copyFile(srcPath, destPath)
@@ -45,7 +48,7 @@ export async function downloadMedia(url, clipId, workDir) {
   if (url.includes('.m3u8')) {
     return downloadHls(url, clipId, workDir)
   }
-  return downloadDirect(url, clipId, workDir)
+  return downloadDirect(url, clipId, workDir, info)
 }
 
 /**
@@ -88,7 +91,7 @@ function downloadHls(url, clipId, workDir) {
 /**
  * Download a direct file URL via http/https.
  */
-function downloadDirect(url, clipId, workDir) {
+function downloadDirect(url, clipId, workDir, info = {}) {
   let ext = '.mp4'
   try {
     const urlExt = path.extname(new URL(url).pathname)
@@ -104,7 +107,7 @@ function downloadDirect(url, clipId, workDir) {
 
     const request = client.get(url, (response) => {
       if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
-        downloadDirect(response.headers.location, clipId, workDir).then(resolve).catch(reject)
+        downloadDirect(response.headers.location, clipId, workDir, info).then(resolve).catch(reject)
         return
       }
 
@@ -112,6 +115,9 @@ function downloadDirect(url, clipId, workDir) {
         reject(new Error(`Download failed: HTTP ${response.statusCode}`))
         return
       }
+      // Another editor backend's upload (?for=render): a stand-in while its master is made
+      info.final = response.headers['x-render-final'] !== '0'
+      if (response.headers['x-render-source']) info.kind = response.headers['x-render-source']
 
       const fileStream = createWriteStream(outputPath)
       response.pipe(fileStream)

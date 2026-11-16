@@ -1,0 +1,53 @@
+{
+  "sheet": {
+    "title": "Atajos de teclado"
+  },
+  "groups": {
+    "playback": "Reproducción",
+    "clips": "Clips",
+    "project": "Proyecto"
+  },
+  "items": {
+    "playPause": "Reproducir / pausar",
+    "playForward": "Reproducir hacia adelante; pulsa otra vez para 2x, 4x, 8x",
+    "playBackward": "Reproducir hacia atrás; pulsa otra vez para ir más rápido",
+    "stop": "Detener",
+    "frameStep": "Un fotograma atrás / adelante (Mayús: 10 fotogramas)",
+    "nudge": "Mover el cabezal 0,1 s (Mayús: 1 s)",
+    "fullscreen": "Activar / desactivar pantalla completa",
+    "nextPrevClip": "Seleccionar el clip siguiente / anterior",
+    "clipLeftRight": "Clip anterior / siguiente en la misma pista",
+    "clipUpDown": "Clip en la pista de arriba / abajo",
+    "openClip": "Abrir los ajustes del clip seleccionado",
+    "selectNone": "No seleccionar nada",
+    "selectAll": "Seleccionar todos los clips",
+    "remove": "Quitar los clips seleccionados",
+    "split": "Dividir el clip seleccionado en el cabezal",
+    "duplicate": "Duplicar el clip seleccionado",
+    "ungroup": "Desagrupar clips",
+    "closeGap": "Cerrar el hueco en el cabezal",
+    "addText": "Añadir texto en el cabezal",
+    "undo": "Deshacer",
+    "redo": "Rehacer",
+    "addFlag": "Añadir una marca en el cabezal",
+    "addChapter": "Añadir un capítulo en el cabezal",
+    "zoom": "Acercar / alejar la línea de tiempo",
+    "showSheet": "Mostrar estos atajos"
+  },
+  "keys": {
+    "space": "Espacio",
+    "tab": "Tab",
+    "shift": "Mayús",
+    "alt": "Alt",
+    "ctrl": "Ctrl",
+    "enter": "Intro",
+    "esc": "Esc",
+    "delete": "Supr"
+  },
+  "announce": {
+    "selected": "{{clip}} seleccionado",
+    "stopped": "Detenido",
+    "forward": "Adelante {{speed}}x",
+    "backward": "Atrás {{speed}}x"
+  }
+}

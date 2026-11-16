@@ -9,7 +9,9 @@ import AdTimeline from './AdTimeline'
 import { Fields, ImageField } from './FieldEditor'
 import PreviewAudio from './previewAudio'
 import useAdDrafts from './useAdDrafts'
-import { loadEngine, toDoc, autoSfx, defaultState, newId, FORMATS, FONTS, COLOR_PRESETS, ROLES, SCENES_BASE, uploadFile, absUrl, pollJob } from './engine'
+import { loadEngine, toDoc, autoSfx, defaultState, newId, FORMATS, FONTS, COLOR_PRESETS, ROLES, SCENES_BASE, uploadFile, absUrl, pollJob, sfxName } from './engine'
+import { useT, formatNumber } from '../i18n'
+import { sceneDesc, styleName, issueText } from './sceneText'
 import './adwizard.css'
 
 // The Ad Wizard: the editor's second entry mode (?mode=ads). Builds an ad from the scene engine's scenes,
@@ -26,12 +28,15 @@ import './adwizard.css'
 
 const STORE = 'adwizard:v1'
 const STEPS = [
-  { key: 'format', label: 'Format' },
-  { key: 'brand', label: 'Brand' },
-  { key: 'scenes', label: 'Scenes' },
-  { key: 'sound', label: 'Sound' },
-  { key: 'render', label: 'Render' },
+  { key: 'format', labelKey: 'adwizard.steps.format' },
+  { key: 'brand', labelKey: 'adwizard.steps.brand' },
+  { key: 'scenes', labelKey: 'adwizard.steps.scenes' },
+  { key: 'sound', labelKey: 'adwizard.steps.sound' },
+  { key: 'render', labelKey: 'adwizard.steps.render' },
 ]
+// "3.2" -> "3,2" in German; a fixed number of decimals like toFixed()
+const fixed = (n, digits = 1) => formatNumber(n, { minimumFractionDigits: digits, maximumFractionDigits: digits })
+const pct = v => formatNumber(v, { style: 'percent', maximumFractionDigits: 0 })
 const PARAMS = new URLSearchParams(window.location.search)
 const LOCKED_FORMAT = ['landscape', 'portrait'].includes(PARAMS.get('format')) ? PARAMS.get('format') : null
 const MAX_AD_SECONDS = Math.max(5, Math.min(120, +PARAMS.get('max') || 60))
@@ -63,6 +68,7 @@ const freshState = () => {
 }
 
 export default function AdWizard() {
+  const { t } = useT()
   const [state, dispatch] = useReducer(reducer, null, () => {
     try {
       const saved = JSON.parse(localStorage.getItem(STORE))
@@ -102,12 +108,14 @@ export default function AdWizard() {
   }, [])
   // 'ad-prefill' { brand: { name, logo } } from a booking fills the brand kit while it is still the default one
   const prefillRef = useRef(false)
+  // the default brand name in the language the wizard opened in (a later language switch must not stop the prefill)
+  const initialBrandName = useRef(defaultState().brand.name)
   useEffect(() => {
     const onMsg = e => {
       if (e.source !== window.parent || e.data?.type !== 'ad-prefill' || prefillRef.current) return
       prefillRef.current = true
       const b = e.data.brand || {}
-      if (state.brand.name === defaultState().brand.name) dispatch({ type: 'brand', patch: { ...(b.name ? { name: String(b.name).slice(0, 40) } : {}), ...(b.logo && !state.brand.logo ? { logo: b.logo } : {}) } })
+      if (state.brand.name === defaultState().brand.name || state.brand.name === initialBrandName.current) dispatch({ type: 'brand', patch: { ...(b.name ? { name: String(b.name).slice(0, 40) } : {}), ...(b.logo && !state.brand.logo ? { logo: b.logo } : {}) } })
     }
     window.addEventListener('message', onMsg)
     return () => window.removeEventListener('message', onMsg)
@@ -130,7 +138,7 @@ export default function AdWizard() {
   const saveNow = useCallback(async (replace) => {
     if (!drafts.session || !state.scenes.length) return
     const id = state.draftId || uuid()
-    const name = state.name || `${state.brand.name || 'Ad'} ${new Date().toISOString().slice(0, 10)}`
+    const name = state.name || `${state.brand.name || t('adwizard.defaults.adName')} ${new Date().toISOString().slice(0, 10)}`
     const snapshot = { ...state, draftId: id, name }
     setSaveState('saving')
     try {
@@ -142,7 +150,7 @@ export default function AdWizard() {
       if (e.status === 409 && e.body?.error === 'limit') { setSaveState('limit'); setLimitDrafts(e.body.drafts) }
       else setSaveState('error')
     }
-  }, [drafts, state])
+  }, [drafts, state, t])
   useEffect(() => {
     if (!drafts.session || saveState === 'limit' || !state.scenes.length) return undefined
     if (lastSaved.current === JSON.stringify({ ...state, draftId: state.draftId, name: state.name })) return undefined
@@ -230,7 +238,7 @@ export default function AdWizard() {
     return () => window.removeEventListener('keydown', k)
   })
 
-  if (!meta || !doc) return <div className="aw-loading"><Loader2 className="spin" /> Loading the scene engine…</div>
+  if (!meta || !doc) return <div className="aw-loading"><Loader2 className="spin" /> {t('adwizard.loading')}</div>
 
   const tooLong = duration > MAX_AD_SECONDS
   const issues = meta.validate(meta.sanitize(doc))
@@ -248,11 +256,13 @@ export default function AdWizard() {
         {/* same branding as the Shorts editor (App.css .branding-*) */}
         <div className="branding-left aw-brand">
           <img src={logo3speak} alt="3Speak" className="branding-logo" />
-          <span className="branding-text">Ad Wizard <span className="branding-badge">beta</span></span>
+          <span className="branding-text">{t('adwizard.title')} <span className="branding-badge">{t('adwizard.beta')}</span></span>
         </div>
-        <input type="text" className="aw-name" value={state.name || ''} placeholder="Untitled ad" maxLength={80} onChange={e => dispatch({ type: 'set', patch: { name: e.target.value } })} />
+        <input type="text" className="aw-name" value={state.name || ''} placeholder={t('adwizard.untitled')} maxLength={80} onChange={e => dispatch({ type: 'set', patch: { name: e.target.value } })} />
         <DraftStatus drafts={drafts} saveState={saveState} onOpen={() => setDraftsOpen(true)} />
-        <span className="aw-len">{duration ? `${duration.toFixed(1)} s` : ''}{FOR_BOOKING ? ` / max ${MAX_AD_SECONDS} s` : ''}</span>
+        <span className="aw-len">{duration
+          ? (FOR_BOOKING ? t('adwizard.lengthOfMax', { length: fixed(duration), max: MAX_AD_SECONDS }) : t('adwizard.seconds', { s: fixed(duration) }))
+          : (FOR_BOOKING ? t('adwizard.maxOnly', { max: MAX_AD_SECONDS }) : '')}</span>
       </header>
 
       <div className="aw-body">
@@ -260,7 +270,7 @@ export default function AdWizard() {
           <nav className="aw-steps">
             {STEPS.map((s, i) => (
               <button key={s.key} type="button" className={step === s.key ? 'on' : ''} onClick={() => setStep(s.key)}>
-                <i>{i + 1}</i>{s.label}
+                <i>{i + 1}</i>{t(s.labelKey)}
               </button>))}
           </nav>
           <div className="aw-controls">
@@ -272,21 +282,21 @@ export default function AdWizard() {
             {step === 'render' && <RenderPanel state={state} doc={doc} meta={meta} info={info} issues={issues} tooLong={tooLong} music={music} sfxAll={sfxAll} audio={audioRef.current} />}
           </div>
           <div className="aw-nav">
-            {stepIdx > 0 && <button type="button" className="aw-btn-ghost" onClick={() => setStep(STEPS[stepIdx - 1].key)}>Back</button>}
-            {stepIdx < STEPS.length - 1 && <button type="button" className="aw-btn" onClick={() => setStep(STEPS[stepIdx + 1].key)}>Next</button>}
+            {stepIdx > 0 && <button type="button" className="aw-btn-ghost" onClick={() => setStep(STEPS[stepIdx - 1].key)}>{t('common.back')}</button>}
+            {stepIdx < STEPS.length - 1 && <button type="button" className="aw-btn" onClick={() => setStep(STEPS[stepIdx + 1].key)}>{t('common.next')}</button>}
           </div>
         </aside>
 
         <section className="aw-stage">
           {state.scenes.length ? <ScenePreview ref={previewRef} doc={doc} onInfo={setInfo} onError={setPreviewError} />
-            : <div className="aw-preview aw-empty"><p>Your ad shows here.</p><button type="button" className="aw-btn" onClick={() => setPicker(true)}><Plus size={16} /> Add the first scene</button></div>}
+            : <div className="aw-preview aw-empty"><p>{t('adwizard.stage.empty')}</p><button type="button" className="aw-btn" onClick={() => setPicker(true)}><Plus size={16} /> {t('adwizard.stage.addFirst')}</button></div>}
           {previewError && <div className="aw-error">{previewError}</div>}
           <div className="aw-transport">
-            <button type="button" className="aw-icon-btn" onClick={() => { stop(); seek(0) }} title="Back to the start"><SkipBack size={16} /></button>
-            <button type="button" className="aw-play" onClick={playing ? stop : play} disabled={!duration} title="Play / pause (space)">
+            <button type="button" className="aw-icon-btn" onClick={() => { stop(); seek(0) }} title={t('adwizard.stage.toStart')}><SkipBack size={16} /></button>
+            <button type="button" className="aw-play" onClick={playing ? stop : play} disabled={!duration} title={t('adwizard.stage.playPause')}>
               {playing ? <Pause size={18} /> : <Play size={18} />}</button>
-            <span className="aw-time">{time.toFixed(1)} / {duration.toFixed(1)} s</span>
-            {tooLong && <span className="aw-warn">The ad can be at most {MAX_AD_SECONDS} s</span>}
+            <span className="aw-time">{t('adwizard.stage.time', { time: fixed(time), duration: fixed(duration) })}</span>
+            {tooLong && <span className="aw-warn">{t('adwizard.stage.tooLong', { max: MAX_AD_SECONDS })}</span>}
           </div>
           {state.scenes.length > 0 && <AdTimeline info={info} scenes={state.scenes} meta={meta} time={time} selected={focus === 'scene' ? selected : -1}
             onSelect={i => { selectScene(i); setStep('scenes') }} onSeek={t => { if (playing) stop(); seek(t) }}
@@ -299,7 +309,7 @@ export default function AdWizard() {
             ? <SfxProperties s={sfxSel} state={state} dispatch={dispatch} audio={audioRef.current} onRemove={() => removeSfx(sfxSel)} />
             : state.scenes[selected]
               ? <SceneProperties state={state} dispatch={dispatch} meta={meta} selected={selected} issues={issues} />
-              : <div className="aw-sec aw-hint"><h2>Properties</h2><p className="aw-tip">Pick a scene in the list or on the timeline to edit it here.</p></div>}
+              : <div className="aw-sec aw-hint"><h2>{t('adwizard.stage.properties')}</h2><p className="aw-tip">{t('adwizard.stage.propertiesHint')}</p></div>}
         </aside>
       </div>
 
@@ -313,54 +323,57 @@ export default function AdWizard() {
 // ---------------------------------------------------------------- drafts UI
 
 function DraftStatus({ drafts, saveState, onOpen }) {
+  const { t } = useT()
   if (!drafts.session) {
     return <div className="aw-draft-status">
-      <CloudOff size={15} /><small>{drafts.reason === 'logged-out' ? 'Log in on 3Speak to keep drafts' : 'Drafts stay in this browser'}</small>
+      <CloudOff size={15} /><small>{drafts.reason === 'logged-out' ? t('adwizard.drafts.logInToKeep') : t('adwizard.drafts.inBrowser')}</small>
       {drafts.reason !== 'logged-out' && drafts.reason !== 'standalone' && <button type="button" className="aw-btn-small" onClick={drafts.signIn} disabled={drafts.signingIn}>
-        {drafts.signingIn ? 'Signing in…' : 'Save drafts'}</button>}
+        {drafts.signingIn ? t('adwizard.drafts.signingIn') : t('adwizard.drafts.saveDrafts')}</button>}
     </div>
   }
   return <div className="aw-draft-status">
-    <Cloud size={15} /><small>{{ saving: 'Saving…', saved: 'Saved', error: 'Not saved', limit: 'Draft limit reached' }[saveState] || 'Draft'}</small>
-    <button type="button" className="aw-btn-small" onClick={onOpen}><FolderOpen size={14} /> Drafts</button>
+    <Cloud size={15} /><small>{t(['saving', 'saved', 'error', 'limit'].includes(saveState) ? `adwizard.drafts.status.${saveState}` : 'adwizard.drafts.status.idle')}</small>
+    <button type="button" className="aw-btn-small" onClick={onOpen}><FolderOpen size={14} /> {t('adwizard.drafts.open')}</button>
   </div>
 }
 
 function DraftsDialog({ drafts, currentId, onOpen, onNew, onClose }) {
+  const { t, lang } = useT()
   const [list, setList] = useState(null)
   const [err, setErr] = useState(null)
   const load = useCallback(() => drafts.list().then(setList).catch(e => setErr(e.message)), [drafts])
   useEffect(() => { load() }, []) // eslint-disable-line react-hooks/exhaustive-deps
   return <div className="aw-modal" onClick={onClose}>
     <div className="aw-modal-box aw-small" onClick={e => e.stopPropagation()}>
-      <div className="aw-modal-head"><b>Your drafts</b>
-        {list && <small className="aw-tip">{list.drafts.length} of {list.limits.maxDrafts} · each kept {list.limits.ttlDays} days after its last change</small>}
+      <div className="aw-modal-head"><b>{t('adwizard.drafts.title')}</b>
+        {list && <small className="aw-tip">{t('adwizard.drafts.listInfo', { n: list.drafts.length, max: list.limits.maxDrafts, count: list.limits.ttlDays })}</small>}
         <button type="button" className="aw-icon-btn" onClick={onClose}><X size={16} /></button></div>
       <div className="aw-draft-list">
         {err && <div className="aw-error">{err}</div>}
         {!list && !err && <Loader2 className="spin" />}
         {list?.drafts.map(d => <div key={d.id} className={`aw-draft${d.id === currentId ? ' on' : ''}`}>
           <img src={`${SCENES_BASE}/thumbs/${d.format}/${d.first || 'words'}.jpg`} alt="" />
-          <span className="aw-grow"><b>{d.name}</b><small>{d.scenes} scene(s) · saved {new Date(d.updatedAt).toLocaleString()} · until {new Date(d.expiresAt).toLocaleDateString()}</small></span>
-          {d.id === currentId ? <small>open</small> : <button type="button" className="aw-btn-small" onClick={() => onOpen(d.id)}>Open</button>}
-          <button type="button" className="aw-icon-btn" title="Delete" onClick={async () => { if (confirm(`Delete "${d.name}"?`)) { await drafts.remove(d.id); load() } }}><Trash2 size={14} /></button>
+          <span className="aw-grow"><b>{d.name}</b><small>{t('adwizard.drafts.draftInfo', { count: d.scenes, saved: new Date(d.updatedAt).toLocaleString(lang), until: new Date(d.expiresAt).toLocaleDateString(lang) })}</small></span>
+          {d.id === currentId ? <small>{t('adwizard.drafts.isOpen')}</small> : <button type="button" className="aw-btn-small" onClick={() => onOpen(d.id)}>{t('adwizard.drafts.openDraft')}</button>}
+          <button type="button" className="aw-icon-btn" title={t('common.delete')} onClick={async () => { if (confirm(t('adwizard.drafts.confirmDelete', { name: d.name }))) { await drafts.remove(d.id); load() } }}><Trash2 size={14} /></button>
         </div>)}
-        {list && !list.drafts.length && <p className="aw-tip">No drafts yet. They save themselves while you work.</p>}
+        {list && !list.drafts.length && <p className="aw-tip">{t('adwizard.drafts.empty')}</p>}
       </div>
-      <div className="aw-modal-foot"><button type="button" className="aw-btn-ghost" onClick={onNew}><FilePlus2 size={15} /> New ad</button></div>
+      <div className="aw-modal-foot"><button type="button" className="aw-btn-ghost" onClick={onNew}><FilePlus2 size={15} /> {t('adwizard.drafts.newAd')}</button></div>
     </div>
   </div>
 }
 
 function LimitDialog({ list, onReplace, onClose }) {
+  const { t, lang } = useT()
   return <div className="aw-modal" onClick={onClose}>
     <div className="aw-modal-box aw-small" onClick={e => e.stopPropagation()}>
-      <div className="aw-modal-head"><b>You have {list.length} drafts already</b><button type="button" className="aw-icon-btn" onClick={onClose}><X size={16} /></button></div>
-      <p className="aw-tip" style={{ padding: '0 14px' }}>Pick one to replace with this ad, or close this and keep working without saving.</p>
+      <div className="aw-modal-head"><b>{t('adwizard.drafts.limitTitle', { count: list.length })}</b><button type="button" className="aw-icon-btn" onClick={onClose}><X size={16} /></button></div>
+      <p className="aw-tip" style={{ padding: '0 14px' }}>{t('adwizard.drafts.limitHint')}</p>
       <div className="aw-draft-list">
         {list.map(d => <div key={d.id} className="aw-draft">
-          <span className="aw-grow"><b>{d.name}</b><small>saved {new Date(d.updatedAt).toLocaleString()}</small></span>
-          <button type="button" className="aw-btn-small" onClick={() => onReplace(d.id)}>Replace</button>
+          <span className="aw-grow"><b>{d.name}</b><small>{t('adwizard.drafts.savedAt', { date: new Date(d.updatedAt).toLocaleString(lang) })}</small></span>
+          <button type="button" className="aw-btn-small" onClick={() => onReplace(d.id)}>{t('adwizard.drafts.replace')}</button>
         </div>)}
       </div>
     </div>
@@ -370,27 +383,29 @@ function LimitDialog({ list, onReplace, onClose }) {
 // ---------------------------------------------------------------- left panels
 
 function FormatPanel({ state, dispatch, onNew }) {
+  const { t, tRich } = useT()
   return <div className="aw-sec">
-    <h2>Format</h2>
+    <h2>{t('adwizard.steps.format')}</h2>
     {LOCKED_FORMAT
-      ? <p className="aw-lead">Your booking runs as <b>{FORMATS[LOCKED_FORMAT].label}</b>, up to {MAX_AD_SECONDS} s.</p>
-      : <p className="aw-lead">Where will the ad run? You can switch later; every scene works in both.</p>}
+      ? <p className="aw-lead">{tRich('adwizard.format.locked', { format: t(FORMATS[LOCKED_FORMAT].labelKey), max: MAX_AD_SECONDS }, { b: <b /> })}</p>
+      : <p className="aw-lead">{t('adwizard.format.where')}</p>}
     <div className="aw-cards">
       {Object.entries(FORMATS).map(([k, f]) => (
         <button key={k} type="button" className={`aw-card${state.format === k ? ' on' : ''}`} disabled={!!LOCKED_FORMAT && k !== LOCKED_FORMAT}
           onClick={() => dispatch({ type: 'set', patch: { format: k } })}>
-          <i className={`aw-shape ${k}`} /><b>{f.label}</b><small>{f.sub}</small><small>{f.width}x{f.height}</small>
+          <i className={`aw-shape ${k}`} /><b>{t(f.labelKey)}</b><small>{t(f.subKey)}</small><small>{f.width}x{f.height}</small>
         </button>))}
     </div>
-    <label className="aw-f">Scene change
+    <label className="aw-f">{t('adwizard.format.sceneChange')}
       <div className="aw-num"><input type="range" min={0.1} max={0.6} step={0.05} value={state.transition}
-        onChange={e => dispatch({ type: 'set', patch: { transition: +e.target.value } })} /><span>{state.transition.toFixed(2)} s</span></div></label>
-    <p className="aw-tip">Readable ads: about 3 s per scene, 15-30 s in total, the opening line readable within the first second.</p>
-    <button type="button" className="aw-btn-ghost aw-danger" onClick={() => { if (confirm('Start a new ad? Your saved drafts stay.')) onNew() }}>New ad</button>
+        onChange={e => dispatch({ type: 'set', patch: { transition: +e.target.value } })} /><span>{t('adwizard.seconds', { s: fixed(state.transition, 2) })}</span></div></label>
+    <p className="aw-tip">{t('adwizard.format.tip')}</p>
+    <button type="button" className="aw-btn-ghost aw-danger" onClick={() => { if (confirm(t('adwizard.format.confirmNew'))) onNew() }}>{t('adwizard.drafts.newAd')}</button>
   </div>
 }
 
 function BrandPanel({ state, dispatch }) {
+  const { t } = useT()
   const b = state.brand
   const [fontBusy, setFontBusy] = useState(false)
   const [fontName, setFontName] = useState('')
@@ -408,68 +423,70 @@ function BrandPanel({ state, dispatch }) {
   }
   const fontOptions = [...b.fontFaces.map(f => f.family), ...FONTS]
   return <div className="aw-sec">
-    <h2>Brand</h2>
-    <label className="aw-f"><div className="aw-f-head"><span>Name</span></div>
+    <h2>{t('adwizard.steps.brand')}</h2>
+    <label className="aw-f"><div className="aw-f-head"><span>{t('adwizard.brand.name')}</span></div>
       <input type="text" value={b.name} maxLength={40} onChange={e => dispatch({ type: 'brand', patch: { name: e.target.value } })} /></label>
-    <div className="aw-f"><div className="aw-f-head"><span>Logo</span><small>square works best; without one the first letter is used</small></div>
+    <div className="aw-f"><div className="aw-f-head"><span>{t('adwizard.brand.logo')}</span><small>{t('adwizard.brand.logoHint')}</small></div>
       <ImageField value={b.logo} adjust={false} onChange={v => dispatch({ type: 'brand', patch: { logo: v || null } })} /></div>
-    <label className="aw-f"><div className="aw-f-head"><span>Monogram</span><small>letter(s) used when there is no logo</small></div>
+    <label className="aw-f"><div className="aw-f-head"><span>{t('adwizard.brand.monogram')}</span><small>{t('adwizard.brand.monogramHint')}</small></div>
       <input type="text" value={b.monogram} maxLength={3} placeholder={(b.name || '?')[0]} onChange={e => dispatch({ type: 'brand', patch: { monogram: e.target.value } })} /></label>
 
-    <h3>Colours</h3>
+    <h3>{t('adwizard.brand.colours')}</h3>
     <div className="aw-presets">{COLOR_PRESETS.map(p => (
-      <button key={p.name} type="button" title={p.name} onClick={() => dispatch({ type: 'colors', patch: p.colors })}>
+      <button key={p.name} type="button" title={t(p.nameKey)} onClick={() => dispatch({ type: 'colors', patch: p.colors })}>
         {['bg', 'accent', 'accent2', 'accent3'].map(k => <i key={k} style={{ background: p.colors[k] }} />)}</button>))}</div>
     <div className="aw-colors">
-      {[['bg', 'Background'], ['ink', 'Text'], ['mute', 'Quiet text'], ['accent', 'Accent'], ['accent2', 'Accent 2'], ['accent3', 'Accent 3']].map(([k, l]) => (
-        <label key={k} className="aw-color"><input type="color" value={b.colors[k]} onChange={e => dispatch({ type: 'colors', patch: { [k]: e.target.value } })} /><span>{l}</span></label>))}
+      {['bg', 'ink', 'mute', 'accent', 'accent2', 'accent3'].map(k => (
+        <label key={k} className="aw-color"><input type="color" value={b.colors[k]} onChange={e => dispatch({ type: 'colors', patch: { [k]: e.target.value } })} /><span>{t(`adwizard.brand.colors.${k}`)}</span></label>))}
     </div>
-    <p className="aw-tip">Use the accent for highlights (*stars* in text). Call-to-action buttons are drawn as outlines.</p>
+    <p className="aw-tip">{t('adwizard.brand.coloursTip')}</p>
 
-    <h3>Fonts</h3>
-    <label className="aw-f">Headlines
+    <h3>{t('adwizard.brand.fonts')}</h3>
+    <label className="aw-f">{t('adwizard.brand.headlines')}
       <select value={b.headFont} onChange={e => dispatch({ type: 'brand', patch: { headFont: e.target.value } })} style={{ fontFamily: b.headFont }}>
         {fontOptions.map(f => <option key={f} value={f}>{f}</option>)}</select></label>
-    <label className="aw-f">Text
+    <label className="aw-f">{t('adwizard.brand.text')}
       <select value={b.font} onChange={e => dispatch({ type: 'brand', patch: { font: e.target.value } })}>
         {fontOptions.map(f => <option key={f} value={f}>{f}</option>)}</select></label>
-    <fieldset className="aw-group"><legend>Your own font file</legend>
+    <fieldset className="aw-group"><legend>{t('adwizard.brand.ownFont')}</legend>
       {b.fontFaces.map(f => <div className="aw-row" key={f.family}><span className="aw-grow">{f.family}</span>
         <button type="button" className="aw-icon-btn" onClick={() => dispatch({ type: 'brand', patch: { fontFaces: b.fontFaces.filter(x => x !== f),
           font: b.font === f.family ? 'Inter' : b.font, headFont: b.headFont === f.family ? 'Inter' : b.headFont } })}><Trash2 size={14} /></button></div>)}
-      <input type="text" placeholder="Font name, e.g. Acme Display" value={fontName} onChange={e => setFontName(e.target.value)} />
-      <label className="aw-f-inline"><input type="checkbox" checked={rights} onChange={e => setRights(e.target.checked)} /> I have the right to use this font in videos</label>
+      <input type="text" placeholder={t('adwizard.brand.fontNamePlaceholder')} value={fontName} onChange={e => setFontName(e.target.value)} />
+      <label className="aw-f-inline"><input type="checkbox" checked={rights} onChange={e => setRights(e.target.checked)} /> {t('adwizard.brand.fontRights')}</label>
       <button type="button" className="aw-btn-small" disabled={!fontName.trim() || !rights || fontBusy} onClick={() => fontRef.current?.click()}>
-        <Upload size={14} /> {fontBusy ? 'Uploading…' : 'Upload TTF / OTF / WOFF'}</button>
+        <Upload size={14} /> {fontBusy ? t('adwizard.brand.uploading') : t('adwizard.brand.uploadFont')}</button>
       <input ref={fontRef} type="file" accept=".ttf,.otf,.woff,.woff2" hidden onChange={e => { addFont(e.target.files[0]); e.target.value = '' }} />
     </fieldset>
   </div>
 }
 
 function SceneList({ state, dispatch, selected, setSelected, issues, onAdd }) {
+  const { t } = useT()
   return <div className="aw-sec">
-    <h2>Scenes</h2>
+    <h2>{t('adwizard.steps.scenes')}</h2>
     <ol className="aw-scenes">
       {state.scenes.map((s, i) => {
         const bad = issues.some(x => x.scene === i && x.level === 'error')
         return <li key={s.id} className={`${i === selected ? 'on' : ''}${bad ? ' bad' : ''}`} onClick={() => setSelected(i)}>
           <img src={`${SCENES_BASE}/thumbs/${state.format}/${s.type}.jpg`} alt="" />
-          <span><b>{i + 1}. {s.type}</b><small>{s.duration.toFixed(1)} s</small></span>
+          <span><b>{i + 1}. {s.type}</b><small>{t('adwizard.seconds', { s: fixed(s.duration) })}</small></span>
           <div className="aw-li-tools" onClick={e => e.stopPropagation()}>
             <button type="button" className="aw-icon-btn" disabled={i === 0} onClick={() => { dispatch({ type: 'moveScene', i, to: i - 1 }); setSelected(i - 1) }}><ChevronUp size={14} /></button>
             <button type="button" className="aw-icon-btn" disabled={i === state.scenes.length - 1} onClick={() => { dispatch({ type: 'moveScene', i, to: i + 1 }); setSelected(i + 1) }}><ChevronDown size={14} /></button>
-            <button type="button" className="aw-icon-btn" title="Duplicate" onClick={() => { dispatch({ type: 'addScene', at: i + 1, scene: { ...JSON.parse(JSON.stringify(s)), id: newId() } }); setSelected(i + 1) }}><Copy size={14} /></button>
-            <button type="button" className="aw-icon-btn" title="Remove" onClick={() => { dispatch({ type: 'removeScene', i }); setSelected(Math.max(0, i - 1)) }}><Trash2 size={14} /></button>
+            <button type="button" className="aw-icon-btn" title={t('adwizard.scenes.duplicate')} onClick={() => { dispatch({ type: 'addScene', at: i + 1, scene: { ...JSON.parse(JSON.stringify(s)), id: newId() } }); setSelected(i + 1) }}><Copy size={14} /></button>
+            <button type="button" className="aw-icon-btn" title={t('common.remove')} onClick={() => { dispatch({ type: 'removeScene', i }); setSelected(Math.max(0, i - 1)) }}><Trash2 size={14} /></button>
           </div>
         </li>
       })}
     </ol>
-    <button type="button" className="aw-btn" onClick={onAdd}><Plus size={16} /> Add a scene</button>
-    <p className="aw-tip">The selected scene's text, pictures and length are on the right.</p>
+    <button type="button" className="aw-btn" onClick={onAdd}><Plus size={16} /> {t('adwizard.scenes.add')}</button>
+    <p className="aw-tip">{t('adwizard.scenes.tip')}</p>
   </div>
 }
 
 function SoundPanel({ state, dispatch, sfxAll, selectedSfx, setSelectedSfx, removeSfx, time, audio, duration }) {
+  const { t } = useT()
   const [lib, setLib] = useState(null)
   const [busy, setBusy] = useState(false)
   const [rights, setRights] = useState(false)
@@ -490,49 +507,50 @@ function SoundPanel({ state, dispatch, sfxAll, selectedSfx, setSelectedSfx, remo
   }
   const maxStart = Math.max(0, (m?.duration || 0) - duration)
   return <div className="aw-sec">
-    <h2>Sound</h2>
-    <h3><Music size={15} /> Music</h3>
+    <h2>{t('adwizard.steps.sound')}</h2>
+    <h3><Music size={15} /> {t('adwizard.sound.music')}</h3>
     {m ? <div className="aw-music">
-      <div className="aw-row"><b className="aw-grow">{m.title}</b><button type="button" className="aw-icon-btn" onClick={() => setMusic(null)} title="Remove"><Trash2 size={14} /></button></div>
+      <div className="aw-row"><b className="aw-grow">{m.title}</b><button type="button" className="aw-icon-btn" onClick={() => setMusic(null)} title={t('common.remove')}><Trash2 size={14} /></button></div>
       {m.credit && <small className="aw-tip">{m.credit}</small>}
       {m.peaks && <div className="aw-peaks">{m.peaks.map((p, i) => <i key={i} style={{ height: `${10 + p * 90}%` }} />)}
         <span style={{ left: `${(m.start / (m.duration || 1)) * 100}%`, width: `${(duration / (m.duration || 1)) * 100}%` }} /></div>}
-      <label className="aw-f">Start in the song <div className="aw-num"><input type="range" min={0} max={maxStart || 0} step={0.1} value={Math.min(m.start, maxStart)}
-        onChange={e => setMusic({ start: +e.target.value })} disabled={!maxStart} /><span>{m.start.toFixed(1)} s</span></div></label>
-      <label className="aw-f">Volume <div className="aw-num"><input type="range" min={0} max={100} value={m.volume} onChange={e => setMusic({ volume: +e.target.value })} /><span>{m.volume}%</span></div></label>
-      <label className="aw-f">Fade in <div className="aw-num"><input type="range" min={0} max={4} step={0.1} value={m.fadeIn} onChange={e => setMusic({ fadeIn: +e.target.value })} /><span>{m.fadeIn.toFixed(1)} s</span></div></label>
-      <label className="aw-f">Fade out <div className="aw-num"><input type="range" min={0} max={4} step={0.1} value={m.fadeOut} onChange={e => setMusic({ fadeOut: +e.target.value })} /><span>{m.fadeOut.toFixed(1)} s</span></div></label>
-    </div> : <p className="aw-tip">No music yet.</p>}
+      <label className="aw-f">{t('adwizard.sound.startInSong')} <div className="aw-num"><input type="range" min={0} max={maxStart || 0} step={0.1} value={Math.min(m.start, maxStart)}
+        onChange={e => setMusic({ start: +e.target.value })} disabled={!maxStart} /><span>{t('adwizard.seconds', { s: fixed(m.start) })}</span></div></label>
+      <label className="aw-f">{t('adwizard.sound.volume')} <div className="aw-num"><input type="range" min={0} max={100} value={m.volume} onChange={e => setMusic({ volume: +e.target.value })} /><span>{pct(m.volume / 100)}</span></div></label>
+      <label className="aw-f">{t('adwizard.sound.fadeIn')} <div className="aw-num"><input type="range" min={0} max={4} step={0.1} value={m.fadeIn} onChange={e => setMusic({ fadeIn: +e.target.value })} /><span>{t('adwizard.seconds', { s: fixed(m.fadeIn) })}</span></div></label>
+      <label className="aw-f">{t('adwizard.sound.fadeOut')} <div className="aw-num"><input type="range" min={0} max={4} step={0.1} value={m.fadeOut} onChange={e => setMusic({ fadeOut: +e.target.value })} /><span>{t('adwizard.seconds', { s: fixed(m.fadeOut) })}</span></div></label>
+    </div> : <p className="aw-tip">{t('adwizard.sound.noMusic')}</p>}
     <div className="aw-row">
-      <button type="button" className="aw-btn-small" onClick={() => setLib('music')}><Music size={14} /> Music library</button>
-      <button type="button" className="aw-btn-small" disabled={!rights || busy} onClick={() => fileRef.current?.click()}><Upload size={14} /> {busy ? 'Uploading…' : 'Upload a song'}</button>
+      <button type="button" className="aw-btn-small" onClick={() => setLib('music')}><Music size={14} /> {t('adwizard.sound.library')}</button>
+      <button type="button" className="aw-btn-small" disabled={!rights || busy} onClick={() => fileRef.current?.click()}><Upload size={14} /> {busy ? t('adwizard.sound.uploading') : t('adwizard.sound.uploadSong')}</button>
     </div>
-    <label className="aw-f-inline"><input type="checkbox" checked={rights} onChange={e => setRights(e.target.checked)} /> I own or licensed the song I upload</label>
+    <label className="aw-f-inline"><input type="checkbox" checked={rights} onChange={e => setRights(e.target.checked)} /> {t('adwizard.sound.songRights')}</label>
     <input ref={fileRef} type="file" accept="audio/*" hidden onChange={e => { upload(e.target.files[0]); e.target.value = '' }} />
 
-    <h3><AudioLines size={15} /> Sound effects</h3>
-    <label className="aw-f-inline"><input type="checkbox" checked={state.sfx.auto} onChange={e => dispatch({ type: 'sfx', patch: { auto: e.target.checked } })} /> Automatic sounds (scene changes, words popping in)</label>
-    {state.sfx.auto && <label className="aw-f">Automatic sounds level <div className="aw-num"><input type="range" min={-12} max={12} step={1} value={state.sfx.gain}
-      onChange={e => dispatch({ type: 'sfx', patch: { gain: +e.target.value } })} /><span>{state.sfx.gain > 0 ? '+' : ''}{state.sfx.gain} dB</span></div></label>}
-    {state.sfx.removed.length > 0 && <button type="button" className="aw-btn-ghost" onClick={() => dispatch({ type: 'sfx', patch: { removed: [] } })}>Restore {state.sfx.removed.length} removed automatic sound(s)</button>}
-    <button type="button" className="aw-btn-small" onClick={() => setLib('sfx')}><Plus size={14} /> Add a sound at {time.toFixed(1)} s</button>
+    <h3><AudioLines size={15} /> {t('adwizard.sound.effects')}</h3>
+    <label className="aw-f-inline"><input type="checkbox" checked={state.sfx.auto} onChange={e => dispatch({ type: 'sfx', patch: { auto: e.target.checked } })} /> {t('adwizard.sound.auto')}</label>
+    {state.sfx.auto && <label className="aw-f">{t('adwizard.sound.autoLevel')} <div className="aw-num"><input type="range" min={-12} max={12} step={1} value={state.sfx.gain}
+      onChange={e => dispatch({ type: 'sfx', patch: { gain: +e.target.value } })} /><span>{t('adwizard.sound.db', { gain: `${state.sfx.gain > 0 ? '+' : ''}${formatNumber(state.sfx.gain)}` })}</span></div></label>}
+    {state.sfx.removed.length > 0 && <button type="button" className="aw-btn-ghost" onClick={() => dispatch({ type: 'sfx', patch: { removed: [] } })}>{t('adwizard.sound.restore', { count: state.sfx.removed.length })}</button>}
+    <button type="button" className="aw-btn-small" onClick={() => setLib('sfx')}><Plus size={14} /> {t('adwizard.sound.addAt', { time: fixed(time) })}</button>
     <ul className="aw-sfx">
       {sfxAll.map(s => {
         const id = s.key || s.id, on = selectedSfx && (selectedSfx.key || selectedSfx.id) === id
         return <li key={id} className={`${s.auto ? 'auto' : ''}${on ? ' on' : ''}`} onClick={() => setSelectedSfx(id)}>
-          <button type="button" className="aw-icon-btn" onClick={e => { e.stopPropagation(); audio.blip(s.url, s.volume) }} title="Listen"><Play size={12} /></button>
-          <span className="aw-grow">{s.name || s.kind}{s.auto && <small> auto</small>}</span><small>{s.at.toFixed(2)} s</small>
-          <button type="button" className="aw-icon-btn" onClick={e => { e.stopPropagation(); removeSfx(s) }} title="Remove"><Trash2 size={12} /></button>
+          <button type="button" className="aw-icon-btn" onClick={e => { e.stopPropagation(); audio.blip(s.url, s.volume) }} title={t('adwizard.sound.listen')}><Play size={12} /></button>
+          <span className="aw-grow">{sfxName(s)}{s.auto && <small> {t('adwizard.sound.autoTag')}</small>}</span><small>{t('adwizard.seconds', { s: fixed(s.at, 2) })}</small>
+          <button type="button" className="aw-icon-btn" onClick={e => { e.stopPropagation(); removeSfx(s) }} title={t('common.remove')}><Trash2 size={12} /></button>
         </li>
       })}
     </ul>
-    <p className="aw-tip">Drag sounds on the timeline to move them. Moving an automatic sound makes it yours.</p>
+    <p className="aw-tip">{t('adwizard.sound.tip')}</p>
     {lib && <MusicLibrary kind={lib} onPick={lib === 'music' ? pickMusic : addSfx} onClose={() => setLib(null)} />}
   </div>
 }
 
 function RenderPanel({ state, doc, meta, info, issues, tooLong, music, sfxAll, audio }) {
-  const [job, setJob] = useState(null) // { phase, progress, outputUrl, error, length }
+  const { t } = useT()
+  const [job, setJob] = useState(null) // { phaseKey (ours) | phase (the backend's), progress, outputUrl, error, length }
   const [used, setUsed] = useState(false)
   const abortRef = useRef(null)
   const errors = issues.filter(x => x.level === 'error')
@@ -541,15 +559,15 @@ function RenderPanel({ state, doc, meta, info, issues, tooLong, music, sfxAll, a
     const ctl = new AbortController(); abortRef.current = ctl
     setUsed(false)
     try {
-      setJob({ phase: 'Drawing the scenes…', progress: 0 })
+      setJob({ phaseKey: 'adwizard.render.drawing', progress: 0 })
       const r = await authFetch(api('/api/scene-render'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ doc: meta.sanitize(doc) }) })
-      if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `scene render: ${r.status}`)
+      if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || t('adwizard.render.sceneRenderFailed', { status: String(r.status) }))
       const { jobId } = await r.json()
       const scene = await pollJob(api(`/api/scene-render/${jobId}`), d => setJob(j => ({ ...j, progress: (d.progress || 0) * 0.7 })), { signal: ctl.signal })
       const videoUrl = absUrl(scene.outputUrl)
       const length = scene.duration || info.duration
 
-      setJob({ phase: 'Mixing the sound…', progress: 0.72 })
+      setJob({ phaseKey: 'adwizard.render.mixing', progress: 0.72 })
       const sfxClips = []
       for (const s of sfxAll) {
         const d = s.duration || await audio.durationOf(s.url)
@@ -567,11 +585,11 @@ function RenderPanel({ state, doc, meta, info, issues, tooLong, music, sfxAll, a
       ]
       const res = await authFetch(api('/api/render'), { method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ timeline: { tracks, outputWidth: doc.width, outputHeight: doc.height, previewWidth: doc.width, previewHeight: doc.height, fps: 30 } }) })
-      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `render: ${res.status}`)
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || t('adwizard.render.renderFailed', { status: String(res.status) }))
       const { jobId: rid } = await res.json()
       const done = await pollJob(api(`/api/render/${rid}`), d => setJob(j => ({ ...j, phase: d.phase || j.phase, progress: 0.72 + (d.progress || 0) / 100 * 0.28 })), { signal: ctl.signal })
       const outputUrl = absUrl(done.outputUrl)
-      setJob({ phase: 'Done', progress: 1, outputUrl, length })
+      setJob({ phaseKey: 'common.done', progress: 1, outputUrl, length })
       post({ type: 'ad-render-complete', outputUrl, format: state.format, width: doc.width, height: doc.height, duration: length, musicCredits: music?.credit ? [music.credit] : [] })
     } catch (e) {
       if (e.message !== 'aborted') setJob({ error: e.message })
@@ -582,23 +600,23 @@ function RenderPanel({ state, doc, meta, info, issues, tooLong, music, sfxAll, a
     setUsed(true)
   }
   return <div className="aw-sec">
-    <h2>Render</h2>
+    <h2>{t('adwizard.steps.render')}</h2>
     <ul className="aw-checks">
-      <li className={state.scenes.length ? 'ok' : ''}>{state.scenes.length} scene(s), {info ? info.duration.toFixed(1) : '0'} s{tooLong ? ` (too long, max ${MAX_AD_SECONDS} s)` : ''}</li>
-      <li className={errors.length ? '' : 'ok'}>{errors.length ? `${errors.length} thing(s) to fill in` : 'All required fields filled in'}</li>
-      <li className={music ? 'ok' : 'opt'}>{music ? `Music: ${music.title}` : 'No music (optional)'}</li>
-      <li className="ok">{sfxAll.length} sound effect(s)</li>
+      <li className={state.scenes.length ? 'ok' : ''}>{t(tooLong ? 'adwizard.render.scenesLengthTooLong' : 'adwizard.render.scenesLength', { count: state.scenes.length, length: info ? fixed(info.duration) : '0', max: MAX_AD_SECONDS })}</li>
+      <li className={errors.length ? '' : 'ok'}>{errors.length ? t('adwizard.render.toFill', { count: errors.length }) : t('adwizard.render.allFilled')}</li>
+      <li className={music ? 'ok' : 'opt'}>{music ? t('adwizard.render.music', { title: music.title }) : t('adwizard.render.noMusic')}</li>
+      <li className="ok">{t('adwizard.render.effects', { count: sfxAll.length })}</li>
     </ul>
-    {errors.slice(0, 8).map((x, i) => <small key={i} className="aw-warn">Scene {x.scene + 1}, {x.field}: {x.msg}</small>)}
-    {!job || job.error ? <button type="button" className="aw-btn aw-big" disabled={blocked} onClick={render}>Render the ad ({FORMATS[state.format].width}x{FORMATS[state.format].height})</button> : null}
+    {errors.slice(0, 8).map((x, i) => <small key={i} className="aw-warn">{t('adwizard.render.issue', { n: x.scene + 1, field: x.field, msg: issueText(x.msg) })}</small>)}
+    {!job || job.error ? <button type="button" className="aw-btn aw-big" disabled={blocked} onClick={render}>{t('adwizard.render.button', { size: `${FORMATS[state.format].width}x${FORMATS[state.format].height}` })}</button> : null}
     {job?.error && <div className="aw-error">{job.error}</div>}
-    {job && !job.error && !job.outputUrl && <div className="aw-progress"><div style={{ width: `${Math.round((job.progress || 0) * 100)}%` }} /><span>{job.phase} {Math.round((job.progress || 0) * 100)}%</span>
-      <button type="button" className="aw-btn-ghost" onClick={() => { abortRef.current?.abort(); setJob(null) }}>Cancel</button></div>}
+    {job && !job.error && !job.outputUrl && <div className="aw-progress"><div style={{ width: `${Math.round((job.progress || 0) * 100)}%` }} /><span>{t('adwizard.render.progress', { phase: job.phase || t(job.phaseKey), percent: pct(job.progress || 0) })}</span>
+      <button type="button" className="aw-btn-ghost" onClick={() => { abortRef.current?.abort(); setJob(null) }}>{t('common.cancel')}</button></div>}
     {job?.outputUrl && <div className="aw-result">
       <video src={job.outputUrl} controls playsInline />
-      {FOR_BOOKING && <button type="button" className="aw-btn aw-big" onClick={useForCampaign} disabled={used}>{used ? <><Check size={16} /> Sent to your campaign</> : 'Use for my campaign'}</button>}
-      <div className="aw-row"><a className={FOR_BOOKING ? 'aw-btn-ghost' : 'aw-btn'} href={job.outputUrl} download><Download size={16} /> Download</a>
-        <button type="button" className="aw-btn-ghost" onClick={() => setJob(null)}><Check size={16} /> Render again</button></div>
+      {FOR_BOOKING && <button type="button" className="aw-btn aw-big" onClick={useForCampaign} disabled={used}>{used ? <><Check size={16} /> {t('adwizard.render.sent')}</> : t('adwizard.render.useForCampaign')}</button>}
+      <div className="aw-row"><a className={FOR_BOOKING ? 'aw-btn-ghost' : 'aw-btn'} href={job.outputUrl} download><Download size={16} /> {t('adwizard.render.download')}</a>
+        <button type="button" className="aw-btn-ghost" onClick={() => setJob(null)}><Check size={16} /> {t('adwizard.render.again')}</button></div>
     </div>}
   </div>
 }
@@ -606,38 +624,40 @@ function RenderPanel({ state, doc, meta, info, issues, tooLong, music, sfxAll, a
 // ---------------------------------------------------------------- right panel (properties)
 
 function SceneProperties({ state, dispatch, meta, selected, issues }) {
+  const { t } = useT()
   const sel = state.scenes[selected]
   const m = sel && meta.TYPES[sel.type]
   if (!m) return null
   const mine = issues.filter(x => x.scene === selected)
   return <div className="aw-sec">
     <h2>{selected + 1}. {sel.type}</h2>
-    <p className="aw-tip">{m.desc}</p>
-    <label className="aw-f">Length
+    <p className="aw-tip">{sceneDesc({ type: sel.type, desc: m.desc })}</p>
+    <label className="aw-f">{t('adwizard.props.length')}
       <div className="aw-num"><input type="range" min={m.dur[0]} max={Math.max(8, m.dur[1] * 2)} step={0.1} value={sel.duration}
-        onChange={e => dispatch({ type: 'duration', i: selected, d: +e.target.value })} /><span>{sel.duration.toFixed(1)} s</span></div></label>
-    {mine.map((x, k) => <small key={k} className={x.level === 'error' ? 'aw-warn' : 'aw-tip'}>{x.field}: {x.msg}</small>)}
+        onChange={e => dispatch({ type: 'duration', i: selected, d: +e.target.value })} /><span>{t('adwizard.seconds', { s: fixed(sel.duration) })}</span></div></label>
+    {mine.map((x, k) => <small key={k} className={x.level === 'error' ? 'aw-warn' : 'aw-tip'}>{t('adwizard.props.fieldIssue', { field: x.field, msg: issueText(x.msg) })}</small>)}
     <Fields fields={m.fields} value={sel} icons={meta.ICONS} onChange={v => dispatch({ type: 'scene', i: selected, scene: v })} />
   </div>
 }
 
 function SfxProperties({ s, state, dispatch, audio, onRemove }) {
+  const { t } = useT()
   const set = patch => dispatch({ type: 'sfx', patch: { clips: state.sfx.clips.map(c => (c.id === s.id ? { ...c, ...patch } : c)) } })
   return <div className="aw-sec">
-    <h2>Sound effect</h2>
-    <p className="aw-tip">{s.name || s.kind}{s.auto ? ' (automatic: move or change it to make it yours)' : ''}</p>
+    <h2>{t('adwizard.props.soundEffect')}</h2>
+    <p className="aw-tip">{s.auto ? t('adwizard.props.autoNote', { name: sfxName(s) }) : sfxName(s)}</p>
     <div className="aw-row">
-      <button type="button" className="aw-btn-small" onClick={() => audio.blip(s.url, s.volume)}><Play size={14} /> Listen</button>
-      <button type="button" className="aw-btn-ghost" onClick={onRemove}><Trash2 size={14} /> Remove</button>
+      <button type="button" className="aw-btn-small" onClick={() => audio.blip(s.url, s.volume)}><Play size={14} /> {t('adwizard.sound.listen')}</button>
+      <button type="button" className="aw-btn-ghost" onClick={onRemove}><Trash2 size={14} /> {t('common.remove')}</button>
     </div>
     {s.auto
       ? <button type="button" className="aw-btn-small" onClick={() => {
         const id = newId()
         dispatch({ type: 'sfx', patch: { removed: [...state.sfx.removed, s.key], clips: [...state.sfx.clips, { id, url: s.url, name: s.kind, at: s.at, volume: s.volume }] } })
-      }}>Make it mine</button>
+      }}>{t('adwizard.props.makeMine')}</button>
       : <>
-        <label className="aw-f">At <div className="aw-num"><input type="number" step={0.05} min={0} value={s.at} onChange={e => set({ at: Math.max(0, +e.target.value) })} /><span>s</span></div></label>
-        <label className="aw-f">Volume <div className="aw-num"><input type="range" min={0} max={100} value={s.volume} onChange={e => set({ volume: +e.target.value })} /><span>{s.volume}%</span></div></label>
+        <label className="aw-f">{t('adwizard.props.at')} <div className="aw-num"><input type="number" step={0.05} min={0} value={s.at} onChange={e => set({ at: Math.max(0, +e.target.value) })} /><span>{t('adwizard.props.secondsUnit')}</span></div></label>
+        <label className="aw-f">{t('adwizard.props.volume')} <div className="aw-num"><input type="range" min={0} max={100} value={s.volume} onChange={e => set({ volume: +e.target.value })} /><span>{pct(s.volume / 100)}</span></div></label>
       </>}
   </div>
 }
@@ -645,29 +665,30 @@ function SfxProperties({ s, state, dispatch, audio, onRemove }) {
 // ---------------------------------------------------------------- scene picker
 
 function ScenePicker({ meta, format, onPick, onClose, first }) {
+  const { t } = useT()
   const [role, setRole] = useState(first ? 'opener' : 'all')
   const [style, setStyle] = useState('all')
   const [q, setQ] = useState('')
   const all = meta.catalogue()
   const list = all.filter(c => (role === 'all' || c.role.includes(role)) && (style === 'all' || c.style === style)
-    && (!q || (c.type + ' ' + c.desc).toLowerCase().includes(q.toLowerCase())))
+    && (!q || (c.type + ' ' + c.desc + ' ' + sceneDesc(c)).toLowerCase().includes(q.toLowerCase())))
   const count = st => all.filter(c => (role === 'all' || c.role.includes(role)) && (st === 'all' || c.style === st)).length
   return <div className="aw-modal" onClick={onClose}>
     <div className="aw-modal-box" onClick={e => e.stopPropagation()}>
-      <div className="aw-modal-head"><b>Add a scene</b>
-        <div className="aw-tabs">{ROLES.map(r => <button key={r.key} type="button" className={role === r.key ? 'on' : ''} onClick={() => setRole(r.key)}>{r.label}</button>)}</div>
-        <label className="aw-search"><Search size={14} /><input value={q} onChange={e => setQ(e.target.value)} placeholder="Search" /></label>
+      <div className="aw-modal-head"><b>{t('adwizard.scenes.add')}</b>
+        <div className="aw-tabs">{ROLES.map(r => <button key={r.key} type="button" className={role === r.key ? 'on' : ''} onClick={() => setRole(r.key)}>{t(r.labelKey)}</button>)}</div>
+        <label className="aw-search"><Search size={14} /><input value={q} onChange={e => setQ(e.target.value)} placeholder={t('adwizard.picker.search')} /></label>
         <button type="button" className="aw-icon-btn" onClick={onClose}><X size={16} /></button></div>
       <div className="aw-modal-sub">
-        <span className="aw-tip">Look</span>
-        <div className="aw-tabs">{[['all', 'All'], ...Object.entries(meta.STYLES)].map(([k, l]) => (
+        <span className="aw-tip">{t('adwizard.picker.look')}</span>
+        <div className="aw-tabs">{[['all', t('adwizard.picker.all')], ...Object.entries(meta.STYLES).map(([k, l]) => [k, styleName(k, l)])].map(([k, l]) => (
           <button key={k} type="button" className={style === k ? 'on' : ''} onClick={() => setStyle(k)} disabled={!count(k)}>{l} <small>{count(k)}</small></button>))}</div>
       </div>
       <div className={`aw-grid ${format}`}>
         {list.map(c => <button key={c.type} type="button" className="aw-tile" onClick={() => onPick(c.type)}>
           <img src={`${SCENES_BASE}/thumbs/${format}/${c.type}.jpg`} alt="" loading="lazy" />
-          <b>{c.type}</b><small>{c.desc}</small></button>)}
-        {!list.length && <p className="aw-tip">Nothing matches.</p>}
+          <b>{c.type}</b><small>{sceneDesc(c)}</small></button>)}
+        {!list.length && <p className="aw-tip">{t('adwizard.picker.nothing')}</p>}
       </div>
     </div>
   </div>

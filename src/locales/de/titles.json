@@ -1,0 +1,111 @@
+{
+  "textFx": {
+    "title": "Texteffekte",
+    "outline": "Kontur",
+    "outlineColour": "Konturfarbe",
+    "outlineWidth": "Konturbreite",
+    "wordsComeIn": "Wörter erscheinen",
+    "allAtOnce": "Alle auf einmal",
+    "atOnce": "Auf einmal",
+    "anims": {
+      "pop": "Ploppen",
+      "fadeUp": "Nach oben einblenden",
+      "typewriter": "Schreibmaschine",
+      "slide": "Gleiten"
+    },
+    "gap": "Abstand",
+    "gapSeconds": "Zeit zwischen Wörtern (Sekunden)",
+    "defaultText": "Text"
+  },
+  "templates": {
+    "dialogTitle": "Titel",
+    "allTitles": "Alle Titel",
+    "overVideo": "Über dem Video",
+    "ownBackground": "Eigener Hintergrund",
+    "starsHint": "Setz *Sternchen* um ein Wort, um es einzufärben.",
+    "addTitle": "Titel hinzufügen",
+    "groups": {
+      "lower": "Bauchbinden",
+      "title": "Titel über dem Video",
+      "card": "Intro- und Outro-Karten"
+    },
+    "fields": {
+      "name": "Name",
+      "role": "Rolle",
+      "lines": "Zeilen",
+      "words": "Wörter",
+      "lineUnder": "Zeile darunter",
+      "lineInFront": "Zeile davor",
+      "rows": "Reihen",
+      "headline": "Überschrift",
+      "lineUnderIt": "Zeile darunter",
+      "tagline": "Slogan",
+      "cta": "Call to Action",
+      "smallPrint": "Kleingedrucktes"
+    },
+    "items": {
+      "lowerName": {
+        "label": "Name und Rolle",
+        "sub": "Creator auf 3Speak"
+      },
+      "lowerStatement": {
+        "label": "Kurze Aussage",
+        "lines": "Drei Dinge,\ndie ich heute *gelernt* habe"
+      },
+      "titleWords": {
+        "label": "Ein Wort nach dem anderen",
+        "words": "Planen.\nFilmen.\n*Posten.*",
+        "line": "Meine Woche auf 3Speak"
+      },
+      "titleKinetic": {
+        "label": "Wörter knallen herein",
+        "words": "Schnell\nEinfach\nDeins",
+        "line": "Gemacht auf *3Speak*"
+      },
+      "titlePoster": {
+        "label": "Riesige gestapelte Wörter",
+        "words": "Tag\neins.",
+        "sub": "Start bei null"
+      },
+      "titleMarquee": {
+        "label": "Scrollende Reihen",
+        "rows": "Planen\nFilmen\nPosten\nWiederholen",
+        "line": "Jede *Woche*"
+      },
+      "cardHook": {
+        "label": "Intro: erste Zeile",
+        "lines": "Wie ich\nmeine\n*Shorts* schneide",
+        "sub": "In unter einer Minute"
+      },
+      "cardEnd": {
+        "label": "Outro: folge mir",
+        "tagline": "Neue Shorts *jede Woche*",
+        "cta": "Folge auf 3Speak"
+      },
+      "cardPoster": {
+        "label": "Outro: riesige Wörter",
+        "words": "Bis\nbald\n*wieder.*",
+        "cta": "Folge auf 3Speak"
+      }
+    }
+  },
+  "scene": {
+    "title": "Titel",
+    "onePerLine": "Eins pro Zeile",
+    "colours": "Farben",
+    "font": "Schriftart",
+    "overVideo": "Über dem Video",
+    "length": "Länge",
+    "lengthSeconds": "Länge (Sekunden)",
+    "defaultName": "Ich",
+    "layerTitle": "Titel"
+  },
+  "colors": {
+    "ember": "Glut",
+    "amber": "Bernstein",
+    "ocean": "Ozean",
+    "forest": "Wald",
+    "berry": "Beere",
+    "paper": "Papier"
+  }
+}

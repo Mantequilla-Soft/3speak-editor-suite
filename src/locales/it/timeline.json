@@ -1,0 +1,182 @@
+{
+  "aria": {
+    "timeline": "Timeline",
+    "ruler": "Righello del tempo: fai clic per spostare la testina",
+    "playhead": "Testina di riproduzione",
+    "zoom": "Zoom"
+  },
+  "split": {
+    "title": "Dividi la clip alla testina (Ctrl+R)",
+    "label": "Dividi"
+  },
+  "toolbar": {
+    "add": {
+      "title": "Aggiungi traccia o clip",
+      "videoTrack": "Traccia video",
+      "audioTrack": "Traccia audio",
+      "musicLibrary": "Libreria musicale",
+      "soundEffects": "Effetti sonori",
+      "stickers": "Sticker",
+      "titles": "Titoli",
+      "stock": "Media di repertorio"
+    },
+    "zoomTitle": "Zoom: {{value}} px/s",
+    "fit": {
+      "title": "Mostra tutta la timeline",
+      "label": "Adatta"
+    },
+    "select": {
+      "titleStart": "Seleziona più clip: tocca ognuna",
+      "titleDone": "Selezione finita",
+      "label": "Seleziona"
+    },
+    "ripple": {
+      "titleTrack": "Chiudi il vuoto alla testina sulla traccia {{number}} (G). Le altre tracce restano come sono.",
+      "titleNoGap": "Nessun vuoto alla testina sulla traccia della clip selezionata",
+      "title": "Rimuovi il vuoto alla testina (G)",
+      "label": "Chiudi vuoto"
+    },
+    "captions": {
+      "title": "Sottotitoli: trasforma ciò che viene detto in sottotitoli parola per parola",
+      "label": "Sottotitoli"
+    },
+    "transcript": {
+      "title": "Trascrizione: modifica dal testo, elimina parole per tagliarle",
+      "label": "Trascrizione"
+    },
+    "flag": {
+      "title": "Metti un segnaposto alla testina (B): il tuo marcatore, numerato e colorato, mai esportato",
+      "label": "Segnaposto"
+    },
+    "autoCut": {
+      "title": "Trova le pause e taglia lì",
+      "label": "Taglio automatico"
+    },
+    "beats": {
+      "title": "Trova il ritmo: agganciati a esso, disponi le clip sopra",
+      "label": "Battiti"
+    },
+    "delete": {
+      "title": "Elimina la clip selezionata (Canc)",
+      "titleMany": "Elimina le clip selezionate (Canc)",
+      "labelMany": "Elimina {{number}}"
+    },
+    "options": "Opzioni",
+    "ungroup": {
+      "titleOne": "Separa: le sue clip si spostano e si rifilano di nuovo da sole",
+      "titleMany": "Separa: queste clip si spostano e si rifilano di nuovo da sole",
+      "label": "Separa"
+    },
+    "group": {
+      "title": "Raggruppa: queste clip si spostano e si rifilano insieme",
+      "label": "Raggruppa {{number}}"
+    },
+    "more": {
+      "title": "Altre azioni sulla clip",
+      "duplicate": "Duplica",
+      "groupVoicesTitle": "Raggruppa con ciò che suona nello stesso momento sulle altre tracce voce: si spostano, si rifilano e perdono i silenzi insieme",
+      "groupVoices": "Raggruppa con le altre voci",
+      "reverse": "Inverti",
+      "unreverse": "Annulla inversione",
+      "snapOn": "Aggancio attivo",
+      "snapOff": "Aggancio disattivo"
+    }
+  },
+  "selectHint": {
+    "count_one": "{{count}} clip selezionata: toccane altre, oppure Fatto",
+    "count_many": "{{count}} clip selezionate: toccane altre, oppure Fatto",
+    "count_other": "{{count}} clip selezionate: toccane altre, oppure Fatto",
+    "none": "Tocca ogni clip che vuoi selezionare",
+    "clear": "Svuota"
+  },
+  "clip": {
+    "settings": "Impostazioni della clip",
+    "textFallback": "Testo",
+    "layer": "L{{number}}",
+    "kind": {
+      "video": "Clip video",
+      "audio": "Clip audio",
+      "image": "Immagine",
+      "text": "Testo",
+      "color": "Colore",
+      "other": "Clip"
+    },
+    "aria": {
+      "plain": "{{kind}}, da {{from}} a {{to}}",
+      "named": "{{kind}} {{name}}, da {{from}} a {{to}}",
+      "onTrack": "{{kind}} su {{track}}, da {{from}} a {{to}}",
+      "namedOnTrack": "{{kind}} {{name}} su {{track}}, da {{from}} a {{to}}"
+    }
+  },
+  "track": {
+    "show": "Mostra la traccia",
+    "hide": "Nascondi la traccia",
+    "mute": "Silenzia la traccia",
+    "unmute": "Riattiva l'audio della traccia",
+    "remove": "Rimuovi la traccia",
+    "addVisual": "Aggiungi video, immagine o testo",
+    "addAudio": "Aggiungi audio",
+    "addFile": "Aggiungi file",
+    "addText": "Aggiungi testo",
+    "addColor": "Aggiungi colore",
+    "recordVideo": "Registra video",
+    "addAudioFile": "Aggiungi file audio",
+    "recordAudio": "Registra audio",
+    "resize": {
+      "aria": "Altezza di {{name}}",
+      "ariaUnnamed": "Altezza di questa traccia",
+      "title": "Trascina per rendere la traccia più alta o più bassa (doppio clic: torna normale)"
+    },
+    "aria": {
+      "named": {
+        "video": "{{name}} (traccia video)",
+        "audio": "{{name}} (traccia audio)",
+        "music": "{{name}} (traccia musicale)"
+      },
+      "numbered": {
+        "video": "Traccia video {{number}}",
+        "audio": "Traccia audio {{number}}",
+        "music": "Traccia musicale {{number}}"
+      }
+    }
+  },
+  "trackName": {
+    "voice": "Voce",
+    "voiceNumbered": "Voce {{number}}",
+    "music": "Musica",
+    "musicNumbered": "Musica {{number}}",
+    "video": "Video",
+    "videoNumbered": "Video {{number}}",
+    "audioNumbered": "Audio {{number}}",
+    "stickers": "Sticker",
+    "stickersNumbered": "Sticker {{number}}",
+    "sfx": "Effetti",
+    "sfxNumbered": "Effetti {{number}}"
+  },
+  "clipName": {
+    "text": "Livello di testo",
+    "color": "Colore",
+    "imported": "Media importato",
+    "linkedAudio": "{{name}} (audio)"
+  },
+  "textClip": {
+    "defaultText": "Scrivi il testo qui"
+  },
+  "flag": {
+    "aria": "Segnaposto {{number}} a {{time}}",
+    "title": "Segnaposto {{number}} · {{time}}: fai clic per andarci, trascina per spostarlo, clic destro per rimuoverlo"
+  },
+  "range": {
+    "label": "{{from}} – {{to}} · {{seconds}} s",
+    "startOnly": "{{time}} · fai clic dove finisce",
+    "dragStart": "Trascina per spostare l'inizio",
+    "dragEnd": "Trascina per spostare la fine"
+  },
+  "pastLimit": "Oltre il limite di rendering",
+  "backgroundMusic": {
+    "title": "Musica di sottofondo",
+    "add": "Aggiungi musica di sottofondo",
+    "remove": "Rimuovi la musica"
+  },
+  "partName": "Parte {{n}} · {{name}}"
+}

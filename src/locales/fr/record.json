@@ -1,0 +1,109 @@
+{
+  "media": {
+    "blocked": {
+      "camera": "La caméra ou le micro est bloqué pour ce site. Autorisez-le avec l'icône dans la barre d'adresse, puis réessayez. Si vous n'avez jamais refusé, les réglages de confidentialité de votre ordinateur bloquent peut-être le navigateur.",
+      "microphone": "Le micro est bloqué pour ce site. Autorisez-le avec l'icône dans la barre d'adresse, puis réessayez. Si vous n'avez jamais refusé, les réglages de confidentialité de votre ordinateur bloquent peut-être le navigateur."
+    },
+    "notAllowed": {
+      "camera": "Cette page n'est pas autorisée à utiliser la caméra ou le micro. Rechargez 3Speak et réessayez.",
+      "microphone": "Cette page n'est pas autorisée à utiliser le micro. Rechargez 3Speak et réessayez."
+    },
+    "busy": {
+      "camera": "Votre caméra ou votre micro est utilisé par une autre appli ou un autre onglet (un appel vidéo, un autre enregistreur). Fermez-le là-bas, puis réessayez.",
+      "microphone": "Votre micro est utilisé par une autre appli ou un autre onglet (un appel vidéo, un autre enregistreur). Fermez-le là-bas, puis réessayez."
+    },
+    "notFound": {
+      "camera": "Aucune caméra ni aucun micro trouvé. Branchez-en un, puis réessayez.",
+      "microphone": "Aucun micro trouvé. Branchez-en un, puis réessayez."
+    },
+    "noDevices": {
+      "camera": "Ce navigateur ne peut pas utiliser la caméra ou le micro ici.",
+      "microphone": "Ce navigateur ne peut pas utiliser le micro ici."
+    },
+    "failed": {
+      "camera": "La caméra ou le micro n'a pas pu démarrer. Réessayez.",
+      "microphone": "Le micro n'a pas pu démarrer. Réessayez."
+    },
+    "failedNamed": {
+      "camera": "La caméra ou le micro n'a pas pu démarrer ({{name}}). Réessayez.",
+      "microphone": "Le micro n'a pas pu démarrer ({{name}}). Réessayez."
+    }
+  },
+  "inline": {
+    "camera": "Caméra",
+    "expand": "Agrandir",
+    "shrink": "Réduire",
+    "uploading": "Mise en ligne...",
+    "uploadingPct": "Mise en ligne... {{pct}} %",
+    "converting": "Conversion...",
+    "rec": "REC",
+    "starting": "Démarrage...",
+    "plateStepOut": "Sortez du champ",
+    "plateShooting": "Prise de l'arrière-plan, restez hors du champ...",
+    "gestures": "Maintenez et faites glisser une image pour la recadrer, pincez pour zoomer.",
+    "gesturesOverlay": "Maintenez et faites glisser une image pour la recadrer, pincez pour zoomer, faites glisser le cadre de votre caméra pour le déplacer.",
+    "greenScreen": {
+      "label": "Fond vert",
+      "off": "Désactivé",
+      "green": "Vert",
+      "blue": "Bleu",
+      "person": "Personne",
+      "static": "Statique",
+      "staticTitle": "Arrière-plan statique (expérimental) : supprime tout ce qui correspond à une prise de l'arrière-plan vide",
+      "personTitle": "Pas besoin de fond vert : vous trouve dans l'image",
+      "threshold": "Seuil",
+      "thresholdStaticTitle": "Tolérance : plus haut ignore davantage de changements de l'arrière-plan (bruit, lumière, mise au point) mais peut commencer à supprimer des parties de vous",
+      "thresholdTitle": "Plus haut supprime davantage la couleur du fond",
+      "despill": "Anti-débordement",
+      "despillStaticTitle": "Retire la couleur du mur sur les bords",
+      "despillGreenTitle": "Retire la teinte verte sur les bords",
+      "despillBlueTitle": "Retire la teinte bleue sur les bords",
+      "retakePlate": "Reprendre l'arrière-plan vide",
+      "shootPlate": "Prendre l'arrière-plan vide",
+      "plateKeep": "Expérimental. Gardez la caméra et la lumière exactement comme elles sont.",
+      "plateHowTo": "Expérimental. Fixez la caméra, appuyez sur le bouton et sortez du champ.",
+      "keyFailed": "L'incrustation en direct n'est pas disponible ici. Le clip reçoit quand même le réglage de fond vert.",
+      "personHowTo": "Pas besoin de fond vert : l'éditeur vous trouve dans l'image. La prise est enregistrée telle quelle et détourée sur la chronologie, où vous choisissez ce qui passe derrière vous."
+    },
+    "tpEdit": "Modifier le texte du téléprompteur",
+    "tpAdd": "Ajouter un texte au téléprompteur",
+    "teleprompter": "Téléprompteur",
+    "recordOnly": "Enregistrer seulement",
+    "recordAndPlay": "Enregistrer + lire la vidéo",
+    "plusPlay": "+ Lecture",
+    "recordReactionTitle": "Enregistrer pendant que l'original joue",
+    "recordReaction": "Enregistrer une réaction",
+    "record": "Enregistrer",
+    "stop": "Arrêter",
+    "retake": "Refaire",
+    "useClip": "Utiliser le clip"
+  },
+  "video": {
+    "title": "Enregistrer une vidéo",
+    "startingCamera": "Démarrage de la caméra...",
+    "start": "Démarrer l'enregistrement",
+    "stop": "Arrêter",
+    "retake": "Refaire",
+    "useClip": "Utiliser le clip"
+  },
+  "audio": {
+    "title": "Enregistrer de l'audio",
+    "cannotRecord": "Ce navigateur ne peut pas enregistrer d'audio ici.",
+    "addFailed": "Impossible d'ajouter l'enregistrement. Réessayez.",
+    "yourRecording": "Votre enregistrement",
+    "micLevel": "Niveau du micro",
+    "accessingMic": "Accès au micro...",
+    "ready": "Prêt à enregistrer : parlez pour vérifier votre niveau",
+    "preparing": "Préparation de votre enregistrement...",
+    "adding": "Ajout à vos pistes...",
+    "tpEdit": "Modifier le texte du téléprompteur",
+    "tpAdd": "Ajouter un texte au téléprompteur",
+    "teleprompter": "Téléprompteur",
+    "start": "Démarrer l'enregistrement",
+    "stop": "Arrêter",
+    "retake": "Refaire",
+    "addingShort": "Ajout...",
+    "useRecording": "Utiliser l'enregistrement",
+    "useScript": "Utiliser ce script"
+  }
+}

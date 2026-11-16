@@ -1,0 +1,86 @@
+{
+  "video": {
+    "title": "Videopodcast",
+    "intro": "De hele aflevering ({{length}}) als 16:9-video: de afbeelding, een bewegende golfvorm, ondertitels en wie er spreekt. Voor videopodcasts op 3Speak, YouTube en Spotify.",
+    "unavailable": "Deze editorserver kan nog geen videopodcasts maken.",
+    "tooLong": "Videopodcasts mogen maximaal {{length}} duren.",
+    "preview": "Voorbeeld van de videopodcast",
+    "sampleCaption": "<b>Jouw</b> woorden verschijnen hier",
+    "stageHint": "De golfvorm beweegt mee met het geluid, de ondertitels en de naam volgen de aflevering.",
+    "defaultLine": "Kijk en luister op *3speak.tv*",
+    "captions": "Ondertitels",
+    "captionsTranscript": "De woorden van je transcript.",
+    "captionsNoStt": "Spraak-naar-tekst is niet beschikbaar op deze server.",
+    "captionsStt": "De woorden, gevonden met spraak-naar-tekst op de server. Lange afleveringen duren even.",
+    "whoSpeaks": "Wie er spreekt",
+    "noVoices": "Geen stemspoor om namen uit te halen.",
+    "speaker": "Spreker {{n}}",
+    "speakerLabel": "Naam voor stemspoor {{n}}",
+    "loudest": "Elke stem op een eigen spoor: de naam van de luidste wordt getoond.",
+    "frameRate": "Framerate",
+    "fps15": "15 fps (kleiner, sneller)",
+    "fps24": "24 fps (vloeiender)",
+    "finding": "Zoeken wie wanneer spreekt...",
+    "sending": "Versturen...",
+    "working": "Bezig...",
+    "serverAnswered": "De server antwoordde {{status}}",
+    "lost": "De taak is verloren gegaan (is de server herstart?)",
+    "stopped": "Gestopt",
+    "signIn": "Log in op 3Speak om een videopodcast te maken.",
+    "failed": "De videopodcast kon niet worden gemaakt: {{error}}",
+    "stop": "Stoppen",
+    "make": "Videopodcast maken",
+    "again": "Opnieuw maken",
+    "download": "MP4 downloaden",
+    "subtitles": "Ondertitels (SRT)",
+    "post": "Op 3Speak plaatsen als video"
+  },
+  "template": {
+    "title": "Je sjabloon",
+    "signedOutIntro": "Sla je intro, outro en muziekbed één keer op, en elke nieuwe opname krijgt ze met één klik. Je sjabloon blijft voorgoed bewaard, dus hij heeft je 3Speak-login nodig.",
+    "signIn": "Log in om een sjabloon te gebruiken",
+    "logIn": "Log in op 3Speak om een sjabloon te gebruiken.",
+    "intro": "Eén sjabloon, voorgoed bewaard. Opslaan vervangt je vorige.",
+    "role": {
+      "intro": {
+        "title": "Intro",
+        "hint": "Speelt eerst, voor je opname.",
+        "clear": "Geen intro"
+      },
+      "outro": {
+        "title": "Outro",
+        "hint": "Speelt direct nadat je opname eindigt.",
+        "clear": "Geen outro"
+      },
+      "bed": {
+        "title": "Muziekbed",
+        "hint": "Zachte muziek onder de hele opname, herhaald zodat het past, aan het eind uitgefaded.",
+        "clear": "Geen muziekbed"
+      }
+    },
+    "useSelected": "\"{{name}}\" gebruiken (het deel waartoe je het hebt ingekort)",
+    "selectFirst": "Selecteer eerst een geüploade audioclip op de tijdlijn",
+    "selectedClip": "Geselecteerde clip",
+    "file": "Bestand",
+    "volume": "Volume",
+    "bedVolume": "Volume van het muziekbed",
+    "loop": "Herhalen over de hele opname",
+    "cutSilences": "De stiltes uit elke nieuwe opname knippen <small>(met je instellingen voor Stiltes knippen)</small>",
+    "loudness": "De luidheid normaliseren voor podcasts <small>(-16 LUFS, toegepast bij het exporteren)</small>",
+    "duck": "De muziek zachter zetten terwijl iemand praat <small>({{db}} dB op het muziekbed; wijzig het in de instellingen van de clip)</small>",
+    "autoApply": "Automatisch toepassen als ik een opname open",
+    "signInUpload": "Log in op 3Speak om te uploaden.",
+    "uploadFailed": "Dat bestand kon niet worden geüpload. Probeer een ander.",
+    "deleteForGood": "Voorgoed verwijderen",
+    "delete": "Sjabloon verwijderen",
+    "saveApply": "Opslaan en toepassen",
+    "voiceTrack": "Stem",
+    "bedTrack": "Muziekbed"
+  },
+  "stage": {
+    "empty": "Voeg een opname toe, neem er een op of kies muziek om te beginnen.",
+    "chapter": "Hoofdstuk",
+    "position": "Positie in de show",
+    "positionText": "{{at}} van {{total}}"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "title": "룩",
+  "noEffects": "효과 없음",
+  "presetsLabel": "룩 프리셋",
+  "doubleClickReset": "더블클릭하면 초기화",
+  "presets": {
+    "original": "원본",
+    "warm": "따뜻하게",
+    "cool": "차갑게",
+    "vivid": "선명하게",
+    "matte": "매트",
+    "bw": "흑백",
+    "vintage": "빈티지",
+    "tealorange": "틸 & 오렌지",
+    "fade": "페이드",
+    "noir": "누아르",
+    "sunset": "선셋"
+  },
+  "sliders": {
+    "blur": "흐림",
+    "vignette": "비네트",
+    "sharpen": "선명도",
+    "split": "틸 & 오렌지"
+  },
+  "transition": {
+    "title": "전환",
+    "none": "없음",
+    "types": {
+      "crossfade": "크로스페이드",
+      "dissolve": "검은 화면으로",
+      "slideleft": "왼쪽으로 슬라이드",
+      "slideright": "오른쪽으로 슬라이드",
+      "slideup": "위로 슬라이드",
+      "zoom": "확대",
+      "whip": "휩"
+    },
+    "length": "전환 길이 (초)",
+    "fades": "페이드",
+    "noFades": "페이드 없음",
+    "in": "인",
+    "out": "아웃",
+    "fadeInSeconds": "페이드 인 (초)",
+    "fadeOutSeconds": "페이드 아웃 (초)",
+    "intoNext": "다음 클립으로",
+    "needNext": "전환을 추가하려면 같은 트랙에서 이 클립 바로 뒤에 클립을 놓으세요.",
+    "fromTo": "{{from}}에서 {{to}}(으)로",
+    "fromUnnamed": "클립에서 {{to}}(으)로",
+    "toUnnamed": "{{from}}에서 다음 클립으로",
+    "bothUnnamed": "클립에서 다음 클립으로",
+    "add": "전환 추가",
+    "cutLabel": "{{type}}, {{seconds}}초"
+  }
+}

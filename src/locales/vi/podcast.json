@@ -1,0 +1,86 @@
+{
+  "video": {
+    "title": "Podcast video",
+    "intro": "Cả tập ({{length}}) dưới dạng video 16:9: hình ảnh, dạng sóng chuyển động, phụ đề và người đang nói. Dành cho podcast video trên 3Speak, YouTube và Spotify.",
+    "unavailable": "Máy chủ chỉnh sửa này chưa thể tạo podcast video.",
+    "tooLong": "Podcast video dài tối đa {{length}}.",
+    "preview": "Xem trước podcast video",
+    "sampleCaption": "Lời <b>của bạn</b> hiện ở đây",
+    "stageHint": "Dạng sóng chuyển động theo âm thanh, phụ đề và tên chạy theo tập.",
+    "defaultLine": "Xem và nghe trên *3speak.tv*",
+    "captions": "Phụ đề",
+    "captionsTranscript": "Lời trong bản ghi lời của bạn.",
+    "captionsNoStt": "Máy chủ này không hỗ trợ chuyển giọng nói thành văn bản.",
+    "captionsStt": "Lời được nhận dạng bằng chuyển giọng nói thành văn bản trên máy chủ. Tập dài sẽ mất một lúc.",
+    "whoSpeaks": "Ai đang nói",
+    "noVoices": "Không có rãnh giọng nói nào để lấy tên.",
+    "speaker": "Người nói {{n}}",
+    "speakerLabel": "Tên cho rãnh giọng nói {{n}}",
+    "loudest": "Mỗi giọng nằm trên rãnh riêng: tên của giọng to nhất sẽ hiện ra.",
+    "frameRate": "Tốc độ khung hình",
+    "fps15": "15 fps (nhỏ hơn, nhanh hơn)",
+    "fps24": "24 fps (mượt hơn)",
+    "finding": "Đang tìm ai nói lúc nào...",
+    "sending": "Đang gửi...",
+    "working": "Đang xử lý...",
+    "serverAnswered": "Máy chủ phản hồi {{status}}",
+    "lost": "Tác vụ bị mất (máy chủ đã khởi động lại?)",
+    "stopped": "Đã dừng",
+    "signIn": "Đăng nhập 3Speak để tạo podcast video.",
+    "failed": "Không tạo được podcast video: {{error}}",
+    "stop": "Dừng",
+    "make": "Tạo podcast video",
+    "again": "Tạo lại",
+    "download": "Tải MP4",
+    "subtitles": "Phụ đề (SRT)",
+    "post": "Đăng lên 3Speak dưới dạng video"
+  },
+  "template": {
+    "title": "Mẫu của bạn",
+    "signedOutIntro": "Lưu phần mở đầu, phần kết và nhạc nền một lần, và mọi bản ghi mới sẽ có chúng chỉ với một cú nhấp. Mẫu của bạn được giữ vĩnh viễn, nên cần đăng nhập 3Speak.",
+    "signIn": "Đăng nhập để dùng mẫu",
+    "logIn": "Đăng nhập 3Speak để dùng mẫu.",
+    "intro": "Một mẫu, giữ vĩnh viễn. Lưu sẽ thay thế mẫu bạn đang có.",
+    "role": {
+      "intro": {
+        "title": "Phần mở đầu",
+        "hint": "Phát đầu tiên, trước bản ghi của bạn.",
+        "clear": "Không có phần mở đầu"
+      },
+      "outro": {
+        "title": "Phần kết",
+        "hint": "Phát ngay sau khi bản ghi của bạn kết thúc.",
+        "clear": "Không có phần kết"
+      },
+      "bed": {
+        "title": "Nhạc nền",
+        "hint": "Nhạc nhẹ dưới toàn bộ bản ghi, lặp lại cho vừa, mờ dần ở cuối.",
+        "clear": "Không có nhạc nền"
+      }
+    },
+    "useSelected": "Dùng \"{{name}}\" (phần bạn đã cắt gọt)",
+    "selectFirst": "Hãy chọn một clip âm thanh đã tải lên trên dòng thời gian trước",
+    "selectedClip": "Clip đã chọn",
+    "file": "Tệp",
+    "volume": "Âm lượng",
+    "bedVolume": "Âm lượng nhạc nền",
+    "loop": "Lặp lại để phủ toàn bộ bản ghi",
+    "cutSilences": "Cắt khoảng lặng khỏi mọi bản ghi mới <small>(theo cài đặt Cắt khoảng lặng của bạn)</small>",
+    "loudness": "Chuẩn hóa độ lớn cho podcast <small>(-16 LUFS, áp dụng khi xuất)</small>",
+    "duck": "Tự giảm nhạc khi có người nói <small>({{db}} dB trên nhạc nền; đổi trong cài đặt của clip)</small>",
+    "autoApply": "Tự áp dụng khi tôi mở một bản ghi",
+    "signInUpload": "Đăng nhập 3Speak để tải lên.",
+    "uploadFailed": "Không tải lên được tệp đó. Hãy thử tệp khác.",
+    "deleteForGood": "Xóa vĩnh viễn",
+    "delete": "Xóa mẫu",
+    "saveApply": "Lưu và áp dụng",
+    "voiceTrack": "Giọng nói",
+    "bedTrack": "Nhạc nền"
+  },
+  "stage": {
+    "empty": "Thêm một bản ghi, ghi âm một bản, hoặc chọn nhạc để bắt đầu.",
+    "chapter": "Chương",
+    "position": "Vị trí trong chương trình",
+    "positionText": "{{at}} / {{total}}"
+  }
+}

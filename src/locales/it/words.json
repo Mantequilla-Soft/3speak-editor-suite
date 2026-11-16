@@ -1,0 +1,63 @@
+{
+  "panel": {
+    "title": "Trascrizione",
+    "close": "Chiudi la trascrizione"
+  },
+  "cutNotice": {
+    "plain": "Tagliato: {{seconds}} s in meno.",
+    "words_one": "{{count}} parola tagliata: {{seconds}} s in meno.",
+    "words_many": "{{count}} parole tagliate: {{seconds}} s in meno.",
+    "words_other": "{{count}} parole tagliate: {{seconds}} s in meno.",
+    "found_one": "{{count}} risultato tagliato: {{seconds}} s in meno.",
+    "found_many": "{{count}} risultati tagliati: {{seconds}} s in meno.",
+    "found_other": "{{count}} risultati tagliati: {{seconds}} s in meno.",
+    "fillers": "Tagliati {{fillers}}, {{pauses}}: {{seconds}} s in meno.",
+    "dismiss": "Chiudi"
+  },
+  "fillers": {
+    "title": "Rimuovi intercalari e pause",
+    "emptyHint": "Funziona dalla trascrizione: trova ehm, uhm, cioè e simili nella lingua della puntata, e le pause lunghe.",
+    "listening": "Ascolto...",
+    "transcribeFirst": "Trascrivi prima la puntata",
+    "checking": "Verifica del server...",
+    "unavailable": "Le trascrizioni non sono disponibili su questo server dell'editor al momento.",
+    "intro": "Intercalari in {{language}}. Ascoltali uno per uno, togli la spunta a ciò che deve restare.",
+    "introNoList": "Intercalari in {{language}} (solo ehm, uhm e simili: ancora nessun elenco per questa lingua). Ascoltali uno per uno, togli la spunta a ciò che deve restare.",
+    "stillTranscribing": "Il resto della puntata è ancora in trascrizione.",
+    "fillerWords": "Intercalari",
+    "longPauses": "Pause lunghe",
+    "minPause": "Pausa più lunga di <strong>{{seconds}} s</strong>",
+    "keepPause": "Accorcia le pause a <strong>{{seconds}} s</strong>",
+    "keepPauseTitle": "Quanto resta di una pausa lunga dopo il taglio",
+    "fillerCount_one": "{{count}} intercalare",
+    "fillerCount_many": "{{count}} intercalari",
+    "fillerCount_other": "{{count}} intercalari",
+    "pauseCount_one": "{{count}} pausa",
+    "pauseCount_many": "{{count}} pause",
+    "pauseCount_other": "{{count}} pause",
+    "summary": "{{fillers}}, {{pauses}} spuntati · taglia {{seconds}} s",
+    "nothingFound": "Niente trovato con queste impostazioni.",
+    "tickAllFillers": "Spunta tutti gli intercalari",
+    "untickAllFillers": "Togli la spunta a tutti gli intercalari",
+    "tickAllPauses": "Spunta tutte le pause",
+    "untickAllPauses": "Togli la spunta a tutte le pause",
+    "listLabel": "Cosa verrebbe tagliato",
+    "item": {
+      "keepPause": "Tieni questa pausa",
+      "cutPause": "Taglia questa pausa",
+      "keepFiller": "Tieni {{text}}",
+      "cutFiller": "Taglia {{text}}",
+      "stop": "Stop",
+      "listenTitle": "Ascolta (con un secondo intorno)",
+      "listenAt": "Ascolta a {{time}}",
+      "pause": "Pausa",
+      "pauseLength": "{{length}} s → {{kept}} s",
+      "filler": "Intercalare",
+      "fillerTitle": "Un suono di esitazione",
+      "maybe": "Forse",
+      "maybeTitle": "Qui un intercalare (tra pause o virgole): ascolta prima"
+    },
+    "cut": "Taglia",
+    "cutCount": "Taglia {{n}} ({{seconds}} s)"
+  }
+}

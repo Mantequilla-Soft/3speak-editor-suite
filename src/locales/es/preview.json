@@ -1,0 +1,29 @@
+{
+  "header": "Vista previa de la línea de tiempo",
+  "smaller": "Más pequeño",
+  "larger": "Más grande",
+  "loopOn": "Bucle: activado",
+  "loopOff": "Bucle: desactivado",
+  "aspect": {
+    "title": "Relación de aspecto: {{ratio}}",
+    "titleAuto": "Relación de aspecto: automática ({{ratio}})",
+    "auto": "Automática"
+  },
+  "fullSize": "Tamaño completo",
+  "halfSize": "Mitad de tamaño",
+  "fullscreen": "Pantalla completa",
+  "noClipHere": "No hay ningún clip en esta posición",
+  "noClips": "No hay clips en la línea de tiempo",
+  "source": {
+    "hls": "(stream HLS)",
+    "uploaded": "(subido)",
+    "local": "(local)",
+    "file": "(archivo)"
+  },
+  "stageLayout": {
+    "tileTop": "Mosaico arriba",
+    "tileBottom": "Mosaico abajo",
+    "overlay": "Superposición"
+  },
+  "selectClip": "Selecciona un clip para la vista previa"
+}

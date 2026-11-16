@@ -1,0 +1,111 @@
+{
+  "textFx": {
+    "title": "Athari za maandishi",
+    "outline": "Mstari wa nje",
+    "outlineColour": "Rangi ya mstari wa nje",
+    "outlineWidth": "Unene wa mstari wa nje",
+    "wordsComeIn": "Maneno yanaingia",
+    "allAtOnce": "Yote kwa pamoja",
+    "atOnce": "Kwa pamoja",
+    "anims": {
+      "pop": "Kuibuka",
+      "fadeUp": "Fifia juu",
+      "typewriter": "Taipureta",
+      "slide": "Teleza"
+    },
+    "gap": "Nafasi",
+    "gapSeconds": "Muda kati ya maneno (sekunde)",
+    "defaultText": "Maandishi"
+  },
+  "templates": {
+    "dialogTitle": "Vichwa",
+    "allTitles": "Vichwa vyote",
+    "overVideo": "Juu ya video",
+    "ownBackground": "Mandharinyuma yake",
+    "starsHint": "Weka *nyota* kuzunguka neno ili kulipaka rangi.",
+    "addTitle": "Ongeza kichwa",
+    "groups": {
+      "lower": "Vichwa vya chini",
+      "title": "Vichwa juu ya video",
+      "card": "Kadi za utangulizi na hitimisho"
+    },
+    "fields": {
+      "name": "Jina",
+      "role": "Jukumu",
+      "lines": "Mistari",
+      "words": "Maneno",
+      "lineUnder": "Mstari chini yake",
+      "lineInFront": "Mstari mbele",
+      "rows": "Safu",
+      "headline": "Kichwa kikuu",
+      "lineUnderIt": "Mstari chini yake",
+      "tagline": "Kauli mbiu",
+      "cta": "Wito wa kuchukua hatua",
+      "smallPrint": "Maandishi madogo"
+    },
+    "items": {
+      "lowerName": {
+        "label": "Jina na jukumu",
+        "sub": "Mtayarishi kwenye 3Speak"
+      },
+      "lowerStatement": {
+        "label": "Kauli fupi",
+        "lines": "Mambo matatu\nniliyo*jifunza* leo"
+      },
+      "titleWords": {
+        "label": "Neno moja kwa wakati mmoja",
+        "words": "Panga.\nRekodi.\n*Chapisha.*",
+        "line": "Wiki yangu kwenye 3Speak"
+      },
+      "titleKinetic": {
+        "label": "Maneno yanagonga ndani",
+        "words": "Haraka\nRahisi\nYako",
+        "line": "Imetengenezwa kwenye *3Speak*"
+      },
+      "titlePoster": {
+        "label": "Maneno makubwa sana yaliyopangwa",
+        "words": "Siku\nya kwanza.",
+        "sub": "Kuanzia sifuri"
+      },
+      "titleMarquee": {
+        "label": "Safu zinazosogea",
+        "rows": "Panga\nRekodi\nChapisha\nRudia",
+        "line": "Kila *wiki*"
+      },
+      "cardHook": {
+        "label": "Utangulizi: mstari wa kufungua",
+        "lines": "Jinsi\nninavyohariri\n*Shorts* zangu",
+        "sub": "Chini ya dakika moja"
+      },
+      "cardEnd": {
+        "label": "Hitimisho: nifuate",
+        "tagline": "Shorts mpya *kila wiki*",
+        "cta": "Fuata kwenye 3Speak"
+      },
+      "cardPoster": {
+        "label": "Hitimisho: maneno makubwa sana",
+        "words": "Tuonane\n*hivi*\n*karibuni.*",
+        "cta": "Fuata kwenye 3Speak"
+      }
+    }
+  },
+  "scene": {
+    "title": "Kichwa",
+    "onePerLine": "Kimoja kwa kila mstari",
+    "colours": "Rangi",
+    "font": "Fonti",
+    "overVideo": "Juu ya video",
+    "length": "Urefu",
+    "lengthSeconds": "Urefu (sekunde)",
+    "defaultName": "Mimi",
+    "layerTitle": "Kichwa"
+  },
+  "colors": {
+    "ember": "Kaa la moto",
+    "amber": "Kahawia",
+    "ocean": "Bahari",
+    "forest": "Msitu",
+    "berry": "Beri",
+    "paper": "Karatasi"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "title": "Look",
+  "noEffects": "Keine Effekte",
+  "presetsLabel": "Look-Vorlagen",
+  "doubleClickReset": "Doppelklick zum Zurücksetzen",
+  "presets": {
+    "original": "Original",
+    "warm": "Warm",
+    "cool": "Kühl",
+    "vivid": "Kräftig",
+    "matte": "Matt",
+    "bw": "S/W",
+    "vintage": "Vintage",
+    "tealorange": "Teal & Orange",
+    "fade": "Verblasst",
+    "noir": "Noir",
+    "sunset": "Sonnenuntergang"
+  },
+  "sliders": {
+    "blur": "Unschärfe",
+    "vignette": "Vignette",
+    "sharpen": "Schärfen",
+    "split": "Teal & Orange"
+  },
+  "transition": {
+    "title": "Übergang",
+    "none": "Keiner",
+    "types": {
+      "crossfade": "Überblenden",
+      "dissolve": "Über Schwarz",
+      "slideleft": "Nach links schieben",
+      "slideright": "Nach rechts schieben",
+      "slideup": "Nach oben schieben",
+      "zoom": "Zoom",
+      "whip": "Wischen"
+    },
+    "length": "Länge des Übergangs (Sekunden)",
+    "fades": "Blenden",
+    "noFades": "Keine Blenden",
+    "in": "Ein",
+    "out": "Aus",
+    "fadeInSeconds": "Einblenden (Sekunden)",
+    "fadeOutSeconds": "Ausblenden (Sekunden)",
+    "intoNext": "In den nächsten Clip",
+    "needNext": "Leg einen Clip direkt hinter diesen auf dieselbe Spur, um einen Übergang hinzuzufügen.",
+    "fromTo": "{{from}} in {{to}}",
+    "fromUnnamed": "Clip in {{to}}",
+    "toUnnamed": "{{from}} in den nächsten Clip",
+    "bothUnnamed": "Clip in den nächsten Clip",
+    "add": "Übergang hinzufügen",
+    "cutLabel": "{{type}}, {{seconds}} s"
+  }
+}

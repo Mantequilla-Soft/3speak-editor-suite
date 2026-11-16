@@ -1,0 +1,83 @@
+{
+  "button": {
+    "rendering": "Me-render...",
+    "exporting": "Mengekspor...",
+    "uploading": "Mengunggah {{percent}}",
+    "reRender": "Render ulang",
+    "exportAgain": "Ekspor lagi",
+    "trimToRender": "Pangkas linimasa menjadi {{limit}} atau kurang untuk me-render",
+    "trimToExport": "Pangkas linimasa menjadi {{limit}} atau kurang untuk mengekspor"
+  },
+  "exportAs": {
+    "button": "Ekspor sebagai",
+    "title": "Ekspor sebagai: proyek yang sama sebagai Short, video persegi, atau lanskap, dipotong di sekitar wajah",
+    "close": "Tutup Ekspor sebagai",
+    "waitUpload": "Tunggu sampai unggahan selesai."
+  },
+  "done": {
+    "download": "Unduh",
+    "audiograms": "Audiogram",
+    "audiogramsCount": "Audiogram ({{n}})",
+    "audiogramsTitle": "Video pendek dari potongan episode, untuk dibagikan atau diposting sebagai Shorts bersamanya",
+    "videoPodcast": "Podcast video",
+    "videoPodcastTitle": "Seluruh episode sebagai video 16:9 dengan sampul, gelombang suara, teks, dan siapa yang berbicara",
+    "useAudio": "Pakai audio ini",
+    "sendVideo": "Kirim video"
+  },
+  "failed": "Render gagal: {{error}}",
+  "phase": {
+    "preparing": "Menyiapkan file...",
+    "submitting": "Mengirim tugas render...",
+    "busyRetry": "Server render sedang sibuk. Mencoba lagi dalam {{seconds}} dtk...",
+    "offlineRetry": "Tidak ada koneksi ke server render. Mencoba lagi dalam {{seconds}} dtk...",
+    "starting": "Memulai...",
+    "reconnecting": "Menyambung ulang ke server render...",
+    "uploadingFile": "Mengunggah {{name}} ({{index}}/{{total}})...",
+    "uploadingUnnamed": "Mengunggah file ({{index}}/{{total}})...",
+    "uploadingPlate": "Mengunggah frame latar untuk {{name}}...",
+    "uploadingPlateUnnamed": "Mengunggah frame latar untuk klip..."
+  },
+  "queue": {
+    "next": "Giliranmu berikutnya",
+    "inLine": {
+      "one": "Kamu di antrean ke-{{n}}",
+      "two": "Kamu di antrean ke-{{n}}",
+      "few": "Kamu di antrean ke-{{n}}",
+      "other": "Kamu di antrean ke-{{n}}"
+    },
+    "waiting": "Menunggu tempat render yang kosong..."
+  },
+  "legacy": {
+    "exportVideo": "Ekspor video",
+    "cancelTitle": "Batalkan ekspor",
+    "settingsTitle": "Pengaturan ekspor",
+    "uploadingRender": "Mengunggah {{name}} ({{percent}}). Lanjutkan mengedit; Render terbuka setelah selesai.",
+    "uploadingExport": "Mengunggah {{name}} ({{percent}}). Lanjutkan mengedit; Ekspor terbuka setelah selesai.",
+    "lengthRender": "Linimasa {{length}}. Pangkas menjadi {{limit}} atau kurang untuk me-render.",
+    "lengthExport": "Linimasa {{length}}. Pangkas menjadi {{limit}} atau kurang untuk mengekspor.",
+    "method": "Metode ekspor",
+    "methodCanvas": "Canvas (WYSIWYG)",
+    "methodFast": "Cepat (tanpa efek)",
+    "canvasHint": "Merekam semua efek visual persis seperti di pratinjau",
+    "fastHint": "Ekspor lebih cepat tetapi mengabaikan zoom, posisi, pangkasan, overlay teks",
+    "quality": "Kualitas",
+    "qualityHigh": "Tinggi (file lebih besar)",
+    "qualityMedium": "Sedang (disarankan)",
+    "qualityLow": "Rendah (file lebih kecil)",
+    "processing": "Memproses... {{percent}}",
+    "renderingPercent": "Me-render... {{percent}}",
+    "downloadRendered": "Unduh video hasil render",
+    "ffmpegLoading": "Memuat FFmpeg...",
+    "ffmpegNotLoaded": "FFmpeg belum dimuat",
+    "addClips": "Tambahkan klip ke linimasa untuk mengekspor"
+  },
+  "canvas": {
+    "loadingMedia": "Memuat media...",
+    "renderingFrames": "Me-render frame...",
+    "encodingVideo": "Meng-encode video...",
+    "processingAudio": "Memproses audio...",
+    "convertingMp4": "Mengonversi ke MP4...",
+    "preparingDownload": "Menyiapkan unduhan...",
+    "complete": "Selesai!"
+  }
+}

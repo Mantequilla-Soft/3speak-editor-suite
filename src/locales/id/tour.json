@@ -1,0 +1,117 @@
+{
+  "shorts": {
+    "welcome": {
+      "title": "Selamat datang!",
+      "text": "Selamat datang di Editor Shorts 3Speak. Yuk lihat sekilas fitur-fitur utamanya."
+    },
+    "preview": {
+      "title": "Pratinjau",
+      "text": "Ini pratinjau videomu. Kamu bisa menyeret klip untuk memindahkannya dan mencubit untuk zoom."
+    },
+    "timeline": {
+      "title": "Linimasa",
+      "text": "Atur klipmu di sini. Seret untuk mengubah urutan, tarik tepinya untuk memangkas."
+    },
+    "addMedia": {
+      "title": "Tambah media",
+      "text": "Ketuk + untuk menambahkan klip video, gambar, teks, audio, atau warna ke trekmu."
+    },
+    "clipSettings": {
+      "title": "Pengaturan klip",
+      "text": "Pilih klip lalu ketuk ikon roda gigi untuk mengedit propertinya seperti skala, posisi, dan opasitas."
+    },
+    "render": {
+      "title": "Render",
+      "text": "Setelah selesai mengedit, tekan Render untuk mengekspor videomu. Lalu kamu bisa mengunduh atau mengirimnya."
+    }
+  },
+  "audio": {
+    "welcome": {
+      "title": "Selamat datang di Editor Audio",
+      "text": "Potong, bersihkan, dan ratakan level podcast, lagu, atau pesan suara, lalu posting di 3Speak. Ini sekilas tentang apa yang bisa dilakukannya."
+    },
+    "addAudio": {
+      "title": "Tambahkan audiomu",
+      "text": "Tambahkan rekaman, rekam langsung di sini, atau pilih musik dari pustaka. File video juga bisa: editor hanya mengambil suaranya. Hingga 3 jam."
+    },
+    "tracks": {
+      "title": "Trek suara dan musik",
+      "text": "Rekaman masuk ke trek suara, musik ke treknya sendiri. Seret klip untuk memindahkannya, tarik tepinya untuk memangkas. Zoom dengan slider, atau ketuk Pas untuk melihat semuanya."
+    },
+    "clipSettings": {
+      "title": "Pengaturan klip",
+      "text": "Pilih klip untuk melihat pengaturannya. Bersihkan suara (Kuat membuang bising dan dengung serta membuatnya lebih jernih dan rata), dan Ducking: klip mengecil saat trek lain diputar. Grupkan suara yang direkam bersamaan agar tetap sinkron."
+    },
+    "cutSilences": {
+      "title": "Potong hening",
+      "text": "Menemukan jeda di trek suaramu, membuangnya, dan merapatkan celahnya. Suara yang digrupkan hanya dipotong saat semua orang diam."
+    },
+    "template": {
+      "title": "Templatemu",
+      "text": "Siapkan intro, outro, dan musik latar sekali saja. Semuanya masuk ke setiap rekaman baru, dan templatemu disimpan selamanya."
+    },
+    "normalize": {
+      "title": "Normalisasi",
+      "text": "Membawa hasil ekspor ke kenyaringan podcast yang rata (-16 LUFS), sehingga setiap episode terdengar sama kerasnya dengan yang sebelumnya. Matikan untuk mempertahankan level aslimu."
+    },
+    "chapters": {
+      "title": "Bab",
+      "text": "Tandai di mana tiap bagian dimulai (tekan M untuk menambah satu di playhead). Bab masuk ke MP3 dan ke deskripsi episodemu."
+    },
+    "export": {
+      "title": "Ekspor",
+      "text": "Ekspor membuat MP3. Dengarkan dulu, lalu pakai untuk unggahanmu atau unduh. Jika sudah masuk, proyekmu disimpan sebagai draf selagi kamu bekerja."
+    }
+  },
+  "audiogram": {
+    "intro": {
+      "title": "Audiogram",
+      "text": "Video pendek dari potongan episodemu: gelombang suara bergerak, judul dan gambarmu, dengan tampilan 3Speak. Semuanya terbit sebagai Shorts 3Speak bersama episodenya."
+    },
+    "piece": {
+      "title": "Potonganmu",
+      "text": "Potongan yang kamu pilih di linimasa, hingga 2 menit. Ganti di sini kapan saja."
+    },
+    "arrange": {
+      "title": "Atur sesukamu",
+      "text": "Seret bagian mana pun untuk memindahkannya, tarik sudut untuk mengubah ukurannya (Shift menjaga bentuk), dan putar dengan gagang bulat di bawahnya. Logo 3Speak selalu ada, sebagai 3S atau logo lengkap."
+    },
+    "picture": {
+      "title": "Gambar",
+      "text": "Unggah satu atau ambil sampul salah satu playlist-mu. Gambar tampil sebagai kartu yang bisa dipindah dan diubah ukurannya seperti bagian lain."
+    },
+    "waveform": {
+      "title": "Gelombang suara",
+      "text": "Batang, garis, lingkaran, atau gelombang lingkaran, dalam merah 3Speak atau warna apa pun yang kamu suka."
+    },
+    "parts": {
+      "title": "Bagian",
+      "text": "Sembunyikan bagian, atau majukan dan mundurkan saat bagian-bagian saling tumpang tindih."
+    },
+    "make": {
+      "title": "Buat",
+      "text": "Buat sebanyak yang kamu mau: masing-masing terbit sebagai Short bersama episodenya, dengan teksnya sendiri dan tautan ke episode. Tampilan terakhirmu disimpan sebagai template untuk yang berikutnya."
+    }
+  },
+  "rangePick": {
+    "startEnd": {
+      "title": "Klik awal, lalu akhir",
+      "text": "Klik di mana potongan dimulai, lalu di mana berakhir: hingga 2 menit. Tarik tepinya untuk menyesuaikan, atau seret melintasi trek untuk menggambar satu potongan utuh. Klik baru akan memulai dari awal."
+    },
+    "moveAround": {
+      "title": "Bergerak",
+      "text": "Seret penggaris atau gulir untuk bergerak di sepanjang episode. Zoom dengan slider untuk awal yang tepat, atau ketuk Pas untuk melihat seluruh episode."
+    },
+    "listen": {
+      "title": "Dengarkan",
+      "text": "Putar potongan (atau Spasi) hanya memutar bagian yang kamu pilih, lalu kembali ke awalnya."
+    },
+    "use": {
+      "title": "Pakai",
+      "text": "Pakai potongan ini (atau Enter) membawanya kembali ke audiogrammu, Batal (atau Escape) mempertahankan yang lama. Sampai saat itu bagian lain editor dikunci, jadi tidak ada yang berubah secara tidak sengaja."
+    }
+  },
+  "buttons": {
+    "done": "Mengerti!"
+  }
+}

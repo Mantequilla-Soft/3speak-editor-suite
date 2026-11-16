@@ -1,0 +1,26 @@
+{
+  "music": {
+    "title": "Âm nhạc",
+    "search": "Tìm bài hát",
+    "loading": "Đang tải bài hát...",
+    "failed": "Không tải được thư viện nhạc.",
+    "none": "Không có bài hát phù hợp.",
+    "note": "Thông tin bài hát được tự động thêm vào bài đăng của bạn. Chọn âm thanh của một nhà sáng tạo 3Speak sẽ mang lại cho họ 5% phần thưởng của bài đăng.",
+    "addTitle": "Thêm vào video"
+  },
+  "sfx": {
+    "title": "Hiệu ứng âm thanh",
+    "search": "Tìm âm thanh",
+    "loading": "Đang tải âm thanh...",
+    "failed": "Không tải được hiệu ứng âm thanh.",
+    "none": "Không có âm thanh phù hợp.",
+    "note": "Âm thanh được thêm tại đầu phát. Dùng miễn phí (CC0, Kenney.nl), không cần ghi nguồn.",
+    "addTitle": "Thêm tại đầu phát"
+  },
+  "all": "Tất cả",
+  "timeline": "Dòng thời gian: {{title}}",
+  "seconds": "{{seconds}} giây",
+  "stop": "Dừng",
+  "listen": "Nghe thử",
+  "add": "Thêm"
+}

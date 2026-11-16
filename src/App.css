@@ -7980,3 +7980,286 @@ input[type="range"] {
     animation: none !important;
   }
 }
+
+/* ============================================================
+   Auto captions (CaptionsPanel, CaptionsOverlay)
+   The overlay draws what the render burns in (utils/captions.js):
+   sizes are % of the canvas height (cqh), so it scales with the preview.
+   ============================================================ */
+.captions-canvas {
+  position: absolute;
+  container-type: size;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 40;
+}
+
+.captions-overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.captions-overlay-block {
+  position: absolute;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  text-align: center;
+}
+
+.captions-overlay-line {
+  white-space: nowrap;
+}
+
+/* the burn-in's black outline sits outside the letters: a stroke twice as wide, painted under the fill */
+.captions-overlay-block:not(.plain) .captions-overlay-line > span {
+  -webkit-text-stroke: var(--caption-outline) #000;
+  paint-order: stroke fill;
+}
+
+.captions-overlay-block.plain .captions-overlay-line > span {
+  display: inline-block;
+  padding: 0 0.22em;
+  background: rgba(0, 0, 0, 0.69);
+}
+
+.captions-overlay-block.pop {
+  animation: captions-pop 120ms linear;
+}
+
+@keyframes captions-pop {
+  from { transform: translateY(-50%) scale(0.7); }
+  to { transform: translateY(-50%) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .captions-overlay-block.pop { animation: none; }
+}
+
+.captions-overlay-emoji {
+  position: absolute;
+  object-fit: contain;
+}
+
+.captions-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+}
+
+.captions-text {
+  margin: 0;
+  font-size: var(--fs-12);
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.captions-error {
+  margin: 0;
+  font-size: var(--fs-12);
+  line-height: 1.45;
+  color: var(--accent);
+}
+
+.captions-go {
+  justify-content: center;
+  width: 100%;
+}
+
+.captions-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  font-size: var(--fs-12);
+  color: var(--muted);
+}
+
+.captions-progress > span {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.captions-progress .silence-cut-cancel {
+  align-self: flex-start;
+}
+
+.captions-panel .beat-sync-toggle {
+  font-size: var(--fs-12);
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.captions-progress-bar {
+  height: 4px;
+  border-radius: var(--r-bar);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.captions-progress-bar > div {
+  height: 100%;
+  background: var(--accent);
+  transition: width var(--t-fast) var(--ease);
+}
+
+.captions-presets {
+  margin-bottom: 0;
+}
+
+.captions-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.captions-swatch {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.captions-swatch.active {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--text);
+}
+
+.captions-words {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.captions-words li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 2px var(--sp-1);
+  border-radius: var(--r-sm);
+}
+
+.captions-words li.active {
+  background: var(--surface-2);
+}
+
+.captions-word-time {
+  flex-shrink: 0;
+  width: 48px;
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: var(--fs-11);
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
+}
+
+.captions-word-time:hover {
+  color: var(--text);
+}
+
+.text-input.captions-word-text {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  height: 28px;
+  padding: 0 var(--sp-3);
+  resize: none;
+  border-radius: var(--r-sm);
+}
+
+.captions-word-emoji,
+.captions-word-remove {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: var(--surface-2);
+  border: none;
+  border-radius: var(--r-sm);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.captions-word-emoji img {
+  width: 18px;
+  height: 18px;
+}
+
+.captions-word-remove:hover,
+.captions-word-emoji:hover {
+  color: var(--text);
+}
+
+.captions-emoji-choices {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+  padding: var(--sp-2);
+  background: var(--surface-2);
+  border-radius: var(--r-sm);
+}
+
+.captions-emoji-choices button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+
+.captions-emoji-choices button.active,
+.captions-emoji-choices button:hover {
+  background: var(--surface);
+}
+
+.captions-emoji-choices img {
+  width: 22px;
+  height: 22px;
+}
+
+.captions-emoji-choices .captions-emoji-none {
+  width: auto;
+  padding: 0 var(--sp-3);
+  font-size: var(--fs-12);
+  color: var(--muted);
+}
+
+.captions-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+
+.captions-actions .silence-cut-cancel,
+.captions-actions .silence-cut-apply {
+  height: 36px;
+}
+
+.captions-actions .silence-cut-cancel:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* the Short has captions, or their panel is open */
+.action-btn.captions-btn.active {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  background: var(--cyan-tint);
+}

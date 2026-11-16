@@ -1,0 +1,88 @@
+{
+  "title": "프롬프터",
+  "showOnCamera": "카메라에 표시",
+  "speechNotice": {
+    "title": "음성 따라가기는 지금은 Chromium 브라우저에서만 작동해요.",
+    "body": "말하는 대로 대본이 스크롤되게 하려면 Chrome, Edge, Brave 또는 Opera를 사용하세요. 이 브라우저에서는 설정한 일정한 속도로 스크롤돼요."
+  },
+  "speechErrors": {
+    "network": "음성 서비스에 연결할 수 없어요. 음성 인식에는 인터넷 연결이 필요해요 (Chrome은 받아쓰기를 위해 오디오를 Google로 보내요).",
+    "audioCapture": "음성 인식에 소리가 들어오지 않았어요. 마이크가 사용 중일 수 있으니 헤드셋을 사용해 보세요.",
+    "notAllowed": "음성 인식에 대한 마이크 권한이 차단되어 있어요.",
+    "unsupported": "이 브라우저에는 음성 인식 기능이 없어요.",
+    "generic": "음성 인식 오류: {{err}}"
+  },
+  "noMic": "마이크 없이 녹화해요(마이크를 사용할 수 없음).",
+  "autoDetect": "자동 감지({{lang}})",
+  "presets": {
+    "frontcam": "전면 카메라",
+    "frontcamTitle": "셀카 렌즈 아래의 좁은 띠, 읽고 있다는 게 가장 덜 티 나요",
+    "max": "최대 크기",
+    "maxTitle": "멀리서도 읽을 수 있는 큰 글씨",
+    "top": "상단 여러 줄",
+    "topTitle": "상단에 여러 줄 표시"
+  },
+  "scroll": {
+    "label": "스크롤",
+    "modeAria": "스크롤 모드",
+    "followVoice": "음성 따라가기",
+    "followVoiceTitle": "대본을 소리 내어 읽으면 스크롤돼요",
+    "needsChromium": "Chrome, Edge 또는 다른 Chromium 브라우저가 필요해요",
+    "timed": "일정 속도",
+    "timedTitle": "일정한 속도로 스크롤돼요",
+    "voiceForcedMissing": "여기서는 음성 따라가기를 사용할 수 없어서 일정 속도 스크롤을 사용해요.",
+    "voiceUnavailable": "이 브라우저에서는 음성 따라가기를 사용할 수 없어요."
+  },
+  "style": {
+    "title": "텍스트 스타일",
+    "fontSize": "글자 크기",
+    "fontSizeValue": "{{size}}px",
+    "text": "텍스트",
+    "background": "배경",
+    "bgOpacity": "배경 불투명도",
+    "mirrorText": "텍스트 좌우 반전 (프롬프터 거울용)",
+    "voiceLanguage": "음성 언어"
+  },
+  "status": {
+    "serverErrorSwitched": "음성 서버 오류 ({{reason}}). 일정 속도 스크롤로 전환했어요.",
+    "voiceErrorSwitched": "{{error}} 일정 속도 스크롤로 전환했어요.",
+    "voiceStoppedSwitched": "음성 따라가기가 멈췄어요. 일정 속도 스크롤로 전환했어요.",
+    "serverError": "음성 서버 오류 ({{reason}}).",
+    "listeningServer": "듣는 중(서버)… 읽기 시작하세요",
+    "connectingServer": "음성 서버에 연결 중…",
+    "listening": "듣는 중… 소리 내어 읽기 시작하세요",
+    "startingMic": "마이크 시작 중…",
+    "scrollPaused": "스크롤 일시정지됨",
+    "timedScroll": "일정 속도 스크롤, 분당 {{wpm}}단어",
+    "scrollTest": "스크롤 테스트, 분당 {{wpm}}단어"
+  },
+  "sttReason": {
+    "unreachable": "연결할 수 없음",
+    "noMic": "마이크 없음",
+    "audioUnavailable": "오디오를 사용할 수 없음",
+    "connectionFailed": "연결 실패",
+    "unauthorized": "권한 없음",
+    "closed": "연결 종료됨",
+    "serverError": "서버 오류"
+  },
+  "scriptPlaceholder": "여기에 대본을 쓰거나 붙여넣으세요. 녹화하는 동안 소리 내어 읽는 대로, 또는 일정 속도 모드에서는 일정한 속도로 스크롤돼요.",
+  "scriptModeVoice": "스크롤: 음성 따라가기",
+  "scriptModeTimed": "스크롤: 일정 속도, 분당 {{wpm}}단어",
+  "hide": "숨기기",
+  "dragToMove": "드래그해서 이동",
+  "dragToResize": "드래그해서 크기 조정",
+  "expandMenu": "메뉴 펼치기",
+  "collapseMenu": "메뉴 접기",
+  "editScript": "대본 수정",
+  "testVoice": "음성 테스트",
+  "stopVoiceTest": "테스트 중지",
+  "scrollSpeed": "스크롤 속도",
+  "slower": "느리게",
+  "faster": "빠르게",
+  "wordsPerMin": "단어/분",
+  "testScroll": "스크롤 테스트",
+  "stopScrollTest": "스크롤 테스트 중지",
+  "pauseScroll": "스크롤 일시정지",
+  "resumeScroll": "스크롤 다시 시작",
+  "hideTeleprompter": "프롬프터 숨기기"
+}

@@ -1,0 +1,180 @@
+{
+  "aria": {
+    "timeline": "타임라인",
+    "ruler": "시간 눈금자: 클릭하면 재생 헤드가 이동해요",
+    "playhead": "재생 헤드",
+    "zoom": "확대"
+  },
+  "split": {
+    "title": "재생 헤드 위치에서 클립 분할 (Ctrl+R)",
+    "label": "분할"
+  },
+  "toolbar": {
+    "add": {
+      "title": "트랙 또는 클립 추가",
+      "videoTrack": "동영상 트랙",
+      "audioTrack": "오디오 트랙",
+      "musicLibrary": "음악 라이브러리",
+      "soundEffects": "효과음",
+      "stickers": "스티커",
+      "titles": "제목",
+      "stock": "스톡 미디어"
+    },
+    "zoomTitle": "확대: {{value}}px/초",
+    "fit": {
+      "title": "타임라인 전체 보기",
+      "label": "맞춤"
+    },
+    "select": {
+      "titleStart": "여러 클립 선택: 하나씩 탭하세요",
+      "titleDone": "선택 완료",
+      "label": "선택"
+    },
+    "ripple": {
+      "titleTrack": "트랙 {{number}}에서 재생 헤드 위치의 빈틈 메우기 (G). 다른 트랙은 그대로예요.",
+      "titleNoGap": "선택한 클립의 트랙에는 재생 헤드 위치에 빈틈이 없어요",
+      "title": "재생 헤드 위치의 빈틈 제거 (G)",
+      "label": "리플"
+    },
+    "captions": {
+      "title": "자막: 말한 내용을 단어별 자막으로 만들어요",
+      "label": "자막"
+    },
+    "transcript": {
+      "title": "스크립트: 텍스트로 편집하고, 단어를 지우면 그 부분이 잘려요",
+      "label": "스크립트"
+    },
+    "flag": {
+      "title": "재생 헤드 위치에 깃발 설정 (B): 번호와 색이 붙는 나만의 표시, 내보내지 않아요",
+      "label": "깃발"
+    },
+    "autoCut": {
+      "title": "쉼을 찾아서 거기서 자르기",
+      "label": "자동 자르기"
+    },
+    "beats": {
+      "title": "비트 찾기: 비트에 맞춰 붙이고 클립을 배치해요",
+      "label": "비트"
+    },
+    "delete": {
+      "title": "선택한 클립 삭제 (Del)",
+      "titleMany": "선택한 클립들 삭제 (Del)",
+      "labelMany": "{{number}}개 삭제"
+    },
+    "options": "옵션",
+    "ungroup": {
+      "titleOne": "그룹 해제: 클립이 다시 따로 이동하고 트리밍돼요",
+      "titleMany": "그룹 해제: 이 클립들이 다시 따로 이동하고 트리밍돼요",
+      "label": "그룹 해제"
+    },
+    "group": {
+      "title": "그룹: 이 클립들이 함께 이동하고 트리밍돼요",
+      "label": "{{number}}개 그룹"
+    },
+    "more": {
+      "title": "클립 작업 더 보기",
+      "duplicate": "복제",
+      "groupVoicesTitle": "다른 음성 트랙에서 동시에 재생되는 것과 그룹으로 묶기: 함께 이동하고, 트리밍되고, 무음이 잘려요",
+      "groupVoices": "다른 목소리와 그룹으로 묶기",
+      "reverse": "역재생",
+      "unreverse": "역재생 해제",
+      "snapOn": "스냅 켜기",
+      "snapOff": "스냅 끄기"
+    }
+  },
+  "selectHint": {
+    "count_other": "클립 {{count}}개 선택됨: 더 탭하거나 완료를 누르세요",
+    "none": "선택할 클립을 하나씩 탭하세요",
+    "clear": "지우기"
+  },
+  "clip": {
+    "settings": "클립 설정",
+    "textFallback": "텍스트",
+    "layer": "L{{number}}",
+    "kind": {
+      "video": "동영상 클립",
+      "audio": "사운드 클립",
+      "image": "이미지",
+      "text": "텍스트",
+      "color": "색상",
+      "other": "클립"
+    },
+    "aria": {
+      "plain": "{{kind}}, {{from}}부터 {{to}}까지",
+      "named": "{{kind}} {{name}}, {{from}}부터 {{to}}까지",
+      "onTrack": "{{track}}의 {{kind}}, {{from}}부터 {{to}}까지",
+      "namedOnTrack": "{{track}}의 {{kind}} {{name}}, {{from}}부터 {{to}}까지"
+    }
+  },
+  "track": {
+    "show": "트랙 보기",
+    "hide": "트랙 숨기기",
+    "mute": "트랙 음소거",
+    "unmute": "트랙 음소거 해제",
+    "remove": "트랙 제거",
+    "addVisual": "동영상, 이미지 또는 텍스트 추가",
+    "addAudio": "오디오 추가",
+    "addFile": "파일 추가",
+    "addText": "텍스트 추가",
+    "addColor": "색상 추가",
+    "recordVideo": "동영상 녹화",
+    "addAudioFile": "오디오 파일 추가",
+    "recordAudio": "오디오 녹음",
+    "resize": {
+      "aria": "{{name}}의 높이",
+      "ariaUnnamed": "이 트랙의 높이",
+      "title": "드래그해서 트랙 높이 조정 (더블클릭: 원래대로)"
+    },
+    "aria": {
+      "named": {
+        "video": "{{name}} (동영상 트랙)",
+        "audio": "{{name}} (오디오 트랙)",
+        "music": "{{name}} (음악 트랙)"
+      },
+      "numbered": {
+        "video": "동영상 트랙 {{number}}",
+        "audio": "오디오 트랙 {{number}}",
+        "music": "음악 트랙 {{number}}"
+      }
+    }
+  },
+  "trackName": {
+    "voice": "음성",
+    "voiceNumbered": "음성 {{number}}",
+    "music": "음악",
+    "musicNumbered": "음악 {{number}}",
+    "video": "동영상",
+    "videoNumbered": "동영상 {{number}}",
+    "audioNumbered": "오디오 {{number}}",
+    "stickers": "스티커",
+    "stickersNumbered": "스티커 {{number}}",
+    "sfx": "효과음",
+    "sfxNumbered": "효과음 {{number}}"
+  },
+  "clipName": {
+    "text": "텍스트 레이어",
+    "color": "색상",
+    "imported": "가져온 미디어",
+    "linkedAudio": "{{name}} (오디오)"
+  },
+  "textClip": {
+    "defaultText": "여기에 텍스트 입력"
+  },
+  "flag": {
+    "aria": "{{time}}의 깃발 {{number}}",
+    "title": "깃발 {{number}} · {{time}}: 클릭하면 이동, 드래그하면 옮기기, 오른쪽 클릭하면 제거"
+  },
+  "range": {
+    "label": "{{from}} – {{to}} · {{seconds}}초",
+    "startOnly": "{{time}} · 끝나는 곳을 클릭하세요",
+    "dragStart": "드래그해서 시작 위치 이동",
+    "dragEnd": "드래그해서 끝 위치 이동"
+  },
+  "pastLimit": "렌더링 한도를 넘었어요",
+  "backgroundMusic": {
+    "title": "배경 음악",
+    "add": "배경 음악 추가",
+    "remove": "음악 제거"
+  },
+  "partName": "파트 {{n}} · {{name}}"
+}

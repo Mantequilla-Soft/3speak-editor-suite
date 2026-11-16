@@ -1,8 +1,10 @@
 import { useRef, useEffect } from 'react'
 import { Music } from './icons'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
+import { useT } from '../i18n'
 
 function VideoPreview({ clip, isVerticalVideo }) {
+  const { t } = useT()
   const mediaRef = useRef(null)
   const hlsRef = useRef(null)
   const loadedUrlRef = useRef(null)
@@ -19,7 +21,8 @@ function VideoPreview({ clip, isVerticalVideo }) {
       hlsRef.current = null
     }
 
-    if (clip.type !== 'audio' && clip.type !== 'image' && isHlsUrl(clip.url)) {
+    // hls.js for an .m3u8 video, and for a sound by HLS (3Speak's "Use this sound")
+    if (clip.type !== 'image' && isHlsUrl(clip.url)) {
       const hls = attachHls(el, clip.url)
       if (hls) {
         hlsRef.current = hls
@@ -62,7 +65,7 @@ function VideoPreview({ clip, isVerticalVideo }) {
   if (!clip) {
     return (
       <div className={previewClass}>
-        <span className="no-video">Select a clip to preview</span>
+        <span className="no-video">{t('preview.selectClip')}</span>
       </div>
     )
   }

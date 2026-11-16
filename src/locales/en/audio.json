@@ -1,0 +1,12 @@
+{
+  "cleaning": {
+    "voice_one": "Cleaning up the voice of {{count}} clip…",
+    "voice_other": "Cleaning up the voice of {{count}} clips…",
+    "voiceRecording_one": "Cleaning up the voice of {{count}} clip · recording {{at}} of {{total}}",
+    "voiceRecording_other": "Cleaning up the voice of {{count}} clips · recording {{at}} of {{total}}",
+    "back_one": "Switching {{count}} clip back…",
+    "back_other": "Switching {{count}} clips back…",
+    "backRecording_one": "Switching {{count}} clip back · recording {{at}} of {{total}}",
+    "backRecording_other": "Switching {{count}} clips back · recording {{at}} of {{total}}"
+  }
+}

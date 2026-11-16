@@ -1,5 +1,7 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from 'react'
 import { fitAt, placeOnTrack } from '../utils/placement'
+import { placeStockClip } from '../utils/stockPlacement'
+import { STOCK_IMAGE_SECONDS } from '../utils/stockLibrary'
 import { rippleTrackId, rippleTrack } from '../utils/ripple'
 import { finiteDuration, isUsableDuration, pickDuration } from '../utils/mediaDuration'
 import { isHlsUrl, getHlsDuration } from '../utils/hlsHelper'
@@ -7,9 +9,13 @@ import { downloadHlsToMp4 } from '../utils/hlsDownloader'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authHeaders, authFetch, dropToken } from '../utils/editorAuth'
 import { MAX_TIMELINE_SECONDS, MAX_IMPORT_BYTES, getTimelineEnd } from '../utils/limits'
+import { useHistoryStore, useUndoableState } from './useHistory'
 import { createSHA256 } from 'hash-wasm'
 import { isAudioMode } from '../utils/editorMode'
 import { applyGroupCut } from '../utils/groupSilence'
+import { splitPair } from '../utils/transitions'
+import { t } from '../i18n'
+import { partName, stripPart } from '../utils/partName'
 
 // Upload requests (whole small files or chunks of big ones) in flight at once,
 // shared by every upload; the rest wait for a free slot. Kept under the
@@ -146,7 +152,7 @@ function placeOverlay(prev, clip, start, end) {
   const free = prev.find(t => t.type === 'video' && t.stickers && fits(t))
   if (free) return prev.map(t => (t.id === free.id ? { ...t, clips: [...t.clips, clip] } : t))
   const count = prev.filter(t => t.type === 'video' && t.stickers).length
-  return [{ id: generateTrackId(), type: 'video', name: count ? `Stickers ${count + 1}` : 'Stickers', stickers: true, clips: [clip] }, ...prev]
+  return [{ id: generateTrackId(), type: 'video', name: count ? t('timeline.trackName.stickersNumbered', { number: count + 1 }) : t('timeline.trackName.stickers'), stickers: true, clips: [clip] }, ...prev]
 }
 
 function generateLibraryId() {
@@ -169,8 +175,6 @@ function getGroupColor(groupId) {
   const hash = groupId.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0)
   return GROUP_COLORS[hash % GROUP_COLORS.length]
 }
-
-const MAX_HISTORY = 20
 
 // Duration, and whether this browser can show the picture: HEVC (iPhone) or
 // 10-bit video loads in some browsers with sound but no image (or not at all).
@@ -237,6 +241,8 @@ function getMediaMetadataFromURL(url, mediaType) {
   // Use HLS.js for .m3u8 streams - get duration, then probe dimensions separately
   if (isHlsUrl(url)) {
     return getHlsDuration(url).then(duration => {
+      // A sound (3Speak's "Use this sound": a Short's HLS rendition): no picture to measure
+      if (mediaType === 'audio') return { duration, videoWidth: 0, videoHeight: 0 }
       // Probe HLS video dimensions via a hidden video element
       return new Promise((resolve) => {
         const video = document.createElement('video')
@@ -313,8 +319,8 @@ function getMediaMetadataFromURL(url, mediaType) {
 // Video tracks are prepended (newest first), audio tracks are appended (oldest first),
 // so we use mirror indexing: videoTracks[i] pairs with audioTracks[last - i].
 function findPairedAudioTrack(tracks, videoTrackId) {
-  // Sticker tracks carry no sound: they never pair with an audio track
-  const videoTracks = tracks.filter(t => t.type === 'video' && !t.stickers)
+  // Sticker and stock tracks carry no sound: they never pair with an audio track
+  const videoTracks = tracks.filter(t => t.type === 'video' && !t.stickers && !t.stock)
   // Music tracks (music library) never pair with a video track
   const audioTracks = tracks.filter(t => t.type === 'audio' && !t.music)
   const videoIndex = videoTracks.findIndex(t => t.id === videoTrackId)
@@ -331,7 +337,7 @@ function createLinkedAudioClip(videoClip, groupId) {
     file: videoClip.file,
     url: videoClip.url,
     serverUrl: videoClip.serverUrl || null,
-    name: videoClip.name + ' (Audio)',
+    name: t('timeline.clipName.linkedAudio', { name: videoClip.name }),
     duration: videoClip.duration,
     startTime: videoClip.startTime,
     endTime: videoClip.endTime,
@@ -354,7 +360,7 @@ function createLinkedAudioClip(videoClip, groupId) {
 
 // Ensure there's a paired audio track for every video track
 function ensurePairedAudioTracks(tracks) {
-  const videoTracks = tracks.filter(t => t.type === 'video' && !t.stickers)
+  const videoTracks = tracks.filter(t => t.type === 'video' && !t.stickers && !t.stock)
   const audioTracks = tracks.filter(t => t.type === 'audio' && !t.music)
 
   if (audioTracks.length >= videoTracks.length) return tracks
@@ -364,7 +370,7 @@ function ensurePairedAudioTracks(tracks) {
     newAudioTracks.push({
       id: generateTrackId(),
       type: 'audio',
-      name: `Audio ${i + 1}`,
+      name: t('timeline.trackName.audioNumbered', { number: i + 1 }),
       clips: []
     })
   }
@@ -379,12 +385,12 @@ export { getGroupColor }
 export function initialTracks() {
   return isAudioMode
     ? [
-        { id: generateTrackId(), type: 'audio', name: 'Voice', clips: [] },
-        { id: generateTrackId(), type: 'audio', name: 'Music', music: true, clips: [] }
+        { id: generateTrackId(), type: 'audio', name: t('timeline.trackName.voice'), clips: [] },
+        { id: generateTrackId(), type: 'audio', name: t('timeline.trackName.music'), music: true, clips: [] }
       ]
     : [
-        { id: generateTrackId(), type: 'video', name: 'Video 1', clips: [] },
-        { id: generateTrackId(), type: 'audio', name: 'Audio 1', clips: [] }
+        { id: generateTrackId(), type: 'video', name: t('timeline.trackName.videoNumbered', { number: 1 }), clips: [] },
+        { id: generateTrackId(), type: 'audio', name: t('timeline.trackName.audioNumbered', { number: 1 }), clips: [] }
       ]
 }
 
@@ -392,15 +398,19 @@ export function useTimeline() {
   // Library: array of { id, file, url, name, duration, type }
   const [library, setLibrary] = useState([])
 
-  // Tracks: array of { id, type: 'video' | 'audio', clips: [] }
-  const [tracks, setTracks] = useState(initialTracks)
+  // Undo / redo (utils/history.js): the tracks and every other project state
+  // that joins with useUndoableState (App: chapters, flags, master, captions).
+  // Tracks: array of { id, type: 'video' | 'audio', clips: [] }; setTracksWithHistory
+  // makes an undo step, setTracks does not (background fixes, opened drafts)
+  const history = useHistoryStore()
+  const [tracks, setTracksWithHistory, setTracks] = useUndoableState(history, 'tracks', initialTracks)
   const [selectedClipId, setSelectedClipId] = useState(null)
 
   // The audio editor always has a voice track: a project that lost its last
   // one (removed before that was blocked) gets an empty Voice track back
   useEffect(() => {
     if (!isAudioMode || !tracks.length || tracks.some(t => t.type === 'audio' && !t.music)) return
-    setTracks(prev => (prev.some(t => t.type === 'audio' && !t.music) ? prev : [{ id: generateTrackId(), type: 'audio', name: 'Voice', clips: [] }, ...prev]))
+    setTracks(prev => (prev.some(t => t.type === 'audio' && !t.music) ? prev : [{ id: generateTrackId(), type: 'audio', name: t('timeline.trackName.voice'), clips: [] }, ...prev]))
   }, [tracks])
   // Several clips at once (drag a box on the timeline, Ctrl/Cmd+A, Shift-click):
   // two or more ids, and then selectedClipId is null
@@ -430,64 +440,13 @@ export function useTimeline() {
   const [playheadPosition, setPlayheadPosition] = useState(0)
 
   // File store: keeps File references separate from serialized track history
-  // Map<clipId, File> — survives JSON.parse(JSON.stringify()) in undo/redo
+  // Map<clipId, File>: survives JSON.parse(JSON.stringify()) in undo/redo
   const fileStoreRef = useRef(new Map())
 
-  // Undo/Redo history
-  const historyRef = useRef([])
-  const historyIndexRef = useRef(-1)
-  const isUndoRedoRef = useRef(false)
-
-  // Save state to history
-  const saveToHistory = useCallback((newTracks) => {
-    if (isUndoRedoRef.current) {
-      isUndoRedoRef.current = false
-      return
-    }
-    // Remove any future history if we're not at the end
-    const newHistory = historyRef.current.slice(0, historyIndexRef.current + 1)
-    newHistory.push(JSON.parse(JSON.stringify(newTracks)))
-    // Limit history size
-    if (newHistory.length > MAX_HISTORY) {
-      newHistory.shift()
-    } else {
-      historyIndexRef.current++
-    }
-    historyRef.current = newHistory
-  }, [])
-
-  // Wrapper for setTracks that saves to history
-  const setTracksWithHistory = useCallback((updater) => {
-    setTracks(prev => {
-      const newTracks = typeof updater === 'function' ? updater(prev) : updater
-      saveToHistory(newTracks)
-      return newTracks
-    })
-  }, [saveToHistory])
-
-  // Undo action
-  const undo = useCallback(() => {
-    if (historyIndexRef.current > 0) {
-      historyIndexRef.current--
-      isUndoRedoRef.current = true
-      const prevState = historyRef.current[historyIndexRef.current]
-      setTracks(JSON.parse(JSON.stringify(prevState)))
-    }
-  }, [])
-
-  // Redo action
-  const redo = useCallback(() => {
-    if (historyIndexRef.current < historyRef.current.length - 1) {
-      historyIndexRef.current++
-      isUndoRedoRef.current = true
-      const nextState = historyRef.current[historyIndexRef.current]
-      setTracks(JSON.parse(JSON.stringify(nextState)))
-    }
-  }, [])
-
-  // Check if undo/redo are available
-  const canUndo = historyIndexRef.current > 0
-  const canRedo = historyIndexRef.current < historyRef.current.length - 1
+  const undo = useCallback(() => { history.undo() }, [history])
+  const redo = useCallback(() => { history.redo() }, [history])
+  const canUndo = history.canUndo
+  const canRedo = history.canRedo
 
   // Find clip by ID across all tracks
   const findClip = useCallback((clipId) => {
@@ -544,7 +503,7 @@ export function useTimeline() {
       ...t,
       clips: t.clips.map(c => (c.libraryId === libraryId ? { ...c, url, serverUrl: url } : c))
     }))
-    historyRef.current = historyRef.current.map(patch)
+    history.patchAll('tracks', patch)
     setTracks(prev => patch(prev))
     setLibrary(prev => prev.map(i => (i.id === libraryId ? { ...i, url, serverUrl: url, converting: false } : i)))
   }, [])
@@ -560,7 +519,7 @@ export function useTimeline() {
           ? { ...c, duration: info.duration, endTime: info.duration }
           : c))
       }))
-      historyRef.current = historyRef.current.map(fix)
+      history.patchAll('tracks', fix)
       setTracks(prev => fix(prev))
       setLibrary(prev => prev.map(i => (i.id === libraryId ? { ...i, duration: info.duration } : i)))
     }
@@ -612,11 +571,11 @@ export function useTimeline() {
       ...track,
       clips: track.clips.map(clip => (clip.libraryId === libraryId && !clip.serverUrl ? { ...clip, serverUrl } : clip))
     }))
-    historyRef.current = historyRef.current.map(patch)
+    history.patchAll('tracks', patch)
     setTracks(prev => patch(prev))
   }, [])
 
-  // Add files to library — uploads to backend for 480p encoding first, then makes available
+  // Add files to library: uploads to backend for 480p encoding first, then makes available
   // A song on an empty timeline defaults to the render limit (utils/limits.js)
   const MAX_DURATION = MAX_TIMELINE_SECONDS
   const addToLibrary = useCallback(async (files) => {
@@ -671,7 +630,7 @@ export function useTimeline() {
           ))
         }
       } else {
-        // Images don't need encoding — mark as ready immediately
+        // Images don't need encoding: mark as ready immediately
         setLibrary(prev => prev.map(i =>
           i.id === itemId ? { ...i, uploading: false } : i
         ))
@@ -700,7 +659,7 @@ export function useTimeline() {
       id: generateLibraryId(),
       file: null,
       url,
-      name: name || 'Imported Media',
+      name: name || t('timeline.clipName.imported'),
       duration: meta.duration,
       type: mediaType,
       videoWidth: meta.videoWidth,
@@ -716,7 +675,7 @@ export function useTimeline() {
   const trackLike = useCallback((track, all) => {
     const kind = (t) => t.type === track.type && !!t.music === !!track.music && !!t.sfx === !!track.sfx
     const n = all.filter(kind).length + 1
-    const name = track.music ? `Music ${n}` : track.sfx ? `SFX ${n}` : track.type === 'video' ? `Video ${n}` : isAudioMode ? `Voice ${n}` : `Audio ${n}`
+    const name = t(track.music ? 'timeline.trackName.musicNumbered' : track.sfx ? 'timeline.trackName.sfxNumbered' : track.type === 'video' ? 'timeline.trackName.videoNumbered' : isAudioMode ? 'timeline.trackName.voiceNumbered' : 'timeline.trackName.audioNumbered', { number: n })
     return { id: generateTrackId(), type: track.type, name, ...(track.music ? { music: true } : {}), ...(track.sfx ? { sfx: true } : {}) }
   }, [])
 
@@ -780,7 +739,7 @@ export function useTimeline() {
         const roomy = prev.find(t => t.type === 'audio' && t.music && fitAt(t.clips, place.at, duration))
         if (roomy) return placeOnTrack(prev, roomy.id, whole, place.at, (t) => trackLike(t, prev))
         const musicCount = prev.filter(t => t.type === 'audio' && t.music).length
-        return [...prev, { id: generateTrackId(), type: 'audio', name: musicCount ? `Music ${musicCount + 1}` : 'Music', music: true, clips: [{ ...whole, timelinePosition: Math.max(0, place.at) }] }]
+        return [...prev, { id: generateTrackId(), type: 'audio', name: musicCount ? t('timeline.trackName.musicNumbered', { number: musicCount + 1 }) : t('timeline.trackName.music'), music: true, clips: [{ ...whole, timelinePosition: Math.max(0, place.at) }] }]
       }
       // Reuse an empty music track, else add one below the others
       const free = prev.find(t => t.type === 'audio' && t.music && t.clips.length === 0)
@@ -791,7 +750,7 @@ export function useTimeline() {
       return [...prev, {
         id: generateTrackId(),
         type: 'audio',
-        name: musicCount ? `Music ${musicCount + 1}` : 'Music',
+        name: musicCount ? t('timeline.trackName.musicNumbered', { number: musicCount + 1 }) : t('timeline.trackName.music'),
         music: true,
         clips: [clip]
       }]
@@ -808,13 +767,13 @@ export function useTimeline() {
     const nextTracks = Array.isArray(state?.tracks) && state.tracks.length
       ? state.tracks
       : initialTracks()
-    historyRef.current = [JSON.parse(JSON.stringify(nextTracks))]
-    historyIndexRef.current = 0
+    // the opened project is the first step (with what App loads alongside: chapters, flags...)
+    history.reset()
     setTracks(nextTracks)
     setLibrary(Array.isArray(state?.library) ? state.library : [])
     setSelectedClipId(null)
     setSelectedClipIds([])
-  }, [])
+  }, [history])
 
   /**
    * Beat sync: lay the clips of the first video track (in order) on the beat,
@@ -883,7 +842,10 @@ export function useTimeline() {
     }
     const clip = sticker.kind === 'text'
       ? { ...base, type: 'text', name: sticker.name, text: sticker.text, textAlign: 'center', backgroundColor: 'transparent', ...sticker.props }
-      : { ...base, type: 'image', name: sticker.name, url: sticker.url, serverUrl: null, file: null, zoom: sticker.zoom || 40 }
+      : sticker.kind === 'scene'
+        // a title from a motion scene (utils/titleScenes.js): its own type, look and length
+        ? { ...base, sticker: false, ...sticker.props }
+        : { ...base, type: 'image', name: sticker.name, url: sticker.url, serverUrl: null, file: null, zoom: sticker.zoom || 40 }
     setTracksWithHistory(prev => {
       // From a track's + menu: that track (or a new one below it), at the playhead
       if (trackId) {
@@ -893,6 +855,42 @@ export function useTimeline() {
       // Stickers go above everything
       return placeOverlay(prev, clip, start, end)
     })
+    return clipId
+  }, [setTracksWithHistory])
+
+  /**
+   * Stock media (utils/stockLibrary.js item: a video, photo or GIF) at
+   * `position` (the playhead), placed by utils/stockPlacement.js: on an empty
+   * timeline as the main footage, else as b-roll over it; with underClipId as
+   * the background of that clip (background removal). Videos and GIFs are
+   * silent clips; a photo stays STOCK_IMAGE_SECONDS. The licence travels as
+   * `stockCredit` (no credit is needed, it is kept for the record).
+   */
+  const addStockClip = useCallback(async (item, position, { underClipId = null } = {}) => {
+    const isPhoto = item.type === 'image'
+    let duration = STOCK_IMAGE_SECONDS
+    let meta = {}
+    if (!isPhoto) {
+      meta = await getMediaMetadataFromURL(item.url, 'video')
+      duration = isUsableDuration(meta.duration) ? meta.duration : item.duration
+      if (!isUsableDuration(duration)) return null
+    }
+    const libraryId = generateLibraryId()
+    const type = isPhoto ? 'image' : 'video'
+    setLibrary(prev => [...prev, {
+      id: libraryId, file: null, url: item.url, name: item.title, duration, type,
+      videoWidth: meta.videoWidth || item.width || undefined, videoHeight: meta.videoHeight || item.height || undefined
+    }])
+    const clipId = generateClipId()
+    const clip = {
+      id: clipId, file: null, url: item.url, serverUrl: null, name: item.title, duration,
+      startTime: 0, endTime: duration, timelinePosition: 0,
+      audioEnabled: false, type, libraryId, groupId: null,
+      videoWidth: meta.videoWidth || item.width || undefined, videoHeight: meta.videoHeight || item.height || undefined,
+      zoom: 100, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100, positionX: 0, positionY: 0, volume: 100,
+      ...(item.credit ? { stockCredit: item.credit } : {})
+    }
+    setTracksWithHistory(prev => placeStockClip(prev, clip, { at: position, underClipId, newTrackId: generateTrackId }).tracks)
     return clipId
   }, [setTracksWithHistory])
 
@@ -930,13 +928,13 @@ export function useTimeline() {
       const free = prev.find(t => t.type === 'audio' && t.sfx && fits(t))
       if (free) return prev.map(t => (t.id === free.id ? { ...t, clips: [...t.clips, clip] } : t))
       const count = prev.filter(t => t.type === 'audio' && t.sfx).length
-      return [...prev, { id: generateTrackId(), type: 'audio', name: count ? `SFX ${count + 1}` : 'SFX', sfx: true, clips: [clip] }]
+      return [...prev, { id: generateTrackId(), type: 'audio', name: count ? t('timeline.trackName.sfxNumbered', { number: count + 1 }) : t('timeline.trackName.sfx'), sfx: true, clips: [clip] }]
     })
     return clipId
   }, [setTracksWithHistory, trackLike])
 
   // Add media from URL to library AND place on timeline
-  // options: { clipStart?: number, clipEnd?: number } — optional trim range
+  // options: { clipStart?: number, clipEnd?: number }: optional trim range
   const addToLibraryAndTimeline = useCallback(async (url, name, mediaType, options = {}) => {
     if (!mediaType || !['video', 'audio', 'image'].includes(mediaType)) return
     if (options.file && !keepImportable([options.file]).length) return
@@ -954,7 +952,7 @@ export function useTimeline() {
       id: libraryId,
       file: options.file || null,
       url,
-      name: name || 'Imported Media',
+      name: name || t('timeline.clipName.imported'),
       duration,
       type: mediaType,
       videoWidth: meta.videoWidth,
@@ -986,7 +984,7 @@ export function useTimeline() {
       // a new Voice track, never the Music track (Cut silences, Studio voice
       // and grouping only work on voices)
       const prev = isAudioMode && targetTrackType === 'audio' && !current.some(t => t.type === 'audio' && !t.music)
-        ? [{ id: generateTrackId(), type: 'audio', name: 'Voice', clips: [] }, ...current]
+        ? [{ id: generateTrackId(), type: 'audio', name: t('timeline.trackName.voice'), clips: [] }, ...current]
         : current
       // Audio goes on the first track that is not a music track (the voice)
       const targetTrack = (targetTrackType === 'audio' && prev.find(t => t.type === 'audio' && !t.music)) ||
@@ -1145,7 +1143,7 @@ export function useTimeline() {
         }
       } else {
         const count = prev.filter(t => t.type === 'video').length + 1
-        videoTrack = { id: generateTrackId(), type: 'video', name: `Video ${count}`, clips: [] }
+        videoTrack = { id: generateTrackId(), type: 'video', name: t('timeline.trackName.videoNumbered', { number: count }), clips: [] }
         tracksNext = ensurePairedAudioTracks([videoTrack, ...prev])
       }
 
@@ -1220,7 +1218,7 @@ export function useTimeline() {
         const newTrack = {
           id: generateTrackId(),
           type: targetTrackType,
-          name: targetTrackType === 'video' ? 'Video 1' : 'Audio 1',
+          name: t(targetTrackType === 'video' ? 'timeline.trackName.videoNumbered' : 'timeline.trackName.audioNumbered', { number: 1 }),
           clips: []
         }
         return [newTrack, ...prev] // Prepend new tracks
@@ -1316,7 +1314,7 @@ export function useTimeline() {
       const probe = await probeMedia(file)
       const duration = probe.duration
 
-      // Allow files longer than the timeline limit — they'll be trimmed when placed on timeline
+      // Allow files longer than the timeline limit: they'll be trimmed when placed on timeline
 
       const url = URL.createObjectURL(file)
       const libraryId = generateLibraryId()
@@ -1436,7 +1434,7 @@ export function useTimeline() {
   const addTrack = useCallback((type = 'video') => {
     // The audio editor's tracks are voices (the Music track does not count)
     const trackCount = tracks.filter(t => t.type === type && !(isAudioMode && t.music)).length + 1
-    const name = type === 'video' ? `Video ${trackCount}` : isAudioMode ? `Voice ${trackCount}` : `Audio ${trackCount}`
+    const name = t(type === 'video' ? 'timeline.trackName.videoNumbered' : isAudioMode ? 'timeline.trackName.voiceNumbered' : 'timeline.trackName.audioNumbered', { number: trackCount })
 
     const newTrack = {
       id: generateTrackId(),
@@ -1470,8 +1468,8 @@ export function useTimeline() {
     if (dropTime === undefined) {
       const start = Math.max(0, playheadPosition || 0)
       const clip = {
-        id: generateClipId(), name: 'Text Layer', type: 'text', duration: 5, startTime: 0, endTime: 5, timelinePosition: start,
-        audioEnabled: false, text: 'Enter text here', fontSize: 48, fontFamily: 'Roboto', fontColor: '#ffffff', fontWeight: 'normal',
+        id: generateClipId(), name: t('timeline.clipName.text'), type: 'text', duration: 5, startTime: 0, endTime: 5, timelinePosition: start,
+        audioEnabled: false, text: t('timeline.textClip.defaultText'), fontSize: 48, fontFamily: 'Roboto', fontColor: '#ffffff', fontWeight: 'normal',
         textAlign: 'center', backgroundColor: 'transparent',
         zoom: 100, positionX: 0, positionY: 0, cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100
       }
@@ -1502,7 +1500,7 @@ export function useTimeline() {
 
       const newClip = {
         id: generateClipId(),
-        name: 'Text Layer',
+        name: t('timeline.clipName.text'),
         type: 'text',
         duration: 5,
         startTime: 0,
@@ -1510,7 +1508,7 @@ export function useTimeline() {
         timelinePosition,
         audioEnabled: false,
         // Text-specific properties
-        text: 'Enter text here',
+        text: t('timeline.textClip.defaultText'),
         fontSize: 48,
         fontFamily: 'Roboto',
         fontColor: '#ffffff',
@@ -1561,7 +1559,7 @@ export function useTimeline() {
 
       const newClip = {
         id: generateClipId(),
-        name: 'Color',
+        name: t('timeline.clipName.color'),
         type: 'color',
         duration: 5,
         startTime: 0,
@@ -1972,7 +1970,8 @@ export function useTimeline() {
             fileStoreRef.current.set(secondClip.id, originalFile)
           }
 
-          newClips.push(firstClip, secondClip)
+          // fades stay at the outer ends, a transition with the second half (utils/transitions.js)
+          newClips.push(...splitPair(firstClip, secondClip))
         }
 
         return modified ? { ...track, clips: newClips } : track
@@ -2018,13 +2017,13 @@ export function useTimeline() {
         for (const c of track.clips) {
           if (same(c)) {
             const file = fileStoreRef.current.get(c.id)
-            const baseName = (c.name || '').replace(/^Part \d+ · /, '')
+            const baseName = stripPart(c.name)
             let packed = pos
             parts.forEach((p, i) => {
               const part = {
                 ...c,
                 id: i === 0 ? c.id : generateClipId(),
-                name: `Part ${i + 1} · ${baseName}`,
+                name: partName(i + 1, baseName),
                 startTime: p.start,
                 endTime: p.end,
                 timelinePosition: closeGaps ? packed : pos + (p.start - target.startTime),
@@ -2094,7 +2093,7 @@ export function useTimeline() {
       }
 
       const newClips = [...track.clips]
-      newClips.splice(clipIndex, 1, firstClip, secondClip)
+      newClips.splice(clipIndex, 1, ...splitPair(firstClip, secondClip))
       return { ...track, clips: newClips }
     }))
   }, [setTracksWithHistory])
@@ -2175,20 +2174,23 @@ export function useTimeline() {
       }
       return updated
     }))
-    // Update tracks directly (not through history) to avoid polluting undo stack
-    setTracks(prev => prev.map(track => ({
+    // Not an undo step: the history snapshots get it too, so undo never brings
+    // the stream back after its download finished
+    const patch = (list) => list.map(track => ({
       ...track,
       clips: track.clips.map(clip => {
         if (clip.libraryId !== libraryId) return clip
         if (trimmedRange) {
-          // Backend already trimmed the file — clip now spans the full trimmed file
+          // Backend already trimmed the file: clip now spans the full trimmed file
           const newDuration = trimmedRange.clipEnd - trimmedRange.clipStart
           return { ...clip, url: newUrl, originalUrl, serverUrl: serverUrl || null, duration: newDuration, startTime: 0, endTime: newDuration }
         }
         return { ...clip, url: newUrl, originalUrl, serverUrl: serverUrl || null }
       })
-    })))
-  }, [])
+    }))
+    history.patchAll('tracks', patch)
+    setTracks(prev => patch(prev))
+  }, [history])
 
   // Start downloading an HLS stream in the background
   const startHlsDownload = useCallback(async (libraryId, hlsUrl, ffmpeg) => {
@@ -2304,6 +2306,7 @@ export function useTimeline() {
     uploadFileToServer,
     addSfxClip,
     addStickerClip,
+    addStockClip,
     fitClipsToBeats,
     loadProjectState,
     findClip,
@@ -2319,6 +2322,8 @@ export function useTimeline() {
     redo,
     canUndo,
     canRedo,
+    // the history itself: more project state joins it with useUndoableState(history, key, initial)
+    history,
 
     // Over-the-limit notice after an import
     lengthNotice,

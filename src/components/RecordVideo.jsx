@@ -1,8 +1,10 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
 import { openCamera, mediaErrorMessage } from '../utils/mediaAccess'
 import { X, Circle, Square, RotateCcw, Check } from './icons'
+import { useT } from '../i18n'
 
 function RecordVideo({ onRecorded, onClose }) {
+  const { t } = useT()
   const liveVideoRef = useRef(null)
   const playbackVideoRef = useRef(null)
   const streamRef = useRef(null)
@@ -35,7 +37,7 @@ function RecordVideo({ onRecorded, onClose }) {
       } catch (err) {
         if (!cancelled) {
           console.warn('[recorder] camera failed:', err?.name, err?.message)
-          setError(mediaErrorMessage(err))
+          setError({ err })
         }
       }
     }
@@ -139,7 +141,7 @@ function RecordVideo({ onRecorded, onClose }) {
       setPhase('previewing')
     } catch (err) {
       console.warn('[recorder] camera failed:', err?.name, err?.message)
-      setError(mediaErrorMessage(err))
+      setError({ err })
     }
   }, [])
 
@@ -173,7 +175,7 @@ function RecordVideo({ onRecorded, onClose }) {
     <div className="record-overlay" onClick={handleClose}>
       <div className="record-modal" onClick={e => e.stopPropagation()}>
         <div className="record-modal-header">
-          <span>Record Video</span>
+          <span>{t('record.video.title')}</span>
           <button className="record-close-btn" onClick={handleClose}>
             <X size={18} />
           </button>
@@ -181,7 +183,7 @@ function RecordVideo({ onRecorded, onClose }) {
 
         <div className="record-preview">
           {error ? (
-            <div className="record-error">{error}</div>
+            <div className="record-error">{mediaErrorMessage(error.err)}</div>
           ) : (
             <>
               <video
@@ -211,7 +213,7 @@ function RecordVideo({ onRecorded, onClose }) {
           )}
 
           {phase === 'starting' && !error && (
-            <div className="record-loading">Starting camera...</div>
+            <div className="record-loading">{t('record.video.startingCamera')}</div>
           )}
         </div>
 
@@ -219,14 +221,14 @@ function RecordVideo({ onRecorded, onClose }) {
           {phase === 'previewing' && (
             <button className="record-start-btn" onClick={startRecording}>
               <Circle size={16} />
-              <span>Start Recording</span>
+              <span>{t('record.video.start')}</span>
             </button>
           )}
 
           {phase === 'recording' && (
             <button className="record-stop-btn" onClick={stopRecording}>
               <Square size={14} />
-              <span>Stop</span>
+              <span>{t('record.video.stop')}</span>
             </button>
           )}
 
@@ -234,11 +236,11 @@ function RecordVideo({ onRecorded, onClose }) {
             <>
               <button className="record-retake-btn" onClick={handleRetake}>
                 <RotateCcw size={14} />
-                <span>Retake</span>
+                <span>{t('record.video.retake')}</span>
               </button>
               <button className="record-use-btn" onClick={handleUseClip}>
                 <Check size={14} />
-                <span>Use Clip</span>
+                <span>{t('record.video.useClip')}</span>
               </button>
             </>
           )}

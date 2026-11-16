@@ -1,0 +1,64 @@
+{
+  "title": "Vibandiko",
+  "search": "Tafuta vibandiko",
+  "textBoxes": "Visanduku vya maandishi",
+  "loading": "Inapakia vibandiko...",
+  "noMatch": "Hakuna kibandiko kinacholingana.",
+  "tileTitle": "{{name}} (inaongezwa kwenye kiashiria cha kucheza)",
+  "note": "Vibandiko vinawekwa kwenye kiashiria cha kucheza kwa sekunde 3. Viburute, badilisha ukubwa au vipunguze kama klipu yoyote; visanduku vya maandishi vinabaki vinaweza kuhaririwa.",
+  "categories": {
+    "emoji": "Emoji",
+    "badges": "Beji",
+    "shapes": "Mishale na maumbo",
+    "branding": "Chapa"
+  },
+  "presets": {
+    "caption": {
+      "title": "Maelezo",
+      "text": "Maelezo yako hapa"
+    },
+    "highlight": {
+      "title": "Angazia",
+      "text": "Lazima uone!"
+    },
+    "brand": {
+      "title": "Nyekundu ya 3Speak",
+      "text": "Video mpya"
+    },
+    "bubble": {
+      "title": "Kiputo",
+      "text": "Habari!"
+    },
+    "outline": {
+      "title": "Mstari wa nje",
+      "text": "Tazama hii"
+    },
+    "neon": {
+      "title": "Neoni",
+      "text": "LEO USIKU"
+    },
+    "title": {
+      "title": "Kichwa kikubwa",
+      "text": "HABARI KUBWA"
+    },
+    "comic": {
+      "title": "Katuni",
+      "text": "BUUM!"
+    },
+    "marker": {
+      "title": "Kalamu ya alama",
+      "text": "kazi ya mkono"
+    },
+    "quote": {
+      "title": "Nukuu",
+      "text": "“Sema vizuri.”"
+    },
+    "tag": {
+      "title": "Hashtag"
+    },
+    "minimal": {
+      "title": "Ndogo kabisa",
+      "text": "rahisi na safi"
+    }
+  }
+}

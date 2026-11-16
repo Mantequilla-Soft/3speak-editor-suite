@@ -1,0 +1,67 @@
+{
+  "language": {
+    "label": "语音语言",
+    "auto": "自动检测"
+  },
+  "intro": {
+    "title": "自动字幕",
+    "text": "把所说的话变成逐字跟随的字幕，烧录进你的短视频，同时也作为字幕发送到 3Speak。",
+    "checking": "正在检查服务器...",
+    "unavailable": "此编辑器服务器暂时无法提供自动字幕。你的短视频会照常渲染，只是不带字幕。",
+    "go": "自动字幕"
+  },
+  "presets": {
+    "karaoke": "卡拉 OK",
+    "pop": "弹出",
+    "plain": "字幕"
+  },
+  "presetHints": {
+    "karaoke": "每次显示几个词，正在说的词用高亮颜色显示",
+    "pop": "每次弹出一个词（或几个词）",
+    "plain": "深色底框上的经典字幕行"
+  },
+  "style": {
+    "title": "样式",
+    "presetsLabel": "字幕样式",
+    "wordsAtATime": "每次显示的词数",
+    "font": "字体",
+    "size": "大小",
+    "sizeLabel": "字幕大小",
+    "position": "位置",
+    "positionLabel": "字幕在画面中的高度",
+    "top": "顶部",
+    "middle": "中间",
+    "low": "底部",
+    "textColour": "文字颜色",
+    "highlight": "高亮",
+    "highlightLabel": "高亮颜色",
+    "uppercase": "大写字母",
+    "emoji": "表情点缀（显示在“火”或“爱”这类词上方）",
+    "burn": "显示在视频中（关闭：仅作为 3Speak 上的字幕）"
+  },
+  "words": {
+    "title": "文字（{{n}}）",
+    "hint": "修正听错的词；清空某个词即可删除它。移动或剪切过片段？请重新运行自动字幕。",
+    "goThere": "跳转到这里",
+    "word": "第 {{n}} 个词",
+    "changeEmoji": "更换或移除表情",
+    "addEmoji": "添加表情",
+    "remove": "移除这个词",
+    "removeNamed": "移除 {{word}}"
+  },
+  "actions": {
+    "again": "重新识别",
+    "againTitle": "重新聆听（替换现有文字）",
+    "remove": "移除字幕"
+  },
+  "videoSound": "视频声音",
+  "job": {
+    "preparing": "正在准备声音...",
+    "listening": "正在聆听...",
+    "noTracks": "没有可生成字幕的语音：请先添加一个带声音的片段。",
+    "serverAnswered": "服务器返回 {{status}}",
+    "lost": "字幕任务丢失了（服务器重启了？）",
+    "noSpeech": "没有发现语音。人声是否在一条未静音的音频轨道上（音乐轨道不计入）？",
+    "failed": "语音识别失败"
+  }
+}

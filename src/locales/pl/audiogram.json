@@ -1,0 +1,192 @@
+{
+  "title": "Audiogramy",
+  "tour": {
+    "again": "Pokaż przewodnik ponownie",
+    "againLabel": "Pokaż ponownie przewodnik po audiogramach"
+  },
+  "saveAndClose": "Zapisz i zamknij",
+  "saveAndCloseTitle": "Twoje audiogramy zostają przy tym audio i są publikowane razem z nim jako Shorty",
+  "loadError": "Nie udało się wczytać ustawień audiogramu: {{error}}",
+  "loadingLook": "Wczytywanie wyglądu audiogramu…",
+  "start": {
+    "title": "Wybierz fragment odcinka",
+    "text_one": "Audiogram to krótki film z fragmentem twojego odcinka, do {{count}} minuty. Jest publikowany jako Short 3Speak razem z audio. Zacznij od zaznaczenia jego początku i końca na osi czasu.",
+    "text_few": "Audiogram to krótki film z fragmentem twojego odcinka, do {{count}} minut. Jest publikowany jako Short 3Speak razem z audio. Zacznij od zaznaczenia jego początku i końca na osi czasu.",
+    "text_many": "Audiogram to krótki film z fragmentem twojego odcinka, do {{count}} minut. Jest publikowany jako Short 3Speak razem z audio. Zacznij od zaznaczenia jego początku i końca na osi czasu.",
+    "text_other": "Audiogram to krótki film z fragmentem twojego odcinka, do {{count}} minuty. Jest publikowany jako Short 3Speak razem z audio. Zacznij od zaznaczenia jego początku i końca na osi czasu.",
+    "choose": "Wybierz na osi czasu"
+  },
+  "stage": {
+    "label": "Podgląd audiogramu: przeciągaj elementy, aby je przesunąć, narożniki, aby zmienić rozmiar, okrągły uchwyt, aby obrócić",
+    "frameTitle": "Podgląd audiogramu",
+    "turned": "{{name}} · {{angle}}°",
+    "rotate": "Obróć (Shift: co 15°). Dwuklik: prosto",
+    "hint": "Przeciągaj elementy, ciągnij narożnik, aby zmienić rozmiar (Shift zachowuje proporcje), okrągły uchwyt, aby obrócić. Strzałki przesuwają, [ i ] obracają.",
+    "hintTemplate": "Przeciągaj elementy, ciągnij narożnik, aby zmienić rozmiar (Shift zachowuje proporcje), okrągły uchwyt, aby obrócić. Strzałki przesuwają, [ i ] obracają. Punktem wyjścia jest twój ostatni audiogram."
+  },
+  "layer": {
+    "logo": {
+      "name": "Logo 3Speak",
+      "drag": "Logo 3Speak: przeciągnij, aby przesunąć",
+      "dragSelected": "Logo 3Speak: przeciągnij, aby przesunąć, narożniki zmieniają rozmiar, okrągły uchwyt obraca"
+    },
+    "cover": {
+      "name": "Obraz",
+      "drag": "Obraz: przeciągnij, aby przesunąć",
+      "dragSelected": "Obraz: przeciągnij, aby przesunąć, narożniki zmieniają rozmiar, okrągły uchwyt obraca",
+      "hide": "Ukryj obraz",
+      "show": "Pokaż obraz",
+      "forward": "Przesuń obraz do przodu",
+      "back": "Przesuń obraz do tyłu"
+    },
+    "title": {
+      "name": "Tytuł",
+      "drag": "Tytuł: przeciągnij, aby przesunąć",
+      "dragSelected": "Tytuł: przeciągnij, aby przesunąć, narożniki zmieniają rozmiar, okrągły uchwyt obraca",
+      "hide": "Ukryj tytuł",
+      "show": "Pokaż tytuł",
+      "forward": "Przesuń tytuł do przodu",
+      "back": "Przesuń tytuł do tyłu"
+    },
+    "line": {
+      "name": "Linijka",
+      "drag": "Linijka: przeciągnij, aby przesunąć",
+      "dragSelected": "Linijka: przeciągnij, aby przesunąć, narożniki zmieniają rozmiar, okrągły uchwyt obraca",
+      "hide": "Ukryj linijkę",
+      "show": "Pokaż linijkę",
+      "forward": "Przesuń linijkę do przodu",
+      "back": "Przesuń linijkę do tyłu"
+    },
+    "wave": {
+      "name": "Fala dźwięku",
+      "drag": "Fala dźwięku: przeciągnij, aby przesunąć",
+      "dragSelected": "Fala dźwięku: przeciągnij, aby przesunąć, narożniki zmieniają rozmiar, okrągły uchwyt obraca",
+      "hide": "Ukryj falę dźwięku",
+      "show": "Pokaż falę dźwięku",
+      "forward": "Przesuń falę dźwięku do przodu",
+      "back": "Przesuń falę dźwięku do tyłu"
+    }
+  },
+  "piece": {
+    "label": "Fragment odcinka",
+    "range": "{{from}} – {{to}} · {{seconds}} s",
+    "inChapter": "w „{{title}}”",
+    "change": "Zmień fragment"
+  },
+  "look": {
+    "title": "Tytuł",
+    "titleLabel": "Tytuł w filmie",
+    "line": "Linijka pod nim <small>(*gwiazdki* barwią na czerwono)</small>",
+    "lineLabel": "Linijka w filmie",
+    "branding": "Oznaczenie 3Speak",
+    "logoGroup": "Logo",
+    "picture": "Obraz",
+    "waveform": "Fala dźwięku",
+    "waveType": "Rodzaj fali dźwięku",
+    "waveColour": "Kolor fali dźwięku",
+    "colour": "Kolor {{colour}}",
+    "anyColour": "Dowolny kolor",
+    "anyWaveColour": "Dowolny kolor fali dźwięku"
+  },
+  "logo": {
+    "mark": "Logo 3S",
+    "full": "Logo 3Speak"
+  },
+  "wave": {
+    "bars": "Słupki",
+    "centered": "Wyśrodkowana",
+    "line": "Linia",
+    "dots": "Cienka",
+    "circle": "Koło",
+    "ring": "Fala kołowa"
+  },
+  "picture": {
+    "upload": "Prześlij obraz",
+    "yours": "Twój obraz",
+    "coverOf": "Okładka „{{title}}”",
+    "playlistCover": "Okładka playlisty",
+    "noCovers": "Twoje playlisty nie mają jeszcze okładek.",
+    "signIn": "Zaloguj się w 3Speak, aby dodać obraz."
+  },
+  "parts": {
+    "title": "Elementy <small>(od przodu do tyłu)</small>",
+    "logoLocked": "Logo 3Speak jest zawsze widoczne, z przodu i nigdy mniejsze niż ustalony rozmiar",
+    "alwaysShown": "Zawsze widoczne",
+    "hide": "Ukryj",
+    "show": "Pokaż",
+    "forward": "Do przodu",
+    "back": "Do tyłu",
+    "tidy": "Uporządkuj układ"
+  },
+  "make": {
+    "starting": "Rozpoczynanie...",
+    "working": "Pracuję...",
+    "noWords": "nie znaleziono słów tego fragmentu (wyłącz napisy, aby zrobić go bez nich)",
+    "failedPlain": "niepowodzenie",
+    "signIn": "Zaloguj się w 3Speak, aby zrobić audiogram.",
+    "failed": "Nie udało się zrobić audiogramu: {{error}}",
+    "make": "Zrób audiogram",
+    "another": "Zrób kolejny audiogram"
+  },
+  "made": {
+    "title": "Twoje audiogramy",
+    "hint": "Są publikowane jako Shorty 3Speak razem z audio, każdy z linkiem do posta, snapa lub komentarza z tym audio.",
+    "fallbackTitle": "Audiogram {{n}}",
+    "length": "{{at}} · {{seconds}} s",
+    "textPlaceholder": "Tekst Shorta (opcjonalnie). Link do audio zostanie dodany automatycznie.",
+    "textLabel": "Tekst Shorta {{n}}",
+    "editText": "Edytuj tekst",
+    "writeText": "Napisz tekst",
+    "download": "Pobierz",
+    "removeLabel": "Usuń audiogram {{n}}"
+  },
+  "confirm": {
+    "title": "Zamknąć bez tworzenia?",
+    "text": "Twoich zmian wyglądu nie ma jeszcze w żadnym audiogramie. Przepadną po zamknięciu.",
+    "stays_one": "Zrobiony audiogram zostaje przy tym audio.",
+    "stays_few": "{{count}} zrobione audiogramy zostają przy tym audio.",
+    "stays_many": "{{count}} zrobionych audiogramów zostaje przy tym audio.",
+    "stays_other": "{{count}} zrobionego audiogramu zostaje przy tym audio.",
+    "keep": "Edytuj dalej"
+  },
+  "captions": {
+    "label": "Napisy",
+    "drag": "Napisy: przeciągnij, aby przesunąć",
+    "dragSelected": "Napisy: przeciągnij, aby przesunąć, ciągnij bok, aby zmienić szerokość",
+    "sample": "Twoje słowa pojawią się tu w chwili ich wypowiedzenia",
+    "show": "Pokazuj, co jest mówione, słowo po słowie",
+    "checking": "Sprawdzanie serwera...",
+    "unavailable": "Napisy nie są teraz dostępne na tym serwerze edytora.",
+    "listening": "Słucham...",
+    "getWords": "Pobierz słowa",
+    "wordCount_one": "{{count}} słowo w tym fragmencie.",
+    "wordCount_few": "{{count}} słowa w tym fragmencie.",
+    "wordCount_many": "{{count}} słów w tym fragmencie.",
+    "wordCount_other": "{{count}} słowa w tym fragmencie.",
+    "noSpeech": "Nie znaleziono mowy w tym fragmencie.",
+    "fix": "Popraw słowa",
+    "doneFixing": "Gotowe",
+    "word": "Słowo {{n}}",
+    "removeWord": "Usuń to słowo",
+    "removeWordLabel": "Usuń {{word}}",
+    "style": "Styl napisów",
+    "preset": {
+      "karaoke": "Karaoke",
+      "pop": "Pop",
+      "plain": "Napisy"
+    },
+    "wordsAtATime": "Słów naraz",
+    "perPage_one": "{{count}} słowo naraz",
+    "perPage_few": "{{count}} słowa naraz",
+    "perPage_many": "{{count}} słów naraz",
+    "perPage_other": "{{count}} słowa naraz",
+    "font": "Czcionka napisów",
+    "size": "Rozmiar napisów",
+    "textColour": "Kolor tekstu napisów",
+    "textColourSwatch": "Kolor tekstu {{colour}}",
+    "highlightColour": "Kolor wyróżnienia",
+    "highlight": "Wyróżnienie",
+    "highlightSwatch": "Wyróżnienie {{colour}}",
+    "capitals": "Wielkie litery"
+  }
+}

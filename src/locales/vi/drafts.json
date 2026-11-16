@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "line": "{{clips}} · {{length}} · {{edited}}",
+    "audioLine": "Âm thanh · {{clips}} · {{length}} · {{edited}}",
+    "clips_other": "{{count}} clip",
+    "edited": {
+      "justNow": "vừa sửa",
+      "minutes_other": "sửa {{count}} phút trước",
+      "hours_other": "sửa {{count}} giờ trước",
+      "days_other": "sửa {{count}} ngày trước"
+    }
+  },
+  "prompt": {
+    "titleOne": "Tiếp tục bản nháp của bạn?",
+    "titleMany": "Tiếp tục một bản nháp?",
+    "keptUntil": "Được giữ đến {{date}}",
+    "open": "Mở",
+    "startNew": "Bắt đầu dự án mới",
+    "singleNote": "Bạn có thể giữ một bản nháp. Bắt đầu dự án mới sẽ thay thế bản này ngay khi bạn chỉnh sửa. 3Speak Pro giữ 3 bản nháp trong 30 ngày."
+  },
+  "limit": {
+    "titleOne": "Thay thế bản nháp đã lưu?",
+    "titleMany": "Bạn đã có {{n}} dự án đã lưu",
+    "skipTitle": "Không lưu dự án này",
+    "noteOne": "Bạn có thể giữ một bản nháp. Lưu dự án này sẽ thay thế bản bên dưới.",
+    "noteMany": "Bạn có thể giữ tối đa {{n}} bản. Hãy chọn bản mà dự án này sẽ thay thế:",
+    "replace": "Thay thế",
+    "skip": "Không lưu dự án này"
+  },
+  "close": {
+    "saveTitle": "Lưu dự án của bạn?",
+    "closeTitle": "Đóng trình chỉnh sửa?",
+    "keepEditing": "Tiếp tục chỉnh sửa",
+    "signInFailed": "Không thành công. Hãy chấp thuận yêu cầu đăng nhập trong ví rồi thử lại, hoặc đăng xuất khỏi 3Speak rồi đăng nhập lại.",
+    "signInToKeep": "Đăng nhập một lần để giữ dự án này làm bản nháp, để bạn có thể tiếp tục sau.",
+    "signedOutLost": "Các chỉnh sửa của bạn sẽ bị mất. Đăng nhập 3Speak để giữ bản nháp dự án.",
+    "lost": "Các chỉnh sửa của bạn sẽ bị mất.",
+    "signingIn": "Đang đăng nhập…",
+    "signInToSave": "Đăng nhập để lưu",
+    "withoutSaving": "Đóng mà không lưu",
+    "keepTitle": "Giữ dự án này?",
+    "keepDays_other": "Chúng tôi giữ nó trong {{count}} ngày",
+    "keepHours_other": "Chúng tôi giữ nó trong {{count}} giờ",
+    "until": "đến {{date}}",
+    "uploadingOne": "{{name}} vẫn đang tải lên ({{percent}}). Bạn có thể lưu khi xong.",
+    "uploadingFiles_other": "{{count}} tệp vẫn đang tải lên ({{percent}}). Bạn có thể lưu khi xong.",
+    "name": "Tên dự án",
+    "namePlaceholder": "Dự án chưa đặt tên",
+    "saveError": "Không lưu được. Hãy kiểm tra kết nối rồi thử lại.",
+    "saveAndClose": "Lưu và đóng",
+    "afterUpload": "Có thể dùng khi tải lên xong",
+    "deleteAndClose": "Xóa và đóng"
+  },
+  "pro": {
+    "title": "Nhiều hơn với 3Speak Pro",
+    "text": "Giữ tối đa 3 dự án, mỗi dự án 30 ngày, thay vì 1 dự án trong 7 ngày.",
+    "get": "Nâng cấp Pro"
+  },
+  "status": {
+    "signingIn": "Đang đăng nhập… hãy kiểm tra ví của bạn",
+    "signInTitle": "Đăng nhập một lần để lưu dự án làm bản nháp",
+    "signInFailed": "Đăng nhập thất bại · thử lại",
+    "saveDrafts": "Lưu bản nháp",
+    "notSavedTitle": "Dự án này chưa được lưu",
+    "chooseSlot": "Chưa lưu: hãy chọn một vị trí",
+    "saving": "Đang lưu…",
+    "notSaved": "Chưa lưu bản nháp",
+    "keptUntil": "Bản nháp được giữ đến {{date}}",
+    "savedUntil": "Đã lưu bản nháp · đến {{date}}"
+  },
+  "library": {
+    "title": "Thư viện dự án",
+    "addFiles": "Thêm tệp",
+    "groups": {
+      "videos": "Video",
+      "images": "Hình ảnh",
+      "sounds": "Âm thanh"
+    },
+    "empty": {
+      "videos": "Không có video",
+      "images": "Không có hình ảnh",
+      "sounds": "Không có âm thanh"
+    },
+    "dropToAdd": "Thả tệp để thêm",
+    "hint": "Thả tệp vào đây hoặc kéo mục vào dòng thời gian",
+    "downloading": "Đang tải xuống... {{percent}}",
+    "downloaded": "Đã tải về máy",
+    "local": "trên máy",
+    "uploadingTitle": "Đang tải lên trong nền. Kết xuất sẽ chờ đến khi xong.",
+    "converting": "đang chuyển đổi",
+    "convertingTitle": "Trình duyệt này không hiển thị được định dạng của video. Bản xem trước sẽ chuyển sang bản 480p khi sẵn sàng.",
+    "noPreview": "không có bản xem trước",
+    "noPreviewTitle": "Không tạo được bản phát được. Bản xem trước có thể vẫn đen, nhưng kết xuất vẫn hoạt động.",
+    "encodedTitle": "Đã mã hóa thành 480p trên máy chủ",
+    "encoding": "Đang mã hóa...",
+    "addToTimeline": "Thêm vào dòng thời gian",
+    "remove": "Gỡ khỏi thư viện"
+  }
+}

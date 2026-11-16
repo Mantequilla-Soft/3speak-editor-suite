@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "line": "{{clips}} · {{length}} · {{edited}}",
+    "audioLine": "Audio · {{clips}} · {{length}} · {{edited}}",
+    "clips_one": "{{count}} clip",
+    "clips_other": "{{count}} clip",
+    "edited": {
+      "justNow": "na-edit ngayon lang",
+      "minutes_one": "na-edit {{count}} min ang nakalipas",
+      "minutes_other": "na-edit {{count}} min ang nakalipas",
+      "hours_one": "na-edit {{count}} oras ang nakalipas",
+      "hours_other": "na-edit {{count}} oras ang nakalipas",
+      "days_one": "na-edit {{count}} araw ang nakalipas",
+      "days_other": "na-edit {{count}} araw ang nakalipas"
+    }
+  },
+  "prompt": {
+    "titleOne": "Ituloy ang draft mo?",
+    "titleMany": "Ituloy ang isang draft?",
+    "keptUntil": "Nakatabi hanggang {{date}}",
+    "open": "Buksan",
+    "startNew": "Magsimula ng bagong proyekto",
+    "singleNote": "Isang draft lang ang puwede mong itabi. Kapag nagsimula ka ng bagong proyekto, papalitan nito ang draft na ito sa sandaling mag-edit ka. Nagtatabi ang 3Speak Pro ng 3 draft nang 30 araw."
+  },
+  "limit": {
+    "titleOne": "Palitan ang na-save mong draft?",
+    "titleMany": "May {{n}} na-save na proyekto ka na",
+    "skipTitle": "Huwag i-save ang proyektong ito",
+    "noteOne": "Isang draft lang ang puwede mong itabi. Kapag na-save ang proyektong ito, papalitan nito ang nasa ibaba.",
+    "noteMany": "Puwede kang magtabi ng hanggang {{n}}. Pumili ng isang papalitan ng proyektong ito:",
+    "replace": "Palitan",
+    "skip": "Huwag i-save ang proyektong ito"
+  },
+  "close": {
+    "saveTitle": "I-save ang proyekto mo?",
+    "closeTitle": "Isara ang editor?",
+    "keepEditing": "Ituloy ang pag-edit",
+    "signInFailed": "Hindi iyon gumana. Aprubahan ang sign-in request sa wallet mo at subukan ulit, o mag-log out sa 3Speak at mag-log in ulit.",
+    "signInToKeep": "Mag-sign in nang isang beses para maitabi ang proyektong ito bilang draft, para maituloy mo mamaya.",
+    "signedOutLost": "Mawawala ang mga edit mo. Mag-log in sa 3Speak para makapagtabi ng mga draft ng proyekto mo.",
+    "lost": "Mawawala ang mga edit mo.",
+    "signingIn": "Nagsa-sign in…",
+    "signInToSave": "Mag-sign in para i-save",
+    "withoutSaving": "Isara nang hindi sine-save",
+    "keepTitle": "Itabi ang proyektong ito?",
+    "keepDays_one": "Itatabi namin ito nang {{count}} araw",
+    "keepDays_other": "Itatabi namin ito nang {{count}} araw",
+    "keepHours_one": "Itatabi namin ito nang {{count}} oras",
+    "keepHours_other": "Itatabi namin ito nang {{count}} oras",
+    "until": "hanggang {{date}}",
+    "uploadingOne": "Ina-upload pa ang {{name}} ({{percent}}). Puwede kang mag-save kapag tapos na ito.",
+    "uploadingFiles_one": "Ina-upload pa ang {{count}} file ({{percent}}). Puwede kang mag-save kapag tapos na ito.",
+    "uploadingFiles_other": "Ina-upload pa ang {{count}} file ({{percent}}). Puwede kang mag-save kapag tapos na ito.",
+    "name": "Pangalan ng proyekto",
+    "namePlaceholder": "Proyektong walang pamagat",
+    "saveError": "Hindi ma-save. Tingnan ang koneksyon mo at subukan ulit.",
+    "saveAndClose": "I-save at isara",
+    "afterUpload": "Magagamit kapag tapos na ang upload",
+    "deleteAndClose": "Burahin at isara"
+  },
+  "pro": {
+    "title": "Mas marami sa 3Speak Pro",
+    "text": "Magtabi ng hanggang 3 proyekto nang 30 araw bawat isa, sa halip na 1 nang 7 araw.",
+    "get": "Kumuha ng Pro"
+  },
+  "status": {
+    "signingIn": "Nagsa-sign in… tingnan ang wallet mo",
+    "signInTitle": "Mag-sign in nang isang beses para ma-save ang proyekto mo bilang draft",
+    "signInFailed": "Pumalya ang sign-in · subukan ulit",
+    "saveDrafts": "I-save ang mga draft",
+    "notSavedTitle": "Hindi pa naka-save ang proyektong ito",
+    "chooseSlot": "Hindi naka-save: pumili ng slot",
+    "saving": "Sine-save…",
+    "notSaved": "Hindi na-save ang draft",
+    "keptUntil": "Nakatabi ang draft hanggang {{date}}",
+    "savedUntil": "Na-save ang draft · hanggang {{date}}"
+  },
+  "library": {
+    "title": "Library ng proyekto",
+    "addFiles": "Magdagdag ng mga file",
+    "groups": {
+      "videos": "Mga Video",
+      "images": "Mga larawan",
+      "sounds": "Mga tunog"
+    },
+    "empty": {
+      "videos": "Walang video",
+      "images": "Walang larawan",
+      "sounds": "Walang tunog"
+    },
+    "dropToAdd": "I-drop ang mga file para idagdag",
+    "hint": "I-drop ang mga file dito o i-drag ang mga item sa timeline",
+    "downloading": "Dina-download... {{percent}}",
+    "downloaded": "Na-download sa device",
+    "local": "lokal",
+    "uploadingTitle": "Ina-upload sa background. Maghihintay ang Render hanggang matapos ito.",
+    "converting": "kino-convert",
+    "convertingTitle": "Hindi maipakita ng browser na ito ang format ng video na ito. Lilipat ang preview sa 480p na kopya kapag handa na ito.",
+    "noPreview": "walang preview",
+    "noPreviewTitle": "Hindi makagawa ng kopyang puwedeng i-play. Maaaring manatiling itim ang preview, pero gumagana pa rin ang pag-render.",
+    "encodedTitle": "Na-encode sa 480p sa server",
+    "encoding": "Ine-encode...",
+    "addToTimeline": "Idagdag sa timeline",
+    "remove": "Alisin sa library"
+  }
+}

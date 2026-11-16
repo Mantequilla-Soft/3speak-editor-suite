@@ -1,0 +1,86 @@
+{
+  "aspect": {
+    "short": {
+      "label": "Short",
+      "hint": "Dikey, en fazla 2 dakika, Short olarak paylaşılır"
+    },
+    "landscape": {
+      "label": "Yatay",
+      "hint": "Geniş ekran video, en fazla 10 dakika"
+    },
+    "classic": {
+      "label": "Klasik",
+      "hint": "4:3 video, en fazla 10 dakika"
+    },
+    "square": {
+      "label": "Kare",
+      "hint": "Kare video, en fazla 10 dakika"
+    }
+  },
+  "chip": {
+    "title": "Bu projenin biçimi: {{shape}}. Değiştirmek için tıkla",
+    "aria": "Proje biçimi: {{shape}}"
+  },
+  "picker": {
+    "title": "Ne yapıyorsun?",
+    "tooLong": "zaman çizelgen {{length}}, işlemek için {{limit}} süresine kırp",
+    "note": "Biçim, 3Speak'e nasıl gideceğini belirler: 9:16 Short olarak, diğerleri normal video olarak. \"Farklı dışa aktar\" onu başka biçimlerde de işler."
+  },
+  "preview": {
+    "heading": "Önizleme biçimi",
+    "yours": "{{aspect}} (seninki)",
+    "projectIs": {
+      "short": "Projen Short 9:16. Başka bir biçimde görüntü kareyi doldurur, içindeki yüzün çevresinden kırpılır.",
+      "landscape": "Projen Yatay 16:9. Başka bir biçimde görüntü kareyi doldurur, içindeki yüzün çevresinden kırpılır.",
+      "classic": "Projen Klasik 4:3. Başka bir biçimde görüntü kareyi doldurur, içindeki yüzün çevresinden kırpılır.",
+      "square": "Projen Kare 1:1. Başka bir biçimde görüntü kareyi doldurur, içindeki yüzün çevresinden kırpılır."
+    }
+  },
+  "faces": {
+    "heading": "Yüzleri takip et",
+    "noFootage": "Henüz yeniden kadrajlanacak görüntü yok. Taşınmış ya da yakınlaştırılmış klipler kendi kadrajlarını korur.",
+    "hint": "Yüz, tarayıcında saniyede birkaç kare ile bulunur. Yüz yoksa orta kısım görünür kalır.",
+    "found": "Yüz bulundu",
+    "noFace": "Yüz yok: orta",
+    "middle": "Orta",
+    "finding": "Yüzler aranıyor",
+    "findOne": "Yüzü bul",
+    "findMany_one": "{{count}} klipte yüzleri bul",
+    "findMany_other": "{{count}} klipte yüzleri bul",
+    "streamNamed": "{{name}} bir yayın: ortasının çevresinden kırpılır.",
+    "streamUnnamed": "Bir klip yayın: ortasının çevresinden kırpılır.",
+    "failed": "Yüz takibi burada çalışmadı: {{error}}",
+    "moveWindow": "{{name}}: pencereyi taşı",
+    "left": "Sol",
+    "right": "Sağ",
+    "up": "Yukarı",
+    "down": "Aşağı",
+    "moveX": "Pencereyi sola ya da sağa taşı",
+    "moveY": "Pencereyi yukarı ya da aşağı taşı",
+    "findAgain": "Yüzü yeniden bul",
+    "reset": "Orta, kaydırma yok"
+  },
+  "clipFallback": "Klip",
+  "stop": "Durdur",
+  "render": {
+    "heading": "Farklı işle",
+    "shortsLimit": "Shorts en fazla {{limit}} olabilir: 9:16 bir tane işlemek için zaman çizelgesini kırp.",
+    "button_one": "{{count}} video işle",
+    "button_other": "{{count}} video işle",
+    "failed": "İşleme başarısız: {{error}}",
+    "download": "İndir",
+    "postShort": "Short olarak paylaş",
+    "postVideo": "Video olarak paylaş"
+  },
+  "job": {
+    "waiting": "Bekleniyor...",
+    "preparing": "Dosyalar hazırlanıyor...",
+    "starting": "Başlatılıyor...",
+    "rendering": "İşleniyor...",
+    "done": "Bitti",
+    "stopped": "Durduruldu",
+    "busy": "İşleme sunucuları meşgul. {{seconds}} sn sonra yeniden deneniyor...",
+    "offline": "İşleme sunucusuyla bağlantı yok. {{seconds}} sn sonra yeniden deneniyor...",
+    "failed": "İşleme başarısız oldu"
+  }
+}

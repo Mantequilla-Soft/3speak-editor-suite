@@ -1,0 +1,26 @@
+{
+  "music": {
+    "title": "Musik",
+    "search": "Songs suchen",
+    "loading": "Songs werden geladen...",
+    "failed": "Die Musikbibliothek konnte nicht geladen werden.",
+    "none": "Keine passenden Songs.",
+    "note": "Die Song-Angabe wird automatisch zu deinem Post hinzugefügt. Wenn du den Sound eines 3Speak-Creators wählst, bekommt er 5 % der Post-Rewards.",
+    "addTitle": "Zum Video hinzufügen"
+  },
+  "sfx": {
+    "title": "Soundeffekte",
+    "search": "Sounds suchen",
+    "loading": "Sounds werden geladen...",
+    "failed": "Die Soundeffekte konnten nicht geladen werden.",
+    "none": "Keine passenden Sounds.",
+    "note": "Sounds werden am Abspielkopf eingefügt. Frei nutzbar (CC0, Kenney.nl), keine Nennung nötig.",
+    "addTitle": "Am Abspielkopf hinzufügen"
+  },
+  "all": "Alle",
+  "timeline": "Zeitleiste: {{title}}",
+  "seconds": "{{seconds}} s",
+  "stop": "Stopp",
+  "listen": "Anhören",
+  "add": "Hinzufügen"
+}

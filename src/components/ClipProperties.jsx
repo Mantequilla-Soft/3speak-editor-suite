@@ -11,18 +11,20 @@ import { Eye, EyeOff } from './icons'
 import { autoColor } from '../utils/autoColor'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
+import LookControls from './LookControls'
+import TransitionControls from './TransitionControls'
+import TextFxControls from './TextFxControls'
+import SceneControls from './SceneControls'
 import './GreenScreen.css'
+import PersonKeyControls from './PersonKeyControls'
+import SpeedControls from './SpeedControls'
+import KeyframeControls from './KeyframeControls'
+import { useT, hasKey, t as i18nT } from '../i18n'
 
 // Green screen (chroma key) on a video clip: keyed pixels turn transparent, so
 // the clips on the tracks below show through. See utils/chromaKey.js.
-const COLOR_SLIDERS = [
-  { key: 'brightness', label: 'Brightness' },
-  { key: 'contrast', label: 'Contrast' },
-  { key: 'midtones', label: 'Midtones' },
-  { key: 'saturation', label: 'Saturation' },
-  { key: 'warmth', label: 'Warmth' },
-  { key: 'tint', label: 'Tint' }
-]
+// labels: clip.color.sliders.<key>
+const COLOR_SLIDERS = ['brightness', 'contrast', 'midtones', 'saturation', 'warmth', 'tint']
 
 /**
  * Colour adjustments of a video / image clip (utils/clipColor.js): the preview
@@ -30,6 +32,7 @@ const COLOR_SLIDERS = [
  * few frames and sets levels, midtones and white balance (utils/autoColor.js).
  */
 function ColorControls({ clip, onUpdateClip }) {
+  const { t } = useT()
   const [autoState, setAutoState] = useState(null) // null | 'busy' | 'failed'
   const color = { ...COLOR_DEFAULTS, ...(clip.color || {}) }
   const changed = !!normalizeColor(clip.color)
@@ -48,24 +51,24 @@ function ColorControls({ clip, onUpdateClip }) {
   return (
     <div className="prop-group">
       <div className="prop-group-label color-group-label">
-        <span>Color</span>
+        <span>{t('clip.sections.color')}</span>
         <span className="color-group-actions">
-          <button className="color-auto-btn" onClick={runAuto} disabled={autoState === 'busy'} title="Fix levels, midtones and white balance from this clip's frames">
-            <Wand2 size={11} /> {autoState === 'busy' ? 'Measuring…' : 'Auto'}
+          <button className="color-auto-btn" onClick={runAuto} disabled={autoState === 'busy'} title={t('clip.color.autoTitle')}>
+            <Wand2 size={11} /> {autoState === 'busy' ? t('clip.color.measuring') : t('common.auto')}
           </button>
           {changed && (
-            <button className="prop-reset-btn" onClick={() => onUpdateClip({ color: null })} title="Reset all colour adjustments">
+            <button className="prop-reset-btn" onClick={() => onUpdateClip({ color: null })} title={t('clip.color.resetAll')}>
               <RotateCcw size={10} />
             </button>
           )}
         </span>
       </div>
-      {autoState === 'failed' && <p className="color-auto-error">Could not read this clip&apos;s picture.</p>}
-      {COLOR_SLIDERS.map(({ key, label }) => (
+      {autoState === 'failed' && <p className="color-auto-error">{t('clip.color.failed')}</p>}
+      {COLOR_SLIDERS.map((key) => (
         <div className="property-group color-slider" key={key}>
           <label>
             {key === 'brightness' ? <SunMedium size={12} /> : null}
-            {label}
+            {t(`clip.color.sliders.${key}`)}
           </label>
           <div className="property-slider">
             <input
@@ -75,7 +78,7 @@ function ColorControls({ clip, onUpdateClip }) {
               value={color[key]}
               onChange={(e) => set(key, parseInt(e.target.value))}
               onDoubleClick={() => set(key, 0)}
-              title="Double-click to reset"
+              title={t('clip.doubleClickReset')}
             />
             <span>{color[key] > 0 ? `+${color[key]}` : color[key]}</span>
           </div>
@@ -85,15 +88,13 @@ function ColorControls({ clip, onUpdateClip }) {
   )
 }
 
-const EFFECT_GROUPS = [
-  { id: 'loop', label: 'Loops' },
-  { id: 'in', label: 'Entrances' },
-  { id: 'out', label: 'Exits' }
-]
+// labels: clip.effects.groups.<id>
+const EFFECT_GROUPS = ['loop', 'in', 'out']
 const DIRECTION_ARROWS = [['left', '←'], ['right', '→'], ['top', '↑'], ['bottom', '↓']]
 // Pivot presets: x, y in -1..1 (centre = 0, 0)
 const PIVOT_GRID = [-1, 0, 1].flatMap(y => [-1, 0, 1].map(x => [x, y]))
-const PIVOT_NAMES = { '-1,-1': 'top left', '0,-1': 'top', '1,-1': 'top right', '-1,0': 'left', '0,0': 'centre', '1,0': 'right', '-1,1': 'bottom left', '0,1': 'bottom', '1,1': 'bottom right' }
+// names: clip.effects.pivotName.<key>
+const PIVOT_NAMES = { '-1,-1': 'topLeft', '0,-1': 'top', '1,-1': 'topRight', '-1,0': 'left', '0,0': 'centre', '1,0': 'right', '-1,1': 'bottomLeft', '0,1': 'bottom', '1,1': 'bottomRight' }
 
 /**
  * Motion of an image / text clip (stickers): a stack of effects (loops,
@@ -102,6 +103,8 @@ const PIVOT_NAMES = { '-1,-1': 'top left', '0,-1': 'top', '1,-1': 'top right', '
  * preview, export and render use the same formulas). Press play to see it.
  */
 function MotionControls({ clip, onUpdateClip }) {
+  const { t } = useT()
+  const pivotName = (x, y) => t(`clip.effects.pivotName.${PIVOT_NAMES[`${x},${y}`] || 'custom'}`)
   const motion = normalizeMotion(clip.motion)
   const effects = motion?.effects || []
   const pivot = { pivotX: motion?.pivotX || 0, pivotY: motion?.pivotY || 0 }
@@ -115,48 +118,49 @@ function MotionControls({ clip, onUpdateClip }) {
 
   return (
     <div className="prop-group">
-      <div className="prop-group-label">Motion</div>
+      <div className="prop-group-label">{t('clip.sections.motion')}</div>
 
       {effects.map((e, i) => {
         const def = EFFECTS.find(x => x.id === e.type)
+        const name = t(`clip.effects.effect.${def.id}`)
         return (
           <div className={`motion-effect${e.hidden ? ' hidden-effect' : ''}`} key={`${e.type}-${i}`}>
             <div className="motion-effect-head">
-              <strong>{def.label}{e.hidden ? ' (hidden)' : ''}</strong>
+              <strong>{e.hidden ? t('clip.effects.hiddenName', { name }) : name}</strong>
               <span className="motion-effect-actions">
                 <button
                   className="prop-reset-btn"
                   onClick={() => setEffect(i, { hidden: !e.hidden })}
-                  title={e.hidden ? 'Show this effect again' : 'Hide this effect (kept, but not applied)'}
+                  title={e.hidden ? t('clip.effects.show') : t('clip.effects.hide')}
                   aria-pressed={!!e.hidden}
                 >
                   {e.hidden ? <EyeOff size={12} /> : <Eye size={12} />}
                 </button>
-                <button className="prop-reset-btn" onClick={() => removeEffect(i)} title="Remove this effect">×</button>
+                <button className="prop-reset-btn" onClick={() => removeEffect(i)} title={t('clip.effects.remove')}>×</button>
               </span>
             </div>
             {def.direction && (
-              <div className="motion-directions" role="radiogroup" aria-label={e.type === 'slideIn' ? 'Comes from' : 'Goes to'}>
-                <span>{e.type === 'slideIn' ? 'From' : 'To'}</span>
+              <div className="motion-directions" role="radiogroup" aria-label={e.type === 'slideIn' ? t('clip.effects.comesFrom') : t('clip.effects.goesTo')}>
+                <span>{e.type === 'slideIn' ? t('clip.effects.from') : t('clip.effects.to')}</span>
                 {DIRECTION_ARROWS.map(([d, arrow]) => (
-                  <button key={d} role="radio" aria-checked={e.direction === d} className={e.direction === d ? 'active' : ''} onClick={() => setEffect(i, { direction: d })} title={d}>
+                  <button key={d} role="radio" aria-checked={e.direction === d} className={e.direction === d ? 'active' : ''} onClick={() => setEffect(i, { direction: d })} title={t(`clip.effects.direction.${d}`)}>
                     {arrow}
                   </button>
                 ))}
               </div>
             )}
             <div className="property-group">
-              <label>Speed</label>
+              <label>{t('clip.effects.speed')}</label>
               <div className="property-slider">
-                <input type="range" min="0.1" max="4" step="0.1" value={e.speed} onChange={(ev) => setEffect(i, { speed: parseFloat(ev.target.value) })} onDoubleClick={() => setEffect(i, { speed: EFFECT_DEFAULTS.speed })} title="Double-click to reset" />
+                <input type="range" min="0.1" max="4" step="0.1" value={e.speed} onChange={(ev) => setEffect(i, { speed: parseFloat(ev.target.value) })} onDoubleClick={() => setEffect(i, { speed: EFFECT_DEFAULTS.speed })} title={t('clip.doubleClickReset')} />
                 <span>{e.speed.toFixed(1)}×</span>
               </div>
             </div>
             {def.amount && (
               <div className="property-group">
-                <label>{def.amount}</label>
+                <label>{t(`clip.effects.amount.${def.amount.toLowerCase()}`)}</label>
                 <div className="property-slider">
-                  <input type="range" min="0" max="100" step="1" value={e.amount} onChange={(ev) => setEffect(i, { amount: parseInt(ev.target.value) })} onDoubleClick={() => setEffect(i, { amount: EFFECT_DEFAULTS.amount })} title="Double-click to reset" />
+                  <input type="range" min="0" max="100" step="1" value={e.amount} onChange={(ev) => setEffect(i, { amount: parseInt(ev.target.value) })} onDoubleClick={() => setEffect(i, { amount: EFFECT_DEFAULTS.amount })} title={t('clip.doubleClickReset')} />
                   <span>{Math.round(e.amount)}%</span>
                 </div>
               </div>
@@ -167,10 +171,10 @@ function MotionControls({ clip, onUpdateClip }) {
 
       <div className="property-group">
         <select className="motion-add" value="" onChange={(ev) => { if (ev.target.value) addEffect(ev.target.value) }}>
-          <option value="">{effects.length ? 'Add another effect…' : 'Add an effect…'}</option>
+          <option value="">{effects.length ? t('clip.effects.addAnother') : t('clip.effects.addFirst')}</option>
           {EFFECT_GROUPS.map(g => (
-            <optgroup key={g.id} label={g.label}>
-              {EFFECTS.filter(x => x.group === g.id).map(x => <option key={x.id} value={x.id}>{x.label}</option>)}
+            <optgroup key={g} label={t(`clip.effects.groups.${g}`)}>
+              {EFFECTS.filter(x => x.group === g).map(x => <option key={x.id} value={x.id}>{t(`clip.effects.effect.${x.id}`)}</option>)}
             </optgroup>
           ))}
         </select>
@@ -178,9 +182,9 @@ function MotionControls({ clip, onUpdateClip }) {
 
       {turns && (
         <div className="property-group">
-          <label>Pivot <small className="motion-pivot-name">{PIVOT_NAMES[`${pivot.pivotX},${pivot.pivotY}`] || 'custom'}</small></label>
+          <label>{t('clip.effects.pivot')} <small className="motion-pivot-name">{pivotName(pivot.pivotX, pivot.pivotY)}</small></label>
           <div className="motion-pivot">
-            <div className="motion-pivot-grid" role="radiogroup" aria-label="Pivot point">
+            <div className="motion-pivot-grid" role="radiogroup" aria-label={t('clip.effects.pivotPoint')}>
               {PIVOT_GRID.map(([x, y]) => (
                 <button
                   key={`${x},${y}`}
@@ -188,7 +192,7 @@ function MotionControls({ clip, onUpdateClip }) {
                   aria-checked={pivot.pivotX === x && pivot.pivotY === y}
                   className={pivot.pivotX === x && pivot.pivotY === y ? 'active' : ''}
                   onClick={() => setPivot(x, y)}
-                  title={PIVOT_NAMES[`${x},${y}`]}
+                  title={pivotName(x, y)}
                 />
               ))}
             </div>
@@ -209,17 +213,18 @@ function MotionControls({ clip, onUpdateClip }) {
   )
 }
 
+// label (and title) in the interface language, read when shown
 export const NOISE_LEVELS = [
-  { id: null, label: 'Off' },
-  { id: 'light', label: 'Light' },
-  { id: 'medium', label: 'Medium' },
-  { id: 'strong', label: 'Strong' }
+  { id: null, get label() { return i18nT('common.off') } },
+  { id: 'light', get label() { return i18nT('clip.noise.levels.light') } },
+  { id: 'medium', get label() { return i18nT('clip.noise.levels.medium') } },
+  { id: 'strong', get label() { return i18nT('clip.noise.levels.strong') } }
 ]
 // The audio editor's levels: Off, Light, Medium and Strong, where Strong is
 // the full voice treatment ('studio': noise down, rumble and mud out, presence
 // and evenness in, de-esser, compressor; see DENOISE in the backend's clip.js).
 // The plain 'strong' noise reduction is the shorts editor's only.
-export const STUDIO_LEVEL = { id: 'studio', label: 'Strong', title: 'Strong: less noise, no rumble, clearer and more even, softer S sounds' }
+export const STUDIO_LEVEL = { id: 'studio', get label() { return i18nT('clip.noise.levels.strong') }, get title() { return i18nT('clip.noise.studioTitle') } }
 export const AUDIO_NOISE_LEVELS = [...NOISE_LEVELS.filter(l => l.id !== 'strong'), STUDIO_LEVEL]
 
 // The uploaded original of a clip's recording (kept while a cleaned version
@@ -324,10 +329,11 @@ export async function cleanVoiceChanges(targets, level) {
 // volume ramp (utils/audioGain.js). A fade never runs longer than the clip.
 const FADE_MAX = 10
 function FadeControls({ clip, onUpdateClip }) {
+  const { t } = useT()
   const length = Math.max(0, clip.endTime - clip.startTime)
   const max = Math.max(0.1, Math.min(FADE_MAX, length))
   const value = (key) => Math.min(max, Math.max(0, +clip[key] || 0))
-  const row = (key, label) => (
+  const row = (key, label, ariaLabel) => (
     <div className="property-slider fade-slider">
       <span className="fade-label">{label}</span>
       <input
@@ -337,7 +343,7 @@ function FadeControls({ clip, onUpdateClip }) {
         step="0.1"
         value={value(key)}
         onChange={(e) => onUpdateClip({ [key]: Math.round(parseFloat(e.target.value) * 10) / 10 })}
-        aria-label={`${label} (seconds)`}
+        aria-label={ariaLabel}
       />
       <span>{value(key).toFixed(1)}s</span>
     </div>
@@ -346,15 +352,15 @@ function FadeControls({ clip, onUpdateClip }) {
   return (
     <div className="property-group">
       <label>
-        Fades
+        {t('clip.fades.label')}
         {any && (
-          <button className="prop-reset-btn" onClick={() => onUpdateClip({ fadeIn: 0, fadeOut: 0 })} title="No fades">
+          <button className="prop-reset-btn" onClick={() => onUpdateClip({ fadeIn: 0, fadeOut: 0 })} title={t('clip.fades.none')}>
             <RotateCcw size={10} />
           </button>
         )}
       </label>
-      {row('fadeIn', 'In')}
-      {row('fadeOut', 'Out')}
+      {row('fadeIn', t('clip.fades.in'), t('clip.fades.inSeconds'))}
+      {row('fadeOut', t('clip.fades.out'), t('clip.fades.outSeconds'))}
     </div>
   )
 }
@@ -362,11 +368,12 @@ function FadeControls({ clip, onUpdateClip }) {
 // voiceTargets (audio editor): the clip and the rest of its group; the
 // clean-up applies to them, never to other pieces of the same recording
 function NoiseControls({ clip, onUpdateClip, voiceTargets = null, onUpdateClipsEach = null }) {
+  const { t } = useT()
   const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
   const audioEditor = !!(voiceTargets && onUpdateClipsEach)
   const targets = audioEditor ? voiceTargets : [clip]
-  const canClean = targets.some(audioEditor ? canCleanClip : (t) => canCleanSource(recordingSource(t)))
+  const canClean = targets.some(audioEditor ? canCleanClip : (c) => canCleanSource(recordingSource(c)))
   const levels = audioEditor ? AUDIO_NOISE_LEVELS : NOISE_LEVELS
   const apply = (changes) => {
     if (audioEditor) onUpdateClipsEach(changes)
@@ -380,7 +387,7 @@ function NoiseControls({ clip, onUpdateClip, voiceTargets = null, onUpdateClipsE
       // denoiseLocalUrl: what the preview played before (often the local file), for Off
       apply(await cleanVoiceChanges(targets, level))
     } catch {
-      setError('Noise reduction failed. Try again.')
+      setError(t('clip.noise.failed'))
     } finally {
       setBusy(null)
     }
@@ -389,12 +396,12 @@ function NoiseControls({ clip, onUpdateClip, voiceTargets = null, onUpdateClipsE
   const running = useCleaningStatus()
   return (
     <div className="property-group">
-      <label>{audioEditor ? 'Clean up the voice' : 'Reduce background noise'}</label>
+      <label>{audioEditor ? t('clip.noise.cleanVoice') : t('clip.noise.reduce')}</label>
       {canClean ? (
-        <div className="noise-levels" role="radiogroup" aria-label="Noise reduction">
+        <div className="noise-levels" role="radiogroup" aria-label={t('clip.noise.group')}>
           {levels.map(({ id, label, title }) => (
             <button
-              key={label}
+              key={String(id)}
               title={title}
               role="radio"
               aria-checked={(clip.denoise || null) === id}
@@ -402,18 +409,18 @@ function NoiseControls({ clip, onUpdateClip, voiceTargets = null, onUpdateClipsE
               disabled={!!busy || !!running}
               onClick={() => choose(id)}
             >
-              {busy && busy === (id ?? 'off') ? <Loader2 size={12} className="encoding-notice-spin" aria-label="Working" /> : label}
+              {busy && busy === (id ?? 'off') ? <Loader2 size={12} className="encoding-notice-spin" aria-label={t('clip.noise.working')} /> : label}
             </button>
           ))}
         </div>
       ) : (
-        <p className="noise-hint">Available once this clip has finished uploading.</p>
+        <p className="noise-hint">{t('clip.noise.afterUpload')}</p>
       )}
       {(busy || running) && (
-        <p className="noise-busy" role="status"><Loader2 size={14} className="encoding-notice-spin" /> {running ? cleaningText(running) : 'Working…'}</p>
+        <p className="noise-busy" role="status"><Loader2 size={14} className="encoding-notice-spin" /> {running ? cleaningText(running) : t('clip.noise.workingDots')}</p>
       )}
       {audioEditor && canClean && (
-        <p className="noise-hint">{targets.length > 1 ? `Applies to this clip and its group (${targets.length} clips).` : 'Applies to this clip only.'}</p>
+        <p className="noise-hint">{targets.length > 1 ? t('clip.noise.appliesGroup', { count: targets.length }) : t('clip.noise.appliesOne')}</p>
       )}
       {error && <p className="noise-hint error">{error}</p>}
     </div>
@@ -427,6 +434,7 @@ function NoiseControls({ clip, onUpdateClip, voiceTargets = null, onUpdateClipsE
  * (a music clip: without its own setting it follows Duck in the top bar) }.
  */
 function DuckControls({ duckInfo, onUpdateClip }) {
+  const { t, tRich } = useT()
   const { setting, sources, defaultSource } = duckInfo
   // A source that is gone (its track removed) falls back to the default
   const source = setting && sources.some(s => s.id === setting.source) ? setting.source : (defaultSource || DUCK_SOURCE_VOICES)
@@ -435,8 +443,8 @@ function DuckControls({ duckInfo, onUpdateClip }) {
   const active = setting ? setting.db : null
   return (
     <div className="property-group">
-      <label>Duck</label>
-      <div className="noise-levels" role="radiogroup" aria-label="Duck this clip">
+      <label>{t('clip.duck.label')}</label>
+      <div className="noise-levels" role="radiogroup" aria-label={t('clip.duck.group')}>
         {[null, ...DUCK_DEPTHS].map(db => (
           <button
             key={String(db)}
@@ -445,36 +453,42 @@ function DuckControls({ duckInfo, onUpdateClip }) {
             className={active === db ? 'active' : ''}
             onClick={() => setDepth(db)}
           >
-            {db == null ? 'Off' : `${db} dB`}
+            {db == null ? t('common.off') : t('clip.duck.depth', { db })}
           </button>
         ))}
       </div>
       {setting && (
         <div className="duck-source">
-          <span>Goes down while</span>
-          <select value={source} onChange={(e) => setSource(e.target.value)} aria-label="Duck source">
-            {sources.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
-          </select>
-          <span>plays</span>
+          {tRich('clip.duck.source', null, {
+            lead: <span />,
+            tail: <span />,
+            pick: (
+              <select value={source} onChange={(e) => setSource(e.target.value)} aria-label={t('clip.duck.sourceLabel')}>
+                {sources.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+              </select>
+            )
+          })}
         </div>
       )}
-      <p className="noise-hint">This clip gets quieter while the chosen track plays, and comes back up in the pauses.</p>
+      <p className="noise-hint">{t('clip.duck.hint')}</p>
     </div>
   )
 }
 
-function GreenScreenControls({ clip, onUpdateClip, playheadPosition }) {
+function GreenScreenControls({ clip, onUpdateClip, playheadPosition, onPickBackground }) {
+  const { t } = useT()
   const [grabbing, setGrabbing] = useState(false)
   const [grabError, setGrabError] = useState(null)
   const key = normalizeChromaKey(clip.chromaKey)
   const isStatic = key?.mode === 'static'
+  const isPerson = key?.mode === 'person'
   const ranges = isStatic ? KEY_RANGES.static : KEY_RANGES.chroma
 
   const setKey = (patch) => onUpdateClip({ chromaKey: { ...clip.chromaKey, ...patch } })
   const setMode = (mode) => {
     if (!key || mode === key.mode) return
-    // Green <-> blue keep the sliders; static uses its own scale
-    if (mode !== 'static' && !isStatic) setKey({ color: mode })
+    // Green <-> blue keep the sliders; static and person use their own scales
+    if (mode !== 'static' && mode !== 'person' && !isStatic && !isPerson) setKey({ color: mode })
     else onUpdateClip({ chromaKey: defaultChromaKey(mode, mode === 'static' ? clip.chromaKey?.plateUrl : null, mode === 'static' ? clip.chromaKey?.noiseUrl : null) })
   }
 
@@ -494,7 +508,7 @@ function GreenScreenControls({ clip, onUpdateClip, playheadPosition }) {
       onUpdateClip({ chromaKey: { ...clip.chromaKey, color: 'static', plateUrl, noiseUrl } })
     } catch (err) {
       console.warn('[ClipProperties] background frame:', err)
-      setGrabError('Could not grab that frame. Try again, or pick another moment.')
+      setGrabError(t('clip.greenScreen.grabFailed'))
     } finally {
       setGrabbing(false)
     }
@@ -503,10 +517,10 @@ function GreenScreenControls({ clip, onUpdateClip, playheadPosition }) {
   const pct = (v) => Math.round(v * 100)
   return (
     <div className="prop-group">
-      <div className="prop-group-label">Green screen</div>
+      <div className="prop-group-label">{t('clip.sections.greenScreen')}</div>
       <div className="property-group">
         <label>
-          Remove background
+          {t('clip.greenScreen.removeBackground')}
           <label className="toggle-switch" style={{ marginLeft: 'auto' }}>
             <input
               type="checkbox"
@@ -519,21 +533,19 @@ function GreenScreenControls({ clip, onUpdateClip, playheadPosition }) {
         {key && (
           <>
             <div className="text-align-buttons chroma-mode-buttons">
-              {[['green', 'Green'], ['blue', 'Blue'], ['static', 'Static (experimental)']].map(([mode, label]) => (
+              {['green', 'blue', 'person', 'static'].map((mode) => (
                 <button
                   key={mode}
                   className={`text-align-btn ${key.mode === mode ? 'active' : ''}`}
                   onClick={() => setMode(mode)}
-                  title={mode === 'static' ? 'Static background (experimental): removes whatever matches a frame of the empty background' : `${label} screen`}
+                  title={t(`clip.greenScreen.modeTitles.${mode}`)}
                 >
-                  {label}
+                  {t(`clip.greenScreen.modes.${mode}`)}
                 </button>
               ))}
             </div>
             <small className="layout-hint">
-              {isStatic
-                ? 'Removes everything that looks like a few frames of the empty background. Small changes (noise, light, focus) are ignored and parts of you that match the wall are kept inside your outline. Needs a camera that does not move; shadows you cast stay visible. If parts of the room keep showing, raise Threshold.'
-                : `Removes the ${key.mode} backdrop so the clips on the tracks below show through.`}
+              {isPerson ? t('clip.greenScreen.hint.person') : isStatic ? t('clip.greenScreen.staticHint') : key.mode === 'blue' ? t('clip.greenScreen.hint.blue') : t('clip.greenScreen.hint.green')}
             </small>
           </>
         )}
@@ -541,25 +553,27 @@ function GreenScreenControls({ clip, onUpdateClip, playheadPosition }) {
 
       {key && isStatic && (
         <div className="property-group">
-          <label>Empty background frame</label>
+          <label>{t('clip.greenScreen.plate')}</label>
           {key.plateUrl ? (
-            <img className="chroma-plate-thumb" src={key.plateUrl} alt="Empty background" />
+            <img className="chroma-plate-thumb" src={key.plateUrl} alt={t('clip.greenScreen.plateAlt')} />
           ) : (
-            <small className="layout-hint">Move the playhead to a moment that shows only the background, without you in it. Half a second of it is used.</small>
+            <small className="layout-hint">{t('clip.greenScreen.plateHint')}</small>
           )}
           <button className="layout-free-btn" onClick={grabPlate} disabled={grabbing}>
-            {grabbing ? 'Grabbing frame...' : key.plateUrl ? 'Use the frame at the playhead instead' : 'Use the frame at the playhead'}
+            {grabbing ? t('clip.greenScreen.grabbing') : key.plateUrl ? t('clip.greenScreen.useFrameInstead') : t('clip.greenScreen.useFrame')}
           </button>
           {grabError && <small className="layout-hint">{grabError}</small>}
         </div>
       )}
 
-      {key && (
+      {isPerson && <PersonKeyControls clip={clip} onUpdateClip={onUpdateClip} onPickBackground={onPickBackground} />}
+
+      {key && !isPerson && (
         <>
           <div className="property-group">
-            <label title={isStatic ? 'Tolerance: higher ignores more change in the background (noise, light, focus) but can start to remove parts of you' : 'Higher removes more of the screen colour'}>
-              Threshold
-              <button className="prop-reset-btn" onClick={() => setKey({ similarity: defaultChromaKey(key.mode).similarity })} title="Reset threshold">
+            <label title={isStatic ? t('clip.greenScreen.thresholdStaticTitle') : t('clip.greenScreen.thresholdTitle')}>
+              {t('clip.greenScreen.threshold')}
+              <button className="prop-reset-btn" onClick={() => setKey({ similarity: defaultChromaKey(key.mode).similarity })} title={t('clip.greenScreen.resetThreshold')}>
                 <RotateCcw size={10} />
               </button>
             </label>
@@ -576,8 +590,8 @@ function GreenScreenControls({ clip, onUpdateClip, playheadPosition }) {
           </div>
           <div className="property-group">
             <label>
-              Edge softness
-              <button className="prop-reset-btn" onClick={() => setKey({ blend: defaultChromaKey(key.mode).blend })} title="Reset softness">
+              {t('clip.greenScreen.softness')}
+              <button className="prop-reset-btn" onClick={() => setKey({ blend: defaultChromaKey(key.mode).blend })} title={t('clip.greenScreen.resetSoftness')}>
                 <RotateCcw size={10} />
               </button>
             </label>
@@ -593,9 +607,9 @@ function GreenScreenControls({ clip, onUpdateClip, playheadPosition }) {
             </div>
           </div>
           <div className="property-group">
-            <label title={isStatic ? 'Removes the wall colour from the edges' : `Removes the ${key.mode} tint from the edges`}>
-              Despill
-              <button className="prop-reset-btn" onClick={() => setKey({ spill: defaultChromaKey(key.mode).spill })} title="Reset despill">
+            <label title={isStatic ? t('clip.greenScreen.despillStaticTitle') : key.mode === 'blue' ? t('clip.greenScreen.despillTitle.blue') : t('clip.greenScreen.despillTitle.green')}>
+              {t('clip.greenScreen.despill')}
+              <button className="prop-reset-btn" onClick={() => setKey({ spill: defaultChromaKey(key.mode).spill })} title={t('clip.greenScreen.resetDespill')}>
                 <RotateCcw size={10} />
               </button>
             </label>
@@ -666,8 +680,8 @@ function DraggableNumberInput({ value, onChange, min, max, step = 1, suffix = ''
 
       const handleTouchMove = (moveEvent) => {
         moveEvent.preventDefault()
-        const t = moveEvent.touches[0]
-        const delta = t.clientX - dragDataRef.current.startX
+        const tp = moveEvent.touches[0]
+        const delta = tp.clientX - dragDataRef.current.startX
         const change = Math.round(delta * step)
         let newValue = dragDataRef.current.startValue + change
         if (min !== undefined) newValue = Math.max(min, newValue)
@@ -732,6 +746,7 @@ function DraggableNumberInput({ value, onChange, min, max, step = 1, suffix = ''
 // 2D drag handle for Position — drag to change both X and Y
 // On mobile: long press (0.5s) to activate drag
 function PositionDragHandle({ positionX, positionY, onChange }) {
+  const { t } = useT()
   const [isDragging, setIsDragging] = useState(false)
   const dragDataRef = useRef({ startX: 0, startY: 0, startPosX: 0, startPosY: 0 })
   const longPressTimer = useRef(null)
@@ -777,9 +792,9 @@ function PositionDragHandle({ positionX, positionY, onChange }) {
 
       const handleTouchMove = (moveEvent) => {
         moveEvent.preventDefault()
-        const t = moveEvent.touches[0]
-        const dx = t.clientX - dragDataRef.current.startX
-        const dy = t.clientY - dragDataRef.current.startY
+        const tp = moveEvent.touches[0]
+        const dx = tp.clientX - dragDataRef.current.startX
+        const dy = tp.clientY - dragDataRef.current.startY
         const newX = Math.round(dragDataRef.current.startPosX + dx)
         const newY = Math.round(dragDataRef.current.startPosY + dy)
         onChange(newX, newY)
@@ -809,7 +824,7 @@ function PositionDragHandle({ positionX, positionY, onChange }) {
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      title="Drag to reposition"
+      title={t('clip.transform.dragToMove')}
     >
       <GripVertical size={12} />
     </span>
@@ -819,10 +834,11 @@ function PositionDragHandle({ positionX, positionY, onChange }) {
 // The tab a phone user last picked, kept across clips (if the next clip has it)
 let lastTab = null
 
-function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, voiceTargets = null, onUpdateClipsEach = null, duckInfo = null }) {
+function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedAudio = null, onUpdateLinkedAudio = null, tabbed = false, voiceTargets = null, onUpdateClipsEach = null, duckInfo = null, motionKit = null, tracks = null, onPickBackground = null }) {
   // Phones (tabbed): one section at a time, a tab per section. The sections
   // differ per clip type and come from several components, so the tabs are
   // read from the rendered sections (.prop-group and its label) after render.
+  const { t } = useT()
   const groupsRef = useRef(null)
   const [tabs, setTabs] = useState([])
   const [activeTab, setActiveTab] = useState(lastTab)
@@ -843,7 +859,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
   if (!clip) {
     return (
       <div className="clip-properties empty">
-        <p>Select a clip to view properties</p>
+        <p>{t('clip.empty')}</p>
       </div>
     )
   }
@@ -862,7 +878,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
       <div className="properties-header">
         <div className="properties-info">
           <span className="clip-name">{clip.name}</span>
-          <span className="clip-type">{clip.type}</span>
+          <span className="clip-type">{hasKey(`clip.types.${clip.type}`) ? t(`clip.types.${clip.type}`) : clip.type}</span>
         </div>
       </div>
 
@@ -883,11 +899,14 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
       )}
 
       <div className={`properties-groups${tabbed ? ' tabbed' : ''}`} ref={groupsRef}>
-        {/* GROUP 1: Content / Audio (images have no sound: no such section) */}
-        {!isImage && (
+        {/* Titles (motion scenes): their words, colours, length */}
+        {clip.type === 'scene' && <SceneControls clip={clip} onUpdateClip={onUpdateClip} />}
+
+        {/* GROUP 1: Content / Audio (images have no sound: no such section; titles have their own) */}
+        {!isImage && clip.type !== 'scene' && (
         <div className="prop-group">
           <div className="prop-group-label">
-            {isText ? 'Content' : isColor ? 'Color' : isAudio ? 'Audio' : 'Audio'}
+            {isText ? t('clip.sections.content') : isColor ? t('clip.sections.color') : t('clip.sections.audio')}
           </div>
 
           {/* Text content & style - only for text clips */}
@@ -896,22 +915,22 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
               <div className="property-group">
                 <label>
                   <Type size={12} />
-                  Text
+                  {t('clip.text.label')}
                 </label>
                 <textarea
                   className="text-input"
                   value={clip.text || ''}
                   onChange={(e) => handleChange('text', e.target.value)}
-                  placeholder="Enter text here..."
+                  placeholder={t('clip.text.placeholder')}
                   rows={2}
                 />
               </div>
 
               <div className="property-group">
                 <label>
-                  Font
+                  {t('clip.text.font')}
                   {((clip.fontFamily && clip.fontFamily !== 'Roboto') || (clip.fontWeight && clip.fontWeight !== 'normal')) && (
-                    <button className="prop-reset-btn" onClick={() => onUpdateClip({ fontFamily: 'Roboto', fontWeight: 'normal' })} title="Reset font">
+                    <button className="prop-reset-btn" onClick={() => onUpdateClip({ fontFamily: 'Roboto', fontWeight: 'normal' })} title={t('clip.text.resetFont')}>
                       <RotateCcw size={10} />
                     </button>
                   )}
@@ -922,7 +941,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                     onChange={(e) => handleChange('fontFamily', e.target.value)}
                     className="font-select"
                   >
-                    <optgroup label="Sans Serif">
+                    <optgroup label={t('clip.text.fontGroups.sansSerif')}>
                       <option value="Roboto" style={{ fontFamily: 'Roboto' }}>Roboto</option>
                       <option value="Open Sans" style={{ fontFamily: 'Open Sans' }}>Open Sans</option>
                       <option value="Lato" style={{ fontFamily: 'Lato' }}>Lato</option>
@@ -932,12 +951,12 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                       <option value="Raleway" style={{ fontFamily: 'Raleway' }}>Raleway</option>
                       <option value="Inter" style={{ fontFamily: 'Inter' }}>Inter</option>
                     </optgroup>
-                    <optgroup label="Serif">
+                    <optgroup label={t('clip.text.fontGroups.serif')}>
                       <option value="Playfair Display" style={{ fontFamily: 'Playfair Display' }}>Playfair Display</option>
                       <option value="Merriweather" style={{ fontFamily: 'Merriweather' }}>Merriweather</option>
                       <option value="Lora" style={{ fontFamily: 'Lora' }}>Lora</option>
                     </optgroup>
-                    <optgroup label="Display">
+                    <optgroup label={t('clip.text.fontGroups.display')}>
                       <option value="Oswald" style={{ fontFamily: 'Oswald' }}>Oswald</option>
                       <option value="Bebas Neue" style={{ fontFamily: 'Bebas Neue' }}>Bebas Neue</option>
                       <option value="Anton" style={{ fontFamily: 'Anton' }}>Anton</option>
@@ -947,14 +966,14 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                       <option value="Fredoka" style={{ fontFamily: 'Fredoka' }}>Fredoka</option>
                       <option value="Lobster" style={{ fontFamily: 'Lobster' }}>Lobster</option>
                     </optgroup>
-                    <optgroup label="Handwriting">
+                    <optgroup label={t('clip.text.fontGroups.handwriting')}>
                       <option value="Dancing Script" style={{ fontFamily: 'Dancing Script' }}>Dancing Script</option>
                       <option value="Pacifico" style={{ fontFamily: 'Pacifico' }}>Pacifico</option>
                       <option value="Caveat" style={{ fontFamily: 'Caveat' }}>Caveat</option>
                       <option value="Permanent Marker" style={{ fontFamily: 'Permanent Marker' }}>Permanent Marker</option>
                       <option value="Bangers" style={{ fontFamily: 'Bangers' }}>Bangers</option>
                     </optgroup>
-                    <optgroup label="Monospace">
+                    <optgroup label={t('clip.text.fontGroups.monospace')}>
                       <option value="Roboto Mono" style={{ fontFamily: 'Roboto Mono' }}>Roboto Mono</option>
                       <option value="Press Start 2P" style={{ fontFamily: 'Press Start 2P' }}>Press Start 2P</option>
                     </optgroup>
@@ -964,24 +983,24 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                     onChange={(e) => handleChange('fontWeight', e.target.value)}
                     className="weight-select"
                   >
-                    <option value="normal">Normal</option>
-                    <option value="bold">Bold</option>
+                    <option value="normal">{t('clip.text.weight.normal')}</option>
+                    <option value="bold">{t('clip.text.weight.bold')}</option>
                   </select>
                 </div>
               </div>
 
               <div className="property-group">
                 <label>
-                  Style
+                  {t('clip.text.style')}
                   {((clip.fontSize && clip.fontSize !== 48) || (clip.fontColor && clip.fontColor !== '#ffffff')) && (
-                    <button className="prop-reset-btn" onClick={() => onUpdateClip({ fontSize: 48, fontColor: '#ffffff' })} title="Reset style">
+                    <button className="prop-reset-btn" onClick={() => onUpdateClip({ fontSize: 48, fontColor: '#ffffff' })} title={t('clip.text.resetStyle')}>
                       <RotateCcw size={10} />
                     </button>
                   )}
                 </label>
                 <div className="property-inputs">
                   <DraggableNumberInput
-                    label="Size"
+                    label={t('clip.text.size')}
                     value={clip.fontSize || 48}
                     onChange={(v) => handleChange('fontSize', v)}
                     min={8}
@@ -1002,9 +1021,9 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
 
               <div className="property-group">
                 <label>
-                  Alignment
+                  {t('clip.text.alignment')}
                   {clip.textHAlign && clip.textHAlign !== 'center' && (
-                    <button className="prop-reset-btn" onClick={() => handleChange('textHAlign', 'center')} title="Reset alignment">
+                    <button className="prop-reset-btn" onClick={() => handleChange('textHAlign', 'center')} title={t('clip.text.resetAlignment')}>
                       <RotateCcw size={10} />
                     </button>
                   )}
@@ -1015,7 +1034,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                       key={align}
                       className={`text-align-btn ${(clip.textHAlign || 'center') === align ? 'active' : ''}`}
                       onClick={() => handleChange('textHAlign', align)}
-                      title={`Align ${align}`}
+                      title={t(`clip.text.align.${align}`)}
                     >
                       {align === 'left' && <AlignLeft size={14} />}
                       {align === 'center' && <AlignCenter size={14} />}
@@ -1027,7 +1046,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
 
               <div className="property-group">
                 <label>
-                  Background Box
+                  {t('clip.text.box')}
                   <label className="toggle-switch" style={{ marginLeft: 'auto' }}>
                     <input
                       type="checkbox"
@@ -1041,7 +1060,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                   <>
                     <div className="property-inputs">
                       <div className="color-field">
-                        <label className="color-label">Fill</label>
+                        <label className="color-label">{t('clip.text.fill')}</label>
                         <input
                           type="color"
                           value={clip.textBoxColor || '#000000'}
@@ -1051,7 +1070,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                         <span className="color-value">{clip.textBoxColor || '#000000'}</span>
                       </div>
                       <DraggableNumberInput
-                        label="Opacity"
+                        label={t('clip.text.opacity')}
                         value={clip.textBoxOpacity ?? 80}
                         onChange={(v) => handleChange('textBoxOpacity', v)}
                         min={0}
@@ -1061,7 +1080,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                     </div>
                     <div className="property-inputs">
                       <DraggableNumberInput
-                        label="Padding"
+                        label={t('clip.text.padding')}
                         value={clip.textBoxPadding ?? 12}
                         onChange={(v) => handleChange('textBoxPadding', v)}
                         min={0}
@@ -1069,7 +1088,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                         suffix="px"
                       />
                       <DraggableNumberInput
-                        label="Radius"
+                        label={t('clip.text.radius')}
                         value={clip.textBoxRadius ?? 8}
                         onChange={(v) => handleChange('textBoxRadius', v)}
                         min={0}
@@ -1079,7 +1098,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                     </div>
                     <div className="property-inputs">
                       <div className="color-field">
-                        <label className="color-label">Border</label>
+                        <label className="color-label">{t('clip.text.border')}</label>
                         <input
                           type="color"
                           value={clip.textBoxBorderColor || '#ffffff'}
@@ -1089,7 +1108,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                         <span className="color-value">{clip.textBoxBorderColor || '#ffffff'}</span>
                       </div>
                       <DraggableNumberInput
-                        label="Width"
+                        label={t('clip.text.width')}
                         value={clip.textBoxBorderWidth ?? 0}
                         onChange={(v) => handleChange('textBoxBorderWidth', v)}
                         min={0}
@@ -1109,7 +1128,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
               <div className="property-group">
                 <label>
                   <Palette size={12} />
-                  Background Color
+                  {t('clip.colorClip.background')}
                 </label>
                 <div className="color-field">
                   <input
@@ -1124,20 +1143,20 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
 
               <div className="property-group">
                 <label>
-                  Gradient
+                  {t('clip.colorClip.gradient')}
                 </label>
                 <button
                   className={`mute-btn ${clip.gradientEnabled ? '' : 'muted'}`}
                   onClick={() => handleChange('gradientEnabled', !clip.gradientEnabled)}
                 >
-                  {clip.gradientEnabled ? 'Enabled' : 'Disabled'}
+                  {clip.gradientEnabled ? t('clip.colorClip.enabled') : t('clip.colorClip.disabled')}
                 </button>
               </div>
 
               {clip.gradientEnabled && (
                 <>
                   <div className="property-group">
-                    <label>End Color</label>
+                    <label>{t('clip.colorClip.endColor')}</label>
                     <div className="color-field">
                       <input
                         type="color"
@@ -1151,9 +1170,9 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
 
                   <div className="property-group">
                     <label>
-                      Angle
+                      {t('clip.colorClip.angle')}
                       {clip.gradientAngle !== undefined && clip.gradientAngle !== 180 && (
-                        <button className="prop-reset-btn" onClick={() => handleChange('gradientAngle', 180)} title="Reset angle">
+                        <button className="prop-reset-btn" onClick={() => handleChange('gradientAngle', 180)} title={t('clip.colorClip.resetAngle')}>
                           <RotateCcw size={10} />
                         </button>
                       )}
@@ -1187,9 +1206,9 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
               <div className="property-group">
                 <label>
                   <Volume2 size={12} />
-                  Volume
+                  {t('clip.volume.label')}
                   {(volume !== 100 || !on) && (
-                    <button className="prop-reset-btn" onClick={() => update({ volume: 100, audioEnabled: true })} title="Reset volume">
+                    <button className="prop-reset-btn" onClick={() => update({ volume: 100, audioEnabled: true })} title={t('clip.volume.reset')}>
                       <RotateCcw size={10} />
                     </button>
                   )}
@@ -1201,7 +1220,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                     max={voiceTargets && isAudio ? MAX_CLIP_VOLUME : 100}
                     value={volume}
                     onChange={(e) => update({ volume: parseInt(e.target.value) })}
-                    aria-label="Volume"
+                    aria-label={t('clip.volume.label')}
                   />
                   <span>{volume}%</span>
                 </div>
@@ -1209,7 +1228,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                   className={`mute-btn ${!on ? 'muted' : ''}`}
                   onClick={() => update({ audioEnabled: !on })}
                 >
-                  {on ? 'Mute' : 'Unmute'}
+                  {on ? t('clip.volume.mute') : t('clip.volume.unmute')}
                 </button>
               </div>
             )
@@ -1226,18 +1245,18 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
         {/* GROUP 2a: Remix layout box (replaces Scale/Position/Crop) */}
         {!isAudio && hasLayout(clip) && (
           <div className="prop-group">
-            <div className="prop-group-label">Layout</div>
+            <div className="prop-group-label">{t('clip.sections.layout')}</div>
             <div className="property-group">
               <label>
                 <Move size={12} />
-                Box size
+                {t('clip.layout.boxSize')}
               </label>
               <div className="layout-size-row">
-                <button className="layout-size-btn" onClick={() => onUpdateClip({ layout: scaleLayout(clip.layout, 1 / 1.15) })} title="Smaller">
+                <button className="layout-size-btn" onClick={() => onUpdateClip({ layout: scaleLayout(clip.layout, 1 / 1.15) })} title={t('clip.layout.smaller')}>
                   <Minus size={12} />
                 </button>
                 <span>{Math.round(clip.layout.w * 100)}% x {Math.round(clip.layout.h * 100)}%</span>
-                <button className="layout-size-btn" onClick={() => onUpdateClip({ layout: scaleLayout(clip.layout, 1.15) })} title="Larger">
+                <button className="layout-size-btn" onClick={() => onUpdateClip({ layout: scaleLayout(clip.layout, 1.15) })} title={t('clip.layout.larger')}>
                   <Plus size={12} />
                 </button>
               </div>
@@ -1245,9 +1264,9 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
             <div className="property-group">
               <label>
                 <ZoomIn size={12} />
-                Zoom
+                {t('clip.layout.zoom')}
                 {layoutZoom(clip.layout) !== 1 && (
-                  <button className="prop-reset-btn" onClick={() => onUpdateClip({ layout: { ...clip.layout, zoom: 1 } })} title="Reset zoom">
+                  <button className="prop-reset-btn" onClick={() => onUpdateClip({ layout: { ...clip.layout, zoom: 1 } })} title={t('clip.layout.resetZoom')}>
                     <RotateCcw size={10} />
                   </button>
                 )}
@@ -1262,9 +1281,9 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                 />
                 <span>{Math.round(layoutZoom(clip.layout) * 100)}%</span>
               </div>
-              <small className="layout-hint">Drag the clip to move it. Press and hold, then drag, to move the video inside its box. Pinch to zoom on touch screens.</small>
+              <small className="layout-hint">{t('clip.layout.hint')}</small>
               <button className="layout-free-btn" onClick={() => onUpdateClip({ layout: undefined })}>
-                Switch to free transform
+                {t('clip.layout.freeTransform')}
               </button>
             </div>
           </div>
@@ -1273,14 +1292,14 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
         {/* GROUP 2: Transform (non-audio only) */}
         {!isAudio && !hasLayout(clip) && (
           <div className="prop-group">
-            <div className="prop-group-label">Transform</div>
+            <div className="prop-group-label">{t('clip.sections.transform')}</div>
 
             <div className="property-group">
               <label>
                 <ZoomIn size={12} />
-                Scale
+                {t('clip.transform.scale')}
                 {clip.zoom !== undefined && clip.zoom !== 100 && (
-                  <button className="prop-reset-btn" onClick={() => handleChange('zoom', 100)} title="Reset scale">
+                  <button className="prop-reset-btn" onClick={() => handleChange('zoom', 100)} title={t('clip.transform.resetScale')}>
                     <RotateCcw size={10} />
                   </button>
                 )}
@@ -1302,9 +1321,9 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
               <div className="property-group">
                 <label>
                   <RotateCw size={12} />
-                  Rotation
+                  {t('clip.transform.rotation')}
                   {clip.rotation ? (
-                    <button className="prop-reset-btn" onClick={() => handleChange('rotation', 0)} title="Reset rotation">
+                    <button className="prop-reset-btn" onClick={() => handleChange('rotation', 0)} title={t('clip.transform.resetRotation')}>
                       <RotateCcw size={10} />
                     </button>
                   ) : null}
@@ -1325,9 +1344,9 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
             <div className="property-group">
               <label>
                 <Move size={12} />
-                Position
+                {t('clip.transform.position')}
                 {(clip.positionX || clip.positionY) ? (
-                  <button className="prop-reset-btn" onClick={() => onUpdateClip({ positionX: 0, positionY: 0 })} title="Reset position">
+                  <button className="prop-reset-btn" onClick={() => onUpdateClip({ positionX: 0, positionY: 0 })} title={t('clip.transform.resetPosition')}>
                     <RotateCcw size={10} />
                   </button>
                 ) : null}
@@ -1353,12 +1372,13 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
               </div>
             </div>
 
+            {clip.type !== 'scene' && (
             <div className="property-group">
               <label>
                 <Crop size={12} />
-                Crop
+                {t('clip.transform.crop')}
                 {(clip.cropX || clip.cropY || (clip.cropWidth !== undefined && clip.cropWidth !== 100) || (clip.cropHeight !== undefined && clip.cropHeight !== 100)) && (
-                  <button className="prop-reset-btn" onClick={() => onUpdateClip({ cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 })} title="Reset crop">
+                  <button className="prop-reset-btn" onClick={() => onUpdateClip({ cropX: 0, cropY: 0, cropWidth: 100, cropHeight: 100 })} title={t('clip.transform.resetCrop')}>
                     <RotateCcw size={10} />
                   </button>
                 )}
@@ -1381,7 +1401,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                   suffix="%"
                 />
                 <DraggableNumberInput
-                  label="W"
+                  label={t('clip.transform.cropWidth')}
                   value={clip.cropWidth || 100}
                   onChange={(v) => handleChange('cropWidth', v)}
                   min={1}
@@ -1389,7 +1409,7 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                   suffix="%"
                 />
                 <DraggableNumberInput
-                  label="H"
+                  label={t('clip.transform.cropHeight')}
                   value={clip.cropHeight || 100}
                   onChange={(v) => handleChange('cropHeight', v)}
                   min={1}
@@ -1398,14 +1418,15 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
                 />
               </div>
             </div>
+            )}
 
             {!isText && (
               <div className="property-group">
                 <label>
                   <Droplets size={12} />
-                  Opacity
+                  {t('clip.transform.opacity')}
                   {clip.opacity !== undefined && clip.opacity !== 100 && (
-                    <button className="prop-reset-btn" onClick={() => handleChange('opacity', 100)} title="Reset opacity">
+                    <button className="prop-reset-btn" onClick={() => handleChange('opacity', 100)} title={t('clip.transform.resetOpacity')}>
                       <RotateCcw size={10} />
                     </button>
                   )}
@@ -1425,8 +1446,25 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
           </div>
         )}
 
+        {/* Text outline and word by word entrance */}
+        {isText && <TextFxControls clip={clip} onUpdateClip={onUpdateClip} />}
+
         {/* Motion (stickers: image and text clips) */}
         {(isImage || isText) && <MotionControls clip={clip} onUpdateClip={onUpdateClip} />}
+
+        {/* Speed, ramps and freeze frames (video), keyframes (Shorts editor) */}
+        {motionKit && <SpeedControls clip={clip} playheadPosition={playheadPosition} kit={motionKit} onUpdateClip={onUpdateClip} />}
+        {motionKit && <KeyframeControls clip={clip} playheadPosition={playheadPosition} onUpdateClip={onUpdateClip} linkedAudio={linkedAudio} onUpdateLinkedAudio={onUpdateLinkedAudio} kit={motionKit} />}
+
+        {/* Fades and the transition into the next clip (video, image and colour clips on a video track) */}
+        {tracks && (clip.type === 'video' || isImage || isColor) && (
+          <TransitionControls clip={clip} tracks={tracks} onUpdateClip={onUpdateClip} linkedAudio={linkedAudio} onUpdateLinkedAudio={onUpdateLinkedAudio} />
+        )}
+
+        {/* Looks: presets, blur, vignette, sharpen (video and image clips) */}
+        {(clip.type === 'video' || isImage) && (
+          <LookControls clip={clip} onUpdateClip={onUpdateClip} playheadPosition={playheadPosition} />
+        )}
 
         {/* Colour adjustments (video and image clips) */}
         {(clip.type === 'video' || isImage) && (
@@ -1435,20 +1473,20 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
 
         {/* Green screen (video clips: camera takes, imports, library clips) */}
         {clip.type === 'video' && (
-          <GreenScreenControls clip={clip} onUpdateClip={onUpdateClip} playheadPosition={playheadPosition} />
+          <GreenScreenControls clip={clip} onUpdateClip={onUpdateClip} playheadPosition={playheadPosition} onPickBackground={onPickBackground} />
         )}
 
         {/* GROUP 3: Timing */}
         <div className="prop-group">
-          <div className="prop-group-label">Timing</div>
+          <div className="prop-group-label">{t('clip.sections.timing')}</div>
 
           {/* Duration control for images/text/color */}
           {(isImage || isText || isColor) && (
             <div className="property-group">
-              <label>Duration</label>
+              <label>{t('clip.timing.duration')}</label>
               <div className="property-inputs">
                 <DraggableNumberInput
-                  label="Sec"
+                  label={t('clip.timing.seconds')}
                   value={parseFloat((clip.endTime - clip.startTime).toFixed(1))}
                   onChange={(v) => handleChange('endTime', clip.startTime + Math.max(0.1, v))}
                   min={0.1}
@@ -1463,19 +1501,19 @@ function ClipProperties({ clip, onUpdateClip, onSplit, playheadPosition, linkedA
           <div className="property-group timing">
             <div className="timing-info">
               <div>
-                <span>In:</span>
+                <span>{t('clip.timing.in')}</span>
                 <span>{clip.startTime?.toFixed(2)}s</span>
               </div>
               <div>
-                <span>Out:</span>
+                <span>{t('clip.timing.out')}</span>
                 <span>{clip.endTime?.toFixed(2)}s</span>
               </div>
               <div>
-                <span>Duration:</span>
+                <span>{t('clip.timing.durationColon')}</span>
                 <span>{(clip.endTime - clip.startTime)?.toFixed(2)}s</span>
               </div>
               <div>
-                <span>Position:</span>
+                <span>{t('clip.timing.position')}</span>
                 <span>{(clip.timelinePosition || 0).toFixed(2)}s</span>
               </div>
             </div>

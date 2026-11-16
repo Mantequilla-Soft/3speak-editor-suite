@@ -1,0 +1,53 @@
+{
+  "title": "Media di repertorio",
+  "titleBackground": "Scegli uno sfondo",
+  "search": "Cerca video, foto e GIF",
+  "searchProvider": "Cerca su {{provider}}",
+  "searchProviderTitle": "Cerca su {{provider}} (libero da usare, copiato sul nostro server quando ne scegli uno)",
+  "kind": "Tipo",
+  "category": "Categoria",
+  "everything": "Tutto",
+  "types": {
+    "all": "Tutti",
+    "video": "Video",
+    "image": "Foto",
+    "gif": "GIF"
+  },
+  "categories": {
+    "nature": "Natura",
+    "city": "Città",
+    "people": "Persone",
+    "animals": "Animali",
+    "food": "Cibo",
+    "tech": "Tecnologia",
+    "sports": "Sport",
+    "space": "Spazio",
+    "abstract": "Astratto",
+    "backgrounds": "Sfondi"
+  },
+  "loading": "Caricamento della libreria...",
+  "typeToSearch": "Scrivi cosa cerchi per cercare su {{provider}}.",
+  "nothingFound": "Nessun risultato.",
+  "searching": "Ricerca...",
+  "loadFailed": "Impossibile caricare la libreria di repertorio.",
+  "nothingMatches": "Nessun risultato.",
+  "adding": "Aggiunta...",
+  "byAuthor": "{{title}} ({{author}})",
+  "licenceOnline": "Da {{provider}}: libero da usare, anche commercialmente, nessun credito necessario. Il file viene copiato sul server di 3Speak quando lo scegli.",
+  "licence": "Libero da usare, anche commercialmente, nessun credito necessario (CC0 / pubblico dominio da Wikimedia Commons).",
+  "placeBackground": "Va dietro di te, su una traccia sua, per tutta la durata della tua clip.",
+  "placeAdd": "Viene inserito alla testina: su una timeline vuota come il tuo video, altrimenti sopra come b-roll.",
+  "errors": {
+    "notCopied": "Impossibile copiare quel file.",
+    "notAdded": "Impossibile aggiungere quel file.",
+    "tooMany": "Troppe ricerche, aspetta un momento.",
+    "searchFailed": "La ricerca non ha funzionato, riprova.",
+    "copyFailed": "Impossibile copiare quel file sul server."
+  },
+  "trackName": {
+    "background": "Sfondo",
+    "backgroundNumbered": "Sfondo {{number}}",
+    "broll": "B-roll",
+    "brollNumbered": "B-roll {{number}}"
+  }
+}

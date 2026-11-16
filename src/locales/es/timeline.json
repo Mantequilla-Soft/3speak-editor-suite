@@ -1,0 +1,182 @@
+{
+  "aria": {
+    "timeline": "Línea de tiempo",
+    "ruler": "Regla de tiempo: haz clic para mover el cabezal",
+    "playhead": "Cabezal de reproducción",
+    "zoom": "Zoom"
+  },
+  "split": {
+    "title": "Dividir el clip en el cabezal (Ctrl+R)",
+    "label": "Dividir"
+  },
+  "toolbar": {
+    "add": {
+      "title": "Añadir pista o clip",
+      "videoTrack": "Pista de video",
+      "audioTrack": "Pista de audio",
+      "musicLibrary": "Biblioteca de música",
+      "soundEffects": "Efectos de sonido",
+      "stickers": "Stickers",
+      "titles": "Títulos",
+      "stock": "Medios de stock"
+    },
+    "zoomTitle": "Zoom: {{value}} px/s",
+    "fit": {
+      "title": "Mostrar toda la línea de tiempo",
+      "label": "Ajustar"
+    },
+    "select": {
+      "titleStart": "Seleccionar varios clips: toca cada uno",
+      "titleDone": "Terminar la selección",
+      "label": "Seleccionar"
+    },
+    "ripple": {
+      "titleTrack": "Cerrar el hueco en el cabezal en la pista {{number}} (G). Las demás pistas se quedan como están.",
+      "titleNoGap": "No hay hueco en el cabezal en la pista del clip seleccionado",
+      "title": "Quitar el hueco en el cabezal (G)",
+      "label": "Cerrar hueco"
+    },
+    "captions": {
+      "title": "Subtítulos: convierte lo que se dice en subtítulos palabra por palabra",
+      "label": "Subtítulos"
+    },
+    "transcript": {
+      "title": "Transcripción: edita por texto, borra palabras para cortarlas",
+      "label": "Transcripción"
+    },
+    "flag": {
+      "title": "Poner una marca en el cabezal (B): tu propio marcador, numerado y de color, nunca se exporta",
+      "label": "Marca"
+    },
+    "autoCut": {
+      "title": "Encontrar las pausas y cortar ahí",
+      "label": "Corte automático"
+    },
+    "beats": {
+      "title": "Encontrar el ritmo: ajustarse a él, colocar clips sobre él",
+      "label": "Ritmo"
+    },
+    "delete": {
+      "title": "Eliminar el clip seleccionado (Supr)",
+      "titleMany": "Eliminar los clips seleccionados (Supr)",
+      "labelMany": "Eliminar {{number}}"
+    },
+    "options": "Opciones",
+    "ungroup": {
+      "titleOne": "Desagrupar: sus clips vuelven a moverse y recortarse por separado",
+      "titleMany": "Desagrupar: estos clips vuelven a moverse y recortarse por separado",
+      "label": "Desagrupar"
+    },
+    "group": {
+      "title": "Agrupar: estos clips se mueven y se recortan juntos",
+      "label": "Agrupar {{number}}"
+    },
+    "more": {
+      "title": "Más acciones de clip",
+      "duplicate": "Duplicar",
+      "groupVoicesTitle": "Agrupar con lo que suena al mismo tiempo en las otras pistas de voz: se mueven, se recortan y se les cortan los silencios juntos",
+      "groupVoices": "Agrupar con otras voces",
+      "reverse": "Invertir",
+      "unreverse": "Deshacer inversión",
+      "snapOn": "Imán: activado",
+      "snapOff": "Imán: desactivado"
+    }
+  },
+  "selectHint": {
+    "count_one": "{{count}} clip seleccionado: toca más o Listo",
+    "count_many": "{{count}} de clips seleccionados: toca más o Listo",
+    "count_other": "{{count}} clips seleccionados: toca más o Listo",
+    "none": "Toca cada clip que quieras seleccionar",
+    "clear": "Borrar"
+  },
+  "clip": {
+    "settings": "Ajustes del clip",
+    "textFallback": "Texto",
+    "layer": "C{{number}}",
+    "kind": {
+      "video": "Clip de video",
+      "audio": "Clip de sonido",
+      "image": "Imagen",
+      "text": "Texto",
+      "color": "Color",
+      "other": "Clip"
+    },
+    "aria": {
+      "plain": "{{kind}}, de {{from}} a {{to}}",
+      "named": "{{kind}} {{name}}, de {{from}} a {{to}}",
+      "onTrack": "{{kind}} en {{track}}, de {{from}} a {{to}}",
+      "namedOnTrack": "{{kind}} {{name}} en {{track}}, de {{from}} a {{to}}"
+    }
+  },
+  "track": {
+    "show": "Mostrar pista",
+    "hide": "Ocultar pista",
+    "mute": "Silenciar pista",
+    "unmute": "Activar sonido de la pista",
+    "remove": "Quitar pista",
+    "addVisual": "Añadir video, imagen o texto",
+    "addAudio": "Añadir audio",
+    "addFile": "Añadir archivo",
+    "addText": "Añadir texto",
+    "addColor": "Añadir color",
+    "recordVideo": "Grabar video",
+    "addAudioFile": "Añadir archivo de audio",
+    "recordAudio": "Grabar audio",
+    "resize": {
+      "aria": "Altura de {{name}}",
+      "ariaUnnamed": "Altura de esta pista",
+      "title": "Arrastra para hacer la pista más alta o más baja (doble clic: volver a lo normal)"
+    },
+    "aria": {
+      "named": {
+        "video": "{{name}} (pista de video)",
+        "audio": "{{name}} (pista de audio)",
+        "music": "{{name}} (pista de música)"
+      },
+      "numbered": {
+        "video": "Pista de video {{number}}",
+        "audio": "Pista de audio {{number}}",
+        "music": "Pista de música {{number}}"
+      }
+    }
+  },
+  "trackName": {
+    "voice": "Voz",
+    "voiceNumbered": "Voz {{number}}",
+    "music": "Música",
+    "musicNumbered": "Música {{number}}",
+    "video": "Video",
+    "videoNumbered": "Video {{number}}",
+    "audioNumbered": "Audio {{number}}",
+    "stickers": "Stickers",
+    "stickersNumbered": "Stickers {{number}}",
+    "sfx": "SFX",
+    "sfxNumbered": "SFX {{number}}"
+  },
+  "clipName": {
+    "text": "Capa de texto",
+    "color": "Color",
+    "imported": "Medio importado",
+    "linkedAudio": "{{name}} (audio)"
+  },
+  "textClip": {
+    "defaultText": "Escribe el texto aquí"
+  },
+  "flag": {
+    "aria": "Marca {{number}} en {{time}}",
+    "title": "Marca {{number}} · {{time}}: haz clic para saltar ahí, arrastra para moverla, clic derecho para quitarla"
+  },
+  "range": {
+    "label": "{{from}} – {{to}} · {{seconds}} s",
+    "startOnly": "{{time}} · haz clic donde termina",
+    "dragStart": "Arrastra para mover el inicio",
+    "dragEnd": "Arrastra para mover el final"
+  },
+  "pastLimit": "Más allá del límite de renderizado",
+  "backgroundMusic": {
+    "title": "Música de fondo",
+    "add": "Añadir música de fondo",
+    "remove": "Quitar música"
+  },
+  "partName": "Parte {{n}} · {{name}}"
+}

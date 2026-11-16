@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { X, Music2 } from './icons'
 import { detectBeats } from '../utils/beatDetect'
+import { useT } from '../i18n'
 
 const EVERY = [1, 2, 4, 8]
 
@@ -10,8 +11,11 @@ const EVERY = [1, 2, 4, 8]
  * clips on the beat, each N beats long. `source` is the clip's File or URL.
  */
 function BeatSyncModal({ clip, source, unavailable, onSetBeats, onFitClips, onClose }) {
+  const { t } = useT()
   const [detected, setDetected] = useState(null)
-  const [error, setError] = useState(unavailable || null)
+  // Our own errors are silence.* keys (shown in the current language); `unavailable` comes as text
+  const [errorKey, setError] = useState(null)
+  const error = unavailable || (errorKey ? t(errorKey) : null)
   // Tempo correction for a doubled / halved read: 0.5, 1 or 2
   const [factor, setFactor] = useState(1)
   const [every, setEvery] = useState(2)
@@ -24,14 +28,14 @@ function BeatSyncModal({ clip, source, unavailable, onSetBeats, onFitClips, onCl
     detectBeats(source, { signal: controller.signal, hintBpm: clip.bpm || 0 })
       .then(r => {
         if (controller.signal.aborted) return
-        if (!r) setError('This clip is too short to find a tempo.')
+        if (!r) setError('silence.beat.tooShort')
         else setDetected(r)
       })
       .catch(err => {
         if (err.name === 'AbortError') return
         setError(err.message === 'too-large'
-          ? 'This file is too big to analyse in the browser (over 300 MB).'
-          : 'Could not read the audio of this clip.')
+          ? 'silence.beat.tooBig'
+          : 'silence.error.readClip')
       })
     return () => controller.abort()
   }, [source, unavailable, clip.bpm])
@@ -93,8 +97,8 @@ function BeatSyncModal({ clip, source, unavailable, onSetBeats, onFitClips, onCl
       <div className="remix-picker silence-cut beat-sync" role="dialog" aria-modal="true" aria-labelledby="beat-sync-title" onClick={e => e.stopPropagation()}>
         <div className="remix-picker-header">
           <span className="remix-picker-icon-spacer" />
-          <h3 id="beat-sync-title">Beat sync</h3>
-          <button className="remix-picker-icon-btn" onClick={onClose} title="Close">
+          <h3 id="beat-sync-title">{t('silence.beat.title')}</h3>
+          <button className="remix-picker-icon-btn" onClick={onClose} title={t('common.close')}>
             <X size={16} />
           </button>
         </div>
@@ -102,46 +106,46 @@ function BeatSyncModal({ clip, source, unavailable, onSetBeats, onFitClips, onCl
         {error ? (
           <p className="silence-cut-status">{error}</p>
         ) : !detected ? (
-          <p className="silence-cut-status">Finding the beat…</p>
+          <p className="silence-cut-status">{t('silence.beat.finding')}</p>
         ) : (
           <>
             <div className="beat-sync-tempo">
               <Music2 size={16} />
-              <strong>{bpm} BPM</strong>
-              <span>{clipBeats.length} beats in this clip</span>
+              <strong>{t('silence.beat.bpm', { bpm })}</strong>
+              <span>{t('silence.beat.inClip', { count: clipBeats.length })}</span>
               <span className="beat-sync-fix">
-                <button onClick={() => setFactor(f => (f === 2 ? 1 : 0.5))} disabled={factor === 0.5} title="The beat is twice too fast">½×</button>
-                <button onClick={() => setFactor(f => (f === 0.5 ? 1 : 2))} disabled={factor === 2} title="The beat is twice too slow">2×</button>
+                <button onClick={() => setFactor(f => (f === 2 ? 1 : 0.5))} disabled={factor === 0.5} title={t('silence.beat.tooFast')}>½×</button>
+                <button onClick={() => setFactor(f => (f === 0.5 ? 1 : 2))} disabled={factor === 2} title={t('silence.beat.tooSlow')}>2×</button>
               </span>
             </div>
             <div className="silence-cut-preview beat-sync-strip"><canvas ref={canvasRef} /></div>
 
             <div className="silence-cut-controls">
               <div>
-                <span className="beat-sync-label">A clip lasts</span>
-                <div className="silence-cut-modes" role="radiogroup" aria-label="Beats per clip">
+                <span className="beat-sync-label">{t('silence.beat.clipLasts')}</span>
+                <div className="silence-cut-modes" role="radiogroup" aria-label={t('silence.beat.perClip')}>
                   {EVERY.map(n => (
                     <button key={n} role="radio" aria-checked={every === n} className={every === n ? 'active' : ''} onClick={() => setEvery(n)}>
-                      {n} beat{n === 1 ? '' : 's'}
+                      {t('silence.beat.beats', { count: n })}
                     </button>
                   ))}
                 </div>
               </div>
               <label className="beat-sync-toggle">
                 <input type="checkbox" checked={showBeats} onChange={e => { setShowBeats(e.target.checked); save(e.target.checked) }} />
-                <span>Show the beats on the timeline (clips snap to them)</span>
+                <span>{t('silence.beat.show')}</span>
               </label>
             </div>
 
             <div className="silence-cut-actions">
-              <button className="silence-cut-cancel" onClick={() => { save(showBeats); onClose() }}>Done</button>
+              <button className="silence-cut-cancel" onClick={() => { save(showBeats); onClose() }}>{t('common.done')}</button>
               <button
                 className="silence-cut-apply"
                 disabled={timelineBeats.length < 2}
                 onClick={() => { save(showBeats); onFitClips(timelineBeats, every); onClose() }}
-                title="Lay the clips of the video track on the beat, in order"
+                title={t('silence.beat.fitTitle')}
               >
-                Fit video clips to the beat
+                {t('silence.beat.fit')}
               </button>
             </div>
           </>

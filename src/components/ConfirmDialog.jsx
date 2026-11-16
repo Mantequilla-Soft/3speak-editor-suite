@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { AlertCircle } from './icons'
+import { useT } from '../i18n'
 
 /**
  * The editor's own "are you sure?" box. window.confirm() is not used: once a
@@ -8,7 +9,8 @@ import { AlertCircle } from './icons'
  * once, with no dialog and no console error, and nothing could be removed.
  * Enter confirms, Escape (or a click beside the box) cancels.
  */
-export default function ConfirmDialog({ message, confirmLabel = 'Remove', onConfirm, onCancel }) {
+export default function ConfirmDialog({ message, confirmLabel, onConfirm, onCancel }) {
+  const { t } = useT()
   const yesRef = useRef(null)
   useEffect(() => {
     yesRef.current?.focus()
@@ -24,8 +26,8 @@ export default function ConfirmDialog({ message, confirmLabel = 'Remove', onConf
       <div className="remix-picker confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-dialog-text">
         <p id="confirm-dialog-text" className="confirm-dialog-text"><AlertCircle size={16} /> {message}</p>
         <div className="silence-cut-actions">
-          <button type="button" className="silence-cut-cancel" onClick={onCancel}>Cancel</button>
-          <button type="button" className="silence-cut-apply" ref={yesRef} onClick={onConfirm}>{confirmLabel}</button>
+          <button type="button" className="silence-cut-cancel" onClick={onCancel}>{t('common.cancel')}</button>
+          <button type="button" className="silence-cut-apply" ref={yesRef} onClick={onConfirm}>{confirmLabel || t('common.remove')}</button>
         </div>
       </div>
     </div>

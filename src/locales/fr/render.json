@@ -1,0 +1,83 @@
+{
+  "button": {
+    "rendering": "Rendu en cours...",
+    "exporting": "Export en cours...",
+    "uploading": "Envoi {{percent}}",
+    "reRender": "Refaire le rendu",
+    "exportAgain": "Exporter à nouveau",
+    "trimToRender": "Coupez la chronologie à {{limit}} ou moins pour faire le rendu",
+    "trimToExport": "Coupez la chronologie à {{limit}} ou moins pour exporter"
+  },
+  "exportAs": {
+    "button": "Exporter en",
+    "title": "Exporter en : le même projet en Short, en vidéo carrée ou en paysage, recadré autour des visages",
+    "close": "Fermer Exporter en",
+    "waitUpload": "Attendez la fin de l'envoi."
+  },
+  "done": {
+    "download": "Télécharger",
+    "audiograms": "Audiogrammes",
+    "audiogramsCount": "Audiogrammes ({{n}})",
+    "audiogramsTitle": "De courtes vidéos de passages de l'épisode, à partager ou à publier en Shorts avec lui",
+    "videoPodcast": "Podcast vidéo",
+    "videoPodcastTitle": "L'épisode entier en vidéo 16:9 avec la pochette, une forme d'onde, les sous-titres et le nom de la personne qui parle",
+    "useAudio": "Utiliser cet audio",
+    "sendVideo": "Envoyer la vidéo"
+  },
+  "failed": "Échec du rendu : {{error}}",
+  "phase": {
+    "preparing": "Préparation des fichiers...",
+    "submitting": "Envoi de la tâche de rendu...",
+    "busyRetry": "Les serveurs de rendu sont occupés. Nouvel essai dans {{seconds}} s...",
+    "offlineRetry": "Pas de connexion au serveur de rendu. Nouvel essai dans {{seconds}} s...",
+    "starting": "Démarrage...",
+    "reconnecting": "Reconnexion au serveur de rendu...",
+    "uploadingFile": "Envoi de {{name}} ({{index}}/{{total}})...",
+    "uploadingUnnamed": "Envoi du fichier ({{index}}/{{total}})...",
+    "uploadingPlate": "Envoi de l'image d'arrière-plan pour {{name}}...",
+    "uploadingPlateUnnamed": "Envoi de l'image d'arrière-plan pour le clip..."
+  },
+  "queue": {
+    "next": "Vous êtes le prochain",
+    "inLine": {
+      "one": "Vous êtes {{n}}er dans la file",
+      "two": "Vous êtes {{n}}e dans la file",
+      "few": "Vous êtes {{n}}e dans la file",
+      "other": "Vous êtes {{n}}e dans la file"
+    },
+    "waiting": "En attente d'une place de rendu libre..."
+  },
+  "legacy": {
+    "exportVideo": "Exporter la vidéo",
+    "cancelTitle": "Annuler l'export",
+    "settingsTitle": "Réglages d'export",
+    "uploadingRender": "Envoi de {{name}} ({{percent}}). Continuez à modifier ; le rendu se débloque une fois l'envoi terminé.",
+    "uploadingExport": "Envoi de {{name}} ({{percent}}). Continuez à modifier ; l'export se débloque une fois l'envoi terminé.",
+    "lengthRender": "La chronologie dure {{length}}. Coupez-la à {{limit}} ou moins pour faire le rendu.",
+    "lengthExport": "La chronologie dure {{length}}. Coupez-la à {{limit}} ou moins pour exporter.",
+    "method": "Méthode d'export",
+    "methodCanvas": "Canvas (WYSIWYG)",
+    "methodFast": "Rapide (sans effets)",
+    "canvasHint": "Capture tous les effets visuels exactement comme dans l'aperçu",
+    "fastHint": "Export plus rapide mais ignore le zoom, la position, le recadrage et les textes superposés",
+    "quality": "Qualité",
+    "qualityHigh": "Haute (fichier plus lourd)",
+    "qualityMedium": "Moyenne (recommandé)",
+    "qualityLow": "Basse (fichier plus léger)",
+    "processing": "Traitement... {{percent}}",
+    "renderingPercent": "Rendu... {{percent}}",
+    "downloadRendered": "Télécharger la vidéo rendue",
+    "ffmpegLoading": "Chargement de FFmpeg...",
+    "ffmpegNotLoaded": "FFmpeg non chargé",
+    "addClips": "Ajoutez des clips à la chronologie pour exporter"
+  },
+  "canvas": {
+    "loadingMedia": "Chargement des médias...",
+    "renderingFrames": "Rendu des images...",
+    "encodingVideo": "Encodage de la vidéo...",
+    "processingAudio": "Traitement de l'audio...",
+    "convertingMp4": "Conversion en MP4...",
+    "preparingDownload": "Préparation du téléchargement...",
+    "complete": "Terminé !"
+  }
+}

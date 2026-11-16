@@ -1,0 +1,109 @@
+{
+  "media": {
+    "blocked": {
+      "camera": "La cámara o el micrófono están bloqueados para este sitio. Permítelos con el icono de la barra de direcciones y vuelve a intentarlo. Si nunca dijiste que no, puede que la configuración de privacidad de tu computadora esté bloqueando el navegador.",
+      "microphone": "El micrófono está bloqueado para este sitio. Permítelo con el icono de la barra de direcciones y vuelve a intentarlo. Si nunca dijiste que no, puede que la configuración de privacidad de tu computadora esté bloqueando el navegador."
+    },
+    "notAllowed": {
+      "camera": "Esta página no tiene permiso para usar la cámara o el micrófono. Recarga 3Speak y vuelve a intentarlo.",
+      "microphone": "Esta página no tiene permiso para usar el micrófono. Recarga 3Speak y vuelve a intentarlo."
+    },
+    "busy": {
+      "camera": "Tu cámara o micrófono está en uso en otra app o pestaña (una videollamada, otra grabadora). Ciérrala allí y vuelve a intentarlo.",
+      "microphone": "Tu micrófono está en uso en otra app o pestaña (una videollamada, otra grabadora). Ciérrala allí y vuelve a intentarlo."
+    },
+    "notFound": {
+      "camera": "No se encontró ninguna cámara ni micrófono. Conecta uno y vuelve a intentarlo.",
+      "microphone": "No se encontró ningún micrófono. Conecta uno y vuelve a intentarlo."
+    },
+    "noDevices": {
+      "camera": "Este navegador no puede usar la cámara ni el micrófono aquí.",
+      "microphone": "Este navegador no puede usar el micrófono aquí."
+    },
+    "failed": {
+      "camera": "No se pudo iniciar la cámara o el micrófono. Vuelve a intentarlo.",
+      "microphone": "No se pudo iniciar el micrófono. Vuelve a intentarlo."
+    },
+    "failedNamed": {
+      "camera": "No se pudo iniciar la cámara o el micrófono ({{name}}). Vuelve a intentarlo.",
+      "microphone": "No se pudo iniciar el micrófono ({{name}}). Vuelve a intentarlo."
+    }
+  },
+  "inline": {
+    "camera": "Cámara",
+    "expand": "Ampliar",
+    "shrink": "Reducir",
+    "uploading": "Subiendo...",
+    "uploadingPct": "Subiendo... {{pct}}%",
+    "converting": "Convirtiendo...",
+    "rec": "GRAB",
+    "starting": "Iniciando...",
+    "plateStepOut": "Sal de la imagen",
+    "plateShooting": "Capturando el fondo, no entres...",
+    "gestures": "Mantén pulsada y arrastra una imagen para reencuadrarla, pellizca para hacer zoom.",
+    "gesturesOverlay": "Mantén pulsada y arrastra una imagen para reencuadrarla, pellizca para hacer zoom, arrastra el recuadro de tu cámara para moverlo.",
+    "greenScreen": {
+      "label": "Pantalla verde",
+      "off": "Desactivado",
+      "green": "Verde",
+      "blue": "Azul",
+      "person": "Persona",
+      "static": "Estático",
+      "staticTitle": "Fondo estático (experimental): quita todo lo que coincide con una toma del fondo vacío",
+      "personTitle": "No hace falta pantalla verde: te detecta en la imagen",
+      "threshold": "Umbral",
+      "thresholdStaticTitle": "Tolerancia: más alta ignora más cambios en el fondo (ruido, luz, enfoque), pero puede empezar a quitar partes de ti",
+      "thresholdTitle": "Más alto quita más del color de la pantalla",
+      "despill": "Quitar reflejo",
+      "despillStaticTitle": "Quita el color de la pared de los bordes",
+      "despillGreenTitle": "Quita el tono verde de los bordes",
+      "despillBlueTitle": "Quita el tono azul de los bordes",
+      "retakePlate": "Volver a capturar el fondo vacío",
+      "shootPlate": "Capturar el fondo vacío",
+      "plateKeep": "Experimental. Deja la cámara y la luz exactamente como están.",
+      "plateHowTo": "Experimental. Fija la cámara, pulsa el botón y sal de la imagen.",
+      "keyFailed": "El recorte en vivo no está disponible aquí. El clip igual recibe el ajuste de pantalla verde.",
+      "personHowTo": "No hace falta pantalla verde: el editor te detecta en la imagen. La toma se graba tal cual y se recorta en la línea de tiempo, donde eliges qué va detrás de ti."
+    },
+    "tpEdit": "Editar el texto del teleprompter",
+    "tpAdd": "Añadir texto al teleprompter",
+    "teleprompter": "Teleprompter",
+    "recordOnly": "Solo grabar",
+    "recordAndPlay": "Grabar + reproducir video",
+    "plusPlay": "+ Reproducir",
+    "recordReactionTitle": "Grabar mientras se reproduce el original",
+    "recordReaction": "Grabar reacción",
+    "record": "Grabar",
+    "stop": "Detener",
+    "retake": "Repetir",
+    "useClip": "Usar clip"
+  },
+  "video": {
+    "title": "Grabar video",
+    "startingCamera": "Iniciando la cámara...",
+    "start": "Empezar a grabar",
+    "stop": "Detener",
+    "retake": "Repetir",
+    "useClip": "Usar clip"
+  },
+  "audio": {
+    "title": "Grabar audio",
+    "cannotRecord": "Este navegador no puede grabar audio aquí.",
+    "addFailed": "No se pudo añadir la grabación. Vuelve a intentarlo.",
+    "yourRecording": "Tu grabación",
+    "micLevel": "Nivel del micrófono",
+    "accessingMic": "Accediendo al micrófono...",
+    "ready": "Listo para grabar: habla para comprobar tu nivel",
+    "preparing": "Preparando tu grabación...",
+    "adding": "Añadiendo a tus pistas...",
+    "tpEdit": "Editar el texto del teleprompter",
+    "tpAdd": "Añadir texto al teleprompter",
+    "teleprompter": "Teleprompter",
+    "start": "Empezar a grabar",
+    "stop": "Detener",
+    "retake": "Repetir",
+    "addingShort": "Añadiendo...",
+    "useRecording": "Usar grabación",
+    "useScript": "Usar este guion"
+  }
+}

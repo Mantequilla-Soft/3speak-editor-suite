@@ -1,0 +1,29 @@
+{
+  "header": "Aperçu de la chronologie",
+  "smaller": "Plus petit",
+  "larger": "Plus grand",
+  "loopOn": "Boucle : activée",
+  "loopOff": "Boucle : désactivée",
+  "aspect": {
+    "title": "Format d'image : {{ratio}}",
+    "titleAuto": "Format d'image : Auto ({{ratio}})",
+    "auto": "Auto"
+  },
+  "fullSize": "Taille réelle",
+  "halfSize": "Demi-taille",
+  "fullscreen": "Plein écran",
+  "noClipHere": "Aucun clip à cette position",
+  "noClips": "Aucun clip sur la chronologie",
+  "source": {
+    "hls": "(flux HLS)",
+    "uploaded": "(envoyé)",
+    "local": "(local)",
+    "file": "(fichier)"
+  },
+  "stageLayout": {
+    "tileTop": "Mosaïque en haut",
+    "tileBottom": "Mosaïque en bas",
+    "overlay": "Superposition"
+  },
+  "selectClip": "Sélectionnez un clip pour l'aperçu"
+}

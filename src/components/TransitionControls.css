@@ -1,0 +1,80 @@
+/* Transitions (TransitionControls.jsx, TransitionCuts.jsx) */
+.transition-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.transition-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.transition-chip {
+  height: 28px;
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--fs-12);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+}
+
+.transition-chip:hover {
+  border-color: color-mix(in srgb, var(--text) 20%, transparent);
+}
+
+.transition-chip.active {
+  border-color: var(--cyan);
+  background: var(--cyan-tint);
+  color: var(--cyan);
+}
+
+.transition-hint {
+  margin: 0;
+  font-size: var(--fs-12);
+  color: var(--muted);
+}
+
+.transition-dialog .transition-hint {
+  margin-bottom: var(--sp-5);
+}
+
+/* the button on a cut: centred on it, above the two clips */
+.transition-cut {
+  position: absolute;
+  top: 50%;
+  z-index: 5;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.transition-cut:hover,
+.transition-cut:focus-visible {
+  opacity: 1;
+  color: var(--text);
+  outline: none;
+  border-color: var(--cyan);
+}
+
+.transition-cut.on {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  color: var(--on-accent);
+  opacity: 1;
+}

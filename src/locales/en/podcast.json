@@ -1,0 +1,86 @@
+{
+  "video": {
+    "title": "Video podcast",
+    "intro": "The whole episode ({{length}}) as a 16:9 video: the picture, a moving waveform, captions and who is speaking. For 3Speak, YouTube and Spotify video podcasts.",
+    "unavailable": "This editor server can not make video podcasts yet.",
+    "tooLong": "Video podcasts can be up to {{length}} long.",
+    "preview": "Video podcast preview",
+    "sampleCaption": "<b>Your</b> words show here",
+    "stageHint": "The waveform moves with the sound, the captions and the name follow the episode.",
+    "defaultLine": "Watch and listen on *3speak.tv*",
+    "captions": "Captions",
+    "captionsTranscript": "The words of your transcript.",
+    "captionsNoStt": "Speech to text is not available on this server.",
+    "captionsStt": "The words, found by speech to text on the server. Long episodes take a while.",
+    "whoSpeaks": "Who is speaking",
+    "noVoices": "No voice track to take names from.",
+    "speaker": "Speaker {{n}}",
+    "speakerLabel": "Name for voice track {{n}}",
+    "loudest": "Each voice on its own track: the name of the loudest one shows.",
+    "frameRate": "Frame rate",
+    "fps15": "15 fps (smaller, faster)",
+    "fps24": "24 fps (smoother)",
+    "finding": "Finding who speaks when...",
+    "sending": "Sending...",
+    "working": "Working...",
+    "serverAnswered": "The server answered {{status}}",
+    "lost": "The job was lost (the server restarted?)",
+    "stopped": "Stopped",
+    "signIn": "Sign in on 3Speak to make a video podcast.",
+    "failed": "The video podcast could not be made: {{error}}",
+    "stop": "Stop",
+    "make": "Make video podcast",
+    "again": "Make it again",
+    "download": "Download MP4",
+    "subtitles": "Subtitles (SRT)",
+    "post": "Post on 3Speak as a video"
+  },
+  "template": {
+    "title": "Your template",
+    "signedOutIntro": "Save your intro, outro and music bed once, and every new recording gets them in one click. Your template is kept for good, so it needs your 3Speak sign-in.",
+    "signIn": "Sign in to use a template",
+    "logIn": "Log in on 3Speak to use a template.",
+    "intro": "One template, kept for good. Saving replaces the one you had.",
+    "role": {
+      "intro": {
+        "title": "Intro",
+        "hint": "Plays first, before your recording.",
+        "clear": "No intro"
+      },
+      "outro": {
+        "title": "Outro",
+        "hint": "Plays right after your recording ends.",
+        "clear": "No outro"
+      },
+      "bed": {
+        "title": "Music bed",
+        "hint": "Quiet music under the whole recording, looped to fit, faded out at the end.",
+        "clear": "No music bed"
+      }
+    },
+    "useSelected": "Use \"{{name}}\" (the part you trimmed it to)",
+    "selectFirst": "Select an uploaded audio clip on the timeline first",
+    "selectedClip": "Selected clip",
+    "file": "File",
+    "volume": "Volume",
+    "bedVolume": "Music bed volume",
+    "loop": "Loop to fill the whole recording",
+    "cutSilences": "Cut the silences out of every new recording <small>(with your Cut silences settings)</small>",
+    "loudness": "Normalize the loudness for podcasts <small>(-16 LUFS, applied when exporting)</small>",
+    "duck": "Duck the music while someone talks <small>({{db}} dB on the music bed; change it in the clip's settings)</small>",
+    "autoApply": "Apply it by itself when I open a recording",
+    "signInUpload": "Sign in on 3Speak to upload.",
+    "uploadFailed": "That file could not be uploaded. Try another one.",
+    "deleteForGood": "Delete it for good",
+    "delete": "Delete template",
+    "saveApply": "Save and apply",
+    "voiceTrack": "Voice",
+    "bedTrack": "Music bed"
+  },
+  "stage": {
+    "empty": "Add a recording, record one, or pick music to start.",
+    "chapter": "Chapter",
+    "position": "Position in the show",
+    "positionText": "{{at}} of {{total}}"
+  }
+}

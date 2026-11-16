@@ -1,0 +1,180 @@
+{
+  "title": "音频波形视频",
+  "tour": {
+    "again": "再看一遍导览",
+    "againLabel": "再看一遍音频波形视频导览"
+  },
+  "saveAndClose": "保存并关闭",
+  "saveAndCloseTitle": "你的音频波形视频会和这段音频保存在一起，并随它作为短视频发布",
+  "loadError": "无法加载音频波形视频设置：{{error}}",
+  "loadingLook": "正在加载你的音频波形视频外观…",
+  "start": {
+    "title": "选择这一集中的一段",
+    "text_other": "音频波形视频是一段短视频，截取你这一集中最长 {{count}} 分钟的片段。它会作为 3Speak 短视频与音频一起发布。先在时间线上标出它的开始和结束位置。",
+    "choose": "在时间线上选择"
+  },
+  "stage": {
+    "label": "音频波形视频预览：拖动各部分来移动，拖动角来调整大小，拖动圆形手柄来旋转",
+    "frameTitle": "音频波形视频预览",
+    "turned": "{{name}} · {{angle}}°",
+    "rotate": "旋转（Shift：每次 15°）。双击：摆正",
+    "hint": "拖动各部分，拉动角来调整大小（按住 Shift 保持比例），拖动圆形手柄来旋转。方向键微调，[ 和 ] 旋转。",
+    "hintTemplate": "拖动各部分，拉动角来调整大小（按住 Shift 保持比例），拖动圆形手柄来旋转。方向键微调，[ 和 ] 旋转。以你上一个音频波形视频为起点。"
+  },
+  "layer": {
+    "logo": {
+      "name": "3Speak 标志",
+      "drag": "3Speak 标志：拖动以移动",
+      "dragSelected": "3Speak 标志：拖动以移动，拖动角来调整大小，拖动圆形手柄来旋转"
+    },
+    "cover": {
+      "name": "图片",
+      "drag": "图片：拖动以移动",
+      "dragSelected": "图片：拖动以移动，拖动角来调整大小，拖动圆形手柄来旋转",
+      "hide": "隐藏图片",
+      "show": "显示图片",
+      "forward": "图片上移一层",
+      "back": "图片下移一层"
+    },
+    "title": {
+      "name": "标题",
+      "drag": "标题：拖动以移动",
+      "dragSelected": "标题：拖动以移动，拖动角来调整大小，拖动圆形手柄来旋转",
+      "hide": "隐藏标题",
+      "show": "显示标题",
+      "forward": "标题上移一层",
+      "back": "标题下移一层"
+    },
+    "line": {
+      "name": "副标题",
+      "drag": "副标题：拖动以移动",
+      "dragSelected": "副标题：拖动以移动，拖动角来调整大小，拖动圆形手柄来旋转",
+      "hide": "隐藏副标题",
+      "show": "显示副标题",
+      "forward": "副标题上移一层",
+      "back": "副标题下移一层"
+    },
+    "wave": {
+      "name": "波形",
+      "drag": "波形：拖动以移动",
+      "dragSelected": "波形：拖动以移动，拖动角来调整大小，拖动圆形手柄来旋转",
+      "hide": "隐藏波形",
+      "show": "显示波形",
+      "forward": "波形上移一层",
+      "back": "波形下移一层"
+    }
+  },
+  "piece": {
+    "label": "这一集中的片段",
+    "range": "{{from}} – {{to}} · {{seconds}} 秒",
+    "inChapter": "位于“{{title}}”",
+    "change": "更换片段"
+  },
+  "look": {
+    "title": "标题",
+    "titleLabel": "视频上的标题",
+    "line": "标题下方的文字 <small>（用 *星号* 包住的文字显示为红色）</small>",
+    "lineLabel": "视频上的副标题",
+    "branding": "3Speak 品牌标识",
+    "logoGroup": "Logo",
+    "picture": "图片",
+    "waveform": "波形",
+    "waveType": "波形类型",
+    "waveColour": "波形颜色",
+    "colour": "颜色 {{colour}}",
+    "anyColour": "任意颜色",
+    "anyWaveColour": "任意波形颜色"
+  },
+  "logo": {
+    "mark": "3S 标志",
+    "full": "3Speak 标志"
+  },
+  "wave": {
+    "bars": "柱状",
+    "centered": "居中",
+    "line": "线条",
+    "dots": "细线",
+    "circle": "圆形",
+    "ring": "环形波"
+  },
+  "picture": {
+    "upload": "上传图片",
+    "yours": "你的图片",
+    "coverOf": "“{{title}}”的封面",
+    "playlistCover": "播放列表封面",
+    "noCovers": "你的播放列表还没有封面。",
+    "signIn": "登录 3Speak 即可添加图片。"
+  },
+  "parts": {
+    "title": "组成部分 <small>（从前到后）</small>",
+    "logoLocked": "3Speak 标志始终显示在最前面，且不会小于设定的尺寸",
+    "alwaysShown": "始终显示",
+    "hide": "隐藏",
+    "show": "显示",
+    "forward": "上移一层",
+    "back": "下移一层",
+    "tidy": "自动整理布局"
+  },
+  "make": {
+    "starting": "正在开始...",
+    "working": "处理中...",
+    "noWords": "找不到这一段的文字（关闭字幕即可不带字幕制作）",
+    "failedPlain": "失败",
+    "signIn": "登录 3Speak 即可制作音频波形视频。",
+    "failed": "无法制作音频波形视频：{{error}}",
+    "make": "制作音频波形视频",
+    "another": "再制作一个音频波形视频"
+  },
+  "made": {
+    "title": "你的音频波形视频",
+    "hint": "它们会作为 3Speak 短视频与音频一起发布，每条都附有指向音频帖子、Snap 或评论的链接。",
+    "fallbackTitle": "音频波形视频 {{n}}",
+    "length": "{{at}} · {{seconds}} 秒",
+    "textPlaceholder": "短视频文字（可选）。会自动添加音频链接。",
+    "textLabel": "短视频 {{n}} 的文字",
+    "editText": "编辑文字",
+    "writeText": "撰写文字",
+    "download": "下载",
+    "removeLabel": "移除音频波形视频 {{n}}"
+  },
+  "confirm": {
+    "title": "不制作就关闭吗？",
+    "text": "你对外观的修改还没有做成音频波形视频。关闭后这些修改会丢失。",
+    "stays_other": "你已制作的 {{count}} 个音频波形视频会保留在这段音频中。",
+    "keep": "继续编辑"
+  },
+  "captions": {
+    "label": "字幕",
+    "drag": "字幕：拖动以移动",
+    "dragSelected": "字幕：拖动以移动，拉动边缘来调整宽度",
+    "sample": "说话时，你的话会显示在这里",
+    "show": "逐字显示所说的内容",
+    "checking": "正在检查服务器...",
+    "unavailable": "此编辑器服务器暂时无法提供字幕。",
+    "listening": "正在聆听...",
+    "getWords": "识别文字",
+    "wordCount_other": "这一段共有 {{count}} 个词。",
+    "noSpeech": "这一段中没有发现语音。",
+    "fix": "修正文字",
+    "doneFixing": "修正完成",
+    "word": "第 {{n}} 个词",
+    "removeWord": "移除这个词",
+    "removeWordLabel": "移除 {{word}}",
+    "style": "字幕样式",
+    "preset": {
+      "karaoke": "卡拉 OK",
+      "pop": "弹出",
+      "plain": "字幕"
+    },
+    "wordsAtATime": "每次显示的词数",
+    "perPage_other": "每次显示 {{count}} 个词",
+    "font": "字幕字体",
+    "size": "字幕大小",
+    "textColour": "字幕文字颜色",
+    "textColourSwatch": "文字颜色 {{colour}}",
+    "highlightColour": "高亮颜色",
+    "highlight": "高亮",
+    "highlightSwatch": "高亮 {{colour}}",
+    "capitals": "大写字母"
+  }
+}

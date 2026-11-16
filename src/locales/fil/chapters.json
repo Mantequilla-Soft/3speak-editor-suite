@@ -1,0 +1,41 @@
+{
+  "title": "Mga kabanata",
+  "intro": "Markahan kung saan nagsisimula ang bawat bahagi ng episode. Ipinapakita ito ng mga podcast app, at inililista ito ng 3Speak sa description. Nananatili ang mga ito sa recording mo kapag pinutol mo ito. Shortcut: nagdadagdag ang <kbd>M</kbd> ng isa sa playhead.",
+  "empty": "Wala pang kabanata. Ilipat ang playhead kung saan nagsisimula ang isang bahagi at magdagdag ng isa.",
+  "goThere": "Pumunta roon",
+  "nameLabel": "Pangalan ng kabanata {{n}}",
+  "moveHere": "Ilipat sa playhead",
+  "moveLabel": "Ilipat ang kabanata {{n}} sa playhead",
+  "removeLabel": "Alisin ang kabanata {{n}}",
+  "leftOut": "Hindi isinasama sa export ang mga kabanatang wala pang isang segundo ang pagitan, o nasa pinakadulo.",
+  "tipZero": "Tip: inaasahan ng maraming app na nasa 0:00 ang unang kabanata.",
+  "addAt": "Idagdag sa {{time}}",
+  "copyTitle": "Kopyahin ang listahan (para sa description)",
+  "copied": "Nakopya",
+  "copy": "Kopyahin ang listahan",
+  "defaultTitle": "Kabanata",
+  "suggest": {
+    "title": "Mga mungkahi",
+    "findTitle": "Hanapin kung saan malamang nagsisimula ang mga bahagi: bagong paksa, mahahabang hinto, pagpalit ng eksena",
+    "again": "Maghanap ulit",
+    "suggest": "Magmungkahi ng mga kabanata",
+    "addAll": "Idagdag lahat ng {{n}}",
+    "withTranscript": "Kapag may transcript (ang button na Transcript), sumusunod din ang mga mungkahi sa mga paksa at kumukuha ng pamagat mula sa sinasabi.",
+    "none": "Walang malinaw na lugar na nakita. Maaaring maikli ang palabas, o tuloy-tuloy ang mga bahagi nito.",
+    "stop": "Itigil",
+    "listen": "Pakinggan mula rito",
+    "titleLabel": "Mungkahing kabanata sa {{time}}",
+    "add": "Idagdag ang kabanatang ito",
+    "addLabel": "Idagdag ang kabanata sa {{time}}",
+    "drop": "Hindi ito",
+    "dropLabel": "Alisin ang mungkahi sa {{time}}",
+    "reason": {
+      "start": "Simula",
+      "topic": "Bagong paksa",
+      "pause": "Mahabang hinto",
+      "scene": "Pagpalit ng eksena"
+    },
+    "intro": "Intro",
+    "part": "Bahagi {{n}}"
+  }
+}

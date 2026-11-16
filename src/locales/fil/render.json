@@ -1,0 +1,83 @@
+{
+  "button": {
+    "rendering": "Nire-render...",
+    "exporting": "Ine-export...",
+    "uploading": "Ina-upload {{percent}}",
+    "reRender": "I-render ulit",
+    "exportAgain": "I-export ulit",
+    "trimToRender": "I-trim ang timeline sa {{limit}} o mas maikli para ma-render",
+    "trimToExport": "I-trim ang timeline sa {{limit}} o mas maikli para ma-export"
+  },
+  "exportAs": {
+    "button": "I-export bilang",
+    "title": "I-export bilang: ang parehong proyekto bilang Short, parisukat o landscape na video, pinutol sa paligid ng mga mukha",
+    "close": "Isara ang I-export bilang",
+    "waitUpload": "Hintaying matapos ang upload."
+  },
+  "done": {
+    "download": "I-download",
+    "audiograms": "Mga audiogram",
+    "audiogramsCount": "Mga audiogram ({{n}})",
+    "audiogramsTitle": "Maiikling video ng mga piraso ng episode, para i-share o i-post bilang Shorts kasama nito",
+    "videoPodcast": "Video podcast",
+    "videoPodcastTitle": "Ang buong episode bilang 16:9 na video na may cover, waveform, captions at kung sino ang nagsasalita",
+    "useAudio": "Gamitin ang audio na ito",
+    "sendVideo": "Ipadala ang video"
+  },
+  "failed": "Pumalya ang render: {{error}}",
+  "phase": {
+    "preparing": "Inihahanda ang mga file...",
+    "submitting": "Isinusumite ang render job...",
+    "busyRetry": "Abala ang mga render server. Susubukan ulit sa loob ng {{seconds}} seg...",
+    "offlineRetry": "Walang koneksyon sa render server. Susubukan ulit sa loob ng {{seconds}} seg...",
+    "starting": "Nagsisimula...",
+    "reconnecting": "Kumokonekta ulit sa render server...",
+    "uploadingFile": "Ina-upload ang {{name}} ({{index}}/{{total}})...",
+    "uploadingUnnamed": "Ina-upload ang file ({{index}}/{{total}})...",
+    "uploadingPlate": "Ina-upload ang background frame para sa {{name}}...",
+    "uploadingPlateUnnamed": "Ina-upload ang background frame para sa clip..."
+  },
+  "queue": {
+    "next": "Ikaw na ang susunod",
+    "inLine": {
+      "one": "Ika-{{n}} ka sa pila",
+      "two": "Ika-{{n}} ka sa pila",
+      "few": "Ika-{{n}} ka sa pila",
+      "other": "Ika-{{n}} ka sa pila"
+    },
+    "waiting": "Naghihintay ng bakanteng puwesto sa render..."
+  },
+  "legacy": {
+    "exportVideo": "I-export ang video",
+    "cancelTitle": "Kanselahin ang export",
+    "settingsTitle": "Mga setting ng export",
+    "uploadingRender": "Ina-upload ang {{name}} ({{percent}}). Ituloy ang pag-edit; magbubukas ang Render kapag tapos na ito.",
+    "uploadingExport": "Ina-upload ang {{name}} ({{percent}}). Ituloy ang pag-edit; magbubukas ang Export kapag tapos na ito.",
+    "lengthRender": "{{length}} ang timeline. I-trim ito sa {{limit}} o mas maikli para ma-render.",
+    "lengthExport": "{{length}} ang timeline. I-trim ito sa {{limit}} o mas maikli para ma-export.",
+    "method": "Paraan ng export",
+    "methodCanvas": "Canvas (WYSIWYG)",
+    "methodFast": "Mabilis (walang effect)",
+    "canvasHint": "Kinukuha ang lahat ng visual effect nang eksakto gaya ng nasa preview",
+    "fastHint": "Mas mabilis na export pero hindi pinapansin ang zoom, posisyon, crop, at text overlay",
+    "quality": "Kalidad",
+    "qualityHigh": "Mataas (mas malaking file)",
+    "qualityMedium": "Katamtaman (inirerekomenda)",
+    "qualityLow": "Mababa (mas maliit na file)",
+    "processing": "Pinoproseso... {{percent}}",
+    "renderingPercent": "Nire-render... {{percent}}",
+    "downloadRendered": "I-download ang na-render na video",
+    "ffmpegLoading": "Nilo-load ang FFmpeg...",
+    "ffmpegNotLoaded": "Hindi naka-load ang FFmpeg",
+    "addClips": "Magdagdag ng mga clip sa timeline para mag-export"
+  },
+  "canvas": {
+    "loadingMedia": "Nilo-load ang media...",
+    "renderingFrames": "Nire-render ang mga frame...",
+    "encodingVideo": "Ine-encode ang video...",
+    "processingAudio": "Pinoproseso ang audio...",
+    "convertingMp4": "Kino-convert sa MP4...",
+    "preparingDownload": "Inihahanda ang download...",
+    "complete": "Tapos na!"
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "title": "Teleprompter",
+  "showOnCamera": "Mostrar sobre la cámara",
+  "speechNotice": {
+    "title": "Por ahora, el seguimiento de voz solo funciona en navegadores Chromium.",
+    "body": "Usa Chrome, Edge, Brave u Opera para que el guion avance mientras hablas. En este navegador avanza a una velocidad constante que puedes ajustar."
+  },
+  "speechErrors": {
+    "network": "No se puede conectar con el servicio de voz. El reconocimiento necesita conexión a internet (Chrome envía el audio a Google para transcribirlo).",
+    "audioCapture": "No llegó audio al reconocimiento. Puede que el micrófono esté en uso; prueba con unos auriculares con micrófono.",
+    "notAllowed": "El permiso del micrófono está bloqueado para el reconocimiento de voz.",
+    "unsupported": "Este navegador no tiene reconocimiento de voz.",
+    "generic": "Error de reconocimiento de voz: {{err}}"
+  },
+  "noMic": "Grabando sin micrófono (micrófono no disponible).",
+  "autoDetect": "Detectar automáticamente ({{lang}})",
+  "presets": {
+    "frontcam": "Cámara frontal",
+    "frontcamTitle": "Franja pequeña bajo la cámara frontal, para que se note lo menos posible que estás leyendo",
+    "max": "Tamaño máximo",
+    "maxTitle": "Letra grande para leer de lejos",
+    "top": "Líneas arriba",
+    "topTitle": "Varias líneas en la parte superior"
+  },
+  "scroll": {
+    "label": "Desplazamiento",
+    "modeAria": "Modo de desplazamiento",
+    "followVoice": "Seguir la voz",
+    "followVoiceTitle": "Avanza mientras lees el guion en voz alta",
+    "needsChromium": "Necesita Chrome, Edge u otro navegador Chromium",
+    "timed": "Temporizado",
+    "timedTitle": "Avanza a velocidad constante",
+    "voiceForcedMissing": "El seguimiento de voz no está disponible aquí; se usa el desplazamiento temporizado.",
+    "voiceUnavailable": "El seguimiento de voz no está disponible en este navegador."
+  },
+  "style": {
+    "title": "Estilo del texto",
+    "fontSize": "Tamaño de fuente",
+    "fontSizeValue": "{{size}} px",
+    "text": "Texto",
+    "background": "Fondo",
+    "bgOpacity": "Opacidad del fondo",
+    "mirrorText": "Texto en espejo (para un espejo de teleprompter)",
+    "voiceLanguage": "Idioma de voz"
+  },
+  "status": {
+    "serverErrorSwitched": "Error del servidor de voz ({{reason}}). Se cambió al desplazamiento temporizado.",
+    "voiceErrorSwitched": "{{error}} Se cambió al desplazamiento temporizado.",
+    "voiceStoppedSwitched": "El seguimiento de voz se detuvo. Se cambió al desplazamiento temporizado.",
+    "serverError": "Error del servidor de voz ({{reason}}).",
+    "listeningServer": "Escuchando (servidor)… empieza a leer",
+    "connectingServer": "Conectando al servidor de voz…",
+    "listening": "Escuchando… empieza a leer en voz alta",
+    "startingMic": "Iniciando micrófono…",
+    "scrollPaused": "Desplazamiento en pausa",
+    "timedScroll": "Desplazamiento temporizado, {{wpm}} ppm",
+    "scrollTest": "Prueba de desplazamiento, {{wpm}} ppm"
+  },
+  "sttReason": {
+    "unreachable": "inaccesible",
+    "noMic": "sin micrófono",
+    "audioUnavailable": "audio no disponible",
+    "connectionFailed": "falló la conexión",
+    "unauthorized": "no autorizado",
+    "closed": "cerrado",
+    "serverError": "error del servidor"
+  },
+  "scriptPlaceholder": "Escribe o pega tu guion aquí. Mientras grabas, avanza a medida que lo lees en voz alta, o a velocidad constante en el modo temporizado.",
+  "scriptModeVoice": "Desplazamiento: sigue tu voz",
+  "scriptModeTimed": "Desplazamiento: temporizado, {{wpm}} ppm",
+  "hide": "Ocultar",
+  "dragToMove": "Arrastra para mover",
+  "dragToResize": "Arrastra para cambiar el tamaño",
+  "expandMenu": "Expandir menú",
+  "collapseMenu": "Contraer menú",
+  "editScript": "Editar guion",
+  "testVoice": "Probar voz",
+  "stopVoiceTest": "Detener prueba",
+  "scrollSpeed": "Velocidad de desplazamiento",
+  "slower": "Más lento",
+  "faster": "Más rápido",
+  "wordsPerMin": "palabras/min",
+  "testScroll": "Probar desplazamiento",
+  "stopScrollTest": "Detener la prueba de desplazamiento",
+  "pauseScroll": "Pausar desplazamiento",
+  "resumeScroll": "Reanudar desplazamiento",
+  "hideTeleprompter": "Ocultar teleprompter"
+}

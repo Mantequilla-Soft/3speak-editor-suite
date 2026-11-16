@@ -1,0 +1,240 @@
+{
+  "title": "Ad Wizard",
+  "beta": "bèta",
+  "loading": "Scène-engine laden…",
+  "untitled": "Advertentie zonder titel",
+  "seconds": "{{s}} s",
+  "lengthOfMax": "{{length}} s / max. {{max}} s",
+  "maxOnly": "/ max. {{max}} s",
+  "steps": {
+    "format": "Formaat",
+    "brand": "Merk",
+    "scenes": "Scènes",
+    "sound": "Geluid",
+    "render": "Renderen"
+  },
+  "formats": {
+    "landscape": "Liggend 16:9",
+    "landscapeSub": "spots in video's, websites",
+    "portrait": "Staand 9:16",
+    "portraitSub": "shorts, stories, reels"
+  },
+  "palettes": {
+    "ember": "Gloed",
+    "amber": "Amber",
+    "ocean": "Oceaan",
+    "forest": "Bos",
+    "berry": "Bes",
+    "paper": "Papier"
+  },
+  "roles": {
+    "all": "Alles",
+    "opener": "Openers",
+    "middle": "Midden",
+    "closer": "Afsluiters"
+  },
+  "defaults": {
+    "brandName": "Je merk",
+    "brandFallback": "Merk",
+    "adName": "Advertentie"
+  },
+  "errors": {
+    "engineLoad": "{{src}} kon niet worden geladen",
+    "uploadFailedStatus": "upload mislukt ({{status}})",
+    "uploadFailed": "upload mislukt",
+    "notSignedIn": "niet ingelogd",
+    "drafts": "concepten {{status}}"
+  },
+  "stage": {
+    "empty": "Je advertentie verschijnt hier.",
+    "addFirst": "Eerste scène toevoegen",
+    "toStart": "Terug naar het begin",
+    "playPause": "Afspelen / pauzeren (spatie)",
+    "time": "{{time}} / {{duration}} s",
+    "tooLong": "De advertentie mag maximaal {{max}} s duren",
+    "properties": "Eigenschappen",
+    "propertiesHint": "Kies een scène in de lijst of op de tijdlijn om hem hier te bewerken."
+  },
+  "drafts": {
+    "logInToKeep": "Log in op 3Speak om concepten te bewaren",
+    "inBrowser": "Concepten blijven in deze browser",
+    "signingIn": "Inloggen…",
+    "saveDrafts": "Concepten opslaan",
+    "status": {
+      "saving": "Opslaan…",
+      "saved": "Opgeslagen",
+      "error": "Niet opgeslagen",
+      "limit": "Conceptlimiet bereikt",
+      "idle": "Concept"
+    },
+    "open": "Concepten",
+    "title": "Je concepten",
+    "listInfo_one": "{{n}} van {{max}} · elk bewaard tot {{count}} dag na de laatste wijziging",
+    "listInfo_other": "{{n}} van {{max}} · elk bewaard tot {{count}} dagen na de laatste wijziging",
+    "draftInfo_one": "{{count}} scène · opgeslagen {{saved}} · tot {{until}}",
+    "draftInfo_other": "{{count}} scènes · opgeslagen {{saved}} · tot {{until}}",
+    "isOpen": "geopend",
+    "openDraft": "Openen",
+    "confirmDelete": "\"{{name}}\" verwijderen?",
+    "empty": "Nog geen concepten. Ze slaan zichzelf op terwijl je werkt.",
+    "newAd": "Nieuwe advertentie",
+    "limitTitle_one": "Je hebt al {{count}} concept",
+    "limitTitle_other": "Je hebt al {{count}} concepten",
+    "limitHint": "Kies er een om door deze advertentie te vervangen, of sluit dit en werk verder zonder op te slaan.",
+    "savedAt": "opgeslagen {{date}}",
+    "replace": "Vervangen"
+  },
+  "format": {
+    "locked": "Je boeking loopt als <b>{{format}}</b>, tot {{max}} s.",
+    "where": "Waar gaat de advertentie draaien? Je kunt later wisselen; elke scène werkt in beide.",
+    "sceneChange": "Scènewissel",
+    "tip": "Leesbare advertenties: ongeveer 3 s per scène, 15-30 s in totaal, de openingsregel leesbaar binnen de eerste seconde.",
+    "confirmNew": "Een nieuwe advertentie beginnen? Je opgeslagen concepten blijven bewaard."
+  },
+  "brand": {
+    "name": "Naam",
+    "logo": "Logo",
+    "logoHint": "vierkant werkt het best; zonder logo wordt de eerste letter gebruikt",
+    "monogram": "Monogram",
+    "monogramHint": "letter(s) die worden gebruikt als er geen logo is",
+    "colours": "Kleuren",
+    "colors": {
+      "bg": "Achtergrond",
+      "ink": "Tekst",
+      "mute": "Rustige tekst",
+      "accent": "Accent",
+      "accent2": "Accent 2",
+      "accent3": "Accent 3"
+    },
+    "coloursTip": "Gebruik het accent voor nadruk (*sterretjes* in de tekst). Call-to-actionknoppen worden als omtrek getekend.",
+    "fonts": "Lettertypen",
+    "headlines": "Koppen",
+    "text": "Tekst",
+    "ownFont": "Je eigen lettertypebestand",
+    "fontNamePlaceholder": "Naam van het lettertype, bijv. Acme Display",
+    "fontRights": "Ik heb het recht om dit lettertype in video's te gebruiken",
+    "uploading": "Uploaden…",
+    "uploadFont": "TTF / OTF / WOFF uploaden"
+  },
+  "scenes": {
+    "duplicate": "Dupliceren",
+    "add": "Scène toevoegen",
+    "tip": "Tekst, afbeeldingen en lengte van de gekozen scène staan rechts."
+  },
+  "sound": {
+    "music": "Muziek",
+    "startInSong": "Startpunt in het nummer",
+    "volume": "Volume",
+    "fadeIn": "Infaden",
+    "fadeOut": "Uitfaden",
+    "noMusic": "Nog geen muziek.",
+    "library": "Muziekbibliotheek",
+    "uploading": "Uploaden…",
+    "uploadSong": "Nummer uploaden",
+    "songRights": "Het nummer dat ik upload is van mij of heb ik in licentie",
+    "effects": "Geluidseffecten",
+    "auto": "Automatische geluiden (scènewissels, woorden die verschijnen)",
+    "autoLevel": "Niveau van automatische geluiden",
+    "db": "{{gain}} dB",
+    "restore_one": "{{count}} verwijderd automatisch geluid terugzetten",
+    "restore_other": "{{count}} verwijderde automatische geluiden terugzetten",
+    "addAt": "Geluid toevoegen op {{time}} s",
+    "listen": "Beluisteren",
+    "autoTag": "auto",
+    "tip": "Sleep geluiden op de tijdlijn om ze te verplaatsen. Een verplaatst automatisch geluid wordt van jou.",
+    "kinds": {
+      "trans": "Overgang",
+      "whoosh": "Woesj",
+      "swish": "Zwiep",
+      "tick": "Tik",
+      "click": "Klik",
+      "type": "Typen",
+      "hit": "Klap"
+    }
+  },
+  "render": {
+    "drawing": "Scènes tekenen…",
+    "mixing": "Geluid mixen…",
+    "sceneRenderFailed": "scènerender: {{status}}",
+    "renderFailed": "render: {{status}}",
+    "scenesLength_one": "{{count}} scène, {{length}} s",
+    "scenesLength_other": "{{count}} scènes, {{length}} s",
+    "scenesLengthTooLong_one": "{{count}} scène, {{length}} s (te lang, max. {{max}} s)",
+    "scenesLengthTooLong_other": "{{count}} scènes, {{length}} s (te lang, max. {{max}} s)",
+    "toFill_one": "{{count}} veld in te vullen",
+    "toFill_other": "{{count}} velden in te vullen",
+    "allFilled": "Alle verplichte velden ingevuld",
+    "music": "Muziek: {{title}}",
+    "noMusic": "Geen muziek (optioneel)",
+    "effects_one": "{{count}} geluidseffect",
+    "effects_other": "{{count}} geluidseffecten",
+    "issue": "Scène {{n}}, {{field}}: {{msg}}",
+    "button": "Advertentie renderen ({{size}})",
+    "progress": "{{phase}} {{percent}}",
+    "sent": "Naar je campagne gestuurd",
+    "useForCampaign": "Gebruiken voor mijn campagne",
+    "download": "Downloaden",
+    "again": "Opnieuw renderen"
+  },
+  "props": {
+    "length": "Lengte",
+    "fieldIssue": "{{field}}: {{msg}}",
+    "soundEffect": "Geluidseffect",
+    "autoNote": "{{name}} (automatisch: verplaats of wijzig het om het van jou te maken)",
+    "makeMine": "Van mij maken",
+    "at": "Op",
+    "secondsUnit": "s",
+    "volume": "Volume"
+  },
+  "picker": {
+    "search": "Zoeken",
+    "look": "Stijl",
+    "all": "Alles",
+    "nothing": "Niets gevonden."
+  },
+  "fields": {
+    "optional": "optioneel",
+    "auto": "auto",
+    "none": "(geen)",
+    "defaultIcon": "standaard ({{icon}})",
+    "clear": "Wissen",
+    "accentTip": "Zet een woord tussen *sterretjes* voor de accentkleur, tussen _lage streepjes_ voor het tweede accent.",
+    "up": "Omhoog",
+    "moveUp": "Omhoog",
+    "moveDown": "Omlaag",
+    "add": "Toevoegen",
+    "needsAtLeast": "minimaal {{min}} nodig",
+    "needs": "{{min}} nodig",
+    "pairX": "x %",
+    "pairY": "y %"
+  },
+  "image": {
+    "notPicture": "Dat is geen afbeelding.",
+    "noClipboardPicture": "Geen afbeelding op het klembord. Kopieer er een, of druk hier op Ctrl+V / Cmd+V.",
+    "clipboardBlocked": "De browser stond het lezen van het klembord niet toe. Klik hier en druk op Ctrl+V / Cmd+V.",
+    "dragToPlace": "Sleep om te kiezen welk deel van de afbeelding te zien is",
+    "zoom": "Zoom",
+    "zoomTitle": "Zoomt in op de afbeelding binnen het kader; het kader houdt zijn grootte",
+    "zoomValue": "{{zoom}}x",
+    "resetPlacement": "Plaatsing resetten",
+    "replace": "Vervangen",
+    "pasteTitle": "Plakken vanaf het klembord",
+    "uploadingPct": "Uploaden {{pct}}%",
+    "upload": "Uploaden",
+    "paste": "Plakken",
+    "linkPlaceholder": "of plak een https://-link of een afbeelding (Ctrl+V)"
+  },
+  "timeline": {
+    "tick": "{{s}}s",
+    "scenes": "Scènes",
+    "blockTitle": "{{type}}: {{length}}s",
+    "dragLength": "Sleep om de lengte te wijzigen",
+    "music": "Muziek",
+    "musicVolume": "{{title}} · {{volume}}",
+    "effects": "Geluidseffecten",
+    "sfxTitle": "{{name}} op {{at}}s"
+  },
+  "preview": {
+    "frameTitle": "Voorbeeld van de advertentie"
+  }
+}

@@ -1,0 +1,232 @@
+{
+  "title": "Ad Wizard",
+  "beta": "ベータ",
+  "loading": "シーンエンジンを読み込み中…",
+  "untitled": "無題の広告",
+  "seconds": "{{s}} 秒",
+  "lengthOfMax": "{{length}} 秒 / 最大 {{max}} 秒",
+  "maxOnly": "/ 最大 {{max}} 秒",
+  "steps": {
+    "format": "フォーマット",
+    "brand": "ブランド",
+    "scenes": "シーン",
+    "sound": "サウンド",
+    "render": "レンダリング"
+  },
+  "formats": {
+    "landscape": "横向き 16:9",
+    "landscapeSub": "動画内広告、ウェブサイト",
+    "portrait": "縦向き 9:16",
+    "portraitSub": "ショート、ストーリー、リール"
+  },
+  "palettes": {
+    "ember": "エンバー",
+    "amber": "アンバー",
+    "ocean": "オーシャン",
+    "forest": "フォレスト",
+    "berry": "ベリー",
+    "paper": "ペーパー"
+  },
+  "roles": {
+    "all": "すべて",
+    "opener": "オープニング",
+    "middle": "中盤",
+    "closer": "エンディング"
+  },
+  "defaults": {
+    "brandName": "あなたのブランド",
+    "brandFallback": "ブランド",
+    "adName": "広告"
+  },
+  "errors": {
+    "engineLoad": "{{src}} を読み込めませんでした",
+    "uploadFailedStatus": "アップロードに失敗しました（{{status}}）",
+    "uploadFailed": "アップロードに失敗しました",
+    "notSignedIn": "ログインしていません",
+    "drafts": "下書き {{status}}"
+  },
+  "stage": {
+    "empty": "ここに広告が表示されます。",
+    "addFirst": "最初のシーンを追加",
+    "toStart": "最初に戻る",
+    "playPause": "再生 / 一時停止（スペース）",
+    "time": "{{time}} / {{duration}} 秒",
+    "tooLong": "広告は最大 {{max}} 秒までです",
+    "properties": "プロパティ",
+    "propertiesHint": "リストかタイムラインでシーンを選ぶと、ここで編集できます。"
+  },
+  "drafts": {
+    "logInToKeep": "下書きを残すには 3Speak にログインしてください",
+    "inBrowser": "下書きはこのブラウザに保存されます",
+    "signingIn": "ログイン中…",
+    "saveDrafts": "下書きを保存",
+    "status": {
+      "saving": "保存中…",
+      "saved": "保存しました",
+      "error": "未保存",
+      "limit": "下書きの上限に達しました",
+      "idle": "下書き"
+    },
+    "open": "下書き",
+    "title": "あなたの下書き",
+    "listInfo_other": "{{n}} / {{max}} 件 · 最後の変更から {{count}} 日間保存",
+    "draftInfo_other": "{{count}} シーン · {{saved}} に保存 · {{until}} まで",
+    "isOpen": "編集中",
+    "openDraft": "開く",
+    "confirmDelete": "「{{name}}」を削除しますか？",
+    "empty": "下書きはまだありません。作業中に自動で保存されます。",
+    "newAd": "新しい広告",
+    "limitTitle_other": "下書きがすでに {{count}} 件あります",
+    "limitHint": "この広告で置き換える下書きを選ぶか、これを閉じて保存せずに作業を続けてください。",
+    "savedAt": "{{date}} に保存",
+    "replace": "差し替え"
+  },
+  "format": {
+    "locked": "予約した広告は <b>{{format}}</b>、最大 {{max}} 秒で配信されます。",
+    "where": "広告をどこで配信しますか？あとで切り替えられます。どのシーンも両方に対応しています。",
+    "sceneChange": "シーン切り替え",
+    "tip": "読みやすい広告の目安：1シーン約3秒、全体で15〜30秒、最初の1秒で冒頭の文が読めること。",
+    "confirmNew": "新しい広告を始めますか？保存済みの下書きは残ります。"
+  },
+  "brand": {
+    "name": "名前",
+    "logo": "ロゴ",
+    "logoHint": "正方形がおすすめです。ない場合は頭文字を使います",
+    "monogram": "モノグラム",
+    "monogramHint": "ロゴがないときに使う文字",
+    "colours": "カラー",
+    "colors": {
+      "bg": "背景",
+      "ink": "テキスト",
+      "mute": "控えめなテキスト",
+      "accent": "アクセント",
+      "accent2": "アクセント 2",
+      "accent3": "アクセント 3"
+    },
+    "coloursTip": "強調にはアクセントを使います（テキスト内の *アスタリスク*）。行動を促すボタンは枠線で描かれます。",
+    "fonts": "フォント",
+    "headlines": "見出し",
+    "text": "テキスト",
+    "ownFont": "自分のフォントファイル",
+    "fontNamePlaceholder": "フォント名（例：Acme Display）",
+    "fontRights": "このフォントを動画で使用する権利があります",
+    "uploading": "アップロード中…",
+    "uploadFont": "TTF / OTF / WOFF をアップロード"
+  },
+  "scenes": {
+    "duplicate": "複製",
+    "add": "シーンを追加",
+    "tip": "選択したシーンのテキスト、画像、長さは右側にあります。"
+  },
+  "sound": {
+    "music": "音楽",
+    "startInSong": "曲の開始位置",
+    "volume": "音量",
+    "fadeIn": "フェードイン",
+    "fadeOut": "フェードアウト",
+    "noMusic": "まだ音楽がありません。",
+    "library": "音楽ライブラリ",
+    "uploading": "アップロード中…",
+    "uploadSong": "曲をアップロード",
+    "songRights": "アップロードする曲の権利またはライセンスを持っています",
+    "effects": "効果音",
+    "auto": "自動サウンド（シーン切り替え、文字の登場）",
+    "autoLevel": "自動サウンドの音量",
+    "db": "{{gain}} dB",
+    "restore_other": "削除した自動サウンド {{count}} 件を復元",
+    "addAt": "{{time}} 秒にサウンドを追加",
+    "listen": "試聴",
+    "autoTag": "自動",
+    "tip": "タイムライン上のサウンドはドラッグで移動できます。自動サウンドを動かすと、あなたのサウンドになります。",
+    "kinds": {
+      "trans": "トランジション",
+      "whoosh": "ヒュッ",
+      "swish": "シュッ",
+      "tick": "チッ",
+      "click": "クリック",
+      "type": "タイピング",
+      "hit": "ドン"
+    }
+  },
+  "render": {
+    "drawing": "シーンを描画中…",
+    "mixing": "サウンドをミックス中…",
+    "sceneRenderFailed": "シーンのレンダリング：{{status}}",
+    "renderFailed": "レンダリング：{{status}}",
+    "scenesLength_other": "{{count}} シーン、{{length}} 秒",
+    "scenesLengthTooLong_other": "{{count}} シーン、{{length}} 秒（長すぎます。最大 {{max}} 秒）",
+    "toFill_other": "入力が必要な項目が {{count}} 件あります",
+    "allFilled": "必須項目はすべて入力済みです",
+    "music": "音楽：{{title}}",
+    "noMusic": "音楽なし（任意）",
+    "effects_other": "効果音 {{count}} 件",
+    "issue": "シーン {{n}}、{{field}}：{{msg}}",
+    "button": "広告をレンダリング（{{size}}）",
+    "progress": "{{phase}} {{percent}}",
+    "sent": "キャンペーンに送信しました",
+    "useForCampaign": "キャンペーンに使う",
+    "download": "ダウンロード",
+    "again": "もう一度レンダリング"
+  },
+  "props": {
+    "length": "長さ",
+    "fieldIssue": "{{field}}：{{msg}}",
+    "soundEffect": "効果音",
+    "autoNote": "{{name}}（自動：動かすか変更すると、あなたのサウンドになります）",
+    "makeMine": "自分のものにする",
+    "at": "位置",
+    "secondsUnit": "秒",
+    "volume": "音量"
+  },
+  "picker": {
+    "search": "検索",
+    "look": "スタイル",
+    "all": "すべて",
+    "nothing": "一致するものがありません。"
+  },
+  "fields": {
+    "optional": "任意",
+    "auto": "自動",
+    "none": "（なし）",
+    "defaultIcon": "デフォルト（{{icon}}）",
+    "clear": "クリア",
+    "accentTip": "単語を *アスタリスク* で囲むとアクセントカラー、_アンダースコア_ で囲むと2番目のアクセントになります。",
+    "up": "上へ",
+    "moveUp": "上へ移動",
+    "moveDown": "下へ移動",
+    "add": "追加",
+    "needsAtLeast": "{{min}} 個以上必要です",
+    "needs": "{{min}} 個必要です",
+    "pairX": "x %",
+    "pairY": "y %"
+  },
+  "image": {
+    "notPicture": "画像ではありません。",
+    "noClipboardPicture": "クリップボードに画像がありません。画像をコピーするか、ここで Ctrl+V / Cmd+V を押してください。",
+    "clipboardBlocked": "ブラウザがクリップボードの読み取りを許可しませんでした。ここをクリックして Ctrl+V / Cmd+V を押してください。",
+    "dragToPlace": "ドラッグして画像の表示部分を選ぶ",
+    "zoom": "ズーム",
+    "zoomTitle": "枠の中で画像を拡大します。枠のサイズは変わりません",
+    "zoomValue": "{{zoom}}x",
+    "resetPlacement": "配置をリセット",
+    "replace": "差し替え",
+    "pasteTitle": "クリップボードから貼り付け",
+    "uploadingPct": "アップロード中 {{pct}}%",
+    "upload": "アップロード",
+    "paste": "貼り付け",
+    "linkPlaceholder": "または https:// リンクか画像を貼り付け（Ctrl+V）"
+  },
+  "timeline": {
+    "tick": "{{s}}秒",
+    "scenes": "シーン",
+    "blockTitle": "{{type}}：{{length}}秒",
+    "dragLength": "ドラッグして長さを変更",
+    "music": "音楽",
+    "musicVolume": "{{title}} · {{volume}}",
+    "effects": "効果音",
+    "sfxTitle": "{{name}}（{{at}}秒）"
+  },
+  "preview": {
+    "frameTitle": "広告プレビュー"
+  }
+}

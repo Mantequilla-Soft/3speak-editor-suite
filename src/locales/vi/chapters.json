@@ -1,0 +1,41 @@
+{
+  "title": "Chương",
+  "intro": "Đánh dấu nơi mỗi phần của tập bắt đầu. Ứng dụng podcast sẽ hiển thị chúng, và 3Speak liệt kê chúng trong phần mô tả. Chúng đi theo bản ghi khi bạn cắt. Phím tắt: <kbd>M</kbd> thêm một chương tại đầu phát.",
+  "empty": "Chưa có chương nào. Di chuyển đầu phát đến chỗ một phần bắt đầu rồi thêm chương.",
+  "goThere": "Đến đó",
+  "nameLabel": "Tên chương {{n}}",
+  "moveHere": "Chuyển đến đầu phát",
+  "moveLabel": "Chuyển chương {{n}} đến đầu phát",
+  "removeLabel": "Gỡ chương {{n}}",
+  "leftOut": "Các chương cách nhau chưa đến một giây, hoặc nằm ở ngay cuối, sẽ bị bỏ khỏi bản xuất.",
+  "tipZero": "Mẹo: nhiều ứng dụng yêu cầu chương đầu tiên ở 0:00.",
+  "addAt": "Thêm tại {{time}}",
+  "copyTitle": "Sao chép danh sách (cho phần mô tả)",
+  "copied": "Đã sao chép",
+  "copy": "Sao chép danh sách",
+  "defaultTitle": "Chương",
+  "suggest": {
+    "title": "Gợi ý",
+    "findTitle": "Tìm nơi các phần có thể bắt đầu: chủ đề mới, chỗ ngừng dài, chuyển cảnh",
+    "again": "Tìm lại",
+    "suggest": "Gợi ý chương",
+    "addAll": "Thêm cả {{n}}",
+    "withTranscript": "Khi có bản ghi lời (nút Bản ghi lời), gợi ý còn bám theo các chủ đề và lấy tiêu đề từ lời nói.",
+    "none": "Không tìm thấy vị trí rõ ràng nào. Chương trình có thể ngắn, hoặc các phần nối liền vào nhau.",
+    "stop": "Dừng",
+    "listen": "Nghe từ đây",
+    "titleLabel": "Chương được gợi ý tại {{time}}",
+    "add": "Thêm chương này",
+    "addLabel": "Thêm chương tại {{time}}",
+    "drop": "Không phải chỗ này",
+    "dropLabel": "Bỏ gợi ý tại {{time}}",
+    "reason": {
+      "start": "Bắt đầu",
+      "topic": "Chủ đề mới",
+      "pause": "Chỗ ngừng dài",
+      "scene": "Chuyển cảnh"
+    },
+    "intro": "Mở đầu",
+    "part": "Phần {{n}}"
+  }
+}

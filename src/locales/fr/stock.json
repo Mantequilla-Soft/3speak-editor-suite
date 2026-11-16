@@ -1,0 +1,53 @@
+{
+  "title": "Médias libres",
+  "titleBackground": "Choisir un arrière-plan",
+  "search": "Rechercher des vidéos, photos et GIF",
+  "searchProvider": "Rechercher sur {{provider}}",
+  "searchProviderTitle": "Rechercher sur {{provider}} (libre d'utilisation, copié sur notre serveur quand vous en choisissez un)",
+  "kind": "Type",
+  "category": "Catégorie",
+  "everything": "Tout",
+  "types": {
+    "all": "Tout",
+    "video": "Vidéos",
+    "image": "Photos",
+    "gif": "GIF"
+  },
+  "categories": {
+    "nature": "Nature",
+    "city": "Ville",
+    "people": "Personnes",
+    "animals": "Animaux",
+    "food": "Cuisine",
+    "tech": "Tech",
+    "sports": "Sports",
+    "space": "Espace",
+    "abstract": "Abstrait",
+    "backgrounds": "Arrière-plans"
+  },
+  "loading": "Chargement de la bibliothèque...",
+  "typeToSearch": "Tapez ce que vous cherchez pour rechercher sur {{provider}}.",
+  "nothingFound": "Aucun résultat.",
+  "searching": "Recherche...",
+  "loadFailed": "Impossible de charger la banque de médias.",
+  "nothingMatches": "Aucun résultat.",
+  "adding": "Ajout...",
+  "byAuthor": "{{title}} ({{author}})",
+  "licenceOnline": "De {{provider}} : libre d'utilisation, même commerciale, sans crédit nécessaire. Le fichier est copié sur le serveur de 3Speak quand vous le choisissez.",
+  "licence": "Libre d'utilisation, même commerciale, sans crédit nécessaire (CC0 / domaine public de Wikimedia Commons).",
+  "placeBackground": "Il passe derrière vous, sur sa propre piste, aussi longtemps que votre clip.",
+  "placeAdd": "Il est placé à la tête de lecture : sur une chronologie vide comme votre vidéo, sinon par-dessus en plans de coupe.",
+  "errors": {
+    "notCopied": "Ce fichier n'a pas pu être copié.",
+    "notAdded": "Ce fichier n'a pas pu être ajouté.",
+    "tooMany": "Trop de recherches, patientez un instant.",
+    "searchFailed": "La recherche n'a pas marché, réessayez.",
+    "copyFailed": "Ce fichier n'a pas pu être copié sur le serveur."
+  },
+  "trackName": {
+    "background": "Arrière-plan",
+    "backgroundNumbered": "Arrière-plan {{number}}",
+    "broll": "Plans de coupe",
+    "brollNumbered": "Plans de coupe {{number}}"
+  }
+}

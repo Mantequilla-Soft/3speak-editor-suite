@@ -1,0 +1,39 @@
+{
+  "cancel": "रद्द करें",
+  "close": "बंद करें",
+  "ok": "ठीक है",
+  "gotIt": "समझ गया",
+  "done": "हो गया",
+  "save": "सेव करें",
+  "delete": "डिलीट करें",
+  "remove": "हटाएँ",
+  "back": "वापस",
+  "next": "अगला",
+  "skip": "छोड़ें",
+  "retry": "फिर से कोशिश करें",
+  "reset": "रीसेट करें",
+  "none": "कोई नहीं",
+  "off": "बंद",
+  "auto": "ऑटो",
+  "play": "चलाएँ",
+  "pause": "रोकें",
+  "undo": "पहले जैसा करें",
+  "preview": "प्रीव्यू",
+  "render": "रेंडर करें",
+  "export": "एक्सपोर्ट करें",
+  "duration": {
+    "seconds_one": "{{count}} सेकंड",
+    "seconds_other": "{{count}} सेकंड",
+    "minutes_one": "{{count}} मिनट",
+    "minutes_other": "{{count}} मिनट",
+    "hours_one": "{{count}} घंटा",
+    "hours_other": "{{count}} घंटे"
+  },
+  "limits": {
+    "atMost": {
+      "short": "शॉर्ट अधिकतम {{limit}} का हो सकता है।",
+      "video": "वीडियो अधिकतम {{limit}} का हो सकता है।",
+      "audio": "एक्सपोर्ट अधिकतम {{limit}} का हो सकता है।"
+    }
+  }
+}

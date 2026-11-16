@@ -1,0 +1,53 @@
+{
+  "sheet": {
+    "title": "Sneltoetsen"
+  },
+  "groups": {
+    "playback": "Afspelen",
+    "clips": "Clips",
+    "project": "Project"
+  },
+  "items": {
+    "playPause": "Afspelen / pauzeren",
+    "playForward": "Vooruit afspelen; druk nogmaals voor 2x, 4x, 8x",
+    "playBackward": "Achteruit afspelen; druk nogmaals voor sneller",
+    "stop": "Stoppen",
+    "frameStep": "Eén beeld terug / vooruit (Shift: 10 beelden)",
+    "nudge": "De afspeelkop 0,1 s verschuiven (Shift: 1 s)",
+    "fullscreen": "Volledig scherm aan / uit",
+    "nextPrevClip": "De volgende / vorige clip selecteren",
+    "clipLeftRight": "Vorige / volgende clip op hetzelfde spoor",
+    "clipUpDown": "Clip op het spoor erboven / eronder",
+    "openClip": "De instellingen van de geselecteerde clip openen",
+    "selectNone": "Niets selecteren",
+    "selectAll": "Alle clips selecteren",
+    "remove": "De geselecteerde clip(s) verwijderen",
+    "split": "De geselecteerde clip splitsen op de afspeelkop",
+    "duplicate": "De geselecteerde clip dupliceren",
+    "ungroup": "Clips degroeperen",
+    "closeGap": "Het gat op de afspeelkop dichten",
+    "addText": "Tekst toevoegen op de afspeelkop",
+    "undo": "Ongedaan maken",
+    "redo": "Opnieuw",
+    "addFlag": "Een vlag zetten op de afspeelkop",
+    "addChapter": "Een hoofdstuk toevoegen op de afspeelkop",
+    "zoom": "In- / uitzoomen op de tijdlijn",
+    "showSheet": "Deze sneltoetsen tonen"
+  },
+  "keys": {
+    "space": "Spatie",
+    "tab": "Tab",
+    "shift": "Shift",
+    "alt": "Alt",
+    "ctrl": "Ctrl",
+    "enter": "Enter",
+    "esc": "Esc",
+    "delete": "Del"
+  },
+  "announce": {
+    "selected": "{{clip}} geselecteerd",
+    "stopped": "Gestopt",
+    "forward": "Vooruit {{speed}}x",
+    "backward": "Achteruit {{speed}}x"
+  }
+}

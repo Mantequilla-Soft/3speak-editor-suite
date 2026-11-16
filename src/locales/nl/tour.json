@@ -1,0 +1,117 @@
+{
+  "shorts": {
+    "welcome": {
+      "title": "Welkom!",
+      "text": "Welkom in de 3Speak Shorts-editor. Laten we snel de belangrijkste functies bekijken."
+    },
+    "preview": {
+      "title": "Voorbeeld",
+      "text": "Dit is het voorbeeld van je video. Je kunt clips slepen om ze te verplaatsen en knijpen om te zoomen."
+    },
+    "timeline": {
+      "title": "Tijdlijn",
+      "text": "Rangschik hier je clips. Sleep om de volgorde te wijzigen, trek aan de randen om in te korten."
+    },
+    "addMedia": {
+      "title": "Media toevoegen",
+      "text": "Tik op + om video, afbeeldingen, tekst, audio of kleurclips aan je sporen toe te voegen."
+    },
+    "clipSettings": {
+      "title": "Clipinstellingen",
+      "text": "Selecteer een clip en tik op het tandwiel om eigenschappen als schaal, positie en dekking te bewerken."
+    },
+    "render": {
+      "title": "Renderen",
+      "text": "Ben je klaar met bewerken, tik dan op Renderen om je video te exporteren. Daarna kun je hem downloaden of versturen."
+    }
+  },
+  "audio": {
+    "welcome": {
+      "title": "Welkom in de audio-editor",
+      "text": "Knip, schoon op en egaliseer een podcast, een nummer of een spraakmemo, en plaats het dan op 3Speak. Hier zie je snel wat hij kan."
+    },
+    "addAudio": {
+      "title": "Voeg je audio toe",
+      "text": "Voeg een opname toe, neem direct hier op of kies muziek uit de bibliotheek. Videobestanden werken ook: de editor houdt alleen het geluid. Tot 3 uur."
+    },
+    "tracks": {
+      "title": "Stem- en muzieksporen",
+      "text": "Opnames komen op stemsporen, muziek op een eigen spoor. Sleep een clip om hem te verplaatsen, trek aan de randen om in te korten. Zoom met de schuifregelaar, of tik op Passend om alles te zien."
+    },
+    "clipSettings": {
+      "title": "Clipinstellingen",
+      "text": "Selecteer een clip om de instellingen te zien. Stem opschonen (Sterk haalt ruis en gerommel weg en maakt het helderder en gelijkmatiger), en Ducking: de clip wordt zachter terwijl een ander spoor speelt. Groepeer stemmen die samen zijn opgenomen om ze synchroon te houden."
+    },
+    "cutSilences": {
+      "title": "Stiltes knippen",
+      "text": "Vindt de pauzes in je stemsporen, knipt ze weg en dicht de gaten. Gegroepeerde stemmen worden alleen geknipt waar iedereen stil is."
+    },
+    "template": {
+      "title": "Je sjabloon",
+      "text": "Stel één keer een intro, een outro en een muziekbed in. Ze komen op elke nieuwe opname, en je sjabloon blijft voorgoed bewaard."
+    },
+    "normalize": {
+      "title": "Normaliseren",
+      "text": "Brengt de export op een gelijkmatige podcastluidheid (-16 LUFS), zodat elke aflevering even luid klinkt als de vorige. Zet het uit om je eigen niveaus te houden."
+    },
+    "chapters": {
+      "title": "Hoofdstukken",
+      "text": "Markeer waar elk deel begint (druk op M om er een toe te voegen op de afspeelkop). Hoofdstukken komen in de MP3 en in de beschrijving van je aflevering."
+    },
+    "export": {
+      "title": "Exporteren",
+      "text": "Exporteren maakt een MP3. Luister ernaar en gebruik hem dan voor je upload of download hem. Ben je ingelogd, dan wordt je project als concept bewaard terwijl je werkt."
+    }
+  },
+  "audiogram": {
+    "intro": {
+      "title": "Audiogrammen",
+      "text": "Korte video's van een stuk van je aflevering: een bewegende golfvorm, je titel en afbeelding, in de stijl van 3Speak. Ze worden samen met de aflevering geplaatst als 3Speak-Shorts."
+    },
+    "piece": {
+      "title": "Je stuk",
+      "text": "Het stuk dat je op de tijdlijn hebt gekozen, tot 2 minuten. Je kunt het hier altijd wijzigen."
+    },
+    "arrange": {
+      "title": "Schik het zoals jij wilt",
+      "text": "Sleep een onderdeel om het te verplaatsen, trek aan een hoek om het formaat te wijzigen (Shift houdt de vorm) en draai het met de ronde greep eronder. Het 3Speak-logo blijft er altijd in, als 3S of als volledig logo."
+    },
+    "picture": {
+      "title": "Een afbeelding",
+      "text": "Upload er een of neem de cover van een van je playlists. Hij verschijnt als kaart die je kunt verplaatsen en schalen zoals de andere onderdelen."
+    },
+    "waveform": {
+      "title": "De golfvorm",
+      "text": "Balken, lijnen, een cirkel of een cirkelgolf, in 3Speak-rood of elke kleur die je wilt."
+    },
+    "parts": {
+      "title": "Onderdelen",
+      "text": "Verberg een onderdeel, of zet het naar voren of naar achteren als onderdelen overlappen."
+    },
+    "make": {
+      "title": "Maak hem",
+      "text": "Maak er zoveel als je wilt: elke wordt als Short met de aflevering geplaatst, met een eigen tekst en een link ernaar. Je laatste look blijft bewaard als sjabloon voor de volgende."
+    }
+  },
+  "rangePick": {
+    "startEnd": {
+      "title": "Klik op het begin, dan op het einde",
+      "text": "Klik waar het stuk moet beginnen, dan waar het eindigt: tot 2 minuten. Trek aan de randen om het aan te passen, of sleep over de sporen om een heel stuk te tekenen. Een nieuwe klik begint opnieuw."
+    },
+    "moveAround": {
+      "title": "Rondkijken",
+      "text": "Sleep de liniaal of scrol om door de aflevering te gaan. Zoom in met de schuifregelaar voor een precies begin, of tik op Passend om de hele aflevering te zien."
+    },
+    "listen": {
+      "title": "Luister ernaar",
+      "text": "Stuk afspelen (of spatie) speelt alleen het deel dat je hebt gekozen en gaat dan terug naar het begin ervan."
+    },
+    "use": {
+      "title": "Gebruik het",
+      "text": "Dit stuk gebruiken (of Enter) neemt het mee naar je audiogram, Annuleren (of Escape) houdt het oude. Tot dan is de rest van de editor vergrendeld, zodat er niets per ongeluk verandert."
+    }
+  },
+  "buttons": {
+    "done": "Begrepen!"
+  }
+}

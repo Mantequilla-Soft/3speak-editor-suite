@@ -1,0 +1,111 @@
+{
+  "textFx": {
+    "title": "Efekty tekstu",
+    "outline": "Kontur",
+    "outlineColour": "Kolor konturu",
+    "outlineWidth": "Grubość konturu",
+    "wordsComeIn": "Pojawianie się słów",
+    "allAtOnce": "Wszystkie naraz",
+    "atOnce": "Naraz",
+    "anims": {
+      "pop": "Wyskok",
+      "fadeUp": "Wyłanianie w górę",
+      "typewriter": "Maszyna do pisania",
+      "slide": "Wsuwanie"
+    },
+    "gap": "Odstęp",
+    "gapSeconds": "Czas między słowami (sekundy)",
+    "defaultText": "Tekst"
+  },
+  "templates": {
+    "dialogTitle": "Tytuły",
+    "allTitles": "Wszystkie tytuły",
+    "overVideo": "Na filmie",
+    "ownBackground": "Własne tło",
+    "starsHint": "Otocz słowo *gwiazdkami*, aby je pokolorować.",
+    "addTitle": "Dodaj tytuł",
+    "groups": {
+      "lower": "Belki dolne",
+      "title": "Tytuły na filmie",
+      "card": "Plansze otwierające i końcowe"
+    },
+    "fields": {
+      "name": "Nazwa",
+      "role": "Rola",
+      "lines": "Wiersze",
+      "words": "Słowa",
+      "lineUnder": "Zdanie pod nimi",
+      "lineInFront": "Zdanie z przodu",
+      "rows": "Rzędy",
+      "headline": "Nagłówek",
+      "lineUnderIt": "Zdanie pod nim",
+      "tagline": "Hasło",
+      "cta": "Wezwanie do działania",
+      "smallPrint": "Drobny druk"
+    },
+    "items": {
+      "lowerName": {
+        "label": "Imię i rola",
+        "sub": "Twórca w 3Speak"
+      },
+      "lowerStatement": {
+        "label": "Krótka wypowiedź",
+        "lines": "Trzy rzeczy,\nktórych się dziś *nauczyłem*"
+      },
+      "titleWords": {
+        "label": "Jedno słowo naraz",
+        "words": "Zaplanuj.\nNagraj.\n*Opublikuj.*",
+        "line": "Mój tydzień w 3Speak"
+      },
+      "titleKinetic": {
+        "label": "Wpadające słowa",
+        "words": "Szybko\nProsto\nPo twojemu",
+        "line": "Zrobione w *3Speak*"
+      },
+      "titlePoster": {
+        "label": "Ogromne słowa jedno nad drugim",
+        "words": "Dzień\npierwszy.",
+        "sub": "Zaczynam od zera"
+      },
+      "titleMarquee": {
+        "label": "Przewijane rzędy",
+        "rows": "Planuj\nNagrywaj\nPublikuj\nPowtarzaj",
+        "line": "Co *tydzień*"
+      },
+      "cardHook": {
+        "label": "Otwarcie: pierwsze zdanie",
+        "lines": "Jak\nmontuję\n*Shorty*",
+        "sub": "W niecałą minutę"
+      },
+      "cardEnd": {
+        "label": "Zakończenie: obserwuj mnie",
+        "tagline": "Nowe Shorty *co tydzień*",
+        "cta": "Obserwuj w 3Speak"
+      },
+      "cardPoster": {
+        "label": "Zakończenie: ogromne słowa",
+        "words": "Do\nzobaczenia\n*wkrótce.*",
+        "cta": "Obserwuj w 3Speak"
+      }
+    }
+  },
+  "scene": {
+    "title": "Tytuł",
+    "onePerLine": "Jeden na wiersz",
+    "colours": "Kolory",
+    "font": "Czcionka",
+    "overVideo": "Na filmie",
+    "length": "Długość",
+    "lengthSeconds": "Długość (sekundy)",
+    "defaultName": "Ja",
+    "layerTitle": "Tytuł"
+  },
+  "colors": {
+    "ember": "Żar",
+    "amber": "Bursztyn",
+    "ocean": "Ocean",
+    "forest": "Las",
+    "berry": "Jagoda",
+    "paper": "Papier"
+  }
+}

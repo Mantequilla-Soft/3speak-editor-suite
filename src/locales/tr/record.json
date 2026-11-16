@@ -1,0 +1,109 @@
+{
+  "media": {
+    "blocked": {
+      "camera": "Kamera ya da mikrofon bu site için engellenmiş. Adres çubuğundaki simgeyle izin ver, sonra tekrar dene. Hiç hayır demediysen bilgisayarının gizlilik ayarları tarayıcıyı engelliyor olabilir.",
+      "microphone": "Mikrofon bu site için engellenmiş. Adres çubuğundaki simgeyle izin ver, sonra tekrar dene. Hiç hayır demediysen bilgisayarının gizlilik ayarları tarayıcıyı engelliyor olabilir."
+    },
+    "notAllowed": {
+      "camera": "Bu sayfanın kamerayı ya da mikrofonu kullanmasına izin verilmiyor. 3Speak'i yeniden yükle ve tekrar dene.",
+      "microphone": "Bu sayfanın mikrofonu kullanmasına izin verilmiyor. 3Speak'i yeniden yükle ve tekrar dene."
+    },
+    "busy": {
+      "camera": "Kameran ya da mikrofonun başka bir uygulamada veya sekmede kullanılıyor (görüntülü görüşme, başka bir kaydedici). Orada kapat, sonra tekrar dene.",
+      "microphone": "Mikrofonun başka bir uygulamada veya sekmede kullanılıyor (görüntülü görüşme, başka bir kaydedici). Orada kapat, sonra tekrar dene."
+    },
+    "notFound": {
+      "camera": "Kamera ya da mikrofon bulunamadı. Birini bağla, sonra tekrar dene.",
+      "microphone": "Mikrofon bulunamadı. Birini bağla, sonra tekrar dene."
+    },
+    "noDevices": {
+      "camera": "Bu tarayıcı burada kamerayı ya da mikrofonu kullanamıyor.",
+      "microphone": "Bu tarayıcı burada mikrofonu kullanamıyor."
+    },
+    "failed": {
+      "camera": "Kamera ya da mikrofon başlatılamadı. Tekrar dene.",
+      "microphone": "Mikrofon başlatılamadı. Tekrar dene."
+    },
+    "failedNamed": {
+      "camera": "Kamera ya da mikrofon başlatılamadı ({{name}}). Tekrar dene.",
+      "microphone": "Mikrofon başlatılamadı ({{name}}). Tekrar dene."
+    }
+  },
+  "inline": {
+    "camera": "Kamera",
+    "expand": "Genişlet",
+    "shrink": "Küçült",
+    "uploading": "Yükleniyor...",
+    "uploadingPct": "Yükleniyor... %{{pct}}",
+    "converting": "Dönüştürülüyor...",
+    "rec": "KAYIT",
+    "starting": "Başlatılıyor...",
+    "plateStepOut": "Görüntüden çık",
+    "plateShooting": "Arka plan çekiliyor, görüntüye girme...",
+    "gestures": "Yeniden kadrajlamak için bir görseli basılı tutup sürükle, yakınlaştırmak için iki parmakla sıkıştır.",
+    "gesturesOverlay": "Yeniden kadrajlamak için bir görseli basılı tutup sürükle, yakınlaştırmak için iki parmakla sıkıştır, kamera kutunu taşımak için sürükle.",
+    "greenScreen": {
+      "label": "Yeşil ekran",
+      "off": "Kapalı",
+      "green": "Yeşil",
+      "blue": "Mavi",
+      "person": "Kişi",
+      "static": "Sabit",
+      "staticTitle": "Sabit arka plan (deneysel): boş arka plan çekimine uyan her şeyi kaldırır",
+      "personTitle": "Yeşil ekran gerekmez: seni görüntüde bulur",
+      "threshold": "Eşik",
+      "thresholdStaticTitle": "Tolerans: yüksek değer arka plandaki daha fazla değişikliği (gürültü, ışık, odak) yok sayar ama senin bazı kısımlarını da kaldırmaya başlayabilir",
+      "thresholdTitle": "Yüksek değer ekran renginden daha fazlasını kaldırır",
+      "despill": "Renk taşmasını gider",
+      "despillStaticTitle": "Duvar rengini kenarlardan kaldırır",
+      "despillGreenTitle": "Yeşil tonu kenarlardan kaldırır",
+      "despillBlueTitle": "Mavi tonu kenarlardan kaldırır",
+      "retakePlate": "Boş arka planı yeniden çek",
+      "shootPlate": "Boş arka planı çek",
+      "plateKeep": "Deneysel. Kamerayı ve ışığı tam olarak olduğu gibi tut.",
+      "plateHowTo": "Deneysel. Kamerayı sabitle, düğmeye bas ve görüntüden çık.",
+      "keyFailed": "Canlı arka plan kaldırma burada kullanılamıyor. Klip yine de yeşil ekran ayarını alır.",
+      "personHowTo": "Yeşil ekran gerekmez: düzenleyici seni görüntüde bulur. Çekim olduğu gibi kaydedilir ve zaman çizelgesinde ayrılır; arkana ne geleceğini orada seçersin."
+    },
+    "tpEdit": "Teleprompter metnini düzenle",
+    "tpAdd": "Teleprompter metni ekle",
+    "teleprompter": "Teleprompter",
+    "recordOnly": "Yalnızca kayıt",
+    "recordAndPlay": "Kayıt + Video oynat",
+    "plusPlay": "+ Oynat",
+    "recordReactionTitle": "Orijinal oynarken kaydet",
+    "recordReaction": "Tepki kaydet",
+    "record": "Kaydet",
+    "stop": "Durdur",
+    "retake": "Yeniden çek",
+    "useClip": "Klibi Kullan"
+  },
+  "video": {
+    "title": "Video Kaydet",
+    "startingCamera": "Kamera başlatılıyor...",
+    "start": "Kaydı başlat",
+    "stop": "Durdur",
+    "retake": "Yeniden çek",
+    "useClip": "Klibi Kullan"
+  },
+  "audio": {
+    "title": "Ses Kaydet",
+    "cannotRecord": "Bu tarayıcı burada ses kaydedemiyor.",
+    "addFailed": "Kayıt eklenemedi. Lütfen tekrar dene.",
+    "yourRecording": "Kaydın",
+    "micLevel": "Mikrofon düzeyi",
+    "accessingMic": "Mikrofona erişiliyor...",
+    "ready": "Kayda hazır: düzeyini kontrol etmek için konuş",
+    "preparing": "Kaydın hazırlanıyor...",
+    "adding": "Kanallarına ekleniyor...",
+    "tpEdit": "Teleprompter metnini düzenle",
+    "tpAdd": "Teleprompter metni ekle",
+    "teleprompter": "Teleprompter",
+    "start": "Kaydı başlat",
+    "stop": "Durdur",
+    "retake": "Yeniden kaydet",
+    "addingShort": "Ekleniyor...",
+    "useRecording": "Kaydı Kullan",
+    "useScript": "Bu metni kullan"
+  }
+}

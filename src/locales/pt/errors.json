@@ -1,0 +1,28 @@
+{
+  "render": {
+    "unreachable": "Não foi possível conectar ao servidor de renderização. Verifique sua conexão e renderize de novo.",
+    "stillBusy": "Os servidores de renderização ainda estão ocupados. Renderize de novo em alguns minutos.",
+    "unknownJob": "O servidor de renderização não reconhece mais esta renderização (talvez tenha reiniciado). Renderize de novo.",
+    "lostContact": "O contato com o servidor de renderização foi perdido. Renderize de novo.",
+    "serverStatus": "O servidor respondeu com {{status}}"
+  },
+  "uploadFailed": "Falha no envio: {{status}}",
+  "signIn": {
+    "loggedOut": "Entre no 3Speak para usar o editor.",
+    "failed": "Entre no 3Speak para enviar e renderizar (o login foi cancelado ou não funcionou)."
+  },
+  "export": {
+    "failed": "Falha na exportação",
+    "ffmpegNotLoaded": "FFmpeg não carregado",
+    "noClips": "Nenhum clipe para exportar",
+    "noCodec": "Nenhum codec de vídeo compatível encontrado para o MediaRecorder",
+    "cancelled": "Exportação cancelada",
+    "noSource": "Nenhuma fonte de arquivo válida para o clipe: {{name}}",
+    "ffmpegFailed": "O comando do FFmpeg falhou com o código de saída {{code}}"
+  },
+  "reverse": {
+    "failed": "Falha ao inverter o clipe",
+    "timedOut": "O tempo para inverter o clipe se esgotou",
+    "statusCheck": "Falha ao verificar o status: {{status}}"
+  }
+}

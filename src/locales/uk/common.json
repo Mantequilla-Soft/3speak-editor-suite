@@ -1,0 +1,45 @@
+{
+  "cancel": "Скасувати",
+  "close": "Закрити",
+  "ok": "OK",
+  "gotIt": "Зрозуміло",
+  "done": "Готово",
+  "save": "Зберегти",
+  "delete": "Видалити",
+  "remove": "Прибрати",
+  "back": "Назад",
+  "next": "Далі",
+  "skip": "Пропустити",
+  "retry": "Спробувати ще раз",
+  "reset": "Скинути",
+  "none": "Немає",
+  "off": "Вимк.",
+  "auto": "Авто",
+  "play": "Відтворити",
+  "pause": "Пауза",
+  "undo": "Скасувати",
+  "preview": "Попередній перегляд",
+  "render": "Рендеринг",
+  "export": "Експорт",
+  "duration": {
+    "seconds_one": "{{count}} секунда",
+    "seconds_few": "{{count}} секунди",
+    "seconds_many": "{{count}} секунд",
+    "seconds_other": "{{count}} секунди",
+    "minutes_one": "{{count}} хвилина",
+    "minutes_few": "{{count}} хвилини",
+    "minutes_many": "{{count}} хвилин",
+    "minutes_other": "{{count}} хвилини",
+    "hours_one": "{{count}} година",
+    "hours_few": "{{count}} години",
+    "hours_many": "{{count}} годин",
+    "hours_other": "{{count}} години"
+  },
+  "limits": {
+    "atMost": {
+      "short": "Short може тривати щонайбільше {{limit}}.",
+      "video": "Відео може тривати щонайбільше {{limit}}.",
+      "audio": "Експорт може тривати щонайбільше {{limit}}."
+    }
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "media": {
+    "blocked": {
+      "camera": "La fotocamera o il microfono sono bloccati per questo sito. Consentili con l'icona nella barra degli indirizzi, poi riprova. Se non hai mai detto di no, potrebbero essere le impostazioni della privacy del computer a bloccare il browser.",
+      "microphone": "Il microfono è bloccato per questo sito. Consentilo con l'icona nella barra degli indirizzi, poi riprova. Se non hai mai detto di no, potrebbero essere le impostazioni della privacy del computer a bloccare il browser."
+    },
+    "notAllowed": {
+      "camera": "Questa pagina non è autorizzata a usare la fotocamera o il microfono. Ricarica 3Speak e riprova.",
+      "microphone": "Questa pagina non è autorizzata a usare il microfono. Ricarica 3Speak e riprova."
+    },
+    "busy": {
+      "camera": "La fotocamera o il microfono sono occupati in un'altra app o scheda (una videochiamata, un altro registratore). Chiudili lì, poi riprova.",
+      "microphone": "Il microfono è occupato in un'altra app o scheda (una videochiamata, un altro registratore). Chiudilo lì, poi riprova."
+    },
+    "notFound": {
+      "camera": "Nessuna fotocamera o microfono trovato. Collegane uno, poi riprova.",
+      "microphone": "Nessun microfono trovato. Collegane uno, poi riprova."
+    },
+    "noDevices": {
+      "camera": "Questo browser non può usare la fotocamera o il microfono qui.",
+      "microphone": "Questo browser non può usare il microfono qui."
+    },
+    "failed": {
+      "camera": "Impossibile avviare la fotocamera o il microfono. Riprova.",
+      "microphone": "Impossibile avviare il microfono. Riprova."
+    },
+    "failedNamed": {
+      "camera": "Impossibile avviare la fotocamera o il microfono ({{name}}). Riprova.",
+      "microphone": "Impossibile avviare il microfono ({{name}}). Riprova."
+    }
+  },
+  "inline": {
+    "camera": "Fotocamera",
+    "expand": "Espandi",
+    "shrink": "Riduci",
+    "uploading": "Caricamento...",
+    "uploadingPct": "Caricamento... {{pct}}%",
+    "converting": "Conversione...",
+    "rec": "REC",
+    "starting": "Avvio...",
+    "plateStepOut": "Esci dall'inquadratura",
+    "plateShooting": "Ripresa dello sfondo, resta fuori...",
+    "gestures": "Tieni premuto e trascina un'immagine per reinquadrarla, pizzica per lo zoom.",
+    "gesturesOverlay": "Tieni premuto e trascina un'immagine per reinquadrarla, pizzica per lo zoom, trascina il riquadro della fotocamera per spostarlo.",
+    "greenScreen": {
+      "label": "Green screen",
+      "off": "Disattivato",
+      "green": "Verde",
+      "blue": "Blu",
+      "person": "Persona",
+      "static": "Statico",
+      "staticTitle": "Sfondo statico (sperimentale): rimuove tutto ciò che corrisponde a una ripresa dello sfondo vuoto",
+      "personTitle": "Niente green screen: ti trova nell'immagine",
+      "threshold": "Soglia",
+      "thresholdStaticTitle": "Tolleranza: più alta ignora più cambiamenti nello sfondo (rumore, luce, messa a fuoco) ma può iniziare a rimuovere parti di te",
+      "thresholdTitle": "Più alta rimuove più colore dello schermo",
+      "despill": "Rimozione dominante",
+      "despillStaticTitle": "Rimuove il colore della parete dai bordi",
+      "despillGreenTitle": "Rimuove la dominante verde dai bordi",
+      "despillBlueTitle": "Rimuove la dominante blu dai bordi",
+      "retakePlate": "Rifai lo sfondo vuoto",
+      "shootPlate": "Riprendi lo sfondo vuoto",
+      "plateKeep": "Sperimentale. Lascia la fotocamera e la luce esattamente come sono.",
+      "plateHowTo": "Sperimentale. Fissa la fotocamera, premi il pulsante ed esci dall'inquadratura.",
+      "keyFailed": "Lo scontorno dal vivo non è disponibile qui. La clip riceve comunque l'impostazione green screen.",
+      "personHowTo": "Niente green screen: l'editor ti trova nell'immagine. La ripresa viene registrata così com'è e scontornata sulla timeline, dove scegli cosa mettere dietro di te."
+    },
+    "tpEdit": "Modifica il testo del gobbo",
+    "tpAdd": "Aggiungi un testo al gobbo",
+    "teleprompter": "Gobbo",
+    "recordOnly": "Solo registrazione",
+    "recordAndPlay": "Registra + riproduci video",
+    "plusPlay": "+ Riproduci",
+    "recordReactionTitle": "Registra mentre l'originale va in riproduzione",
+    "recordReaction": "Registra reazione",
+    "record": "Registra",
+    "stop": "Stop",
+    "retake": "Rifai",
+    "useClip": "Usa la clip"
+  },
+  "video": {
+    "title": "Registra video",
+    "startingCamera": "Avvio della fotocamera...",
+    "start": "Avvia registrazione",
+    "stop": "Stop",
+    "retake": "Rifai",
+    "useClip": "Usa la clip"
+  },
+  "audio": {
+    "title": "Registra audio",
+    "cannotRecord": "Questo browser non può registrare audio qui.",
+    "addFailed": "Impossibile aggiungere la registrazione. Riprova.",
+    "yourRecording": "La tua registrazione",
+    "micLevel": "Livello del microfono",
+    "accessingMic": "Accesso al microfono...",
+    "ready": "Pronto a registrare: parla per controllare il livello",
+    "preparing": "Preparazione della registrazione...",
+    "adding": "Aggiunta alle tue tracce...",
+    "tpEdit": "Modifica il testo del gobbo",
+    "tpAdd": "Aggiungi un testo al gobbo",
+    "teleprompter": "Gobbo",
+    "start": "Avvia registrazione",
+    "stop": "Stop",
+    "retake": "Rifai",
+    "addingShort": "Aggiunta...",
+    "useRecording": "Usa la registrazione",
+    "useScript": "Usa questo copione"
+  }
+}

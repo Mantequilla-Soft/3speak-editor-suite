@@ -1,0 +1,59 @@
+{
+  "panel": {
+    "title": "ট্রান্সক্রিপ্ট",
+    "close": "ট্রান্সক্রিপ্ট বন্ধ করুন"
+  },
+  "cutNotice": {
+    "plain": "কাটা হয়েছে: {{seconds}} সেকেন্ড ছোট।",
+    "words_one": "{{count}}টি শব্দ কাটা হয়েছে: {{seconds}} সেকেন্ড ছোট।",
+    "words_other": "{{count}}টি শব্দ কাটা হয়েছে: {{seconds}} সেকেন্ড ছোট।",
+    "found_one": "পাওয়া {{count}}টি কাটা হয়েছে: {{seconds}} সেকেন্ড ছোট।",
+    "found_other": "পাওয়া {{count}}টি কাটা হয়েছে: {{seconds}} সেকেন্ড ছোট।",
+    "fillers": "{{fillers}}, {{pauses}} কাটা হয়েছে: {{seconds}} সেকেন্ড ছোট।",
+    "dismiss": "বাদ দিন"
+  },
+  "fillers": {
+    "title": "ফিলার ও বিরতি সরান",
+    "emptyHint": "এটি ট্রান্সক্রিপ্ট থেকে কাজ করে: শোয়ের ভাষায় আ, উম, মানে জাতীয় শব্দ এবং লম্বা বিরতি খুঁজে বের করে।",
+    "listening": "শুনছে...",
+    "transcribeFirst": "আগে শো ট্রান্সক্রাইব করুন",
+    "checking": "সার্ভার পরীক্ষা করা হচ্ছে...",
+    "unavailable": "এই এডিটর সার্ভারে এখন ট্রান্সক্রিপ্ট পাওয়া যাচ্ছে না।",
+    "intro": "{{language}}-এ ফিলার। প্রতিটি শুনুন, যা থাকবে তার টিক তুলে দিন।",
+    "introNoList": "{{language}}-এ ফিলার (শুধু আ, উম জাতীয়: এই ভাষার তালিকা এখনো নেই)। প্রতিটি শুনুন, যা থাকবে তার টিক তুলে দিন।",
+    "stillTranscribing": "শোয়ের বাকি অংশ এখনো ট্রান্সক্রাইব হচ্ছে।",
+    "fillerWords": "ফিলার শব্দ",
+    "longPauses": "লম্বা বিরতি",
+    "minPause": "<strong>{{seconds}} সে</strong>-এর চেয়ে লম্বা বিরতি",
+    "keepPause": "বিরতি <strong>{{seconds}} সে</strong>-এ ছোট করুন",
+    "keepPauseTitle": "কাটার পরে লম্বা বিরতির কতটা থাকবে",
+    "fillerCount_one": "{{count}}টি ফিলার",
+    "fillerCount_other": "{{count}}টি ফিলার",
+    "pauseCount_one": "{{count}}টি বিরতি",
+    "pauseCount_other": "{{count}}টি বিরতি",
+    "summary": "{{fillers}}, {{pauses}} টিক দেওয়া · {{seconds}} সে কাটা হবে",
+    "nothingFound": "এই সেটিংসে কিছু পাওয়া যায়নি।",
+    "tickAllFillers": "সব ফিলারে টিক দিন",
+    "untickAllFillers": "সব ফিলারের টিক তুলুন",
+    "tickAllPauses": "সব বিরতিতে টিক দিন",
+    "untickAllPauses": "সব বিরতির টিক তুলুন",
+    "listLabel": "যা কাটা হবে",
+    "item": {
+      "keepPause": "এই বিরতি রাখুন",
+      "cutPause": "এই বিরতি কাটুন",
+      "keepFiller": "{{text}} রাখুন",
+      "cutFiller": "{{text}} কাটুন",
+      "stop": "থামান",
+      "listenTitle": "শুনুন (চারপাশের এক সেকেন্ডসহ)",
+      "listenAt": "{{time}}-এ শুনুন",
+      "pause": "বিরতি",
+      "pauseLength": "{{length}} সে → {{kept}} সে",
+      "filler": "ফিলার",
+      "fillerTitle": "দ্বিধার শব্দ",
+      "maybe": "হয়তো",
+      "maybeTitle": "এখানে একটি ফিলার (বিরতি বা কমা দিয়ে আলাদা): আগে শুনুন"
+    },
+    "cut": "কাটুন",
+    "cutCount": "{{n}}টি কাটুন ({{seconds}} সে)"
+  }
+}

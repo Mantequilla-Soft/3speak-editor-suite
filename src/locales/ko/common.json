@@ -1,0 +1,36 @@
+{
+  "cancel": "취소",
+  "close": "닫기",
+  "ok": "확인",
+  "gotIt": "확인",
+  "done": "완료",
+  "save": "저장",
+  "delete": "삭제",
+  "remove": "제거",
+  "back": "뒤로",
+  "next": "다음",
+  "skip": "건너뛰기",
+  "retry": "다시 시도",
+  "reset": "초기화",
+  "none": "없음",
+  "off": "끄기",
+  "auto": "자동",
+  "play": "재생",
+  "pause": "일시정지",
+  "undo": "실행 취소",
+  "preview": "미리보기",
+  "render": "렌더링",
+  "export": "내보내기",
+  "duration": {
+    "seconds_other": "{{count}}초",
+    "minutes_other": "{{count}}분",
+    "hours_other": "{{count}}시간"
+  },
+  "limits": {
+    "atMost": {
+      "short": "쇼츠는 최대 {{limit}}까지 가능해요.",
+      "video": "동영상은 최대 {{limit}}까지 가능해요.",
+      "audio": "내보내기는 최대 {{limit}}까지 가능해요."
+    }
+  }
+}

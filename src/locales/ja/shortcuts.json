@@ -1,0 +1,53 @@
+{
+  "sheet": {
+    "title": "キーボードショートカット"
+  },
+  "groups": {
+    "playback": "再生",
+    "clips": "クリップ",
+    "project": "プロジェクト"
+  },
+  "items": {
+    "playPause": "再生 / 一時停止",
+    "playForward": "順再生。もう一度押すと 2倍、4倍、8倍",
+    "playBackward": "逆再生。もう一度押すとさらに速く",
+    "stop": "停止",
+    "frameStep": "1フレーム戻る / 進む（Shift：10フレーム）",
+    "nudge": "再生ヘッドを0.1秒移動（Shift：1秒）",
+    "fullscreen": "全画面表示のオン / オフ",
+    "nextPrevClip": "次 / 前のクリップを選択",
+    "clipLeftRight": "同じトラックの前 / 次のクリップ",
+    "clipUpDown": "上 / 下のトラックのクリップ",
+    "openClip": "選択したクリップの設定を開く",
+    "selectNone": "選択を解除",
+    "selectAll": "すべてのクリップを選択",
+    "remove": "選択したクリップを削除",
+    "split": "選択したクリップを再生ヘッドの位置で分割",
+    "duplicate": "選択したクリップを複製",
+    "ungroup": "クリップのグループを解除",
+    "closeGap": "再生ヘッドの位置の隙間を詰める",
+    "addText": "再生ヘッドの位置にテキストを追加",
+    "undo": "元に戻す",
+    "redo": "やり直す",
+    "addFlag": "再生ヘッドの位置にフラグを追加",
+    "addChapter": "再生ヘッドの位置にチャプターを追加",
+    "zoom": "タイムラインをズームイン / ズームアウト",
+    "showSheet": "このショートカット一覧を表示"
+  },
+  "keys": {
+    "space": "スペース",
+    "tab": "Tab",
+    "shift": "Shift",
+    "alt": "Alt",
+    "ctrl": "Ctrl",
+    "enter": "Enter",
+    "esc": "Esc",
+    "delete": "Delete"
+  },
+  "announce": {
+    "selected": "{{clip}} を選択しました",
+    "stopped": "停止しました",
+    "forward": "順再生 {{speed}}倍",
+    "backward": "逆再生 {{speed}}倍"
+  }
+}

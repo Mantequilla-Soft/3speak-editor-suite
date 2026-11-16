@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "line": "{{clips}} · {{length}} · {{edited}}",
+    "audioLine": "音频 · {{clips}} · {{length}} · {{edited}}",
+    "clips_other": "{{count}} 个片段",
+    "edited": {
+      "justNow": "刚刚编辑",
+      "minutes_other": "{{count}} 分钟前编辑",
+      "hours_other": "{{count}} 小时前编辑",
+      "days_other": "{{count}} 天前编辑"
+    }
+  },
+  "prompt": {
+    "titleOne": "继续编辑你的草稿？",
+    "titleMany": "继续编辑草稿？",
+    "keptUntil": "保留至 {{date}}",
+    "open": "打开",
+    "startNew": "新建项目",
+    "singleNote": "你可以保留一份草稿。新建项目后，一旦开始编辑就会替换这份草稿。3Speak Pro 可保留 3 份草稿，每份 30 天。"
+  },
+  "limit": {
+    "titleOne": "替换已保存的草稿？",
+    "titleMany": "你已经有 {{n}} 个已保存的项目",
+    "skipTitle": "不保存此项目",
+    "noteOne": "你可以保留一份草稿。保存此项目会替换下面这份。",
+    "noteMany": "你最多可以保留 {{n}} 份。请选择一份由此项目替换：",
+    "replace": "替换",
+    "skip": "不保存此项目"
+  },
+  "close": {
+    "saveTitle": "保存你的项目？",
+    "closeTitle": "关闭编辑器？",
+    "keepEditing": "继续编辑",
+    "signInFailed": "没有成功。请在钱包中批准登录请求后再试，或退出 3Speak 后重新登录。",
+    "signInToKeep": "登录一次即可把此项目保存为草稿，以后继续编辑。",
+    "signedOutLost": "你的编辑内容将会丢失。登录 3Speak 即可保留项目草稿。",
+    "lost": "你的编辑内容将会丢失。",
+    "signingIn": "正在登录…",
+    "signInToSave": "登录以保存",
+    "withoutSaving": "不保存并关闭",
+    "keepTitle": "保留此项目？",
+    "keepDays_other": "我们会保留 {{count}} 天",
+    "keepHours_other": "我们会保留 {{count}} 小时",
+    "until": "保留至 {{date}}",
+    "uploadingOne": "{{name}} 仍在上传（{{percent}}）。上传完成后即可保存。",
+    "uploadingFiles_other": "{{count}} 个文件仍在上传（{{percent}}）。上传完成后即可保存。",
+    "name": "项目名称",
+    "namePlaceholder": "未命名项目",
+    "saveError": "无法保存。请检查网络连接后再试。",
+    "saveAndClose": "保存并关闭",
+    "afterUpload": "上传完成后即可使用",
+    "deleteAndClose": "删除并关闭"
+  },
+  "pro": {
+    "title": "3Speak Pro 提供更多",
+    "text": "最多保留 3 个项目，每个 30 天，而不是 1 个项目 7 天。",
+    "get": "获取 Pro"
+  },
+  "status": {
+    "signingIn": "正在登录… 请查看你的钱包",
+    "signInTitle": "登录一次即可把项目保存为草稿",
+    "signInFailed": "登录失败 · 请重试",
+    "saveDrafts": "保存草稿",
+    "notSavedTitle": "此项目尚未保存",
+    "chooseSlot": "未保存：请选择一个位置",
+    "saving": "正在保存…",
+    "notSaved": "草稿未保存",
+    "keptUntil": "草稿保留至 {{date}}",
+    "savedUntil": "草稿已保存 · 保留至 {{date}}"
+  },
+  "library": {
+    "title": "项目素材库",
+    "addFiles": "添加文件",
+    "groups": {
+      "videos": "视频",
+      "images": "图片",
+      "sounds": "声音"
+    },
+    "empty": {
+      "videos": "没有视频",
+      "images": "没有图片",
+      "sounds": "没有声音"
+    },
+    "dropToAdd": "拖放文件以添加",
+    "hint": "将文件拖放到这里，或将素材拖到时间线上",
+    "downloading": "正在下载... {{percent}}",
+    "downloaded": "已下载到本地",
+    "local": "本地",
+    "uploadingTitle": "正在后台上传。渲染会等上传完成后再开始。",
+    "converting": "转换中",
+    "convertingTitle": "此浏览器无法显示这个视频的格式。480p 副本准备好后，预览会切换过去。",
+    "noPreview": "无预览",
+    "noPreviewTitle": "无法生成可播放的副本。预览可能一直是黑屏，但渲染仍然正常。",
+    "encodedTitle": "已在服务器上编码为 480p",
+    "encoding": "编码中...",
+    "addToTimeline": "添加到时间线",
+    "remove": "从素材库中移除"
+  }
+}

@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch } from '../utils/editorAuth'
+import { normalizeCaptions } from '../utils/captions'
+import { t, getLanguage } from '../i18n'
+import { stripPart } from '../utils/partName'
 
 const AUTOSAVE_DELAY = 2500
 const LOCAL = /^(blob|data):/
@@ -31,6 +34,8 @@ function localPlateUrls(tracks) {
   for (const t of tracks) {
     for (const c of t.clips) {
       const ck = c.chromaKey
+      // background removal (person key): its matte file
+      if (ck?.color === 'person' && ck.maskUrl && LOCAL.test(ck.maskUrl)) urls.add(ck.maskUrl)
       if (ck?.color !== 'static') continue
       if (ck.plateUrl && LOCAL.test(ck.plateUrl)) urls.add(ck.plateUrl)
       if (ck.noiseUrl && LOCAL.test(ck.noiseUrl)) urls.add(ck.noiseUrl)
@@ -58,13 +63,13 @@ async function uploadLocalImage(localUrl, name) {
  * autosave after their upload picks them up. `plates` maps local plate / noise
  * map URLs to their uploaded copies (see useDrafts).
  */
-export function serializeProject(tracks, library, plates = new Map(), { mode = 'video', master = null, chapters = null, playhead = null, zoom = null, flags = null, selected = null, remix = null } = {}) {
+export function serializeProject(tracks, library, plates = new Map(), { mode = 'video', master = null, chapters = null, playhead = null, zoom = null, flags = null, selected = null, remix = null, captions = null, transcript = null, aspect = null } = {}) {
   let pending = 0
   const serverRef = (x) => x.serverUrl || (x.url && !LOCAL.test(x.url) ? x.url : null)
   const outTracks = tracks.map(t => ({
     ...t,
     clips: t.clips.flatMap(c => {
-      if (c.type === 'text' || c.type === 'color') return [stripLocal(c)]
+      if (c.type === 'text' || c.type === 'color' || c.type === 'scene') return [stripLocal(c)]
       const url = serverRef(c)
       if (!url) { pending++; return [] }
       let source = { ...c, url }
@@ -72,6 +77,10 @@ export function serializeProject(tracks, library, plates = new Map(), { mode = '
       if (c.chromaKey?.color === 'static') {
         const swap = (u) => (u && LOCAL.test(u) ? plates.get(u) || u : u)
         source = { ...source, chromaKey: { ...c.chromaKey, plateUrl: swap(c.chromaKey.plateUrl), noiseUrl: swap(c.chromaKey.noiseUrl) } }
+      }
+      // A person key: its matte as the uploaded copy (without one it is made again on open)
+      if (c.chromaKey?.color === 'person' && c.chromaKey.maskUrl && LOCAL.test(c.chromaKey.maskUrl)) {
+        source = { ...source, chromaKey: { ...c.chromaKey, maskUrl: plates.get(c.chromaKey.maskUrl) || c.chromaKey.maskUrl } }
       }
       const clip = stripLocal(source)
       // Without its plate (upload failed) the static key cannot work: save the clip unkeyed
@@ -96,6 +105,15 @@ export function serializeProject(tracks, library, plates = new Map(), { mode = '
   if (Array.isArray(selected) && selected.length) state.selected = selected.slice(0, 500)
   // remix: the original post a remix goes under ({ parentAuthor, parentPermlink })
   if (remix?.parentAuthor && remix?.parentPermlink) state.remix = { parentAuthor: String(remix.parentAuthor), parentPermlink: String(remix.parentPermlink) }
+  // captions: the Shorts editor's auto captions (utils/captions.js), words and look
+  const caps = mode !== 'audio' ? normalizeCaptions(captions) : null
+  if (caps) state.captions = { ...caps, ...(captions.burn === false ? { burn: false } : {}) }
+  // transcript: the words of the recordings still on the timeline (utils/transcript.js)
+  const used = new Set(outTracks.flatMap(t => t.clips.map(c => c.libraryId)).filter(Boolean))
+  const sources = Object.entries(transcript?.sources || {}).filter(([id]) => used.has(id))
+  if (sources.length) state.transcript = { v: 1, language: transcript.language || null, sources: Object.fromEntries(sources) }
+  // aspect: the video project's shape (utils/projectFormat.js); a draft without it is a Short
+  if (mode !== 'audio' && typeof aspect === 'string' && aspect !== '9:16') state.aspect = aspect
   if (mode === 'audio') {
     state.mode = 'audio'
     state.master = { loudness: master?.loudness !== false, duck: master?.duck === true, ...(Number.isFinite(+master?.duckDb) ? { duckDb: +master.duckDb } : {}) }
@@ -122,7 +140,7 @@ export const projectMode = (p) => (p?.mode === 'audio' ? 'audio' : 'video')
  * per-tier limit (free: 1 for 7 days, Pro: 3 for 30 days; each save restarts
  * the clock) and deleting the draft once the video is sent.
  */
-export function useDrafts({ session, hasMedia, tracks, library, loadProjectState, onUnauthorized, mode = 'video', master = null, chapters = null, playhead = 0, playing = false, zoom = null, flags = null, selected = null, remix = null }) {
+export function useDrafts({ session, hasMedia, tracks, library, loadProjectState, onUnauthorized, mode = 'video', master = null, chapters = null, playhead = 0, playing = false, zoom = null, flags = null, selected = null, remix = null, captions = null, transcript = null, aspect = null }) {
   const [drafts, setDrafts] = useState(null) // summaries, once fetched
   const [limits, setLimits] = useState(null)
   const [prompt, setPrompt] = useState(false) // "continue a draft?" on start
@@ -157,7 +175,8 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
     for (const local of localPlateUrls(tracks)) {
       if (platesRef.current.has(local)) continue
       try {
-        platesRef.current.set(local, await uploadLocalImage(local, 'background-plate.png'))
+        const isMask = tracks.some(t => t.clips.some(c => c.chromaKey?.color === 'person' && c.chromaKey.maskUrl === local))
+        platesRef.current.set(local, await uploadLocalImage(local, isMask ? 'person-mask.gz' : 'background-plate.png'))
       } catch (err) {
         console.warn('[drafts] green-screen plate not uploaded:', err.message)
       }
@@ -191,7 +210,7 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
     const at = playheadRef.current
     const z = zoomRef.current
     const sel = selectedRef.current
-    const { state, pending: notYet } = serializeProject(tracks, library, platesRef.current, { mode, master, chapters, playhead: at, zoom: z, flags, selected: sel, remix })
+    const { state, pending: notYet } = serializeProject(tracks, library, platesRef.current, { mode, master, chapters, playhead: at, zoom: z, flags, selected: sel, remix, captions, transcript, aspect })
     setPending(notYet)
     if (!projectIdRef.current) projectIdRef.current = newId()
     const finalName = (saveName ?? name).trim() || defaultName(tracks, mode)
@@ -229,7 +248,7 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
       setStatus('error')
       return { ok: false }
     }
-  }, [session, tracks, library, name, authed, limits, uploadPlates, mode, master, chapters, flags, remix])
+  }, [session, tracks, library, name, authed, limits, uploadPlates, mode, master, chapters, flags, remix, captions, transcript, aspect])
 
   // Autosave from the first edit on (not while the limit question is open)
   useEffect(() => {
@@ -240,7 +259,7 @@ export function useDrafts({ session, hasMedia, tracks, library, loadProjectState
     clearTimeout(timerRef.current)
     timerRef.current = setTimeout(() => { save() }, AUTOSAVE_DELAY)
     return () => clearTimeout(timerRef.current)
-  }, [tracks, library, session, master, chapters, flags]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tracks, library, session, master, chapters, flags, captions, transcript, aspect]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // The playhead came to rest somewhere else (paused, moved, a draft opened),
   // the timeline was zoomed or another clip selected: a draft already on the
@@ -320,31 +339,21 @@ export function defaultName(tracks, mode = 'video') {
   const first = mode === 'audio'
     ? tracks.filter(t => !t.music).flatMap(t => t.clips).find(c => c.type === 'audio' && !c.templateRole)
     : tracks.flatMap(t => t.clips).find(c => c.type === 'video' || c.type === 'image')
-  const base = (first?.name || (mode === 'audio' ? 'Episode' : 'Project')).replace(/^Part \d+ · /, '').replace(/\.[a-z0-9]{2,4}$/i, '')
+  const base = stripPart(first?.name || (mode === 'audio' ? t('app.drafts.episode') : t('app.drafts.project'))).replace(/\.[a-z0-9]{2,4}$/i, '')
   const d = new Date()
-  return `${base.slice(0, 40)} · ${d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`
+  return `${base.slice(0, 40)} · ${d.toLocaleDateString(getLanguage(), { month: 'short', day: 'numeric' })}`
 }
 
 // "until Thu, 22 Oct, 14:05"
 // One formatter, made once: toLocaleString builds a new one on every call, and
-// the draft status shows this on every render (20 times a second while playing)
+// the draft status shows this on every render (20 times a second while playing).
+// Made again only when the interface language changes.
 let untilFormat = null
+let untilLang = null
 export function formatUntil(ms) {
-  if (!untilFormat) untilFormat = new Intl.DateTimeFormat(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  if (!untilFormat || untilLang !== getLanguage()) {
+    untilLang = getLanguage()
+    untilFormat = new Intl.DateTimeFormat(untilLang, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  }
   return untilFormat.format(new Date(ms))
-}
-
-// "7 days" / "30 days" (whole days from 2 days up, else hours)
-export function formatKeep(ttlHours) {
-  if (!ttlHours) return ''
-  return ttlHours >= 48 && ttlHours % 24 === 0 ? `${ttlHours / 24} days` : `${ttlHours} hours`
-}
-
-// "2 h ago"
-export function formatAgo(ms) {
-  const s = Math.max(0, (Date.now() - ms) / 1000)
-  if (s < 90) return 'just now'
-  if (s < 3600) return `${Math.round(s / 60)} min ago`
-  if (s < 86400) return `${Math.round(s / 3600)} h ago`
-  return `${Math.round(s / 86400)} days ago`
 }

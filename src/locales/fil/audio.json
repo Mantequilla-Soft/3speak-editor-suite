@@ -1,0 +1,12 @@
+{
+  "cleaning": {
+    "voice_one": "Nililinis ang boses ng {{count}} clip…",
+    "voice_other": "Nililinis ang boses ng {{count}} clip…",
+    "voiceRecording_one": "Nililinis ang boses ng {{count}} clip · recording {{at}} sa {{total}}",
+    "voiceRecording_other": "Nililinis ang boses ng {{count}} clip · recording {{at}} sa {{total}}",
+    "back_one": "Ibinabalik ang {{count}} clip…",
+    "back_other": "Ibinabalik ang {{count}} clip…",
+    "backRecording_one": "Ibinabalik ang {{count}} clip · recording {{at}} sa {{total}}",
+    "backRecording_other": "Ibinabalik ang {{count}} clip · recording {{at}} sa {{total}}"
+  }
+}

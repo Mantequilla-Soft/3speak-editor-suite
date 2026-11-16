@@ -1,0 +1,304 @@
+{
+  "empty": "속성을 보려면 클립을 선택하세요",
+  "types": {
+    "video": "동영상",
+    "audio": "오디오",
+    "image": "이미지",
+    "text": "텍스트",
+    "color": "색상",
+    "scene": "장면"
+  },
+  "sections": {
+    "content": "콘텐츠",
+    "color": "색상",
+    "audio": "오디오",
+    "layout": "레이아웃",
+    "transform": "변형",
+    "timing": "타이밍",
+    "motion": "모션",
+    "greenScreen": "그린 스크린"
+  },
+  "doubleClickReset": "더블클릭하면 초기화",
+  "text": {
+    "label": "텍스트",
+    "placeholder": "여기에 텍스트 입력...",
+    "font": "글꼴",
+    "resetFont": "글꼴 초기화",
+    "fontGroups": {
+      "sansSerif": "산세리프",
+      "serif": "세리프",
+      "display": "디스플레이",
+      "handwriting": "손글씨",
+      "monospace": "고정폭"
+    },
+    "weight": {
+      "normal": "보통",
+      "bold": "굵게"
+    },
+    "style": "스타일",
+    "resetStyle": "스타일 초기화",
+    "size": "크기",
+    "alignment": "정렬",
+    "resetAlignment": "정렬 초기화",
+    "align": {
+      "left": "왼쪽 정렬",
+      "center": "가운데 정렬",
+      "right": "오른쪽 정렬"
+    },
+    "box": "배경 상자",
+    "fill": "채우기",
+    "opacity": "불투명도",
+    "padding": "여백",
+    "radius": "모서리 둥글기",
+    "border": "테두리",
+    "width": "너비"
+  },
+  "colorClip": {
+    "background": "배경 색상",
+    "gradient": "그라데이션",
+    "enabled": "사용",
+    "disabled": "사용 안 함",
+    "endColor": "끝 색상",
+    "angle": "각도",
+    "resetAngle": "각도 초기화"
+  },
+  "volume": {
+    "label": "볼륨",
+    "reset": "볼륨 초기화",
+    "mute": "음소거",
+    "unmute": "음소거 해제"
+  },
+  "fades": {
+    "label": "페이드",
+    "none": "페이드 없음",
+    "in": "인",
+    "out": "아웃",
+    "inSeconds": "인 (초)",
+    "outSeconds": "아웃 (초)"
+  },
+  "noise": {
+    "reduce": "배경 소음 줄이기",
+    "cleanVoice": "음성 정리",
+    "group": "소음 감소",
+    "working": "처리 중",
+    "workingDots": "처리 중…",
+    "afterUpload": "이 클립의 업로드가 끝나면 사용할 수 있어요.",
+    "appliesGroup_other": "이 클립과 그 그룹(클립 {{count}}개)에 적용돼요.",
+    "appliesOne": "이 클립에만 적용돼요.",
+    "failed": "소음 감소에 실패했어요. 다시 시도하세요.",
+    "levels": {
+      "light": "약하게",
+      "medium": "보통",
+      "strong": "강하게"
+    },
+    "studioTitle": "강하게: 소음은 줄이고, 웅웅거림은 없애고, 더 선명하고 고르게, ㅅ 소리는 부드럽게"
+  },
+  "duck": {
+    "label": "더킹",
+    "group": "이 클립 더킹",
+    "depth": "{{db}} dB",
+    "source": "<lead></lead><pick/><tail> 재생 중에 음량 낮추기</tail>",
+    "sourceLabel": "더킹 기준",
+    "hint": "선택한 트랙이 재생되는 동안 이 클립의 음량이 낮아지고, 쉬는 동안 다시 올라가요."
+  },
+  "greenScreen": {
+    "removeBackground": "배경 제거",
+    "modes": {
+      "green": "그린",
+      "blue": "블루",
+      "person": "인물",
+      "static": "고정 배경 (실험적)"
+    },
+    "modeTitles": {
+      "green": "그린 스크린",
+      "blue": "블루 스크린",
+      "person": "그린 스크린 필요 없음: 화면에서 나를 찾아 나머지를 지워요",
+      "static": "고정 배경 (실험적): 빈 배경 프레임과 일치하는 부분을 지워요"
+    },
+    "staticHint": "빈 배경의 몇 프레임과 비슷해 보이는 것을 모두 지워요. 작은 변화(노이즈, 빛, 초점)는 무시되고, 벽과 비슷한 내 모습의 일부도 윤곽 안에 있으면 남아요. 카메라가 움직이지 않아야 하고, 내 그림자는 보이는 채로 남아요. 방의 일부가 계속 보이면 임계값을 높이세요.",
+    "hint": {
+      "green": "녹색 배경을 지워서 아래 트랙의 클립이 비쳐 보이게 해요.",
+      "blue": "파란색 배경을 지워서 아래 트랙의 클립이 비쳐 보이게 해요.",
+      "person": "그린 스크린 필요 없음: 편집기가 모든 프레임에서 인물을 찾아 나머지를 지워요. 카메라 앞에 한 사람이, 조명을 충분히 받을 때 가장 잘 작동해요."
+    },
+    "plate": "빈 배경 프레임",
+    "plateAlt": "빈 배경",
+    "plateHint": "내가 없고 배경만 보이는 순간으로 재생 헤드를 옮기세요. 그중 0.5초가 사용돼요.",
+    "grabbing": "프레임 가져오는 중...",
+    "useFrame": "재생 헤드 위치의 프레임 사용",
+    "useFrameInstead": "대신 재생 헤드 위치의 프레임 사용",
+    "grabFailed": "그 프레임을 가져오지 못했어요. 다시 시도하거나 다른 순간을 고르세요.",
+    "threshold": "임계값",
+    "thresholdStaticTitle": "허용 범위: 높이면 배경의 변화(노이즈, 빛, 초점)를 더 많이 무시하지만, 내 모습 일부가 지워지기 시작할 수 있어요",
+    "thresholdTitle": "높이면 스크린 색상을 더 많이 지워요",
+    "resetThreshold": "임계값 초기화",
+    "softness": "가장자리 부드럽게",
+    "resetSoftness": "부드럽기 초기화",
+    "despill": "색 번짐 제거",
+    "despillStaticTitle": "가장자리에서 벽 색상을 지워요",
+    "despillTitle": {
+      "green": "가장자리에서 녹색 기운을 지워요",
+      "blue": "가장자리에서 파란색 기운을 지워요"
+    },
+    "resetDespill": "색 번짐 제거 초기화",
+    "cameraLock": {
+      "allLocked": "카메라 초점과 노출, 화이트 밸런스까지 고정했어요.",
+      "focusExposureLocked": "카메라 초점과 노출을 고정했어요.",
+      "noFocus": "이 카메라는 초점을 고정할 수 없어요. 카메라에 가까이 가거나 멀어지지 마세요.",
+      "lockedList": "고정됨: {{list}}.",
+      "noExposure": "초점을 고정했어요. 이 카메라는 노출을 고정할 수 없으니 조명을 일정하게 유지하세요.",
+      "names": {
+        "focus": "초점",
+        "exposure": "노출",
+        "whiteBalance": "화이트 밸런스"
+      }
+    }
+  },
+  "layout": {
+    "boxSize": "상자 크기",
+    "smaller": "작게",
+    "larger": "크게",
+    "zoom": "확대",
+    "resetZoom": "확대 초기화",
+    "hint": "클립을 드래그해 옮기세요. 길게 누른 뒤 드래그하면 상자 안에서 동영상을 움직여요. 터치스크린에서는 두 손가락으로 확대하세요.",
+    "freeTransform": "자유 변형으로 전환"
+  },
+  "transform": {
+    "scale": "배율",
+    "resetScale": "배율 초기화",
+    "rotation": "회전",
+    "resetRotation": "회전 초기화",
+    "position": "위치",
+    "resetPosition": "위치 초기화",
+    "dragToMove": "드래그해서 위치 변경",
+    "crop": "자르기",
+    "resetCrop": "자르기 초기화",
+    "cropWidth": "너비",
+    "cropHeight": "높이",
+    "opacity": "불투명도",
+    "resetOpacity": "불투명도 초기화"
+  },
+  "timing": {
+    "duration": "길이",
+    "seconds": "초",
+    "in": "인:",
+    "out": "아웃:",
+    "durationColon": "길이:",
+    "position": "위치:"
+  },
+  "color": {
+    "measuring": "측정 중…",
+    "autoTitle": "이 클립의 프레임으로 레벨, 중간 톤, 화이트 밸런스 보정",
+    "resetAll": "모든 색상 조정 초기화",
+    "failed": "이 클립의 화면을 읽지 못했어요.",
+    "sliders": {
+      "brightness": "밝기",
+      "contrast": "대비",
+      "midtones": "중간 톤",
+      "saturation": "채도",
+      "warmth": "색온도",
+      "tint": "색조"
+    }
+  },
+  "effects": {
+    "hiddenName": "{{name}} (숨김)",
+    "show": "이 효과 다시 보이기",
+    "hide": "이 효과 숨기기 (남아 있지만 적용되지 않아요)",
+    "remove": "이 효과 제거",
+    "comesFrom": "들어오는 방향",
+    "goesTo": "나가는 방향",
+    "from": "들어오는 방향",
+    "to": "나가는 방향",
+    "speed": "속도",
+    "amount": {
+      "amplitude": "진폭",
+      "bounce": "통통",
+      "distance": "거리"
+    },
+    "addFirst": "효과 추가…",
+    "addAnother": "다른 효과 추가…",
+    "groups": {
+      "loop": "반복",
+      "in": "등장",
+      "out": "퇴장"
+    },
+    "effect": {
+      "pulse": "맥박",
+      "wobble": "흔들림",
+      "bob": "둥실둥실",
+      "sway": "흔들흔들",
+      "spin": "회전",
+      "pop": "팝 인",
+      "slideIn": "슬라이드 인",
+      "fadeIn": "페이드 인",
+      "popOut": "팝 아웃",
+      "slideOut": "슬라이드 아웃",
+      "fadeOut": "페이드 아웃"
+    },
+    "direction": {
+      "left": "왼쪽",
+      "right": "오른쪽",
+      "top": "위",
+      "bottom": "아래"
+    },
+    "pivot": "기준점",
+    "pivotPoint": "기준점 위치",
+    "pivotName": {
+      "topLeft": "왼쪽 위",
+      "top": "위",
+      "topRight": "오른쪽 위",
+      "left": "왼쪽",
+      "centre": "가운데",
+      "right": "오른쪽",
+      "bottomLeft": "왼쪽 아래",
+      "bottom": "아래",
+      "bottomRight": "오른쪽 아래",
+      "custom": "사용자 지정"
+    }
+  },
+  "multi": {
+    "volume": "볼륨",
+    "volumeMixed": "볼륨 (혼합)",
+    "volumeAll": "선택한 모든 클립의 볼륨",
+    "muteAll": "모두 음소거",
+    "unmuteAll": "모두 음소거 해제",
+    "cleanVoice": "음성 정리",
+    "cleanGroup": "선택한 모든 클립의 음성 정리",
+    "afterUpload": "이 클립들의 업로드가 끝나면 사용할 수 있어요.",
+    "failed": "음성 정리에 실패했어요. 다시 시도하세요.",
+    "applies_other": "선택한 클립 {{count}}개에 적용돼요.",
+    "appliesWithGroups_other": "선택한 클립 {{selected}}개와 그 그룹의 다른 클립 {{count}}개에 적용돼요.",
+    "stillUploading": "아직 업로드 중인 클립은 그대로 둬요.",
+    "remove_other": "클립 {{count}}개 제거"
+  },
+  "trim": {
+    "title": "트리밍: {{name}}",
+    "start": "시작 지점",
+    "end": "끝 지점",
+    "trimmed": "트리밍 후 길이"
+  },
+  "reframe": {
+    "readFailed": "여기서는 동영상을 읽을 수 없어요",
+    "openFailed": "얼굴 추적을 위해 동영상을 열 수 없었어요"
+  },
+  "personKey": {
+    "ready": "준비 완료: 모든 프레임에서 나를 오려 냈어요. 렌더링 결과는 미리보기와 같아요.",
+    "failed": "이 클립에서 인물을 찾지 못했어요 ({{error}}).",
+    "finding": "모든 프레임에서 나를 찾는 중... 그동안 미리보기에는 이미 실시간으로 보여요.",
+    "findingProgress": "모든 프레임에서 나를 찾는 중: {{percent}} 그동안 미리보기에는 이미 실시간으로 보여요.",
+    "behind": "내 뒤",
+    "backgrounds": {
+      "none": "투명",
+      "noneTitle": "아래 트랙의 클립이 내 뒤에 보여요",
+      "blur": "흐림",
+      "blurTitle": "내 원래 배경을 흐리게",
+      "color": "색상",
+      "colorTitle": "내 뒤에 단색"
+    },
+    "pickStock": "뒤에 스톡 사진이나 동영상 놓기",
+    "colour": "색상",
+    "blur": "흐림",
+    "resetBlur": "흐림 초기화",
+    "thresholdTitle": "높이면 내 주변을 적게 남기고, 낮추면 많이 남겨요"
+  }
+}

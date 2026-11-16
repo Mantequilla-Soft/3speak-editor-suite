@@ -1,0 +1,39 @@
+{
+  "cancel": "İptal",
+  "close": "Kapat",
+  "ok": "Tamam",
+  "gotIt": "Anladım",
+  "done": "Bitti",
+  "save": "Kaydet",
+  "delete": "Sil",
+  "remove": "Kaldır",
+  "back": "Geri",
+  "next": "İleri",
+  "skip": "Atla",
+  "retry": "Tekrar dene",
+  "reset": "Sıfırla",
+  "none": "Yok",
+  "off": "Kapalı",
+  "auto": "Otomatik",
+  "play": "Oynat",
+  "pause": "Duraklat",
+  "undo": "Geri al",
+  "preview": "Önizleme",
+  "render": "İşle",
+  "export": "Dışa aktar",
+  "duration": {
+    "seconds_one": "{{count}} saniye",
+    "seconds_other": "{{count}} saniye",
+    "minutes_one": "{{count}} dakika",
+    "minutes_other": "{{count}} dakika",
+    "hours_one": "{{count}} saat",
+    "hours_other": "{{count}} saat"
+  },
+  "limits": {
+    "atMost": {
+      "short": "Bir Short en fazla {{limit}} olabilir.",
+      "video": "Bir video en fazla {{limit}} olabilir.",
+      "audio": "Dışa aktarılan dosya en fazla {{limit}} olabilir."
+    }
+  }
+}

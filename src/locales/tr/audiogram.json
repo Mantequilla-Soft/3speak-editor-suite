@@ -1,0 +1,184 @@
+{
+  "title": "Audiogramlar",
+  "tour": {
+    "again": "Turu yeniden göster",
+    "againLabel": "Audiogram turunu yeniden göster"
+  },
+  "saveAndClose": "Kaydet ve kapat",
+  "saveAndCloseTitle": "Audiogramların bu sesle kalır ve onunla birlikte Shorts olarak paylaşılır",
+  "loadError": "Audiogram ayarları yüklenemedi: {{error}}",
+  "loadingLook": "Audiogram görünümün yükleniyor…",
+  "start": {
+    "title": "Bölümden bir parça seç",
+    "text_one": "Audiogram, bölümünün bir parçasından yapılan en fazla {{count}} dakikalık kısa bir videodur. Sesle birlikte 3Speak Short olarak paylaşılır. Başlangıcını ve bitişini zaman çizelgesinde işaretleyerek başla.",
+    "text_other": "Audiogram, bölümünün bir parçasından yapılan en fazla {{count}} dakikalık kısa bir videodur. Sesle birlikte 3Speak Short olarak paylaşılır. Başlangıcını ve bitişini zaman çizelgesinde işaretleyerek başla.",
+    "choose": "Zaman çizelgesinde seç"
+  },
+  "stage": {
+    "label": "Audiogram önizlemesi: öğeleri taşımak için sürükle, boyutlandırmak için köşeleri, döndürmek için yuvarlak tutamacı",
+    "frameTitle": "Audiogram önizlemesi",
+    "turned": "{{name}} · {{angle}}°",
+    "rotate": "Döndür (Shift: 15° adımlar). Çift tıklama: düz",
+    "hint": "Öğeleri sürükle, boyutlandırmak için bir köşeyi çek (Shift şekli korur), döndürmek için yuvarlak tutamacı kullan. Ok tuşları kaydırır, [ ve ] döndürür.",
+    "hintTemplate": "Öğeleri sürükle, boyutlandırmak için bir köşeyi çek (Shift şekli korur), döndürmek için yuvarlak tutamacı kullan. Ok tuşları kaydırır, [ ve ] döndürür. Son audiogramın başlangıç noktasıdır."
+  },
+  "layer": {
+    "logo": {
+      "name": "3Speak logosu",
+      "drag": "3Speak logosu: taşımak için sürükle",
+      "dragSelected": "3Speak logosu: taşımak için sürükle, boyut için köşeler, döndürmek için yuvarlak tutamaç"
+    },
+    "cover": {
+      "name": "Görsel",
+      "drag": "Görsel: taşımak için sürükle",
+      "dragSelected": "Görsel: taşımak için sürükle, boyut için köşeler, döndürmek için yuvarlak tutamaç",
+      "hide": "Görseli gizle",
+      "show": "Görseli göster",
+      "forward": "Görseli öne getir",
+      "back": "Görseli arkaya gönder"
+    },
+    "title": {
+      "name": "Başlık",
+      "drag": "Başlık: taşımak için sürükle",
+      "dragSelected": "Başlık: taşımak için sürükle, boyut için köşeler, döndürmek için yuvarlak tutamaç",
+      "hide": "Başlığı gizle",
+      "show": "Başlığı göster",
+      "forward": "Başlığı öne getir",
+      "back": "Başlığı arkaya gönder"
+    },
+    "line": {
+      "name": "Satır",
+      "drag": "Satır: taşımak için sürükle",
+      "dragSelected": "Satır: taşımak için sürükle, boyut için köşeler, döndürmek için yuvarlak tutamaç",
+      "hide": "Satırı gizle",
+      "show": "Satırı göster",
+      "forward": "Satırı öne getir",
+      "back": "Satırı arkaya gönder"
+    },
+    "wave": {
+      "name": "Dalga formu",
+      "drag": "Dalga formu: taşımak için sürükle",
+      "dragSelected": "Dalga formu: taşımak için sürükle, boyut için köşeler, döndürmek için yuvarlak tutamaç",
+      "hide": "Dalga formunu gizle",
+      "show": "Dalga formunu göster",
+      "forward": "Dalga formunu öne getir",
+      "back": "Dalga formunu arkaya gönder"
+    }
+  },
+  "piece": {
+    "label": "Bölümden parça",
+    "range": "{{from}} – {{to}} · {{seconds}} sn",
+    "inChapter": "“{{title}}” içinde",
+    "change": "Parçayı değiştir"
+  },
+  "look": {
+    "title": "Başlık",
+    "titleLabel": "Videodaki başlık",
+    "line": "Altındaki satır <small>(*yıldızlar* kırmızı yapar)</small>",
+    "lineLabel": "Videodaki satır",
+    "branding": "3Speak markası",
+    "logoGroup": "Logo",
+    "picture": "Görsel",
+    "waveform": "Dalga formu",
+    "waveType": "Dalga formu türü",
+    "waveColour": "Dalga formu rengi",
+    "colour": "Renk {{colour}}",
+    "anyColour": "Herhangi bir renk",
+    "anyWaveColour": "Herhangi bir dalga formu rengi"
+  },
+  "logo": {
+    "mark": "3S logosu",
+    "full": "3Speak logosu"
+  },
+  "wave": {
+    "bars": "Çubuklar",
+    "centered": "Ortalanmış",
+    "line": "Çizgi",
+    "dots": "İnce",
+    "circle": "Daire",
+    "ring": "Daire dalgası"
+  },
+  "picture": {
+    "upload": "Görsel yükle",
+    "yours": "Senin görselin",
+    "coverOf": "“{{title}}” kapağı",
+    "playlistCover": "Oynatma listesi kapağı",
+    "noCovers": "Oynatma listelerinin henüz kapağı yok.",
+    "signIn": "Görsel eklemek için 3Speak'te oturum aç."
+  },
+  "parts": {
+    "title": "Öğeler <small>(önden arkaya)</small>",
+    "logoLocked": "3Speak logosu her zaman önde gösterilir ve belirli bir boyuttan küçük olamaz",
+    "alwaysShown": "Her zaman gösterilir",
+    "hide": "Gizle",
+    "show": "Göster",
+    "forward": "Öne",
+    "back": "Arkaya",
+    "tidy": "Düzenli yerleşim"
+  },
+  "make": {
+    "starting": "Başlatılıyor...",
+    "working": "Çalışılıyor...",
+    "noWords": "bu parçanın kelimeleri bulunamadı (altyazısız yapmak için altyazıları kapat)",
+    "failedPlain": "başarısız",
+    "signIn": "Audiogram yapmak için 3Speak'te oturum aç.",
+    "failed": "Audiogram yapılamadı: {{error}}",
+    "make": "Audiogram yap",
+    "another": "Bir audiogram daha yap"
+  },
+  "made": {
+    "title": "Audiogramların",
+    "hint": "Sesle birlikte 3Speak Shorts olarak paylaşılırlar; her biri sesin gönderisine, snap'ine ya da yorumuna bağlantı içerir.",
+    "fallbackTitle": "Audiogram {{n}}",
+    "length": "{{at}} · {{seconds}} sn",
+    "textPlaceholder": "Short metni (isteğe bağlı). Sese bir bağlantı otomatik eklenir.",
+    "textLabel": "Short {{n}} metni",
+    "editText": "Metni düzenle",
+    "writeText": "Metin yaz",
+    "download": "İndir",
+    "removeLabel": "Audiogram {{n}} kaldır"
+  },
+  "confirm": {
+    "title": "Yapmadan kapatılsın mı?",
+    "text": "Görünümde yaptığın değişiklikler henüz bir audiograma dönüşmedi. Kapatırsan kaybolurlar.",
+    "stays_one": "Yaptığın audiogram bu sesle kalır.",
+    "stays_other": "Yaptığın {{count}} audiogram bu sesle kalır.",
+    "keep": "Düzenlemeye devam et"
+  },
+  "captions": {
+    "label": "Altyazılar",
+    "drag": "Altyazılar: taşımak için sürükle",
+    "dragSelected": "Altyazılar: taşımak için sürükle, genişliği değiştirmek için bir kenarı çek",
+    "sample": "Sözlerin söylendikçe burada görünür",
+    "show": "Söyleneni kelime kelime göster",
+    "checking": "Sunucu kontrol ediliyor...",
+    "unavailable": "Altyazılar şu anda bu düzenleyici sunucusunda kullanılamıyor.",
+    "listening": "Dinleniyor...",
+    "getWords": "Kelimeleri al",
+    "wordCount_one": "Bu parçada {{count}} kelime var.",
+    "wordCount_other": "Bu parçada {{count}} kelime var.",
+    "noSpeech": "Bu parçada konuşma bulunamadı.",
+    "fix": "Kelimeleri düzelt",
+    "doneFixing": "Düzeltme bitti",
+    "word": "Kelime {{n}}",
+    "removeWord": "Bu kelimeyi kaldır",
+    "removeWordLabel": "Kaldır: {{word}}",
+    "style": "Altyazı stili",
+    "preset": {
+      "karaoke": "Karaoke",
+      "pop": "Pop",
+      "plain": "Altyazılar"
+    },
+    "wordsAtATime": "Aynı anda kelime",
+    "perPage_one": "Aynı anda {{count}} kelime",
+    "perPage_other": "Aynı anda {{count}} kelime",
+    "font": "Altyazı yazı tipi",
+    "size": "Altyazı boyutu",
+    "textColour": "Altyazı metin rengi",
+    "textColourSwatch": "Metin rengi {{colour}}",
+    "highlightColour": "Vurgu rengi",
+    "highlight": "Vurgula",
+    "highlightSwatch": "Vurgu {{colour}}",
+    "capitals": "Büyük harfler"
+  }
+}

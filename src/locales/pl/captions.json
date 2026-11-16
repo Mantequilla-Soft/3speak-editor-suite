@@ -1,0 +1,67 @@
+{
+  "language": {
+    "label": "Język mowy",
+    "auto": "Wykryj automatycznie"
+  },
+  "intro": {
+    "title": "Automatyczne napisy",
+    "text": "Zamień to, co jest mówione, w napisy podążające za każdym słowem, wtopione w twojego Shorta i wysłane też do 3Speak jako napisy.",
+    "checking": "Sprawdzanie serwera...",
+    "unavailable": "Automatyczne napisy nie są teraz dostępne na tym serwerze edytora. Twój Short wyrenderuje się normalnie bez nich.",
+    "go": "Automatyczne napisy"
+  },
+  "presets": {
+    "karaoke": "Karaoke",
+    "pop": "Pop",
+    "plain": "Napisy"
+  },
+  "presetHints": {
+    "karaoke": "Kilka słów naraz, wypowiadane słowo w kolorze wyróżnienia",
+    "pop": "Jedno słowo (lub kilka) naraz, wyskakujące",
+    "plain": "Klasyczne linie napisów na ciemnym tle"
+  },
+  "style": {
+    "title": "Styl",
+    "presetsLabel": "Styl napisów",
+    "wordsAtATime": "Słów naraz",
+    "font": "Czcionka",
+    "size": "Rozmiar",
+    "sizeLabel": "Rozmiar napisów",
+    "position": "Położenie",
+    "positionLabel": "Wysokość napisów w obrazie",
+    "top": "Góra",
+    "middle": "Środek",
+    "low": "Dół",
+    "textColour": "Kolor tekstu",
+    "highlight": "Wyróżnienie",
+    "highlightLabel": "Kolor wyróżnienia",
+    "uppercase": "Wielkie litery",
+    "emoji": "Akcenty emoji (nad słowami typu „ogień” czy „miłość”)",
+    "burn": "Pokaż w filmie (wył.: tylko jako napisy w 3Speak)"
+  },
+  "words": {
+    "title": "Słowa ({{n}})",
+    "hint": "Popraw źle usłyszane słowa; wyczyść słowo, aby je pominąć. Klipy przesunięte lub przycięte? Uruchom automatyczne napisy ponownie.",
+    "goThere": "Przejdź tam",
+    "word": "Słowo {{n}}",
+    "changeEmoji": "Zmień lub usuń emoji",
+    "addEmoji": "Dodaj emoji",
+    "remove": "Usuń to słowo",
+    "removeNamed": "Usuń {{word}}"
+  },
+  "actions": {
+    "again": "Ponownie",
+    "againTitle": "Odsłuchaj ponownie (zastępuje słowa)",
+    "remove": "Usuń napisy"
+  },
+  "videoSound": "Dźwięk filmu",
+  "job": {
+    "preparing": "Przygotowywanie dźwięku...",
+    "listening": "Słucham...",
+    "noTracks": "Nie ma mowy do opisania: najpierw dodaj klip z dźwiękiem.",
+    "serverAnswered": "Serwer odpowiedział {{status}}",
+    "lost": "Zadanie napisów zostało utracone (serwer się zrestartował?)",
+    "noSpeech": "Nie znaleziono mowy. Czy głos jest na niewyciszonej ścieżce audio (ścieżki muzyczne są pomijane)?",
+    "failed": "Rozpoznawanie mowy nie powiodło się"
+  }
+}

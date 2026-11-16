@@ -1,0 +1,53 @@
+{
+  "title": "Giao diện",
+  "noEffects": "Không có hiệu ứng",
+  "presetsLabel": "Mẫu giao diện",
+  "doubleClickReset": "Nhấp đúp để đặt lại",
+  "presets": {
+    "original": "Bản gốc",
+    "warm": "Ấm",
+    "cool": "Lạnh",
+    "vivid": "Rực rỡ",
+    "matte": "Mờ lì",
+    "bw": "Đen trắng",
+    "vintage": "Cổ điển",
+    "tealorange": "Xanh cam",
+    "fade": "Phai màu",
+    "noir": "U tối",
+    "sunset": "Hoàng hôn"
+  },
+  "sliders": {
+    "blur": "Làm mờ",
+    "vignette": "Tối viền",
+    "sharpen": "Làm nét",
+    "split": "Xanh cam"
+  },
+  "transition": {
+    "title": "Chuyển cảnh",
+    "none": "Không có",
+    "types": {
+      "crossfade": "Hòa trộn",
+      "dissolve": "Chuyển qua màu đen",
+      "slideleft": "Trượt sang trái",
+      "slideright": "Trượt sang phải",
+      "slideup": "Trượt lên",
+      "zoom": "Thu phóng",
+      "whip": "Lia nhanh"
+    },
+    "length": "Độ dài chuyển cảnh (giây)",
+    "fades": "Hiện dần / mờ dần",
+    "noFades": "Không hiện/mờ dần",
+    "in": "Vào",
+    "out": "Ra",
+    "fadeInSeconds": "Hiện dần (giây)",
+    "fadeOutSeconds": "Mờ dần (giây)",
+    "intoNext": "Sang clip tiếp theo",
+    "needNext": "Đặt một clip ngay sau clip này trên cùng rãnh để thêm chuyển cảnh.",
+    "fromTo": "{{from}} sang {{to}}",
+    "fromUnnamed": "Clip sang {{to}}",
+    "toUnnamed": "{{from}} sang clip tiếp theo",
+    "bothUnnamed": "Clip sang clip tiếp theo",
+    "add": "Thêm chuyển cảnh",
+    "cutLabel": "{{type}}, {{seconds}} giây"
+  }
+}

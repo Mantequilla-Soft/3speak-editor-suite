@@ -1,0 +1,26 @@
+{
+  "music": {
+    "title": "Muziek",
+    "search": "Nummers zoeken",
+    "loading": "Nummers laden...",
+    "failed": "De muziekbibliotheek kon niet worden geladen.",
+    "none": "Geen nummers gevonden.",
+    "note": "De vermelding van het nummer wordt automatisch aan je post toegevoegd. Kies je het geluid van een 3Speak-creator, dan krijgt die 5% van de beloningen van de post.",
+    "addTitle": "Aan video toevoegen"
+  },
+  "sfx": {
+    "title": "Geluidseffecten",
+    "search": "Geluiden zoeken",
+    "loading": "Geluiden laden...",
+    "failed": "De geluidseffecten konden niet worden geladen.",
+    "none": "Geen geluiden gevonden.",
+    "note": "Geluiden komen op de afspeelkop. Vrij te gebruiken (CC0, Kenney.nl), geen vermelding nodig.",
+    "addTitle": "Toevoegen op de afspeelkop"
+  },
+  "all": "Alles",
+  "timeline": "Tijdlijn: {{title}}",
+  "seconds": "{{seconds}} s",
+  "stop": "Stoppen",
+  "listen": "Beluisteren",
+  "add": "Toevoegen"
+}

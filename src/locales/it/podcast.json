@@ -1,0 +1,86 @@
+{
+  "video": {
+    "title": "Video podcast",
+    "intro": "L'intero episodio ({{length}}) come video 16:9: l'immagine, una forma d'onda in movimento, i sottotitoli e chi sta parlando. Per i video podcast su 3Speak, YouTube e Spotify.",
+    "unavailable": "Questo server dell'editor non può ancora creare video podcast.",
+    "tooLong": "I video podcast possono durare fino a {{length}}.",
+    "preview": "Anteprima del video podcast",
+    "sampleCaption": "<b>Le tue</b> parole appaiono qui",
+    "stageHint": "La forma d'onda si muove con l'audio, i sottotitoli e il nome seguono l'episodio.",
+    "defaultLine": "Guarda e ascolta su *3speak.tv*",
+    "captions": "Sottotitoli",
+    "captionsTranscript": "Le parole della tua trascrizione.",
+    "captionsNoStt": "La trascrizione vocale non è disponibile su questo server.",
+    "captionsStt": "Le parole, trovate dalla trascrizione vocale sul server. Gli episodi lunghi richiedono un po' di tempo.",
+    "whoSpeaks": "Chi sta parlando",
+    "noVoices": "Nessuna traccia voce da cui prendere i nomi.",
+    "speaker": "Speaker {{n}}",
+    "speakerLabel": "Nome per la traccia voce {{n}}",
+    "loudest": "Ogni voce su una traccia sua: appare il nome di quella più forte.",
+    "frameRate": "Frequenza fotogrammi",
+    "fps15": "15 fps (più leggero, più veloce)",
+    "fps24": "24 fps (più fluido)",
+    "finding": "Ricerca di chi parla e quando...",
+    "sending": "Invio...",
+    "working": "Elaborazione...",
+    "serverAnswered": "Il server ha risposto {{status}}",
+    "lost": "Il lavoro è andato perso (il server si è riavviato?)",
+    "stopped": "Interrotto",
+    "signIn": "Accedi su 3Speak per creare un video podcast.",
+    "failed": "Impossibile creare il video podcast: {{error}}",
+    "stop": "Stop",
+    "make": "Crea video podcast",
+    "again": "Ricrealo",
+    "download": "Scarica MP4",
+    "subtitles": "Sottotitoli (SRT)",
+    "post": "Pubblica su 3Speak come video"
+  },
+  "template": {
+    "title": "Il tuo modello",
+    "signedOutIntro": "Salva una volta intro, outro e base musicale, e ogni nuova registrazione li riceve con un clic. Il tuo modello viene conservato per sempre, quindi serve l'accesso a 3Speak.",
+    "signIn": "Accedi per usare un modello",
+    "logIn": "Accedi su 3Speak per usare un modello.",
+    "intro": "Un solo modello, conservato per sempre. Salvare sostituisce quello che avevi.",
+    "role": {
+      "intro": {
+        "title": "Intro",
+        "hint": "Parte per prima, prima della tua registrazione.",
+        "clear": "Nessuna intro"
+      },
+      "outro": {
+        "title": "Outro",
+        "hint": "Parte subito dopo la fine della registrazione.",
+        "clear": "Nessuna outro"
+      },
+      "bed": {
+        "title": "Base musicale",
+        "hint": "Musica leggera sotto tutta la registrazione, ripetuta per riempirla, in dissolvenza alla fine.",
+        "clear": "Nessuna base musicale"
+      }
+    },
+    "useSelected": "Usa \"{{name}}\" (la parte a cui l'hai rifilato)",
+    "selectFirst": "Seleziona prima una clip audio caricata sulla timeline",
+    "selectedClip": "Clip selezionata",
+    "file": "File",
+    "volume": "Volume",
+    "bedVolume": "Volume della base musicale",
+    "loop": "Ripeti per riempire tutta la registrazione",
+    "cutSilences": "Taglia i silenzi da ogni nuova registrazione <small>(con le tue impostazioni di Taglia i silenzi)</small>",
+    "loudness": "Normalizza il volume per i podcast <small>(-16 LUFS, applicato all'esportazione)</small>",
+    "duck": "Abbassa la musica quando qualcuno parla <small>({{db}} dB sulla base musicale; modificalo nelle impostazioni della clip)</small>",
+    "autoApply": "Applicalo da solo quando apro una registrazione",
+    "signInUpload": "Accedi su 3Speak per caricare.",
+    "uploadFailed": "Impossibile caricare quel file. Provane un altro.",
+    "deleteForGood": "Eliminalo definitivamente",
+    "delete": "Elimina il modello",
+    "saveApply": "Salva e applica",
+    "voiceTrack": "Voce",
+    "bedTrack": "Base musicale"
+  },
+  "stage": {
+    "empty": "Aggiungi una registrazione, registrane una o scegli della musica per iniziare.",
+    "chapter": "Capitolo",
+    "position": "Posizione nella puntata",
+    "positionText": "{{at}} di {{total}}"
+  }
+}

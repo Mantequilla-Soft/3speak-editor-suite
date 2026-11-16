@@ -1,0 +1,143 @@
+{
+  "dismiss": "閉じる",
+  "branding": {
+    "audioEditor": "オーディオエディター",
+    "shortsEditor": "ショートエディター",
+    "videoEditor": "動画エディター",
+    "beta": "ベータ",
+    "backend": "バックエンド：{{url}}",
+    "backendSelecting": "バックエンド：選択中...",
+    "showTour": "ツアーをもう一度見る",
+    "shortcuts": "キーボードショートカット（?）",
+    "shortcutsLabel": "キーボードショートカット",
+    "fullscreen": "全画面表示（F）",
+    "fullscreenLabel": "全画面表示",
+    "leaveFullscreen": "全画面表示を終了（F）",
+    "leaveFullscreenLabel": "全画面表示を終了",
+    "closeEditor": "エディターを閉じる"
+  },
+  "backendDown": "バックエンドサーバーに接続できません。録画のアップロード、レンダリング、メディア処理は動作しません。",
+  "menu": {
+    "undo": "元に戻す (Ctrl+Z)",
+    "redo": "やり直す (Ctrl+Shift+Z)"
+  },
+  "audioTools": {
+    "cutSilences": "無音をカット",
+    "cutSilencesTitle": "選択したクリップ（またはそのグループ）から無音部分をカットします：間を見つけてカットし、隙間を詰めます",
+    "template": "テンプレート",
+    "templateTitle": "あなたのテンプレート：すべての録音に付けるイントロ、アウトロ、BGM",
+    "normalizeLabel": "ラウドネスを正規化",
+    "normalizeOn": "正規化：オン",
+    "normalizeOff": "正規化：オフ",
+    "normalizeOnTitle": "正規化はオンです：書き出しは均一な -16 LUFS（ポッドキャストの標準）に調整されます",
+    "normalizeOffTitle": "正規化はオフです：書き出しは今の音量のままです",
+    "chapters": "チャプター",
+    "chaptersCount": "チャプター（{{n}}）",
+    "chaptersTitle": "チャプター：各パートの開始位置に印を付けます（M で再生ヘッドの位置に追加）",
+    "transcript": "文字起こし",
+    "transcriptTitle": "文字起こし：テキストで番組を編集し、単語を削除するとその部分がカットされます",
+    "fillersLabel": "フィラーを削除",
+    "fillers": "フィラー",
+    "fillersTitle": "フィラーを削除：「えー」「あの」「なんか」や長い間を見つけ、確認してカットします"
+  },
+  "cutSilences": {
+    "progress": "無音をカット中：クリップ {{done}} / {{total}}",
+    "failed_other": "{{count}} 個のクリップを読み込めませんでした。他のクリップはカットしました。",
+    "failedUploading_other": "{{count}} 個のクリップはまだ読み込めません：アップロードが終わってからもう一度お試しください。他のクリップはカットしました。"
+  },
+  "group": {
+    "nothing": "他の音声トラックで同時に再生されているものがありません。まず別の声を専用のトラックに置いてください。",
+    "done_other": "{{count}} 人の声をグループにしました：移動、トリム、無音カットが一緒に行われます。"
+  },
+  "template": {
+    "applied": "テンプレートを適用しました：{{parts}}。",
+    "intro": "イントロ",
+    "outro": "アウトロ",
+    "bed": "BGM",
+    "takeOff": "外す"
+  },
+  "rangePick": {
+    "hint": "オーディオグラムにする部分の開始位置をクリックし、次に終了位置をクリックします（最大2分）。端を引っ張って調整できます。",
+    "from": "{{start}} から：終了位置をクリックしてください",
+    "span": "{{start}} – {{end}} · {{seconds}}秒",
+    "listenTitle": "この部分だけを聴く（スペース）",
+    "stop": "停止",
+    "play": "この部分を再生",
+    "use": "この部分を使う"
+  },
+  "empty": {
+    "addVideo": "動画を追加",
+    "addImage": "画像を追加",
+    "addAudio": "音声を追加",
+    "addRecording": "録音を追加",
+    "record": "録音",
+    "music": "音楽"
+  },
+  "confirm": {
+    "removeClip": "このクリップをタイムラインから削除しますか？",
+    "removeClips_other": "この {{count}} 個のクリップをタイムラインから削除しますか？",
+    "removeLibraryItem": "この項目をプロジェクトライブラリから削除しますか？",
+    "removeTrack": "このトラックとそのすべてのクリップを削除しますか？"
+  },
+  "clipStreaming": "このクリップはまだ 3Speak からストリーミング中です。ダウンロードが終わってからもう一度お試しください。",
+  "reverse": {
+    "title": "クリップを逆再生に変換中...",
+    "body": "サーバーで処理中です。しばらくお待ちください。",
+    "failed": "クリップを逆再生にできませんでした：{{error}}"
+  },
+  "remix": {
+    "stitch": "スティッチ",
+    "stitchHintBefore": "最大 {{seconds}}秒まで録画できます。元の動画の直前に再生されます。",
+    "stitchHintAfter": "最大 {{seconds}}秒まで録画できます。元の動画の直後に再生されます。",
+    "reaction": "リアクション",
+    "reactionHint": "録画中は元の動画が最初から再生されます。マイクに音が入らないようヘッドホンを使ってください。",
+    "originalFillsLimit": "元の動画だけで上限の {{limit}} に達しています。タイムラインでトリムしてから、カメラボタンでスティッチを録画してください。"
+  },
+  "chapters": {
+    "intro": "イントロ",
+    "numbered": "チャプター {{n}}"
+  },
+  "duck": {
+    "allVoices": "すべての音声トラック"
+  },
+  "media": "メディア",
+  "importedMedia": "読み込んだメディア",
+  "files_other": "{{count}} 個のファイル",
+  "side": {
+    "clipsSelected_other": "{{count}} 個のクリップを選択中",
+    "clearSelection": "選択を解除",
+    "closeProperties": "プロパティを閉じる",
+    "captions": "字幕",
+    "closeCaptions": "字幕を閉じる",
+    "noClip": "クリップが選択されていません",
+    "noClipHint": "タイムラインでクリップを選ぶと設定が表示されます。複数のクリップを囲むようにドラッグすると、まとめて変更できます。"
+  },
+  "cleaningHint": "長い録音は1分ほどかかることがあります。",
+  "hlsDownload": {
+    "title": "メディアをダウンロード中",
+    "hint": "メディアを準備しています。しばらくお待ちください..."
+  },
+  "sendPreview": {
+    "titleAudio": "使う前に聴いてみる",
+    "titleVideo": "動画をプレビュー",
+    "back": "エディターに戻る",
+    "askTitle": "ショート用のオーディオグラムを作りますか？",
+    "askBody": "この音声の聴きどころを短い動画にして、3Speak のショートとして一緒に投稿します。それぞれ元の音声にリンクします。",
+    "askNo": "いいえ、音声を使う",
+    "askMake": "オーディオグラムを作成"
+  },
+  "legacy": {
+    "projectLibrary": "プロジェクトライブラリ",
+    "loadingFfmpeg": "FFmpeg を読み込み中... {{percent}}",
+    "properties": "プロパティ",
+    "propertiesOf": "プロパティ：{{name}}",
+    "addMedia": "メディアを追加",
+    "addMediaTitle": "ライブラリにメディアを追加",
+    "record": "録画",
+    "recordTitle": "カメラで動画を録画"
+  },
+  "drafts": {
+    "episode": "エピソード",
+    "project": "プロジェクト"
+  }
+}

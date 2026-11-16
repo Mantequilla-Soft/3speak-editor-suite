@@ -1,0 +1,86 @@
+{
+  "video": {
+    "title": "视频播客",
+    "intro": "把整集（{{length}}）做成 16:9 视频：包含图片、动态波形、字幕和说话人。适用于 3Speak、YouTube 和 Spotify 视频播客。",
+    "unavailable": "此编辑器服务器暂时还不能制作视频播客。",
+    "tooLong": "视频播客最长为 {{length}}。",
+    "preview": "视频播客预览",
+    "sampleCaption": "<b>你的</b>话会显示在这里",
+    "stageHint": "波形随声音变化，字幕和名字跟随这一集的进度。",
+    "defaultLine": "在 *3speak.tv* 上观看和收听",
+    "captions": "字幕",
+    "captionsTranscript": "你的文字稿中的文字。",
+    "captionsNoStt": "此服务器不支持语音转文字。",
+    "captionsStt": "由服务器上的语音转文字识别出的文字。较长的单集需要一些时间。",
+    "whoSpeaks": "谁在说话",
+    "noVoices": "没有可以获取名字的语音轨道。",
+    "speaker": "说话人 {{n}}",
+    "speakerLabel": "语音轨道 {{n}} 的名字",
+    "loudest": "每个声音都在单独的轨道上：显示音量最大的那个人的名字。",
+    "frameRate": "帧率",
+    "fps15": "15 fps（更小、更快）",
+    "fps24": "24 fps（更流畅）",
+    "finding": "正在识别谁在什么时候说话...",
+    "sending": "正在发送...",
+    "working": "处理中...",
+    "serverAnswered": "服务器返回 {{status}}",
+    "lost": "任务丢失了（服务器重启了？）",
+    "stopped": "已停止",
+    "signIn": "登录 3Speak 即可制作视频播客。",
+    "failed": "无法制作视频播客：{{error}}",
+    "stop": "停止",
+    "make": "制作视频播客",
+    "again": "重新制作",
+    "download": "下载 MP4",
+    "subtitles": "字幕（SRT）",
+    "post": "作为视频发布到 3Speak"
+  },
+  "template": {
+    "title": "你的模板",
+    "signedOutIntro": "只需保存一次片头、片尾和背景音乐，之后每段新录音一键即可套用。模板会永久保留，因此需要登录 3Speak。",
+    "signIn": "登录以使用模板",
+    "logIn": "登录 3Speak 即可使用模板。",
+    "intro": "一个模板，永久保留。保存会替换你之前的模板。",
+    "role": {
+      "intro": {
+        "title": "片头",
+        "hint": "最先播放，在你的录音之前。",
+        "clear": "无片头"
+      },
+      "outro": {
+        "title": "片尾",
+        "hint": "在你的录音结束后立即播放。",
+        "clear": "无片尾"
+      },
+      "bed": {
+        "title": "背景音乐",
+        "hint": "在整段录音下方播放的轻柔音乐，自动循环以填满时长，结尾淡出。",
+        "clear": "无背景音乐"
+      }
+    },
+    "useSelected": "使用“{{name}}”（你修剪后的部分）",
+    "selectFirst": "请先在时间线上选择一个已上传的音频片段",
+    "selectedClip": "已选片段",
+    "file": "文件",
+    "volume": "音量",
+    "bedVolume": "背景音乐音量",
+    "loop": "循环以填满整段录音",
+    "cutSilences": "剪掉每段新录音中的静音 <small>（使用你的“剪掉静音”设置）</small>",
+    "loudness": "按播客标准进行响度标准化 <small>（-16 LUFS，导出时应用）</small>",
+    "duck": "有人说话时自动压低音乐 <small>（背景音乐降低 {{db}} dB；可在片段设置中更改）</small>",
+    "autoApply": "打开录音时自动应用",
+    "signInUpload": "登录 3Speak 即可上传。",
+    "uploadFailed": "无法上传该文件。请换一个试试。",
+    "deleteForGood": "永久删除",
+    "delete": "删除模板",
+    "saveApply": "保存并应用",
+    "voiceTrack": "语音",
+    "bedTrack": "背景音乐"
+  },
+  "stage": {
+    "empty": "添加一段录音、录制一段，或选择音乐来开始。",
+    "chapter": "章节",
+    "position": "在节目中的位置",
+    "positionText": "{{at}} / {{total}}"
+  }
+}

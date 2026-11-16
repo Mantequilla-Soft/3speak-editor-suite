@@ -1,0 +1,106 @@
+{
+  "speed": {
+    "title": "Hız",
+    "stillFrame": "Sabit kare",
+    "holds": "Videonun {{time}} anındaki kareyi sabitler. Zaman çizelgesinde kırp ya da bir süre seç:",
+    "seconds": "{{value}} sn",
+    "speed": "Hız",
+    "ramp": "Hız rampası",
+    "ramps": {
+      "montage": "Montaj",
+      "hero": "Kahraman",
+      "speedUp": "Hızlan",
+      "slowDown": "Yavaşla"
+    },
+    "rampHint": "Önizleme rampayı yakından takip eder, işleme ise tam olarak uygular. Ses perdesini korur.",
+    "freeze": "Kare dondurma",
+    "freezeLength": "Dondurma süresi",
+    "freezeTitle": "Oynatma kafasının altındaki kareyi sabitle",
+    "freezeMoveFirst": "Önce oynatma kafasını bu klibin üzerine getir",
+    "freezeAt": "Oynatma kafasında dondur",
+    "stillName": "Sabit · {{name}}",
+    "stillNameFallback": "klip"
+  },
+  "badge": {
+    "still": "Sabit",
+    "ramp": "Rampa",
+    "stillTitle": "Sabit kare",
+    "speedTitle": "Hız {{speed}}",
+    "rampTitle": "Hız Rampası"
+  },
+  "keyframes": {
+    "title": "Anahtar kareler",
+    "moveHere": "Anahtar kare eklemek için oynatma kafasını bu klibin üzerine getir.",
+    "props": {
+      "x": "Konum X",
+      "y": "Konum Y",
+      "scale": "Ölçek",
+      "rotation": "Döndürme",
+      "opacity": "Opaklık",
+      "volume": "Ses düzeyi"
+    },
+    "aria": {
+      "x": {
+        "prev": "Önceki Konum X anahtar karesi",
+        "next": "Sonraki Konum X anahtar karesi",
+        "add": "Konum X anahtar karesi ekle",
+        "remove": "Konum X anahtar karesini kaldır"
+      },
+      "y": {
+        "prev": "Önceki Konum Y anahtar karesi",
+        "next": "Sonraki Konum Y anahtar karesi",
+        "add": "Konum Y anahtar karesi ekle",
+        "remove": "Konum Y anahtar karesini kaldır"
+      },
+      "scale": {
+        "prev": "Önceki Ölçek anahtar karesi",
+        "next": "Sonraki Ölçek anahtar karesi",
+        "add": "Ölçek anahtar karesi ekle",
+        "remove": "Ölçek anahtar karesini kaldır"
+      },
+      "rotation": {
+        "prev": "Önceki Döndürme anahtar karesi",
+        "next": "Sonraki Döndürme anahtar karesi",
+        "add": "Döndürme anahtar karesi ekle",
+        "remove": "Döndürme anahtar karesini kaldır"
+      },
+      "opacity": {
+        "prev": "Önceki Opaklık anahtar karesi",
+        "next": "Sonraki Opaklık anahtar karesi",
+        "add": "Opaklık anahtar karesi ekle",
+        "remove": "Opaklık anahtar karesini kaldır"
+      },
+      "volume": {
+        "prev": "Önceki Ses düzeyi anahtar karesi",
+        "next": "Sonraki Ses düzeyi anahtar karesi",
+        "add": "Ses düzeyi anahtar karesi ekle",
+        "remove": "Ses düzeyi anahtar karesini kaldır"
+      }
+    },
+    "prev": "Önceki anahtar kare",
+    "next": "Sonraki anahtar kare",
+    "add": "Oynatma kafasına anahtar kare ekle",
+    "remove": "Oynatma kafasındaki anahtar kareyi kaldır",
+    "ease": "Buradan sonraki anahtar kareye yumuşak geçiş",
+    "removeAll": "Tüm anahtar kareleri kaldır"
+  },
+  "kenBurns": {
+    "title": "Ken Burns",
+    "in": "Yavaş yakınlaşma",
+    "out": "Yavaş uzaklaşma",
+    "pan": "Yavaş kaydırma"
+  },
+  "punch": {
+    "title": "Ani yakınlaşmalar",
+    "hint": "Cümle başlarında ve yüksek sesli kelimelerde hızlı yakınlaşmalar; varsa altyazılardan, yoksa sesten.",
+    "listening": "Dinleniyor...",
+    "auto": "Otomatik yakınlaşmalar",
+    "remove": "Yakınlaşmaları kaldır",
+    "noMoments": "Bu klipte cümle başı ya da yüksek sesli kelime bulunamadı.",
+    "noSound": "Bu klibin sesi okunamadı. Önce otomatik altyazı ekle, sonra tekrar dene.",
+    "addedCaptions_one": "Altyazılardan {{count}} yakınlaşma eklendi. Bunlar Ölçek üzerindeki normal anahtar karelerdir.",
+    "addedCaptions_other": "Altyazılardan {{count}} yakınlaşma eklendi. Bunlar Ölçek üzerindeki normal anahtar karelerdir.",
+    "addedSound_one": "Sesten {{count}} yakınlaşma eklendi. Bunlar Ölçek üzerindeki normal anahtar karelerdir.",
+    "addedSound_other": "Sesten {{count}} yakınlaşma eklendi. Bunlar Ölçek üzerindeki normal anahtar karelerdir."
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "line": "{{clips}} · {{length}} · {{edited}}",
+    "audioLine": "Audio · {{clips}} · {{length}} · {{edited}}",
+    "clips_one": "{{count}} Clip",
+    "clips_other": "{{count}} Clips",
+    "edited": {
+      "justNow": "gerade bearbeitet",
+      "minutes_one": "vor {{count}} Min. bearbeitet",
+      "minutes_other": "vor {{count}} Min. bearbeitet",
+      "hours_one": "vor {{count}} Std. bearbeitet",
+      "hours_other": "vor {{count}} Std. bearbeitet",
+      "days_one": "vor {{count}} Tag bearbeitet",
+      "days_other": "vor {{count}} Tagen bearbeitet"
+    }
+  },
+  "prompt": {
+    "titleOne": "Mit deinem Entwurf weitermachen?",
+    "titleMany": "Mit einem Entwurf weitermachen?",
+    "keptUntil": "Aufbewahrt bis {{date}}",
+    "open": "Öffnen",
+    "startNew": "Neues Projekt beginnen",
+    "singleNote": "Du kannst einen Entwurf behalten. Ein neues Projekt ersetzt diesen, sobald du etwas bearbeitest. 3Speak Pro behält 3 Entwürfe für 30 Tage."
+  },
+  "limit": {
+    "titleOne": "Deinen gespeicherten Entwurf ersetzen?",
+    "titleMany": "Du hast schon {{n}} gespeicherte Projekte",
+    "skipTitle": "Dieses Projekt nicht speichern",
+    "noteOne": "Du kannst einen Entwurf behalten. Wenn du dieses Projekt speicherst, ersetzt es das unten.",
+    "noteMany": "Du kannst bis zu {{n}} behalten. Wähle eins, das dieses Projekt ersetzt:",
+    "replace": "Ersetzen",
+    "skip": "Dieses Projekt nicht speichern"
+  },
+  "close": {
+    "saveTitle": "Dein Projekt speichern?",
+    "closeTitle": "Editor schließen?",
+    "keepEditing": "Weiter bearbeiten",
+    "signInFailed": "Das hat nicht geklappt. Bestätige die Anmeldeanfrage in deiner Wallet und versuch es erneut, oder melde dich bei 3Speak ab und wieder an.",
+    "signInToKeep": "Melde dich einmal an, um dieses Projekt als Entwurf zu behalten und später weiterzumachen.",
+    "signedOutLost": "Deine Änderungen gehen verloren. Melde dich bei 3Speak an, um Entwürfe deiner Projekte zu behalten.",
+    "lost": "Deine Änderungen gehen verloren.",
+    "signingIn": "Anmeldung läuft…",
+    "signInToSave": "Zum Speichern anmelden",
+    "withoutSaving": "Ohne Speichern schließen",
+    "keepTitle": "Dieses Projekt behalten?",
+    "keepDays_one": "Wir bewahren es {{count}} Tag auf",
+    "keepDays_other": "Wir bewahren es {{count}} Tage auf",
+    "keepHours_one": "Wir bewahren es {{count}} Stunde auf",
+    "keepHours_other": "Wir bewahren es {{count}} Stunden auf",
+    "until": "bis {{date}}",
+    "uploadingOne": "{{name}} wird noch hochgeladen ({{percent}}). Du kannst speichern, sobald es fertig ist.",
+    "uploadingFiles_one": "{{count}} Datei wird noch hochgeladen ({{percent}}). Du kannst speichern, sobald es fertig ist.",
+    "uploadingFiles_other": "{{count}} Dateien werden noch hochgeladen ({{percent}}). Du kannst speichern, sobald es fertig ist.",
+    "name": "Projektname",
+    "namePlaceholder": "Projekt ohne Titel",
+    "saveError": "Speichern fehlgeschlagen. Prüf deine Verbindung und versuch es erneut.",
+    "saveAndClose": "Speichern und schließen",
+    "afterUpload": "Verfügbar, sobald der Upload fertig ist",
+    "deleteAndClose": "Löschen und schließen"
+  },
+  "pro": {
+    "title": "Mehr mit 3Speak Pro",
+    "text": "Behalte bis zu 3 Projekte für je 30 Tage statt 1 für 7 Tage.",
+    "get": "Pro holen"
+  },
+  "status": {
+    "signingIn": "Anmeldung läuft… schau in deine Wallet",
+    "signInTitle": "Melde dich einmal an, um dein Projekt als Entwurf zu speichern",
+    "signInFailed": "Anmeldung fehlgeschlagen · versuch es erneut",
+    "saveDrafts": "Entwürfe speichern",
+    "notSavedTitle": "Dieses Projekt ist noch nicht gespeichert",
+    "chooseSlot": "Nicht gespeichert: wähle einen Platz",
+    "saving": "Wird gespeichert…",
+    "notSaved": "Entwurf nicht gespeichert",
+    "keptUntil": "Entwurf aufbewahrt bis {{date}}",
+    "savedUntil": "Entwurf gespeichert · bis {{date}}"
+  },
+  "library": {
+    "title": "Projektbibliothek",
+    "addFiles": "Dateien hinzufügen",
+    "groups": {
+      "videos": "Videos",
+      "images": "Bilder",
+      "sounds": "Sounds"
+    },
+    "empty": {
+      "videos": "Keine Videos",
+      "images": "Keine Bilder",
+      "sounds": "Keine Sounds"
+    },
+    "dropToAdd": "Dateien zum Hinzufügen ablegen",
+    "hint": "Leg Dateien hier ab oder zieh Elemente in die Zeitleiste",
+    "downloading": "Wird heruntergeladen... {{percent}}",
+    "downloaded": "Lokal heruntergeladen",
+    "local": "lokal",
+    "uploadingTitle": "Wird im Hintergrund hochgeladen. Das Rendern wartet, bis es fertig ist.",
+    "converting": "wird umgewandelt",
+    "convertingTitle": "Dieser Browser kann das Format dieses Videos nicht anzeigen. Die Vorschau wechselt zu einer 480p-Kopie, sobald sie fertig ist.",
+    "noPreview": "keine Vorschau",
+    "noPreviewTitle": "Es konnte keine abspielbare Kopie erstellt werden. Die Vorschau bleibt vielleicht schwarz, das Rendern funktioniert trotzdem.",
+    "encodedTitle": "Auf dem Server in 480p kodiert",
+    "encoding": "Wird kodiert...",
+    "addToTimeline": "Zur Zeitleiste hinzufügen",
+    "remove": "Aus der Bibliothek entfernen"
+  }
+}

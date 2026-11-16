@@ -1,0 +1,232 @@
+{
+  "title": "Ad Wizard",
+  "beta": "beta",
+  "loading": "Đang tải công cụ cảnh…",
+  "untitled": "Quảng cáo chưa đặt tên",
+  "seconds": "{{s}} giây",
+  "lengthOfMax": "{{length}} giây / tối đa {{max}} giây",
+  "maxOnly": "/ tối đa {{max}} giây",
+  "steps": {
+    "format": "Định dạng",
+    "brand": "Thương hiệu",
+    "scenes": "Cảnh",
+    "sound": "Âm thanh",
+    "render": "Kết xuất"
+  },
+  "formats": {
+    "landscape": "Ngang 16:9",
+    "landscapeSub": "quảng cáo trong video, trang web",
+    "portrait": "Dọc 9:16",
+    "portraitSub": "shorts, tin, reels"
+  },
+  "palettes": {
+    "ember": "Than hồng",
+    "amber": "Hổ phách",
+    "ocean": "Đại dương",
+    "forest": "Rừng",
+    "berry": "Quả mọng",
+    "paper": "Giấy"
+  },
+  "roles": {
+    "all": "Tất cả",
+    "opener": "Mở đầu",
+    "middle": "Giữa",
+    "closer": "Kết thúc"
+  },
+  "defaults": {
+    "brandName": "Thương hiệu của bạn",
+    "brandFallback": "Thương hiệu",
+    "adName": "Quảng cáo"
+  },
+  "errors": {
+    "engineLoad": "không tải được {{src}}",
+    "uploadFailedStatus": "tải lên thất bại ({{status}})",
+    "uploadFailed": "tải lên thất bại",
+    "notSignedIn": "chưa đăng nhập",
+    "drafts": "bản nháp {{status}}"
+  },
+  "stage": {
+    "empty": "Quảng cáo của bạn hiển thị ở đây.",
+    "addFirst": "Thêm cảnh đầu tiên",
+    "toStart": "Về đầu",
+    "playPause": "Phát / tạm dừng (dấu cách)",
+    "time": "{{time}} / {{duration}} giây",
+    "tooLong": "Quảng cáo dài tối đa {{max}} giây",
+    "properties": "Thuộc tính",
+    "propertiesHint": "Chọn một cảnh trong danh sách hoặc trên dòng thời gian để chỉnh sửa ở đây."
+  },
+  "drafts": {
+    "logInToKeep": "Đăng nhập 3Speak để giữ bản nháp",
+    "inBrowser": "Bản nháp chỉ lưu trong trình duyệt này",
+    "signingIn": "Đang đăng nhập…",
+    "saveDrafts": "Lưu bản nháp",
+    "status": {
+      "saving": "Đang lưu…",
+      "saved": "Đã lưu",
+      "error": "Chưa lưu",
+      "limit": "Đã đạt giới hạn bản nháp",
+      "idle": "Bản nháp"
+    },
+    "open": "Bản nháp",
+    "title": "Bản nháp của bạn",
+    "listInfo_other": "{{n}}/{{max}} · mỗi bản được giữ {{count}} ngày kể từ lần sửa cuối",
+    "draftInfo_other": "{{count}} cảnh · đã lưu {{saved}} · đến {{until}}",
+    "isOpen": "đang mở",
+    "openDraft": "Mở",
+    "confirmDelete": "Xóa \"{{name}}\"?",
+    "empty": "Chưa có bản nháp nào. Bản nháp tự lưu trong lúc bạn làm việc.",
+    "newAd": "Quảng cáo mới",
+    "limitTitle_other": "Bạn đã có {{count}} bản nháp",
+    "limitHint": "Chọn một bản để thay bằng quảng cáo này, hoặc đóng cửa sổ này và tiếp tục làm mà không lưu.",
+    "savedAt": "đã lưu {{date}}",
+    "replace": "Thay thế"
+  },
+  "format": {
+    "locked": "Lượt đặt của bạn chạy ở định dạng <b>{{format}}</b>, tối đa {{max}} giây.",
+    "where": "Quảng cáo sẽ chạy ở đâu? Bạn có thể đổi sau; mọi cảnh đều dùng được cho cả hai.",
+    "sceneChange": "Chuyển cảnh",
+    "tip": "Quảng cáo dễ đọc: khoảng 3 giây mỗi cảnh, tổng cộng 15-30 giây, câu mở đầu đọc được ngay trong giây đầu tiên.",
+    "confirmNew": "Bắt đầu quảng cáo mới? Các bản nháp đã lưu vẫn được giữ."
+  },
+  "brand": {
+    "name": "Tên",
+    "logo": "Logo",
+    "logoHint": "hình vuông là tốt nhất; nếu không có, chữ cái đầu sẽ được dùng",
+    "monogram": "Chữ lồng",
+    "monogramHint": "chữ cái dùng khi không có logo",
+    "colours": "Màu sắc",
+    "colors": {
+      "bg": "Nền",
+      "ink": "Văn bản",
+      "mute": "Văn bản phụ",
+      "accent": "Màu nhấn",
+      "accent2": "Màu nhấn 2",
+      "accent3": "Màu nhấn 3"
+    },
+    "coloursTip": "Dùng màu nhấn để làm nổi bật (đặt *dấu sao* quanh chữ). Nút kêu gọi hành động được vẽ dạng viền.",
+    "fonts": "Phông chữ",
+    "headlines": "Tiêu đề",
+    "text": "Văn bản",
+    "ownFont": "Tệp phông chữ của riêng bạn",
+    "fontNamePlaceholder": "Tên phông chữ, ví dụ Acme Display",
+    "fontRights": "Tôi có quyền dùng phông chữ này trong video",
+    "uploading": "Đang tải lên…",
+    "uploadFont": "Tải lên TTF / OTF / WOFF"
+  },
+  "scenes": {
+    "duplicate": "Nhân bản",
+    "add": "Thêm cảnh",
+    "tip": "Văn bản, hình ảnh và độ dài của cảnh đang chọn nằm ở bên phải."
+  },
+  "sound": {
+    "music": "Âm nhạc",
+    "startInSong": "Điểm bắt đầu trong bài",
+    "volume": "Âm lượng",
+    "fadeIn": "Hiện dần",
+    "fadeOut": "Mờ dần",
+    "noMusic": "Chưa có nhạc.",
+    "library": "Thư viện nhạc",
+    "uploading": "Đang tải lên…",
+    "uploadSong": "Tải bài hát lên",
+    "songRights": "Tôi sở hữu hoặc đã được cấp phép cho bài hát tôi tải lên",
+    "effects": "Hiệu ứng âm thanh",
+    "auto": "Âm thanh tự động (chuyển cảnh, chữ bật lên)",
+    "autoLevel": "Mức âm thanh tự động",
+    "db": "{{gain}} dB",
+    "restore_other": "Khôi phục {{count}} âm thanh tự động đã gỡ",
+    "addAt": "Thêm âm thanh tại {{time}} giây",
+    "listen": "Nghe thử",
+    "autoTag": "tự động",
+    "tip": "Kéo âm thanh trên dòng thời gian để di chuyển. Di chuyển một âm thanh tự động sẽ biến nó thành của bạn.",
+    "kinds": {
+      "trans": "Chuyển cảnh",
+      "whoosh": "Vù",
+      "swish": "Vút",
+      "tick": "Tích tắc",
+      "click": "Lách cách",
+      "type": "Gõ phím",
+      "hit": "Va chạm"
+    }
+  },
+  "render": {
+    "drawing": "Đang vẽ các cảnh…",
+    "mixing": "Đang trộn âm thanh…",
+    "sceneRenderFailed": "kết xuất cảnh: {{status}}",
+    "renderFailed": "kết xuất: {{status}}",
+    "scenesLength_other": "{{count}} cảnh, {{length}} giây",
+    "scenesLengthTooLong_other": "{{count}} cảnh, {{length}} giây (quá dài, tối đa {{max}} giây)",
+    "toFill_other": "Còn {{count}} mục cần điền",
+    "allFilled": "Đã điền đủ mọi trường bắt buộc",
+    "music": "Nhạc: {{title}}",
+    "noMusic": "Không có nhạc (không bắt buộc)",
+    "effects_other": "{{count}} hiệu ứng âm thanh",
+    "issue": "Cảnh {{n}}, {{field}}: {{msg}}",
+    "button": "Kết xuất quảng cáo ({{size}})",
+    "progress": "{{phase}} {{percent}}",
+    "sent": "Đã gửi tới chiến dịch của bạn",
+    "useForCampaign": "Dùng cho chiến dịch của tôi",
+    "download": "Tải xuống",
+    "again": "Kết xuất lại"
+  },
+  "props": {
+    "length": "Độ dài",
+    "fieldIssue": "{{field}}: {{msg}}",
+    "soundEffect": "Hiệu ứng âm thanh",
+    "autoNote": "{{name}} (tự động: di chuyển hoặc thay đổi để biến nó thành của bạn)",
+    "makeMine": "Đặt làm của tôi",
+    "at": "Tại",
+    "secondsUnit": "giây",
+    "volume": "Âm lượng"
+  },
+  "picker": {
+    "search": "Tìm",
+    "look": "Giao diện",
+    "all": "Tất cả",
+    "nothing": "Không có gì phù hợp."
+  },
+  "fields": {
+    "optional": "không bắt buộc",
+    "auto": "tự động",
+    "none": "(không có)",
+    "defaultIcon": "mặc định ({{icon}})",
+    "clear": "Xóa",
+    "accentTip": "Đặt một từ trong *dấu sao* để dùng màu nhấn, trong _gạch dưới_ để dùng màu nhấn thứ hai.",
+    "up": "Lên",
+    "moveUp": "Lên trên",
+    "moveDown": "Xuống dưới",
+    "add": "Thêm",
+    "needsAtLeast": "cần ít nhất {{min}}",
+    "needs": "cần {{min}}",
+    "pairX": "x %",
+    "pairY": "y %"
+  },
+  "image": {
+    "notPicture": "Đó không phải là hình ảnh.",
+    "noClipboardPicture": "Không có hình ảnh trong bộ nhớ tạm. Hãy sao chép một hình, hoặc nhấn Ctrl+V / Cmd+V tại đây.",
+    "clipboardBlocked": "Trình duyệt không cho phép đọc bộ nhớ tạm. Nhấp vào đây và nhấn Ctrl+V / Cmd+V.",
+    "dragToPlace": "Kéo để chọn phần nào của hình được hiển thị",
+    "zoom": "Thu phóng",
+    "zoomTitle": "Phóng to hình bên trong khung; khung giữ nguyên kích thước",
+    "zoomValue": "{{zoom}}x",
+    "resetPlacement": "Đặt lại vị trí",
+    "replace": "Thay thế",
+    "pasteTitle": "Dán từ bộ nhớ tạm",
+    "uploadingPct": "Đang tải lên {{pct}}%",
+    "upload": "Tải lên",
+    "paste": "Dán",
+    "linkPlaceholder": "hoặc dán một liên kết https://, hoặc một hình ảnh (Ctrl+V)"
+  },
+  "timeline": {
+    "tick": "{{s}} giây",
+    "scenes": "Cảnh",
+    "blockTitle": "{{type}}: {{length}} giây",
+    "dragLength": "Kéo để thay đổi độ dài",
+    "music": "Âm nhạc",
+    "musicVolume": "{{title}} · {{volume}}",
+    "effects": "Hiệu ứng âm thanh",
+    "sfxTitle": "{{name}} tại {{at}} giây"
+  },
+  "preview": {
+    "frameTitle": "Xem trước quảng cáo"
+  }
+}

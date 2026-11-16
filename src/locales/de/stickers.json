@@ -1,0 +1,64 @@
+{
+  "title": "Sticker",
+  "search": "Sticker suchen",
+  "textBoxes": "Textboxen",
+  "loading": "Sticker werden geladen...",
+  "noMatch": "Keine passenden Sticker.",
+  "tileTitle": "{{name}} (wird am Abspielkopf eingefügt)",
+  "note": "Sticker werden für 3 Sekunden am Abspielkopf eingefügt. Zieh, skaliere oder kürze sie wie jeden Clip; Textboxen bleiben bearbeitbar.",
+  "categories": {
+    "emoji": "Emojis",
+    "badges": "Badges",
+    "shapes": "Pfeile & Formen",
+    "branding": "Branding"
+  },
+  "presets": {
+    "caption": {
+      "title": "Bildunterschrift",
+      "text": "Deine Bildunterschrift hier"
+    },
+    "highlight": {
+      "title": "Hervorheben",
+      "text": "Unbedingt ansehen!"
+    },
+    "brand": {
+      "title": "3Speak-Rot",
+      "text": "Neues Video"
+    },
+    "bubble": {
+      "title": "Sprechblase",
+      "text": "Hallo!"
+    },
+    "outline": {
+      "title": "Kontur",
+      "text": "Schau dir das an"
+    },
+    "neon": {
+      "title": "Neon",
+      "text": "HEUTE ABEND"
+    },
+    "title": {
+      "title": "Großer Titel",
+      "text": "GROSSE NEWS"
+    },
+    "comic": {
+      "title": "Comic",
+      "text": "BUMM!"
+    },
+    "marker": {
+      "title": "Marker",
+      "text": "handgemacht"
+    },
+    "quote": {
+      "title": "Zitat",
+      "text": "„Sag es gut.“"
+    },
+    "tag": {
+      "title": "Hashtag"
+    },
+    "minimal": {
+      "title": "Minimal",
+      "text": "schlicht und klar"
+    }
+  }
+}

@@ -1,0 +1,240 @@
+{
+  "title": "Ad Wizard",
+  "beta": "beta",
+  "loading": "Sahne motoru yükleniyor…",
+  "untitled": "Adsız reklam",
+  "seconds": "{{s}} sn",
+  "lengthOfMax": "{{length}} sn / en fazla {{max}} sn",
+  "maxOnly": "/ en fazla {{max}} sn",
+  "steps": {
+    "format": "Format",
+    "brand": "Marka",
+    "scenes": "Sahneler",
+    "sound": "Ses",
+    "render": "İşle"
+  },
+  "formats": {
+    "landscape": "Yatay 16:9",
+    "landscapeSub": "video içi reklamlar, web siteleri",
+    "portrait": "Dikey 9:16",
+    "portraitSub": "shorts, hikâyeler, reels"
+  },
+  "palettes": {
+    "ember": "Kor",
+    "amber": "Kehribar",
+    "ocean": "Okyanus",
+    "forest": "Orman",
+    "berry": "Böğürtlen",
+    "paper": "Kâğıt"
+  },
+  "roles": {
+    "all": "Tümü",
+    "opener": "Açılışlar",
+    "middle": "Orta",
+    "closer": "Kapanışlar"
+  },
+  "defaults": {
+    "brandName": "Markan",
+    "brandFallback": "Marka",
+    "adName": "Reklam"
+  },
+  "errors": {
+    "engineLoad": "yüklenemedi: {{src}}",
+    "uploadFailedStatus": "yükleme başarısız ({{status}})",
+    "uploadFailed": "yükleme başarısız",
+    "notSignedIn": "giriş yapılmadı",
+    "drafts": "taslaklar {{status}}"
+  },
+  "stage": {
+    "empty": "Reklamın burada görünür.",
+    "addFirst": "İlk sahneyi ekle",
+    "toStart": "Başa dön",
+    "playPause": "Oynat / duraklat (boşluk)",
+    "time": "{{time}} / {{duration}} sn",
+    "tooLong": "Reklam en fazla {{max}} sn olabilir",
+    "properties": "Özellikler",
+    "propertiesHint": "Burada düzenlemek için listeden ya da zaman çizelgesinden bir sahne seç."
+  },
+  "drafts": {
+    "logInToKeep": "Taslakları saklamak için 3Speak'te oturum aç",
+    "inBrowser": "Taslaklar bu tarayıcıda kalır",
+    "signingIn": "Giriş yapılıyor…",
+    "saveDrafts": "Taslakları kaydet",
+    "status": {
+      "saving": "Kaydediliyor…",
+      "saved": "Kaydedildi",
+      "error": "Kaydedilmedi",
+      "limit": "Taslak sınırına ulaşıldı",
+      "idle": "Taslak"
+    },
+    "open": "Taslaklar",
+    "title": "Taslakların",
+    "listInfo_one": "{{n}} / {{max}} · her biri son değişiklikten sonra {{count}} gün saklanır",
+    "listInfo_other": "{{n}} / {{max}} · her biri son değişiklikten sonra {{count}} gün saklanır",
+    "draftInfo_one": "{{count}} sahne · kaydedildi {{saved}} · bitiş {{until}}",
+    "draftInfo_other": "{{count}} sahne · kaydedildi {{saved}} · bitiş {{until}}",
+    "isOpen": "açık",
+    "openDraft": "Aç",
+    "confirmDelete": "\"{{name}}\" silinsin mi?",
+    "empty": "Henüz taslak yok. Sen çalışırken kendiliğinden kaydedilirler.",
+    "newAd": "Yeni reklam",
+    "limitTitle_one": "Zaten {{count}} taslağın var",
+    "limitTitle_other": "Zaten {{count}} taslağın var",
+    "limitHint": "Bu reklamla değiştirilecek birini seç ya da bunu kapatıp kaydetmeden çalışmaya devam et.",
+    "savedAt": "kaydedildi {{date}}",
+    "replace": "Değiştir"
+  },
+  "format": {
+    "locked": "Rezervasyonun <b>{{format}}</b> olarak, en fazla {{max}} sn yayınlanır.",
+    "where": "Reklam nerede gösterilecek? Sonra değiştirebilirsin; her sahne iki formatta da çalışır.",
+    "sceneChange": "Sahne geçişi",
+    "tip": "Okunabilir reklamlar: sahne başına yaklaşık 3 sn, toplamda 15-30 sn, açılış cümlesi ilk saniyede okunabilir.",
+    "confirmNew": "Yeni bir reklama başlansın mı? Kaydedilmiş taslakların kalır."
+  },
+  "brand": {
+    "name": "Ad",
+    "logo": "Logo",
+    "logoHint": "kare en iyisidir; logo yoksa ilk harf kullanılır",
+    "monogram": "Monogram",
+    "monogramHint": "logo olmadığında kullanılan harf(ler)",
+    "colours": "Renkler",
+    "colors": {
+      "bg": "Arka plan",
+      "ink": "Metin",
+      "mute": "Soluk metin",
+      "accent": "Vurgu",
+      "accent2": "Vurgu 2",
+      "accent3": "Vurgu 3"
+    },
+    "coloursTip": "Öne çıkarmak için vurgu rengini kullan (metinde *yıldız*). Harekete geçirici düğmeler çerçeve olarak çizilir.",
+    "fonts": "Yazı tipleri",
+    "headlines": "Başlıklar",
+    "text": "Metin",
+    "ownFont": "Kendi yazı tipi dosyan",
+    "fontNamePlaceholder": "Yazı tipi adı, örn. Acme Display",
+    "fontRights": "Bu yazı tipini videolarda kullanma hakkım var",
+    "uploading": "Yükleniyor…",
+    "uploadFont": "TTF / OTF / WOFF yükle"
+  },
+  "scenes": {
+    "duplicate": "Çoğalt",
+    "add": "Sahne ekle",
+    "tip": "Seçili sahnenin metni, resimleri ve süresi sağda."
+  },
+  "sound": {
+    "music": "Müzik",
+    "startInSong": "Şarkıda başlangıç",
+    "volume": "Ses düzeyi",
+    "fadeIn": "Giderek açılma",
+    "fadeOut": "Giderek kısılma",
+    "noMusic": "Henüz müzik yok.",
+    "library": "Müzik kitaplığı",
+    "uploading": "Yükleniyor…",
+    "uploadSong": "Şarkı yükle",
+    "songRights": "Yüklediğim şarkının sahibiyim ya da lisansına sahibim",
+    "effects": "Ses efektleri",
+    "auto": "Otomatik sesler (sahne geçişleri, beliren kelimeler)",
+    "autoLevel": "Otomatik ses düzeyi",
+    "db": "{{gain}} dB",
+    "restore_one": "Kaldırılan {{count}} otomatik sesi geri getir",
+    "restore_other": "Kaldırılan {{count}} otomatik sesi geri getir",
+    "addAt": "{{time}} sn konumuna ses ekle",
+    "listen": "Dinle",
+    "autoTag": "oto",
+    "tip": "Sesleri taşımak için zaman çizelgesinde sürükle. Otomatik bir sesi taşıdığında o ses senin olur.",
+    "kinds": {
+      "trans": "Geçiş",
+      "whoosh": "Vınlama",
+      "swish": "Hışırtı",
+      "tick": "Tık",
+      "click": "Klik",
+      "type": "Yazma",
+      "hit": "Vuruş"
+    }
+  },
+  "render": {
+    "drawing": "Sahneler çiziliyor…",
+    "mixing": "Ses miksleniyor…",
+    "sceneRenderFailed": "sahne işleme: {{status}}",
+    "renderFailed": "işleme: {{status}}",
+    "scenesLength_one": "{{count}} sahne, {{length}} sn",
+    "scenesLength_other": "{{count}} sahne, {{length}} sn",
+    "scenesLengthTooLong_one": "{{count}} sahne, {{length}} sn (çok uzun, en fazla {{max}} sn)",
+    "scenesLengthTooLong_other": "{{count}} sahne, {{length}} sn (çok uzun, en fazla {{max}} sn)",
+    "toFill_one": "Doldurulacak {{count}} alan",
+    "toFill_other": "Doldurulacak {{count}} alan",
+    "allFilled": "Tüm zorunlu alanlar dolduruldu",
+    "music": "Müzik: {{title}}",
+    "noMusic": "Müzik yok (isteğe bağlı)",
+    "effects_one": "{{count}} ses efekti",
+    "effects_other": "{{count}} ses efekti",
+    "issue": "Sahne {{n}}, {{field}}: {{msg}}",
+    "button": "Reklamı işle ({{size}})",
+    "progress": "{{phase}} {{percent}}",
+    "sent": "Kampanyana gönderildi",
+    "useForCampaign": "Kampanyamda kullan",
+    "download": "İndir",
+    "again": "Yeniden işle"
+  },
+  "props": {
+    "length": "Uzunluk",
+    "fieldIssue": "{{field}}: {{msg}}",
+    "soundEffect": "Ses efekti",
+    "autoNote": "{{name}} (otomatik: senin olması için taşı ya da değiştir)",
+    "makeMine": "Benim olsun",
+    "at": "Konum",
+    "secondsUnit": "sn",
+    "volume": "Ses düzeyi"
+  },
+  "picker": {
+    "search": "Ara",
+    "look": "Görünüm",
+    "all": "Tümü",
+    "nothing": "Eşleşen bir şey yok."
+  },
+  "fields": {
+    "optional": "isteğe bağlı",
+    "auto": "oto",
+    "none": "(yok)",
+    "defaultIcon": "varsayılan ({{icon}})",
+    "clear": "Temizle",
+    "accentTip": "Vurgu rengi için bir kelimeyi *yıldız* içine, ikinci vurgu için _alt çizgi_ içine al.",
+    "up": "Yukarı",
+    "moveUp": "Yukarı taşı",
+    "moveDown": "Aşağı taşı",
+    "add": "Ekle",
+    "needsAtLeast": "en az {{min}} gerekli",
+    "needs": "{{min}} gerekli",
+    "pairX": "x %",
+    "pairY": "y %"
+  },
+  "image": {
+    "notPicture": "Bu bir resim değil.",
+    "noClipboardPicture": "Panoda resim yok. Bir resim kopyala ya da burada Ctrl+V / Cmd+V'ye bas.",
+    "clipboardBlocked": "Tarayıcı panonun okunmasına izin vermedi. Buraya tıkla ve Ctrl+V / Cmd+V'ye bas.",
+    "dragToPlace": "Resmin hangi kısmının görüneceğini seçmek için sürükle",
+    "zoom": "Yakınlaştır",
+    "zoomTitle": "Resmi çerçevesinin içinde yakınlaştırır; çerçeve boyutunu korur",
+    "zoomValue": "{{zoom}}x",
+    "resetPlacement": "Yerleşimi sıfırla",
+    "replace": "Değiştir",
+    "pasteTitle": "Panodan yapıştır",
+    "uploadingPct": "Yükleniyor %{{pct}}",
+    "upload": "Yükle",
+    "paste": "Yapıştır",
+    "linkPlaceholder": "ya da bir https:// bağlantısı veya resim yapıştır (Ctrl+V)"
+  },
+  "timeline": {
+    "tick": "{{s}} sn",
+    "scenes": "Sahneler",
+    "blockTitle": "{{type}}: {{length}} sn",
+    "dragLength": "Süreyi değiştirmek için sürükle",
+    "music": "Müzik",
+    "musicVolume": "{{title}} · {{volume}}",
+    "effects": "Ses efektleri",
+    "sfxTitle": "{{name}}, {{at}} sn"
+  },
+  "preview": {
+    "frameTitle": "Reklam önizlemesi"
+  }
+}

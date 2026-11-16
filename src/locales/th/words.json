@@ -1,0 +1,55 @@
+{
+  "panel": {
+    "title": "ข้อความถอดเสียง",
+    "close": "ปิดข้อความถอดเสียง"
+  },
+  "cutNotice": {
+    "plain": "ตัดแล้ว สั้นลง {{seconds}} วิ",
+    "words_other": "ตัด {{count}} คำแล้ว: สั้นลง {{seconds}} วิ",
+    "found_other": "ตัด {{count}} จุดที่พบแล้ว: สั้นลง {{seconds}} วิ",
+    "fillers": "ตัด {{fillers}}, {{pauses}} แล้ว: สั้นลง {{seconds}} วิ",
+    "dismiss": "ปิด"
+  },
+  "fillers": {
+    "title": "ลบคำเติมและช่วงหยุด",
+    "emptyHint": "ทำงานจากข้อความถอดเสียง: หา อืม, เอ่อ, แบบว่า และคำทำนองเดียวกันในภาษาของรายการ รวมถึงช่วงหยุดยาว",
+    "listening": "กำลังฟัง...",
+    "transcribeFirst": "ถอดเสียงรายการก่อน",
+    "checking": "กำลังตรวจสอบเซิร์ฟเวอร์...",
+    "unavailable": "ขณะนี้เซิร์ฟเวอร์ตัวแก้ไขนี้ยังไม่รองรับข้อความถอดเสียง",
+    "intro": "คำเติมใน{{language}} ฟังทีละอัน แล้วเอาเครื่องหมายออกจากอันที่ควรเก็บไว้",
+    "introNoList": "คำเติมใน{{language}} (เฉพาะ อืม, เอ่อ และคำคล้ายกัน: ยังไม่มีรายการสำหรับภาษานี้) ฟังทีละอัน แล้วเอาเครื่องหมายออกจากอันที่ควรเก็บไว้",
+    "stillTranscribing": "ส่วนที่เหลือของรายการยังถอดเสียงอยู่",
+    "fillerWords": "คำเติม",
+    "longPauses": "ช่วงหยุดยาว",
+    "minPause": "ช่วงหยุดที่ยาวกว่า <strong>{{seconds}} วิ</strong>",
+    "keepPause": "ย่อช่วงหยุดเหลือ <strong>{{seconds}} วิ</strong>",
+    "keepPauseTitle": "ส่วนที่เหลือของช่วงหยุดยาวหลังการตัด",
+    "fillerCount_other": "คำเติม {{count}} คำ",
+    "pauseCount_other": "ช่วงหยุด {{count}} ช่วง",
+    "summary": "เลือก {{fillers}}, {{pauses}} · ตัด {{seconds}} วิ",
+    "nothingFound": "ไม่พบอะไรด้วยการตั้งค่านี้",
+    "tickAllFillers": "เลือกคำเติมทั้งหมด",
+    "untickAllFillers": "ยกเลิกเลือกคำเติมทั้งหมด",
+    "tickAllPauses": "เลือกช่วงหยุดทั้งหมด",
+    "untickAllPauses": "ยกเลิกเลือกช่วงหยุดทั้งหมด",
+    "listLabel": "สิ่งที่จะถูกตัด",
+    "item": {
+      "keepPause": "เก็บช่วงหยุดนี้",
+      "cutPause": "ตัดช่วงหยุดนี้",
+      "keepFiller": "เก็บ {{text}}",
+      "cutFiller": "ตัด {{text}}",
+      "stop": "หยุด",
+      "listenTitle": "ฟัง (พร้อมช่วงรอบๆ หนึ่งวินาที)",
+      "listenAt": "ฟังที่ {{time}}",
+      "pause": "ช่วงหยุด",
+      "pauseLength": "{{length}} วิ → {{kept}} วิ",
+      "filler": "คำเติม",
+      "fillerTitle": "เสียงลังเล",
+      "maybe": "อาจจะ",
+      "maybeTitle": "อาจเป็นคำเติม (คั่นด้วยช่วงหยุดหรือจุลภาค): ฟังก่อน"
+    },
+    "cut": "ตัด",
+    "cutCount": "ตัด {{n}} ({{seconds}} วิ)"
+  }
+}

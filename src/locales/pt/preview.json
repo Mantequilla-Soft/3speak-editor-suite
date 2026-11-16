@@ -1,0 +1,29 @@
+{
+  "header": "Prévia da linha do tempo",
+  "smaller": "Menor",
+  "larger": "Maior",
+  "loopOn": "Repetir: ligado",
+  "loopOff": "Repetir: desligado",
+  "aspect": {
+    "title": "Proporção: {{ratio}}",
+    "titleAuto": "Proporção: automática ({{ratio}})",
+    "auto": "Automática"
+  },
+  "fullSize": "Tamanho total",
+  "halfSize": "Metade do tamanho",
+  "fullscreen": "Tela cheia",
+  "noClipHere": "Nenhum clipe nesta posição",
+  "noClips": "Nenhum clipe na linha do tempo",
+  "source": {
+    "hls": "(stream HLS)",
+    "uploaded": "(enviado)",
+    "local": "(local)",
+    "file": "(arquivo)"
+  },
+  "stageLayout": {
+    "tileTop": "Lado a lado em cima",
+    "tileBottom": "Lado a lado embaixo",
+    "overlay": "Sobreposição"
+  },
+  "selectClip": "Selecione um clipe para ver a prévia"
+}

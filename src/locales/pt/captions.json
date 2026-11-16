@@ -1,0 +1,67 @@
+{
+  "language": {
+    "label": "Idioma falado",
+    "auto": "Detectar automaticamente"
+  },
+  "intro": {
+    "title": "Legendas automáticas",
+    "text": "Transforme o que é dito em legendas que acompanham cada palavra, gravadas no seu Short e enviadas ao 3Speak também como legendas.",
+    "checking": "Verificando o servidor...",
+    "unavailable": "As legendas automáticas não estão disponíveis neste servidor do editor agora. Seu Short é renderizado normalmente, sem elas.",
+    "go": "Legendas automáticas"
+  },
+  "presets": {
+    "karaoke": "Karaokê",
+    "pop": "Pop",
+    "plain": "Legendas"
+  },
+  "presetHints": {
+    "karaoke": "Poucas palavras por vez, com a palavra falada na cor de destaque",
+    "pop": "Uma palavra (ou poucas) por vez, surgindo de repente",
+    "plain": "Linhas de legenda clássicas sobre uma caixa escura"
+  },
+  "style": {
+    "title": "Estilo",
+    "presetsLabel": "Estilo das legendas",
+    "wordsAtATime": "Palavras por vez",
+    "font": "Fonte",
+    "size": "Tamanho",
+    "sizeLabel": "Tamanho das legendas",
+    "position": "Posição",
+    "positionLabel": "Altura das legendas na imagem",
+    "top": "Em cima",
+    "middle": "No meio",
+    "low": "Embaixo",
+    "textColour": "Cor do texto",
+    "highlight": "Destaque",
+    "highlightLabel": "Cor de destaque",
+    "uppercase": "Letras maiúsculas",
+    "emoji": "Emojis de destaque (sobre palavras como \"fogo\" ou \"amor\")",
+    "burn": "Mostrar no vídeo (desligado: só como legendas no 3Speak)"
+  },
+  "words": {
+    "title": "Palavras ({{n}})",
+    "hint": "Corrija o que foi entendido errado; apague uma palavra para removê-la. Moveu ou cortou clipes? Use Legendas automáticas de novo.",
+    "goThere": "Ir para lá",
+    "word": "Palavra {{n}}",
+    "changeEmoji": "Trocar ou remover o emoji",
+    "addEmoji": "Adicionar um emoji",
+    "remove": "Remover esta palavra",
+    "removeNamed": "Remover {{word}}"
+  },
+  "actions": {
+    "again": "De novo",
+    "againTitle": "Ouvir de novo (substitui as palavras)",
+    "remove": "Remover legendas"
+  },
+  "videoSound": "Som do vídeo",
+  "job": {
+    "preparing": "Preparando o som...",
+    "listening": "Ouvindo...",
+    "noTracks": "Não há fala para legendar: adicione primeiro um clipe com som.",
+    "serverAnswered": "O servidor respondeu {{status}}",
+    "lost": "A tarefa de legendas foi perdida (o servidor reiniciou?)",
+    "noSpeech": "Nenhuma fala encontrada. A voz está em uma faixa de áudio que não está silenciada? (as faixas de música ficam de fora)",
+    "failed": "Falha no reconhecimento de voz"
+  }
+}

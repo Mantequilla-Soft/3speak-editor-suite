@@ -1,0 +1,41 @@
+{
+  "title": "Kısımlar",
+  "intro": "Bölümün her kısmının nerede başladığını işaretle. Podcast uygulamaları bunları gösterir, 3Speak de açıklamada listeler. Kaydı kestiğinde kısımlar kayıtla birlikte kalır. Kısayol: <kbd>M</kbd> oynatma kafasına bir kısım ekler.",
+  "empty": "Henüz kısım yok. Oynatma kafasını bir kısmın başladığı yere getir ve ekle.",
+  "goThere": "Oraya git",
+  "nameLabel": "Kısım {{n}} adı",
+  "moveHere": "Oynatma kafasına taşı",
+  "moveLabel": "Kısım {{n}} oynatma kafasına taşı",
+  "removeLabel": "Kısım {{n}} kaldır",
+  "leftOut": "Aralarında bir saniyeden az olan ya da en sonda kalan kısımlar dışa aktarmaya dahil edilmez.",
+  "tipZero": "İpucu: birçok uygulama ilk kısmın 0:00'da başlamasını bekler.",
+  "addAt": "{{time}} konumuna ekle",
+  "copyTitle": "Listeyi kopyala (açıklama için)",
+  "copied": "Kopyalandı",
+  "copy": "Listeyi kopyala",
+  "defaultTitle": "Kısım",
+  "suggest": {
+    "title": "Öneriler",
+    "findTitle": "Kısımların muhtemelen başladığı yerleri bul: yeni konular, uzun duraklamalar, sahne geçişleri",
+    "again": "Yeniden bak",
+    "suggest": "Kısım öner",
+    "addAll": "Tümünü ekle ({{n}})",
+    "withTranscript": "Döküm varsa (Döküm düğmesi) öneriler konuları da takip eder ve başlıklarını söylenenlerden alır.",
+    "none": "Belirgin bir yer bulunamadı. Program kısa olabilir ya da kısımları birbirine akıyor olabilir.",
+    "stop": "Durdur",
+    "listen": "Buradan dinle",
+    "titleLabel": "{{time}} konumunda önerilen kısım",
+    "add": "Bu kısmı ekle",
+    "addLabel": "Kısmı {{time}} konumuna ekle",
+    "drop": "Bu değil",
+    "dropLabel": "{{time}} konumundaki öneriyi at",
+    "reason": {
+      "start": "Başlangıç",
+      "topic": "Yeni konu",
+      "pause": "Uzun duraklama",
+      "scene": "Sahne geçişi"
+    },
+    "intro": "Giriş",
+    "part": "Kısım {{n}}"
+  }
+}

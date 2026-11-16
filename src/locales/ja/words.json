@@ -1,0 +1,55 @@
+{
+  "panel": {
+    "title": "文字起こし",
+    "close": "文字起こしを閉じる"
+  },
+  "cutNotice": {
+    "plain": "カットしました：{{seconds}} 秒短くなりました。",
+    "words_other": "{{count}} 語をカット：{{seconds}} 秒短くなりました。",
+    "found_other": "見つかった {{count}} 件をカット：{{seconds}} 秒短くなりました。",
+    "fillers": "{{fillers}}、{{pauses}} をカット：{{seconds}} 秒短くなりました。",
+    "dismiss": "閉じる"
+  },
+  "fillers": {
+    "title": "フィラーと間を削除",
+    "emptyHint": "文字起こしをもとに動作します：番組の言語での「えー」「あの」「なんか」などと、長い間を見つけます。",
+    "listening": "聞き取り中...",
+    "transcribeFirst": "まず番組を文字起こし",
+    "checking": "サーバーを確認中...",
+    "unavailable": "このエディターサーバーでは現在文字起こしを利用できません。",
+    "intro": "{{language}} のフィラー。それぞれ聴いて、残すもののチェックを外してください。",
+    "introNoList": "{{language}} のフィラー（「えー」「あー」などのみ：この言語の一覧はまだありません）。それぞれ聴いて、残すもののチェックを外してください。",
+    "stillTranscribing": "番組の残りはまだ文字起こし中です。",
+    "fillerWords": "フィラー",
+    "longPauses": "長い間",
+    "minPause": "<strong>{{seconds}}秒</strong> より長い間",
+    "keepPause": "間を <strong>{{seconds}}秒</strong> に短縮",
+    "keepPauseTitle": "カット後に長い間をどれだけ残すか",
+    "fillerCount_other": "フィラー {{count}} 個",
+    "pauseCount_other": "間 {{count}} 箇所",
+    "summary": "{{fillers}}、{{pauses}} を選択 · {{seconds}}秒をカット",
+    "nothingFound": "この設定では何も見つかりませんでした。",
+    "tickAllFillers": "フィラーをすべて選択",
+    "untickAllFillers": "フィラーの選択をすべて解除",
+    "tickAllPauses": "間をすべて選択",
+    "untickAllPauses": "間の選択をすべて解除",
+    "listLabel": "カットされるもの",
+    "item": {
+      "keepPause": "この間を残す",
+      "cutPause": "この間をカット",
+      "keepFiller": "{{text}} を残す",
+      "cutFiller": "{{text}} をカット",
+      "stop": "停止",
+      "listenTitle": "試聴（前後1秒を含む）",
+      "listenAt": "{{time}} を試聴",
+      "pause": "間",
+      "pauseLength": "{{length}}秒 → {{kept}}秒",
+      "filler": "フィラー",
+      "fillerTitle": "言いよどみの音",
+      "maybe": "たぶん",
+      "maybeTitle": "ここはフィラーかもしれません（間や読点で区切られています）：まず聴いてみてください"
+    },
+    "cut": "カット",
+    "cutCount": "{{n}} 件をカット（{{seconds}}秒）"
+  }
+}

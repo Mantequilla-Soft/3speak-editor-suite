@@ -1,0 +1,45 @@
+{
+  "cancel": "Anuluj",
+  "close": "Zamknij",
+  "ok": "OK",
+  "gotIt": "Rozumiem",
+  "done": "Gotowe",
+  "save": "Zapisz",
+  "delete": "Usuń",
+  "remove": "Usuń",
+  "back": "Wstecz",
+  "next": "Dalej",
+  "skip": "Pomiń",
+  "retry": "Spróbuj ponownie",
+  "reset": "Resetuj",
+  "none": "Brak",
+  "off": "Wył.",
+  "auto": "Auto",
+  "play": "Odtwórz",
+  "pause": "Wstrzymaj",
+  "undo": "Cofnij",
+  "preview": "Podgląd",
+  "render": "Renderuj",
+  "export": "Eksportuj",
+  "duration": {
+    "seconds_one": "{{count}} sekunda",
+    "seconds_few": "{{count}} sekundy",
+    "seconds_many": "{{count}} sekund",
+    "seconds_other": "{{count}} sekundy",
+    "minutes_one": "{{count}} minuta",
+    "minutes_few": "{{count}} minuty",
+    "minutes_many": "{{count}} minut",
+    "minutes_other": "{{count}} minuty",
+    "hours_one": "{{count}} godzina",
+    "hours_few": "{{count}} godziny",
+    "hours_many": "{{count}} godzin",
+    "hours_other": "{{count}} godziny"
+  },
+  "limits": {
+    "atMost": {
+      "short": "Short może trwać maksymalnie {{limit}}.",
+      "video": "Film może trwać maksymalnie {{limit}}.",
+      "audio": "Eksport może trwać maksymalnie {{limit}}."
+    }
+  }
+}

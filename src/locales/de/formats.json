@@ -1,0 +1,86 @@
+{
+  "aspect": {
+    "short": {
+      "label": "Short",
+      "hint": "Hochformat, bis zu 2 Minuten, als Short gepostet"
+    },
+    "landscape": {
+      "label": "Querformat",
+      "hint": "Breitbild-Video, bis zu 10 Minuten"
+    },
+    "classic": {
+      "label": "Klassisch",
+      "hint": "4:3-Video, bis zu 10 Minuten"
+    },
+    "square": {
+      "label": "Quadratisch",
+      "hint": "Quadratisches Video, bis zu 10 Minuten"
+    }
+  },
+  "chip": {
+    "title": "Format dieses Projekts: {{shape}}. Zum Ändern klicken",
+    "aria": "Projektformat: {{shape}}"
+  },
+  "picker": {
+    "title": "Was erstellst du?",
+    "tooLong": "deine Zeitleiste ist {{length}} lang, kürze sie auf {{limit}}, um zu rendern",
+    "note": "Das Format entscheidet, wie es zu 3Speak geht: 9:16 als Short, die anderen als normales Video. „Rendern als“ rendert es auch in anderen Formaten."
+  },
+  "preview": {
+    "heading": "Vorschau in",
+    "yours": "{{aspect}} (deins)",
+    "projectIs": {
+      "short": "Dein Projekt ist Short 9:16. In einem anderen Format füllt das Material das Bild, zugeschnitten um das Gesicht darin.",
+      "landscape": "Dein Projekt ist Querformat 16:9. In einem anderen Format füllt das Material das Bild, zugeschnitten um das Gesicht darin.",
+      "classic": "Dein Projekt ist Klassisch 4:3. In einem anderen Format füllt das Material das Bild, zugeschnitten um das Gesicht darin.",
+      "square": "Dein Projekt ist Quadratisch 1:1. In einem anderen Format füllt das Material das Bild, zugeschnitten um das Gesicht darin."
+    }
+  },
+  "faces": {
+    "heading": "Gesichtern folgen",
+    "noFootage": "Noch kein Material zum Neuausrichten. Verschobene oder gezoomte Clips behalten ihren eigenen Ausschnitt.",
+    "hint": "Das Gesicht wird in deinem Browser gesucht, ein paar Bilder pro Sekunde. Ohne Gesicht bleibt die Mitte im Bild.",
+    "found": "Gesicht gefunden",
+    "noFace": "Kein Gesicht: Mitte",
+    "middle": "Mitte",
+    "finding": "Gesichter werden gesucht",
+    "findOne": "Gesicht finden",
+    "findMany_one": "Gesichter in {{count}} Clip finden",
+    "findMany_other": "Gesichter in {{count}} Clips finden",
+    "streamNamed": "{{name}} ist ein Stream: er wird um seine Mitte zugeschnitten.",
+    "streamUnnamed": "Ein Clip ist ein Stream: er wird um seine Mitte zugeschnitten.",
+    "failed": "Die Gesichtsverfolgung hat hier nicht funktioniert: {{error}}",
+    "moveWindow": "{{name}}: Ausschnitt verschieben",
+    "left": "Links",
+    "right": "Rechts",
+    "up": "Hoch",
+    "down": "Runter",
+    "moveX": "Ausschnitt nach links oder rechts verschieben",
+    "moveY": "Ausschnitt nach oben oder unten verschieben",
+    "findAgain": "Gesicht erneut suchen",
+    "reset": "Mitte, ohne Verschiebung"
+  },
+  "clipFallback": "Clip",
+  "stop": "Stopp",
+  "render": {
+    "heading": "Rendern als",
+    "shortsLimit": "Shorts sind höchstens {{limit}} lang: kürze die Zeitleiste, um ein 9:16-Video zu rendern.",
+    "button_one": "{{count}} Video rendern",
+    "button_other": "{{count}} Videos rendern",
+    "failed": "Rendern fehlgeschlagen: {{error}}",
+    "download": "Herunterladen",
+    "postShort": "Als Short posten",
+    "postVideo": "Als Video posten"
+  },
+  "job": {
+    "waiting": "Warten...",
+    "preparing": "Dateien werden vorbereitet...",
+    "starting": "Wird gestartet...",
+    "rendering": "Wird gerendert...",
+    "done": "Fertig",
+    "stopped": "Gestoppt",
+    "busy": "Die Render-Server sind ausgelastet. Neuer Versuch in {{seconds}} s...",
+    "offline": "Keine Verbindung zum Render-Server. Neuer Versuch in {{seconds}} s...",
+    "failed": "Das Rendern ist fehlgeschlagen"
+  }
+}

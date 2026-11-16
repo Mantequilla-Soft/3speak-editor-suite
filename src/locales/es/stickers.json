@@ -1,0 +1,64 @@
+{
+  "title": "Stickers",
+  "search": "Buscar stickers",
+  "textBoxes": "Cuadros de texto",
+  "loading": "Cargando stickers...",
+  "noMatch": "Ningún sticker coincide.",
+  "tileTitle": "{{name}} (se añade en el cabezal)",
+  "note": "Los stickers se insertan en el cabezal durante 3 segundos. Arrástralos, cámbiales el tamaño o recórtalos como cualquier clip; los cuadros de texto siguen siendo editables.",
+  "categories": {
+    "emoji": "Emojis",
+    "badges": "Insignias",
+    "shapes": "Flechas y formas",
+    "branding": "Marca"
+  },
+  "presets": {
+    "caption": {
+      "title": "Leyenda",
+      "text": "Tu texto aquí"
+    },
+    "highlight": {
+      "title": "Resaltar",
+      "text": "¡Imperdible!"
+    },
+    "brand": {
+      "title": "Rojo 3Speak",
+      "text": "Nuevo video"
+    },
+    "bubble": {
+      "title": "Burbuja",
+      "text": "¡Hola!"
+    },
+    "outline": {
+      "title": "Contorno",
+      "text": "Mira esto"
+    },
+    "neon": {
+      "title": "Neón",
+      "text": "ESTA NOCHE"
+    },
+    "title": {
+      "title": "Título grande",
+      "text": "GRAN NOTICIA"
+    },
+    "comic": {
+      "title": "Cómic",
+      "text": "¡BUM!"
+    },
+    "marker": {
+      "title": "Marcador",
+      "text": "hecho a mano"
+    },
+    "quote": {
+      "title": "Cita",
+      "text": "“Dilo bien.”"
+    },
+    "tag": {
+      "title": "Hashtag"
+    },
+    "minimal": {
+      "title": "Minimalista",
+      "text": "simple y limpio"
+    }
+  }
+}

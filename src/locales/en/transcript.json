@@ -1,0 +1,75 @@
+{
+  "language": {
+    "label": "Spoken language",
+    "auto": "Detect automatically"
+  },
+  "intro": {
+    "title": "Edit by text",
+    "text": "Turn what is said into text with every voice by name, then edit the recording like a document: select words and press Delete to cut them out.",
+    "checking": "Checking the server...",
+    "unavailable": "Transcripts are not available on this editor server right now.",
+    "noSpeech": "Add a recording with speech first.",
+    "transcribeSeconds": "Transcribe ({{n}} s of recording)",
+    "transcribeMinutes": "Transcribe ({{n}} min of recording)",
+    "longShow": "A long show takes a while: the words show up part by part, and you can start editing the first ones."
+  },
+  "listening": "Listening...",
+  "stop": "Stop",
+  "goThere": "Go there",
+  "search": {
+    "placeholder": "Find words",
+    "label": "Find words in the transcript",
+    "previous": "Previous",
+    "previousLabel": "Previous match",
+    "next": "Next",
+    "nextLabel": "Next match"
+  },
+  "selection": {
+    "count_one": "{{count}} word · {{seconds}} s",
+    "count_other": "{{count}} words · {{seconds}} s",
+    "cut": "Cut",
+    "cutTitle": "Cut the selected words out of the recording (Delete)",
+    "clearTitle": "Clear the selection (Esc)",
+    "clearLabel": "Clear the selection"
+  },
+  "found": {
+    "cutAll_one": "Cut all {{count}}",
+    "cutAll_other": "Cut all {{count}}",
+    "cutAllTitle": "Cut every place found out of the recording"
+  },
+  "fillers": "Fillers",
+  "fillersTitle": "Find um, uh, you know and long pauses",
+  "copy": "Copy the transcript",
+  "speakers": "Speakers",
+  "missing": {
+    "seconds": "{{n}} s of recording has no text yet.",
+    "minutes": "{{n}} min of recording has no text yet.",
+    "transcribe": "Transcribe it"
+  },
+  "scrollLabel": "Transcript: click a word to go there, drag over words to select them, Delete cuts them",
+  "hint_one": "{{count}} word. Click a word to go there; drag or Shift+click to select; Delete cuts. Undo brings it back.",
+  "hint_other": "{{count}} words. Click a word to go there; drag or Shift+click to select; Delete cuts. Undo brings it back.",
+  "speaker": {
+    "default": "Voice",
+    "numbered": "Voice {{n}}"
+  },
+  "job": {
+    "starting": "Starting...",
+    "preparing": "Preparing the recordings...",
+    "listening": "Listening...",
+    "signIn": "Sign in on 3Speak to make a transcript.",
+    "uploadFailed": "The recordings could not be uploaded: {{message}}",
+    "notUploaded": "The recordings are not on the server yet. Try again once they have uploaded.",
+    "serverAnswered": "The server answered {{status}}",
+    "lost": "The transcript job was lost (the server restarted?)",
+    "failed": "Speech recognition failed"
+  },
+  "stt": {
+    "audioUnavailable": "audio unavailable",
+    "serverError": "server error",
+    "connectionFailed": "connection failed",
+    "unauthorized": "unauthorized",
+    "closed": "closed",
+    "initFailed": "stt init failed"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "title": "Hoofdstukken",
+  "intro": "Markeer waar elk deel van de aflevering begint. Podcastapps tonen ze, en 3Speak zet ze in de beschrijving. Ze blijven bij je opname als je erin knipt. Sneltoets: <kbd>M</kbd> voegt er een toe op de afspeelkop.",
+  "empty": "Nog geen hoofdstukken. Zet de afspeelkop waar een deel begint en voeg er een toe.",
+  "goThere": "Ga ernaartoe",
+  "nameLabel": "Naam van hoofdstuk {{n}}",
+  "moveHere": "Naar de afspeelkop verplaatsen",
+  "moveLabel": "Hoofdstuk {{n}} naar de afspeelkop verplaatsen",
+  "removeLabel": "Hoofdstuk {{n}} verwijderen",
+  "leftOut": "Hoofdstukken die minder dan een seconde uit elkaar liggen, of helemaal aan het eind staan, worden bij het exporteren weggelaten.",
+  "tipZero": "Tip: veel apps verwachten het eerste hoofdstuk op 0:00.",
+  "addAt": "Toevoegen op {{time}}",
+  "copyTitle": "De lijst kopiëren (voor een beschrijving)",
+  "copied": "Gekopieerd",
+  "copy": "Lijst kopiëren",
+  "defaultTitle": "Hoofdstuk",
+  "suggest": {
+    "title": "Suggesties",
+    "findTitle": "Vind waar delen waarschijnlijk beginnen: nieuwe onderwerpen, lange pauzes, scènewissels",
+    "again": "Opnieuw zoeken",
+    "suggest": "Hoofdstukken voorstellen",
+    "addAll": "Alle {{n}} toevoegen",
+    "withTranscript": "Met een transcript (de knop Transcript) volgen de suggesties ook de onderwerpen en krijgen ze titels uit wat er wordt gezegd.",
+    "none": "Geen duidelijke plekken gevonden. De show is misschien kort, of de delen lopen in elkaar over.",
+    "stop": "Stoppen",
+    "listen": "Vanaf hier beluisteren",
+    "titleLabel": "Voorgesteld hoofdstuk op {{time}}",
+    "add": "Dit hoofdstuk toevoegen",
+    "addLabel": "Het hoofdstuk op {{time}} toevoegen",
+    "drop": "Deze niet",
+    "dropLabel": "De suggestie op {{time}} laten vallen",
+    "reason": {
+      "start": "Begin",
+      "topic": "Nieuw onderwerp",
+      "pause": "Lange pauze",
+      "scene": "Scènewissel"
+    },
+    "intro": "Intro",
+    "part": "Deel {{n}}"
+  }
+}

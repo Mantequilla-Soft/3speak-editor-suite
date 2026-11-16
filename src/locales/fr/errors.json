@@ -1,0 +1,28 @@
+{
+  "render": {
+    "unreachable": "Le serveur de rendu est injoignable. Vérifiez votre connexion et relancez le rendu.",
+    "stillBusy": "Les serveurs de rendu sont encore occupés. Relancez le rendu dans quelques minutes.",
+    "unknownJob": "Le serveur de rendu ne connaît plus ce rendu (il a peut-être redémarré). Relancez le rendu.",
+    "lostContact": "Contact perdu avec le serveur de rendu. Relancez le rendu.",
+    "serverStatus": "Le serveur a répondu {{status}}"
+  },
+  "uploadFailed": "Échec de l'envoi : {{status}}",
+  "signIn": {
+    "loggedOut": "Connectez-vous sur 3Speak pour utiliser l'éditeur.",
+    "failed": "Connectez-vous sur 3Speak pour envoyer et faire le rendu (la connexion a été annulée ou n'a pas marché)."
+  },
+  "export": {
+    "failed": "Échec de l'export",
+    "ffmpegNotLoaded": "FFmpeg non chargé",
+    "noClips": "Aucun clip à exporter",
+    "noCodec": "Aucun codec vidéo compatible trouvé pour MediaRecorder",
+    "cancelled": "Export annulé",
+    "noSource": "Aucune source de fichier valide pour le clip : {{name}}",
+    "ffmpegFailed": "La commande FFmpeg a échoué avec le code de sortie {{code}}"
+  },
+  "reverse": {
+    "failed": "Échec de l'inversion",
+    "timedOut": "L'inversion a expiré",
+    "statusCheck": "Échec de la vérification du statut : {{status}}"
+  }
+}

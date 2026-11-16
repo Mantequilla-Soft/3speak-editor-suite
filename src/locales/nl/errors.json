@@ -1,0 +1,28 @@
+{
+  "render": {
+    "unreachable": "De renderserver is niet bereikbaar. Controleer je verbinding en render opnieuw.",
+    "stillBusy": "De renderservers zijn nog bezet. Render over een paar minuten opnieuw.",
+    "unknownJob": "De renderserver kent deze render niet meer (misschien is hij herstart). Render opnieuw.",
+    "lostContact": "Het contact met de renderserver is verbroken. Render opnieuw.",
+    "serverStatus": "Server antwoordde met {{status}}"
+  },
+  "uploadFailed": "Upload mislukt: {{status}}",
+  "signIn": {
+    "loggedOut": "Log in op 3Speak om de editor te gebruiken.",
+    "failed": "Log in op 3Speak om te uploaden en te renderen (het inloggen is geannuleerd of werkte niet)."
+  },
+  "export": {
+    "failed": "Exporteren mislukt",
+    "ffmpegNotLoaded": "FFmpeg niet geladen",
+    "noClips": "Geen clips om te exporteren",
+    "noCodec": "Geen ondersteunde videocodec gevonden voor MediaRecorder",
+    "cancelled": "Exporteren geannuleerd",
+    "noSource": "Geen geldige bestandsbron voor clip: {{name}}",
+    "ffmpegFailed": "FFmpeg-opdracht mislukt met exitcode {{code}}"
+  },
+  "reverse": {
+    "failed": "Omkeren mislukt",
+    "timedOut": "Omkeren duurde te lang",
+    "statusCheck": "Statuscontrole mislukt: {{status}}"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "title": "Mídia de banco",
+  "titleBackground": "Escolha um fundo",
+  "search": "Pesquisar vídeos, fotos e GIFs",
+  "searchProvider": "Pesquisar no {{provider}}",
+  "searchProviderTitle": "Pesquisar no {{provider}} (uso livre, copiado para o nosso servidor quando você escolhe)",
+  "kind": "Tipo",
+  "category": "Categoria",
+  "everything": "Tudo",
+  "types": {
+    "all": "Todos",
+    "video": "Vídeos",
+    "image": "Fotos",
+    "gif": "GIFs"
+  },
+  "categories": {
+    "nature": "Natureza",
+    "city": "Cidade",
+    "people": "Pessoas",
+    "animals": "Animais",
+    "food": "Comida",
+    "tech": "Tecnologia",
+    "sports": "Esportes",
+    "space": "Espaço",
+    "abstract": "Abstrato",
+    "backgrounds": "Fundos"
+  },
+  "loading": "Carregando a biblioteca...",
+  "typeToSearch": "Digite o que você procura para pesquisar no {{provider}}.",
+  "nothingFound": "Nada encontrado.",
+  "searching": "Pesquisando...",
+  "loadFailed": "Não foi possível carregar o banco de mídia.",
+  "nothingMatches": "Nada corresponde.",
+  "adding": "Adicionando...",
+  "byAuthor": "{{title}} ({{author}})",
+  "licenceOnline": "Do {{provider}}: uso livre, inclusive comercial, sem necessidade de crédito. O arquivo é copiado para o servidor do 3Speak quando você o escolhe.",
+  "licence": "Uso livre, inclusive comercial, sem necessidade de crédito (CC0 / domínio público do Wikimedia Commons).",
+  "placeBackground": "Fica atrás de você, na própria faixa, com a mesma duração do seu clipe.",
+  "placeAdd": "Entra no cursor de reprodução: numa linha do tempo vazia como seu vídeo; senão, por cima como b-roll.",
+  "errors": {
+    "notCopied": "Não foi possível copiar esse arquivo.",
+    "notAdded": "Não foi possível adicionar esse arquivo.",
+    "tooMany": "Pesquisas demais, aguarde um momento.",
+    "searchFailed": "A pesquisa não funcionou, tente de novo.",
+    "copyFailed": "Não foi possível copiar esse arquivo para o servidor."
+  },
+  "trackName": {
+    "background": "Fundo",
+    "backgroundNumbered": "Fundo {{number}}",
+    "broll": "B-roll",
+    "brollNumbered": "B-roll {{number}}"
+  }
+}

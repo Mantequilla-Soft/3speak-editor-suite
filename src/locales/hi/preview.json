@@ -1,0 +1,29 @@
+{
+  "header": "टाइमलाइन प्रीव्यू",
+  "smaller": "छोटा",
+  "larger": "बड़ा",
+  "loopOn": "लूप: चालू",
+  "loopOff": "लूप: बंद",
+  "aspect": {
+    "title": "आस्पेक्ट रेशियो: {{ratio}}",
+    "titleAuto": "आस्पेक्ट रेशियो: ऑटो ({{ratio}})",
+    "auto": "ऑटो"
+  },
+  "fullSize": "पूरा साइज़",
+  "halfSize": "आधा साइज़",
+  "fullscreen": "फ़ुलस्क्रीन",
+  "noClipHere": "इस स्थिति पर कोई क्लिप नहीं",
+  "noClips": "टाइमलाइन पर कोई क्लिप नहीं",
+  "source": {
+    "hls": "(HLS स्ट्रीम)",
+    "uploaded": "(अपलोड किया गया)",
+    "local": "(लोकल)",
+    "file": "(फ़ाइल)"
+  },
+  "stageLayout": {
+    "tileTop": "ऊपर टाइल",
+    "tileBottom": "नीचे टाइल",
+    "overlay": "ओवरले"
+  },
+  "selectClip": "प्रीव्यू के लिए कोई क्लिप चुनें"
+}

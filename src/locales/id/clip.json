@@ -1,0 +1,304 @@
+{
+  "empty": "Pilih klip untuk melihat properti",
+  "types": {
+    "video": "video",
+    "audio": "audio",
+    "image": "gambar",
+    "text": "teks",
+    "color": "warna",
+    "scene": "adegan"
+  },
+  "sections": {
+    "content": "Konten",
+    "color": "Warna",
+    "audio": "Audio",
+    "layout": "Tata letak",
+    "transform": "Transformasi",
+    "timing": "Waktu",
+    "motion": "Gerakan",
+    "greenScreen": "Layar hijau"
+  },
+  "doubleClickReset": "Klik dua kali untuk mengatur ulang",
+  "text": {
+    "label": "Teks",
+    "placeholder": "Tulis teks di sini...",
+    "font": "Font",
+    "resetFont": "Atur ulang font",
+    "fontGroups": {
+      "sansSerif": "Sans Serif",
+      "serif": "Serif",
+      "display": "Display",
+      "handwriting": "Tulisan tangan",
+      "monospace": "Monospace"
+    },
+    "weight": {
+      "normal": "Normal",
+      "bold": "Tebal"
+    },
+    "style": "Gaya",
+    "resetStyle": "Atur ulang gaya",
+    "size": "Ukuran",
+    "alignment": "Perataan",
+    "resetAlignment": "Atur ulang perataan",
+    "align": {
+      "left": "Rata kiri",
+      "center": "Rata tengah",
+      "right": "Rata kanan"
+    },
+    "box": "Kotak latar",
+    "fill": "Isi",
+    "opacity": "Opasitas",
+    "padding": "Padding",
+    "radius": "Radius",
+    "border": "Garis tepi",
+    "width": "Lebar"
+  },
+  "colorClip": {
+    "background": "Warna latar",
+    "gradient": "Gradien",
+    "enabled": "Aktif",
+    "disabled": "Nonaktif",
+    "endColor": "Warna akhir",
+    "angle": "Sudut",
+    "resetAngle": "Atur ulang sudut"
+  },
+  "volume": {
+    "label": "Volume",
+    "reset": "Atur ulang volume",
+    "mute": "Bisukan",
+    "unmute": "Bunyikan"
+  },
+  "fades": {
+    "label": "Fade",
+    "none": "Tanpa fade",
+    "in": "Masuk",
+    "out": "Keluar",
+    "inSeconds": "Masuk (detik)",
+    "outSeconds": "Keluar (detik)"
+  },
+  "noise": {
+    "reduce": "Kurangi bising latar",
+    "cleanVoice": "Bersihkan suara",
+    "group": "Pengurangan bising",
+    "working": "Memproses",
+    "workingDots": "Memproses…",
+    "afterUpload": "Tersedia setelah klip ini selesai diunggah.",
+    "appliesGroup_other": "Berlaku untuk klip ini dan grupnya ({{count}} klip).",
+    "appliesOne": "Hanya berlaku untuk klip ini.",
+    "failed": "Pengurangan bising gagal. Coba lagi.",
+    "levels": {
+      "light": "Ringan",
+      "medium": "Sedang",
+      "strong": "Kuat"
+    },
+    "studioTitle": "Kuat: bising lebih sedikit, tanpa dengung, lebih jernih dan rata, bunyi S lebih lembut"
+  },
+  "duck": {
+    "label": "Ducking",
+    "group": "Ducking klip ini",
+    "depth": "{{db}} dB",
+    "source": "<lead>Mengecil saat</lead><pick/><tail>diputar</tail>",
+    "sourceLabel": "Sumber ducking",
+    "hint": "Klip ini menjadi lebih pelan saat trek yang dipilih diputar, dan kembali naik saat jeda."
+  },
+  "greenScreen": {
+    "removeBackground": "Hapus latar",
+    "modes": {
+      "green": "Hijau",
+      "blue": "Biru",
+      "person": "Orang",
+      "static": "Statis (eksperimental)"
+    },
+    "modeTitles": {
+      "green": "Layar hijau",
+      "blue": "Layar biru",
+      "person": "Tanpa layar hijau: menemukanmu di gambar dan menghapus sisanya",
+      "static": "Latar statis (eksperimental): menghapus apa pun yang cocok dengan frame latar kosong"
+    },
+    "staticHint": "Menghapus semua yang mirip beberapa frame latar kosong. Perubahan kecil (bising, cahaya, fokus) diabaikan dan bagian tubuhmu yang mirip dinding tetap dipertahankan di dalam garis tubuhmu. Butuh kamera yang tidak bergerak; bayanganmu tetap terlihat. Jika bagian ruangan masih tampak, naikkan Ambang.",
+    "hint": {
+      "green": "Menghapus latar hijau agar klip di trek bawah terlihat.",
+      "blue": "Menghapus latar biru agar klip di trek bawah terlihat.",
+      "person": "Tanpa layar hijau: editor menemukan orang di setiap frame dan menghapus sisanya. Paling bagus dengan satu orang, cukup cahaya, di depan kamera."
+    },
+    "plate": "Frame latar kosong",
+    "plateAlt": "Latar kosong",
+    "plateHint": "Pindahkan playhead ke momen yang hanya menampilkan latar, tanpa dirimu. Setengah detik darinya akan dipakai.",
+    "grabbing": "Mengambil frame...",
+    "useFrame": "Pakai frame di playhead",
+    "useFrameInstead": "Pakai frame di playhead sebagai gantinya",
+    "grabFailed": "Frame itu tidak dapat diambil. Coba lagi, atau pilih momen lain.",
+    "threshold": "Ambang",
+    "thresholdStaticTitle": "Toleransi: makin tinggi makin banyak perubahan latar yang diabaikan (bising, cahaya, fokus), tetapi bisa mulai menghapus bagian tubuhmu",
+    "thresholdTitle": "Makin tinggi makin banyak warna layar yang dihapus",
+    "resetThreshold": "Atur ulang ambang",
+    "softness": "Kelembutan tepi",
+    "resetSoftness": "Atur ulang kelembutan",
+    "despill": "Despill",
+    "despillStaticTitle": "Menghapus warna dinding dari tepi",
+    "despillTitle": {
+      "green": "Menghapus semburat hijau dari tepi",
+      "blue": "Menghapus semburat biru dari tepi"
+    },
+    "resetDespill": "Atur ulang despill",
+    "cameraLock": {
+      "allLocked": "Fokus dan eksposur kamera dikunci, white balance juga.",
+      "focusExposureLocked": "Fokus dan eksposur kamera dikunci.",
+      "noFocus": "Kameramu tidak bisa mengunci fokus; jangan bergerak mendekat atau menjauh.",
+      "lockedList": "Dikunci: {{list}}.",
+      "noExposure": "Fokus dikunci. Eksposur tidak bisa dikunci di kamera ini; jaga cahaya tetap stabil.",
+      "names": {
+        "focus": "fokus",
+        "exposure": "eksposur",
+        "whiteBalance": "white balance"
+      }
+    }
+  },
+  "layout": {
+    "boxSize": "Ukuran kotak",
+    "smaller": "Lebih kecil",
+    "larger": "Lebih besar",
+    "zoom": "Zoom",
+    "resetZoom": "Atur ulang zoom",
+    "hint": "Seret klip untuk memindahkannya. Tekan dan tahan, lalu seret, untuk memindahkan video di dalam kotaknya. Cubit untuk zoom di layar sentuh.",
+    "freeTransform": "Beralih ke transformasi bebas"
+  },
+  "transform": {
+    "scale": "Skala",
+    "resetScale": "Atur ulang skala",
+    "rotation": "Rotasi",
+    "resetRotation": "Atur ulang rotasi",
+    "position": "Posisi",
+    "resetPosition": "Atur ulang posisi",
+    "dragToMove": "Seret untuk memindahkan",
+    "crop": "Pangkas",
+    "resetCrop": "Atur ulang pangkasan",
+    "cropWidth": "L",
+    "cropHeight": "T",
+    "opacity": "Opasitas",
+    "resetOpacity": "Atur ulang opasitas"
+  },
+  "timing": {
+    "duration": "Durasi",
+    "seconds": "Dtk",
+    "in": "Masuk:",
+    "out": "Keluar:",
+    "durationColon": "Durasi:",
+    "position": "Posisi:"
+  },
+  "color": {
+    "measuring": "Mengukur…",
+    "autoTitle": "Perbaiki level, midtone, dan white balance dari frame klip ini",
+    "resetAll": "Atur ulang semua penyesuaian warna",
+    "failed": "Gambar klip ini tidak dapat dibaca.",
+    "sliders": {
+      "brightness": "Kecerahan",
+      "contrast": "Kontras",
+      "midtones": "Midtone",
+      "saturation": "Saturasi",
+      "warmth": "Kehangatan",
+      "tint": "Rona"
+    }
+  },
+  "effects": {
+    "hiddenName": "{{name}} (disembunyikan)",
+    "show": "Tampilkan efek ini lagi",
+    "hide": "Sembunyikan efek ini (disimpan, tetapi tidak diterapkan)",
+    "remove": "Hapus efek ini",
+    "comesFrom": "Datang dari",
+    "goesTo": "Pergi ke",
+    "from": "Dari",
+    "to": "Ke",
+    "speed": "Kecepatan",
+    "amount": {
+      "amplitude": "Amplitudo",
+      "bounce": "Pantulan",
+      "distance": "Jarak"
+    },
+    "addFirst": "Tambahkan efek…",
+    "addAnother": "Tambahkan efek lain…",
+    "groups": {
+      "loop": "Berulang",
+      "in": "Masuk",
+      "out": "Keluar"
+    },
+    "effect": {
+      "pulse": "Berdenyut",
+      "wobble": "Bergetar",
+      "bob": "Naik-turun",
+      "sway": "Bergoyang",
+      "spin": "Berputar",
+      "pop": "Muncul",
+      "slideIn": "Geser masuk",
+      "fadeIn": "Fade in",
+      "popOut": "Menghilang",
+      "slideOut": "Geser keluar",
+      "fadeOut": "Fade out"
+    },
+    "direction": {
+      "left": "kiri",
+      "right": "kanan",
+      "top": "atas",
+      "bottom": "bawah"
+    },
+    "pivot": "Poros",
+    "pivotPoint": "Titik poros",
+    "pivotName": {
+      "topLeft": "kiri atas",
+      "top": "atas",
+      "topRight": "kanan atas",
+      "left": "kiri",
+      "centre": "tengah",
+      "right": "kanan",
+      "bottomLeft": "kiri bawah",
+      "bottom": "bawah",
+      "bottomRight": "kanan bawah",
+      "custom": "kustom"
+    }
+  },
+  "multi": {
+    "volume": "Volume",
+    "volumeMixed": "Volume (campuran)",
+    "volumeAll": "Volume semua klip terpilih",
+    "muteAll": "Bisukan semua",
+    "unmuteAll": "Bunyikan semua",
+    "cleanVoice": "Bersihkan suara",
+    "cleanGroup": "Pembersihan suara untuk semua klip terpilih",
+    "afterUpload": "Tersedia setelah klip-klip ini selesai diunggah.",
+    "failed": "Pembersihan suara gagal. Coba lagi.",
+    "applies_other": "Berlaku untuk {{count}} klip terpilih.",
+    "appliesWithGroups_other": "Berlaku untuk {{selected}} klip terpilih dan {{count}} klip lain di grupnya.",
+    "stillUploading": "Klip yang masih diunggah dibiarkan apa adanya.",
+    "remove_other": "Hapus {{count}} klip"
+  },
+  "trim": {
+    "title": "Pangkas: {{name}}",
+    "start": "Titik awal",
+    "end": "Titik akhir",
+    "trimmed": "Durasi setelah dipangkas"
+  },
+  "reframe": {
+    "readFailed": "Video tidak dapat dibaca di sini",
+    "openFailed": "Video tidak dapat dibuka untuk pelacakan wajah"
+  },
+  "personKey": {
+    "ready": "Siap: kamu sudah terpotong di setiap frame. Hasil render sama seperti pratinjau.",
+    "failed": "Tidak ditemukan orang di klip ini ({{error}}).",
+    "finding": "Mencarimu di setiap frame... Sementara itu pratinjau sudah menampilkannya secara langsung.",
+    "findingProgress": "Mencarimu di setiap frame: {{percent}} Sementara itu pratinjau sudah menampilkannya secara langsung.",
+    "behind": "Di belakangmu",
+    "backgrounds": {
+      "none": "Tembus pandang",
+      "noneTitle": "Klip di trek bawah tampil di belakangmu",
+      "blur": "Blur",
+      "blurTitle": "Latarmu sendiri, di-blur",
+      "color": "Warna",
+      "colorTitle": "Warna polos di belakangmu"
+    },
+    "pickStock": "Taruh gambar atau video stok di belakang",
+    "colour": "Warna",
+    "blur": "Blur",
+    "resetBlur": "Atur ulang blur",
+    "thresholdTitle": "Makin tinggi makin sedikit yang dipertahankan di sekitarmu, makin rendah makin banyak"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "header": "Timeline Preview",
+  "smaller": "Smaller",
+  "larger": "Larger",
+  "loopOn": "Loop: On",
+  "loopOff": "Loop: Off",
+  "aspect": {
+    "title": "Aspect ratio: {{ratio}}",
+    "titleAuto": "Aspect ratio: Auto ({{ratio}})",
+    "auto": "Auto"
+  },
+  "fullSize": "Full size",
+  "halfSize": "Half size",
+  "fullscreen": "Fullscreen",
+  "noClipHere": "No clip at this position",
+  "noClips": "No clips on timeline",
+  "source": {
+    "hls": "(HLS stream)",
+    "uploaded": "(uploaded)",
+    "local": "(local)",
+    "file": "(file)"
+  },
+  "stageLayout": {
+    "tileTop": "Tile above",
+    "tileBottom": "Tile below",
+    "overlay": "Overlay"
+  },
+  "selectClip": "Select a clip to preview"
+}

@@ -5,6 +5,7 @@ import fixWebmDuration from 'fix-webm-duration'
 import { finiteDuration, pickRecorderType, recordingExtension } from '../utils/mediaDuration'
 import { rmsLevel, levelHistory, drawLevels } from '../utils/voiceGraph'
 import Teleprompter from './Teleprompter/Teleprompter'
+import { useT } from '../i18n'
 
 // Level samples per second for the graph (and the take's shape afterwards)
 const LEVEL_RATE = 20
@@ -12,6 +13,7 @@ const LEVEL_RATE = 20
 const LIVE_WINDOW = 8
 
 function RecordAudio({ onRecorded, onClose }) {
+  const { t } = useT()
   const streamRef = useRef(null)
   const recorderRef = useRef(null)
   const chunksRef = useRef([])
@@ -118,7 +120,7 @@ function RecordAudio({ onRecorded, onClose }) {
     }, (err) => {
       if (!cancelled) {
         console.warn('[recorder] microphone failed:', err?.name, err?.message)
-        setError(mediaErrorMessage(err, 'microphone'))
+        setError({ err })
       }
     })
     return () => {
@@ -140,7 +142,7 @@ function RecordAudio({ onRecorded, onClose }) {
     try {
       recorder = new MediaRecorder(streamRef.current, mimeType ? { mimeType } : undefined)
     } catch {
-      setError('This browser cannot record audio here.')
+      setError({ key: 'record.audio.cannotRecord' })
       return
     }
 
@@ -210,7 +212,7 @@ function RecordAudio({ onRecorded, onClose }) {
       setPhase('ready')
     } catch (err) {
       console.warn('[recorder] microphone failed:', err?.name, err?.message)
-      setError(mediaErrorMessage(err, 'microphone'))
+      setError({ err })
     }
   }, [openMic])
 
@@ -231,7 +233,7 @@ function RecordAudio({ onRecorded, onClose }) {
       onClose()
     } catch {
       setAdding(false)
-      setError('Could not add the recording. Please try again.')
+      setError({ key: 'record.audio.addFailed' })
     }
   }, [recordedBlob, adding, onRecorded, onClose])
 
@@ -283,7 +285,7 @@ function RecordAudio({ onRecorded, onClose }) {
     <div className="record-overlay" onClick={handleClose}>
       <div className="record-modal record-audio-modal" onClick={e => e.stopPropagation()}>
         <div className="record-modal-header">
-          <span>Record Audio</span>
+          <span>{t('record.audio.title')}</span>
           <button className="record-close-btn" onClick={handleClose}>
             <X size={18} />
           </button>
@@ -291,13 +293,13 @@ function RecordAudio({ onRecorded, onClose }) {
 
         <div className="record-audio-preview">
           {error ? (
-            <div className="record-error">{error}</div>
+            <div className="record-error">{error.key ? t(error.key) : mediaErrorMessage(error.err, 'microphone')}</div>
           ) : (
             <div className="record-audio-indicator">
               <canvas
                 ref={canvasRef}
                 className={`record-voice-graph${phase === 'recording' ? ' recording' : ''}`}
-                aria-label={phase === 'done' ? 'Your recording' : 'Microphone level'}
+                aria-label={phase === 'done' ? t('record.audio.yourRecording') : t('record.audio.micLevel')}
                 role="img"
               />
               {phase === 'countdown' && (
@@ -310,19 +312,19 @@ function RecordAudio({ onRecorded, onClose }) {
                 </div>
               )}
               {phase === 'starting' && (
-                <div className="record-loading">Accessing microphone...</div>
+                <div className="record-loading">{t('record.audio.accessingMic')}</div>
               )}
               {phase === 'ready' && (
-                <div className="record-loading">Ready to record: speak to check your level</div>
+                <div className="record-loading">{t('record.audio.ready')}</div>
               )}
               {phase === 'preparing' && (
-                <div className="record-loading record-busy"><Loader2 size={16} className="encoding-notice-spin" /> Preparing your recording...</div>
+                <div className="record-loading record-busy"><Loader2 size={16} className="encoding-notice-spin" /> {t('record.audio.preparing')}</div>
               )}
               {phase === 'done' && (
                 <audio ref={playbackRef} controls className={previewReady ? '' : 'record-audio-loading'} />
               )}
               {adding && (
-                <div className="record-loading record-busy" role="status"><Loader2 size={16} className="encoding-notice-spin" /> Adding to your tracks...</div>
+                <div className="record-loading record-busy" role="status"><Loader2 size={16} className="encoding-notice-spin" /> {t('record.audio.adding')}</div>
               )}
             </div>
           )}
@@ -334,14 +336,14 @@ function RecordAudio({ onRecorded, onClose }) {
               <button
                 className={`record-tp-btn${tpActive ? ' active' : ''}`}
                 onClick={() => tpRef.current?.openEditor()}
-                title={tpActive ? 'Edit teleprompter text' : 'Add teleprompter text'}
+                title={tpActive ? t('record.audio.tpEdit') : t('record.audio.tpAdd')}
               >
                 <ScrollText size={14} />
-                <span>Teleprompter</span>
+                <span>{t('record.audio.teleprompter')}</span>
               </button>
               <button className="record-start-btn" onClick={tpActive ? startWithCountdown : startRecording}>
                 <Circle size={16} />
-                <span>Start Recording</span>
+                <span>{t('record.audio.start')}</span>
               </button>
             </>
           )}
@@ -349,7 +351,7 @@ function RecordAudio({ onRecorded, onClose }) {
           {phase === 'recording' && (
             <button className="record-stop-btn" onClick={stopRecording}>
               <Square size={14} />
-              <span>Stop</span>
+              <span>{t('record.audio.stop')}</span>
             </button>
           )}
 
@@ -357,18 +359,18 @@ function RecordAudio({ onRecorded, onClose }) {
             <>
               <button className="record-retake-btn" onClick={handleRetake} disabled={adding}>
                 <RotateCcw size={14} />
-                <span>Retake</span>
+                <span>{t('record.audio.retake')}</span>
               </button>
               <button className="record-use-btn" onClick={handleUseClip} disabled={adding}>
                 {adding ? <Loader2 size={14} className="encoding-notice-spin" /> : <Check size={14} />}
-                <span>{adding ? 'Adding...' : 'Use Recording'}</span>
+                <span>{adding ? t('record.audio.addingShort') : t('record.audio.useRecording')}</span>
               </button>
             </>
           )}
         </div>
         {/* Inside the modal (not beside it): clicks on the teleprompter must not
             reach the backdrop, which closes the recorder */}
-        <Teleprompter ref={tpRef} recState={tpRecState} streamRef={streamRef} onActiveChange={setTpActive} showLabel="Use this script" />
+        <Teleprompter ref={tpRef} recState={tpRecState} streamRef={streamRef} onActiveChange={setTpActive} showLabel={t('record.audio.useScript')} />
       </div>
     </div>
   )

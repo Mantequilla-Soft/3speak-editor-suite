@@ -1,5 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { X, Play, Pause, Plus, Search, Music, AudioLines } from './icons'
+import { useT, t, formatNumber } from '../i18n'
 
 // Where the song lists come from: comma separated URLs of library.json files
 // ({ moods: [{ id, label }], tracks: [...] }), relative to the editor's origin.
@@ -11,28 +12,29 @@ const sourceList = (value) => value.split(',').map(s => s.trim()).filter(Boolean
 // The same sheet lists music or sound effects. Sound effects (Kenney CC0 packs,
 // scripts/sfx/build_library.py) use the same library.json format, with the
 // categories in `moods`; CC0 needs no credit, so none goes into the post.
+// The texts are keys (t() at render, in the current language).
 const KINDS = {
   music: {
     sources: sourceList(import.meta.env.VITE_MUSIC_SOURCES || '/music/library.json'),
-    title: 'Music',
+    title: 'music.music.title',
     Icon: Music,
-    search: 'Search songs',
-    loading: 'Loading songs...',
-    failed: 'The music library could not be loaded.',
-    none: 'No songs match.',
-    note: "The song credit is added to your post automatically. Picking a 3Speak creator's sound gives them 5% of the post rewards.",
-    addTitle: 'Add to video'
+    search: 'music.music.search',
+    loading: 'music.music.loading',
+    failed: 'music.music.failed',
+    none: 'music.music.none',
+    note: 'music.music.note',
+    addTitle: 'music.music.addTitle'
   },
   sfx: {
     sources: sourceList(import.meta.env.VITE_SFX_SOURCES || '/sfx/library.json'),
-    title: 'Sound effects',
+    title: 'music.sfx.title',
     Icon: AudioLines,
-    search: 'Search sounds',
-    loading: 'Loading sounds...',
-    failed: 'The sound effects could not be loaded.',
-    none: 'No sounds match.',
-    note: 'Sounds go in at the playhead. Free to use (CC0, Kenney.nl), no credit needed.',
-    addTitle: 'Add at the playhead'
+    search: 'music.sfx.search',
+    loading: 'music.sfx.loading',
+    failed: 'music.sfx.failed',
+    none: 'music.sfx.none',
+    note: 'music.sfx.note',
+    addTitle: 'music.sfx.addTitle'
   }
 }
 
@@ -94,7 +96,10 @@ async function loadLibraries(sources) {
 
 const formatDuration = (secs, short = false) => {
   // Sound effects are mostly well under a second
-  if (short && secs < 10) return `${secs < 1 ? secs.toFixed(2) : secs.toFixed(1)}s`
+  if (short && secs < 10) {
+    const digits = secs < 1 ? 2 : 1
+    return t('music.seconds', { seconds: formatNumber(secs, { minimumFractionDigits: digits, maximumFractionDigits: digits }) })
+  }
   const s = Math.round(secs)
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 }
@@ -107,6 +112,7 @@ const FLAT_PEAKS = Array(60).fill(35)
  * Works as a slider from the keyboard too (arrows: 5s, Home/End).
  */
 function Waveform({ peaks, duration, position, active, onSeek, onScrub, title }) {
+  const { t } = useT()
   const ref = useRef(null)
   // useId() has colons (or guillemets), which some browsers will not resolve
   // inside an SVG url(#...) reference
@@ -143,7 +149,7 @@ function Waveform({ peaks, duration, position, active, onSeek, onScrub, title })
       className={`music-wave${active ? ' active' : ''}${drag !== null ? ' dragging' : ''}`}
       role="slider"
       tabIndex={0}
-      aria-label={`Timeline: ${title}`}
+      aria-label={t('music.timeline', { title })}
       aria-valuemin={0}
       aria-valuemax={Math.round(duration)}
       aria-valuenow={Math.round(frac * duration)}
@@ -180,6 +186,7 @@ function Waveform({ peaks, duration, position, active, onSeek, onScrub, title })
 }
 
 function MusicLibrary({ onPick, onClose, kind = 'music' }) {
+  const { t } = useT()
   const cfg = KINDS[kind] || KINDS.music
   const [data, setData] = useState(null)
   const [error, setError] = useState(false)
@@ -279,8 +286,8 @@ function MusicLibrary({ onPick, onClose, kind = 'music' }) {
       <div className="remix-picker music-library" role="dialog" aria-modal="true" aria-labelledby="music-library-title" onClick={e => e.stopPropagation()}>
         <div className="remix-picker-header">
           <cfg.Icon size={16} />
-          <h3 id="music-library-title">{cfg.title}</h3>
-          <button className="remix-picker-icon-btn" onClick={onClose} title="Close">
+          <h3 id="music-library-title">{t(cfg.title)}</h3>
+          <button className="remix-picker-icon-btn" onClick={onClose} title={t('common.close')}>
             <X size={16} />
           </button>
         </div>
@@ -289,7 +296,7 @@ function MusicLibrary({ onPick, onClose, kind = 'music' }) {
           <Search size={14} />
           <input
             type="search"
-            placeholder={cfg.search}
+            placeholder={t(cfg.search)}
             value={query}
             onChange={e => setQuery(e.target.value)}
           />
@@ -297,7 +304,7 @@ function MusicLibrary({ onPick, onClose, kind = 'music' }) {
 
         {data && data.moods.length > 0 && (
           <div className="music-library-moods">
-            {[{ id: 'all', label: 'All' }, ...data.moods].map(m => (
+            {[{ id: 'all', label: t('music.all') }, ...data.moods].map(m => (
               <button key={m.id} className={mood === m.id ? 'active' : ''} onClick={() => setMood(m.id)}>
                 {m.label}
               </button>
@@ -306,47 +313,47 @@ function MusicLibrary({ onPick, onClose, kind = 'music' }) {
         )}
 
         <div className="music-library-list">
-          {!data && <div className="music-library-empty">{cfg.loading}</div>}
-          {data && error && <div className="music-library-empty">{cfg.failed}</div>}
-          {data && !error && visible.length === 0 && <div className="music-library-empty">{cfg.none}</div>}
-          {visible.map(t => (
-            <div key={t.key} className={`music-library-row${playingKey === t.key ? ' playing' : ''}`}>
-              <button className="music-library-play" onClick={() => togglePreview(t)} title={playingKey === t.key ? 'Stop' : 'Listen'}>
-                {playingKey === t.key ? <Pause size={14} /> : <Play size={14} />}
+          {!data && <div className="music-library-empty">{t(cfg.loading)}</div>}
+          {data && error && <div className="music-library-empty">{t(cfg.failed)}</div>}
+          {data && !error && visible.length === 0 && <div className="music-library-empty">{t(cfg.none)}</div>}
+          {visible.map(track => (
+            <div key={track.key} className={`music-library-row${playingKey === track.key ? ' playing' : ''}`}>
+              <button className="music-library-play" onClick={() => togglePreview(track)} title={playingKey === track.key ? t('music.stop') : t('music.listen')}>
+                {playingKey === track.key ? <Pause size={14} /> : <Play size={14} />}
               </button>
               <div className="music-library-info">
                 <div className="music-library-title">
-                  {t.title}
-                  {t.is3speak && <span className="music-library-badge">3Speak</span>}
+                  {track.title}
+                  {track.is3speak && <span className="music-library-badge">3Speak</span>}
                 </div>
                 <div className="music-library-meta">
-                  {t.artist} · {playingKey === t.key
-                    ? `${formatDuration(scrubTime ?? position, kind === 'sfx')} / ${formatDuration(t.duration, kind === 'sfx')}`
-                    : formatDuration(t.duration, kind === 'sfx')}
+                  {track.artist} · {playingKey === track.key
+                    ? `${formatDuration(scrubTime ?? position, kind === 'sfx')} / ${formatDuration(track.duration, kind === 'sfx')}`
+                    : formatDuration(track.duration, kind === 'sfx')}
                 </div>
                 <Waveform
-                  peaks={t.peaks}
-                  duration={t.duration}
+                  peaks={track.peaks}
+                  duration={track.duration}
                   position={position}
-                  active={playingKey === t.key}
-                  onSeek={(secs) => seek(t, secs)}
-                  onScrub={playingKey === t.key ? setScrubTime : undefined}
-                  title={t.title}
+                  active={playingKey === track.key}
+                  onSeek={(secs) => seek(track, secs)}
+                  onScrub={playingKey === track.key ? setScrubTime : undefined}
+                  title={track.title}
                 />
               </div>
               <button
                 className="music-library-add"
-                onClick={() => handleAdd(t)}
+                onClick={() => handleAdd(track)}
                 disabled={!!adding}
-                title={cfg.addTitle}
+                title={t(cfg.addTitle)}
               >
-                {adding === t.key ? '...' : <><Plus size={14} /> Add</>}
+                {adding === track.key ? '...' : <><Plus size={14} /> {t('music.add')}</>}
               </button>
             </div>
           ))}
         </div>
 
-        <p className="music-library-note">{cfg.note}</p>
+        <p className="music-library-note">{t(cfg.note)}</p>
         <audio ref={audioRef} onEnded={() => setPlayingKey(null)} preload="none" />
       </div>
     </div>

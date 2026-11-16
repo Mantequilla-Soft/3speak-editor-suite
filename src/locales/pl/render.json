@@ -1,0 +1,83 @@
+{
+  "button": {
+    "rendering": "Renderowanie...",
+    "exporting": "Eksportowanie...",
+    "uploading": "Przesyłanie {{percent}}",
+    "reRender": "Renderuj ponownie",
+    "exportAgain": "Eksportuj ponownie",
+    "trimToRender": "Przytnij oś czasu do {{limit}} lub mniej, aby renderować",
+    "trimToExport": "Przytnij oś czasu do {{limit}} lub mniej, aby eksportować"
+  },
+  "exportAs": {
+    "button": "Eksportuj jako",
+    "title": "Eksportuj jako: ten sam projekt jako Short, film kwadratowy lub poziomy, kadrowany wokół twarzy",
+    "close": "Zamknij Eksportuj jako",
+    "waitUpload": "Poczekaj na zakończenie przesyłania."
+  },
+  "done": {
+    "download": "Pobierz",
+    "audiograms": "Audiogramy",
+    "audiogramsCount": "Audiogramy ({{n}})",
+    "audiogramsTitle": "Krótkie filmy z fragmentami odcinka, do udostępnienia lub publikacji razem z nim jako Shorty",
+    "videoPodcast": "Podcast wideo",
+    "videoPodcastTitle": "Cały odcinek jako film 16:9 z okładką, falą dźwięku, napisami i informacją, kto mówi",
+    "useAudio": "Użyj tego audio",
+    "sendVideo": "Wyślij film"
+  },
+  "failed": "Renderowanie nie powiodło się: {{error}}",
+  "phase": {
+    "preparing": "Przygotowywanie plików...",
+    "submitting": "Wysyłanie zadania renderowania...",
+    "busyRetry": "Serwery renderowania są zajęte. Ponowna próba za {{seconds}} s...",
+    "offlineRetry": "Brak połączenia z serwerem renderowania. Ponowna próba za {{seconds}} s...",
+    "starting": "Rozpoczynanie...",
+    "reconnecting": "Ponowne łączenie z serwerem renderowania...",
+    "uploadingFile": "Przesyłanie {{name}} ({{index}}/{{total}})...",
+    "uploadingUnnamed": "Przesyłanie pliku ({{index}}/{{total}})...",
+    "uploadingPlate": "Przesyłanie klatki tła dla {{name}}...",
+    "uploadingPlateUnnamed": "Przesyłanie klatki tła dla klipu..."
+  },
+  "queue": {
+    "next": "Jesteś następny w kolejce",
+    "inLine": {
+      "one": "Twoje miejsce w kolejce: {{n}}",
+      "two": "Twoje miejsce w kolejce: {{n}}",
+      "few": "Twoje miejsce w kolejce: {{n}}",
+      "other": "Twoje miejsce w kolejce: {{n}}"
+    },
+    "waiting": "Oczekiwanie na wolne miejsce do renderowania..."
+  },
+  "legacy": {
+    "exportVideo": "Eksportuj film",
+    "cancelTitle": "Anuluj eksport",
+    "settingsTitle": "Ustawienia eksportu",
+    "uploadingRender": "Przesyłanie {{name}} ({{percent}}). Edytuj dalej; renderowanie odblokuje się po zakończeniu.",
+    "uploadingExport": "Przesyłanie {{name}} ({{percent}}). Edytuj dalej; eksport odblokuje się po zakończeniu.",
+    "lengthRender": "Oś czasu trwa {{length}}. Przytnij ją do {{limit}} lub mniej, aby renderować.",
+    "lengthExport": "Oś czasu trwa {{length}}. Przytnij ją do {{limit}} lub mniej, aby eksportować.",
+    "method": "Metoda eksportu",
+    "methodCanvas": "Canvas (WYSIWYG)",
+    "methodFast": "Szybka (bez efektów)",
+    "canvasHint": "Zachowuje wszystkie efekty wizualne dokładnie tak, jak w podglądzie",
+    "fastHint": "Szybszy eksport, ale pomija powiększenie, położenie, kadrowanie i nakładki tekstowe",
+    "quality": "Jakość",
+    "qualityHigh": "Wysoka (większy plik)",
+    "qualityMedium": "Średnia (zalecana)",
+    "qualityLow": "Niska (mniejszy plik)",
+    "processing": "Przetwarzanie... {{percent}}",
+    "renderingPercent": "Renderowanie... {{percent}}",
+    "downloadRendered": "Pobierz wyrenderowany film",
+    "ffmpegLoading": "Wczytywanie FFmpeg...",
+    "ffmpegNotLoaded": "FFmpeg nie jest wczytany",
+    "addClips": "Dodaj klipy do osi czasu, aby eksportować"
+  },
+  "canvas": {
+    "loadingMedia": "Wczytywanie multimediów...",
+    "renderingFrames": "Renderowanie klatek...",
+    "encodingVideo": "Kodowanie wideo...",
+    "processingAudio": "Przetwarzanie audio...",
+    "convertingMp4": "Konwertowanie do MP4...",
+    "preparingDownload": "Przygotowywanie pobierania...",
+    "complete": "Gotowe!"
+  }
+}

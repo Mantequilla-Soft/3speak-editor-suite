@@ -1,0 +1,64 @@
+{
+  "title": "ステッカー",
+  "search": "ステッカーを検索",
+  "textBoxes": "テキストボックス",
+  "loading": "ステッカーを読み込み中...",
+  "noMatch": "一致するステッカーはありません。",
+  "tileTitle": "{{name}}（再生ヘッドの位置に追加）",
+  "note": "ステッカーは再生ヘッドの位置に3秒間入ります。他のクリップと同じようにドラッグ、サイズ変更、トリムができ、テキストボックスはあとから編集できます。",
+  "categories": {
+    "emoji": "絵文字",
+    "badges": "バッジ",
+    "shapes": "矢印と図形",
+    "branding": "ブランド"
+  },
+  "presets": {
+    "caption": {
+      "title": "キャプション",
+      "text": "ここにキャプション"
+    },
+    "highlight": {
+      "title": "ハイライト",
+      "text": "必見！"
+    },
+    "brand": {
+      "title": "3Speak レッド",
+      "text": "新着動画"
+    },
+    "bubble": {
+      "title": "吹き出し",
+      "text": "やあ！"
+    },
+    "outline": {
+      "title": "アウトライン",
+      "text": "これを見て"
+    },
+    "neon": {
+      "title": "ネオン",
+      "text": "今夜"
+    },
+    "title": {
+      "title": "大見出し",
+      "text": "ビッグニュース"
+    },
+    "comic": {
+      "title": "コミック",
+      "text": "ドカーン！"
+    },
+    "marker": {
+      "title": "マーカー",
+      "text": "手づくり"
+    },
+    "quote": {
+      "title": "引用",
+      "text": "「上手に伝えよう。」"
+    },
+    "tag": {
+      "title": "ハッシュタグ"
+    },
+    "minimal": {
+      "title": "ミニマル",
+      "text": "シンプルですっきり"
+    }
+  }
+}

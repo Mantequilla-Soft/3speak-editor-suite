@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../utils/backendSelector'
+import { t } from '../i18n'
 
 // Server drafts for the Ad Wizard (backend /api/ad-drafts: 5 drafts, 90 days after the last save).
 // Who the user is comes from the 3Speak page that opened us: it answers 'editor-ready' with
@@ -30,14 +31,14 @@ export default function useAdDrafts() {
   }, [])
 
   const call = useCallback(async (path, opts = {}) => {
-    if (!tokenRef.current) throw new Error('not signed in')
+    if (!tokenRef.current) throw new Error(t('adwizard.errors.notSignedIn'))
     const res = await fetch(api(`/api/ad-drafts${path}`), {
       ...opts,
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${tokenRef.current}`, ...(opts.headers || {}) },
     })
     const body = await res.json().catch(() => ({}))
     if (res.status === 401) { tokenRef.current = null; setSession(null); setReason('sign-in-needed') }
-    if (!res.ok) { const err = new Error(body.error || `drafts ${res.status}`); err.status = res.status; err.body = body; throw err }
+    if (!res.ok) { const err = new Error(body.error || t('adwizard.errors.drafts', { status: String(res.status) })); err.status = res.status; err.body = body; throw err }
     return body
   }, [])
 

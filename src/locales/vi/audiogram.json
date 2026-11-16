@@ -1,0 +1,180 @@
+{
+  "title": "Audiogram",
+  "tour": {
+    "again": "Xem lại phần hướng dẫn",
+    "againLabel": "Xem lại hướng dẫn audiogram"
+  },
+  "saveAndClose": "Lưu và đóng",
+  "saveAndCloseTitle": "Audiogram của bạn được giữ cùng âm thanh này và được đăng cùng nó dưới dạng Shorts",
+  "loadError": "Không tải được cài đặt audiogram: {{error}}",
+  "loadingLook": "Đang tải giao diện audiogram của bạn…",
+  "start": {
+    "title": "Chọn một đoạn của tập",
+    "text_other": "Audiogram là một video ngắn từ một đoạn trong tập của bạn, dài tối đa {{count}} phút. Nó được đăng thành Short trên 3Speak cùng với âm thanh. Hãy bắt đầu bằng cách đánh dấu điểm đầu và điểm cuối trên dòng thời gian.",
+    "choose": "Chọn trên dòng thời gian"
+  },
+  "stage": {
+    "label": "Xem trước audiogram: kéo các phần để di chuyển, kéo góc để đổi kích thước, kéo tay cầm tròn để xoay",
+    "frameTitle": "Xem trước audiogram",
+    "turned": "{{name}} · {{angle}}°",
+    "rotate": "Xoay (Shift: mỗi bước 15°). Nhấp đúp: thẳng lại",
+    "hint": "Kéo các phần, kéo một góc để đổi kích thước (Shift giữ tỉ lệ), kéo tay cầm tròn để xoay. Phím mũi tên để dịch nhẹ, [ và ] để xoay.",
+    "hintTemplate": "Kéo các phần, kéo một góc để đổi kích thước (Shift giữ tỉ lệ), kéo tay cầm tròn để xoay. Phím mũi tên để dịch nhẹ, [ và ] để xoay. Audiogram gần nhất của bạn là điểm khởi đầu."
+  },
+  "layer": {
+    "logo": {
+      "name": "Logo 3Speak",
+      "drag": "Logo 3Speak: kéo để di chuyển",
+      "dragSelected": "Logo 3Speak: kéo để di chuyển, kéo góc để đổi kích thước, kéo tay cầm tròn để xoay"
+    },
+    "cover": {
+      "name": "Ảnh",
+      "drag": "Ảnh: kéo để di chuyển",
+      "dragSelected": "Ảnh: kéo để di chuyển, kéo góc để đổi kích thước, kéo tay cầm tròn để xoay",
+      "hide": "Ẩn ảnh",
+      "show": "Hiện ảnh",
+      "forward": "Đưa ảnh lên trên",
+      "back": "Đưa ảnh xuống dưới"
+    },
+    "title": {
+      "name": "Tiêu đề",
+      "drag": "Tiêu đề: kéo để di chuyển",
+      "dragSelected": "Tiêu đề: kéo để di chuyển, kéo góc để đổi kích thước, kéo tay cầm tròn để xoay",
+      "hide": "Ẩn tiêu đề",
+      "show": "Hiện tiêu đề",
+      "forward": "Đưa tiêu đề lên trên",
+      "back": "Đưa tiêu đề xuống dưới"
+    },
+    "line": {
+      "name": "Dòng phụ",
+      "drag": "Dòng phụ: kéo để di chuyển",
+      "dragSelected": "Dòng phụ: kéo để di chuyển, kéo góc để đổi kích thước, kéo tay cầm tròn để xoay",
+      "hide": "Ẩn dòng phụ",
+      "show": "Hiện dòng phụ",
+      "forward": "Đưa dòng phụ lên trên",
+      "back": "Đưa dòng phụ xuống dưới"
+    },
+    "wave": {
+      "name": "Dạng sóng",
+      "drag": "Dạng sóng: kéo để di chuyển",
+      "dragSelected": "Dạng sóng: kéo để di chuyển, kéo góc để đổi kích thước, kéo tay cầm tròn để xoay",
+      "hide": "Ẩn dạng sóng",
+      "show": "Hiện dạng sóng",
+      "forward": "Đưa dạng sóng lên trên",
+      "back": "Đưa dạng sóng xuống dưới"
+    }
+  },
+  "piece": {
+    "label": "Đoạn của tập",
+    "range": "{{from}} – {{to}} · {{seconds}} giây",
+    "inChapter": "trong “{{title}}”",
+    "change": "Đổi đoạn"
+  },
+  "look": {
+    "title": "Tiêu đề",
+    "titleLabel": "Tiêu đề trên video",
+    "line": "Dòng bên dưới <small>(*dấu sao* làm chữ thành màu đỏ)</small>",
+    "lineLabel": "Dòng phụ trên video",
+    "branding": "Nhận diện 3Speak",
+    "logoGroup": "Logo",
+    "picture": "Ảnh",
+    "waveform": "Dạng sóng",
+    "waveType": "Kiểu dạng sóng",
+    "waveColour": "Màu dạng sóng",
+    "colour": "Màu {{colour}}",
+    "anyColour": "Màu bất kỳ",
+    "anyWaveColour": "Màu dạng sóng bất kỳ"
+  },
+  "logo": {
+    "mark": "Logo 3S",
+    "full": "Logo 3Speak"
+  },
+  "wave": {
+    "bars": "Cột",
+    "centered": "Căn giữa",
+    "line": "Đường",
+    "dots": "Mảnh",
+    "circle": "Vòng tròn",
+    "ring": "Sóng tròn"
+  },
+  "picture": {
+    "upload": "Tải ảnh lên",
+    "yours": "Ảnh của bạn",
+    "coverOf": "Ảnh bìa của “{{title}}”",
+    "playlistCover": "Ảnh bìa danh sách phát",
+    "noCovers": "Danh sách phát của bạn chưa có ảnh bìa.",
+    "signIn": "Đăng nhập 3Speak để thêm ảnh."
+  },
+  "parts": {
+    "title": "Các phần <small>(từ trước ra sau)</small>",
+    "logoLocked": "Logo 3Speak luôn hiển thị, ở phía trước và không bao giờ nhỏ hơn kích thước quy định",
+    "alwaysShown": "Luôn hiển thị",
+    "hide": "Ẩn",
+    "show": "Hiện",
+    "forward": "Lên trên",
+    "back": "Xuống dưới",
+    "tidy": "Sắp xếp gọn gàng"
+  },
+  "make": {
+    "starting": "Đang bắt đầu...",
+    "working": "Đang xử lý...",
+    "noWords": "không tìm được lời của đoạn này (tắt phụ đề để tạo mà không có phụ đề)",
+    "failedPlain": "thất bại",
+    "signIn": "Đăng nhập 3Speak để tạo audiogram.",
+    "failed": "Không tạo được audiogram: {{error}}",
+    "make": "Tạo audiogram",
+    "another": "Tạo thêm audiogram"
+  },
+  "made": {
+    "title": "Audiogram của bạn",
+    "hint": "Chúng được đăng thành Shorts trên 3Speak cùng với âm thanh, mỗi video kèm liên kết đến bài đăng, snap hoặc bình luận của âm thanh.",
+    "fallbackTitle": "Audiogram {{n}}",
+    "length": "{{at}} · {{seconds}} giây",
+    "textPlaceholder": "Nội dung Short (không bắt buộc). Liên kết đến audio được tự động thêm vào.",
+    "textLabel": "Nội dung Short {{n}}",
+    "editText": "Sửa nội dung",
+    "writeText": "Viết nội dung",
+    "download": "Tải xuống",
+    "removeLabel": "Gỡ audiogram {{n}}"
+  },
+  "confirm": {
+    "title": "Đóng mà không tạo?",
+    "text": "Các thay đổi giao diện của bạn chưa được đưa vào audiogram nào. Chúng sẽ mất khi bạn đóng.",
+    "stays_other": "{{count}} audiogram bạn đã tạo vẫn được giữ cùng âm thanh này.",
+    "keep": "Tiếp tục chỉnh sửa"
+  },
+  "captions": {
+    "label": "Phụ đề",
+    "drag": "Phụ đề: kéo để di chuyển",
+    "dragSelected": "Phụ đề: kéo để di chuyển, kéo một cạnh để đổi độ rộng",
+    "sample": "Lời bạn nói hiện ở đây ngay khi được nói",
+    "show": "Hiện lời nói, từng từ một",
+    "checking": "Đang kiểm tra máy chủ...",
+    "unavailable": "Phụ đề hiện không khả dụng trên máy chủ chỉnh sửa này.",
+    "listening": "Đang nghe...",
+    "getWords": "Lấy lời",
+    "wordCount_other": "{{count}} từ trong đoạn này.",
+    "noSpeech": "Không tìm thấy lời nói trong đoạn này.",
+    "fix": "Sửa từ",
+    "doneFixing": "Sửa xong",
+    "word": "Từ {{n}}",
+    "removeWord": "Gỡ từ này",
+    "removeWordLabel": "Gỡ {{word}}",
+    "style": "Kiểu phụ đề",
+    "preset": {
+      "karaoke": "Karaoke",
+      "pop": "Bật lên",
+      "plain": "Phụ đề"
+    },
+    "wordsAtATime": "Số từ mỗi lần",
+    "perPage_other": "{{count}} từ mỗi lần",
+    "font": "Phông chữ phụ đề",
+    "size": "Cỡ phụ đề",
+    "textColour": "Màu chữ phụ đề",
+    "textColourSwatch": "Màu chữ {{colour}}",
+    "highlightColour": "Màu tô sáng",
+    "highlight": "Tô sáng",
+    "highlightSwatch": "Tô sáng {{colour}}",
+    "capitals": "Chữ in hoa"
+  }
+}

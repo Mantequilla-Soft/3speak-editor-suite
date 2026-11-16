@@ -1,0 +1,64 @@
+{
+  "title": "스티커",
+  "search": "스티커 검색",
+  "textBoxes": "텍스트 상자",
+  "loading": "스티커 불러오는 중...",
+  "noMatch": "일치하는 스티커가 없습니다.",
+  "tileTitle": "{{name}} (재생 헤드 위치에 추가)",
+  "note": "스티커는 재생 헤드 위치에 3초 동안 들어가요. 다른 클립처럼 드래그, 크기 조정, 트리밍할 수 있고, 텍스트 상자는 계속 편집할 수 있어요.",
+  "categories": {
+    "emoji": "이모지",
+    "badges": "배지",
+    "shapes": "화살표 및 도형",
+    "branding": "브랜딩"
+  },
+  "presets": {
+    "caption": {
+      "title": "캡션",
+      "text": "여기에 캡션 입력"
+    },
+    "highlight": {
+      "title": "강조",
+      "text": "꼭 보세요!"
+    },
+    "brand": {
+      "title": "3Speak 레드",
+      "text": "새 동영상"
+    },
+    "bubble": {
+      "title": "말풍선",
+      "text": "안녕하세요!"
+    },
+    "outline": {
+      "title": "외곽선",
+      "text": "이것 좀 보세요"
+    },
+    "neon": {
+      "title": "네온",
+      "text": "오늘 밤"
+    },
+    "title": {
+      "title": "큰 제목",
+      "text": "빅 뉴스"
+    },
+    "comic": {
+      "title": "만화",
+      "text": "쾅!"
+    },
+    "marker": {
+      "title": "마커",
+      "text": "손으로 쓴"
+    },
+    "quote": {
+      "title": "인용",
+      "text": "“잘 말하세요.”"
+    },
+    "tag": {
+      "title": "해시태그"
+    },
+    "minimal": {
+      "title": "미니멀",
+      "text": "심플하고 깔끔하게"
+    }
+  }
+}

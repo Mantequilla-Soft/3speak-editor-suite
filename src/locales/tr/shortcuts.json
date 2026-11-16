@@ -1,0 +1,53 @@
+{
+  "sheet": {
+    "title": "Klavye kısayolları"
+  },
+  "groups": {
+    "playback": "Oynatma",
+    "clips": "Klipler",
+    "project": "Proje"
+  },
+  "items": {
+    "playPause": "Oynat / duraklat",
+    "playForward": "İleri oynat; 2x, 4x, 8x için tekrar bas",
+    "playBackward": "Geri oynat; hızlandırmak için tekrar bas",
+    "stop": "Durdur",
+    "frameStep": "Bir kare geri / ileri (Shift: 10 kare)",
+    "nudge": "Oynatma kafasını 0,1 sn kaydır (Shift: 1 sn)",
+    "fullscreen": "Tam ekran aç / kapat",
+    "nextPrevClip": "Sonraki / önceki klibi seç",
+    "clipLeftRight": "Aynı kanaldaki önceki / sonraki klip",
+    "clipUpDown": "Üstteki / alttaki kanaldaki klip",
+    "openClip": "Seçili klibin ayarlarını aç",
+    "selectNone": "Seçimi kaldır",
+    "selectAll": "Tüm klipleri seç",
+    "remove": "Seçili klip(ler)i kaldır",
+    "split": "Seçili klibi oynatma kafasında böl",
+    "duplicate": "Seçili klibi çoğalt",
+    "ungroup": "Klip grubunu çöz",
+    "closeGap": "Oynatma kafasındaki boşluğu kapat",
+    "addText": "Oynatma kafasına metin ekle",
+    "undo": "Geri al",
+    "redo": "Yinele",
+    "addFlag": "Oynatma kafasına bayrak ekle",
+    "addChapter": "Oynatma kafasına kısım ekle",
+    "zoom": "Zaman çizelgesini yakınlaştır / uzaklaştır",
+    "showSheet": "Bu kısayolları göster"
+  },
+  "keys": {
+    "space": "Boşluk",
+    "tab": "Tab",
+    "shift": "Shift",
+    "alt": "Alt",
+    "ctrl": "Ctrl",
+    "enter": "Enter",
+    "esc": "Esc",
+    "delete": "Delete"
+  },
+  "announce": {
+    "selected": "Seçildi: {{clip}}",
+    "stopped": "Durduruldu",
+    "forward": "İleri {{speed}}x",
+    "backward": "Geri {{speed}}x"
+  }
+}

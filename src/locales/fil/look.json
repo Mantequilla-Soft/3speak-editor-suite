@@ -1,0 +1,53 @@
+{
+  "title": "Itsura",
+  "noEffects": "Walang effect",
+  "presetsLabel": "Mga preset ng itsura",
+  "doubleClickReset": "I-double-click para i-reset",
+  "presets": {
+    "original": "Orihinal",
+    "warm": "Mainit",
+    "cool": "Malamig",
+    "vivid": "Matingkad",
+    "matte": "Matte",
+    "bw": "B&W",
+    "vintage": "Vintage",
+    "tealorange": "Teal at Orange",
+    "fade": "Kupas",
+    "noir": "Noir",
+    "sunset": "Paglubog ng araw"
+  },
+  "sliders": {
+    "blur": "Blur",
+    "vignette": "Vignette",
+    "sharpen": "Patalasin",
+    "split": "Teal at orange"
+  },
+  "transition": {
+    "title": "Transition",
+    "none": "Wala",
+    "types": {
+      "crossfade": "Crossfade",
+      "dissolve": "Dumilim muna",
+      "slideleft": "Dausdos pakaliwa",
+      "slideright": "Dausdos pakanan",
+      "slideup": "Dausdos pataas",
+      "zoom": "Zoom",
+      "whip": "Hagupit"
+    },
+    "length": "Haba ng transition (segundo)",
+    "fades": "Mga fade",
+    "noFades": "Walang fade",
+    "in": "Papasok",
+    "out": "Palabas",
+    "fadeInSeconds": "Fade in (segundo)",
+    "fadeOutSeconds": "Fade out (segundo)",
+    "intoNext": "Papunta sa susunod na clip",
+    "needNext": "Maglagay ng clip kasunod mismo nito sa parehong track para magdagdag ng transition.",
+    "fromTo": "{{from}} papunta sa {{to}}",
+    "fromUnnamed": "Clip papunta sa {{to}}",
+    "toUnnamed": "{{from}} papunta sa susunod na clip",
+    "bothUnnamed": "Clip papunta sa susunod na clip",
+    "add": "Magdagdag ng transition",
+    "cutLabel": "{{type}}, {{seconds}} seg"
+  }
+}

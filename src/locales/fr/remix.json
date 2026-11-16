@@ -1,0 +1,42 @@
+{
+  "titles": {
+    "mode": "Comment voulez-vous remixer ?",
+    "stitch": "Où placer votre clip ?",
+    "reaction": "Où placer votre réaction ?"
+  },
+  "skip": "Passer, montage libre",
+  "options": {
+    "stitch": {
+      "title": "Stitch",
+      "text": "Enregistrez un clip qui passe avant ou après l'original."
+    },
+    "reaction": {
+      "title": "Réaction",
+      "text": "Filmez-vous pendant que l'original joue."
+    },
+    "free": {
+      "title": "Montage libre",
+      "text": "Ouvrir l'éditeur avec l'original sur la chronologie."
+    },
+    "stitchBefore": {
+      "title": "Avant l'original",
+      "text": "Votre clip passe d'abord, puis l'original."
+    },
+    "stitchAfter": {
+      "title": "Après l'original",
+      "text": "L'original passe d'abord, puis votre clip."
+    },
+    "overlay": {
+      "title": "Superposition",
+      "text": "Votre caméra dans un petit cadre par-dessus l'original. Faites-le glisser où vous voulez."
+    },
+    "tileTop": {
+      "title": "Mosaïque en haut",
+      "text": "L'original passe dans la moitié inférieure, vous en haut."
+    },
+    "tileBottom": {
+      "title": "Mosaïque en bas",
+      "text": "L'original passe dans la moitié supérieure, vous en bas."
+    }
+  }
+}

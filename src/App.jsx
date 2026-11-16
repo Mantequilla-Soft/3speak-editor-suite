@@ -1,32 +1,28 @@
 import { useCallback, useEffect, useRef, useMemo, useState } from 'react'
-import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, HelpCircle, Maximize, Minimize, Scissors, Play, Pause, MousePointerClick } from './components/icons'
+import { Undo2, Redo2, ChevronDown, ChevronRight, FolderPlus, Video, X, Download, Upload, Send, Clapperboard, Info, Film, Image as ImageIcon, Music, Mic, AudioWaveform, LayoutTemplate, Gauge, Loader2, Bookmark, HelpCircle, Maximize, Minimize, Scissors, Play, Pause, MousePointerClick, Keyboard, ScrollText, Wand2 } from './components/icons'
 import { useFFmpeg } from './hooks/useFFmpeg'
 import { useCanvasExport } from './hooks/useCanvasExport'
 import { useTimeline } from './hooks/useTimeline'
+import { useUndoableState } from './hooks/useHistory'
 import { useIframeApi } from './hooks/useIframeApi'
+import { STOCK_ENABLED } from './utils/stockLibrary'
 import { isHlsUrl } from './utils/hlsHelper'
 import { reverseClipOnBackend } from './utils/reverseClip'
 import { selectBackend, getBackendUrl, api } from './utils/backendSelector'
-import ProjectLibrary from './components/ProjectLibrary'
 import Timeline from './components/Timeline'
-import VideoPreview from './components/VideoPreview'
 import GlobalPreview from './components/GlobalPreview'
+// opened on demand, each its own chunk (components/lazyPanels.jsx)
+import { ProjectLibrary, VideoPreview, ExportButton, RecordVideo, RecordAudio, RemixModePicker, MusicLibrary, AudioTemplateDialog, ChaptersDialog, AudiogramDialog, BeatSyncModal, StickerPicker, StockLibrary, CaptionsPanel, ShortcutSheet, TitleTemplates } from './components/lazyPanels'
 import ClipProperties from './components/ClipProperties'
-import ExportButton from './components/ExportButton'
-import RecordVideo from './components/RecordVideo'
-import RecordAudio from './components/RecordAudio'
+import { routeAnimatedEdits, mediaView, mediaPartsToClip } from './utils/motionEdits'
 import OnboardingTour, { AUDIO_TOUR_STEPS, RANGE_PICK_TOUR_STEPS, useFirstTimeTour } from './components/OnboardingTour'
 import MultiClipProperties from './components/MultiClipProperties'
 import { soundTargets } from './utils/multiSelect'
-import RemixModePicker from './components/RemixModePicker'
-import MusicLibrary from './components/MusicLibrary'
 import { REMIX_LAYOUTS, hasLayout, clampLayout } from './utils/remixLayout'
-import { MAX_TIMELINE_SECONDS, MAX_TIMELINE_ADJ, MAX_TIMELINE_TEXT, getTimelineEnd } from './utils/limits'
+import { MAX_TIMELINE_SECONDS, maxTimelineText, getTimelineEnd } from './utils/limits'
 import LengthLimitNotice from './components/LengthLimitNotice'
 import TooLargeNotice from './components/TooLargeNotice'
 import SilenceCutModal, { loadSettings as loadAutoCutSettings } from './components/SilenceCutModal'
-import AudioTemplateDialog from './components/AudioTemplateDialog'
-import ChaptersDialog from './components/ChaptersDialog'
 import { newChapter, moveChapter, resolveChapters, chapterSpans, chapterTime, MAX_CHAPTERS } from './utils/chapters'
 import { duckPlans, clipDuckSetting, applyMasterDuck, DUCK_DEPTHS, DUCK_DEFAULT_DB } from './utils/duck'
 import { trackNumbers, trackLabel } from './utils/trackNumbers'
@@ -36,19 +32,31 @@ import { applyAudioTemplate, removeAudioTemplate, appliedRoles, hasSlots } from 
 import { loadLoudness, planCuts } from './utils/silenceDetect'
 import { combineLoudness, groupSpan, overlappingVoices } from './utils/groupSilence'
 import { isAudioMode } from './utils/editorMode'
-import AudiogramDialog from './components/AudiogramDialog'
 import { audiogramsToPost } from './utils/audiogramLayers'
 import { audioFileName } from './utils/audioTemplate'
-import BeatSyncModal from './components/BeatSyncModal'
-import StickerPicker from './components/StickerPicker'
+import { usePersonMasks } from './hooks/usePersonMasks'
 import EncodingNotice from './components/EncodingNotice'
 import ClipColorFilters from './components/ClipColorFilters'
+import { outputSize } from './utils/outputSize'
 import { DraftsPrompt, DraftLimitPicker, CloseDialog, DraftStatus } from './components/DraftsDialogs'
 import { useDrafts, savedPlayhead } from './hooks/useDrafts'
+import { useAutoCaptions } from './hooks/useAutoCaptions'
+import { normalizeCaptions, suggestEmojis, DEFAULT_CAPTION_STYLE } from './utils/captions'
+import { voiceTracksOf } from './utils/captionSources'
 import ConfirmDialog from './components/ConfirmDialog'
 import { useCleaningStatus, cleaningText } from './utils/cleaningStatus'
 import { isTypingTarget } from './utils/keyboard'
+import { isRenderActive } from './utils/renderQueue'
+import { useShortcuts } from './hooks/useShortcuts'
+import { useWordTools } from './components/WordTools'
 import logo3speak from './assets/3speak.png'
+import ProjectFormat from './components/ProjectFormat'
+import FormatsPanel from './components/FormatsPanel'
+import VideoPodcastDialog from './components/VideoPodcastDialog'
+import { useProjectFormat } from './hooks/useProjectFormat'
+import { postFormat } from './utils/projectFormat'
+import { useT } from './i18n'
+import { stripPart } from './utils/partName'
 
 // Audio editor: the talking = clips on audio tracks that are not music and not template parts
 function voiceClipsOf(list) {
@@ -75,6 +83,8 @@ const masterOf = (m) => ({
 })
 
 function App() {
+  const { t, lang, formatNumber, formatList } = useT()
+  const percent = (p) => formatNumber(p, { style: 'percent', maximumFractionDigits: 0 })
   const { ffmpeg, loaded, loading, progress, exporting, exportProgress, loadFFmpeg, processVideo } = useFFmpeg()
   const {
     exporting: canvasExporting,
@@ -93,6 +103,7 @@ function App() {
     addMusicClip,
     addSfxClip,
     addStickerClip,
+    addStockClip,
     fitClipsToBeats,
     loadProjectState,
     addRemixRecording,
@@ -112,7 +123,7 @@ function App() {
     updateTrack,
     removeTrack,
     removeClip,
-    updateClip,
+    updateClip: updateClipPlain,
     selectClip,
     duplicateClip,
     splitClip,
@@ -142,11 +153,18 @@ function App() {
     redo,
     canUndo,
     canRedo,
+    history,
     lengthNotice,
     dismissLengthNotice,
     rejectedFiles,
     dismissRejectedFiles
   } = useTimeline()
+  // An edit of an animated property (slider, drag on the preview) goes to its
+  // keyframe at the playhead (utils/motionEdits.js); anything else as it is
+  const updateClip = useCallback((clipId, updates) => {
+    const clip = tracks.flatMap(t => t.clips).find(c => c.id === clipId)
+    updateClipPlain(clipId, routeAnimatedEdits(clip, updates, playheadPosition))
+  }, [tracks, playheadPosition, updateClipPlain])
 
   // Auto cut popup: the clip it was opened for
   const [autoCutClipId, setAutoCutClipId] = useState(null)
@@ -159,7 +177,7 @@ function App() {
     ? (fileStoreRef.current.get(autoCutClip.id) || autoCutClip.file || (isHlsUrl(autoCutClip.url) ? null : autoCutClip.url))
     : null
   const autoCutUnavailable = autoCutClip && !autoCutSource
-    ? 'This clip is still streaming from 3Speak. Try again once its download has finished.'
+    ? t('app.clipStreaming')
     : null
   const autoCutOpenRef = useRef(false)
   // Audio editor: M adds a chapter at the playhead (set further down)
@@ -179,10 +197,10 @@ function App() {
   }, [autoCutClip, tracks, fileStoreRef])
   const handleAutoCutApply = useCallback((parts, options) => {
     if (autoCutGroup) applyGroupSilenceCut(autoCutGroup.map(m => m.clip.id), parts, options)
-    else applySilenceCut(autoCutClipId, parts, options)
+    else applySilenceCut(autoCutClipId, mediaPartsToClip(autoCutClip, parts), options) // parts are in media seconds
     setAutoCutClipId(null)
     refitTemplateRef.current?.()
-  }, [applySilenceCut, applyGroupSilenceCut, autoCutClipId, autoCutGroup])
+  }, [applySilenceCut, applyGroupSilenceCut, autoCutClipId, autoCutGroup, autoCutClip])
   // (refitTemplate is defined further down, with the template)
   const refitTemplateRef = useRef(null)
 
@@ -208,9 +226,10 @@ function App() {
   const audioMode = isAudioMode
   // Finishing settings of the audio editor (sent with the render, kept in drafts
   // and in the template): loudness levelling, music ducked under the voices
-  const [master, setMaster] = useState(() => masterOf(null))
+  // (these and the tracks are under undo: hooks/useHistory.js)
+  const [master, setMaster, setMasterSilently] = useUndoableState(history, 'master', () => masterOf(null))
   // Chapters (utils/chapters.js): pinned to the recording, resolved to where they are now
-  const [chapters, setChapters] = useState([])
+  const [chapters, setChapters, setChaptersSilently] = useUndoableState(history, 'chapters', [])
   // The preview is playing (the timeline then keeps the playhead in the middle)
   const [previewPlaying, setPreviewPlaying] = useState(false)
   // The timeline's zoom (px per second): saved with the draft, and handed back
@@ -219,7 +238,7 @@ function App() {
   const [restoreZoom, setRestoreZoom] = useState(null)
   const resolvedChapters = useMemo(() => (audioMode ? resolveChapters(tracks, chapters, timelineEnd) : []), [audioMode, tracks, chapters, timelineEnd])
   // Flags: the creator's own numbered markers (utils/flags.js), kept with the draft
-  const [flags, setFlags] = useState([])
+  const [flags, setFlags, setFlagsSilently] = useUndoableState(history, 'flags', [])
   const resolvedFlags = useMemo(() => resolveFlags(tracks, flags, Math.max(timelineEnd, 0)), [tracks, flags, timelineEnd])
   const tracksNowRef = useRef(tracks)
   tracksNowRef.current = tracks
@@ -234,13 +253,23 @@ function App() {
   const audioTitle = useMemo(() => {
     if (!audioMode) return null
     const first = tracks.filter(t => t.type === 'audio' && !t.music).flatMap(t => t.clips).find(c => !c.templateRole)
-    return first ? String(first.name || '').replace(/^Part \d+ · /, '').replace(/\.[a-z0-9]{2,4}$/i, '').trim() || null : null
+    return first ? stripPart(first.name).replace(/\.[a-z0-9]{2,4}$/i, '').trim() || null : null
   }, [audioMode, tracks])
 
-  // Locked to 9:16 for shorts
-  const activeAspectRatio = '9:16'
-  const isVerticalVideo = true
+  // The project's shape (utils/projectFormat.js): a Short (9:16, up to 2 minutes)
+  // or a 16:9, 4:3 or 1:1 video (up to 10). The audio editor keeps the old frame.
+  const projectFormat = useProjectFormat()
+  const activeAspectRatio = audioMode ? '9:16' : projectFormat.aspect
+  const isVerticalVideo = activeAspectRatio === '9:16'
+  // Export as (FormatsPanel): the preview may show the project in another shape, reframed
+  const [formatsOpen, setFormatsOpen] = useState(false)
+  const [viewAspect, setViewAspect] = useState(null)
+  const shownAspect = (formatsOpen && viewAspect) || activeAspectRatio
   const [orientationOverride, setOrientationOverride] = useState(null)
+
+  // Auto captions of a Short (utils/captions.js): { words, language, style, burn } or null
+  const [captions, setCaptions, setCaptionsSilently] = useUndoableState(history, 'captions', null)
+  const [captionsOpen, setCaptionsOpen] = useState(false)
 
   // Imperative handle into GlobalPreview: { togglePlay, pause, playFromStart }
   const previewControlRef = useRef(null)
@@ -268,8 +297,27 @@ function App() {
     clearRemixPrompt,
     playlistCovers,
     requestPlaylistCovers,
-    editTextInHost
-  } = useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay, audioMode, master, title: audioTitle, chapters: chapterList })
+    editTextInHost,
+    buildAndUploadPayload
+  } = useIframeApi({ addToLibraryAndTimeline, addMusicClip, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay, audioMode, master, title: audioTitle, chapters: chapterList, captions: audioMode ? null : captions })
+
+  // Word tools (components/WordTools.jsx): the transcript to edit by text,
+  // Remove fillers, chapter ideas. wordRefitRef: the audio template refitted
+  // after a cut, in the same undo step (set with the template further down)
+  const wordRefitRef = useRef(null)
+  const wordTools = useWordTools({ tracks, buildAndUploadPayload, applyTracks, undo, fileStoreRef, previewControlRef, setChapters, refitRef: wordRefitRef })
+
+  // Auto captions: speech to text on the backend, then the words go on screen
+  const autoCaptions = useAutoCaptions({ enabled: !audioMode })
+  const transcribeCaptions = useCallback(async (language) => {
+    const voiceTracks = voiceTracksOf(tracks)
+    const r = await autoCaptions.start((onPhase) => buildAndUploadPayload(onPhase, { voiceTracks }), language)
+    if (!r) return
+    setCaptions(c => {
+      const style = { ...DEFAULT_CAPTION_STYLE, ...(c?.style || {}) }
+      return { words: style.emoji ? suggestEmojis(r.words) : r.words, language: r.language, style, burn: c?.burn !== false }
+    })
+  }, [tracks, autoCaptions.start, buildAndUploadPayload]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Apply theme to document on mount and changes
   useEffect(() => {
@@ -341,19 +389,19 @@ function App() {
   }, [])
 
   const handleRemoveClip = useCallback((clipId) => {
-    askConfirm('Remove this clip from the timeline?', () => removeClip(clipId))
+    askConfirm(t('app.confirm.removeClip'), () => removeClip(clipId))
   }, [removeClip, askConfirm])
 
   const handleRemoveClips = useCallback((clipIds) => {
-    askConfirm(`Remove these ${clipIds.length} clips from the timeline?`, () => removeClip(clipIds))
+    askConfirm(t('app.confirm.removeClips', { count: clipIds.length }), () => removeClip(clipIds))
   }, [removeClip, askConfirm])
 
   const handleRemoveFromLibrary = useCallback((itemId) => {
-    askConfirm('Remove this item from the project library?', () => removeFromLibrary(itemId))
+    askConfirm(t('app.confirm.removeLibraryItem'), () => removeFromLibrary(itemId))
   }, [removeFromLibrary, askConfirm])
 
   const handleRemoveTrack = useCallback((trackId) => {
-    askConfirm('Remove this track and all its clips?', () => removeTrack(trackId))
+    askConfirm(t('app.confirm.removeTrack'), () => removeTrack(trackId))
   }, [removeTrack, askConfirm])
 
   // Reverse clip: send to backend, get reversed file, swap URL
@@ -431,7 +479,7 @@ function App() {
       }
     } catch (err) {
       console.error('Failed to reverse clip:', err)
-      alert('Failed to reverse clip: ' + err.message)
+      alert(t('app.reverse.failed', { error: err.message }))
     } finally {
       setReversingClipId(null)
     }
@@ -455,11 +503,10 @@ function App() {
     return () => window.removeEventListener('beforeunload', handler)
   }, [])
 
-  // Auto-load FFmpeg on mount
-  useEffect(() => {
-    loadFFmpeg()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // FFmpeg.wasm is for the legacy layout's exports and whole-HLS downloads
+  // only: loaded when one of them needs it, never on open (hooks/useFFmpeg.js)
+  const legacyLayout = !compactMode && !audioMode
+  useEffect(() => { if (legacyLayout) loadFFmpeg() }, [legacyLayout, loadFFmpeg])
 
   // Auto-download HLS streams when new HLS library items appear
   // If clipStart/clipEnd are set → backend prepares the clip (no FFmpeg needed client-side)
@@ -476,14 +523,14 @@ function App() {
           // Backend path: download 480p + trim on server
           downloadedHlsRef.current.add(item.id)
           startBackendClipPreparation(item.id, item.url, item.clipStart, item.clipEnd)
-        } else if (loaded && ffmpeg) {
-          // Client-side path: download full HLS in browser
+        } else {
+          // Client-side path: download full HLS in browser (FFmpeg.wasm loads for it)
           downloadedHlsRef.current.add(item.id)
-          startHlsDownload(item.id, item.url, ffmpeg)
+          loadFFmpeg().then(ff => { if (ff) startHlsDownload(item.id, item.url, ff) })
         }
       }
     }
-  }, [library, loaded, ffmpeg, hlsDownloads, startHlsDownload, startBackendClipPreparation])
+  }, [library, hlsDownloads, loadFFmpeg, startHlsDownload, startBackendClipPreparation])
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -614,12 +661,13 @@ function App() {
       const PLAYHEAD_STEP_LARGE = 1 // 1 second when holding shift
       const step = e.shiftKey ? PLAYHEAD_STEP_LARGE : PLAYHEAD_STEP
 
-      if (e.key === 'ArrowLeft') {
+      // (Alt+arrows move between clips: hooks/useShortcuts.js)
+      if (e.key === 'ArrowLeft' && !e.altKey) {
         e.preventDefault()
         setPlayheadPosition(prev => Math.max(0, prev - step))
       }
 
-      if (e.key === 'ArrowRight') {
+      if (e.key === 'ArrowRight' && !e.altKey) {
         e.preventDefault()
         setPlayheadPosition(prev => prev + step)
       }
@@ -721,6 +769,9 @@ function App() {
     else setRecordingAudioOpen(true)
   }, [])
   const [stickersOpen, setStickersOpen] = useState(false)
+  // Stock media sheet: null closed, {} adding at the playhead, { underClipId } a background for that clip
+  const [stockOpen, setStockOpen] = useState(null)
+  const [titlesOpen, setTitlesOpen] = useState(false) // Titles: motion scene templates
   const [inlineRecordingOpen, setInlineRecordingOpen] = useState(false)
   const [recorderSize, setRecorderSize] = useState('small') // 'small' | 'big'
 
@@ -759,25 +810,25 @@ function App() {
     const { mode, maxDuration } = remixSession
     if (mode === 'stitch') {
       return {
-        title: 'Stitch',
+        title: t('app.remix.stitch'),
         mode,
         sourceClipId: remixSession.sourceClipId,
-        hint: `Record up to ${Math.floor(maxDuration)}s. It plays right ${remixSession.before ? 'before' : 'after'} the original.`,
+        hint: t(remixSession.before ? 'app.remix.stitchHintBefore' : 'app.remix.stitchHintAfter', { seconds: Math.floor(maxDuration) }),
         maxDuration,
         sync: false
       }
     }
     return {
-      title: 'Reaction',
+      title: t('app.remix.reaction'),
       mode,
       sourceClipId: remixSession.sourceClipId,
       layouts: remixSession.layouts,
       timelineStart: remixSession.timelineStart || 0,
-      hint: 'The original plays from the start while you record. Use headphones so it does not echo into your mic.',
+      hint: t('app.remix.reactionHint'),
       maxDuration,
       sync: true
     }
-  }, [remixSession])
+  }, [remixSession, lang]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleRemixChoice = useCallback((mode) => {
     const sourceClipId = remixPrompt?.clipId
@@ -792,7 +843,7 @@ function App() {
     if (mode === 'stitchBefore' || mode === 'stitchAfter') {
       const remaining = MAX_TIMELINE_SECONDS - sourceEnd
       if (remaining < 1) {
-        alert(`The original already fills the ${MAX_TIMELINE_ADJ} limit. Trim it on the timeline, then record your stitch with the camera button.`)
+        alert(t('app.remix.originalFillsLimit', { limit: maxTimelineText() }))
         return
       }
       const before = mode === 'stitchBefore'
@@ -894,10 +945,28 @@ function App() {
     if (id) selectClip(id)
   }, [addTextClip, selectClip])
 
+  // A title (motion scene) at the playhead, above the footage
+  const handleAddTitle = useCallback((props) => {
+    const clipId = addStickerClip({ kind: 'scene', props }, playheadPosition, props.endTime - props.startTime)
+    if (clipId) selectClip(clipId)
+  }, [addStickerClip, selectClip, playheadPosition])
+
   const handlePickSticker = useCallback((sticker) => {
     const clipId = addStickerClip(sticker, playheadPosition)
     if (clipId) selectClip(clipId)
   }, [addStickerClip, selectClip, playheadPosition])
+
+  // Stock media (utils/stockPlacement.js): at the playhead, or behind a clip whose background is removed
+  const handlePickStock = useCallback(async (item) => {
+    const under = stockOpen?.underClipId || null
+    const clipId = await addStockClip(item, playheadPosition, { underClipId: under })
+    if (!clipId) return false
+    if (!under) selectClip(clipId)
+    return true
+  }, [addStockClip, selectClip, playheadPosition, stockOpen])
+
+  // Background removal without a green screen: mattes for the clips that have it on
+  usePersonMasks(tracks, updateClip)
 
   // Sound effects go in at the playhead
   const handlePickSfx = useCallback(async (track) => {
@@ -932,8 +1001,8 @@ function App() {
     if (!downloading) return null
     const [id, info] = downloading
     const item = library.find(l => l.id === id)
-    return { name: item?.name || 'Media', progress: info.progress }
-  }, [hlsDownloads, library])
+    return { name: item?.name || t('app.media'), progress: info.progress }
+  }, [hlsDownloads, library, lang]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Footage this browser cannot show while its playable copy is made; the
   // popup can be hidden per video (the library badge still shows the status)
@@ -962,13 +1031,13 @@ function App() {
   const emptyTimelineActions = (
     <div className="empty-timeline-actions">
       <button type="button" onClick={() => emptyVideoInputRef.current?.click()}>
-        <Film size={22} /> <span>Add video</span>
+        <Film size={22} /> <span>{t('app.empty.addVideo')}</span>
       </button>
       <button type="button" onClick={() => emptyImageInputRef.current?.click()}>
-        <ImageIcon size={22} /> <span>Add image</span>
+        <ImageIcon size={22} /> <span>{t('app.empty.addImage')}</span>
       </button>
       <button type="button" onClick={() => emptyAudioInputRef.current?.click()}>
-        <Music size={22} /> <span>Add audio</span>
+        <Music size={22} /> <span>{t('app.empty.addAudio')}</span>
       </button>
       <input ref={emptyVideoInputRef} type="file" accept="video/*" multiple hidden onChange={(e) => addFilesFromEmpty(e, 'video')} />
       <input ref={emptyImageInputRef} type="file" accept="image/*" multiple hidden onChange={(e) => addFilesFromEmpty(e, 'image')} />
@@ -980,13 +1049,13 @@ function App() {
   const emptyAudioActions = (
     <div className="empty-timeline-actions">
       <button type="button" onClick={() => emptyAudioInputRef.current?.click()}>
-        <Upload size={22} /> <span>Add recording</span>
+        <Upload size={22} /> <span>{t('app.empty.addRecording')}</span>
       </button>
       <button type="button" onClick={() => openAdd('record')}>
-        <Mic size={22} /> <span>Record</span>
+        <Mic size={22} /> <span>{t('app.empty.record')}</span>
       </button>
       <button type="button" onClick={() => openAdd('music')}>
-        <Music size={22} /> <span>Music</span>
+        <Music size={22} /> <span>{t('app.empty.music')}</span>
       </button>
       <input ref={emptyAudioInputRef} type="file" accept="audio/*,video/*" multiple hidden onChange={(e) => addFilesFromEmpty(e, 'audio')} />
     </div>
@@ -1004,9 +1073,9 @@ function App() {
       total += size
       done += size * (item.uploadProgress || 0)
     }
-    const name = uploading.length > 1 ? `${uploading.length} files` : (uploading[0].name || 'Media')
+    const name = uploading.length > 1 ? t('app.files', { count: uploading.length }) : (uploading[0].name || t('app.media'))
     return { name, progress: total ? done / total : 0, count: uploading.length }
-  }, [library])
+  }, [library, lang]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Ref for add-media file input
   const addMediaInputRef = useRef(null)
@@ -1030,16 +1099,22 @@ function App() {
     // Back where the playhead was when the draft was saved, at the zoom it had
     setPlayheadPosition(savedPlayhead(state))
     if (Number.isFinite(+state?.zoom) && +state.zoom > 0) setRestoreZoom({ value: +state.zoom, key: Date.now() })
-    if (state?.master) setMaster(masterOf(state.master))
-    setChapters(Array.isArray(state?.chapters) ? state.chapters.slice(0, MAX_CHAPTERS) : [])
-    setFlags(cleanFlags(state?.flags))
+    // (silently: the opened draft is the first undo step, see loadProjectState)
+    if (state?.master) setMasterSilently(masterOf(state.master))
+    setChaptersSilently(Array.isArray(state?.chapters) ? state.chapters.slice(0, MAX_CHAPTERS) : [])
+    setFlagsSilently(cleanFlags(state?.flags))
+    setCaptionsSilently(normalizeCaptions(state?.captions) ? { ...state.captions, ...normalizeCaptions(state.captions) } : null)
+    // the video project's shape (a draft from before shapes is a Short)
+    if (!audioMode) { projectFormat.setAspect(state?.aspect); setViewAspect(null) }
+    // the transcript (kept out of undo: its words are pinned to the recordings, so undoing a cut brings them back)
+    wordTools.tr.load(state?.transcript)
     // a remix draft: its export posts under the original again
     restoreRemixSource(state?.remix || null)
     // and the clip(s) that were selected (those still on the timeline)
     const ids = new Set((state?.tracks || []).flatMap(t => (t.clips || []).map(c => c.id)))
     const sel = Array.isArray(state?.selected) ? state.selected.filter(id => ids.has(id)) : []
     if (sel.length) selectClips(sel)
-  }, [loadProjectState, setPlayheadPosition, selectClips, restoreRemixSource])
+  }, [loadProjectState, setPlayheadPosition, selectClips, restoreRemixSource, setMasterSilently, setChaptersSilently, setFlagsSilently, setCaptionsSilently, audioMode, projectFormat.setAspect]) // eslint-disable-line react-hooks/exhaustive-deps
   const drafts = useDrafts({
     session: draftSession,
     hasMedia: draftContext.hasMedia,
@@ -1055,7 +1130,10 @@ function App() {
     zoom: timelineZoom,
     flags,
     selected: selectedClipIds.length ? selectedClipIds : (selectedClipId ? [selectedClipId] : []),
-    remix: remixing ? remixSource : null
+    remix: remixing ? remixSource : null,
+    captions: audioMode ? null : captions,
+    aspect: audioMode ? null : activeAspectRatio,
+    transcript: wordTools.tr.transcript
   })
   const canDraftSignIn = isIframe && !draftSession && ['sign-in-needed', 'sign-in-failed', 'signing-in'].includes(draftContext.reason)
 
@@ -1072,6 +1150,7 @@ function App() {
     if (!tpl || !appliedRoles(tracksRef.current).length) return
     applyTracks(t => applyAudioTemplate(t, tpl))
   }, [audioTemplate.template, applyTracks])
+  wordRefitRef.current = (t) => (audioTemplate.template && appliedRoles(t).length ? applyAudioTemplate(t, audioTemplate.template) : t)
 
   const voiceClips = useMemo(() => (audioMode ? voiceClipsOf(tracks) : []), [audioMode, tracks])
 
@@ -1180,11 +1259,11 @@ function App() {
   const groupWithVoices = useCallback((clipId) => {
     const ids = overlappingVoices(tracksRef.current, clipId)
     if (ids.length < 2) {
-      setGroupNotice('Nothing plays at the same time on another voice track. Put the other voice on its own track first.')
+      setGroupNotice(t('app.group.nothing'))
       return
     }
     groupClips(ids)
-    setGroupNotice(`${ids.length} voices grouped: they now move, trim and get their silences cut together.`)
+    setGroupNotice(t('app.group.done', { count: ids.length }))
   }, [groupClips])
 
   // Chapters: added at the playhead (M), renamed, moved, removed
@@ -1192,6 +1271,8 @@ function App() {
   // Audiograms (after an export): the ones made, the piece of the timeline
   // they are made from, and picking that piece on the timeline
   const [audiogramOpen, setAudiogramOpen] = useState(false)
+  // Video podcast: the whole episode as a 16:9 video (VideoPodcastDialog)
+  const [videoPodcastOpen, setVideoPodcastOpen] = useState(false)
   const [audiograms, setAudiograms] = useState([])
   const [audiogramRange, setAudiogramRange] = useState(null)
   const [pickingRange, setPickingRange] = useState(false)
@@ -1286,12 +1367,14 @@ function App() {
     if (!audioMode || !master.duck) return
     applyTracks(ts => applyMasterDuck(ts, master))
     setMaster(m => ({ ...m, duck: false }))
+    // part of the step that brought the Duck (a draft, a template), not one of its own
+    history.amend()
   }, [audioMode, master.duck]) // eslint-disable-line react-hooks/exhaustive-deps
   const [chapterFocus, setChapterFocus] = useState(null)
   const addChapter = useCallback((at) => {
     setChapters(list => {
       if (list.length >= MAX_CHAPTERS) return list
-      const ch = newChapter(tracksRef.current, at, list.length === 0 && at < 1 ? 'Intro' : `Chapter ${list.length + 1}`)
+      const ch = newChapter(tracksRef.current, at, list.length === 0 && at < 1 ? t('app.chapters.intro') : t('app.chapters.numbered', { n: list.length + 1 }))
       setChapterFocus(ch.id)
       return [...list, ch]
     })
@@ -1333,7 +1416,8 @@ function App() {
     else setCloseDialog('parent')
   }, [closeRequest]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isBackendRendering = renderStatus && (renderStatus.status === 'submitting' || renderStatus.status === 'processing')
+  // waiting in the render queue counts too (utils/renderQueue.js)
+  const isBackendRendering = !!renderStatus && isRenderActive(renderStatus.status)
 
   // Preview modal state — user must preview rendered video before sending
   const [showPreview, setShowPreview] = useState(false)
@@ -1371,7 +1455,7 @@ function App() {
       // every other track by its number and name, then all voice tracks at once
       sources: [
         ...others.sort((a, b) => numbers.get(a.id) - numbers.get(b.id)).map(t => ({ id: t.id, label: trackLabel(t, numbers) })),
-        { id: 'voices', label: 'All voice tracks' }
+        { id: 'voices', label: t('app.duck.allVoices') }
       ],
       // a new Duck listens to the first other voice track (else the first other track)
       defaultSource: (others.find(t => !t.music) || others[0])?.id || 'voices'
@@ -1428,8 +1512,8 @@ function App() {
   const multiPanel = multiClips.length > 1 && !(selectMode && !isDesktop) ? (
           <div className="compact-properties-panel multi-clip-panel">
             <div className="compact-properties-header">
-              <span className="compact-properties-title">{multiClips.length} clips selected</span>
-              <button className="compact-btn compact-properties-close" onClick={() => selectClips([])} title="Clear the selection">
+              <span className="compact-properties-title">{t('app.side.clipsSelected', { count: multiClips.length })}</span>
+              <button className="compact-btn compact-properties-close" onClick={() => selectClips([])} title={t('app.side.clearSelection')}>
                 <X size={14} />
               </button>
             </div>
@@ -1444,6 +1528,11 @@ function App() {
             />
           </div>
   ) : null
+  // Speed, freeze frames and keyframes in the clip settings (SpeedControls, KeyframeControls)
+  const retimeCaptions = useCallback((map) => setCaptions(c => (c?.words?.length
+    ? { ...c, words: c.words.map(w => ({ ...w, start: map(w.start), end: Math.max(map(w.start), map(w.end)) })) }
+    : c)), [])
+  const motionKit = { tracks, applyTracks, fileStoreRef, retimeCaptions, setPlayhead: setPlayheadPosition, captions }
   const compactPropertiesPanel = sideClip ? (
           <div className="compact-properties-panel">
             <div className="compact-properties-header">
@@ -1451,7 +1540,7 @@ function App() {
               <button
                 className="compact-btn compact-properties-close"
                 onClick={() => { setCompactPropertiesClipId(null); if (isDesktop) selectClip(null) }}
-                title="Close properties"
+                title={t('app.side.closeProperties')}
               >
                 <X size={14} />
               </button>
@@ -1459,6 +1548,7 @@ function App() {
             <ClipProperties
               clip={sideClip}
               linkedAudio={linkedAudioOf(sideClip)}
+              tracks={audioMode ? null : tracks}
               onUpdateLinkedAudio={(u) => { const a = linkedAudioOf(sideClip); if (a) updateClip(a.id, u) }}
               onUpdateClip={(updates) => updateClip(sideClip.id, updates)}
               onSplit={() => splitClip(sideClip.id)}
@@ -1467,20 +1557,86 @@ function App() {
               duckInfo={audioMode ? duckInfoFor(sideClip) : null}
               playheadPosition={playheadPosition}
               tabbed={!isDesktop}
+              motionKit={audioMode ? null : motionKit}
+              onPickBackground={STOCK_ENABLED ? (clipId) => setStockOpen({ underClipId: clipId }) : null}
             />
           </div>
   ) : null
+
+  // Export as: one of the other shapes, rendered by the panel
+  const sendFormatToHost = ({ outputUrl, aspect, subtitles }) => {
+    if (drafts.hasEdits()) drafts.save().catch(() => {})
+    sendToParent('post-to-3speak', {
+      outputUrl,
+      ...(remixSource && { remixSource }),
+      ...(musicCredits.length > 0 && { musicCredits }),
+      ...(subtitles && { subtitles }),
+      format: postFormat(aspect, timelineEnd)
+    })
+  }
+  const formatsPanel = formatsOpen && !audioMode ? (
+    <div className="compact-properties-panel captions-side">
+      <div className="compact-properties-header">
+        <span className="compact-properties-title">{t('render.exportAs.button')}</span>
+        <button className="compact-btn compact-properties-close" onClick={() => { setFormatsOpen(false); setViewAspect(null) }} title={t('render.exportAs.close')}>
+          <X size={14} />
+        </button>
+      </div>
+      <FormatsPanel
+        projectAspect={activeAspectRatio}
+        viewAspect={viewAspect}
+        onViewAspect={setViewAspect}
+        tracks={tracks}
+        fileStore={fileStoreRef.current}
+        onUpdateClip={updateClip}
+        selectedClipId={selectedClipId}
+        onSelectClip={selectClip}
+        timelineEnd={timelineEnd}
+        buildPayload={(aspect, onPhase) => buildAndUploadPayload(onPhase, { aspect })}
+        canRender={videoClips.length > 0 && !activeUpload && !isBackendRendering}
+        renderBlocked={activeUpload ? t('render.exportAs.waitUpload') : null}
+        canSend={isIframe}
+        onSend={sendFormatToHost}
+      />
+    </div>
+  ) : null
+
+  // Auto captions (Shorts editor): in the clip settings' place while open, so
+  // the canvas stays in sight and shows every change live
+  const captionsPanel = captionsOpen && !audioMode ? (
+    <div className="compact-properties-panel captions-side">
+      <div className="compact-properties-header">
+        <span className="compact-properties-title">{t('app.side.captions')}</span>
+        <button className="compact-btn compact-properties-close" onClick={() => setCaptionsOpen(false)} title={t('app.side.closeCaptions')}>
+          <X size={14} />
+        </button>
+      </div>
+      <CaptionsPanel
+        captions={captions}
+        onChange={setCaptions}
+        status={autoCaptions.status}
+        job={autoCaptions.job}
+        onTranscribe={transcribeCaptions}
+        onCancel={autoCaptions.cancel}
+        onSeek={setPlayheadPosition}
+        playheadPosition={playheadPosition}
+      />
+    </div>
+  ) : null
+
+  // The transcript (edit by text), in the same place while open
+  const transcriptPanel = wordTools.transcriptPanel({ playheadPosition, playing: previewPlaying, onSeek: setPlayheadPosition })
 
   // Desktop: the selected clip's settings in a sidebar. The audio editor puts
   // it beside the stage only, so the timeline gets the full width below.
   const sideBesideStage = isDesktop && audioMode
   const sidePanel = (
     <aside className="compact-side">
-      {multiPanel || (sideClip ? compactPropertiesPanel : (
+      {formatsPanel || captionsPanel || transcriptPanel || multiPanel || (sideClip ? compactPropertiesPanel : (
         <div className="compact-side-empty">
           <MousePointerClick size={28} />
-          <strong>No clip selected</strong>
-          <p>Select a clip on the timeline to see its settings. Drag a box over several clips to change them together.</p>
+          <strong>{t('app.side.noClip')}</strong>
+          <p>{t('app.side.noClipHint')}</p>
         </div>
       ))}
     </aside>
@@ -1492,9 +1648,27 @@ function App() {
     <div className="cleaning-notice" role="status" aria-live="polite">
       <Loader2 size={15} className="encoding-notice-spin" />
       <span>{cleaningText(cleaning)}</span>
-      <small>Long recordings can take a minute.</small>
+      <small>{t('app.cleaningHint')}</small>
     </div>
   ) : null
+
+  // J / K / L, frame steps, moving between clips, the `?` sheet (hooks/useShortcuts.js)
+  const shortcuts = useShortcuts({
+    previewRef: previewControlRef,
+    playing: previewPlaying,
+    tracks,
+    duration: timelineEnd,
+    selectedClipId,
+    selectClip,
+    setPlayheadPosition,
+    openClip: (id) => { if (compactMode || audioMode) setCompactPropertiesClipId(id); else setPropertiesOpen(true) }
+  })
+  const shortcutLayer = (
+    <>
+      {shortcuts.sheetOpen && <ShortcutSheet mode={audioMode ? 'audio' : 'video'} onClose={() => shortcuts.setSheetOpen(false)} />}
+      <div className="editor-sr-only" role="status" aria-live="polite">{shortcuts.announcement}</div>
+    </>
+  )
 
   const confirmDialog = confirmAsk ? (
     <ConfirmDialog message={confirmAsk.message} onConfirm={acceptConfirm} onCancel={closeConfirm} />
@@ -1517,18 +1691,22 @@ function App() {
       // The audiograms: 3Speak posts them as Shorts linking to the episode
       ...(audioMode && audiogramsToPost(audiograms).length > 0 && { audiograms: audiogramsToPost(audiograms) }),
       ...(remixSource && { remixSource }),
-      ...(musicCredits.length > 0 && { musicCredits })
+      ...(musicCredits.length > 0 && { musicCredits }),
+      // Auto captions as subtitles: { language, vttUrl, srtUrl, cues: [{ start, end, text }] }
+      ...(!audioMode && renderStatus.subtitles && { subtitles: renderStatus.subtitles }),
+      // The shape: 3Speak posts a 9:16 render as a Short, the others as a normal video
+      ...(!audioMode && { format: postFormat(activeAspectRatio, timelineEnd) })
     })
   }
 
   return (
       <div className={`app compact${isDesktop ? ' desktop' : ''}${audioMode && pickingRange ? ' picking-range' : ''}`}>
-        <ClipColorFilters tracks={tracks} />
+        <ClipColorFilters tracks={tracks} frame={outputSize(activeAspectRatio)} />
         {/* Backend health warning */}
         {backendStatus === 'error' && (
           <div className="backend-warning">
-            Backend server is unreachable. Recording upload, rendering, and media processing will not work.
-            <button onClick={() => setBackendStatus('ok')}>Dismiss</button>
+            {t('app.backendDown')}
+            <button onClick={() => setBackendStatus('ok')}>{t('app.dismiss')}</button>
           </div>
         )}
 
@@ -1536,16 +1714,22 @@ function App() {
         <header className="app-branding">
           <div className="branding-left">
             <img src={logo3speak} alt="3Speak" className="branding-logo" />
-            <span className="branding-text">{audioMode ? 'Audio Editor' : 'Shorts Editor'} <span className="branding-badge">beta</span></span>
+            <span className="branding-text">{audioMode ? t('app.branding.audioEditor') : isVerticalVideo ? t('app.branding.shortsEditor') : t('app.branding.videoEditor')} <span className="branding-badge">{t('app.branding.beta')}</span></span>
+            {!audioMode && <ProjectFormat aspect={activeAspectRatio} onChange={(a) => { projectFormat.setAspect(a); setViewAspect(null) }} tracks={tracks} />}
             <span className="branding-info" onClick={() => setShowBackendInfo(prev => !prev)}>
               <Info size={14} />
               {showBackendInfo && (
-                <span className="branding-info-popup">Backend: {selectedBackendUrl || 'selecting...'}</span>
+                <span className="branding-info-popup">{selectedBackendUrl ? t('app.branding.backend', { url: selectedBackendUrl }) : t('app.branding.backendSelecting')}</span>
               )}
             </span>
             {audioMode && (
-              <button className="branding-help-btn" onClick={() => setShowTour(true)} title="Show the tour again" aria-label="Show the tour again">
+              <button className="branding-help-btn" onClick={() => setShowTour(true)} title={t('app.branding.showTour')} aria-label={t('app.branding.showTour')}>
                 <HelpCircle size={15} />
+              </button>
+            )}
+            {isDesktop && (
+              <button className="branding-help-btn" onClick={() => shortcuts.setSheetOpen(true)} title={t('app.branding.shortcuts')} aria-label={t('app.branding.shortcutsLabel')}>
+                <Keyboard size={15} />
               </button>
             )}
           </div>
@@ -1554,14 +1738,14 @@ function App() {
             <button
               className="branding-close-btn branding-fullscreen-btn"
               onClick={(e) => { e.currentTarget.blur(); toggleFullscreen() }}
-              title={isFullscreen ? 'Leave full screen (F)' : 'Full screen (F)'}
-              aria-label={isFullscreen ? 'Leave full screen' : 'Full screen'}
+              title={isFullscreen ? t('app.branding.leaveFullscreen') : t('app.branding.fullscreen')}
+              aria-label={isFullscreen ? t('app.branding.leaveFullscreenLabel') : t('app.branding.fullscreenLabel')}
               aria-pressed={isFullscreen}
             >
               {isFullscreen ? <Minimize size={15} /> : <Maximize size={15} />}
             </button>
           )}
-          <button className="branding-close-btn" onClick={handleCloseEditor} title="Close editor">
+          <button className="branding-close-btn" onClick={handleCloseEditor} title={t('app.branding.closeEditor')}>
             <X size={16} />
           </button>
         </header>
@@ -1572,7 +1756,7 @@ function App() {
             <button
               onClick={undo}
               disabled={!canUndo}
-              title="Undo (Ctrl+Z)"
+              title={t('app.menu.undo')}
               className="compact-btn"
             >
               <Undo2 size={16} />
@@ -1580,7 +1764,7 @@ function App() {
             <button
               onClick={redo}
               disabled={!canRedo}
-              title="Redo (Ctrl+Shift+Z)"
+              title={t('app.menu.redo')}
               className="compact-btn"
             >
               <Redo2 size={16} />
@@ -1591,11 +1775,23 @@ function App() {
               className={renderStatus?.status === 'completed' ? 'compact-download-btn' : 'compact-render-btn'}
               onClick={() => { clearRenderStatus(); requestRender() }}
               disabled={(audioMode ? audioClips.length === 0 : videoClips.length === 0) || (exporting || canvasExporting) || isBackendRendering || overLengthLimit || !!activeUpload || !!cutProgress}
-              title={overLengthLimit ? `Trim the timeline to ${MAX_TIMELINE_TEXT} or less to ${audioMode ? 'export' : 'render'}` : undefined}
+              title={overLengthLimit ? t(audioMode ? 'render.button.trimToExport' : 'render.button.trimToRender', { limit: maxTimelineText() }) : undefined}
             >
               {audioMode ? <AudioWaveform size={14} /> : <Clapperboard size={14} />}
-              <span>{isBackendRendering ? (audioMode ? 'Exporting...' : 'Rendering...') : activeUpload ? `Uploading ${Math.round(activeUpload.progress * 100)}%` : renderStatus?.status === 'completed' ? (audioMode ? 'Export again' : 'Re-render') : (audioMode ? 'Export' : 'Render')}</span>
+              <span>{isBackendRendering ? (audioMode ? t('render.button.exporting') : t('render.button.rendering')) : activeUpload ? t('render.button.uploading', { percent: percent(activeUpload.progress) }) : renderStatus?.status === 'completed' ? (audioMode ? t('render.button.exportAgain') : t('render.button.reRender')) : (audioMode ? t('common.export') : t('common.render'))}</span>
             </button>
+            {!audioMode && (
+              <button
+                className={`compact-download-btn${formatsOpen ? ' active' : ''}`}
+                onClick={() => { setFormatsOpen(o => !o); setViewAspect(null) }}
+                disabled={videoClips.length === 0}
+                aria-pressed={formatsOpen}
+                title={t('render.exportAs.title')}
+              >
+                <Film size={14} />
+                <span>{t('render.exportAs.button')}</span>
+              </button>
+            )}
             {renderStatus?.status === 'completed' && renderStatus.outputUrl && (
               <>
                 <a
@@ -1606,12 +1802,18 @@ function App() {
                   rel="noopener noreferrer"
                 >
                   <Download size={14} />
-                  <span>Download</span>
+                  <span>{t('render.done.download')}</span>
                 </a>
                 {audioMode && (
-                  <button className="compact-download-btn" onClick={() => setAudiogramOpen(true)} title="Short videos of pieces of the episode, to share or to post as Shorts with it">
+                  <button className="compact-download-btn" onClick={() => setAudiogramOpen(true)} title={t('render.done.audiogramsTitle')}>
                     <Film size={14} />
-                    <span>Audiograms{audiograms.length ? ` (${audiograms.length})` : ''}</span>
+                    <span>{audiograms.length ? t('render.done.audiogramsCount', { n: audiograms.length }) : t('render.done.audiograms')}</span>
+                  </button>
+                )}
+                {audioMode && (
+                  <button className="compact-download-btn" onClick={() => setVideoPodcastOpen(true)} title={t('render.done.videoPodcastTitle')}>
+                    <Film size={14} />
+                    <span>{t('render.done.videoPodcast')}</span>
                   </button>
                 )}
                 {isIframe && (
@@ -1620,7 +1822,7 @@ function App() {
                     onClick={() => setShowPreview(true)}
                   >
                     <Send size={14} />
-                    <span>{audioMode ? 'Use this audio' : 'Send Video'}</span>
+                    <span>{audioMode ? t('render.done.useAudio') : t('render.done.sendVideo')}</span>
                   </button>
                 )}
               </>
@@ -1630,38 +1832,56 @@ function App() {
             {audioMode && (
               <>
                 <button
-                  className="compact-btn compact-tool-btn"
+                  className="compact-btn compact-tool-btn tour-cut-silences"
                   onClick={openCutSilences}
                   disabled={!cuttableClips.length || !!cutProgress}
-                  title="Cut the silences out of the selected clip (or its group): find the pauses, cut them, close the gaps"
-                  aria-label="Cut silences"
+                  title={t('app.audioTools.cutSilencesTitle')}
+                  aria-label={t('app.audioTools.cutSilences')}
                 >
-                  <AudioWaveform size={15} /><span>Cut silences</span>
+                  <AudioWaveform size={15} /><span>{t('app.audioTools.cutSilences')}</span>
                 </button>
                 <button
-                  className={`compact-btn compact-tool-btn${appliedRoles(tracks).length ? ' active' : ''}`}
+                  className={`compact-btn compact-tool-btn tour-template${appliedRoles(tracks).length ? ' active' : ''}`}
                   onClick={() => setTemplateOpen(true)}
-                  title="Your template: intro, outro and music bed for every recording"
-                  aria-label="Template"
+                  title={t('app.audioTools.templateTitle')}
+                  aria-label={t('app.audioTools.template')}
                 >
-                  <LayoutTemplate size={15} /><span>Template</span>
+                  <LayoutTemplate size={15} /><span>{t('app.audioTools.template')}</span>
                 </button>
                 <button
-                  className={`compact-btn compact-tool-btn${master.loudness ? ' active' : ''}`}
+                  className={`compact-btn compact-tool-btn tour-normalize${master.loudness ? ' active' : ''}`}
                   onClick={() => setMaster(m => ({ ...m, loudness: !m.loudness }))}
                   aria-pressed={master.loudness}
-                  aria-label="Normalize loudness"
-                  title={master.loudness ? 'Normalize is on: the export is brought to an even -16 LUFS (the podcast standard)' : 'Normalize is off: the export keeps your levels as they are'}
+                  aria-label={t('app.audioTools.normalizeLabel')}
+                  title={master.loudness ? t('app.audioTools.normalizeOnTitle') : t('app.audioTools.normalizeOffTitle')}
                 >
-                  <Gauge size={15} /><span>{master.loudness ? 'Normalize: on' : 'Normalize: off'}</span>
+                  <Gauge size={15} /><span>{master.loudness ? t('app.audioTools.normalizeOn') : t('app.audioTools.normalizeOff')}</span>
                 </button>
                 <button
-                  className={`compact-btn compact-tool-btn${chapters.length ? ' active' : ''}`}
+                  className={`compact-btn compact-tool-btn tour-chapters${chapters.length ? ' active' : ''}`}
                   onClick={() => setChaptersOpen(true)}
-                  aria-label="Chapters"
-                  title="Chapters: mark where each part starts (M adds one at the playhead)"
+                  aria-label={t('app.audioTools.chapters')}
+                  title={t('app.audioTools.chaptersTitle')}
                 >
-                  <Bookmark size={15} /><span>{chapters.length ? `Chapters (${chapters.length})` : 'Chapters'}</span>
+                  <Bookmark size={15} /><span>{chapters.length ? t('app.audioTools.chaptersCount', { n: chapters.length }) : t('app.audioTools.chapters')}</span>
+                </button>
+                <button
+                  className={`compact-btn compact-tool-btn${wordTools.transcriptOpen ? ' active' : ''}`}
+                  onClick={wordTools.openTranscript}
+                  aria-pressed={wordTools.transcriptOpen}
+                  aria-label={t('app.audioTools.transcript')}
+                  title={t('app.audioTools.transcriptTitle')}
+                >
+                  <ScrollText size={15} /><span>{t('app.audioTools.transcript')}</span>
+                </button>
+                <button
+                  className="compact-btn compact-tool-btn"
+                  onClick={() => wordTools.setFillersOpen(true)}
+                  disabled={!audioClips.length}
+                  aria-label={t('app.audioTools.fillersLabel')}
+                  title={t('app.audioTools.fillersTitle')}
+                >
+                  <Wand2 size={15} /><span>{t('app.audioTools.fillers')}</span>
                 </button>
               </>
             )}
@@ -1674,14 +1894,14 @@ function App() {
             {cutProgress.finished ? (
               <>
                 <span className="compact-render-progress-text">
-                  {cutProgress.failed} clip{cutProgress.failed === 1 ? '' : 's'} could not be read{activeUpload ? ' yet: try again when the upload is done' : ''}. The others were cut.
+                  {t(activeUpload ? 'app.cutSilences.failedUploading' : 'app.cutSilences.failed', { count: cutProgress.failed })}
                 </span>
-                <button className="compact-btn" onClick={() => setCutProgress(null)} title="Dismiss"><X size={12} /></button>
+                <button className="compact-btn" onClick={() => setCutProgress(null)} title={t('app.dismiss')}><X size={12} /></button>
               </>
             ) : (
               <>
                 <Loader2 size={14} className="encoding-notice-spin" />
-                <span className="compact-render-progress-text">Cutting silences: clip {cutProgress.done} of {cutProgress.total}</span>
+                <span className="compact-render-progress-text">{t('app.cutSilences.progress', { done: cutProgress.done, total: cutProgress.total })}</span>
               </>
             )}
           </div>
@@ -1689,18 +1909,20 @@ function App() {
         {groupNotice && (
           <div className="compact-render-progress audio-template-notice" role="status">
             <span className="compact-render-progress-text">{groupNotice}</span>
-            <button className="compact-btn" onClick={() => setGroupNotice(null)} title="Dismiss"><X size={12} /></button>
+            <button className="compact-btn" onClick={() => setGroupNotice(null)} title={t('app.dismiss')}><X size={12} /></button>
           </div>
         )}
         {templateNotice && (
           <div className="compact-render-progress audio-template-notice" role="status">
             <span className="compact-render-progress-text">
-              Template applied: {templateNotice.map(r => ({ intro: 'intro', outro: 'outro', bed: 'music bed' }[r])).filter(Boolean).join(', ')}.
+              {t('app.template.applied', { parts: formatList(templateNotice.filter(r => ['intro', 'outro', 'bed'].includes(r)).map(r => t(`app.template.${r}`))) })}
             </span>
-            <button className="compact-btn" onClick={() => { applyTracks(t => removeAudioTemplate(t)); setTemplateNotice(null) }}>Take it off</button>
-            <button className="compact-btn" onClick={() => setTemplateNotice(null)} title="Dismiss"><X size={12} /></button>
+            <button className="compact-btn" onClick={() => { applyTracks(t => removeAudioTemplate(t)); setTemplateNotice(null) }}>{t('app.template.takeOff')}</button>
+            <button className="compact-btn" onClick={() => setTemplateNotice(null)} title={t('app.dismiss')}><X size={12} /></button>
           </div>
         )}
+
+        {wordTools.cutNoticeBar}
 
         {/* Render progress bar (shown below menu bar when active) */}
         {isBackendRendering && (
@@ -1712,7 +1934,7 @@ function App() {
               />
             </div>
             <span className="compact-render-progress-text">
-              {renderStatus.phase || `${Math.round((renderStatus.progress || 0) * 100)}%`}
+              {renderStatus.phase || percent(renderStatus.progress || 0)}
             </span>
           </div>
         )}
@@ -1720,7 +1942,7 @@ function App() {
         {/* Render error */}
         {renderStatus?.status === 'failed' && (
           <div className="compact-render-error">
-            <span>Render failed: {renderStatus.error}</span>
+            <span>{t('render.failed', { error: renderStatus.error })}</span>
             <button onClick={clearRenderStatus}><X size={12} /></button>
           </div>
         )}
@@ -1737,8 +1959,9 @@ function App() {
           tracks={tracks}
           playheadPosition={playheadPosition}
           onSetPlayhead={setPlayheadPosition}
-          isVerticalVideo={isVerticalVideo}
-          activeAspectRatio={activeAspectRatio}
+          isVerticalVideo={shownAspect === '9:16'}
+          activeAspectRatio={shownAspect}
+          reframeView={shownAspect !== activeAspectRatio}
           selectedClipId={selectedClipId}
           onUpdateClip={updateClip}
           onSelectClip={selectClip}
@@ -1753,6 +1976,7 @@ function App() {
           recorderSize={recorderSize}
           onSetRecorderSize={setRecorderSize}
           onPlayingChange={setPreviewPlaying}
+          captions={audioMode ? null : captions}
         />
         {sideBesideStage && sidePanel}
         </div>
@@ -1762,22 +1986,22 @@ function App() {
           {audioMode && pickingRange && (
             <div className="range-pick-bar" role="status">
               <Scissors size={14} />
-              <span>Click where the audiogram's piece starts, then where it ends (up to 2 minutes). Pull its edges to adjust.</span>
+              <span>{t('app.rangePick.hint')}</span>
               {audiogramRange && (audiogramRange.end == null
-                ? <strong data-testid="range-pick-value">From {chapterTime(audiogramRange.start)}: now click where it ends</strong>
-                : <strong data-testid="range-pick-value">{chapterTime(audiogramRange.start)} – {chapterTime(audiogramRange.end)} · {Math.round(audiogramRange.end - audiogramRange.start)}s</strong>)}
+                ? <strong data-testid="range-pick-value">{t('app.rangePick.from', { start: chapterTime(audiogramRange.start) })}</strong>
+                : <strong data-testid="range-pick-value">{t('app.rangePick.span', { start: chapterTime(audiogramRange.start), end: chapterTime(audiogramRange.end), seconds: Math.round(audiogramRange.end - audiogramRange.start) })}</strong>)}
               <button
                 className={`compact-btn range-pick-play${rangePreview ? ' active' : ''}`}
                 onClick={toggleRangePreview}
                 disabled={!audiogramRange || audiogramRange.end == null || audiogramRange.end - audiogramRange.start < 3}
                 aria-pressed={rangePreview}
-                title="Listen to just this piece (Space)"
+                title={t('app.rangePick.listenTitle')}
               >
-                {rangePreview ? <Pause size={14} /> : <Play size={14} />} {rangePreview ? 'Stop' : 'Play the piece'}
+                {rangePreview ? <Pause size={14} /> : <Play size={14} />} {rangePreview ? t('app.rangePick.stop') : t('app.rangePick.play')}
               </button>
               <span className="range-pick-spacer" />
-              <button className="compact-btn" onClick={() => finishPickingRange(false)}>Cancel</button>
-              <button className="compact-render-btn" onClick={() => finishPickingRange(true)} disabled={!audiogramRange || audiogramRange.end == null || audiogramRange.end - audiogramRange.start < 3}>Use this piece</button>
+              <button className="compact-btn" onClick={() => finishPickingRange(false)}>{t('common.cancel')}</button>
+              <button className="compact-render-btn" onClick={() => finishPickingRange(true)} disabled={!audiogramRange || audiogramRange.end == null || audiogramRange.end - audiogramRange.start < 3}>{t('app.rangePick.use')}</button>
             </div>
           )}
           <Timeline
@@ -1820,6 +2044,12 @@ function App() {
             onOpenMusic={(trackId) => openAdd('music', trackId)}
             onOpenSfx={(trackId) => openAdd('sfx', trackId)}
             onOpenStickers={audioMode ? undefined : () => setStickersOpen(true)}
+            onOpenStock={audioMode || !STOCK_ENABLED ? undefined : () => setStockOpen({})}
+            onOpenTitles={audioMode ? undefined : () => setTitlesOpen(true)}
+            onOpenCaptions={audioMode ? undefined : () => { wordTools.setTranscriptOpen(false); setCaptionsOpen(o => !o) }}
+            captionsActive={captionsOpen || !!captions}
+            onOpenTranscript={audioMode ? undefined : () => { setCaptionsOpen(false); wordTools.openTranscript() }}
+            transcriptActive={wordTools.transcriptOpen}
             onRecordVideo={audioMode ? undefined : openRecorder}
             onReverseClip={audioMode ? undefined : handleReverseClip}
             onUpdateTrack={updateTrack}
@@ -1840,14 +2070,14 @@ function App() {
           {reversingClipId && (
             <div className="hls-download-overlay">
               <div className="hls-download-modal">
-                <h3>Reversing clip...</h3>
-                <p>Processing on server, please wait.</p>
+                <h3>{t('app.reverse.title')}</h3>
+                <p>{t('app.reverse.body')}</p>
               </div>
             </div>
           )}
 
           {/* Compact properties panel (phones: over the timeline; desktop: the sidebar) */}
-          {!isDesktop && (multiPanel || compactPropertiesPanel)}
+          {!isDesktop && (formatsPanel || captionsPanel || transcriptPanel || multiPanel || compactPropertiesPanel)}
         </div>
         </div>
         {/* Desktop shorts editor: the selected clip's settings beside preview and timeline */}
@@ -1855,6 +2085,7 @@ function App() {
         </div>
 
         {confirmDialog}
+        {shortcutLayer}
         {cleaningNotice}
 
         {/* Onboarding Tour (the shorts editor's, or the audio editor's) */}
@@ -1899,7 +2130,7 @@ function App() {
             key={beatClip.id}
             clip={beatClip}
             source={beatSource}
-            unavailable={beatClip && !beatSource ? 'This clip is still streaming from 3Speak. Try again once its download has finished.' : null}
+            unavailable={beatClip && !beatSource ? t('app.clipStreaming') : null}
             onSetBeats={(fields) => updateClip(beatClip.id, fields)}
             onFitClips={fitClipsToBeats}
             onClose={() => setBeatClipId(null)}
@@ -1908,7 +2139,7 @@ function App() {
         {autoCutClip && (
           <SilenceCutModal
             key={autoCutClip.id}
-            clip={autoCutClip}
+            clip={mediaView(autoCutClip)}
             source={autoCutSource}
             analysisUrl={autoCutClip.serverUrl || null}
             unavailable={autoCutSource || autoCutClip.serverUrl ? null : autoCutUnavailable}
@@ -1941,6 +2172,37 @@ function App() {
           />
         )}
 
+        {videoPodcastOpen && audioMode && renderStatus?.status === 'completed' && renderStatus.outputUrl && (
+          <VideoPodcastDialog
+            outputUrl={renderStatus.outputUrl}
+            length={timelineEnd}
+            title={audioTitle}
+            tracks={tracks}
+            words={wordTools.tr.words.length && wordTools.tr.missingSeconds < 1 ? wordTools.tr.words : null}
+            language={wordTools.tr.language}
+            playlistCovers={playlistCovers}
+            onRequestCovers={requestPlaylistCovers}
+            canSend={isIframe}
+            onSend={(r) => {
+              setVideoPodcastOpen(false)
+              if (drafts.hasEdits()) drafts.save().catch(() => {})
+              // 3Speak posts it as a normal video (format), the chapters in its description
+              sendToParent('post-to-3speak', {
+                mediaType: 'video',
+                outputUrl: r.outputUrl,
+                fileName: audioFileName(audioTitle).replace(/\.mp3$/i, '.mp4'),
+                durationSec: r.durationSec,
+                format: postFormat('16:9', r.durationSec),
+                ...(audioTitle ? { title: String(audioTitle).slice(0, 120) } : {}),
+                ...(chapterList.length > 0 && { chapters: chapterList }),
+                ...(musicCredits.length > 0 && { musicCredits }),
+                ...(r.subtitles && { subtitles: r.subtitles })
+              })
+            }}
+            onClose={() => setVideoPodcastOpen(false)}
+          />
+        )}
+
         {chaptersOpen && (
           <ChaptersDialog
             resolved={resolvedChapters}
@@ -1953,8 +2215,10 @@ function App() {
             onRemove={removeChapter}
             onSeek={(t) => setPlayheadPosition(t)}
             onClose={() => { setChaptersOpen(false); setChapterFocus(null) }}
+            suggestions={wordTools.chapterSuggestions({ end: timelineEnd, resolved: resolvedChapters })}
           />
         )}
+        {wordTools.fillerDialog}
 
         {templateOpen && (
           <AudioTemplateDialog
@@ -1979,6 +2243,9 @@ function App() {
         {sfxOpen && <MusicLibrary kind="sfx" onPick={handlePickSfx} onClose={() => setSfxOpen(false)} />}
 
         {stickersOpen && <StickerPicker onPick={handlePickSticker} onClose={() => setStickersOpen(false)} />}
+        {titlesOpen && <TitleTemplates onAdd={handleAddTitle} onClose={() => setTitlesOpen(false)} frame={outputSize(activeAspectRatio)} />}
+
+        {stockOpen && <StockLibrary purpose={stockOpen.underClipId ? 'background' : 'add'} onPick={handlePickStock} onClose={() => setStockOpen(null)} />}
 
         {/* Record Video Modal */}
         {recordingOpen && (
@@ -2001,7 +2268,7 @@ function App() {
           <div className="hls-download-overlay">
             <div className="hls-download-modal">
               <Download size={32} className="hls-download-icon" />
-              <h3>Downloading Media</h3>
+              <h3>{t('app.hlsDownload.title')}</h3>
               <p className="hls-download-name">{activeHlsDownload.name}</p>
               <div className="hls-download-progress-bar">
                 <div
@@ -2009,8 +2276,8 @@ function App() {
                   style={{ width: `${Math.round(activeHlsDownload.progress * 100)}%` }}
                 />
               </div>
-              <p className="hls-download-percent">{Math.round(activeHlsDownload.progress * 100)}%</p>
-              <p className="hls-download-hint">Please wait while the media is being prepared...</p>
+              <p className="hls-download-percent">{percent(activeHlsDownload.progress)}</p>
+              <p className="hls-download-hint">{t('app.hlsDownload.hint')}</p>
             </div>
           </div>
         )}
@@ -2025,8 +2292,8 @@ function App() {
           <div className="video-preview-overlay">
             <div className="video-preview-modal">
               <div className="video-preview-header">
-                <h3>{audioMode ? 'Listen before you use it' : 'Preview your video'}</h3>
-                <button className="video-preview-close" onClick={() => setShowPreview(false)}>
+                <h3>{audioMode ? t('app.sendPreview.titleAudio') : t('app.sendPreview.titleVideo')}</h3>
+                <button className="video-preview-close" onClick={() => setShowPreview(false)} title={t('common.close')} aria-label={t('common.close')}>
                   <X size={18} />
                 </button>
               </div>
@@ -2046,22 +2313,22 @@ function App() {
               {askAudiograms ? (
                 // No audiograms for this audio yet: offer them before it goes (once per export)
                 <div className="video-preview-ask" role="alertdialog" aria-labelledby="ask-audiograms-title">
-                  <h4 id="ask-audiograms-title"><Film size={15} /> Make audiograms for Shorts?</h4>
-                  <p>Short videos of the best pieces of this audio, posted as 3Speak Shorts together with it, each linking back to it.</p>
+                  <h4 id="ask-audiograms-title"><Film size={15} /> {t('app.sendPreview.askTitle')}</h4>
+                  <p>{t('app.sendPreview.askBody')}</p>
                   <div className="video-preview-actions">
                     <button className="video-preview-back" onClick={() => { askedAudiogramsRef.current.add(renderStatus.outputUrl); setAskAudiograms(false); sendToHost() }}>
-                      No, use the audio
+                      {t('app.sendPreview.askNo')}
                     </button>
                     <button className="video-preview-send" onClick={() => { askedAudiogramsRef.current.add(renderStatus.outputUrl); setAskAudiograms(false); setShowPreview(false); setAudiogramOpen(true) }}>
                       <Film size={14} />
-                      <span>Make audiograms</span>
+                      <span>{t('app.sendPreview.askMake')}</span>
                     </button>
                   </div>
                 </div>
               ) : (
               <div className="video-preview-actions">
                 <button className="video-preview-back" onClick={() => setShowPreview(false)}>
-                  Back to Editor
+                  {t('app.sendPreview.back')}
                 </button>
                 <button
                   className="video-preview-send"
@@ -2071,7 +2338,7 @@ function App() {
                   }}
                 >
                   <Send size={14} />
-                  <span>{audioMode ? 'Use this audio' : 'Send Video'}</span>
+                  <span>{audioMode ? t('render.done.useAudio') : t('render.done.sendVideo')}</span>
                 </button>
               </div>
               )}
@@ -2084,12 +2351,12 @@ function App() {
 
   return (
     <div className="app">
-      <ClipColorFilters tracks={tracks} />
+      <ClipColorFilters tracks={tracks} frame={outputSize(activeAspectRatio)} />
       {/* Backend health warning */}
       {backendStatus === 'error' && (
         <div className="backend-warning">
-          Backend server is unreachable. Recording upload, rendering, and media processing will not work.
-          <button onClick={() => setBackendStatus('ok')}>Dismiss</button>
+          {t('app.backendDown')}
+          <button onClick={() => setBackendStatus('ok')}>{t('app.dismiss')}</button>
         </div>
       )}
 
@@ -2097,13 +2364,13 @@ function App() {
       <header className="app-branding">
         <div className="branding-left">
           <img src={logo3speak} alt="3Speak" className="branding-logo" />
-          <span className="branding-text">Shorts Editor <span className="branding-badge">beta</span></span>
-          <span className="branding-info" title={`Backend: ${window.location.origin}`}>
+          <span className="branding-text">{t('app.branding.shortsEditor')} <span className="branding-badge">{t('app.branding.beta')}</span></span>
+          <span className="branding-info" title={t('app.branding.backend', { url: window.location.origin })}>
             <Info size={14} />
           </span>
         </div>
         <DraftStatus drafts={drafts} canSignIn={canDraftSignIn} signInState={draftContext.reason} onSignIn={requestDraftSignIn} onOpenLimit={() => drafts.save()} />
-        <button className="branding-close-btn" onClick={handleCloseEditor} title="Close editor">
+        <button className="branding-close-btn" onClick={handleCloseEditor} title={t('app.branding.closeEditor')}>
           <X size={18} />
         </button>
       </header>
@@ -2114,7 +2381,7 @@ function App() {
           <div className={`collapsible-section ${previewOpen ? 'open' : 'closed'}`}>
             <button className="collapsible-header" onClick={() => setPreviewOpen(p => !p)}>
               {previewOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              <span>Preview</span>
+              <span>{t('common.preview')}</span>
             </button>
             {previewOpen && (
               <div className="collapsible-body">
@@ -2127,7 +2394,7 @@ function App() {
           <div className={`collapsible-section ${libraryOpen ? 'open' : 'closed'}`}>
             <button className="collapsible-header" onClick={() => setLibraryOpen(p => !p)}>
               {libraryOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              <span>Project Library</span>
+              <span>{t('app.legacy.projectLibrary')}</span>
             </button>
             {libraryOpen && (
               <div className="collapsible-body">
@@ -2147,7 +2414,7 @@ function App() {
           {/* FFmpeg Status - only show while loading */}
           {loading && (
             <div className="ffmpeg-status">
-              <span className="ffmpeg-loading">Loading FFmpeg... {Math.round(progress * 100)}%</span>
+              <span className="ffmpeg-loading">{t('app.legacy.loadingFfmpeg', { percent: percent(progress) })}</span>
             </div>
           )}
 
@@ -2206,7 +2473,7 @@ function App() {
               <button
                 onClick={undo}
                 disabled={!canUndo}
-                title="Undo (Ctrl+Z)"
+                title={t('app.menu.undo')}
                 className="undo-btn"
               >
                 <Undo2 size={16} />
@@ -2214,19 +2481,19 @@ function App() {
               <button
                 onClick={redo}
                 disabled={!canRedo}
-                title="Redo (Ctrl+Shift+Z)"
+                title={t('app.menu.redo')}
                 className="redo-btn"
               >
                 <Redo2 size={16} />
               </button>
             </div>
-            <button className="add-media-btn" onClick={handleAddMedia} title="Add media to library">
+            <button className="add-media-btn" onClick={handleAddMedia} title={t('app.legacy.addMediaTitle')}>
               <FolderPlus size={16} />
-              <span>Add Media</span>
+              <span>{t('app.legacy.addMedia')}</span>
             </button>
-            <button className="add-media-btn" onClick={openRecorder} title="Record video from camera">
+            <button className="add-media-btn" onClick={openRecorder} title={t('app.legacy.recordTitle')}>
               <Video size={16} />
-              <span>Record</span>
+              <span>{t('app.legacy.record')}</span>
             </button>
             <input
               ref={addMediaInputRef}
@@ -2277,6 +2544,12 @@ function App() {
               onOpenMusic={(trackId) => openAdd('music', trackId)}
               onOpenSfx={(trackId) => openAdd('sfx', trackId)}
               onOpenStickers={() => setStickersOpen(true)}
+              onOpenStock={STOCK_ENABLED ? () => setStockOpen({}) : undefined}
+              onOpenTitles={() => setTitlesOpen(true)}
+              onOpenCaptions={() => { wordTools.setTranscriptOpen(false); setCaptionsOpen(o => !o) }}
+              captionsActive={captionsOpen || !!captions}
+              onOpenTranscript={() => { setCaptionsOpen(false); wordTools.openTranscript() }}
+              transcriptActive={wordTools.transcriptOpen}
               onRecordVideo={openRecorder}
               onReverseClip={handleReverseClip}
               onUpdateTrack={updateTrack}
@@ -2291,14 +2564,15 @@ function App() {
         {reversingClipId && (
           <div className="hls-download-overlay">
             <div className="hls-download-modal">
-              <h3>Reversing clip...</h3>
-              <p>Processing on server, please wait.</p>
+              <h3>{t('app.reverse.title')}</h3>
+              <p>{t('app.reverse.body')}</p>
             </div>
           </div>
         )}
 
         {/* Right panel: properties for horizontal, timeline preview for vertical */}
         <div className="right-panel">
+          {captionsPanel || transcriptPanel}
           {isVerticalVideo ? (
             <GlobalPreview
               emptyActions={emptyTimelineActions}
@@ -2320,22 +2594,26 @@ function App() {
               controlRef={previewControlRef}
               recorderSize={recorderSize}
               onSetRecorderSize={setRecorderSize}
+              captions={captions}
             />
           ) : (
             <div className={`collapsible-section properties-section ${propertiesOpen ? 'open' : 'closed'}`}>
               <button className="collapsible-header" onClick={() => setPropertiesOpen(p => !p)}>
                 {propertiesOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                <span>Properties{selectedClip ? ` — ${selectedClip.name}` : ''}</span>
+                <span>{selectedClip ? t('app.legacy.propertiesOf', { name: selectedClip.name }) : t('app.legacy.properties')}</span>
               </button>
               {propertiesOpen && selectedClip && (
                 <div className="collapsible-body">
                   <ClipProperties
                     clip={selectedClip}
                     linkedAudio={linkedAudioOf(selectedClip)}
+                    tracks={audioMode ? null : tracks}
                     onUpdateLinkedAudio={(u) => { const a = linkedAudioOf(selectedClip); if (a) updateClip(a.id, u) }}
                     onUpdateClip={(updates) => selectedClipId && updateClip(selectedClipId, updates)}
                     onSplit={(time) => selectedClipId && splitClip(selectedClipId, time)}
                     playheadPosition={playheadPosition}
+                    motionKit={audioMode ? null : motionKit}
+                    onPickBackground={STOCK_ENABLED ? (clipId) => setStockOpen({ underClipId: clipId }) : null}
                   />
                 </div>
               )}
@@ -2380,7 +2658,7 @@ function App() {
           key={beatClip.id}
           clip={beatClip}
           source={beatSource}
-          unavailable={beatClip && !beatSource ? 'This clip is still streaming from 3Speak. Try again once its download has finished.' : null}
+          unavailable={beatClip && !beatSource ? t('app.clipStreaming') : null}
           onSetBeats={(fields) => updateClip(beatClip.id, fields)}
           onFitClips={fitClipsToBeats}
           onClose={() => setBeatClipId(null)}
@@ -2389,19 +2667,23 @@ function App() {
       {autoCutClip && (
         <SilenceCutModal
           key={autoCutClip.id}
-          clip={autoCutClip}
+          clip={mediaView(autoCutClip)}
           source={autoCutSource}
           unavailable={autoCutUnavailable}
           onApply={handleAutoCutApply}
           onClose={() => setAutoCutClipId(null)}
         />
       )}
+      {wordTools.fillerDialog}
 
       {musicOpen && <MusicLibrary onPick={handlePickMusic} onClose={() => setMusicOpen(false)} />}
 
       {sfxOpen && <MusicLibrary kind="sfx" onPick={handlePickSfx} onClose={() => setSfxOpen(false)} />}
 
       {stickersOpen && <StickerPicker onPick={handlePickSticker} onClose={() => setStickersOpen(false)} />}
+      {titlesOpen && <TitleTemplates onAdd={handleAddTitle} onClose={() => setTitlesOpen(false)} frame={outputSize(activeAspectRatio)} />}
+
+      {stockOpen && <StockLibrary purpose={stockOpen.underClipId ? 'background' : 'add'} onPick={handlePickStock} onClose={() => setStockOpen(null)} />}
 
       {/* Record Video Modal */}
       {recordingOpen && (
@@ -2424,7 +2706,7 @@ function App() {
         <div className="hls-download-overlay">
           <div className="hls-download-modal">
             <Download size={32} className="hls-download-icon" />
-            <h3>Downloading Media</h3>
+            <h3>{t('app.hlsDownload.title')}</h3>
             <p className="hls-download-name">{activeHlsDownload.name}</p>
             <div className="hls-download-progress-bar">
               <div
@@ -2432,8 +2714,8 @@ function App() {
                 style={{ width: `${Math.round(activeHlsDownload.progress * 100)}%` }}
               />
             </div>
-            <p className="hls-download-percent">{Math.round(activeHlsDownload.progress * 100)}%</p>
-            <p className="hls-download-hint">Please wait while the media is being prepared...</p>
+            <p className="hls-download-percent">{percent(activeHlsDownload.progress)}</p>
+            <p className="hls-download-hint">{t('app.hlsDownload.hint')}</p>
           </div>
         </div>
       )}
@@ -2444,6 +2726,7 @@ function App() {
       )}
 
       {confirmDialog}
+      {shortcutLayer}
     </div>
   )
 }

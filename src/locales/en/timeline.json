@@ -1,0 +1,181 @@
+{
+  "aria": {
+    "timeline": "Timeline",
+    "ruler": "Time ruler: click to move the playhead",
+    "playhead": "Playhead",
+    "zoom": "Zoom"
+  },
+  "split": {
+    "title": "Split clip at playhead (Ctrl+R)",
+    "label": "Split"
+  },
+  "toolbar": {
+    "add": {
+      "title": "Add track or clip",
+      "videoTrack": "Video Track",
+      "audioTrack": "Audio Track",
+      "musicLibrary": "Music Library",
+      "soundEffects": "Sound Effects",
+      "stickers": "Stickers",
+      "titles": "Titles",
+      "stock": "Stock media"
+    },
+    "zoomTitle": "Zoom: {{value}}px/s",
+    "fit": {
+      "title": "Show the whole timeline",
+      "label": "Fit"
+    },
+    "select": {
+      "titleStart": "Select several clips: tap each one",
+      "titleDone": "Done selecting",
+      "label": "Select"
+    },
+    "ripple": {
+      "titleTrack": "Close the gap at the playhead on track {{number}} (G). Other tracks stay as they are.",
+      "titleNoGap": "No gap at the playhead on the selected clip's track",
+      "title": "Remove gap at playhead (G)",
+      "label": "Ripple"
+    },
+    "captions": {
+      "title": "Captions: turn what is said into word-by-word captions",
+      "label": "Captions"
+    },
+    "transcript": {
+      "title": "Transcript: edit by text, delete words to cut them",
+      "label": "Transcript"
+    },
+    "flag": {
+      "title": "Set a flag at the playhead (B): your own marker, numbered and coloured, never exported",
+      "label": "Flag"
+    },
+    "autoCut": {
+      "title": "Find the pauses and cut there",
+      "label": "Auto cut"
+    },
+    "beats": {
+      "title": "Find the beat: snap to it, lay clips on it",
+      "label": "Beats"
+    },
+    "delete": {
+      "title": "Delete selected clip (Del)",
+      "titleMany": "Delete the selected clips (Del)",
+      "labelMany": "Delete {{number}}"
+    },
+    "options": "Options",
+    "ungroup": {
+      "titleOne": "Ungroup: its clips move and trim on their own again",
+      "titleMany": "Ungroup: these clips move and trim on their own again",
+      "label": "Ungroup"
+    },
+    "group": {
+      "title": "Group: these clips move and trim together",
+      "label": "Group {{number}}"
+    },
+    "more": {
+      "title": "More clip actions",
+      "duplicate": "Duplicate",
+      "groupVoicesTitle": "Group with what plays at the same time on the other voice tracks: they move, trim and get their silences cut together",
+      "groupVoices": "Group with other voices",
+      "reverse": "Reverse",
+      "unreverse": "Unreverse",
+      "snapOn": "Snap On",
+      "snapOff": "Snap Off"
+    }
+  },
+  "selectHint": {
+    "count_one": "{{count}} clip selected: tap more, or Done",
+    "count_other": "{{count}} clips selected: tap more, or Done",
+    "none": "Tap each clip you want to select",
+    "clear": "Clear"
+  },
+  "clip": {
+    "settings": "Clip settings",
+    "textFallback": "Text",
+    "layer": "L{{number}}",
+    "kind": {
+      "video": "Video clip",
+      "audio": "Sound clip",
+      "image": "Image",
+      "text": "Text",
+      "color": "Colour",
+      "other": "Clip"
+    },
+    "aria": {
+      "plain": "{{kind}}, {{from}} to {{to}}",
+      "named": "{{kind}} {{name}}, {{from}} to {{to}}",
+      "onTrack": "{{kind}} on {{track}}, {{from}} to {{to}}",
+      "namedOnTrack": "{{kind}} {{name}} on {{track}}, {{from}} to {{to}}"
+    }
+  },
+  "track": {
+    "show": "Show track",
+    "hide": "Hide track",
+    "mute": "Mute track",
+    "unmute": "Unmute track",
+    "remove": "Remove track",
+    "addVisual": "Add video, image or text",
+    "addAudio": "Add audio",
+    "addFile": "Add File",
+    "addText": "Add Text",
+    "addColor": "Add Color",
+    "recordVideo": "Record Video",
+    "addAudioFile": "Add Audio File",
+    "recordAudio": "Record Audio",
+    "resize": {
+      "aria": "Height of {{name}}",
+      "ariaUnnamed": "Height of this track",
+      "title": "Drag to make the track taller or shorter (double-click: back to normal)"
+    },
+    "aria": {
+      "named": {
+        "video": "{{name}} (video track)",
+        "audio": "{{name}} (audio track)",
+        "music": "{{name}} (music track)"
+      },
+      "numbered": {
+        "video": "Video track {{number}}",
+        "audio": "Audio track {{number}}",
+        "music": "Music track {{number}}"
+      }
+    }
+  },
+  "trackName": {
+    "voice": "Voice",
+    "voiceNumbered": "Voice {{number}}",
+    "music": "Music",
+    "musicNumbered": "Music {{number}}",
+    "video": "Video",
+    "videoNumbered": "Video {{number}}",
+    "audioNumbered": "Audio {{number}}",
+    "stickers": "Stickers",
+    "stickersNumbered": "Stickers {{number}}",
+    "sfx": "SFX",
+    "sfxNumbered": "SFX {{number}}"
+  },
+  "clipName": {
+    "text": "Text Layer",
+    "color": "Color",
+    "imported": "Imported Media",
+    "linkedAudio": "{{name}} (Audio)"
+  },
+  "textClip": {
+    "defaultText": "Enter text here"
+  },
+  "flag": {
+    "aria": "Flag {{number}} at {{time}}",
+    "title": "Flag {{number}} · {{time}}: click to jump there, drag to move, right-click to remove"
+  },
+  "range": {
+    "label": "{{from}} – {{to}} · {{seconds}}s",
+    "startOnly": "{{time}} · click where it ends",
+    "dragStart": "Drag to move the start",
+    "dragEnd": "Drag to move the end"
+  },
+  "pastLimit": "Past the render limit",
+  "backgroundMusic": {
+    "title": "Background Music",
+    "add": "Add Background Music",
+    "remove": "Remove music"
+  },
+  "partName": "Part {{n}} · {{name}}"
+}

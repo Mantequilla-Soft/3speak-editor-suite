@@ -1,0 +1,86 @@
+{
+  "video": {
+    "title": "비디오 팟캐스트",
+    "intro": "에피소드 전체({{length}})를 16:9 동영상으로: 사진, 움직이는 파형, 자막, 말하는 사람. 3Speak, YouTube, Spotify 비디오 팟캐스트용이에요.",
+    "unavailable": "이 편집기 서버는 아직 비디오 팟캐스트를 만들 수 없어요.",
+    "tooLong": "비디오 팟캐스트는 최대 {{length}}까지 가능해요.",
+    "preview": "비디오 팟캐스트 미리보기",
+    "sampleCaption": "<b>내</b> 말이 여기에 보여요",
+    "stageHint": "파형은 소리에 맞춰 움직이고, 자막과 이름은 에피소드를 따라가요.",
+    "defaultLine": "*3speak.tv*에서 보고 듣기",
+    "captions": "자막",
+    "captionsTranscript": "내 스크립트의 단어.",
+    "captionsNoStt": "이 서버에서는 음성 텍스트 변환을 사용할 수 없어요.",
+    "captionsStt": "서버에서 음성 텍스트 변환으로 찾은 단어. 긴 에피소드는 시간이 걸려요.",
+    "whoSpeaks": "말하는 사람",
+    "noVoices": "이름을 가져올 음성 트랙이 없어요.",
+    "speaker": "화자 {{n}}",
+    "speakerLabel": "음성 트랙 {{n}}의 이름",
+    "loudest": "목소리마다 별도 트랙: 가장 큰 목소리의 이름이 표시돼요.",
+    "frameRate": "프레임 레이트",
+    "fps15": "15 fps (더 작고 빠름)",
+    "fps24": "24 fps (더 부드러움)",
+    "finding": "누가 언제 말하는지 찾는 중...",
+    "sending": "보내는 중...",
+    "working": "처리 중...",
+    "serverAnswered": "서버 응답: {{status}}",
+    "lost": "작업이 사라졌어요 (서버가 다시 시작됐을 수 있어요)",
+    "stopped": "중지됨",
+    "signIn": "비디오 팟캐스트를 만들려면 3Speak에 로그인하세요.",
+    "failed": "비디오 팟캐스트를 만들지 못했어요: {{error}}",
+    "stop": "중지",
+    "make": "비디오 팟캐스트 만들기",
+    "again": "다시 만들기",
+    "download": "MP4 다운로드",
+    "subtitles": "자막 (SRT)",
+    "post": "3Speak에 동영상으로 게시"
+  },
+  "template": {
+    "title": "내 템플릿",
+    "signedOutIntro": "인트로, 아웃트로, 배경 음악을 한 번 저장하면 새 녹음마다 클릭 한 번으로 붙일 수 있어요. 템플릿은 계속 보관되므로 3Speak 로그인이 필요해요.",
+    "signIn": "로그인해서 템플릿 사용",
+    "logIn": "템플릿을 사용하려면 3Speak에 로그인하세요.",
+    "intro": "템플릿은 하나이고 계속 보관돼요. 저장하면 기존 템플릿이 교체돼요.",
+    "role": {
+      "intro": {
+        "title": "인트로",
+        "hint": "녹음 전에 맨 처음 재생돼요.",
+        "clear": "인트로 없음"
+      },
+      "outro": {
+        "title": "아웃트로",
+        "hint": "녹음이 끝난 직후에 재생돼요.",
+        "clear": "아웃트로 없음"
+      },
+      "bed": {
+        "title": "배경 음악",
+        "hint": "녹음 전체에 잔잔하게 깔리는 음악. 길이에 맞게 반복되고 끝에서 페이드 아웃돼요.",
+        "clear": "배경 음악 없음"
+      }
+    },
+    "useSelected": "\"{{name}}\" 사용 (트리밍한 부분)",
+    "selectFirst": "먼저 타임라인에서 업로드한 오디오 클립을 선택하세요",
+    "selectedClip": "선택한 클립",
+    "file": "파일",
+    "volume": "볼륨",
+    "bedVolume": "배경 음악 볼륨",
+    "loop": "녹음 전체에 반복",
+    "cutSilences": "새 녹음마다 무음 자르기 <small>(내 무음 자르기 설정 사용)</small>",
+    "loudness": "팟캐스트용으로 음량 정규화 <small>(-16 LUFS, 내보낼 때 적용)</small>",
+    "duck": "누군가 말하는 동안 음악 더킹 <small>(배경 음악을 {{db}} dB 낮춤, 클립 설정에서 변경)</small>",
+    "autoApply": "녹음을 열면 자동으로 적용",
+    "signInUpload": "업로드하려면 3Speak에 로그인하세요.",
+    "uploadFailed": "그 파일을 업로드하지 못했어요. 다른 파일을 시도하세요.",
+    "deleteForGood": "영구 삭제",
+    "delete": "템플릿 삭제",
+    "saveApply": "저장하고 적용",
+    "voiceTrack": "음성",
+    "bedTrack": "배경 음악"
+  },
+  "stage": {
+    "empty": "녹음을 추가하거나, 녹음하거나, 음악을 골라 시작하세요.",
+    "chapter": "챕터",
+    "position": "방송 내 위치",
+    "positionText": "{{at}} / {{total}}"
+  }
+}

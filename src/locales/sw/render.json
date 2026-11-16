@@ -1,0 +1,83 @@
+{
+  "button": {
+    "rendering": "Inatengeneza...",
+    "exporting": "Inahamisha...",
+    "uploading": "Inapakia {{percent}}",
+    "reRender": "Tengeneza upya",
+    "exportAgain": "Hamisha tena",
+    "trimToRender": "Punguza mfuatano wa muda hadi {{limit}} au chini ili kutengeneza",
+    "trimToExport": "Punguza mfuatano wa muda hadi {{limit}} au chini ili kuhamisha"
+  },
+  "exportAs": {
+    "button": "Hamisha kama",
+    "title": "Hamisha kama: mradi ule ule kama Short, video ya mraba au ya mlalo, iliyokatwa kuzunguka nyuso",
+    "close": "Funga Hamisha kama",
+    "waitUpload": "Subiri upakiaji ukamilike."
+  },
+  "done": {
+    "download": "Pakua",
+    "audiograms": "Audiogramu",
+    "audiogramsCount": "Audiogramu ({{n}})",
+    "audiogramsTitle": "Video fupi za vipande vya kipindi, za kushiriki au kuchapisha kama Shorts pamoja nacho",
+    "videoPodcast": "Podikasti ya video",
+    "videoPodcastTitle": "Kipindi kizima kama video ya 16:9 yenye jalada, mawimbi ya sauti, manukuu na anayezungumza",
+    "useAudio": "Tumia sauti hii",
+    "sendVideo": "Tuma video"
+  },
+  "failed": "Utengenezaji umeshindwa: {{error}}",
+  "phase": {
+    "preparing": "Inaandaa faili...",
+    "submitting": "Inatuma kazi ya utengenezaji...",
+    "busyRetry": "Seva za utengenezaji zina shughuli nyingi. Inajaribu tena baada ya sek {{seconds}}...",
+    "offlineRetry": "Hakuna muunganisho na seva ya utengenezaji. Inajaribu tena baada ya sek {{seconds}}...",
+    "starting": "Inaanza...",
+    "reconnecting": "Inaunganisha upya na seva ya utengenezaji...",
+    "uploadingFile": "Inapakia {{name}} ({{index}}/{{total}})...",
+    "uploadingUnnamed": "Inapakia faili ({{index}}/{{total}})...",
+    "uploadingPlate": "Inapakia fremu ya mandharinyuma ya {{name}}...",
+    "uploadingPlateUnnamed": "Inapakia fremu ya mandharinyuma ya klipu..."
+  },
+  "queue": {
+    "next": "Wewe ndiye unayefuata",
+    "inLine": {
+      "one": "Wewe ni wa {{n}} kwenye foleni",
+      "two": "Wewe ni wa {{n}} kwenye foleni",
+      "few": "Wewe ni wa {{n}} kwenye foleni",
+      "other": "Wewe ni wa {{n}} kwenye foleni"
+    },
+    "waiting": "Inasubiri nafasi ya utengenezaji iwe wazi..."
+  },
+  "legacy": {
+    "exportVideo": "Hamisha video",
+    "cancelTitle": "Ghairi kuhamisha",
+    "settingsTitle": "Mipangilio ya kuhamisha",
+    "uploadingRender": "Inapakia {{name}} ({{percent}}). Endelea kuhariri; Tengeneza itafunguka ikikamilika.",
+    "uploadingExport": "Inapakia {{name}} ({{percent}}). Endelea kuhariri; Hamisha itafunguka ikikamilika.",
+    "lengthRender": "Mfuatano wa muda ni {{length}}. Upunguze hadi {{limit}} au chini ili kutengeneza.",
+    "lengthExport": "Mfuatano wa muda ni {{length}}. Upunguze hadi {{limit}} au chini ili kuhamisha.",
+    "method": "Njia ya kuhamisha",
+    "methodCanvas": "Canvas (kama unavyoona)",
+    "methodFast": "Haraka (bila athari)",
+    "canvasHint": "Inanasa athari zote za picha kama zinavyoonekana kwenye onyesho la awali",
+    "fastHint": "Kuhamisha kwa haraka zaidi lakini kunapuuza ukuzaji, mahali, upunguzaji na maandishi juu ya video",
+    "quality": "Ubora",
+    "qualityHigh": "Juu (faili kubwa zaidi)",
+    "qualityMedium": "Wastani (inapendekezwa)",
+    "qualityLow": "Chini (faili dogo zaidi)",
+    "processing": "Inachakata... {{percent}}",
+    "renderingPercent": "Inatengeneza... {{percent}}",
+    "downloadRendered": "Pakua video iliyotengenezwa",
+    "ffmpegLoading": "Inapakia FFmpeg...",
+    "ffmpegNotLoaded": "FFmpeg haijapakiwa",
+    "addClips": "Ongeza klipu kwenye mfuatano wa muda ili kuhamisha"
+  },
+  "canvas": {
+    "loadingMedia": "Inapakia midia...",
+    "renderingFrames": "Inatengeneza fremu...",
+    "encodingVideo": "Inasimba video...",
+    "processingAudio": "Inachakata sauti...",
+    "convertingMp4": "Inabadilisha kuwa MP4...",
+    "preparingDownload": "Inaandaa upakuaji...",
+    "complete": "Imekamilika!"
+  }
+}

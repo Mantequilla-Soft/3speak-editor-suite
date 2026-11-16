@@ -1,0 +1,104 @@
+{
+  "speed": {
+    "title": "Tốc độ",
+    "stillFrame": "Khung hình tĩnh",
+    "holds": "Giữ khung hình tại {{time}} của video. Cắt gọt nó trên dòng thời gian hoặc chọn độ dài:",
+    "seconds": "{{value}} giây",
+    "speed": "Tốc độ",
+    "ramp": "Đổi tốc độ dần",
+    "ramps": {
+      "montage": "Dựng phim",
+      "hero": "Khoảnh khắc anh hùng",
+      "speedUp": "Tăng tốc",
+      "slowDown": "Giảm tốc"
+    },
+    "rampHint": "Bản xem trước bám sát đường đổi tốc độ, bản kết xuất thì chính xác. Âm thanh giữ nguyên cao độ.",
+    "freeze": "Đóng băng khung hình",
+    "freezeLength": "Độ dài đóng băng",
+    "freezeTitle": "Giữ khung hình tại đầu phát",
+    "freezeMoveFirst": "Hãy di chuyển đầu phát vào clip này trước",
+    "freezeAt": "Đóng băng tại đầu phát",
+    "stillName": "Tĩnh · {{name}}",
+    "stillNameFallback": "clip"
+  },
+  "badge": {
+    "still": "Tĩnh",
+    "ramp": "Đổi tốc",
+    "stillTitle": "Khung hình tĩnh",
+    "speedTitle": "Tốc độ {{speed}}",
+    "rampTitle": "Đổi tốc độ dần"
+  },
+  "keyframes": {
+    "title": "Keyframe",
+    "moveHere": "Di chuyển đầu phát vào clip này để thêm keyframe.",
+    "props": {
+      "x": "Vị trí X",
+      "y": "Vị trí Y",
+      "scale": "Tỉ lệ",
+      "rotation": "Xoay",
+      "opacity": "Độ mờ đục",
+      "volume": "Âm lượng"
+    },
+    "aria": {
+      "x": {
+        "prev": "Keyframe Vị trí X trước",
+        "next": "Keyframe Vị trí X tiếp theo",
+        "add": "Thêm keyframe Vị trí X",
+        "remove": "Gỡ keyframe Vị trí X"
+      },
+      "y": {
+        "prev": "Keyframe Vị trí Y trước",
+        "next": "Keyframe Vị trí Y tiếp theo",
+        "add": "Thêm keyframe Vị trí Y",
+        "remove": "Gỡ keyframe Vị trí Y"
+      },
+      "scale": {
+        "prev": "Keyframe Tỉ lệ trước",
+        "next": "Keyframe Tỉ lệ tiếp theo",
+        "add": "Thêm keyframe Tỉ lệ",
+        "remove": "Gỡ keyframe Tỉ lệ"
+      },
+      "rotation": {
+        "prev": "Keyframe Xoay trước",
+        "next": "Keyframe Xoay tiếp theo",
+        "add": "Thêm keyframe Xoay",
+        "remove": "Gỡ keyframe Xoay"
+      },
+      "opacity": {
+        "prev": "Keyframe Độ mờ đục trước",
+        "next": "Keyframe Độ mờ đục tiếp theo",
+        "add": "Thêm keyframe Độ mờ đục",
+        "remove": "Gỡ keyframe Độ mờ đục"
+      },
+      "volume": {
+        "prev": "Keyframe Âm lượng trước",
+        "next": "Keyframe Âm lượng tiếp theo",
+        "add": "Thêm keyframe Âm lượng",
+        "remove": "Gỡ keyframe Âm lượng"
+      }
+    },
+    "prev": "Keyframe trước",
+    "next": "Keyframe tiếp theo",
+    "add": "Thêm keyframe tại đầu phát",
+    "remove": "Gỡ keyframe tại đầu phát",
+    "ease": "Chuyển mượt từ đây đến keyframe tiếp theo",
+    "removeAll": "Gỡ tất cả keyframe"
+  },
+  "kenBurns": {
+    "title": "Hiệu ứng Ken Burns",
+    "in": "Phóng to chậm",
+    "out": "Thu nhỏ chậm",
+    "pan": "Lia chậm"
+  },
+  "punch": {
+    "title": "Zoom nhấn",
+    "hint": "Phóng to nhanh ở đầu câu và ở những từ nói to, dựa vào phụ đề nếu có, nếu không thì dựa vào âm thanh.",
+    "listening": "Đang nghe...",
+    "auto": "Zoom nhấn tự động",
+    "remove": "Gỡ zoom nhấn",
+    "noMoments": "Không tìm thấy đầu câu hay từ nói to nào trong clip này.",
+    "noSound": "Không đọc được âm thanh của clip này. Hãy thêm phụ đề tự động trước rồi thử lại.",
+    "addedCaptions_other": "Đã thêm {{count}} zoom nhấn, dựa vào phụ đề. Chúng là các keyframe Tỉ lệ bình thường.",
+    "addedSound_other": "Đã thêm {{count}} zoom nhấn, dựa vào âm thanh. Chúng là các keyframe Tỉ lệ bình thường."
+  }
+}

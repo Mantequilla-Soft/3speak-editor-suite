@@ -23,6 +23,7 @@
 //
 // Returns a handle with stop(); tears everything down safely.
 import workletSource from './sttDownsampler.worklet.js?raw'
+import { t } from '../i18n'
 
 let workletUrl = null
 function getWorkletUrl() {
@@ -42,7 +43,7 @@ export function createSttStream({ track, url, lang, token, onTranscript, onStatu
   ;(async () => {
     try {
       const AudioCtx = window.AudioContext || window.webkitAudioContext
-      if (!AudioCtx || !track) { status('error', 'audio unavailable'); return }
+      if (!AudioCtx || !track) { status('error', t('transcript.stt.audioUnavailable')); return }
       const openCtx = async (opts) => {
         const c = opts ? new AudioCtx(opts) : new AudioCtx()
         // Editor addition: this runs after the countdown, outside a click, so the
@@ -94,11 +95,11 @@ export function createSttStream({ track, url, lang, token, onTranscript, onStatu
           const msg = JSON.parse(e.data)
           // isFinal closes the utterance so the matcher restarts its word count.
           if (msg.type === 'partial' || msg.type === 'final') onTranscript?.(msg.text || '', msg.type === 'final')
-          else if (msg.type === 'error') status('error', msg.message || 'server error')
+          else if (msg.type === 'error') status('error', msg.message || t('transcript.stt.serverError'))
         } catch { /* ignore non-JSON */ }
       }
-      ws.onerror = () => status('error', 'connection failed')
-      ws.onclose = (ev) => { if (closed) return; status('error', ev && ev.code === 4401 ? 'unauthorized' : 'closed') }
+      ws.onerror = () => status('error', t('transcript.stt.connectionFailed'))
+      ws.onclose = (ev) => { if (closed) return; status('error', ev && ev.code === 4401 ? t('transcript.stt.unauthorized') : t('transcript.stt.closed')) }
 
       worklet.port.onmessage = (e) => {
         if (ws && ws.readyState === 1) { try { ws.send(e.data) } catch { /* ignore */ } }
@@ -107,7 +108,7 @@ export function createSttStream({ track, url, lang, token, onTranscript, onStatu
       source.connect(worklet)
       worklet.connect(ctx.destination) // pulls the graph; the processor emits silence
     } catch (err) {
-      status('error', err?.message || 'stt init failed')
+      status('error', err?.message || t('transcript.stt.initFailed'))
     }
   })()
 

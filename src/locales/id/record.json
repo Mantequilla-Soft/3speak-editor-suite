@@ -1,0 +1,109 @@
+{
+  "media": {
+    "blocked": {
+      "camera": "Kamera atau mikrofon diblokir untuk situs ini. Izinkan lewat ikon di bilah alamat, lalu coba lagi. Jika kamu tidak pernah menolak, pengaturan privasi komputermu mungkin memblokir browser.",
+      "microphone": "Mikrofon diblokir untuk situs ini. Izinkan lewat ikon di bilah alamat, lalu coba lagi. Jika kamu tidak pernah menolak, pengaturan privasi komputermu mungkin memblokir browser."
+    },
+    "notAllowed": {
+      "camera": "Halaman ini tidak diizinkan memakai kamera atau mikrofon. Muat ulang 3Speak lalu coba lagi.",
+      "microphone": "Halaman ini tidak diizinkan memakai mikrofon. Muat ulang 3Speak lalu coba lagi."
+    },
+    "busy": {
+      "camera": "Kamera atau mikrofonmu sedang dipakai di aplikasi atau tab lain (panggilan video, perekam lain). Tutup di sana, lalu coba lagi.",
+      "microphone": "Mikrofonmu sedang dipakai di aplikasi atau tab lain (panggilan video, perekam lain). Tutup di sana, lalu coba lagi."
+    },
+    "notFound": {
+      "camera": "Kamera atau mikrofon tidak ditemukan. Sambungkan satu, lalu coba lagi.",
+      "microphone": "Mikrofon tidak ditemukan. Sambungkan satu, lalu coba lagi."
+    },
+    "noDevices": {
+      "camera": "Browser ini tidak bisa memakai kamera atau mikrofon di sini.",
+      "microphone": "Browser ini tidak bisa memakai mikrofon di sini."
+    },
+    "failed": {
+      "camera": "Kamera atau mikrofon tidak dapat dimulai. Coba lagi.",
+      "microphone": "Mikrofon tidak dapat dimulai. Coba lagi."
+    },
+    "failedNamed": {
+      "camera": "Kamera atau mikrofon tidak dapat dimulai ({{name}}). Coba lagi.",
+      "microphone": "Mikrofon tidak dapat dimulai ({{name}}). Coba lagi."
+    }
+  },
+  "inline": {
+    "camera": "Kamera",
+    "expand": "Perbesar",
+    "shrink": "Perkecil",
+    "uploading": "Mengunggah...",
+    "uploadingPct": "Mengunggah... {{pct}}%",
+    "converting": "Mengonversi...",
+    "rec": "REK",
+    "starting": "Memulai...",
+    "plateStepOut": "Keluar dari gambar",
+    "plateShooting": "Merekam latar, tetap di luar...",
+    "gestures": "Tahan dan seret gambar untuk membingkai ulang, cubit untuk zoom.",
+    "gesturesOverlay": "Tahan dan seret gambar untuk membingkai ulang, cubit untuk zoom, seret kotak kameramu untuk memindahkannya.",
+    "greenScreen": {
+      "label": "Layar hijau",
+      "off": "Mati",
+      "green": "Hijau",
+      "blue": "Biru",
+      "person": "Orang",
+      "static": "Statis",
+      "staticTitle": "Latar statis (eksperimental): menghapus apa pun yang cocok dengan rekaman latar kosong",
+      "personTitle": "Tanpa layar hijau: menemukanmu di gambar",
+      "threshold": "Ambang",
+      "thresholdStaticTitle": "Toleransi: makin tinggi makin banyak perubahan latar yang diabaikan (bising, cahaya, fokus), tetapi bisa mulai menghapus bagian tubuhmu",
+      "thresholdTitle": "Makin tinggi makin banyak warna layar yang dihapus",
+      "despill": "Despill",
+      "despillStaticTitle": "Menghapus warna dinding dari tepi",
+      "despillGreenTitle": "Menghapus semburat hijau dari tepi",
+      "despillBlueTitle": "Menghapus semburat biru dari tepi",
+      "retakePlate": "Rekam ulang latar kosong",
+      "shootPlate": "Rekam latar kosong",
+      "plateKeep": "Eksperimental. Biarkan kamera dan cahaya persis seperti sekarang.",
+      "plateHowTo": "Eksperimental. Pasang kamera di tempat yang tetap, tekan tombol, lalu keluar dari gambar.",
+      "keyFailed": "Keying langsung tidak tersedia di sini. Klip tetap mendapatkan pengaturan layar hijau.",
+      "personHowTo": "Tanpa layar hijau: editor menemukanmu di gambar. Rekaman disimpan apa adanya lalu dipotong di linimasa, tempat kamu memilih apa yang ada di belakangmu."
+    },
+    "tpEdit": "Edit teks teleprompter",
+    "tpAdd": "Tambahkan teks teleprompter",
+    "teleprompter": "Teleprompter",
+    "recordOnly": "Rekam saja",
+    "recordAndPlay": "Rekam + Putar video",
+    "plusPlay": "+ Putar",
+    "recordReactionTitle": "Rekam selagi video asli diputar",
+    "recordReaction": "Rekam reaksi",
+    "record": "Rekam",
+    "stop": "Berhenti",
+    "retake": "Rekam ulang",
+    "useClip": "Pakai klip"
+  },
+  "video": {
+    "title": "Rekam Video",
+    "startingCamera": "Menyalakan kamera...",
+    "start": "Mulai merekam",
+    "stop": "Berhenti",
+    "retake": "Rekam ulang",
+    "useClip": "Pakai klip"
+  },
+  "audio": {
+    "title": "Rekam Audio",
+    "cannotRecord": "Browser ini tidak bisa merekam audio di sini.",
+    "addFailed": "Rekaman tidak dapat ditambahkan. Silakan coba lagi.",
+    "yourRecording": "Rekamanmu",
+    "micLevel": "Level mikrofon",
+    "accessingMic": "Mengakses mikrofon...",
+    "ready": "Siap merekam: bicaralah untuk memeriksa levelmu",
+    "preparing": "Menyiapkan rekamanmu...",
+    "adding": "Menambahkan ke trekmu...",
+    "tpEdit": "Edit teks teleprompter",
+    "tpAdd": "Tambahkan teks teleprompter",
+    "teleprompter": "Teleprompter",
+    "start": "Mulai merekam",
+    "stop": "Berhenti",
+    "retake": "Rekam ulang",
+    "addingShort": "Menambahkan...",
+    "useRecording": "Pakai rekaman",
+    "useScript": "Pakai naskah ini"
+  }
+}

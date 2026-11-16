@@ -1,7 +1,7 @@
-// Uploads: only real video gets a 480p copy (which replaces the original).
-// A browser voice recording is .webm too but holds no picture: it must stay
-// as uploaded, or the render (which copies the original) can't find it.
-// And a render still finds an upload whose original was already replaced.
+// Uploads: only real video gets a 480p copy (the editing proxy; renders read
+// the original, see renderSource.test.mjs). A browser voice recording is .webm
+// too but holds no picture: it stays as uploaded. And a render still finds an
+// old upload whose original was replaced by its 480p copy.
 import { test, before, after } from 'node:test'
 import assert from 'node:assert/strict'
 import crypto from 'node:crypto'
@@ -60,7 +60,7 @@ test('a video .webm still gets its 480p copy', { skip: !hasFfmpeg }, async () =>
   assert.equal(body.encodes, true)
 })
 
-test('a render copy falls back to the 480p file once the original was replaced', async () => {
+test('a render copy falls back to the 480p file of an old upload (original gone)', async () => {
   const work = path.join(dir, 'work')
   fs.mkdirSync(work, { recursive: true })
   fs.writeFileSync(path.join(uploads, 'gone_480p.mp4'), 'encoded')

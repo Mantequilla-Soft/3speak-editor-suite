@@ -1,0 +1,106 @@
+{
+  "speed": {
+    "title": "Speed",
+    "stillFrame": "Still frame",
+    "holds": "Holds the frame at {{time}} of the video. Trim it on the timeline or pick a length:",
+    "seconds": "{{value}} s",
+    "speed": "Speed",
+    "ramp": "Speed ramp",
+    "ramps": {
+      "montage": "Montage",
+      "hero": "Hero",
+      "speedUp": "Speed up",
+      "slowDown": "Slow down"
+    },
+    "rampHint": "The preview follows the ramp closely, the render is exact. The sound keeps its pitch.",
+    "freeze": "Freeze frame",
+    "freezeLength": "Freeze length",
+    "freezeTitle": "Hold the frame under the playhead",
+    "freezeMoveFirst": "Move the playhead onto this clip first",
+    "freezeAt": "Freeze at playhead",
+    "stillName": "Still · {{name}}",
+    "stillNameFallback": "clip"
+  },
+  "badge": {
+    "still": "Still",
+    "ramp": "Ramp",
+    "stillTitle": "Still frame",
+    "speedTitle": "Speed {{speed}}",
+    "rampTitle": "Speed Ramp"
+  },
+  "keyframes": {
+    "title": "Keyframes",
+    "moveHere": "Move the playhead onto this clip to add keyframes.",
+    "props": {
+      "x": "Position X",
+      "y": "Position Y",
+      "scale": "Scale",
+      "rotation": "Rotation",
+      "opacity": "Opacity",
+      "volume": "Volume"
+    },
+    "aria": {
+      "x": {
+        "prev": "Previous Position X keyframe",
+        "next": "Next Position X keyframe",
+        "add": "Add Position X keyframe",
+        "remove": "Remove Position X keyframe"
+      },
+      "y": {
+        "prev": "Previous Position Y keyframe",
+        "next": "Next Position Y keyframe",
+        "add": "Add Position Y keyframe",
+        "remove": "Remove Position Y keyframe"
+      },
+      "scale": {
+        "prev": "Previous Scale keyframe",
+        "next": "Next Scale keyframe",
+        "add": "Add Scale keyframe",
+        "remove": "Remove Scale keyframe"
+      },
+      "rotation": {
+        "prev": "Previous Rotation keyframe",
+        "next": "Next Rotation keyframe",
+        "add": "Add Rotation keyframe",
+        "remove": "Remove Rotation keyframe"
+      },
+      "opacity": {
+        "prev": "Previous Opacity keyframe",
+        "next": "Next Opacity keyframe",
+        "add": "Add Opacity keyframe",
+        "remove": "Remove Opacity keyframe"
+      },
+      "volume": {
+        "prev": "Previous Volume keyframe",
+        "next": "Next Volume keyframe",
+        "add": "Add Volume keyframe",
+        "remove": "Remove Volume keyframe"
+      }
+    },
+    "prev": "Previous keyframe",
+    "next": "Next keyframe",
+    "add": "Add a keyframe at the playhead",
+    "remove": "Remove the keyframe at the playhead",
+    "ease": "Ease from here to the next keyframe",
+    "removeAll": "Remove all keyframes"
+  },
+  "kenBurns": {
+    "title": "Ken Burns",
+    "in": "Slow zoom in",
+    "out": "Slow zoom out",
+    "pan": "Slow pan"
+  },
+  "punch": {
+    "title": "Punch-ins",
+    "hint": "Quick zoom-ins at the start of sentences and on loud words, from the captions if there are any, else from the sound.",
+    "listening": "Listening...",
+    "auto": "Auto punch-ins",
+    "remove": "Remove punch-ins",
+    "noMoments": "No sentence starts or loud words found in this clip.",
+    "noSound": "The sound of this clip could not be read. Add auto captions first, then try again.",
+    "addedCaptions_one": "{{count}} punch-in added, from the captions. They are ordinary keyframes on Scale.",
+    "addedCaptions_other": "{{count}} punch-ins added, from the captions. They are ordinary keyframes on Scale.",
+    "addedSound_one": "{{count}} punch-in added, from the sound. They are ordinary keyframes on Scale.",
+    "addedSound_other": "{{count}} punch-ins added, from the sound. They are ordinary keyframes on Scale."
+  }
+}

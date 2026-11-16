@@ -1,0 +1,106 @@
+{
+  "speed": {
+    "title": "Bilis",
+    "stillFrame": "Still frame",
+    "holds": "Hinihinto ang frame sa {{time}} ng video. I-trim ito sa timeline o pumili ng haba:",
+    "seconds": "{{value}} seg",
+    "speed": "Bilis",
+    "ramp": "Speed ramp",
+    "ramps": {
+      "montage": "Montage",
+      "hero": "Bida",
+      "speedUp": "Pabilisin",
+      "slowDown": "Pabagalin"
+    },
+    "rampHint": "Malapit na sinusundan ng preview ang ramp, eksakto ang render. Hindi nagbabago ang pitch ng tunog.",
+    "freeze": "Freeze frame",
+    "freezeLength": "Haba ng freeze",
+    "freezeTitle": "Ihinto ang frame sa ilalim ng playhead",
+    "freezeMoveFirst": "Ilipat muna ang playhead sa clip na ito",
+    "freezeAt": "I-freeze sa playhead",
+    "stillName": "Still · {{name}}",
+    "stillNameFallback": "clip"
+  },
+  "badge": {
+    "still": "Still",
+    "ramp": "Ramp",
+    "stillTitle": "Still frame",
+    "speedTitle": "Bilis {{speed}}",
+    "rampTitle": "Speed ramp"
+  },
+  "keyframes": {
+    "title": "Mga keyframe",
+    "moveHere": "Ilipat ang playhead sa clip na ito para magdagdag ng mga keyframe.",
+    "props": {
+      "x": "Posisyon X",
+      "y": "Posisyon Y",
+      "scale": "Scale",
+      "rotation": "Pag-ikot",
+      "opacity": "Opacity",
+      "volume": "Volume"
+    },
+    "aria": {
+      "x": {
+        "prev": "Nakaraang keyframe ng Posisyon X",
+        "next": "Susunod na keyframe ng Posisyon X",
+        "add": "Magdagdag ng keyframe ng Posisyon X",
+        "remove": "Alisin ang keyframe ng Posisyon X"
+      },
+      "y": {
+        "prev": "Nakaraang keyframe ng Posisyon Y",
+        "next": "Susunod na keyframe ng Posisyon Y",
+        "add": "Magdagdag ng keyframe ng Posisyon Y",
+        "remove": "Alisin ang keyframe ng Posisyon Y"
+      },
+      "scale": {
+        "prev": "Nakaraang keyframe ng Scale",
+        "next": "Susunod na keyframe ng Scale",
+        "add": "Magdagdag ng keyframe ng Scale",
+        "remove": "Alisin ang keyframe ng Scale"
+      },
+      "rotation": {
+        "prev": "Nakaraang keyframe ng Pag-ikot",
+        "next": "Susunod na keyframe ng Pag-ikot",
+        "add": "Magdagdag ng keyframe ng Pag-ikot",
+        "remove": "Alisin ang keyframe ng Pag-ikot"
+      },
+      "opacity": {
+        "prev": "Nakaraang keyframe ng Opacity",
+        "next": "Susunod na keyframe ng Opacity",
+        "add": "Magdagdag ng keyframe ng Opacity",
+        "remove": "Alisin ang keyframe ng Opacity"
+      },
+      "volume": {
+        "prev": "Nakaraang keyframe ng Volume",
+        "next": "Susunod na keyframe ng Volume",
+        "add": "Magdagdag ng keyframe ng Volume",
+        "remove": "Alisin ang keyframe ng Volume"
+      }
+    },
+    "prev": "Nakaraang keyframe",
+    "next": "Susunod na keyframe",
+    "add": "Magdagdag ng keyframe sa playhead",
+    "remove": "Alisin ang keyframe sa playhead",
+    "ease": "Pakinisin mula rito hanggang sa susunod na keyframe",
+    "removeAll": "Alisin ang lahat ng keyframe"
+  },
+  "kenBurns": {
+    "title": "Ken Burns",
+    "in": "Mabagal na zoom in",
+    "out": "Mabagal na zoom out",
+    "pan": "Mabagal na pan"
+  },
+  "punch": {
+    "title": "Mga punch-in",
+    "hint": "Mabibilis na zoom-in sa simula ng mga pangungusap at sa malalakas na salita, mula sa captions kung mayroon, kung wala ay mula sa tunog.",
+    "listening": "Nakikinig...",
+    "auto": "Auto punch-in",
+    "remove": "Alisin ang mga punch-in",
+    "noMoments": "Walang nakitang simula ng pangungusap o malakas na salita sa clip na ito.",
+    "noSound": "Hindi mabasa ang tunog ng clip na ito. Magdagdag muna ng auto captions, tapos subukan ulit.",
+    "addedCaptions_one": "Nadagdag ang {{count}} punch-in, mula sa captions. Karaniwang keyframe ito sa Scale.",
+    "addedCaptions_other": "Nadagdag ang {{count}} punch-in, mula sa captions. Karaniwang keyframe ang mga ito sa Scale.",
+    "addedSound_one": "Nadagdag ang {{count}} punch-in, mula sa tunog. Karaniwang keyframe ito sa Scale.",
+    "addedSound_other": "Nadagdag ang {{count}} punch-in, mula sa tunog. Karaniwang keyframe ang mga ito sa Scale."
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "shorts": {
+    "welcome": {
+      "title": "Chào mừng!",
+      "text": "Chào mừng bạn đến với Trình chỉnh sửa Shorts của 3Speak. Hãy cùng xem nhanh các tính năng chính."
+    },
+    "preview": {
+      "title": "Xem trước",
+      "text": "Đây là bản xem trước video của bạn. Bạn có thể kéo clip để đổi vị trí và chụm hai ngón để thu phóng."
+    },
+    "timeline": {
+      "title": "Dòng thời gian",
+      "text": "Sắp xếp các clip của bạn ở đây. Kéo để đổi thứ tự, kéo các cạnh để cắt gọt."
+    },
+    "addMedia": {
+      "title": "Thêm phương tiện",
+      "text": "Chạm + để thêm clip video, hình ảnh, văn bản, âm thanh hoặc màu vào các rãnh."
+    },
+    "clipSettings": {
+      "title": "Cài đặt clip",
+      "text": "Chọn một clip rồi chạm biểu tượng bánh răng để chỉnh các thuộc tính như tỉ lệ, vị trí và độ mờ đục."
+    },
+    "render": {
+      "title": "Kết xuất",
+      "text": "Khi chỉnh sửa xong, nhấn Kết xuất để xuất video. Sau đó bạn có thể tải xuống hoặc gửi đi."
+    }
+  },
+  "audio": {
+    "welcome": {
+      "title": "Chào mừng đến với Trình chỉnh sửa âm thanh",
+      "text": "Cắt, làm sạch và cân chỉnh âm lượng cho podcast, bài hát hay ghi chú giọng nói, rồi đăng lên 3Speak. Đây là cái nhìn nhanh về những gì nó làm được."
+    },
+    "addAudio": {
+      "title": "Thêm âm thanh của bạn",
+      "text": "Thêm một bản ghi, ghi âm ngay tại đây, hoặc chọn nhạc từ thư viện. Tệp video cũng được: trình chỉnh sửa chỉ giữ lại âm thanh. Tối đa 3 giờ."
+    },
+    "tracks": {
+      "title": "Rãnh giọng nói và nhạc",
+      "text": "Bản ghi nằm trên rãnh giọng nói, nhạc nằm trên rãnh riêng. Kéo clip để di chuyển, kéo các cạnh để cắt gọt. Thu phóng bằng thanh trượt, hoặc chạm Vừa khung để xem toàn bộ."
+    },
+    "clipSettings": {
+      "title": "Cài đặt clip",
+      "text": "Chọn một clip để xem cài đặt của nó. Làm sạch giọng nói (Mạnh loại bỏ tạp âm và tiếng ù, làm giọng rõ và đều hơn), và Tự giảm âm: clip nhỏ lại khi rãnh khác phát. Nhóm các giọng được ghi cùng nhau để chúng luôn khớp."
+    },
+    "cutSilences": {
+      "title": "Cắt khoảng lặng",
+      "text": "Tìm các chỗ ngừng trong rãnh giọng nói, cắt bỏ và khép khoảng trống. Các giọng đã nhóm chỉ bị cắt khi tất cả đều im lặng."
+    },
+    "template": {
+      "title": "Mẫu của bạn",
+      "text": "Thiết lập phần mở đầu, phần kết và nhạc nền một lần. Chúng được thêm vào mọi bản ghi mới, và mẫu của bạn được giữ vĩnh viễn."
+    },
+    "normalize": {
+      "title": "Chuẩn hóa",
+      "text": "Đưa bản xuất về độ lớn podcast đồng đều (-16 LUFS), để tập nào cũng to như tập trước. Tắt đi để giữ mức âm lượng của riêng bạn."
+    },
+    "chapters": {
+      "title": "Chương",
+      "text": "Đánh dấu nơi mỗi phần bắt đầu (nhấn M để thêm một chương tại đầu phát). Chương được ghi vào MP3 và vào phần mô tả của tập."
+    },
+    "export": {
+      "title": "Xuất",
+      "text": "Xuất sẽ tạo một tệp MP3. Nghe thử, rồi dùng nó để tải lên hoặc tải xuống. Khi đã đăng nhập, dự án của bạn được giữ làm bản nháp trong lúc bạn làm việc."
+    }
+  },
+  "audiogram": {
+    "intro": {
+      "title": "Audiogram",
+      "text": "Video ngắn từ một đoạn trong tập của bạn: dạng sóng chuyển động, tiêu đề và hình ảnh của bạn, mang phong cách 3Speak. Chúng được đăng thành Shorts trên 3Speak cùng với tập."
+    },
+    "piece": {
+      "title": "Đoạn của bạn",
+      "text": "Đoạn bạn đã chọn trên dòng thời gian, tối đa 2 phút. Đổi ở đây bất cứ lúc nào."
+    },
+    "arrange": {
+      "title": "Sắp xếp theo ý bạn",
+      "text": "Kéo bất kỳ phần nào để di chuyển, kéo một góc để đổi kích thước (Shift giữ tỉ lệ), và xoay bằng tay cầm tròn bên dưới. Logo 3Speak luôn có mặt, dưới dạng 3S hoặc logo đầy đủ."
+    },
+    "picture": {
+      "title": "Một hình ảnh",
+      "text": "Tải lên một hình hoặc dùng ảnh bìa của một danh sách phát của bạn. Nó hiển thị như một thẻ mà bạn có thể di chuyển và đổi kích thước như các phần khác."
+    },
+    "waveform": {
+      "title": "Dạng sóng",
+      "text": "Cột, đường, vòng tròn hoặc sóng tròn, màu đỏ 3Speak hoặc bất kỳ màu nào bạn thích."
+    },
+    "parts": {
+      "title": "Các phần",
+      "text": "Ẩn một phần, hoặc đưa nó lên trên hay xuống dưới khi các phần chồng lên nhau."
+    },
+    "make": {
+      "title": "Tạo",
+      "text": "Tạo bao nhiêu tùy thích: mỗi cái được đăng thành một Short cùng với tập, có nội dung riêng và liên kết đến tập. Giao diện gần nhất của bạn được giữ làm mẫu cho cái tiếp theo."
+    }
+  },
+  "rangePick": {
+    "startEnd": {
+      "title": "Nhấp điểm đầu, rồi điểm cuối",
+      "text": "Nhấp vào chỗ đoạn bắt đầu, rồi chỗ nó kết thúc: tối đa 2 phút. Kéo các cạnh để điều chỉnh, hoặc kéo ngang qua các rãnh để vẽ cả đoạn. Nhấp lần mới sẽ bắt đầu lại."
+    },
+    "moveAround": {
+      "title": "Di chuyển quanh",
+      "text": "Kéo thước hoặc cuộn để di chuyển dọc theo tập. Phóng to bằng thanh trượt để chọn điểm đầu chính xác, hoặc chạm Vừa khung để xem cả tập."
+    },
+    "listen": {
+      "title": "Nghe thử",
+      "text": "Phát đoạn này (hoặc Dấu cách) chỉ phát phần bạn đã chọn, rồi quay về điểm đầu của nó."
+    },
+    "use": {
+      "title": "Dùng nó",
+      "text": "Dùng đoạn này (hoặc Enter) đưa nó về audiogram của bạn, Hủy (hoặc Esc) giữ đoạn cũ. Cho đến lúc đó, phần còn lại của trình chỉnh sửa bị khóa để không có gì vô tình thay đổi."
+    }
+  },
+  "buttons": {
+    "done": "Đã hiểu!"
+  }
+}

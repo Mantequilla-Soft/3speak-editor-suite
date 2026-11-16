@@ -15,7 +15,8 @@ const ADMIN_USER = process.env.ADMIN_USER || 'admin'
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || ''
 
 app.use(cors())
-app.use(express.json())
+// Render timelines carry auto captions (every word with its times): more than the 100 kB default
+app.use(express.json({ limit: '2mb' }))
 
 // Basic auth middleware for admin routes. Fails CLOSED: without ADMIN_PASSWORD the admin API and page are
 // switched off (they used to be open to anyone).

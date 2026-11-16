@@ -1,0 +1,64 @@
+{
+  "title": "Stickers",
+  "search": "Search stickers",
+  "textBoxes": "Text boxes",
+  "loading": "Loading stickers...",
+  "noMatch": "No stickers match.",
+  "tileTitle": "{{name}} (adds at the playhead)",
+  "note": "Stickers go in at the playhead for 3 seconds. Drag, resize or trim them like any clip; text boxes stay editable.",
+  "categories": {
+    "emoji": "Emojis",
+    "badges": "Badges",
+    "shapes": "Arrows & shapes",
+    "branding": "Branding"
+  },
+  "presets": {
+    "caption": {
+      "title": "Caption",
+      "text": "Your caption here"
+    },
+    "highlight": {
+      "title": "Highlight",
+      "text": "Must see!"
+    },
+    "brand": {
+      "title": "3Speak red",
+      "text": "New video"
+    },
+    "bubble": {
+      "title": "Bubble",
+      "text": "Hey there!"
+    },
+    "outline": {
+      "title": "Outline",
+      "text": "Look at this"
+    },
+    "neon": {
+      "title": "Neon",
+      "text": "TONIGHT"
+    },
+    "title": {
+      "title": "Big title",
+      "text": "BIG NEWS"
+    },
+    "comic": {
+      "title": "Comic",
+      "text": "BOOM!"
+    },
+    "marker": {
+      "title": "Marker",
+      "text": "handmade"
+    },
+    "quote": {
+      "title": "Quote",
+      "text": "“Say it well.”"
+    },
+    "tag": {
+      "title": "Hashtag"
+    },
+    "minimal": {
+      "title": "Minimal",
+      "text": "simple and clean"
+    }
+  }
+}

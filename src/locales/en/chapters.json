@@ -1,0 +1,41 @@
+{
+  "title": "Chapters",
+  "intro": "Mark where each part of the episode starts. Podcast apps show them, and 3Speak lists them in the description. They stay with your recording when you cut it. Shortcut: <kbd>M</kbd> adds one at the playhead.",
+  "empty": "No chapters yet. Move the playhead to where a part starts and add one.",
+  "goThere": "Go there",
+  "nameLabel": "Chapter {{n}} name",
+  "moveHere": "Move it to the playhead",
+  "moveLabel": "Move chapter {{n}} to the playhead",
+  "removeLabel": "Remove chapter {{n}}",
+  "leftOut": "Chapters less than a second apart, or at the very end, are left out of the export.",
+  "tipZero": "Tip: many apps expect the first chapter at 0:00.",
+  "addAt": "Add at {{time}}",
+  "copyTitle": "Copy the list (for a description)",
+  "copied": "Copied",
+  "copy": "Copy list",
+  "defaultTitle": "Chapter",
+  "suggest": {
+    "title": "Suggestions",
+    "findTitle": "Find where parts likely start: new topics, long pauses, scene changes",
+    "again": "Look again",
+    "suggest": "Suggest chapters",
+    "addAll": "Add all {{n}}",
+    "withTranscript": "With a transcript (the Transcript button), suggestions also follow the topics and get titles from what is said.",
+    "none": "No clear places found. The show may be short, or its parts flow into each other.",
+    "stop": "Stop",
+    "listen": "Listen from here",
+    "titleLabel": "Suggested chapter at {{time}}",
+    "add": "Add this chapter",
+    "addLabel": "Add the chapter at {{time}}",
+    "drop": "Not this one",
+    "dropLabel": "Drop the suggestion at {{time}}",
+    "reason": {
+      "start": "Start",
+      "topic": "New topic",
+      "pause": "Long pause",
+      "scene": "Scene change"
+    },
+    "intro": "Intro",
+    "part": "Part {{n}}"
+  }
+}

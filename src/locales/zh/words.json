@@ -1,0 +1,55 @@
+{
+  "panel": {
+    "title": "文字稿",
+    "close": "关闭文字稿"
+  },
+  "cutNotice": {
+    "plain": "已剪掉，缩短 {{seconds}} 秒。",
+    "words_other": "已剪掉 {{count}} 个词：缩短 {{seconds}} 秒。",
+    "found_other": "已剪掉找到的 {{count}} 处：缩短 {{seconds}} 秒。",
+    "fillers": "已剪掉 {{fillers}}、{{pauses}}：缩短 {{seconds}} 秒。",
+    "dismiss": "关闭"
+  },
+  "fillers": {
+    "title": "去除语气词和停顿",
+    "emptyHint": "此功能基于文字稿：它会找出节目语言中的“嗯”“呃”“那个”之类的语气词，以及长时间停顿。",
+    "listening": "正在聆听...",
+    "transcribeFirst": "先转写节目",
+    "checking": "正在检查服务器...",
+    "unavailable": "此编辑器服务器暂时无法提供文字稿。",
+    "intro": "{{language}}中的语气词。逐个试听，取消勾选需要保留的内容。",
+    "introNoList": "{{language}}中的语气词（仅限“嗯”“呃”之类：这种语言还没有语气词列表）。逐个试听，取消勾选需要保留的内容。",
+    "stillTranscribing": "节目的其余部分仍在转写中。",
+    "fillerWords": "语气词",
+    "longPauses": "长时间停顿",
+    "minPause": "停顿超过 <strong>{{seconds}} 秒</strong>",
+    "keepPause": "将停顿缩短到 <strong>{{seconds}} 秒</strong>",
+    "keepPauseTitle": "剪切后长停顿剩下的时长",
+    "fillerCount_other": "{{count}} 个语气词",
+    "pauseCount_other": "{{count}} 处停顿",
+    "summary": "已勾选 {{fillers}}、{{pauses}} · 剪掉 {{seconds}} 秒",
+    "nothingFound": "使用这些设置没有找到任何内容。",
+    "tickAllFillers": "勾选所有语气词",
+    "untickAllFillers": "取消勾选所有语气词",
+    "tickAllPauses": "勾选所有停顿",
+    "untickAllPauses": "取消勾选所有停顿",
+    "listLabel": "将被剪掉的内容",
+    "item": {
+      "keepPause": "保留这处停顿",
+      "cutPause": "剪掉这处停顿",
+      "keepFiller": "保留 {{text}}",
+      "cutFiller": "剪掉 {{text}}",
+      "stop": "停止",
+      "listenTitle": "试听（前后各多听一秒）",
+      "listenAt": "在 {{time}} 处试听",
+      "pause": "停顿",
+      "pauseLength": "{{length}} 秒 → {{kept}} 秒",
+      "filler": "语气词",
+      "fillerTitle": "犹豫时发出的声音",
+      "maybe": "可能",
+      "maybeTitle": "这里可能是语气词（前后有停顿或逗号）：请先试听"
+    },
+    "cut": "剪掉",
+    "cutCount": "剪掉 {{n}} 个（{{seconds}} 秒）"
+  }
+}

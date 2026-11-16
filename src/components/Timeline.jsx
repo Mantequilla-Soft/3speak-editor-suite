@@ -1,12 +1,17 @@
 import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo, memo } from 'react'
 import { boxFrom, clipIdsInBox, toggleInSelection, clipIdsInRange } from '../utils/marquee'
 import { trackNumbers } from '../utils/trackNumbers'
-import { Trash2, Flag, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker, Maximize2, ListChecks } from './icons'
+import { Trash2, Flag, Film, Music, Type, Scissors, ArrowLeftToLine, ArrowRightLeft, Copy, Link, Unlink, Plus, Settings, ChevronDown, FolderPlus, Mic, Video, MoreHorizontal, Magnet, Eye, EyeOff, Volume2, VolumeX, Palette, AudioWaveform, AudioLines, Music2, Sticker, Maximize2, ListChecks, Subtitles, ScrollText, Stock } from './icons'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
 import { getGroupColor } from '../hooks/useTimeline'
 import { MAX_TIMELINE_SECONDS } from '../utils/limits'
 import { timelineBeats } from '../utils/beatDetect'
 import { getPeaks, peaksForRange } from '../utils/peakCache'
+import TransitionCuts from './TransitionCuts'
+import { clipLabel, trackAriaLabel, formatSpokenTime } from '../utils/shortcuts'
+import { maxEndTime, sourceRange } from '../utils/clipSpeed'
+import KeyframeMarks from './KeyframeMarks'
+import { useT } from '../i18n'
 
 function formatTime(seconds) {
   const s = Math.floor(seconds)
@@ -168,6 +173,7 @@ const TimelineClip = memo(function TimelineClip({
   onOpenSettings,
   onDragPreviewChange
 }) {
+  const { t } = useT()
   const clipRef = useRef(null)
   const [isDragging, setIsDragging] = useState(null) // 'move', 'trimStart', 'trimEnd'
   const [dragPreview, setDragPreview] = useState(null) // { left, trackId } for visual feedback
@@ -213,9 +219,11 @@ const TimelineClip = memo(function TimelineClip({
   }, [isAudio, clip.url, clip.serverUrl])
 
   // This clip's own stretch of the file (trim / zoom only re-read it)
+  // (its media seconds: a sped-up clip covers more of the file, utils/clipSpeed.js)
+  const [mediaFrom, mediaTo] = sourceRange(clip)
   const realWaveform = useMemo(
-    () => peaksForRange(peakEnvelope, clip.startTime, clip.endTime, barCount),
-    [peakEnvelope, clip.startTime, clip.endTime, barCount]
+    () => peaksForRange(peakEnvelope, mediaFrom, mediaTo, barCount),
+    [peakEnvelope, mediaFrom, mediaTo, barCount]
   )
 
   const [waveformFailed, setWaveformFailed] = useState(false)
@@ -322,7 +330,7 @@ const TimelineClip = memo(function TimelineClip({
       return
     }
 
-    // Long-press fired — we're dragging, prevent scroll
+    // Long-press fired: we're dragging, prevent scroll
     e.preventDefault()
   }, [])
 
@@ -404,7 +412,7 @@ const TimelineClip = memo(function TimelineClip({
         onTrimStart(newStartTime, newPosition)
       } else if (isDragging === 'trimEnd') {
         const minEnd = initialValues.startTime + 0.1
-        const maxEnd = (isImage || isText || isColor) ? 600 : initialValues.duration
+        const maxEnd = (isImage || isText || isColor) ? 600 : maxEndTime(clip, initialValues.duration)
         const newEndTime = Math.max(minEnd, Math.min(initialValues.endTime + deltaTime, maxEnd))
         const newClipEnd = (initialValues.timelinePosition || 0) + (newEndTime - initialValues.startTime)
 
@@ -458,6 +466,11 @@ const TimelineClip = memo(function TimelineClip({
         ...(clip.groupId ? { borderLeftColor: getGroupColor(clip.groupId), borderLeftWidth: '3px', borderLeftStyle: 'solid' } : {})
       }}
       data-clip-id={clip.id}
+      role="button"
+      aria-roledescription="clip"
+      aria-label={clipLabel(clip, allTracks?.find(t => t.id === trackId))}
+      aria-pressed={isSelected}
+      tabIndex={isSelected ? 0 : -1}
       onClick={(e) => { e.stopPropagation(); onSelect(e) }}
     >
       {/* Trim handle - start */}
@@ -490,10 +503,11 @@ const TimelineClip = memo(function TimelineClip({
               <span className="clip-duration">{formatTime(clipDuration)}</span>
             </div>
           </div>
-        ) : isText ? (
+        ) : isText || clip.type === 'scene' ? (
           <div className="clip-text-preview">
             <Type size={16} />
-            <span className="text-preview">{clip.text?.substring(0, 20) || 'Text'}{clip.text?.length > 20 ? '...' : ''}</span>
+            {/* a title (motion scene) shows its name */}
+            <span className="text-preview">{clip.type === 'scene' ? clip.name : <>{clip.text?.substring(0, 20) || t('timeline.clip.textFallback')}{clip.text?.length > 20 ? '...' : ''}</>}</span>
           </div>
         ) : isColor ? (
           <div className="clip-color-preview" style={{
@@ -515,7 +529,7 @@ const TimelineClip = memo(function TimelineClip({
                   const spriteTime = i * spriteData.interval
                   const spriteEndTime = (i + 1) * spriteData.interval
                   // Only show sprites that overlap with the trimmed region
-                  if (spriteEndTime < clip.startTime || spriteTime > clip.endTime) return null
+                  if (spriteEndTime < mediaFrom || spriteTime > mediaTo) return null
                   return src ? (
                     <img key={i} src={src} alt="" className="sprite-frame" />
                   ) : (
@@ -536,6 +550,7 @@ const TimelineClip = memo(function TimelineClip({
             <span className="clip-duration">{formatTime(clipDuration)}</span>
           </div>
         )}
+        <KeyframeMarks clip={clip} pixelsPerSecond={pixelsPerSecond} selected={isSelected} />
         {/* Group indicator */}
         {clip.groupId && (
           <div className="group-indicator" style={{ backgroundColor: getGroupColor(clip.groupId) }}>
@@ -544,7 +559,7 @@ const TimelineClip = memo(function TimelineClip({
         )}
         {/* Layer indicator */}
         {trackIndex !== undefined && (
-          <div className="layer-indicator">L{trackIndex + 1}</div>
+          <div className="layer-indicator">{t('timeline.clip.layer', { number: trackIndex + 1 })}</div>
         )}
       </div>
 
@@ -553,7 +568,7 @@ const TimelineClip = memo(function TimelineClip({
         <button
           className="clip-settings-btn"
           onClick={(e) => { e.stopPropagation(); onOpenSettings(clip.id) }}
-          title="Clip settings"
+          title={t('timeline.clip.settings')}
         >
           <Settings size={12} />
         </button>
@@ -624,6 +639,15 @@ function Timeline({
   onOpenMusic,
   onOpenSfx,
   onOpenStickers,
+  onOpenStock,
+  // Titles from motion scenes (TitleTemplates.jsx)
+  onOpenTitles,
+  // Auto captions panel (Shorts editor); captionsActive: it is open or the Short has captions
+  onOpenCaptions,
+  captionsActive = false,
+  // The transcript panel (edit by text); transcriptActive: it is open
+  onOpenTranscript,
+  transcriptActive = false,
   onRecordVideo,
   onReverseClip,
   onUpdateTrack,
@@ -643,6 +667,7 @@ function Timeline({
   rangeMax = 120,
   onRangeChange
 }) {
+  const { t } = useT()
   const { min: MIN_ZOOM, max: MAX_ZOOM } = zoomRange(audioMode)
   const [zoom, setZoom] = useState(33) // pixels per second
   const [isDraggingPlayhead, setIsDraggingPlayhead] = useState(false)
@@ -1067,6 +1092,7 @@ function Timeline({
         <div
           key={t}
           className="ruler-mark"
+          aria-hidden="true"
           style={{ left: `${t * pixelsPerSecond}px` }}
         >
           <div className="ruler-tick" />
@@ -1079,7 +1105,7 @@ function Timeline({
     const spacing = beats.length > 1 ? ((beats[beats.length - 1] - beats[0]) / (beats.length - 1)) * pixelsPerSecond : 0
     if (spacing >= 4) {
       for (const b of beats) {
-        marks.push(<div key={`beat-${b}`} className="ruler-beat" style={{ left: `${b * pixelsPerSecond}px` }} />)
+        marks.push(<div key={`beat-${b}`} className="ruler-beat" aria-hidden="true" style={{ left: `${b * pixelsPerSecond}px` }} />)
       }
     }
     // Chapter flags (audio editor): click to go there, double click for the list
@@ -1214,7 +1240,7 @@ function Timeline({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [trackAddPopup])
 
-  // Handle "+" button click per track — show popup instead of directly opening file input
+  // Handle "+" button click per track: show popup instead of directly opening file input
   const handleTrackAddClick = useCallback((trackId, e) => {
     if (trackAddPopup === trackId) {
       setTrackAddPopup(null)
@@ -1295,8 +1321,8 @@ function Timeline({
       className="track-resize-handle"
       role="separator"
       aria-orientation="horizontal"
-      aria-label={`Height of ${track.name || 'this track'}`}
-      title="Drag to make the track taller or shorter (double-click: back to normal)"
+      aria-label={track.name ? t('timeline.track.resize.aria', { name: track.name }) : t('timeline.track.resize.ariaUnnamed')}
+      title={t('timeline.track.resize.title')}
       onPointerDown={(e) => startTrackResize(e, track)}
       onDoubleClick={() => onUpdateTrack(track.id, { height: undefined })}
     />
@@ -1438,7 +1464,7 @@ function Timeline({
       {/* Timeline toolbar */}
       <div className="timeline-toolbar">
         <div className="toolbar-left" ref={addMenuRef}>
-          <button className="add-menu-btn" onClick={() => setShowAddMenu(v => !v)} title="Add track or clip">
+          <button className="add-menu-btn" onClick={() => setShowAddMenu(v => !v)} title={t('timeline.toolbar.add.title')}>
             <Plus size={14} />
             <ChevronDown size={10} />
           </button>
@@ -1446,25 +1472,35 @@ function Timeline({
             <div className="add-menu-dropdown">
               {!audioMode && (
                 <button onClick={() => { onAddTrack && onAddTrack('video'); setShowAddMenu(false) }}>
-                  <Film size={14} /> Video Track
+                  <Film size={14} /> {t('timeline.toolbar.add.videoTrack')}
                 </button>
               )}
               <button onClick={() => { onAddTrack && onAddTrack('audio'); setShowAddMenu(false) }}>
-                <Music size={14} /> Audio Track
+                <Music size={14} /> {t('timeline.toolbar.add.audioTrack')}
               </button>
               {onOpenMusic && (
                 <button onClick={() => { onOpenMusic(); setShowAddMenu(false) }}>
-                  <Music size={14} /> Music Library
+                  <Music size={14} /> {t('timeline.toolbar.add.musicLibrary')}
                 </button>
               )}
               {onOpenSfx && (
                 <button onClick={() => { onOpenSfx(); setShowAddMenu(false) }}>
-                  <AudioLines size={14} /> Sound Effects
+                  <AudioLines size={14} /> {t('timeline.toolbar.add.soundEffects')}
                 </button>
               )}
               {onOpenStickers && (
                 <button onClick={() => { onOpenStickers(); setShowAddMenu(false) }}>
-                  <Sticker size={14} /> Stickers
+                  <Sticker size={14} /> {t('timeline.toolbar.add.stickers')}
+                </button>
+              )}
+              {onOpenTitles && (
+                <button onClick={() => { onOpenTitles(); setShowAddMenu(false) }}>
+                  <Type size={14} /> {t('timeline.toolbar.add.titles')}
+                </button>
+              )}
+              {onOpenStock && (
+                <button onClick={() => { onOpenStock(); setShowAddMenu(false) }}>
+                  <Stock size={14} /> {t('timeline.toolbar.add.stock')}
                 </button>
               )}
             </div>
@@ -1482,11 +1518,11 @@ function Timeline({
                 step={0.01}
                 value={Math.log(zoom)}
                 onChange={(e) => setZoom(Math.exp(Number(e.target.value)))}
-                title={`Zoom: ${zoom < 1 ? zoom.toFixed(2) : Math.round(zoom)}px/s`}
-                aria-label="Zoom"
+                title={t('timeline.toolbar.zoomTitle', { value: zoom < 1 ? Math.round(zoom * 100) / 100 : Math.round(zoom) })}
+                aria-label={t('timeline.aria.zoom')}
               />
-              <button className="action-btn zoom-fit-btn" onClick={fitToView} disabled={maxClipEnd <= 0} title="Show the whole timeline">
-                <Maximize2 size={14} /> <span>Fit</span>
+              <button className="action-btn zoom-fit-btn" onClick={fitToView} disabled={maxClipEnd <= 0} title={t('timeline.toolbar.fit.title')}>
+                <Maximize2 size={14} /> <span>{t('timeline.toolbar.fit.label')}</span>
               </button>
             </>
           ) : (
@@ -1497,7 +1533,7 @@ function Timeline({
               max={200}
               value={zoom}
               onChange={(e) => setZoom(Number(e.target.value))}
-              title={`Zoom: ${Math.round(zoom)}px/s`}
+              title={t('timeline.toolbar.zoomTitle', { value: Math.round(zoom) })}
             />
           )}
         </div>
@@ -1508,9 +1544,9 @@ function Timeline({
               className={`action-btn select-mode-btn${selectMode ? ' active' : ''}`}
               onClick={() => onSelectModeChange(!selectMode)}
               aria-pressed={selectMode}
-              title={selectMode ? 'Done selecting' : 'Select several clips: tap each one'}
+              title={selectMode ? t('timeline.toolbar.select.titleDone') : t('timeline.toolbar.select.titleStart')}
             >
-              <ListChecks size={14} /> <span>{selectMode ? 'Done' : 'Select'}</span>
+              <ListChecks size={14} /> <span>{selectMode ? t('common.done') : t('timeline.toolbar.select.label')}</span>
             </button>
           )}
           <button
@@ -1518,18 +1554,38 @@ function Timeline({
             onClick={() => onRemoveGap && onRemoveGap()}
             disabled={!isPlayheadOnGap}
             title={rippleTrackId
-              ? `Close the gap at the playhead on track ${numbers.get(rippleTrackId)} (G). Other tracks stay as they are.`
-              : (selectedClipId ? 'No gap at the playhead on the selected clip\'s track' : 'Remove gap at playhead (G)')}
+              ? t('timeline.toolbar.ripple.titleTrack', { number: numbers.get(rippleTrackId) })
+              : (selectedClipId ? t('timeline.toolbar.ripple.titleNoGap') : t('timeline.toolbar.ripple.title'))}
           >
-            <ArrowLeftToLine size={14} /> <span>Ripple</span>
+            <ArrowLeftToLine size={14} /> <span>{t('timeline.toolbar.ripple.label')}</span>
           </button>
+          {onOpenCaptions && (
+            <button
+              className={`action-btn captions-btn${captionsActive ? ' active' : ''}`}
+              onClick={onOpenCaptions}
+              aria-pressed={captionsActive}
+              title={t('timeline.toolbar.captions.title')}
+            >
+              <Subtitles size={14} /> <span>{t('timeline.toolbar.captions.label')}</span>
+            </button>
+          )}
+          {onOpenTranscript && (
+            <button
+              className={`action-btn transcript-btn${transcriptActive ? ' active' : ''}`}
+              onClick={onOpenTranscript}
+              aria-pressed={transcriptActive}
+              title={t('timeline.toolbar.transcript.title')}
+            >
+              <ScrollText size={14} /> <span>{t('timeline.toolbar.transcript.label')}</span>
+            </button>
+          )}
           {onAddFlag && (
             <button
               className="action-btn"
               onClick={() => onAddFlag(playheadPosition)}
-              title="Set a flag at the playhead (B): your own marker, numbered and coloured, never exported"
+              title={t('timeline.toolbar.flag.title')}
             >
-              <Flag size={14} /> <span>Flag</span>
+              <Flag size={14} /> <span>{t('timeline.toolbar.flag.label')}</span>
             </button>
           )}
           {selectedClipId && (
@@ -1537,66 +1593,66 @@ function Timeline({
               <button
                 className="action-btn"
                 onClick={() => { onSplitAtPlayhead && onSplitAtPlayhead(selectedClipId, playheadPosition) }}
-                title="Split clip at playhead (Ctrl+R)"
+                title={t('timeline.split.title')}
               >
-                <Scissors size={14} /> <span>Split</span>
+                <Scissors size={14} /> <span>{t('timeline.split.label')}</span>
               </button>
               {onAutoCut && (selectedClip?.type === 'video' || selectedClip?.type === 'audio') && (
                 <button
                   className="action-btn"
                   onClick={() => onAutoCut(selectedClipId)}
-                  title="Find the pauses and cut there"
+                  title={t('timeline.toolbar.autoCut.title')}
                 >
-                  <AudioWaveform size={14} /> <span>Auto cut</span>
+                  <AudioWaveform size={14} /> <span>{t('timeline.toolbar.autoCut.label')}</span>
                 </button>
               )}
               {onBeatSync && selectedClip?.type === 'audio' && (
                 <button
                   className="action-btn"
                   onClick={() => onBeatSync(selectedClipId)}
-                  title="Find the beat: snap to it, lay clips on it"
+                  title={t('timeline.toolbar.beats.title')}
                 >
-                  <Music2 size={14} /> <span>Beats</span>
+                  <Music2 size={14} /> <span>{t('timeline.toolbar.beats.label')}</span>
                 </button>
               )}
               <button
                 className="action-btn delete-btn"
                 onClick={() => onRemoveClip && onRemoveClip(selectedClipId)}
-                title="Delete selected clip (Del)"
+                title={t('timeline.toolbar.delete.title')}
               >
-                <Trash2 size={14} /> <span>Delete</span>
+                <Trash2 size={14} /> <span>{t('common.delete')}</span>
               </button>
               <button
                 className="action-btn"
                 onClick={() => onOpenClipSettings && onOpenClipSettings(selectedClipId)}
-                title="Clip settings"
+                title={t('timeline.clip.settings')}
               >
-                <Settings size={14} /> <span>Options</span>
+                <Settings size={14} /> <span>{t('timeline.toolbar.options')}</span>
               </button>
               {selectedClipGroupId && onUngroupClips && (
-                <button className="action-btn" onClick={() => onUngroupClips(selectedClipId)} title="Ungroup: its clips move and trim on their own again">
-                  <Unlink size={14} /> <span>Ungroup</span>
+                <button className="action-btn" onClick={() => onUngroupClips(selectedClipId)} title={t('timeline.toolbar.ungroup.titleOne')}>
+                  <Unlink size={14} /> <span>{t('timeline.toolbar.ungroup.label')}</span>
                 </button>
               )}
               <div className="clip-actions-wrap" ref={clipActionsRef}>
                 <button
                   className="action-btn"
                   onClick={() => setShowClipActions(v => !v)}
-                  title="More clip actions"
+                  title={t('timeline.toolbar.more.title')}
                 >
                   <MoreHorizontal size={14} />
                 </button>
                 {showClipActions && (
                   <div className="clip-actions-dropdown">
                     <button onClick={() => { onDuplicate && onDuplicate(selectedClipId); setShowClipActions(false) }}>
-                      <Copy size={14} /> Duplicate
+                      <Copy size={14} /> {t('timeline.toolbar.more.duplicate')}
                     </button>
                     {onGroupVoices && selectedClip?.type === 'audio' && !selectedClip.templateRole && (
                       <button
                         onClick={() => { onGroupVoices(selectedClipId); setShowClipActions(false) }}
-                        title="Group with what plays at the same time on the other voice tracks: they move, trim and get their silences cut together"
+                        title={t('timeline.toolbar.more.groupVoicesTitle')}
                       >
-                        <Link size={14} /> Group with other voices
+                        <Link size={14} /> {t('timeline.toolbar.more.groupVoices')}
                       </button>
                     )}
                     {selectedClip && (selectedClip.type === 'video' || selectedClip.type === 'audio') && onReverseClip && (
@@ -1604,11 +1660,11 @@ function Timeline({
                         className={selectedClip.reversed ? 'active' : ''}
                         onClick={() => { onReverseClip(selectedClipId); setShowClipActions(false) }}
                       >
-                        <ArrowRightLeft size={14} /> {selectedClip.reversed ? 'Unreverse' : 'Reverse'}
+                        <ArrowRightLeft size={14} /> {selectedClip.reversed ? t('timeline.toolbar.more.unreverse') : t('timeline.toolbar.more.reverse')}
                       </button>
                     )}
                     <button className={snapEnabled ? 'active' : ''} onClick={() => setSnapEnabled(v => !v)}>
-                      <Magnet size={14} /> Snap {snapEnabled ? 'On' : 'Off'}
+                      <Magnet size={14} /> {snapEnabled ? t('timeline.toolbar.more.snapOn') : t('timeline.toolbar.more.snapOff')}
                     </button>
                   </div>
                 )}
@@ -1620,20 +1676,20 @@ function Timeline({
             <>
               {multiGroupId ? (
                 onUngroupClips && (
-                  <button className="action-btn" onClick={() => onUngroupClips(multiClips[0].id)} title="Ungroup: these clips move and trim on their own again">
-                    <Unlink size={14} /> <span>Ungroup</span>
+                  <button className="action-btn" onClick={() => onUngroupClips(multiClips[0].id)} title={t('timeline.toolbar.ungroup.titleMany')}>
+                    <Unlink size={14} /> <span>{t('timeline.toolbar.ungroup.label')}</span>
                   </button>
                 )
               ) : (
                 onGroupClips && (
-                  <button className="action-btn" onClick={() => onGroupClips(multiClips.map(c => c.id))} title="Group: these clips move and trim together">
-                    <Link size={14} /> <span>Group {multiClips.length}</span>
+                  <button className="action-btn" onClick={() => onGroupClips(multiClips.map(c => c.id))} title={t('timeline.toolbar.group.title')}>
+                    <Link size={14} /> <span>{t('timeline.toolbar.group.label', { number: multiClips.length })}</span>
                   </button>
                 )
               )}
               {onRemoveClips && (
-                <button className="action-btn delete-btn" onClick={() => onRemoveClips(multiClips.map(c => c.id))} title="Delete the selected clips (Del)">
-                  <Trash2 size={14} /> <span>Delete {multiClips.length}</span>
+                <button className="action-btn delete-btn" onClick={() => onRemoveClips(multiClips.map(c => c.id))} title={t('timeline.toolbar.delete.titleMany')}>
+                  <Trash2 size={14} /> <span>{t('timeline.toolbar.delete.labelMany', { number: multiClips.length })}</span>
                 </button>
               )}
             </>
@@ -1643,11 +1699,11 @@ function Timeline({
 
       {selectMode && (
         <div className="timeline-select-hint" role="status">
-          <span>{(() => { const n = currentSelection().length; return n ? `${n} clip${n === 1 ? '' : 's'} selected: tap more, or Done` : 'Tap each clip you want to select' })()}</span>
+          <span>{(() => { const n = currentSelection().length; return n ? t('timeline.selectHint.count', { count: n }) : t('timeline.selectHint.none') })()}</span>
           {currentSelection().length > 0 && (
-            <button className="action-btn" onClick={() => onSelectClips([])}>Clear</button>
+            <button className="action-btn" onClick={() => onSelectClips([])}>{t('timeline.selectHint.clear')}</button>
           )}
-          <button className="action-btn" onClick={() => onSelectModeChange(false)}>Done</button>
+          <button className="action-btn" onClick={() => onSelectModeChange(false)}>{t('common.done')}</button>
         </div>
       )}
 
@@ -1674,7 +1730,7 @@ function Timeline({
                   <button
                     className="track-toggle-btn"
                     onClick={() => onUpdateTrack(track.id, { visible: track.visible === false ? true : false })}
-                    title={track.visible === false ? 'Show track' : 'Hide track'}
+                    title={track.visible === false ? t('timeline.track.show') : t('timeline.track.hide')}
                   >
                     {track.visible === false ? <EyeOff size={12} /> : <Eye size={12} />}
                   </button>
@@ -1682,7 +1738,7 @@ function Timeline({
               </div>
               <div className="track-label-bottom">
                 {onRemoveTrack && videoTracks.length > 1 && (
-                  <button className="track-delete-btn" onClick={() => onRemoveTrack(track.id)} title="Remove track">
+                  <button className="track-delete-btn" onClick={() => onRemoveTrack(track.id)} title={t('timeline.track.remove')}>
                     <Trash2 size={16} />
                   </button>
                 )}
@@ -1691,29 +1747,39 @@ function Timeline({
                     <button
                       className="track-add-btn"
                       onClick={(e) => handleTrackAddClick(track.id, e)}
-                      title="Add video, image or text"
+                      title={t('timeline.track.addVisual')}
                     >
                       <Plus size={18} />
                     </button>
                     {trackAddPopup === track.id && trackAddPopupPos && (
                       <div className="track-add-popup" style={{ top: trackAddPopupPos.top, left: trackAddPopupPos.left }}>
                         <button onClick={() => { handleTrackFileInputClick(track.id); setTrackAddPopup(null) }}>
-                          <FolderPlus size={14} /> Add File
+                          <FolderPlus size={14} /> {t('timeline.track.addFile')}
                         </button>
                         <button onClick={() => { onAddTextClip && onAddTextClip(track.id); setTrackAddPopup(null) }}>
-                          <Type size={14} /> Add Text
+                          <Type size={14} /> {t('timeline.track.addText')}
                         </button>
                         <button onClick={() => { onAddColorClip && onAddColorClip(track.id); setTrackAddPopup(null) }}>
-                          <Palette size={14} /> Add Color
+                          <Palette size={14} /> {t('timeline.track.addColor')}
                         </button>
                         {onRecordVideo && (
                           <button onClick={() => { onRecordVideo(); setTrackAddPopup(null) }}>
-                            <Video size={14} /> Record Video
+                            <Video size={14} /> {t('timeline.track.recordVideo')}
                           </button>
                         )}
                         {onOpenStickers && (
                           <button onClick={() => { onOpenStickers(); setTrackAddPopup(null) }}>
-                            <Sticker size={14} /> Stickers
+                            <Sticker size={14} /> {t('timeline.toolbar.add.stickers')}
+                          </button>
+                        )}
+                        {onOpenTitles && (
+                          <button onClick={() => { onOpenTitles(); setTrackAddPopup(null) }}>
+                            <Type size={14} /> {t('timeline.toolbar.add.titles')}
+                          </button>
+                        )}
+                        {onOpenStock && (
+                          <button onClick={() => { onOpenStock(); setTrackAddPopup(null) }}>
+                            <Stock size={14} /> {t('timeline.toolbar.add.stock')}
                           </button>
                         )}
                       </div>
@@ -1745,7 +1811,7 @@ function Timeline({
                   <button
                     className="track-toggle-btn"
                     onClick={() => onUpdateTrack(track.id, { muted: !track.muted })}
-                    title={track.muted ? 'Unmute track' : 'Mute track'}
+                    title={track.muted ? t('timeline.track.unmute') : t('timeline.track.mute')}
                   >
                     {track.muted ? <VolumeX size={12} /> : <Volume2 size={12} />}
                   </button>
@@ -1754,7 +1820,7 @@ function Timeline({
               <div className="track-label-bottom">
                 {/* the audio editor keeps its last voice track */}
                 {onRemoveTrack && audioTracks.length > 1 && !(audioMode && !track.music && audioTracks.filter(t => !t.music).length <= 1) && (
-                  <button className="track-delete-btn" onClick={() => onRemoveTrack(track.id)} title="Remove track">
+                  <button className="track-delete-btn" onClick={() => onRemoveTrack(track.id)} title={t('timeline.track.remove')}>
                     <Trash2 size={16} />
                   </button>
                 )}
@@ -1763,28 +1829,28 @@ function Timeline({
                     <button
                       className="track-add-btn"
                       onClick={(e) => handleTrackAddClick(track.id, e)}
-                      title="Add audio"
+                      title={t('timeline.track.addAudio')}
                     >
                       <Plus size={18} />
                     </button>
                     {trackAddPopup === track.id && trackAddPopupPos && (
                       <div className="track-add-popup" style={{ top: trackAddPopupPos.top, left: trackAddPopupPos.left }}>
                         <button onClick={() => { handleTrackFileInputClick(track.id); setTrackAddPopup(null) }}>
-                          <Music size={14} /> Add Audio File
+                          <Music size={14} /> {t('timeline.track.addAudioFile')}
                         </button>
                         {onOpenMusic && (
                           <button onClick={() => { onOpenMusic(track.id); setTrackAddPopup(null) }}>
-                            <Music size={14} /> Music Library
+                            <Music size={14} /> {t('timeline.toolbar.add.musicLibrary')}
                           </button>
                         )}
                         {onOpenSfx && (
                           <button onClick={() => { onOpenSfx(track.id); setTrackAddPopup(null) }}>
-                            <AudioLines size={14} /> Sound Effects
+                            <AudioLines size={14} /> {t('timeline.toolbar.add.soundEffects')}
                           </button>
                         )}
                         {onRecordAudio && (
                           <button onClick={() => { onRecordAudio(track.id); setTrackAddPopup(null) }}>
-                            <Mic size={14} /> Record Audio
+                            <Mic size={14} /> {t('timeline.track.recordAudio')}
                           </button>
                         )}
                       </div>
@@ -1806,6 +1872,8 @@ function Timeline({
 
         <div
           className="timeline-content"
+          role="region"
+          aria-label={t('timeline.aria.timeline')}
           ref={timelineContentRef}
           onMouseDown={handleContentMouseDown}
           onMouseDownCapture={rangePicking ? pickCapture : undefined}
@@ -1820,6 +1888,8 @@ function Timeline({
           {/* Ruler */}
           <div
             className={`timeline-ruler${isDraggingRuler ? ' dragging' : ''}`}
+            role="group"
+            aria-label={t('timeline.aria.ruler')}
             ref={rulerRef}
             style={{ width: `${timelineWidth}px` }}
             onClick={handleRulerClick}
@@ -1834,8 +1904,8 @@ function Timeline({
                 className="timeline-flag-head"
                 data-flag={fl.n}
                 style={{ left: `${(flagDrag?.id === fl.id ? flagDrag.at : fl.at) * pixelsPerSecond}px`, '--flag-color': fl.color }}
-                aria-label={`Flag ${fl.n} at ${formatTime(fl.at)}`}
-                title={`Flag ${fl.n} · ${formatTime(fl.at)}: click to jump there, drag to move, right-click to remove`}
+                aria-label={t('timeline.flag.aria', { number: fl.n, time: formatTime(fl.at) })}
+                title={t('timeline.flag.title', { number: fl.n, time: formatTime(fl.at) })}
                 onMouseDown={(e) => startFlagDrag(e, fl)}
                 onClick={(e) => e.stopPropagation()}
                 onContextMenu={(e) => { e.preventDefault(); e.stopPropagation(); onRemoveFlag?.(fl.id) }}
@@ -1852,9 +1922,9 @@ function Timeline({
               data-testid="timeline-range"
               style={{ left: `${range.start * pixelsPerSecond}px`, width: `${(range.end - range.start) * pixelsPerSecond}px`, height: `${contentHeight}px` }}
             >
-              <span className="timeline-range-label">{formatTime(range.start)} – {formatTime(range.end)} · {Math.round(range.end - range.start)}s</span>
-              {rangePicking && <span className="timeline-range-edge start" data-range-edge="start" title="Drag to move the start" />}
-              {rangePicking && <span className="timeline-range-edge end" data-range-edge="end" title="Drag to move the end" />}
+              <span className="timeline-range-label">{t('timeline.range.label', { from: formatTime(range.start), to: formatTime(range.end), seconds: Math.round(range.end - range.start) })}</span>
+              {rangePicking && <span className="timeline-range-edge start" data-range-edge="start" title={t('timeline.range.dragStart')} />}
+              {rangePicking && <span className="timeline-range-edge end" data-range-edge="end" title={t('timeline.range.dragEnd')} />}
             </div>
           )}
           {/* only the start marked: waiting for the click on the end */}
@@ -1864,8 +1934,8 @@ function Timeline({
               data-testid="timeline-range-start"
               style={{ left: `${range.start * pixelsPerSecond}px`, width: 0, height: `${contentHeight}px` }}
             >
-              <span className="timeline-range-label">{formatTime(range.start)} · click where it ends</span>
-              {rangePicking && <span className="timeline-range-edge start" data-range-edge="start" title="Drag to move the start" />}
+              <span className="timeline-range-label">{t('timeline.range.startOnly', { time: formatTime(range.start) })}</span>
+              {rangePicking && <span className="timeline-range-edge start" data-range-edge="start" title={t('timeline.range.dragStart')} />}
             </div>
           )}
 
@@ -1878,13 +1948,20 @@ function Timeline({
                 width: `${Math.max(0, timelineWidth - MAX_TIMELINE_SECONDS * pixelsPerSecond)}px`,
                 height: `${contentHeight}px`
               }}
-              title="Past the render limit"
+              title={t('timeline.pastLimit')}
             />
           )}
 
           {/* Playhead */}
           <div
             className="timeline-playhead"
+            role="slider"
+            tabIndex={0}
+            aria-label={t('timeline.aria.playhead')}
+            aria-valuemin={0}
+            aria-valuemax={Math.round(Math.max(maxClipEnd || 0, playheadPosition) * 10) / 10}
+            aria-valuenow={Math.round(playheadPosition * 10) / 10}
+            aria-valuetext={formatSpokenTime(playheadPosition)}
             style={{ left: `${playheadLeft}px`, height: `${contentHeight}px` }}
             onMouseDown={handlePlayheadMouseDown}
             onTouchStart={handlePlayheadTouchStart}
@@ -1908,6 +1985,8 @@ function Timeline({
               key={track.id}
               className="timeline-track-v2"
               data-track-id={track.id}
+              role="group"
+              aria-label={trackAriaLabel(track, trackIndex)}
               style={{ width: `${timelineWidth}px`, height: `${heightOf(track)}px` }}
               onDragOver={(e) => handleTrackDragOver(e, track.id)}
               onDrop={(e) => handleTrackDrop(e, track.id)}
@@ -1939,6 +2018,8 @@ function Timeline({
               {crossTrackGhost && crossTrackGhost.trackId === track.id && (
                 <div className="clip-ghost" style={{ left: `${crossTrackGhost.left}px`, width: `${crossTrackGhost.width}px` }} />
               )}
+              {/* Transitions: a button on each cut between two clips */}
+              {!audioMode && <TransitionCuts track={track} pixelsPerSecond={pixelsPerSecond} onUpdateClip={onUpdateClip} />}
             </div>
           ))}
 
@@ -1950,6 +2031,8 @@ function Timeline({
               key={track.id}
               className="timeline-track-v2 audio"
               data-track-id={track.id}
+              role="group"
+              aria-label={trackAriaLabel(track, trackIndex)}
               style={{ width: `${timelineWidth}px`, height: `${heightOf(track)}px` }}
               onDragOver={(e) => handleTrackDragOver(e, track.id)}
               onDrop={(e) => handleTrackDrop(e, track.id)}

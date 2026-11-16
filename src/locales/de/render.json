@@ -1,0 +1,83 @@
+{
+  "button": {
+    "rendering": "Wird gerendert...",
+    "exporting": "Wird exportiert...",
+    "uploading": "Wird hochgeladen {{percent}}",
+    "reRender": "Neu rendern",
+    "exportAgain": "Erneut exportieren",
+    "trimToRender": "Kürze die Zeitleiste auf {{limit}} oder weniger, um zu rendern",
+    "trimToExport": "Kürze die Zeitleiste auf {{limit}} oder weniger, um zu exportieren"
+  },
+  "exportAs": {
+    "button": "Exportieren als",
+    "title": "Exportieren als: dasselbe Projekt als Short, quadratisches oder Querformat-Video, zugeschnitten um die Gesichter",
+    "close": "„Exportieren als“ schließen",
+    "waitUpload": "Warte, bis der Upload fertig ist."
+  },
+  "done": {
+    "download": "Herunterladen",
+    "audiograms": "Audiogramme",
+    "audiogramsCount": "Audiogramme ({{n}})",
+    "audiogramsTitle": "Kurze Videos aus Stücken der Folge, zum Teilen oder um sie damit als Shorts zu posten",
+    "videoPodcast": "Video-Podcast",
+    "videoPodcastTitle": "Die ganze Folge als 16:9-Video mit Cover, Wellenform, Untertiteln und wer gerade spricht",
+    "useAudio": "Dieses Audio verwenden",
+    "sendVideo": "Video senden"
+  },
+  "failed": "Rendern fehlgeschlagen: {{error}}",
+  "phase": {
+    "preparing": "Dateien werden vorbereitet...",
+    "submitting": "Render-Auftrag wird gesendet...",
+    "busyRetry": "Die Render-Server sind ausgelastet. Neuer Versuch in {{seconds}} s...",
+    "offlineRetry": "Keine Verbindung zum Render-Server. Neuer Versuch in {{seconds}} s...",
+    "starting": "Wird gestartet...",
+    "reconnecting": "Verbindung zum Render-Server wird wiederhergestellt...",
+    "uploadingFile": "{{name}} wird hochgeladen ({{index}}/{{total}})...",
+    "uploadingUnnamed": "Datei wird hochgeladen ({{index}}/{{total}})...",
+    "uploadingPlate": "Hintergrundbild für {{name}} wird hochgeladen...",
+    "uploadingPlateUnnamed": "Hintergrundbild für den Clip wird hochgeladen..."
+  },
+  "queue": {
+    "next": "Du bist als Nächstes dran",
+    "inLine": {
+      "one": "Du bist {{n}}. in der Warteschlange",
+      "two": "Du bist {{n}}. in der Warteschlange",
+      "few": "Du bist {{n}}. in der Warteschlange",
+      "other": "Du bist {{n}}. in der Warteschlange"
+    },
+    "waiting": "Warte auf einen freien Render-Platz..."
+  },
+  "legacy": {
+    "exportVideo": "Video exportieren",
+    "cancelTitle": "Export abbrechen",
+    "settingsTitle": "Export-Einstellungen",
+    "uploadingRender": "{{name}} wird hochgeladen ({{percent}}). Bearbeite ruhig weiter, Rendern wird freigeschaltet, sobald es fertig ist.",
+    "uploadingExport": "{{name}} wird hochgeladen ({{percent}}). Bearbeite ruhig weiter, Exportieren wird freigeschaltet, sobald es fertig ist.",
+    "lengthRender": "Die Zeitleiste ist {{length}} lang. Kürze sie auf {{limit}} oder weniger, um zu rendern.",
+    "lengthExport": "Die Zeitleiste ist {{length}} lang. Kürze sie auf {{limit}} oder weniger, um zu exportieren.",
+    "method": "Export-Methode",
+    "methodCanvas": "Canvas (WYSIWYG)",
+    "methodFast": "Schnell (ohne Effekte)",
+    "canvasHint": "Erfasst alle visuellen Effekte genau wie in der Vorschau",
+    "fastHint": "Schnellerer Export, ignoriert aber Zoom, Position, Zuschnitt und Text-Overlays",
+    "quality": "Qualität",
+    "qualityHigh": "Hoch (größere Datei)",
+    "qualityMedium": "Mittel (empfohlen)",
+    "qualityLow": "Niedrig (kleinere Datei)",
+    "processing": "Wird verarbeitet... {{percent}}",
+    "renderingPercent": "Wird gerendert... {{percent}}",
+    "downloadRendered": "Gerendertes Video herunterladen",
+    "ffmpegLoading": "FFmpeg wird geladen...",
+    "ffmpegNotLoaded": "FFmpeg nicht geladen",
+    "addClips": "Füge Clips zur Zeitleiste hinzu, um zu exportieren"
+  },
+  "canvas": {
+    "loadingMedia": "Medien werden geladen...",
+    "renderingFrames": "Bilder werden gerendert...",
+    "encodingVideo": "Video wird kodiert...",
+    "processingAudio": "Audio wird verarbeitet...",
+    "convertingMp4": "Wird in MP4 umgewandelt...",
+    "preparingDownload": "Download wird vorbereitet...",
+    "complete": "Fertig!"
+  }
+}

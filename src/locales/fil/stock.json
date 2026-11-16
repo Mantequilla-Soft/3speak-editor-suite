@@ -1,0 +1,53 @@
+{
+  "title": "Stock media",
+  "titleBackground": "Pumili ng background",
+  "search": "Maghanap ng video, litrato at GIF",
+  "searchProvider": "Maghanap sa {{provider}}",
+  "searchProviderTitle": "Maghanap sa {{provider}} (libreng gamitin, kinokopya sa server namin kapag pumili ka)",
+  "kind": "Uri",
+  "category": "Kategorya",
+  "everything": "Lahat",
+  "types": {
+    "all": "Lahat",
+    "video": "Mga Video",
+    "image": "Mga litrato",
+    "gif": "Mga GIF"
+  },
+  "categories": {
+    "nature": "Kalikasan",
+    "city": "Lungsod",
+    "people": "Mga tao",
+    "animals": "Mga hayop",
+    "food": "Pagkain",
+    "tech": "Teknolohiya",
+    "sports": "Palakasan",
+    "space": "Kalawakan",
+    "abstract": "Abstrakto",
+    "backgrounds": "Mga background"
+  },
+  "loading": "Nilo-load ang library...",
+  "typeToSearch": "I-type ang hinahanap mo para maghanap sa {{provider}}.",
+  "nothingFound": "Walang nakita.",
+  "searching": "Naghahanap...",
+  "loadFailed": "Hindi ma-load ang stock library.",
+  "nothingMatches": "Walang tugma.",
+  "adding": "Idinadagdag...",
+  "byAuthor": "{{title}} ({{author}})",
+  "licenceOnline": "Mula sa {{provider}}: libreng gamitin, pati sa komersyal, hindi kailangan ng credit. Kinokopya ang file sa server ng 3Speak kapag pinili mo ito.",
+  "licence": "Libreng gamitin, pati sa komersyal, hindi kailangan ng credit (CC0 / public domain mula sa Wikimedia Commons).",
+  "placeBackground": "Ilalagay ito sa likod mo, sa sarili nitong track, kasinghaba ng clip mo.",
+  "placeAdd": "Ilalagay ito sa playhead: sa walang lamang timeline bilang video mo, kung hindi ay sa ibabaw nito bilang b-roll.",
+  "errors": {
+    "notCopied": "Hindi makopya ang file na iyon.",
+    "notAdded": "Hindi maidagdag ang file na iyon.",
+    "tooMany": "Masyadong maraming paghahanap, maghintay sandali.",
+    "searchFailed": "Hindi gumana ang paghahanap, subukan ulit.",
+    "copyFailed": "Hindi makopya sa server ang file na iyon."
+  },
+  "trackName": {
+    "background": "Background",
+    "backgroundNumbered": "Background {{number}}",
+    "broll": "B-roll",
+    "brollNumbered": "B-roll {{number}}"
+  }
+}

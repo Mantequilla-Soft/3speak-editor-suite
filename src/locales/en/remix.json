@@ -1,0 +1,42 @@
+{
+  "titles": {
+    "mode": "How do you want to remix?",
+    "stitch": "Where should your clip go?",
+    "reaction": "Where should your reaction go?"
+  },
+  "skip": "Skip, free edit",
+  "options": {
+    "stitch": {
+      "title": "Stitch",
+      "text": "Record a clip that plays before or after the original."
+    },
+    "reaction": {
+      "title": "Reaction",
+      "text": "Record yourself while the original plays."
+    },
+    "free": {
+      "title": "Free edit",
+      "text": "Open the editor with the original on the timeline."
+    },
+    "stitchBefore": {
+      "title": "Before the original",
+      "text": "Your clip plays first, then the original."
+    },
+    "stitchAfter": {
+      "title": "After the original",
+      "text": "The original plays first, then your clip."
+    },
+    "overlay": {
+      "title": "Overlay",
+      "text": "Your camera in a small box on top of the original. Drag it anywhere."
+    },
+    "tileTop": {
+      "title": "Tile above",
+      "text": "Original shrinks to the bottom half, you on top."
+    },
+    "tileBottom": {
+      "title": "Tile below",
+      "text": "Original shrinks to the top half, you below."
+    }
+  }
+}

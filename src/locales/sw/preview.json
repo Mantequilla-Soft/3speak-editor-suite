@@ -1,0 +1,29 @@
+{
+  "header": "Onyesho la awali la mfuatano wa muda",
+  "smaller": "Ndogo zaidi",
+  "larger": "Kubwa zaidi",
+  "loopOn": "Rudia: imewashwa",
+  "loopOff": "Rudia: imezimwa",
+  "aspect": {
+    "title": "Uwiano wa picha: {{ratio}}",
+    "titleAuto": "Uwiano wa picha: Otomatiki ({{ratio}})",
+    "auto": "Otomatiki"
+  },
+  "fullSize": "Ukubwa kamili",
+  "halfSize": "Nusu ya ukubwa",
+  "fullscreen": "Skrini nzima",
+  "noClipHere": "Hakuna klipu mahali hapa",
+  "noClips": "Hakuna klipu kwenye mfuatano wa muda",
+  "source": {
+    "hls": "(mtiririko wa HLS)",
+    "uploaded": "(imepakiwa)",
+    "local": "(kwenye kifaa)",
+    "file": "(faili)"
+  },
+  "stageLayout": {
+    "tileTop": "Kigae juu",
+    "tileBottom": "Kigae chini",
+    "overlay": "Tabaka"
+  },
+  "selectClip": "Chagua klipu ili kuona onyesho la awali"
+}

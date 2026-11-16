@@ -1,0 +1,75 @@
+{
+  "language": {
+    "label": "Wikang sinasalita",
+    "auto": "Kusang tukuyin"
+  },
+  "intro": {
+    "title": "I-edit sa pamamagitan ng text",
+    "text": "Gawing text ang sinasabi kasama ang pangalan ng bawat boses, tapos i-edit ang recording na parang dokumento: piliin ang mga salita at pindutin ang Delete para putulin.",
+    "checking": "Tinitingnan ang server...",
+    "unavailable": "Hindi available ang mga transcript sa editor server na ito ngayon.",
+    "noSpeech": "Magdagdag muna ng recording na may pananalita.",
+    "transcribeSeconds": "I-transcribe ({{n}} seg ng recording)",
+    "transcribeMinutes": "I-transcribe ({{n}} min ng recording)",
+    "longShow": "Matagal ang mahabang palabas: lumalabas ang mga salita nang bahagi por bahagi, at puwede mo nang simulang i-edit ang mga nauna."
+  },
+  "listening": "Nakikinig...",
+  "stop": "Itigil",
+  "goThere": "Pumunta roon",
+  "search": {
+    "placeholder": "Maghanap ng salita",
+    "label": "Maghanap ng salita sa transcript",
+    "previous": "Nakaraan",
+    "previousLabel": "Nakaraang tugma",
+    "next": "Susunod",
+    "nextLabel": "Susunod na tugma"
+  },
+  "selection": {
+    "count_one": "{{count}} salita · {{seconds}} seg",
+    "count_other": "{{count}} salita · {{seconds}} seg",
+    "cut": "Putulin",
+    "cutTitle": "Putulin ang mga napiling salita sa recording (Delete)",
+    "clearTitle": "I-clear ang pinili (Esc)",
+    "clearLabel": "I-clear ang pinili"
+  },
+  "found": {
+    "cutAll_one": "Putulin lahat ng {{count}}",
+    "cutAll_other": "Putulin lahat ng {{count}}",
+    "cutAllTitle": "Putulin sa recording ang bawat nakitang lugar"
+  },
+  "fillers": "Mga filler",
+  "fillersTitle": "Hanapin ang um, uh, ano, at mahahabang hinto",
+  "copy": "Kopyahin ang transcript",
+  "speakers": "Mga nagsasalita",
+  "missing": {
+    "seconds": "Wala pang text ang {{n}} seg ng recording.",
+    "minutes": "Wala pang text ang {{n}} min ng recording.",
+    "transcribe": "I-transcribe ito"
+  },
+  "scrollLabel": "Transcript: i-click ang salita para pumunta roon, i-drag sa mga salita para piliin, pinuputol ng Delete",
+  "hint_one": "{{count}} salita. I-click ang salita para pumunta roon; i-drag o Shift+click para pumili; pinuputol ng Delete. Ibinabalik ito ng Undo.",
+  "hint_other": "{{count}} salita. I-click ang salita para pumunta roon; i-drag o Shift+click para pumili; pinuputol ng Delete. Ibinabalik ito ng Undo.",
+  "speaker": {
+    "default": "Boses",
+    "numbered": "Boses {{n}}"
+  },
+  "job": {
+    "starting": "Nagsisimula...",
+    "preparing": "Inihahanda ang mga recording...",
+    "listening": "Nakikinig...",
+    "signIn": "Mag-sign in sa 3Speak para gumawa ng transcript.",
+    "uploadFailed": "Hindi ma-upload ang mga recording: {{message}}",
+    "notUploaded": "Wala pa sa server ang mga recording. Subukan ulit kapag na-upload na ang mga ito.",
+    "serverAnswered": "Sumagot ang server ng {{status}}",
+    "lost": "Nawala ang transcript job (nag-restart ang server?)",
+    "failed": "Pumalya ang speech recognition"
+  },
+  "stt": {
+    "audioUnavailable": "hindi available ang audio",
+    "serverError": "error sa server",
+    "connectionFailed": "pumalya ang koneksyon",
+    "unauthorized": "walang pahintulot",
+    "closed": "sarado",
+    "initFailed": "pumalya ang pagsisimula ng STT"
+  }
+}

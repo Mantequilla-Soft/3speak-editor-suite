@@ -1,0 +1,75 @@
+{
+  "language": {
+    "label": "Lugha inayozungumzwa",
+    "auto": "Gundua kiotomatiki"
+  },
+  "intro": {
+    "title": "Hariri kupitia maandishi",
+    "text": "Geuza kinachosemwa kuwa maandishi yenye jina la kila mzungumzaji, kisha hariri rekodi kama hati: chagua maneno na ubonyeze Delete ili kuyakata.",
+    "checking": "Inakagua seva...",
+    "unavailable": "Nakala hazipatikani kwenye seva hii ya kihariri kwa sasa.",
+    "noSpeech": "Ongeza rekodi yenye usemi kwanza.",
+    "transcribeSeconds": "Andika nakala (sek {{n}} za rekodi)",
+    "transcribeMinutes": "Andika nakala (dakika {{n}} za rekodi)",
+    "longShow": "Kipindi kirefu kinachukua muda: maneno yanaonekana sehemu kwa sehemu, na unaweza kuanza kuhariri ya kwanza."
+  },
+  "listening": "Inasikiliza...",
+  "stop": "Simamisha",
+  "goThere": "Nenda hapo",
+  "search": {
+    "placeholder": "Tafuta maneno",
+    "label": "Tafuta maneno kwenye nakala",
+    "previous": "Iliyotangulia",
+    "previousLabel": "Inayolingana iliyotangulia",
+    "next": "Inayofuata",
+    "nextLabel": "Inayolingana inayofuata"
+  },
+  "selection": {
+    "count_one": "Neno {{count}} · sek {{seconds}}",
+    "count_other": "Maneno {{count}} · sek {{seconds}}",
+    "cut": "Kata",
+    "cutTitle": "Kata maneno yaliyochaguliwa kutoka kwenye rekodi (Delete)",
+    "clearTitle": "Futa uteuzi (Esc)",
+    "clearLabel": "Futa uteuzi"
+  },
+  "found": {
+    "cutAll_one": "Kata {{count}}",
+    "cutAll_other": "Kata zote {{count}}",
+    "cutAllTitle": "Kata kila mahali palipopatikana kutoka kwenye rekodi"
+  },
+  "fillers": "Maneno ya kujaza",
+  "fillersTitle": "Tafuta \"aa\", \"mm\", \"unajua\" na mapumziko marefu",
+  "copy": "Nakili nakala",
+  "speakers": "Wazungumzaji",
+  "missing": {
+    "seconds": "Sek {{n}} za rekodi bado hazina maandishi.",
+    "minutes": "Dakika {{n}} za rekodi bado hazina maandishi.",
+    "transcribe": "Iandikie nakala"
+  },
+  "scrollLabel": "Nakala: bofya neno ili kwenda hapo, buruta juu ya maneno ili kuyachagua, Delete inayakata",
+  "hint_one": "Neno {{count}}. Bofya neno ili kwenda hapo; buruta au Shift+bofya ili kuchagua; Delete inakata. Tendua inarudisha.",
+  "hint_other": "Maneno {{count}}. Bofya neno ili kwenda hapo; buruta au Shift+bofya ili kuchagua; Delete inakata. Tendua inarudisha.",
+  "speaker": {
+    "default": "Sauti ya mazungumzo",
+    "numbered": "Sauti ya mazungumzo {{n}}"
+  },
+  "job": {
+    "starting": "Inaanza...",
+    "preparing": "Inaandaa rekodi...",
+    "listening": "Inasikiliza...",
+    "signIn": "Ingia kwenye 3Speak ili kutengeneza nakala.",
+    "uploadFailed": "Rekodi hazikuweza kupakiwa: {{message}}",
+    "notUploaded": "Rekodi bado haziko kwenye seva. Jaribu tena zikimaliza kupakiwa.",
+    "serverAnswered": "Seva ilijibu {{status}}",
+    "lost": "Kazi ya nakala imepotea (seva ilianzishwa upya?)",
+    "failed": "Utambuzi wa usemi umeshindwa"
+  },
+  "stt": {
+    "audioUnavailable": "sauti haipatikani",
+    "serverError": "hitilafu ya seva",
+    "connectionFailed": "muunganisho umeshindwa",
+    "unauthorized": "hakuna idhini",
+    "closed": "imefungwa",
+    "initFailed": "kuanzisha utambuzi wa usemi kumeshindwa"
+  }
+}

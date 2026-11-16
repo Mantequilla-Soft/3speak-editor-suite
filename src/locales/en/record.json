@@ -1,0 +1,109 @@
+{
+  "media": {
+    "blocked": {
+      "camera": "The camera or microphone is blocked for this site. Allow it with the icon in the address bar, then try again. If you never said no, your computer's privacy settings may be blocking the browser.",
+      "microphone": "The microphone is blocked for this site. Allow it with the icon in the address bar, then try again. If you never said no, your computer's privacy settings may be blocking the browser."
+    },
+    "notAllowed": {
+      "camera": "This page is not allowed to use the camera or microphone. Reload 3Speak and try again.",
+      "microphone": "This page is not allowed to use the microphone. Reload 3Speak and try again."
+    },
+    "busy": {
+      "camera": "Your camera or microphone is busy in another app or tab (a video call, another recorder). Close it there, then try again.",
+      "microphone": "Your microphone is busy in another app or tab (a video call, another recorder). Close it there, then try again."
+    },
+    "notFound": {
+      "camera": "No camera or microphone found. Connect one, then try again.",
+      "microphone": "No microphone found. Connect one, then try again."
+    },
+    "noDevices": {
+      "camera": "This browser cannot use the camera or microphone here.",
+      "microphone": "This browser cannot use the microphone here."
+    },
+    "failed": {
+      "camera": "The camera or microphone could not start. Try again.",
+      "microphone": "The microphone could not start. Try again."
+    },
+    "failedNamed": {
+      "camera": "The camera or microphone could not start ({{name}}). Try again.",
+      "microphone": "The microphone could not start ({{name}}). Try again."
+    }
+  },
+  "inline": {
+    "camera": "Camera",
+    "expand": "Expand",
+    "shrink": "Shrink",
+    "uploading": "Uploading...",
+    "uploadingPct": "Uploading... {{pct}}%",
+    "converting": "Converting...",
+    "rec": "REC",
+    "starting": "Starting...",
+    "plateStepOut": "Step out of the picture",
+    "plateShooting": "Shooting the background, stay out...",
+    "gestures": "Hold and drag a picture to reframe it, pinch to zoom.",
+    "gesturesOverlay": "Hold and drag a picture to reframe it, pinch to zoom, drag your camera box to move it.",
+    "greenScreen": {
+      "label": "Green screen",
+      "off": "Off",
+      "green": "Green",
+      "blue": "Blue",
+      "person": "Person",
+      "static": "Static",
+      "staticTitle": "Static background (experimental): removes whatever matches a shot of the empty background",
+      "personTitle": "No green screen needed: finds you in the picture",
+      "threshold": "Threshold",
+      "thresholdStaticTitle": "Tolerance: higher ignores more change in the background (noise, light, focus) but can start to remove parts of you",
+      "thresholdTitle": "Higher removes more of the screen colour",
+      "despill": "Despill",
+      "despillStaticTitle": "Removes the wall colour from the edges",
+      "despillGreenTitle": "Removes the green tint from the edges",
+      "despillBlueTitle": "Removes the blue tint from the edges",
+      "retakePlate": "Retake empty background",
+      "shootPlate": "Shoot empty background",
+      "plateKeep": "Experimental. Keep the camera and the light exactly as they are.",
+      "plateHowTo": "Experimental. Fix the camera in place, press the button and step out of the picture.",
+      "keyFailed": "Live keying is not available here. The clip still gets the green screen setting.",
+      "personHowTo": "No green screen needed: the editor finds you in the picture. The take is recorded as it is and cut out on the timeline, where you pick what goes behind you."
+    },
+    "tpEdit": "Edit teleprompter text",
+    "tpAdd": "Add teleprompter text",
+    "teleprompter": "Teleprompter",
+    "recordOnly": "Record only",
+    "recordAndPlay": "Record + Play video",
+    "plusPlay": "+ Play",
+    "recordReactionTitle": "Record while the original plays",
+    "recordReaction": "Record reaction",
+    "record": "Record",
+    "stop": "Stop",
+    "retake": "Retake",
+    "useClip": "Use Clip"
+  },
+  "video": {
+    "title": "Record Video",
+    "startingCamera": "Starting camera...",
+    "start": "Start recording",
+    "stop": "Stop",
+    "retake": "Retake",
+    "useClip": "Use Clip"
+  },
+  "audio": {
+    "title": "Record Audio",
+    "cannotRecord": "This browser cannot record audio here.",
+    "addFailed": "Could not add the recording. Please try again.",
+    "yourRecording": "Your recording",
+    "micLevel": "Microphone level",
+    "accessingMic": "Accessing microphone...",
+    "ready": "Ready to record: speak to check your level",
+    "preparing": "Preparing your recording...",
+    "adding": "Adding to your tracks...",
+    "tpEdit": "Edit teleprompter text",
+    "tpAdd": "Add teleprompter text",
+    "teleprompter": "Teleprompter",
+    "start": "Start recording",
+    "stop": "Stop",
+    "retake": "Retake",
+    "addingShort": "Adding...",
+    "useRecording": "Use Recording",
+    "useScript": "Use this script"
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "media": {
+    "blocked": {
+      "camera": "Naka-block ang camera o mikropono para sa site na ito. Payagan ito gamit ang icon sa address bar, tapos subukan ulit. Kung hindi ka kailanman tumanggi, baka hinaharangan ng privacy settings ng computer mo ang browser.",
+      "microphone": "Naka-block ang mikropono para sa site na ito. Payagan ito gamit ang icon sa address bar, tapos subukan ulit. Kung hindi ka kailanman tumanggi, baka hinaharangan ng privacy settings ng computer mo ang browser."
+    },
+    "notAllowed": {
+      "camera": "Hindi pinapayagang gumamit ng camera o mikropono ang page na ito. I-reload ang 3Speak at subukan ulit.",
+      "microphone": "Hindi pinapayagang gumamit ng mikropono ang page na ito. I-reload ang 3Speak at subukan ulit."
+    },
+    "busy": {
+      "camera": "Ginagamit ng ibang app o tab ang camera o mikropono mo (video call, ibang recorder). Isara ito roon, tapos subukan ulit.",
+      "microphone": "Ginagamit ng ibang app o tab ang mikropono mo (video call, ibang recorder). Isara ito roon, tapos subukan ulit."
+    },
+    "notFound": {
+      "camera": "Walang nakitang camera o mikropono. Magkabit ng isa, tapos subukan ulit.",
+      "microphone": "Walang nakitang mikropono. Magkabit ng isa, tapos subukan ulit."
+    },
+    "noDevices": {
+      "camera": "Hindi magamit ng browser na ito ang camera o mikropono rito.",
+      "microphone": "Hindi magamit ng browser na ito ang mikropono rito."
+    },
+    "failed": {
+      "camera": "Hindi masimulan ang camera o mikropono. Subukan ulit.",
+      "microphone": "Hindi masimulan ang mikropono. Subukan ulit."
+    },
+    "failedNamed": {
+      "camera": "Hindi masimulan ang camera o mikropono ({{name}}). Subukan ulit.",
+      "microphone": "Hindi masimulan ang mikropono ({{name}}). Subukan ulit."
+    }
+  },
+  "inline": {
+    "camera": "Camera",
+    "expand": "Palakihin",
+    "shrink": "Paliitin",
+    "uploading": "Ina-upload...",
+    "uploadingPct": "Ina-upload... {{pct}}%",
+    "converting": "Kino-convert...",
+    "rec": "REC",
+    "starting": "Nagsisimula...",
+    "plateStepOut": "Umalis sa larawan",
+    "plateShooting": "Kinukunan ang background, huwag pumasok...",
+    "gestures": "Pindutin nang matagal at i-drag ang larawan para i-reframe, mag-pinch para mag-zoom.",
+    "gesturesOverlay": "Pindutin nang matagal at i-drag ang larawan para i-reframe, mag-pinch para mag-zoom, i-drag ang kahon ng camera mo para ilipat ito.",
+    "greenScreen": {
+      "label": "Green screen",
+      "off": "Naka-off",
+      "green": "Berde",
+      "blue": "Asul",
+      "person": "Tao",
+      "static": "Static",
+      "staticTitle": "Static na background (eksperimental): inaalis ang anumang tugma sa kuha ng walang lamang background",
+      "personTitle": "Hindi kailangan ng green screen: hinahanap ka sa larawan",
+      "threshold": "Threshold",
+      "thresholdStaticTitle": "Tolerance: mas mataas, mas maraming pagbabago sa background ang hindi pinapansin (ingay, liwanag, focus) pero puwedeng magsimulang maalis ang mga bahagi mo",
+      "thresholdTitle": "Mas mataas, mas maraming kulay ng screen ang inaalis",
+      "despill": "Despill",
+      "despillStaticTitle": "Inaalis ang kulay ng pader sa mga gilid",
+      "despillGreenTitle": "Inaalis ang berdeng tint sa mga gilid",
+      "despillBlueTitle": "Inaalis ang asul na tint sa mga gilid",
+      "retakePlate": "Kunan ulit ang walang lamang background",
+      "shootPlate": "Kunan ang walang lamang background",
+      "plateKeep": "Eksperimental. Panatilihin ang camera at ang liwanag nang eksakto gaya ng ngayon.",
+      "plateHowTo": "Eksperimental. Ipirmi ang camera sa puwesto, pindutin ang button at umalis sa larawan.",
+      "keyFailed": "Hindi available rito ang live keying. Makukuha pa rin ng clip ang setting ng green screen.",
+      "personHowTo": "Hindi kailangan ng green screen: hinahanap ka ng editor sa larawan. Nire-record ang take nang ganoon lang at kina-cut out sa timeline, kung saan mo pipiliin kung ano ang nasa likod mo."
+    },
+    "tpEdit": "I-edit ang text ng teleprompter",
+    "tpAdd": "Magdagdag ng text ng teleprompter",
+    "teleprompter": "Teleprompter",
+    "recordOnly": "Mag-record lang",
+    "recordAndPlay": "Mag-record + I-play ang video",
+    "plusPlay": "+ I-play",
+    "recordReactionTitle": "Mag-record habang tumutugtog ang orihinal",
+    "recordReaction": "Mag-record ng reaction",
+    "record": "Mag-record",
+    "stop": "Itigil",
+    "retake": "Ulitin",
+    "useClip": "Gamitin ang clip"
+  },
+  "video": {
+    "title": "Mag-record ng Video",
+    "startingCamera": "Sinisimulan ang camera...",
+    "start": "Simulan ang recording",
+    "stop": "Itigil",
+    "retake": "Ulitin",
+    "useClip": "Gamitin ang clip"
+  },
+  "audio": {
+    "title": "Mag-record ng Audio",
+    "cannotRecord": "Hindi makapag-record ng audio ang browser na ito rito.",
+    "addFailed": "Hindi maidagdag ang recording. Pakisubukan ulit.",
+    "yourRecording": "Ang recording mo",
+    "micLevel": "Level ng mikropono",
+    "accessingMic": "Ina-access ang mikropono...",
+    "ready": "Handa nang mag-record: magsalita para i-check ang level mo",
+    "preparing": "Inihahanda ang recording mo...",
+    "adding": "Idinadagdag sa mga track mo...",
+    "tpEdit": "I-edit ang text ng teleprompter",
+    "tpAdd": "Magdagdag ng text ng teleprompter",
+    "teleprompter": "Teleprompter",
+    "start": "Simulan ang recording",
+    "stop": "Itigil",
+    "retake": "Ulitin",
+    "addingShort": "Idinadagdag...",
+    "useRecording": "Gamitin ang recording",
+    "useScript": "Gamitin ang script na ito"
+  }
+}

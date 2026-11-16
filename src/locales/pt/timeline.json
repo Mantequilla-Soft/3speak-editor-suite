@@ -1,0 +1,182 @@
+{
+  "aria": {
+    "timeline": "Linha do tempo",
+    "ruler": "Régua de tempo: clique para mover o cursor de reprodução",
+    "playhead": "Cursor de reprodução",
+    "zoom": "Zoom"
+  },
+  "split": {
+    "title": "Dividir o clipe no cursor de reprodução (Ctrl+R)",
+    "label": "Dividir"
+  },
+  "toolbar": {
+    "add": {
+      "title": "Adicionar faixa ou clipe",
+      "videoTrack": "Faixa de vídeo",
+      "audioTrack": "Faixa de áudio",
+      "musicLibrary": "Biblioteca de músicas",
+      "soundEffects": "Efeitos sonoros",
+      "stickers": "Stickers",
+      "titles": "Títulos",
+      "stock": "Mídia de banco"
+    },
+    "zoomTitle": "Zoom: {{value}} px/s",
+    "fit": {
+      "title": "Mostrar a linha do tempo inteira",
+      "label": "Ajustar"
+    },
+    "select": {
+      "titleStart": "Selecionar vários clipes: toque em cada um",
+      "titleDone": "Concluir seleção",
+      "label": "Selecionar"
+    },
+    "ripple": {
+      "titleTrack": "Fechar o espaço no cursor de reprodução na faixa {{number}} (G). As outras faixas ficam como estão.",
+      "titleNoGap": "Nenhum espaço no cursor de reprodução na faixa do clipe selecionado",
+      "title": "Remover o espaço no cursor de reprodução (G)",
+      "label": "Fechar espaço"
+    },
+    "captions": {
+      "title": "Legendas: transforma o que é dito em legendas palavra por palavra",
+      "label": "Legendas"
+    },
+    "transcript": {
+      "title": "Transcrição: edite pelo texto, apague palavras para cortá-las",
+      "label": "Transcrição"
+    },
+    "flag": {
+      "title": "Colocar uma marca no cursor de reprodução (B): seu próprio marcador, numerado e colorido, nunca é exportado",
+      "label": "Marca"
+    },
+    "autoCut": {
+      "title": "Encontrar as pausas e cortar ali",
+      "label": "Corte automático"
+    },
+    "beats": {
+      "title": "Encontrar a batida: encaixar nela, colocar clipes sobre ela",
+      "label": "Batidas"
+    },
+    "delete": {
+      "title": "Excluir o clipe selecionado (Del)",
+      "titleMany": "Excluir os clipes selecionados (Del)",
+      "labelMany": "Excluir {{number}}"
+    },
+    "options": "Opções",
+    "ungroup": {
+      "titleOne": "Desagrupar: os clipes voltam a se mover e ser cortados separadamente",
+      "titleMany": "Desagrupar: estes clipes voltam a se mover e ser cortados separadamente",
+      "label": "Desagrupar"
+    },
+    "group": {
+      "title": "Agrupar: estes clipes se movem e são cortados juntos",
+      "label": "Agrupar {{number}}"
+    },
+    "more": {
+      "title": "Mais ações do clipe",
+      "duplicate": "Duplicar",
+      "groupVoicesTitle": "Agrupar com o que toca ao mesmo tempo nas outras faixas de voz: eles se movem, são cortados e têm os silêncios removidos juntos",
+      "groupVoices": "Agrupar com outras vozes",
+      "reverse": "Inverter",
+      "unreverse": "Desfazer inversão",
+      "snapOn": "Ímã: ligado",
+      "snapOff": "Ímã: desligado"
+    }
+  },
+  "selectHint": {
+    "count_one": "{{count}} clipe selecionado: toque em mais ou em Concluído",
+    "count_many": "{{count}} de clipes selecionados: toque em mais ou em Concluído",
+    "count_other": "{{count}} clipes selecionados: toque em mais ou em Concluído",
+    "none": "Toque em cada clipe que você quer selecionar",
+    "clear": "Limpar"
+  },
+  "clip": {
+    "settings": "Configurações do clipe",
+    "textFallback": "Texto",
+    "layer": "C{{number}}",
+    "kind": {
+      "video": "Clipe de vídeo",
+      "audio": "Clipe de som",
+      "image": "Imagem",
+      "text": "Texto",
+      "color": "Cor",
+      "other": "Clipe"
+    },
+    "aria": {
+      "plain": "{{kind}}, de {{from}} a {{to}}",
+      "named": "{{kind}} {{name}}, de {{from}} a {{to}}",
+      "onTrack": "{{kind}} em {{track}}, de {{from}} a {{to}}",
+      "namedOnTrack": "{{kind}} {{name}} em {{track}}, de {{from}} a {{to}}"
+    }
+  },
+  "track": {
+    "show": "Mostrar faixa",
+    "hide": "Ocultar faixa",
+    "mute": "Silenciar faixa",
+    "unmute": "Ativar som da faixa",
+    "remove": "Remover faixa",
+    "addVisual": "Adicionar vídeo, imagem ou texto",
+    "addAudio": "Adicionar áudio",
+    "addFile": "Adicionar arquivo",
+    "addText": "Adicionar texto",
+    "addColor": "Adicionar cor",
+    "recordVideo": "Gravar vídeo",
+    "addAudioFile": "Adicionar arquivo de áudio",
+    "recordAudio": "Gravar áudio",
+    "resize": {
+      "aria": "Altura de {{name}}",
+      "ariaUnnamed": "Altura desta faixa",
+      "title": "Arraste para deixar a faixa mais alta ou mais baixa (clique duplo: volta ao normal)"
+    },
+    "aria": {
+      "named": {
+        "video": "{{name}} (faixa de vídeo)",
+        "audio": "{{name}} (faixa de áudio)",
+        "music": "{{name}} (faixa de música)"
+      },
+      "numbered": {
+        "video": "Faixa de vídeo {{number}}",
+        "audio": "Faixa de áudio {{number}}",
+        "music": "Faixa de música {{number}}"
+      }
+    }
+  },
+  "trackName": {
+    "voice": "Voz",
+    "voiceNumbered": "Voz {{number}}",
+    "music": "Música",
+    "musicNumbered": "Música {{number}}",
+    "video": "Vídeo",
+    "videoNumbered": "Vídeo {{number}}",
+    "audioNumbered": "Áudio {{number}}",
+    "stickers": "Stickers",
+    "stickersNumbered": "Stickers {{number}}",
+    "sfx": "SFX",
+    "sfxNumbered": "SFX {{number}}"
+  },
+  "clipName": {
+    "text": "Camada de texto",
+    "color": "Cor",
+    "imported": "Mídia importada",
+    "linkedAudio": "{{name}} (áudio)"
+  },
+  "textClip": {
+    "defaultText": "Digite o texto aqui"
+  },
+  "flag": {
+    "aria": "Marca {{number}} em {{time}}",
+    "title": "Marca {{number}} · {{time}}: clique para pular até ela, arraste para mover, clique com o botão direito para remover"
+  },
+  "range": {
+    "label": "{{from}} – {{to}} · {{seconds}} s",
+    "startOnly": "{{time}} · clique onde termina",
+    "dragStart": "Arraste para mover o início",
+    "dragEnd": "Arraste para mover o fim"
+  },
+  "pastLimit": "Além do limite de renderização",
+  "backgroundMusic": {
+    "title": "Música de fundo",
+    "add": "Adicionar música de fundo",
+    "remove": "Remover música"
+  },
+  "partName": "Parte {{n}} · {{name}}"
+}

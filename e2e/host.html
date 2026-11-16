@@ -12,7 +12,9 @@ const EDITOR = params.get('editor')
 const FILE = params.get('file') // e.g. speech.wav, or none
 window.__messages = []
 const ed = document.getElementById('ed')
-ed.src = params.get('mode') === 'video' ? `${EDITOR}/?compact=true` : `${EDITOR}/?compact=true&mode=audio`
+ed.src = params.get('mode') === 'video' ? `${EDITOR}/?compact=true` : params.get('mode') === 'ads' ? `${EDITOR}/?mode=ads` : `${EDITOR}/?compact=true&mode=audio`
+// like 3Speak's EditorModal: the viewer's language rides along as ?lang=
+if (params.get('lang')) ed.src += `&lang=${encodeURIComponent(params.get('lang'))}`
 const send = (m) => ed.contentWindow.postMessage(m, new URL(EDITOR).origin)
 window.__send = send
 window.addEventListener('message', async (e) => {

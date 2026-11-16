@@ -1,0 +1,180 @@
+{
+  "title": "オーディオグラム",
+  "tour": {
+    "again": "ツアーをもう一度見る",
+    "againLabel": "オーディオグラムのツアーをもう一度見る"
+  },
+  "saveAndClose": "保存して閉じる",
+  "saveAndCloseTitle": "オーディオグラムはこの音声と一緒に保存され、ショートとして一緒に公開されます",
+  "loadError": "オーディオグラムの設定を読み込めませんでした：{{error}}",
+  "loadingLook": "オーディオグラムのデザインを読み込み中…",
+  "start": {
+    "title": "エピソードの一部を選ぶ",
+    "text_other": "オーディオグラムは、エピソードの一部（最大 {{count}} 分）を使った短い動画です。音声と一緒に 3Speak のショートとして公開されます。まずタイムラインで開始位置と終了位置を指定してください。",
+    "choose": "タイムラインで選ぶ"
+  },
+  "stage": {
+    "label": "オーディオグラムのプレビュー：パーツはドラッグで移動、角でサイズ変更、丸いハンドルで回転",
+    "frameTitle": "オーディオグラムのプレビュー",
+    "turned": "{{name}} · {{angle}}°",
+    "rotate": "回転（Shift：15°刻み）。ダブルクリック：まっすぐに戻す",
+    "hint": "パーツはドラッグで移動、角を引っ張ってサイズ変更（Shift で形を保持）、丸いハンドルで回転。矢印キーで微調整、[ と ] で回転。",
+    "hintTemplate": "パーツはドラッグで移動、角を引っ張ってサイズ変更（Shift で形を保持）、丸いハンドルで回転。矢印キーで微調整、[ と ] で回転。前回のオーディオグラムが出発点になります。"
+  },
+  "layer": {
+    "logo": {
+      "name": "3Speak ロゴ",
+      "drag": "3Speak ロゴ：ドラッグで移動",
+      "dragSelected": "3Speak ロゴ：ドラッグで移動、角でサイズ変更、丸いハンドルで回転"
+    },
+    "cover": {
+      "name": "画像",
+      "drag": "画像：ドラッグで移動",
+      "dragSelected": "画像：ドラッグで移動、角でサイズ変更、丸いハンドルで回転",
+      "hide": "画像を隠す",
+      "show": "画像を表示",
+      "forward": "画像を前面へ",
+      "back": "画像を背面へ"
+    },
+    "title": {
+      "name": "タイトル",
+      "drag": "タイトル：ドラッグで移動",
+      "dragSelected": "タイトル：ドラッグで移動、角でサイズ変更、丸いハンドルで回転",
+      "hide": "タイトルを隠す",
+      "show": "タイトルを表示",
+      "forward": "タイトルを前面へ",
+      "back": "タイトルを背面へ"
+    },
+    "line": {
+      "name": "サブライン",
+      "drag": "サブライン：ドラッグで移動",
+      "dragSelected": "サブライン：ドラッグで移動、角でサイズ変更、丸いハンドルで回転",
+      "hide": "サブラインを隠す",
+      "show": "サブラインを表示",
+      "forward": "サブラインを前面へ",
+      "back": "サブラインを背面へ"
+    },
+    "wave": {
+      "name": "波形",
+      "drag": "波形：ドラッグで移動",
+      "dragSelected": "波形：ドラッグで移動、角でサイズ変更、丸いハンドルで回転",
+      "hide": "波形を隠す",
+      "show": "波形を表示",
+      "forward": "波形を前面へ",
+      "back": "波形を背面へ"
+    }
+  },
+  "piece": {
+    "label": "エピソードの一部",
+    "range": "{{from}} – {{to}} · {{seconds}}秒",
+    "inChapter": "「{{title}}」内",
+    "change": "範囲を変更"
+  },
+  "look": {
+    "title": "タイトル",
+    "titleLabel": "動画上のタイトル",
+    "line": "その下の行 <small>（*アスタリスク* で赤くなります）</small>",
+    "lineLabel": "動画上のサブライン",
+    "branding": "3Speak ブランディング",
+    "logoGroup": "ロゴ",
+    "picture": "画像",
+    "waveform": "波形",
+    "waveType": "波形の種類",
+    "waveColour": "波形の色",
+    "colour": "色 {{colour}}",
+    "anyColour": "任意の色",
+    "anyWaveColour": "任意の波形の色"
+  },
+  "logo": {
+    "mark": "3S ロゴ",
+    "full": "3Speak ロゴ"
+  },
+  "wave": {
+    "bars": "バー",
+    "centered": "中央",
+    "line": "ライン",
+    "dots": "細線",
+    "circle": "円",
+    "ring": "円形波"
+  },
+  "picture": {
+    "upload": "画像をアップロード",
+    "yours": "あなたの画像",
+    "coverOf": "「{{title}}」のカバー",
+    "playlistCover": "再生リストのカバー",
+    "noCovers": "再生リストにはまだカバーがありません。",
+    "signIn": "画像を追加するには 3Speak にログインしてください。"
+  },
+  "parts": {
+    "title": "パーツ <small>（前面から背面）</small>",
+    "logoLocked": "3Speak ロゴは常に最前面に表示され、一定のサイズより小さくはなりません",
+    "alwaysShown": "常に表示",
+    "hide": "隠す",
+    "show": "表示",
+    "forward": "前面へ",
+    "back": "背面へ",
+    "tidy": "配置を整える"
+  },
+  "make": {
+    "starting": "開始中...",
+    "working": "処理中...",
+    "noWords": "この部分の言葉が見つかりませんでした（字幕をオフにすると字幕なしで作成できます）",
+    "failedPlain": "失敗しました",
+    "signIn": "オーディオグラムを作るには 3Speak にログインしてください。",
+    "failed": "オーディオグラムを作成できませんでした：{{error}}",
+    "make": "オーディオグラムを作成",
+    "another": "別のオーディオグラムを作成"
+  },
+  "made": {
+    "title": "あなたのオーディオグラム",
+    "hint": "音声と一緒に 3Speak のショートとして公開され、それぞれ音声の投稿、スナップ、コメントへのリンクが付きます。",
+    "fallbackTitle": "オーディオグラム {{n}}",
+    "length": "{{at}} · {{seconds}}秒",
+    "textPlaceholder": "ショートのテキスト（任意）。音声へのリンクは自動で追加されます。",
+    "textLabel": "ショート{{n}}のテキスト",
+    "editText": "テキストを編集",
+    "writeText": "テキストを書く",
+    "download": "ダウンロード",
+    "removeLabel": "オーディオグラム {{n}} を削除"
+  },
+  "confirm": {
+    "title": "作成せずに閉じますか？",
+    "text": "デザインの変更はまだオーディオグラムになっていません。閉じると失われます。",
+    "stays_other": "作成した {{count}} 個のオーディオグラムはこの音声に残ります。",
+    "keep": "編集を続ける"
+  },
+  "captions": {
+    "label": "字幕",
+    "drag": "字幕：ドラッグで移動",
+    "dragSelected": "字幕：ドラッグで移動、横を引っ張って幅を変更",
+    "sample": "話した言葉がここに表示されます",
+    "show": "話している内容を1語ずつ表示",
+    "checking": "サーバーを確認中...",
+    "unavailable": "このエディターサーバーでは現在字幕を利用できません。",
+    "listening": "聞き取り中...",
+    "getWords": "言葉を取得",
+    "wordCount_other": "この部分には {{count}} 語あります。",
+    "noSpeech": "この部分に音声が見つかりませんでした。",
+    "fix": "言葉を修正",
+    "doneFixing": "修正完了",
+    "word": "単語 {{n}}",
+    "removeWord": "この単語を削除",
+    "removeWordLabel": "{{word}} を削除",
+    "style": "字幕スタイル",
+    "preset": {
+      "karaoke": "カラオケ",
+      "pop": "ポップ",
+      "plain": "字幕"
+    },
+    "wordsAtATime": "一度に表示する語数",
+    "perPage_other": "一度に {{count}} 語",
+    "font": "字幕のフォント",
+    "size": "字幕のサイズ",
+    "textColour": "字幕の文字色",
+    "textColourSwatch": "文字色 {{colour}}",
+    "highlightColour": "ハイライトの色",
+    "highlight": "ハイライト",
+    "highlightSwatch": "ハイライト {{colour}}",
+    "capitals": "大文字"
+  }
+}

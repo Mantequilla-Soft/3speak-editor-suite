@@ -1,0 +1,45 @@
+{
+  "cancel": "Отмена",
+  "close": "Закрыть",
+  "ok": "OK",
+  "gotIt": "Понятно",
+  "done": "Готово",
+  "save": "Сохранить",
+  "delete": "Удалить",
+  "remove": "Убрать",
+  "back": "Назад",
+  "next": "Далее",
+  "skip": "Пропустить",
+  "retry": "Попробовать снова",
+  "reset": "Сбросить",
+  "none": "Нет",
+  "off": "Выкл.",
+  "auto": "Авто",
+  "play": "Воспроизвести",
+  "pause": "Пауза",
+  "undo": "Отменить",
+  "preview": "Превью",
+  "render": "Рендеринг",
+  "export": "Экспорт",
+  "duration": {
+    "seconds_one": "{{count}} секунда",
+    "seconds_few": "{{count}} секунды",
+    "seconds_many": "{{count}} секунд",
+    "seconds_other": "{{count}} секунды",
+    "minutes_one": "{{count}} минута",
+    "minutes_few": "{{count}} минуты",
+    "minutes_many": "{{count}} минут",
+    "minutes_other": "{{count}} минуты",
+    "hours_one": "{{count}} час",
+    "hours_few": "{{count}} часа",
+    "hours_many": "{{count}} часов",
+    "hours_other": "{{count}} часа"
+  },
+  "limits": {
+    "atMost": {
+      "short": "Short может длиться не более {{limit}}.",
+      "video": "Видео может длиться не более {{limit}}.",
+      "audio": "Экспорт может длиться не более {{limit}}."
+    }
+  }
+}

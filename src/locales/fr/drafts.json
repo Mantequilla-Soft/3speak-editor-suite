@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "line": "{{clips}} · {{length}} · {{edited}}",
+    "audioLine": "Audio · {{clips}} · {{length}} · {{edited}}",
+    "clips_one": "{{count}} clip",
+    "clips_many": "{{count}} clips",
+    "clips_other": "{{count}} clips",
+    "edited": {
+      "justNow": "modifié à l'instant",
+      "minutes_one": "modifié il y a {{count}} min",
+      "minutes_many": "modifié il y a {{count}} min",
+      "minutes_other": "modifié il y a {{count}} min",
+      "hours_one": "modifié il y a {{count}} h",
+      "hours_many": "modifié il y a {{count}} h",
+      "hours_other": "modifié il y a {{count}} h",
+      "days_one": "modifié il y a {{count}} jour",
+      "days_many": "modifié il y a {{count}} jours",
+      "days_other": "modifié il y a {{count}} jours"
+    }
+  },
+  "prompt": {
+    "titleOne": "Reprendre votre brouillon ?",
+    "titleMany": "Reprendre un brouillon ?",
+    "keptUntil": "Gardé jusqu'au {{date}}",
+    "open": "Ouvrir",
+    "startNew": "Commencer un nouveau projet",
+    "singleNote": "Vous pouvez garder un brouillon. Commencer un nouveau projet remplace celui-ci dès que vous modifiez quelque chose. 3Speak Pro garde 3 brouillons pendant 30 jours."
+  },
+  "limit": {
+    "titleOne": "Remplacer votre brouillon enregistré ?",
+    "titleMany": "Vous avez déjà {{n}} projets enregistrés",
+    "skipTitle": "Ne pas enregistrer ce projet",
+    "noteOne": "Vous pouvez garder un brouillon. Enregistrer ce projet remplace celui ci-dessous.",
+    "noteMany": "Vous pouvez en garder jusqu'à {{n}}. Choisissez celui que ce projet remplace :",
+    "replace": "Remplacer",
+    "skip": "Ne pas enregistrer ce projet"
+  },
+  "close": {
+    "saveTitle": "Enregistrer votre projet ?",
+    "closeTitle": "Fermer l'éditeur ?",
+    "keepEditing": "Continuer",
+    "signInFailed": "Ça n'a pas marché. Approuvez la demande de connexion dans votre portefeuille et réessayez, ou déconnectez-vous de 3Speak puis reconnectez-vous.",
+    "signInToKeep": "Connectez-vous une fois pour garder ce projet en brouillon et le reprendre plus tard.",
+    "signedOutLost": "Vos modifications seront perdues. Connectez-vous à 3Speak pour garder des brouillons de vos projets.",
+    "lost": "Vos modifications seront perdues.",
+    "signingIn": "Connexion…",
+    "signInToSave": "Se connecter pour enregistrer",
+    "withoutSaving": "Fermer sans enregistrer",
+    "keepTitle": "Garder ce projet ?",
+    "keepDays_one": "Nous le gardons {{count}} jour",
+    "keepDays_many": "Nous le gardons {{count}} jours",
+    "keepDays_other": "Nous le gardons {{count}} jours",
+    "keepHours_one": "Nous le gardons {{count}} heure",
+    "keepHours_many": "Nous le gardons {{count}} heures",
+    "keepHours_other": "Nous le gardons {{count}} heures",
+    "until": "jusqu'au {{date}}",
+    "uploadingOne": "{{name}} est encore en cours d'envoi ({{percent}}). Vous pourrez enregistrer une fois terminé.",
+    "uploadingFiles_one": "{{count}} fichier est encore en cours d'envoi ({{percent}}). Vous pourrez enregistrer une fois terminé.",
+    "uploadingFiles_many": "{{count}} fichiers sont encore en cours d'envoi ({{percent}}). Vous pourrez enregistrer une fois terminé.",
+    "uploadingFiles_other": "{{count}} fichiers sont encore en cours d'envoi ({{percent}}). Vous pourrez enregistrer une fois terminé.",
+    "name": "Nom du projet",
+    "namePlaceholder": "Projet sans titre",
+    "saveError": "Impossible d'enregistrer. Vérifiez votre connexion et réessayez.",
+    "saveAndClose": "Enregistrer et fermer",
+    "afterUpload": "Disponible une fois l'envoi terminé",
+    "deleteAndClose": "Le supprimer et fermer"
+  },
+  "pro": {
+    "title": "Plus avec 3Speak Pro",
+    "text": "Gardez jusqu'à 3 projets pendant 30 jours chacun, au lieu d'un seul pendant 7 jours.",
+    "get": "Passer à Pro"
+  },
+  "status": {
+    "signingIn": "Connexion… vérifiez votre portefeuille",
+    "signInTitle": "Connectez-vous une fois pour enregistrer votre projet en brouillon",
+    "signInFailed": "Échec de la connexion · réessayez",
+    "saveDrafts": "Enregistrer les brouillons",
+    "notSavedTitle": "Ce projet n'est pas encore enregistré",
+    "chooseSlot": "Non enregistré : choisissez un emplacement",
+    "saving": "Enregistrement…",
+    "notSaved": "Brouillon non enregistré",
+    "keptUntil": "Brouillon gardé jusqu'au {{date}}",
+    "savedUntil": "Brouillon enregistré · jusqu'au {{date}}"
+  },
+  "library": {
+    "title": "Bibliothèque du projet",
+    "addFiles": "Ajouter des fichiers",
+    "groups": {
+      "videos": "Vidéos",
+      "images": "Images",
+      "sounds": "Sons"
+    },
+    "empty": {
+      "videos": "Aucune vidéo",
+      "images": "Aucune image",
+      "sounds": "Aucun son"
+    },
+    "dropToAdd": "Déposez des fichiers pour les ajouter",
+    "hint": "Déposez des fichiers ici ou faites glisser des éléments sur la chronologie",
+    "downloading": "Téléchargement... {{percent}}",
+    "downloaded": "Téléchargé localement",
+    "local": "local",
+    "uploadingTitle": "Envoi en arrière-plan. Le rendu attend la fin de l'envoi.",
+    "converting": "conversion",
+    "convertingTitle": "Ce navigateur ne peut pas afficher le format de cette vidéo. L'aperçu passe à une copie 480p dès qu'elle est prête.",
+    "noPreview": "pas d'aperçu",
+    "noPreviewTitle": "Impossible de créer une copie lisible. L'aperçu peut rester noir, le rendu fonctionne quand même.",
+    "encodedTitle": "Encodé en 480p sur le serveur",
+    "encoding": "Encodage...",
+    "addToTimeline": "Ajouter à la chronologie",
+    "remove": "Retirer de la bibliothèque"
+  }
+}

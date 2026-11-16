@@ -1,0 +1,42 @@
+{
+  "titles": {
+    "mode": "Bạn muốn remix thế nào?",
+    "stitch": "Clip của bạn nên đặt ở đâu?",
+    "reaction": "Phản ứng của bạn nên đặt ở đâu?"
+  },
+  "skip": "Bỏ qua, chỉnh sửa tự do",
+  "options": {
+    "stitch": {
+      "title": "Ghép nối",
+      "text": "Quay một clip phát trước hoặc sau bản gốc."
+    },
+    "reaction": {
+      "title": "Phản ứng",
+      "text": "Quay chính bạn trong lúc bản gốc phát."
+    },
+    "free": {
+      "title": "Chỉnh sửa tự do",
+      "text": "Mở trình chỉnh sửa với bản gốc trên dòng thời gian."
+    },
+    "stitchBefore": {
+      "title": "Trước bản gốc",
+      "text": "Clip của bạn phát trước, rồi đến bản gốc."
+    },
+    "stitchAfter": {
+      "title": "Sau bản gốc",
+      "text": "Bản gốc phát trước, rồi đến clip của bạn."
+    },
+    "overlay": {
+      "title": "Lớp phủ",
+      "text": "Camera của bạn trong một khung nhỏ phía trên bản gốc. Kéo nó đến bất cứ đâu."
+    },
+    "tileTop": {
+      "title": "Xếp phía trên",
+      "text": "Bản gốc thu nhỏ xuống nửa dưới, bạn ở phía trên."
+    },
+    "tileBottom": {
+      "title": "Xếp phía dưới",
+      "text": "Bản gốc thu nhỏ lên nửa trên, bạn ở phía dưới."
+    }
+  }
+}

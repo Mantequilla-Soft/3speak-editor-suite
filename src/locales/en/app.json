@@ -1,0 +1,149 @@
+{
+  "dismiss": "Dismiss",
+  "branding": {
+    "audioEditor": "Audio Editor",
+    "shortsEditor": "Shorts Editor",
+    "videoEditor": "Video Editor",
+    "beta": "beta",
+    "backend": "Backend: {{url}}",
+    "backendSelecting": "Backend: selecting...",
+    "showTour": "Show the tour again",
+    "shortcuts": "Keyboard shortcuts (?)",
+    "shortcutsLabel": "Keyboard shortcuts",
+    "fullscreen": "Full screen (F)",
+    "fullscreenLabel": "Full screen",
+    "leaveFullscreen": "Leave full screen (F)",
+    "leaveFullscreenLabel": "Leave full screen",
+    "closeEditor": "Close editor"
+  },
+  "backendDown": "Backend server is unreachable. Recording upload, rendering, and media processing will not work.",
+  "menu": {
+    "undo": "Undo (Ctrl+Z)",
+    "redo": "Redo (Ctrl+Shift+Z)"
+  },
+  "audioTools": {
+    "cutSilences": "Cut silences",
+    "cutSilencesTitle": "Cut the silences out of the selected clip (or its group): find the pauses, cut them, close the gaps",
+    "template": "Template",
+    "templateTitle": "Your template: intro, outro and music bed for every recording",
+    "normalizeLabel": "Normalize loudness",
+    "normalizeOn": "Normalize: on",
+    "normalizeOff": "Normalize: off",
+    "normalizeOnTitle": "Normalize is on: the export is brought to an even -16 LUFS (the podcast standard)",
+    "normalizeOffTitle": "Normalize is off: the export keeps your levels as they are",
+    "chapters": "Chapters",
+    "chaptersCount": "Chapters ({{n}})",
+    "chaptersTitle": "Chapters: mark where each part starts (M adds one at the playhead)",
+    "transcript": "Transcript",
+    "transcriptTitle": "Transcript: edit the show by its text, delete words to cut them",
+    "fillersLabel": "Remove fillers",
+    "fillers": "Fillers",
+    "fillersTitle": "Remove fillers: find um, uh, you know and long pauses, review them, cut them"
+  },
+  "cutSilences": {
+    "progress": "Cutting silences: clip {{done}} of {{total}}",
+    "failed_one": "{{count}} clip could not be read. The others were cut.",
+    "failed_other": "{{count}} clips could not be read. The others were cut.",
+    "failedUploading_one": "{{count}} clip could not be read yet: try again when the upload is done. The others were cut.",
+    "failedUploading_other": "{{count}} clips could not be read yet: try again when the upload is done. The others were cut."
+  },
+  "group": {
+    "nothing": "Nothing plays at the same time on another voice track. Put the other voice on its own track first.",
+    "done_one": "{{count}} voice grouped: they now move, trim and get their silences cut together.",
+    "done_other": "{{count}} voices grouped: they now move, trim and get their silences cut together."
+  },
+  "template": {
+    "applied": "Template applied: {{parts}}.",
+    "intro": "intro",
+    "outro": "outro",
+    "bed": "music bed",
+    "takeOff": "Take it off"
+  },
+  "rangePick": {
+    "hint": "Click where the audiogram's piece starts, then where it ends (up to 2 minutes). Pull its edges to adjust.",
+    "from": "From {{start}}: now click where it ends",
+    "span": "{{start}} – {{end}} · {{seconds}}s",
+    "listenTitle": "Listen to just this piece (Space)",
+    "stop": "Stop",
+    "play": "Play the piece",
+    "use": "Use this piece"
+  },
+  "empty": {
+    "addVideo": "Add video",
+    "addImage": "Add image",
+    "addAudio": "Add audio",
+    "addRecording": "Add recording",
+    "record": "Record",
+    "music": "Music"
+  },
+  "confirm": {
+    "removeClip": "Remove this clip from the timeline?",
+    "removeClips_one": "Remove this {{count}} clip from the timeline?",
+    "removeClips_other": "Remove these {{count}} clips from the timeline?",
+    "removeLibraryItem": "Remove this item from the project library?",
+    "removeTrack": "Remove this track and all its clips?"
+  },
+  "clipStreaming": "This clip is still streaming from 3Speak. Try again once its download has finished.",
+  "reverse": {
+    "title": "Reversing clip...",
+    "body": "Processing on server, please wait.",
+    "failed": "Failed to reverse clip: {{error}}"
+  },
+  "remix": {
+    "stitch": "Stitch",
+    "stitchHintBefore": "Record up to {{seconds}}s. It plays right before the original.",
+    "stitchHintAfter": "Record up to {{seconds}}s. It plays right after the original.",
+    "reaction": "Reaction",
+    "reactionHint": "The original plays from the start while you record. Use headphones so it does not echo into your mic.",
+    "originalFillsLimit": "The original already fills the limit of {{limit}}. Trim it on the timeline, then record your stitch with the camera button."
+  },
+  "chapters": {
+    "intro": "Intro",
+    "numbered": "Chapter {{n}}"
+  },
+  "duck": {
+    "allVoices": "All voice tracks"
+  },
+  "media": "Media",
+  "importedMedia": "Imported Media",
+  "files_one": "{{count}} file",
+  "files_other": "{{count}} files",
+  "side": {
+    "clipsSelected_one": "{{count}} clip selected",
+    "clipsSelected_other": "{{count}} clips selected",
+    "clearSelection": "Clear the selection",
+    "closeProperties": "Close properties",
+    "captions": "Captions",
+    "closeCaptions": "Close captions",
+    "noClip": "No clip selected",
+    "noClipHint": "Select a clip on the timeline to see its settings. Drag a box over several clips to change them together."
+  },
+  "cleaningHint": "Long recordings can take a minute.",
+  "hlsDownload": {
+    "title": "Downloading Media",
+    "hint": "Please wait while the media is being prepared..."
+  },
+  "sendPreview": {
+    "titleAudio": "Listen before you use it",
+    "titleVideo": "Preview your video",
+    "back": "Back to Editor",
+    "askTitle": "Make audiograms for Shorts?",
+    "askBody": "Short videos of the best pieces of this audio, posted as 3Speak Shorts together with it, each linking back to it.",
+    "askNo": "No, use the audio",
+    "askMake": "Make audiograms"
+  },
+  "legacy": {
+    "projectLibrary": "Project Library",
+    "loadingFfmpeg": "Loading FFmpeg... {{percent}}",
+    "properties": "Properties",
+    "propertiesOf": "Properties: {{name}}",
+    "addMedia": "Add Media",
+    "addMediaTitle": "Add media to library",
+    "record": "Record",
+    "recordTitle": "Record video from camera"
+  },
+  "drafts": {
+    "episode": "Episode",
+    "project": "Project"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "length": {
+    "title": "Mfuatano wako wa muda una urefu wa {{length}}",
+    "body": "{{atMost}} Unaweza kuendelea kuhariri kila kitu, lakini Tengeneza inabaki imezimwa hadi mfuatano wa muda uishe kwenye mstari uliowekwa alama wa {{limitAt}}. Punguza, gawanya au futa klipu ili kufika hapo.",
+    "bodyAudio": "{{atMost}} Unaweza kuendelea kuhariri kila kitu, lakini Hamisha inabaki imezimwa hadi mfuatano wa muda uishe kwenye mstari uliowekwa alama wa {{limitAt}}. Punguza, gawanya au futa klipu ili kufika hapo."
+  },
+  "tooLarge": {
+    "title_one": "Faili hili ni kubwa mno",
+    "title_other": "Faili hizi ni kubwa mno",
+    "body": "Kihariri kinapokea faili hadi {{size}}. Fupisha au bana video kwanza (simu au programu yoyote ya video inaweza kuhamisha nakala ndogo zaidi), kisha uiongeze tena."
+  },
+  "encoding": {
+    "title": "Video hii inahitaji kubadilishwa kwanza",
+    "videos_one": "video {{count}}",
+    "videos_other": "video {{count}}",
+    "next": "Inayofuata",
+    "waiting_one": "Inasubiri video nyingine {{count}}",
+    "waiting_other": "Inasubiri video nyingine {{count}}",
+    "starting": "Inaanza…",
+    "upload": "Pakia",
+    "convert": "Badilisha kuwa nakala inayochezeka",
+    "hint": "Kivinjari hiki hakiwezi kucheza muundo wa video hii (HEVC au HDR, ni kawaida kutoka kwa simu), kwa hiyo inaonekana nyeusi hadi nakala inayochezeka iwe tayari. Onyesho la awali kisha linabadilika lenyewe. Unaweza kuendelea kuhariri wakati huo huo.",
+    "hide": "Ficha"
+  }
+}

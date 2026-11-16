@@ -1,0 +1,111 @@
+{
+  "textFx": {
+    "title": "Teksteffecten",
+    "outline": "Omlijning",
+    "outlineColour": "Kleur van de omlijning",
+    "outlineWidth": "Dikte van de omlijning",
+    "wordsComeIn": "Woorden komen binnen",
+    "allAtOnce": "Allemaal tegelijk",
+    "atOnce": "Tegelijk",
+    "anims": {
+      "pop": "Springen",
+      "fadeUp": "Omhoog infaden",
+      "typewriter": "Typemachine",
+      "slide": "Schuiven"
+    },
+    "gap": "Tussenruimte",
+    "gapSeconds": "Tijd tussen woorden (seconden)",
+    "defaultText": "Tekst"
+  },
+  "templates": {
+    "dialogTitle": "Titels",
+    "allTitles": "Alle titels",
+    "overVideo": "Over de video",
+    "ownBackground": "Eigen achtergrond",
+    "starsHint": "Zet *sterretjes* rond een woord om het te kleuren.",
+    "addTitle": "Titel toevoegen",
+    "groups": {
+      "lower": "Onderbalken",
+      "title": "Titels over de video",
+      "card": "Intro- en outrokaarten"
+    },
+    "fields": {
+      "name": "Naam",
+      "role": "Rol",
+      "lines": "Regels",
+      "words": "Woorden",
+      "lineUnder": "Regel eronder",
+      "lineInFront": "Regel ervoor",
+      "rows": "Rijen",
+      "headline": "Kop",
+      "lineUnderIt": "Regel eronder",
+      "tagline": "Slogan",
+      "cta": "Call-to-action",
+      "smallPrint": "Kleine lettertjes"
+    },
+    "items": {
+      "lowerName": {
+        "label": "Naam en rol",
+        "sub": "Creator op 3Speak"
+      },
+      "lowerStatement": {
+        "label": "Korte uitspraak",
+        "lines": "Drie dingen\ndie ik vandaag *leerde*"
+      },
+      "titleWords": {
+        "label": "Eén woord tegelijk",
+        "words": "Plannen.\nFilmen.\n*Posten.*",
+        "line": "Mijn week op 3Speak"
+      },
+      "titleKinetic": {
+        "label": "Woorden knallen binnen",
+        "words": "Snel\nSimpel\nVan jou",
+        "line": "Gemaakt op *3Speak*"
+      },
+      "titlePoster": {
+        "label": "Enorme gestapelde woorden",
+        "words": "Dag\néén.",
+        "sub": "Beginnen bij nul"
+      },
+      "titleMarquee": {
+        "label": "Scrollende rijen",
+        "rows": "Plannen\nFilmen\nPosten\nHerhalen",
+        "line": "Elke *week*"
+      },
+      "cardHook": {
+        "label": "Intro: openingszin",
+        "lines": "Zo\nbewerk ik\nmijn *Shorts*",
+        "sub": "In minder dan een minuut"
+      },
+      "cardEnd": {
+        "label": "Outro: volg mij",
+        "tagline": "Nieuwe Shorts *elke week*",
+        "cta": "Volg op 3Speak"
+      },
+      "cardPoster": {
+        "label": "Outro: enorme woorden",
+        "words": "Tot\nsnel\n*weer.*",
+        "cta": "Volg op 3Speak"
+      }
+    }
+  },
+  "scene": {
+    "title": "Titel",
+    "onePerLine": "Eén per regel",
+    "colours": "Kleuren",
+    "font": "Lettertype",
+    "overVideo": "Over de video",
+    "length": "Lengte",
+    "lengthSeconds": "Lengte (seconden)",
+    "defaultName": "Ik",
+    "layerTitle": "Titel"
+  },
+  "colors": {
+    "ember": "Gloed",
+    "amber": "Amber",
+    "ocean": "Oceaan",
+    "forest": "Bos",
+    "berry": "Bes",
+    "paper": "Papier"
+  }
+}

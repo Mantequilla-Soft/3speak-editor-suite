@@ -1,0 +1,53 @@
+{
+  "title": "Görünüm",
+  "noEffects": "Efekt yok",
+  "presetsLabel": "Hazır görünümler",
+  "doubleClickReset": "Sıfırlamak için çift tıkla",
+  "presets": {
+    "original": "Orijinal",
+    "warm": "Sıcak",
+    "cool": "Soğuk",
+    "vivid": "Canlı",
+    "matte": "Mat",
+    "bw": "S/B",
+    "vintage": "Vintage",
+    "tealorange": "Turkuaz ve Turuncu",
+    "fade": "Soluk",
+    "noir": "Noir",
+    "sunset": "Gün batımı"
+  },
+  "sliders": {
+    "blur": "Bulanıklık",
+    "vignette": "Vinyet",
+    "sharpen": "Keskinleştir",
+    "split": "Turkuaz ve turuncu"
+  },
+  "transition": {
+    "title": "Geçiş",
+    "none": "Yok",
+    "types": {
+      "crossfade": "Çapraz geçiş",
+      "dissolve": "Siyaha geçiş",
+      "slideleft": "Sola kaydır",
+      "slideright": "Sağa kaydır",
+      "slideup": "Yukarı kaydır",
+      "zoom": "Yakınlaştır",
+      "whip": "Hızlı kaydırma"
+    },
+    "length": "Geçiş süresi (saniye)",
+    "fades": "Geçişler",
+    "noFades": "Geçiş yok",
+    "in": "Giriş",
+    "out": "Çıkış",
+    "fadeInSeconds": "Açılarak giriş (saniye)",
+    "fadeOutSeconds": "Kararak çıkış (saniye)",
+    "intoNext": "Sonraki klibe",
+    "needNext": "Geçiş eklemek için aynı kanalda bu klibin hemen ardına bir klip koy.",
+    "fromTo": "{{from}} → {{to}}",
+    "fromUnnamed": "Klip → {{to}}",
+    "toUnnamed": "{{from}} → sonraki klip",
+    "bothUnnamed": "Klip → sonraki klip",
+    "add": "Geçiş ekle",
+    "cutLabel": "{{type}}, {{seconds}} sn"
+  }
+}

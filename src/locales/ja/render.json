@@ -1,0 +1,83 @@
+{
+  "button": {
+    "rendering": "レンダリング中...",
+    "exporting": "書き出し中...",
+    "uploading": "アップロード中 {{percent}}",
+    "reRender": "再レンダリング",
+    "exportAgain": "もう一度書き出す",
+    "trimToRender": "レンダリングするにはタイムラインを {{limit}} 以下にトリムしてください",
+    "trimToExport": "書き出すにはタイムラインを {{limit}} 以下にトリムしてください"
+  },
+  "exportAs": {
+    "button": "書き出し形式",
+    "title": "書き出し形式：同じプロジェクトをショート、正方形、横向きの動画として、顔を中心に切り抜いて書き出します",
+    "close": "書き出し形式を閉じる",
+    "waitUpload": "アップロードが終わるまでお待ちください。"
+  },
+  "done": {
+    "download": "ダウンロード",
+    "audiograms": "オーディオグラム",
+    "audiogramsCount": "オーディオグラム（{{n}}）",
+    "audiogramsTitle": "エピソードの一部を使った短い動画。共有したり、一緒にショートとして投稿したりできます",
+    "videoPodcast": "ビデオポッドキャスト",
+    "videoPodcastTitle": "カバー、波形、字幕、話している人の名前付きで、エピソード全編を 16:9 の動画にします",
+    "useAudio": "この音声を使う",
+    "sendVideo": "動画を送信"
+  },
+  "failed": "レンダリングに失敗しました：{{error}}",
+  "phase": {
+    "preparing": "ファイルを準備中...",
+    "submitting": "レンダリングジョブを送信中...",
+    "busyRetry": "レンダリングサーバーが混雑しています。{{seconds}} 秒後に再試行します...",
+    "offlineRetry": "レンダリングサーバーに接続できません。{{seconds}} 秒後に再試行します...",
+    "starting": "開始中...",
+    "reconnecting": "レンダリングサーバーに再接続中...",
+    "uploadingFile": "{{name}} をアップロード中（{{index}}/{{total}}）...",
+    "uploadingUnnamed": "ファイルをアップロード中（{{index}}/{{total}}）...",
+    "uploadingPlate": "{{name}} の背景フレームをアップロード中...",
+    "uploadingPlateUnnamed": "クリップの背景フレームをアップロード中..."
+  },
+  "queue": {
+    "next": "次はあなたの番です",
+    "inLine": {
+      "one": "あなたは {{n}} 番目です",
+      "two": "あなたは {{n}} 番目です",
+      "few": "あなたは {{n}} 番目です",
+      "other": "あなたは {{n}} 番目です"
+    },
+    "waiting": "レンダリングの空きを待っています..."
+  },
+  "legacy": {
+    "exportVideo": "動画を書き出す",
+    "cancelTitle": "書き出しをキャンセル",
+    "settingsTitle": "書き出し設定",
+    "uploadingRender": "{{name}} をアップロード中（{{percent}}）。編集を続けてください。完了するとレンダリングできます。",
+    "uploadingExport": "{{name}} をアップロード中（{{percent}}）。編集を続けてください。完了すると書き出せます。",
+    "lengthRender": "タイムラインは {{length}} です。レンダリングするには {{limit}} 以下にトリムしてください。",
+    "lengthExport": "タイムラインは {{length}} です。書き出すには {{limit}} 以下にトリムしてください。",
+    "method": "書き出し方法",
+    "methodCanvas": "Canvas（見たまま）",
+    "methodFast": "高速（エフェクトなし）",
+    "canvasHint": "プレビューの見た目どおりにすべての視覚効果を記録します",
+    "fastHint": "書き出しは速くなりますが、ズーム、位置、切り抜き、テキストオーバーレイは無視されます",
+    "quality": "画質",
+    "qualityHigh": "高（ファイルが大きい）",
+    "qualityMedium": "中（おすすめ）",
+    "qualityLow": "低（ファイルが小さい）",
+    "processing": "処理中... {{percent}}",
+    "renderingPercent": "レンダリング中... {{percent}}",
+    "downloadRendered": "レンダリングした動画をダウンロード",
+    "ffmpegLoading": "FFmpeg を読み込み中...",
+    "ffmpegNotLoaded": "FFmpeg が読み込まれていません",
+    "addClips": "書き出すにはタイムラインにクリップを追加してください"
+  },
+  "canvas": {
+    "loadingMedia": "メディアを読み込み中...",
+    "renderingFrames": "フレームをレンダリング中...",
+    "encodingVideo": "動画をエンコード中...",
+    "processingAudio": "音声を処理中...",
+    "convertingMp4": "MP4 に変換中...",
+    "preparingDownload": "ダウンロードを準備中...",
+    "complete": "完了しました！"
+  }
+}

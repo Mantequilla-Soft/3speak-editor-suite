@@ -1,0 +1,88 @@
+{
+  "aspect": {
+    "short": {
+      "label": "Short",
+      "hint": "Vertical, até 2 minutos, publicado como Short"
+    },
+    "landscape": {
+      "label": "Paisagem",
+      "hint": "Vídeo widescreen, até 10 minutos"
+    },
+    "classic": {
+      "label": "Clássico",
+      "hint": "Vídeo 4:3, até 10 minutos"
+    },
+    "square": {
+      "label": "Quadrado",
+      "hint": "Vídeo quadrado, até 10 minutos"
+    }
+  },
+  "chip": {
+    "title": "Formato deste projeto: {{shape}}. Clique para mudar",
+    "aria": "Formato do projeto: {{shape}}"
+  },
+  "picker": {
+    "title": "O que você vai criar?",
+    "tooLong": "sua linha do tempo tem {{length}}, corte para {{limit}} para renderizar",
+    "note": "O formato decide como vai para o 3Speak: 9:16 como Short, os outros como vídeo normal. Exportar como também renderiza em outros formatos."
+  },
+  "preview": {
+    "heading": "Prévia em",
+    "yours": "{{aspect}} (o seu)",
+    "projectIs": {
+      "short": "Seu projeto é Short 9:16. Em outro formato, a imagem preenche o quadro, recortada em volta do rosto.",
+      "landscape": "Seu projeto é Paisagem 16:9. Em outro formato, a imagem preenche o quadro, recortada em volta do rosto.",
+      "classic": "Seu projeto é Clássico 4:3. Em outro formato, a imagem preenche o quadro, recortada em volta do rosto.",
+      "square": "Seu projeto é Quadrado 1:1. Em outro formato, a imagem preenche o quadro, recortada em volta do rosto."
+    }
+  },
+  "faces": {
+    "heading": "Seguir rostos",
+    "noFootage": "Ainda não há imagens para reenquadrar. Clipes movidos ou com zoom mantêm o próprio enquadramento.",
+    "hint": "O rosto é encontrado no seu navegador, alguns quadros por segundo. Sem rosto, o centro fica à vista.",
+    "found": "Rosto encontrado",
+    "noFace": "Sem rosto: centro",
+    "middle": "Centro",
+    "finding": "Procurando rostos",
+    "findOne": "Encontrar o rosto",
+    "findMany_one": "Encontrar rostos em {{count}} clipe",
+    "findMany_many": "Encontrar rostos em {{count}} de clipes",
+    "findMany_other": "Encontrar rostos em {{count}} clipes",
+    "streamNamed": "{{name}} é um stream: é recortado em volta do centro.",
+    "streamUnnamed": "Um clipe é um stream: é recortado em volta do centro.",
+    "failed": "O rastreamento de rosto não funcionou aqui: {{error}}",
+    "moveWindow": "{{name}}: mover o enquadramento",
+    "left": "Esquerda",
+    "right": "Direita",
+    "up": "Para cima",
+    "down": "Para baixo",
+    "moveX": "Mover o enquadramento para a esquerda ou para a direita",
+    "moveY": "Mover o enquadramento para cima ou para baixo",
+    "findAgain": "Encontrar o rosto de novo",
+    "reset": "Centro, sem deslocamento"
+  },
+  "clipFallback": "Clipe",
+  "stop": "Parar",
+  "render": {
+    "heading": "Renderizar como",
+    "shortsLimit": "Shorts têm no máximo {{limit}}: corte a linha do tempo para renderizar um em 9:16.",
+    "button_one": "Renderizar {{count}} vídeo",
+    "button_many": "Renderizar {{count}} de vídeos",
+    "button_other": "Renderizar {{count}} vídeos",
+    "failed": "Falha na renderização: {{error}}",
+    "download": "Baixar",
+    "postShort": "Publicar como Short",
+    "postVideo": "Publicar como vídeo"
+  },
+  "job": {
+    "waiting": "Aguardando...",
+    "preparing": "Preparando arquivos...",
+    "starting": "Iniciando...",
+    "rendering": "Renderizando...",
+    "done": "Concluído",
+    "stopped": "Parado",
+    "busy": "Os servidores de renderização estão ocupados. Tentando de novo em {{seconds}} s...",
+    "offline": "Sem conexão com o servidor de renderização. Tentando de novo em {{seconds}} s...",
+    "failed": "A renderização falhou"
+  }
+}

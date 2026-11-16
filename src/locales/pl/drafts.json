@@ -1,0 +1,120 @@
+{
+  "meta": {
+    "line": "{{clips}} · {{length}} · {{edited}}",
+    "audioLine": "Audio · {{clips}} · {{length}} · {{edited}}",
+    "clips_one": "{{count}} klip",
+    "clips_few": "{{count}} klipy",
+    "clips_many": "{{count}} klipów",
+    "clips_other": "{{count}} klipu",
+    "edited": {
+      "justNow": "edytowano przed chwilą",
+      "minutes_one": "edytowano {{count}} min temu",
+      "minutes_few": "edytowano {{count}} min temu",
+      "minutes_many": "edytowano {{count}} min temu",
+      "minutes_other": "edytowano {{count}} min temu",
+      "hours_one": "edytowano {{count}} godz. temu",
+      "hours_few": "edytowano {{count}} godz. temu",
+      "hours_many": "edytowano {{count}} godz. temu",
+      "hours_other": "edytowano {{count}} godz. temu",
+      "days_one": "edytowano {{count}} dzień temu",
+      "days_few": "edytowano {{count}} dni temu",
+      "days_many": "edytowano {{count}} dni temu",
+      "days_other": "edytowano {{count}} dnia temu"
+    }
+  },
+  "prompt": {
+    "titleOne": "Kontynuować szkic?",
+    "titleMany": "Kontynuować któryś szkic?",
+    "keptUntil": "Przechowywany do {{date}}",
+    "open": "Otwórz",
+    "startNew": "Zacznij nowy projekt",
+    "singleNote": "Możesz mieć jeden szkic. Nowy projekt zastąpi ten, gdy tylko zaczniesz edytować. 3Speak Pro przechowuje 3 szkice przez 30 dni."
+  },
+  "limit": {
+    "titleOne": "Zastąpić zapisany szkic?",
+    "titleMany": "Masz już zapisane projekty: {{n}}",
+    "skipTitle": "Nie zapisuj tego projektu",
+    "noteOne": "Możesz mieć jeden szkic. Zapisanie tego projektu zastąpi ten poniżej.",
+    "noteMany": "Możesz mieć maksymalnie {{n}}. Wybierz, który zastąpi ten projekt:",
+    "replace": "Zastąp",
+    "skip": "Nie zapisuj tego projektu"
+  },
+  "close": {
+    "saveTitle": "Zapisać projekt?",
+    "closeTitle": "Zamknąć edytor?",
+    "keepEditing": "Edytuj dalej",
+    "signInFailed": "Nie zadziałało. Zatwierdź prośbę o logowanie w portfelu i spróbuj ponownie albo wyloguj się z 3Speak i zaloguj ponownie.",
+    "signInToKeep": "Zaloguj się raz, aby zachować ten projekt jako szkic i kontynuować później.",
+    "signedOutLost": "Twoje zmiany zostaną utracone. Zaloguj się w 3Speak, aby zachowywać szkice projektów.",
+    "lost": "Twoje zmiany zostaną utracone.",
+    "signingIn": "Logowanie…",
+    "signInToSave": "Zaloguj się, aby zapisać",
+    "withoutSaving": "Zamknij bez zapisywania",
+    "keepTitle": "Zachować ten projekt?",
+    "keepDays_one": "Przechowamy go przez {{count}} dzień",
+    "keepDays_few": "Przechowamy go przez {{count}} dni",
+    "keepDays_many": "Przechowamy go przez {{count}} dni",
+    "keepDays_other": "Przechowamy go przez {{count}} dnia",
+    "keepHours_one": "Przechowamy go przez {{count}} godzinę",
+    "keepHours_few": "Przechowamy go przez {{count}} godziny",
+    "keepHours_many": "Przechowamy go przez {{count}} godzin",
+    "keepHours_other": "Przechowamy go przez {{count}} godziny",
+    "until": "do {{date}}",
+    "uploadingOne": "{{name}} wciąż się przesyła ({{percent}}). Możesz zapisać, gdy się skończy.",
+    "uploadingFiles_one": "Trwa przesyłanie {{count}} pliku ({{percent}}). Możesz zapisać, gdy się skończy.",
+    "uploadingFiles_few": "Trwa przesyłanie {{count}} plików ({{percent}}). Możesz zapisać, gdy się skończy.",
+    "uploadingFiles_many": "Trwa przesyłanie {{count}} plików ({{percent}}). Możesz zapisać, gdy się skończy.",
+    "uploadingFiles_other": "Trwa przesyłanie {{count}} pliku ({{percent}}). Możesz zapisać, gdy się skończy.",
+    "name": "Nazwa projektu",
+    "namePlaceholder": "Projekt bez tytułu",
+    "saveError": "Nie udało się zapisać. Sprawdź połączenie i spróbuj ponownie.",
+    "saveAndClose": "Zapisz i zamknij",
+    "afterUpload": "Dostępne po zakończeniu przesyłania",
+    "deleteAndClose": "Usuń i zamknij"
+  },
+  "pro": {
+    "title": "Więcej z 3Speak Pro",
+    "text": "Przechowuj do 3 projektów, każdy przez 30 dni, zamiast 1 przez 7 dni.",
+    "get": "Kup Pro"
+  },
+  "status": {
+    "signingIn": "Logowanie… sprawdź portfel",
+    "signInTitle": "Zaloguj się raz, aby zapisać projekt jako szkic",
+    "signInFailed": "Logowanie nie powiodło się · spróbuj ponownie",
+    "saveDrafts": "Zapisuj szkice",
+    "notSavedTitle": "Ten projekt nie jest jeszcze zapisany",
+    "chooseSlot": "Nie zapisano: wybierz miejsce",
+    "saving": "Zapisywanie…",
+    "notSaved": "Szkic nie zapisany",
+    "keptUntil": "Szkic przechowywany do {{date}}",
+    "savedUntil": "Szkic zapisany · do {{date}}"
+  },
+  "library": {
+    "title": "Biblioteka projektu",
+    "addFiles": "Dodaj pliki",
+    "groups": {
+      "videos": "Filmy",
+      "images": "Obrazy",
+      "sounds": "Dźwięki"
+    },
+    "empty": {
+      "videos": "Brak filmów",
+      "images": "Brak obrazów",
+      "sounds": "Brak dźwięków"
+    },
+    "dropToAdd": "Upuść pliki, aby dodać",
+    "hint": "Upuść tu pliki lub przeciągnij elementy na oś czasu",
+    "downloading": "Pobieranie... {{percent}}",
+    "downloaded": "Pobrano lokalnie",
+    "local": "lokalny",
+    "uploadingTitle": "Przesyłanie w tle. Renderowanie poczeka, aż się zakończy.",
+    "converting": "konwersja",
+    "convertingTitle": "Ta przeglądarka nie obsługuje formatu tego wideo. Podgląd przełączy się na kopię 480p, gdy będzie gotowa.",
+    "noPreview": "brak podglądu",
+    "noPreviewTitle": "Nie udało się utworzyć odtwarzalnej kopii. Podgląd może pozostać czarny, ale renderowanie nadal działa.",
+    "encodedTitle": "Zakodowano do 480p na serwerze",
+    "encoding": "Kodowanie...",
+    "addToTimeline": "Dodaj do osi czasu",
+    "remove": "Usuń z biblioteki"
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "title": "Teleprompter",
+  "showOnCamera": "Ipakita sa camera",
+  "speechNotice": {
+    "title": "Sa mga Chromium browser lang gumagana ang pagsunod sa boses sa ngayon.",
+    "body": "Gamitin ang Chrome, Edge, Brave o Opera para mag-scroll ang script habang nagsasalita ka. Sa browser na ito, nag-i-scroll ito sa pare-parehong bilis na puwede mong itakda."
+  },
+  "speechErrors": {
+    "network": "Hindi maabot ang speech service. Kailangan ng internet connection ang recognition (ipinapadala ng Chrome ang audio sa Google para i-transcribe).",
+    "audioCapture": "Walang audio na nakarating sa recognition. Baka ginagamit ang mic, subukan ang headset.",
+    "notAllowed": "Naka-block ang permiso sa mikropono para sa speech recognition.",
+    "unsupported": "Walang speech recognition ang browser na ito.",
+    "generic": "Error sa speech recognition: {{err}}"
+  },
+  "noMic": "Nagre-record nang walang mikropono (hindi available ang mic).",
+  "autoDetect": "Auto-detect ({{lang}})",
+  "presets": {
+    "frontcam": "Front cam",
+    "frontcamTitle": "Maliit na strip sa ilalim ng selfie lens, pinakahindi halatang nagbabasa ka",
+    "max": "Max na laki",
+    "maxTitle": "Malalaking letra mula sa malayo",
+    "top": "Mga linya sa itaas",
+    "topTitle": "Ilang linya sa itaas"
+  },
+  "scroll": {
+    "label": "Scroll",
+    "modeAria": "Mode ng scroll",
+    "followVoice": "Sundan ang boses",
+    "followVoiceTitle": "Nag-i-scroll habang binabasa mo nang malakas ang script",
+    "needsChromium": "Kailangan ng Chrome, Edge o ibang Chromium browser",
+    "timed": "Naka-oras",
+    "timedTitle": "Nag-i-scroll sa pare-parehong bilis",
+    "voiceForcedMissing": "Hindi available rito ang pagsunod sa boses, naka-oras na scroll ang ginagamit.",
+    "voiceUnavailable": "Hindi available sa browser na ito ang pagsunod sa boses."
+  },
+  "style": {
+    "title": "Style ng text",
+    "fontSize": "Laki ng font",
+    "fontSizeValue": "{{size}}px",
+    "text": "Text",
+    "background": "Background",
+    "bgOpacity": "Opacity ng BG",
+    "mirrorText": "I-mirror ang text (para sa salamin ng teleprompter)",
+    "voiceLanguage": "Wika ng boses"
+  },
+  "status": {
+    "serverErrorSwitched": "Error sa speech server ({{reason}}). Lumipat sa naka-oras na scroll.",
+    "voiceErrorSwitched": "{{error}} Lumipat sa naka-oras na scroll.",
+    "voiceStoppedSwitched": "Huminto ang pagsunod sa boses. Lumipat sa naka-oras na scroll.",
+    "serverError": "Error sa speech server ({{reason}}).",
+    "listeningServer": "Nakikinig (server)… magsimulang magbasa",
+    "connectingServer": "Kumokonekta sa speech server…",
+    "listening": "Nakikinig… magsimulang magbasa nang malakas",
+    "startingMic": "Sinisimulan ang mic…",
+    "scrollPaused": "Naka-pause ang scroll",
+    "timedScroll": "Naka-oras na scroll, {{wpm}} wpm",
+    "scrollTest": "Test ng scroll, {{wpm}} wpm"
+  },
+  "sttReason": {
+    "unreachable": "hindi maabot",
+    "noMic": "walang mikropono",
+    "audioUnavailable": "hindi available ang audio",
+    "connectionFailed": "pumalya ang koneksyon",
+    "unauthorized": "walang pahintulot",
+    "closed": "sarado",
+    "serverError": "error sa server"
+  },
+  "scriptPlaceholder": "Isulat o i-paste ang script mo rito. Habang nagre-record ka, nag-i-scroll ito habang binabasa mo nang malakas, o sa pare-parehong bilis sa naka-oras na mode.",
+  "scriptModeVoice": "Scroll: sumusunod sa boses mo",
+  "scriptModeTimed": "Scroll: naka-oras, {{wpm}} wpm",
+  "hide": "Itago",
+  "dragToMove": "I-drag para ilipat",
+  "dragToResize": "I-drag para baguhin ang laki",
+  "expandMenu": "Palawakin ang menu",
+  "collapseMenu": "Itiklop ang menu",
+  "editScript": "I-edit ang script",
+  "testVoice": "I-test ang boses",
+  "stopVoiceTest": "Itigil ang test",
+  "scrollSpeed": "Bilis ng scroll",
+  "slower": "Mas mabagal",
+  "faster": "Mas mabilis",
+  "wordsPerMin": "salita/min",
+  "testScroll": "I-test ang scroll",
+  "stopScrollTest": "Itigil ang test ng scroll",
+  "pauseScroll": "I-pause ang scroll",
+  "resumeScroll": "Ituloy ang scroll",
+  "hideTeleprompter": "Itago ang teleprompter"
+}

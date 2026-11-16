@@ -1,0 +1,308 @@
+{
+  "empty": "Selecteer een clip om de eigenschappen te zien",
+  "types": {
+    "video": "video",
+    "audio": "audio",
+    "image": "afbeelding",
+    "text": "tekst",
+    "color": "kleur",
+    "scene": "scène"
+  },
+  "sections": {
+    "content": "Inhoud",
+    "color": "Kleur",
+    "audio": "Audio",
+    "layout": "Indeling",
+    "transform": "Transformeren",
+    "timing": "Timing",
+    "motion": "Beweging",
+    "greenScreen": "Green screen"
+  },
+  "doubleClickReset": "Dubbelklik om te resetten",
+  "text": {
+    "label": "Tekst",
+    "placeholder": "Typ hier tekst...",
+    "font": "Lettertype",
+    "resetFont": "Lettertype resetten",
+    "fontGroups": {
+      "sansSerif": "Schreefloos",
+      "serif": "Schreef",
+      "display": "Display",
+      "handwriting": "Handschrift",
+      "monospace": "Monospace"
+    },
+    "weight": {
+      "normal": "Normaal",
+      "bold": "Vet"
+    },
+    "style": "Stijl",
+    "resetStyle": "Stijl resetten",
+    "size": "Grootte",
+    "alignment": "Uitlijning",
+    "resetAlignment": "Uitlijning resetten",
+    "align": {
+      "left": "Links uitlijnen",
+      "center": "Centreren",
+      "right": "Rechts uitlijnen"
+    },
+    "box": "Achtergrondvak",
+    "fill": "Vulling",
+    "opacity": "Dekking",
+    "padding": "Binnenmarge",
+    "radius": "Radius",
+    "border": "Rand",
+    "width": "Breedte"
+  },
+  "colorClip": {
+    "background": "Achtergrondkleur",
+    "gradient": "Verloop",
+    "enabled": "Aan",
+    "disabled": "Uit",
+    "endColor": "Eindkleur",
+    "angle": "Hoek",
+    "resetAngle": "Hoek resetten"
+  },
+  "volume": {
+    "label": "Volume",
+    "reset": "Volume resetten",
+    "mute": "Dempen",
+    "unmute": "Dempen opheffen"
+  },
+  "fades": {
+    "label": "Fades",
+    "none": "Geen fades",
+    "in": "In",
+    "out": "Uit",
+    "inSeconds": "In (seconden)",
+    "outSeconds": "Uit (seconden)"
+  },
+  "noise": {
+    "reduce": "Achtergrondruis verminderen",
+    "cleanVoice": "Stem opschonen",
+    "group": "Ruisonderdrukking",
+    "working": "Bezig",
+    "workingDots": "Bezig…",
+    "afterUpload": "Beschikbaar zodra deze clip klaar is met uploaden.",
+    "appliesGroup_one": "Geldt voor deze clip en zijn groep ({{count}} clip).",
+    "appliesGroup_other": "Geldt voor deze clip en zijn groep ({{count}} clips).",
+    "appliesOne": "Geldt alleen voor deze clip.",
+    "failed": "Ruisonderdrukking mislukt. Probeer het opnieuw.",
+    "levels": {
+      "light": "Licht",
+      "medium": "Middel",
+      "strong": "Sterk"
+    },
+    "studioTitle": "Sterk: minder ruis, geen gerommel, helderder en gelijkmatiger, zachtere s-klanken"
+  },
+  "duck": {
+    "label": "Ducking",
+    "group": "Ducking voor deze clip",
+    "depth": "{{db}} dB",
+    "source": "<lead>Wordt zachter terwijl</lead><pick/><tail>speelt</tail>",
+    "sourceLabel": "Bron voor ducking",
+    "hint": "Deze clip wordt zachter terwijl het gekozen spoor speelt en komt in de pauzes weer omhoog."
+  },
+  "greenScreen": {
+    "removeBackground": "Achtergrond verwijderen",
+    "modes": {
+      "green": "Groen",
+      "blue": "Blauw",
+      "person": "Persoon",
+      "static": "Statisch (experimenteel)"
+    },
+    "modeTitles": {
+      "green": "Green screen",
+      "blue": "Blue screen",
+      "person": "Geen green screen nodig: vindt jou in het beeld en verwijdert de rest",
+      "static": "Statische achtergrond (experimenteel): verwijdert alles wat overeenkomt met een beeld van de lege achtergrond"
+    },
+    "staticHint": "Verwijdert alles wat lijkt op een paar beelden van de lege achtergrond. Kleine veranderingen (ruis, licht, focus) worden genegeerd, en delen van jou die op de muur lijken blijven binnen je omtrek behouden. Vereist een camera die niet beweegt; schaduwen die je werpt blijven zichtbaar. Blijven delen van de kamer zichtbaar, verhoog dan de drempel.",
+    "hint": {
+      "green": "Verwijdert de groene achtergrond zodat de clips op de sporen eronder zichtbaar worden.",
+      "blue": "Verwijdert de blauwe achtergrond zodat de clips op de sporen eronder zichtbaar worden.",
+      "person": "Geen green screen nodig: de editor vindt de persoon in elk beeld en verwijdert de rest. Werkt het best met één persoon, goed belicht, voor de camera."
+    },
+    "plate": "Beeld van de lege achtergrond",
+    "plateAlt": "Lege achtergrond",
+    "plateHint": "Zet de afspeelkop op een moment waarop alleen de achtergrond te zien is, zonder jou. Er wordt een halve seconde van gebruikt.",
+    "grabbing": "Beeld vastleggen...",
+    "useFrame": "Het beeld op de afspeelkop gebruiken",
+    "useFrameInstead": "In plaats daarvan het beeld op de afspeelkop gebruiken",
+    "grabFailed": "Dat beeld kon niet worden vastgelegd. Probeer het opnieuw of kies een ander moment.",
+    "threshold": "Drempel",
+    "thresholdStaticTitle": "Tolerantie: hoger negeert meer verandering in de achtergrond (ruis, licht, focus), maar kan delen van jou gaan verwijderen",
+    "thresholdTitle": "Hoger verwijdert meer van de schermkleur",
+    "resetThreshold": "Drempel resetten",
+    "softness": "Zachtheid van de randen",
+    "resetSoftness": "Zachtheid resetten",
+    "despill": "Despill",
+    "despillStaticTitle": "Verwijdert de muurkleur van de randen",
+    "despillTitle": {
+      "green": "Verwijdert de groene zweem van de randen",
+      "blue": "Verwijdert de blauwe zweem van de randen"
+    },
+    "resetDespill": "Despill resetten",
+    "cameraLock": {
+      "allLocked": "Focus en belichting van de camera vergrendeld, witbalans ook.",
+      "focusExposureLocked": "Focus en belichting van de camera vergrendeld.",
+      "noFocus": "Je camera staat niet toe dat de focus wordt vergrendeld; kom niet dichterbij en ga niet verder weg.",
+      "lockedList": "Vergrendeld: {{list}}.",
+      "noExposure": "Focus vergrendeld. De belichting kan op deze camera niet worden vergrendeld; houd het licht gelijk.",
+      "names": {
+        "focus": "focus",
+        "exposure": "belichting",
+        "whiteBalance": "witbalans"
+      }
+    }
+  },
+  "layout": {
+    "boxSize": "Grootte van het vak",
+    "smaller": "Kleiner",
+    "larger": "Groter",
+    "zoom": "Zoom",
+    "resetZoom": "Zoom resetten",
+    "hint": "Sleep de clip om hem te verplaatsen. Houd ingedrukt en sleep dan om de video binnen zijn vak te verplaatsen. Knijp om te zoomen op touchscreens.",
+    "freeTransform": "Overschakelen naar vrij transformeren"
+  },
+  "transform": {
+    "scale": "Schaal",
+    "resetScale": "Schaal resetten",
+    "rotation": "Draaiing",
+    "resetRotation": "Draaiing resetten",
+    "position": "Positie",
+    "resetPosition": "Positie resetten",
+    "dragToMove": "Sleep om te verplaatsen",
+    "crop": "Bijsnijden",
+    "resetCrop": "Bijsnijden resetten",
+    "cropWidth": "B",
+    "cropHeight": "H",
+    "opacity": "Dekking",
+    "resetOpacity": "Dekking resetten"
+  },
+  "timing": {
+    "duration": "Duur",
+    "seconds": "Sec",
+    "in": "In:",
+    "out": "Uit:",
+    "durationColon": "Duur:",
+    "position": "Positie:"
+  },
+  "color": {
+    "measuring": "Meten…",
+    "autoTitle": "Niveaus, middentonen en witbalans corrigeren op basis van de beelden van deze clip",
+    "resetAll": "Alle kleuraanpassingen resetten",
+    "failed": "Het beeld van deze clip kon niet worden gelezen.",
+    "sliders": {
+      "brightness": "Helderheid",
+      "contrast": "Contrast",
+      "midtones": "Middentonen",
+      "saturation": "Verzadiging",
+      "warmth": "Warmte",
+      "tint": "Tint"
+    }
+  },
+  "effects": {
+    "hiddenName": "{{name}} (verborgen)",
+    "show": "Dit effect weer tonen",
+    "hide": "Dit effect verbergen (blijft bewaard, maar wordt niet toegepast)",
+    "remove": "Dit effect verwijderen",
+    "comesFrom": "Komt van",
+    "goesTo": "Gaat naar",
+    "from": "Van",
+    "to": "Tot",
+    "speed": "Snelheid",
+    "amount": {
+      "amplitude": "Amplitude",
+      "bounce": "Stuiteren",
+      "distance": "Afstand"
+    },
+    "addFirst": "Effect toevoegen…",
+    "addAnother": "Nog een effect toevoegen…",
+    "groups": {
+      "loop": "Lussen",
+      "in": "Ingangen",
+      "out": "Uitgangen"
+    },
+    "effect": {
+      "pulse": "Pulseren",
+      "wobble": "Wiebelen",
+      "bob": "Dobberen",
+      "sway": "Wiegen",
+      "spin": "Draaien",
+      "pop": "Tevoorschijn springen",
+      "slideIn": "Inschuiven",
+      "fadeIn": "Infaden",
+      "popOut": "Wegspringen",
+      "slideOut": "Uitschuiven",
+      "fadeOut": "Uitfaden"
+    },
+    "direction": {
+      "left": "links",
+      "right": "rechts",
+      "top": "boven",
+      "bottom": "onder"
+    },
+    "pivot": "Draaipunt",
+    "pivotPoint": "Draaipunt",
+    "pivotName": {
+      "topLeft": "linksboven",
+      "top": "boven",
+      "topRight": "rechtsboven",
+      "left": "links",
+      "centre": "midden",
+      "right": "rechts",
+      "bottomLeft": "linksonder",
+      "bottom": "onder",
+      "bottomRight": "rechtsonder",
+      "custom": "aangepast"
+    }
+  },
+  "multi": {
+    "volume": "Volume",
+    "volumeMixed": "Volume (gemengd)",
+    "volumeAll": "Volume van alle geselecteerde clips",
+    "muteAll": "Alles dempen",
+    "unmuteAll": "Dempen overal opheffen",
+    "cleanVoice": "Stem opschonen",
+    "cleanGroup": "Stem opschonen voor alle geselecteerde clips",
+    "afterUpload": "Beschikbaar zodra deze clips klaar zijn met uploaden.",
+    "failed": "Stem opschonen mislukt. Probeer het opnieuw.",
+    "applies_one": "Geldt voor de {{count}} geselecteerde clip.",
+    "applies_other": "Geldt voor de {{count}} geselecteerde clips.",
+    "appliesWithGroups_one": "Geldt voor de {{selected}} geselecteerde clips en de {{count}} andere clip in hun groepen.",
+    "appliesWithGroups_other": "Geldt voor de {{selected}} geselecteerde clips en de {{count}} andere clips in hun groepen.",
+    "stillUploading": "Clips die nog uploaden blijven zoals ze zijn.",
+    "remove_one": "{{count}} clip verwijderen",
+    "remove_other": "{{count}} clips verwijderen"
+  },
+  "trim": {
+    "title": "Inkorten: {{name}}",
+    "start": "Beginpunt",
+    "end": "Eindpunt",
+    "trimmed": "Ingekorte duur"
+  },
+  "reframe": {
+    "readFailed": "De video kon hier niet worden gelezen",
+    "openFailed": "De video kon niet worden geopend voor gezichtsvolging"
+  },
+  "personKey": {
+    "ready": "Klaar: je bent in elk beeld uitgeknipt. De render ziet eruit als het voorbeeld.",
+    "failed": "Geen persoon gevonden in deze clip ({{error}}).",
+    "finding": "Jou zoeken in elk beeld... Het voorbeeld toont het intussen al live.",
+    "findingProgress": "Jou zoeken in elk beeld: {{percent}} Het voorbeeld toont het intussen al live.",
+    "behind": "Achter jou",
+    "backgrounds": {
+      "none": "Doorzichtig",
+      "noneTitle": "De clips op de sporen eronder verschijnen achter jou",
+      "blur": "Vervagen",
+      "blurTitle": "Je eigen achtergrond, vervaagd",
+      "color": "Kleur",
+      "colorTitle": "Een effen kleur achter jou"
+    },
+    "pickStock": "Een stockfoto of -video erachter zetten",
+    "colour": "Kleur",
+    "blur": "Vervaging",
+    "resetBlur": "Vervaging resetten",
+    "thresholdTitle": "Hoger houdt minder rond je over, lager houdt meer"
+  }
+}

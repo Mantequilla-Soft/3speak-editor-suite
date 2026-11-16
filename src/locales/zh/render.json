@@ -1,0 +1,83 @@
+{
+  "button": {
+    "rendering": "渲染中...",
+    "exporting": "导出中...",
+    "uploading": "正在上传 {{percent}}",
+    "reRender": "重新渲染",
+    "exportAgain": "重新导出",
+    "trimToRender": "请把时间线修剪到 {{limit}} 以内再渲染",
+    "trimToExport": "请把时间线修剪到 {{limit}} 以内再导出"
+  },
+  "exportAs": {
+    "button": "导出为",
+    "title": "导出为：把同一个项目做成短视频、方形或横屏视频，并围绕人脸裁剪",
+    "close": "关闭“导出为”",
+    "waitUpload": "请等待上传完成。"
+  },
+  "done": {
+    "download": "下载",
+    "audiograms": "音频波形视频",
+    "audiogramsCount": "音频波形视频（{{n}}）",
+    "audiogramsTitle": "用这一集的片段制作的短视频，可以分享，也可以作为短视频与它一起发布",
+    "videoPodcast": "视频播客",
+    "videoPodcastTitle": "把整集做成 16:9 视频，包含封面、波形、字幕和说话人",
+    "useAudio": "使用此音频",
+    "sendVideo": "发送视频"
+  },
+  "failed": "渲染失败：{{error}}",
+  "phase": {
+    "preparing": "正在准备文件...",
+    "submitting": "正在提交渲染任务...",
+    "busyRetry": "渲染服务器繁忙。{{seconds}} 秒后重试...",
+    "offlineRetry": "未连接到渲染服务器。{{seconds}} 秒后重试...",
+    "starting": "正在开始...",
+    "reconnecting": "正在重新连接渲染服务器...",
+    "uploadingFile": "正在上传 {{name}}（{{index}}/{{total}}）...",
+    "uploadingUnnamed": "正在上传文件（{{index}}/{{total}}）...",
+    "uploadingPlate": "正在上传 {{name}} 的背景帧...",
+    "uploadingPlateUnnamed": "正在上传片段的背景帧..."
+  },
+  "queue": {
+    "next": "下一个就是你",
+    "inLine": {
+      "one": "你排在第 {{n}} 位",
+      "two": "你排在第 {{n}} 位",
+      "few": "你排在第 {{n}} 位",
+      "other": "你排在第 {{n}} 位"
+    },
+    "waiting": "正在等待空闲的渲染位置..."
+  },
+  "legacy": {
+    "exportVideo": "导出视频",
+    "cancelTitle": "取消导出",
+    "settingsTitle": "导出设置",
+    "uploadingRender": "正在上传 {{name}}（{{percent}}）。可以继续编辑；上传完成后即可渲染。",
+    "uploadingExport": "正在上传 {{name}}（{{percent}}）。可以继续编辑；上传完成后即可导出。",
+    "lengthRender": "时间线长度为 {{length}}。请修剪到 {{limit}} 以内再渲染。",
+    "lengthExport": "时间线长度为 {{length}}。请修剪到 {{limit}} 以内再导出。",
+    "method": "导出方式",
+    "methodCanvas": "Canvas（所见即所得）",
+    "methodFast": "快速（无效果）",
+    "canvasHint": "完全按照预览中的样子捕获所有视觉效果",
+    "fastHint": "导出更快，但会忽略缩放、位置、裁剪和文字叠加",
+    "quality": "画质",
+    "qualityHigh": "高（文件较大）",
+    "qualityMedium": "中（推荐）",
+    "qualityLow": "低（文件较小）",
+    "processing": "处理中... {{percent}}",
+    "renderingPercent": "渲染中... {{percent}}",
+    "downloadRendered": "下载渲染好的视频",
+    "ffmpegLoading": "正在加载 FFmpeg...",
+    "ffmpegNotLoaded": "FFmpeg 未加载",
+    "addClips": "请先在时间线上添加片段再导出"
+  },
+  "canvas": {
+    "loadingMedia": "正在加载媒体...",
+    "renderingFrames": "正在渲染帧...",
+    "encodingVideo": "正在编码视频...",
+    "processingAudio": "正在处理音频...",
+    "convertingMp4": "正在转换为 MP4...",
+    "preparingDownload": "正在准备下载...",
+    "complete": "完成！"
+  }
+}

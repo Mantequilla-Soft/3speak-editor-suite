@@ -1,0 +1,59 @@
+{
+  "panel": {
+    "title": "Döküm",
+    "close": "Dökümü kapat"
+  },
+  "cutNotice": {
+    "plain": "Kesildi: {{seconds}} sn daha kısa.",
+    "words_one": "{{count}} kelime kesildi: {{seconds}} sn daha kısa.",
+    "words_other": "{{count}} kelime kesildi: {{seconds}} sn daha kısa.",
+    "found_one": "Bulunan {{count}} yer kesildi: {{seconds}} sn daha kısa.",
+    "found_other": "Bulunan {{count}} yer kesildi: {{seconds}} sn daha kısa.",
+    "fillers": "Kesildi: {{fillers}}, {{pauses}}; {{seconds}} sn daha kısa.",
+    "dismiss": "Kapat"
+  },
+  "fillers": {
+    "title": "Dolgu seslerini ve duraklamaları kaldır",
+    "emptyHint": "Bu, dökümden çalışır: programın dilindeki ıı, eee, yani ve benzerlerini ve uzun duraklamaları bulur.",
+    "listening": "Dinleniyor...",
+    "transcribeFirst": "Önce programın dökümünü çıkar",
+    "checking": "Sunucu kontrol ediliyor...",
+    "unavailable": "Dökümler şu anda bu düzenleyici sunucusunda kullanılamıyor.",
+    "intro": "Dolgu sesleri (dil: {{language}}). Her birini dinle, kalması gerekenlerin işaretini kaldır.",
+    "introNoList": "Dolgu sesleri (dil: {{language}}; yalnızca ıı, eee ve benzerleri: bu dil için henüz liste yok). Her birini dinle, kalması gerekenlerin işaretini kaldır.",
+    "stillTranscribing": "Programın geri kalanının dökümü hâlâ çıkarılıyor.",
+    "fillerWords": "Dolgu sesleri",
+    "longPauses": "Uzun duraklamalar",
+    "minPause": "<strong>{{seconds}} sn</strong> üzeri duraklama",
+    "keepPause": "Duraklamaları <strong>{{seconds}} sn</strong> olacak şekilde kısalt",
+    "keepPauseTitle": "Kesimden sonra uzun bir duraklamadan geriye kalan",
+    "fillerCount_one": "{{count}} dolgu sesi",
+    "fillerCount_other": "{{count}} dolgu sesi",
+    "pauseCount_one": "{{count}} duraklama",
+    "pauseCount_other": "{{count}} duraklama",
+    "summary": "İşaretli: {{fillers}}, {{pauses}} · {{seconds}} sn kesilir",
+    "nothingFound": "Bu ayarlarla hiçbir şey bulunamadı.",
+    "tickAllFillers": "Tüm dolgu seslerini işaretle",
+    "untickAllFillers": "Tüm dolgu seslerinin işaretini kaldır",
+    "tickAllPauses": "Tüm duraklamaları işaretle",
+    "untickAllPauses": "Tüm duraklamaların işaretini kaldır",
+    "listLabel": "Kesilecekler",
+    "item": {
+      "keepPause": "Bu duraklamayı koru",
+      "cutPause": "Bu duraklamayı kes",
+      "keepFiller": "Koru: {{text}}",
+      "cutFiller": "Kes: {{text}}",
+      "stop": "Durdur",
+      "listenTitle": "Dinle (çevresindeki bir saniyeyle)",
+      "listenAt": "{{time}} konumunda dinle",
+      "pause": "Duraklama",
+      "pauseLength": "{{length}} sn → {{kept}} sn",
+      "filler": "Dolgu sesi",
+      "fillerTitle": "Bir tereddüt sesi",
+      "maybe": "Belki",
+      "maybeTitle": "Burada bir dolgu sesi (duraklama ya da virgülle ayrılmış): önce dinle"
+    },
+    "cut": "Kes",
+    "cutCount": "Kes: {{n}} ({{seconds}} sn)"
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "media": {
+    "blocked": {
+      "camera": "De camera of microfoon is geblokkeerd voor deze site. Sta het toe via het pictogram in de adresbalk en probeer het opnieuw. Heb je nooit nee gezegd, dan blokkeren de privacyinstellingen van je computer misschien de browser.",
+      "microphone": "De microfoon is geblokkeerd voor deze site. Sta het toe via het pictogram in de adresbalk en probeer het opnieuw. Heb je nooit nee gezegd, dan blokkeren de privacyinstellingen van je computer misschien de browser."
+    },
+    "notAllowed": {
+      "camera": "Deze pagina mag de camera of microfoon niet gebruiken. Laad 3Speak opnieuw en probeer het nog eens.",
+      "microphone": "Deze pagina mag de microfoon niet gebruiken. Laad 3Speak opnieuw en probeer het nog eens."
+    },
+    "busy": {
+      "camera": "Je camera of microfoon is bezet in een andere app of tab (een videogesprek, een andere recorder). Sluit het daar en probeer het opnieuw.",
+      "microphone": "Je microfoon is bezet in een andere app of tab (een videogesprek, een andere recorder). Sluit het daar en probeer het opnieuw."
+    },
+    "notFound": {
+      "camera": "Geen camera of microfoon gevonden. Sluit er een aan en probeer het opnieuw.",
+      "microphone": "Geen microfoon gevonden. Sluit er een aan en probeer het opnieuw."
+    },
+    "noDevices": {
+      "camera": "Deze browser kan de camera of microfoon hier niet gebruiken.",
+      "microphone": "Deze browser kan de microfoon hier niet gebruiken."
+    },
+    "failed": {
+      "camera": "De camera of microfoon kon niet starten. Probeer het opnieuw.",
+      "microphone": "De microfoon kon niet starten. Probeer het opnieuw."
+    },
+    "failedNamed": {
+      "camera": "De camera of microfoon kon niet starten ({{name}}). Probeer het opnieuw.",
+      "microphone": "De microfoon kon niet starten ({{name}}). Probeer het opnieuw."
+    }
+  },
+  "inline": {
+    "camera": "Camera",
+    "expand": "Vergroten",
+    "shrink": "Verkleinen",
+    "uploading": "Uploaden...",
+    "uploadingPct": "Uploaden... {{pct}}%",
+    "converting": "Omzetten...",
+    "rec": "REC",
+    "starting": "Starten...",
+    "plateStepOut": "Stap uit beeld",
+    "plateShooting": "Achtergrond opnemen, blijf uit beeld...",
+    "gestures": "Houd een afbeelding vast en sleep om het kader te wijzigen, knijp om te zoomen.",
+    "gesturesOverlay": "Houd een afbeelding vast en sleep om het kader te wijzigen, knijp om te zoomen, sleep je cameravak om het te verplaatsen.",
+    "greenScreen": {
+      "label": "Green screen",
+      "off": "Uit",
+      "green": "Groen",
+      "blue": "Blauw",
+      "person": "Persoon",
+      "static": "Statisch",
+      "staticTitle": "Statische achtergrond (experimenteel): verwijdert alles wat overeenkomt met een opname van de lege achtergrond",
+      "personTitle": "Geen green screen nodig: vindt jou in het beeld",
+      "threshold": "Drempel",
+      "thresholdStaticTitle": "Tolerantie: hoger negeert meer verandering in de achtergrond (ruis, licht, focus), maar kan delen van jou gaan verwijderen",
+      "thresholdTitle": "Hoger verwijdert meer van de schermkleur",
+      "despill": "Despill",
+      "despillStaticTitle": "Verwijdert de muurkleur van de randen",
+      "despillGreenTitle": "Verwijdert de groene zweem van de randen",
+      "despillBlueTitle": "Verwijdert de blauwe zweem van de randen",
+      "retakePlate": "Lege achtergrond opnieuw opnemen",
+      "shootPlate": "Lege achtergrond opnemen",
+      "plateKeep": "Experimenteel. Laat de camera en het licht precies zoals ze zijn.",
+      "plateHowTo": "Experimenteel. Zet de camera vast, druk op de knop en stap uit beeld.",
+      "keyFailed": "Live keying is hier niet beschikbaar. De clip krijgt nog steeds de green-screeninstelling.",
+      "personHowTo": "Geen green screen nodig: de editor vindt jou in het beeld. De opname wordt vastgelegd zoals hij is en op de tijdlijn uitgeknipt, waar je kiest wat er achter je komt."
+    },
+    "tpEdit": "Tekst voor de teleprompter bewerken",
+    "tpAdd": "Tekst voor de teleprompter toevoegen",
+    "teleprompter": "Teleprompter",
+    "recordOnly": "Alleen opnemen",
+    "recordAndPlay": "Opnemen + video afspelen",
+    "plusPlay": "+ Afspelen",
+    "recordReactionTitle": "Opnemen terwijl het origineel speelt",
+    "recordReaction": "Reactie opnemen",
+    "record": "Opnemen",
+    "stop": "Stoppen",
+    "retake": "Opnieuw opnemen",
+    "useClip": "Clip gebruiken"
+  },
+  "video": {
+    "title": "Video opnemen",
+    "startingCamera": "Camera starten...",
+    "start": "Opname starten",
+    "stop": "Stoppen",
+    "retake": "Opnieuw opnemen",
+    "useClip": "Clip gebruiken"
+  },
+  "audio": {
+    "title": "Audio opnemen",
+    "cannotRecord": "Deze browser kan hier geen audio opnemen.",
+    "addFailed": "De opname kon niet worden toegevoegd. Probeer het opnieuw.",
+    "yourRecording": "Je opname",
+    "micLevel": "Microfoonniveau",
+    "accessingMic": "Toegang tot microfoon...",
+    "ready": "Klaar om op te nemen: spreek om je niveau te controleren",
+    "preparing": "Je opname voorbereiden...",
+    "adding": "Toevoegen aan je sporen...",
+    "tpEdit": "Tekst voor de teleprompter bewerken",
+    "tpAdd": "Tekst voor de teleprompter toevoegen",
+    "teleprompter": "Teleprompter",
+    "start": "Opname starten",
+    "stop": "Stoppen",
+    "retake": "Opnieuw opnemen",
+    "addingShort": "Toevoegen...",
+    "useRecording": "Opname gebruiken",
+    "useScript": "Dit script gebruiken"
+  }
+}

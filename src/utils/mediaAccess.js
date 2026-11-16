@@ -5,6 +5,7 @@
 // settings, there is no camera, or the system blocks the browser. The recorders
 // used to show "Camera access denied" for all of them, so tell them apart and
 // try once more with plain settings when the first ask is too specific.
+import { t } from '../i18n'
 
 const RETRY_PLAIN = new Set(['OverconstrainedError', 'ConstraintNotSatisfiedError', 'NotReadableError', 'TrackStartError', 'AbortError'])
 
@@ -40,27 +41,30 @@ export async function openMicrophone({ getUserMedia } = {}) {
 }
 
 // What went wrong, in plain words, and what to do next. `devices` names what
-// was asked for: 'camera' (camera + microphone) or 'microphone'.
+// was asked for: 'camera' (camera + microphone) or 'microphone'. Each text has
+// both variants as whole sentences (record.media.<cause>.camera / .microphone).
 export function mediaErrorMessage(err, devices = 'camera') {
-  const both = devices === 'camera' ? 'camera or microphone' : 'microphone'
+  const which = devices === 'camera' ? 'camera' : 'microphone'
   switch (err?.name) {
     case 'NotAllowedError':
     case 'PermissionDeniedError':
-      return `The ${both} is blocked for this site. Allow it with the icon in the address bar, then try again. If you never said no, your computer's privacy settings may be blocking the browser.`
+      return t(`record.media.blocked.${which}`)
     case 'SecurityError':
-      return `This page is not allowed to use the ${both}. Reload 3Speak and try again.`
+      return t(`record.media.notAllowed.${which}`)
     case 'NotReadableError':
     case 'TrackStartError':
     case 'AbortError':
-      return `Your ${both} is busy in another app or tab (a video call, another recorder). Close it there, then try again.`
+      return t(`record.media.busy.${which}`)
     case 'NotFoundError':
     case 'DevicesNotFoundError':
     case 'OverconstrainedError':
     case 'ConstraintNotSatisfiedError':
-      return `No ${both} found. Connect one, then try again.`
+      return t(`record.media.notFound.${which}`)
     case 'NoMediaDevices':
-      return `This browser cannot use the ${both} here.`
+      return t(`record.media.noDevices.${which}`)
     default:
-      return `The ${both} could not start${err?.name ? ` (${err.name})` : ''}. Try again.`
+      return err?.name
+        ? t(`record.media.failedNamed.${which}`, { name: String(err.name) })
+        : t(`record.media.failed.${which}`)
   }
 }

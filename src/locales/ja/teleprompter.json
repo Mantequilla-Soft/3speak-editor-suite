@@ -1,0 +1,88 @@
+{
+  "title": "プロンプター",
+  "showOnCamera": "カメラに表示",
+  "speechNotice": {
+    "title": "音声追従は今のところ Chromium 系ブラウザでのみ動作します。",
+    "body": "話すのに合わせて原稿をスクロールさせるには、Chrome、Edge、Brave、Opera を使ってください。このブラウザでは、設定した一定の速度でスクロールします。"
+  },
+  "speechErrors": {
+    "network": "音声サービスに接続できません。音声認識にはインターネット接続が必要です（Chrome は文字起こしのため音声を Google に送信します）。",
+    "audioCapture": "音声認識に音声が届いていません。マイクが使用中かもしれません。ヘッドセットをお試しください。",
+    "notAllowed": "音声認識のためのマイクの許可がブロックされています。",
+    "unsupported": "このブラウザには音声認識がありません。",
+    "generic": "音声認識エラー: {{err}}"
+  },
+  "noMic": "マイクなしで録画しています（マイクを利用できません）。",
+  "autoDetect": "自動検出（{{lang}}）",
+  "presets": {
+    "frontcam": "フロントカメラ",
+    "frontcamTitle": "自撮りレンズの下に細い帯で表示。読んでいることが最も目立ちません",
+    "max": "最大サイズ",
+    "maxTitle": "離れても読める大きな文字",
+    "top": "上部の行",
+    "topTitle": "上部に複数行を表示"
+  },
+  "scroll": {
+    "label": "スクロール",
+    "modeAria": "スクロールモード",
+    "followVoice": "声に追従",
+    "followVoiceTitle": "原稿を声に出して読むとスクロールします",
+    "needsChromium": "Chrome、Edge などの Chromium 系ブラウザが必要です",
+    "timed": "一定速度",
+    "timedTitle": "一定の速度でスクロールします",
+    "voiceForcedMissing": "ここでは音声追従を利用できないため、一定速度のスクロールを使います。",
+    "voiceUnavailable": "このブラウザでは音声追従を利用できません。"
+  },
+  "style": {
+    "title": "テキストのスタイル",
+    "fontSize": "文字サイズ",
+    "fontSizeValue": "{{size}}px",
+    "text": "テキスト",
+    "background": "背景",
+    "bgOpacity": "背景の不透明度",
+    "mirrorText": "テキストを反転（プロンプター用ミラー向け）",
+    "voiceLanguage": "音声の言語"
+  },
+  "status": {
+    "serverErrorSwitched": "音声サーバーのエラー（{{reason}}）。一定速度のスクロールに切り替えました。",
+    "voiceErrorSwitched": "{{error}} 一定速度のスクロールに切り替えました。",
+    "voiceStoppedSwitched": "音声追従が停止しました。一定速度のスクロールに切り替えました。",
+    "serverError": "音声サーバーのエラー（{{reason}}）。",
+    "listeningServer": "聞き取り中（サーバー）… 読み始めてください",
+    "connectingServer": "音声サーバーに接続中…",
+    "listening": "聞き取り中… 声に出して読み始めてください",
+    "startingMic": "マイクを起動中…",
+    "scrollPaused": "スクロール一時停止中",
+    "timedScroll": "一定速度のスクロール、{{wpm}} 語/分",
+    "scrollTest": "スクロールのテスト、{{wpm}} 語/分"
+  },
+  "sttReason": {
+    "unreachable": "接続できません",
+    "noMic": "マイクがありません",
+    "audioUnavailable": "音声を利用できません",
+    "connectionFailed": "接続に失敗しました",
+    "unauthorized": "認証されていません",
+    "closed": "切断されました",
+    "serverError": "サーバーエラー"
+  },
+  "scriptPlaceholder": "ここに原稿を書くか貼り付けてください。録画中は声に出して読むのに合わせて、または一定速度モードでは一定の速さでスクロールします。",
+  "scriptModeVoice": "スクロール：声に追従",
+  "scriptModeTimed": "スクロール：一定速度、{{wpm}} 語/分",
+  "hide": "隠す",
+  "dragToMove": "ドラッグして移動",
+  "dragToResize": "ドラッグしてサイズ変更",
+  "expandMenu": "メニューを展開",
+  "collapseMenu": "メニューを折りたたむ",
+  "editScript": "原稿を編集",
+  "testVoice": "音声をテスト",
+  "stopVoiceTest": "テストを停止",
+  "scrollSpeed": "スクロール速度",
+  "slower": "遅く",
+  "faster": "速く",
+  "wordsPerMin": "語/分",
+  "testScroll": "スクロールをテスト",
+  "stopScrollTest": "スクロールのテストを停止",
+  "pauseScroll": "スクロールを一時停止",
+  "resumeScroll": "スクロールを再開",
+  "hideTeleprompter": "プロンプターを隠す"
+}

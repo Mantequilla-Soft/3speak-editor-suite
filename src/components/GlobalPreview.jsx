@@ -1,6 +1,7 @@
 import { useRef, useEffect, useLayoutEffect, useState, useMemo, useCallback, Fragment } from 'react'
 import { Play, Pause, SkipBack, Minus, Plus, Maximize, Minimize2, Repeat } from './icons'
 import { isHlsUrl, attachHls, destroyHls } from '../utils/hlsHelper'
+import { useT } from '../i18n'
 
 function formatTime(seconds) {
   const s = Math.floor(seconds)
@@ -71,10 +72,19 @@ import { clipGainAt, clipVolume, splitGain } from '../utils/audioGain'
 import { duckGainAt } from '../utils/duck'
 import { clipColorFilter } from './ClipColorFilters'
 import { motionStyle, normalizeMotion, pivotPoint } from '../utils/stickerMotion'
+import { keyframeBase } from '../utils/keyframes'
+import { prerollTime, parkTime, syncPlayback, isFrozen, layerKeyframeStyle, valueAtTime, keyframeGainAt } from '../utils/keyframePreview'
 import usePhoneLayout from '../hooks/usePhoneLayout'
+import { reframeBox, isReframable } from '../utils/reframe'
+import { canvasCss, aspectValue } from '../utils/projectFormat'
 import { REMIX_LAYOUTS, hasLayout, clampLayout, layoutPan, layoutZoom, LAYOUT_ZOOM_MIN, LAYOUT_ZOOM_MAX } from '../utils/remixLayout'
 import { getClipChromaKey } from '../utils/chromaKey'
 import ChromaKeyCanvas from './ChromaKeyCanvas'
+import CaptionsOverlay from './CaptionsOverlay'
+import SceneLayer, { seekSceneLayers } from './SceneLayer'
+import { outputSize } from '../utils/outputSize'
+import { AnimatedText, applyWordFrames, textStrokeStyle, animatedBoxStyle } from './TextFx'
+import { withTransitions, mediaTimeAt, holdTransitionFrame, transitionLayerProps, applyTransitionFrames, withAudioCrossfades, crossfadeGain } from '../utils/previewTransitions'
 
 // In stitch mode the preview sits in its own column with its own controls;
 // otherwise this renders the preview as-is.
@@ -89,18 +99,12 @@ function PreviewColumn({ own, controls, children }) {
 }
 
 // The 9:16 output canvas contained in .preview-layer-container (a size container)
-const CANVAS_W = 'min(100cqw, 56.25cqh)'
-const CANVAS_H = 'min(100cqh, 177.7778cqw)'
 
-// Reaction layouts offered on the phone record stage
-const STAGE_LAYOUTS = [
-  { mode: 'tileTop', label: 'Tile above' },
-  { mode: 'tileBottom', label: 'Tile below' },
-  { mode: 'overlay', label: 'Overlay' }
-]
+// Reaction layouts offered on the phone record stage (named in preview.stageLayout.<mode>)
+const STAGE_LAYOUTS = ['tileTop', 'tileBottom', 'overlay']
 
 const ASPECT_RATIOS = ['auto', '16:9', '9:16', '4:3', '1:1']
-const RATIO_LABELS = { 'auto': 'Auto', '16:9': '16:9', '9:16': '9:16', '4:3': '4:3', '1:1': '1:1' }
+const RATIO_LABELS = { '16:9': '16:9', '9:16': '9:16', '4:3': '4:3', '1:1': '1:1' }
 
 /**
  * A text clip's text (and its box), shrunk to the widest line.
@@ -146,12 +150,22 @@ function FitTextBox({ measureKey, children, ...rest }) {
   return <span ref={ref} {...rest}>{children}</span>
 }
 
-function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVideo, activeAspectRatio, aspectRatioOverride, onSetAspectRatio, selectedClipId, onUpdateClip, onSelectClip, compact, inlineRecording, onRecordedInline, onCloseInlineRecorder, recorderSize, onSetRecorderSize, recorderGuide, onChangeRemixMode, onChangeStageLayout, controlRef, emptyActions, audioMode = false, duck = null, chapters = null, onPlayingChange }) {
+function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVideo, activeAspectRatio, aspectRatioOverride, onSetAspectRatio, selectedClipId, onUpdateClip, onSelectClip, compact, inlineRecording, onRecordedInline, onCloseInlineRecorder, recorderSize, onSetRecorderSize, recorderGuide, onChangeRemixMode, onChangeStageLayout, controlRef, emptyActions, audioMode = false, duck = null, chapters = null, onPlayingChange, captions = null, reframeView = false }) {
+  const { t, lang } = useT()
+  const stageLayouts = useMemo(() => STAGE_LAYOUTS.map(mode => ({ mode, label: t(`preview.stageLayout.${mode}`) })), [t, lang])
+  // The frame's shape: remix layout boxes are fractions of it (utils/projectFormat.js)
+  const { w: CANVAS_W, h: CANVAS_H } = canvasCss(activeAspectRatio)
+  const CANVAS = { w: CANVAS_W, h: CANVAS_H } // for transitions' slides
+  const frameRatio = aspectValue(activeAspectRatio)
   const videoRefs = useRef({}) // Map of clip ID to video element
   // Sticker motion: the layer container (= the frame) and the moving clips,
   // which the playback loop moves every frame (React renders only ~20/s)
   const layerContainerRef = useRef(null)
   const motionClipsRef = useRef({}) // clip id -> { motion, start, duration, kind, opacity }
+  const transClipsRef = useRef({}) // clip id -> { clip, base } of layers in a transition or fade
+  const wordClipsRef = useRef({}) // clip id -> { anim, start } of text clips with a word entrance
+  const sceneClipsRef = useRef({}) // clip id -> { seek } of titles (scene clips) on screen
+  const kfClipsRef = useRef({}) // clip id -> the clip, for layers animated by keyframes
   // Natural sizes of image clips (for an off-centre pivot), learned on load
   const imageSizeRef = useRef({})
   const [, setImageSizeTick] = useState(0)
@@ -170,7 +184,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   const loopRef = useRef(false)
   const previewContainerRef = useRef(null)
 
-  // Refs for playback loop — avoid React re-renders during animation
+  // Refs for playback loop: avoid React re-renders during animation
   const playbackPosRef = useRef(playheadPosition)
   const lastUiUpdateRef = useRef(0)
   const activeTopClipIdRef = useRef(null)
@@ -232,15 +246,16 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
 
   // Get all video/image clips with their timeline positions (respecting track visibility)
   const videoClips = useMemo(() => {
-    return (tracks || [])
+    // Transitions (utils/previewTransitions.js): clips in one overlap the cut
+    return withTransitions((tracks || [])
       .filter(t => t.type === 'video' && t.visible !== false)
       .flatMap(t => t.clips)
       .map(clip => ({
-        ...clip,
+        ...keyframeBase(clip), // animated clips are laid out from their reference values
         timelineStart: clip.timelinePosition || 0,
         timelineEnd: (clip.timelinePosition || 0) + (clip.endTime - clip.startTime)
       }))
-      .sort((a, b) => a.timelineStart - b.timelineStart)
+      .sort((a, b) => a.timelineStart - b.timelineStart), tracks)
   }, [tracks])
 
   // Get all audio clips with their timeline positions (respecting track mute)
@@ -249,7 +264,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   // clip that is ducked (its own Duck or the top bar's), the duck (audio editor, utils/duck.js)
   const duckRef = useRef(duck)
   duckRef.current = duck
-  const gainAt = (clip, t) => clipGainAt(clip, t) * (duckRef.current?.[clip.id] ? duckGainAt(duckRef.current[clip.id], t) : 1)
+  const gainAt = (clip, t) => clipGainAt(clip, t) * keyframeGainAt(clip, t) * (duckRef.current?.[clip.id] ? duckGainAt(duckRef.current[clip.id], t) : 1) * crossfadeGain(clip, t)
 
   // Louder than 100% (audio editor, up to 200%): an <audio> element stops at
   // volume 1, so a boosted clip's element (data-boost, mounted with
@@ -292,22 +307,33 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
     try { el._boostGain?.disconnect() } catch { /* already */ }
     el._boostSource = null
     el._boostGain = null
+    if (el._hls) { destroyHls(el._hls); el._hls = null; el._hlsUrl = null }
     try {
       el.pause()
       el.removeAttribute('src')
       el.load()
     } catch { /* gone */ }
   }
+  // A sound by HLS (3Speak's "Use this sound": a Short's .m3u8 rendition) plays
+  // through hls.js like a video clip; any other URL is the element's own src.
+  // Once per element and URL (the ref runs on every render).
+  const attachAudioSource = (el, url) => {
+    if (!isHlsUrl(url) || el._hlsUrl === url) return
+    if (el._hls) destroyHls(el._hls)
+    el._hls = attachHls(el, url)
+    el._hlsUrl = url
+  }
   const audioClips = useMemo(() => {
-    return (tracks || [])
+    // Linked sound crossfades at transitions (utils/previewTransitions.js)
+    return withAudioCrossfades((tracks || [])
       .filter(t => t.type === 'audio' && t.muted !== true)
       .flatMap(t => t.clips.map(c => (t.music ? { ...c, musicTrack: true, trackId: t.id } : c)))
       .filter(c => c.audioEnabled !== false)
       .map(clip => ({
-        ...clip,
+        ...keyframeBase(clip),
         timelineStart: clip.timelinePosition || 0,
         timelineEnd: (clip.timelinePosition || 0) + (clip.endTime - clip.startTime)
-      }))
+      })), tracks)
   }, [tracks])
 
   // Audio elements exist only around the playhead (playing, or starting within
@@ -446,15 +472,13 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   }, [currentClips, upcomingClips, heldClips])
 
   // Calculate the media time within a clip
-  const getMediaTime = useCallback((clip, position) => {
-    const offsetInClip = position - clip.timelineStart
-    return clip.startTime + offsetInClip
-  }, [])
+  // (through the clip's speed; held on the first / last frame in a transition's overlap)
+  const getMediaTime = useCallback((clip, position) => mediaTimeAt(clip, position), [])
 
   // Track which URL is loaded per clip
   const loadedUrlsRef = useRef({})
 
-  // Stable ref to latest values — RAF loop reads these without triggering re-renders
+  // Stable ref to latest values: RAF loop reads these without triggering re-renders
   const latestRef = useRef({})
   latestRef.current = { findClipsAtPosition, getMediaTime, totalDuration, onSetPlayhead, setVideoSource, audioClips, videoClips, audioMode }
   loopRef.current = loop
@@ -497,7 +521,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
     }
   }, [playheadPosition]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Load sources and seek video elements — runs during both playback and scrubbing
+  // Load sources and seek video elements: runs during both playback and scrubbing
   // During playback: loads sources for new clips, skips seeking for the playing top clip
   // When paused: fully seeks all clips
   useEffect(() => {
@@ -524,7 +548,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         return
       }
 
-      // During playback, let all clips play naturally — don't seek clips that are playing
+      // During playback, let all clips play naturally: don't seek clips that are playing
       if (isPlayingClip && !videoEl.paused) return
 
       // Seek when paused (scrubbing) or when clip needs syncing
@@ -544,17 +568,17 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         setVideoSource(el, clip.id, clip.url)
         loadedUrlsRef.current[clip.id] = clip.url
         el.addEventListener('loadedmetadata', () => {
-          if (el.paused) el.currentTime = Math.max(0, clip.startTime - PREROLL)
+          if (el.paused) el.currentTime = parkTime(clip, PREROLL)
         }, { once: true })
-      } else if (el.paused && el.readyState >= 1 && Math.abs(el.currentTime - Math.max(0, clip.startTime - PREROLL)) > 0.05) {
+      } else if (el.paused && el.readyState >= 1 && Math.abs(el.currentTime - parkTime(clip, PREROLL)) > 0.05) {
         // Parked where the pre-roll starts, so starting it needs no seek
-        el.currentTime = Math.max(0, clip.startTime - PREROLL)
+        el.currentTime = parkTime(clip, PREROLL)
       }
     })
   }, [upcomingClips, setVideoSource])
 
   // Sync muted/volume state imperatively after every render.
-  // Video clips are all muted — audio comes from the audio track clips.
+  // Video clips are all muted: audio comes from the audio track clips.
   // Audio clips play at their individual volume levels.
   useEffect(() => {
     // Mute all video elements (audio is handled by audio track)
@@ -574,7 +598,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
     })
   }, [currentClips, currentAudioClips, isPlaying]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Handle playback — ref-driven animation loop
+  // Handle playback: ref-driven animation loop
   useEffect(() => {
     if (!isPlaying) {
       isPlayingRef.current = false
@@ -607,7 +631,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
     const startClips = latestRef.current.findClipsAtPosition(playbackPosRef.current)
     const startTop = startClips[0]
     startClips.forEach(clip => {
-      if (clip.type === 'image') return
+      if (clip.type === 'image' || isFrozen(clip)) return
       const videoEl = videoRefs.current[clip.id]
       if (!videoEl) return
       if (loadedUrlsRef.current[clip.id] !== clip.url) {
@@ -616,6 +640,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         loadedUrlsRef.current[clip.id] = clip.url
       }
       videoEl.muted = true // Audio comes from audio track
+      if (holdTransitionFrame(clip, videoEl, playbackPosRef.current)) return
       if (videoEl.paused) {
         const mediaTime = latestRef.current.getMediaTime(clip, playbackPosRef.current)
         const beginPlay = () => {
@@ -646,6 +671,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         setElementGain(audioEl, gainAt(clip, playbackPosRef.current))
         const mediaTime = latestRef.current.getMediaTime(clip, playbackPosRef.current)
         audioEl.currentTime = mediaTime
+        syncPlayback(audioEl, clip, playbackPosRef.current)
         audioEl.play().catch(() => {})
       }
     })
@@ -711,29 +737,46 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
           ? textPivot(mc.motion)
           : imagePivot(mc.motion, el.naturalWidth, el.naturalHeight, frameW, frameH)
         const st = motionStyle(mc.motion, newPosition - mc.start, mc.duration, frameH, pv)
-        el.style.transform = `${el.dataset.motionBase || ''} ${st.transform}`.trim()
-        el.style.opacity = String(mc.opacity * st.opacity)
+        const kfx = el.dataset.kfId ? layerKeyframeStyle(kfClipsRef.current[el.dataset.kfId], newPosition) : null
+        el.style.transform = `${kfx?.prefix || ''} ${el.dataset.motionBase || ''} ${st.transform}`.trim()
+        el.style.opacity = String(mc.opacity * st.opacity * (kfx ? kfx.opacity : 1))
       })
+      // Keyframes (utils/keyframes.js): animated layers to this exact moment
+      layerContainerRef.current?.querySelectorAll('[data-kf-id]:not([data-motion-id])').forEach(el => {
+        const kfx = layerKeyframeStyle(kfClipsRef.current[el.dataset.kfId], newPosition)
+        if (!kfx) return
+        el.style.transform = `${kfx.prefix} ${el.dataset.kfBase || ''}`.trim()
+        el.style.opacity = String((+el.dataset.kfOpacity || 1) * kfx.opacity)
+      })
+
+      // Transitions and fades: the layers' opacity, slide, zoom, blur at this moment
+      applyTransitionFrames(layerContainerRef.current, newPosition, frameH, CANVAS, transClipsRef.current)
+      // Text coming in word by word
+      applyWordFrames(layerContainerRef.current, newPosition, wordClipsRef.current)
+      // Titles (motion scenes) to this moment
+      seekSceneLayers(newPosition, sceneClipsRef.current)
 
       // Pre-roll clips about to start (see PREROLL): hidden video / silent audio
       const { videoClips: allVideoClips, audioClips: preAudioClips } = latestRef.current
       for (const clip of allVideoClips) {
-        if (clip.type !== 'video') continue
+        if (clip.type !== 'video' || clip.xHead) continue
         const lead = clip.timelineStart - newPosition
         // A clip starting at the very beginning of its file has nothing to pre-roll from
-        if (lead <= 0 || lead > PREROLL || clip.startTime - lead < 0) continue
+        if (lead <= 0 || lead > PREROLL || prerollTime(clip, lead) === null) continue
         const el = videoRefs.current[clip.id]
         if (!el || !el.paused || el.readyState < 2 || loadedUrlsRef.current[clip.id] !== clip.url) continue
         el.muted = true
-        prerollElement(el, () => clip.startTime - (clip.timelineStart - playbackPosRef.current))
+        syncPlayback(el, clip, clip.timelineStart)
+        prerollElement(el, () => prerollTime(clip, clip.timelineStart - playbackPosRef.current) ?? 0)
       }
       for (const clip of preAudioClips) {
         const lead = clip.timelineStart - newPosition
-        if (lead <= 0 || lead > PREROLL || clip.startTime - lead < 0) continue
+        if (lead <= 0 || lead > PREROLL || prerollTime(clip, lead) === null) continue
         const el = audioRefs.current[clip.id]
         if (!el || !el.paused || el.readyState < 2) continue
         el.volume = 0 // silent until its clip starts (the loop sets its volume then)
-        prerollElement(el, () => clip.startTime - (clip.timelineStart - playbackPosRef.current))
+        syncPlayback(el, clip, clip.timelineStart)
+        prerollElement(el, () => prerollTime(clip, clip.timelineStart - playbackPosRef.current) ?? 0)
       }
 
       // Check for clip transitions
@@ -746,7 +789,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         // throttled UI update (else the old one stands frozen up to 50ms)
         lastUiUpdateRef.current = currentTime
         onSetPlayhead(newPosition)
-        // Top clip changed — pause old top if it's no longer visible at all
+        // Top clip changed: pause old top if it's no longer visible at all
         if (activeTopClipIdRef.current) {
           const stillVisible = clipsAtPos.some(c => c.id === activeTopClipIdRef.current)
           if (!stillVisible) {
@@ -764,6 +807,10 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         const videoEl = videoRefs.current[clip.id]
         if (!videoEl) return
         videoEl.muted = true // Audio comes from audio track
+        // A transition's overlap holds the first / last frame (utils/previewTransitions.js)
+        if (holdTransitionFrame(clip, videoEl, newPosition)) return
+        // Speed / ramp / still (utils/clipSpeed.js): a still stays paused on its frame
+        if (syncPlayback(videoEl, clip, newPosition, currentTime)) return
 
         const seekAndPlay = () => {
           if (!isPlayingRef.current) return
@@ -799,7 +846,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         }
       })
 
-      // Sync audio clips — start/stop as they enter/leave playhead
+      // Sync audio clips: start/stop as they enter/leave playhead
       const { audioClips: allAudioClips, getMediaTime: gmt } = latestRef.current
       allAudioClips.forEach(clip => {
         const audioEl = audioRefs.current[clip.id]
@@ -808,6 +855,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         if (inRange) {
           // volume and fades, every frame (a fade is a ramp, not a step)
           setElementGain(audioEl, gainAt(clip, newPosition))
+          syncPlayback(audioEl, clip, newPosition, currentTime)
           if (audioEl.paused) {
             audioEl.currentTime = gmt(clip, newPosition)
             audioEl.play().catch(() => {})
@@ -851,9 +899,10 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       const clips = latestRef.current.findClipsAtPosition(playbackPosRef.current)
       const top = clips[0]
       clips.forEach(clip => {
-        if (clip.type === 'image') return
+        if (clip.type === 'image' || isFrozen(clip)) return
         const videoEl = videoRefs.current[clip.id]
         if (videoEl) {
+          syncPlayback(videoEl, clip, playbackPosRef.current)
           videoEl.muted = true // Audio comes from audio track
           const mediaTime = latestRef.current.getMediaTime(clip, playbackPosRef.current)
           if (Math.abs(videoEl.currentTime - mediaTime) > 0.05) {
@@ -874,6 +923,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
           setElementGain(audioEl, gainAt(clip, playbackPosRef.current))
           const mt = getMediaTime(clip, playbackPosRef.current)
           audioEl.currentTime = mt
+          syncPlayback(audioEl, clip, playbackPosRef.current)
           audioEl.play().catch(() => {})
         }
       })
@@ -1123,8 +1173,8 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
 
     // Layout boxes are relative to the 9:16 canvas contained in the layer container
     const rect = e.currentTarget.closest('.preview-layer-container')?.getBoundingClientRect()
-    const canvasW = rect ? Math.min(rect.width, rect.height * 9 / 16) : 1
-    const container = { width: canvasW, height: canvasW * 16 / 9 }
+    const canvasW = rect ? Math.min(rect.width, rect.height * frameRatio) : 1
+    const container = { width: canvasW, height: canvasW / frameRatio }
 
     const layout = hasLayout(clip) ? clip.layout : null
 
@@ -1151,8 +1201,8 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       mode: 'pending', // pending -> move | pan
       startMouseX: clientX,
       startMouseY: clientY,
-      startPosX: clip.positionX || 0,
-      startPosY: clip.positionY || 0,
+      startPosX: valueAtTime(clip, 'x', playbackPosRef.current),
+      startPosY: valueAtTime(clip, 'y', playbackPosRef.current),
       // Layout clips move in canvas fractions, not preview pixels
       startLayout: layout,
       // Fixed boxes (tiles) only pan and zoom; a plain drag does nothing
@@ -1314,7 +1364,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
   const ownControls = ownPlayer ? (
     <div className="preview-own-controls">
       <div className="global-preview-controls">
-        <button onClick={handlePlayPause} title={isPlaying ? 'Pause' : 'Play'}>
+        <button onClick={handlePlayPause} title={isPlaying ? t('common.pause') : t('common.play')}>
           {isPlaying ? <Pause size={14} /> : <Play size={14} />}
         </button>
         <span className="time-display">
@@ -1329,19 +1379,19 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
     <div ref={previewContainerRef} className={`global-preview${audioMode ? ' audio-mode' : ''}${stage ? ` remix-stage remix-stage-${recorderGuide.mode}` : ''}${compact ? ` compact-global-preview compact-${compactSize}` : ` size-${size}`}${isVerticalVideo ? ' vertical-video' : ''} aspect-${activeAspectRatio?.replace(':', '-') || '16-9'}`}>
       {!compact && (
         <div className="global-preview-header">
-          <h3>Timeline Preview</h3>
+          <h3>{t('preview.header')}</h3>
           <div className="size-controls">
             <button
               onClick={decreaseSize}
               disabled={!canDecrease}
-              title="Smaller"
+              title={t('preview.smaller')}
             >
               <Minus size={14} />
             </button>
             <button
               onClick={increaseSize}
               disabled={!canIncrease}
-              title="Larger"
+              title={t('preview.larger')}
             >
               <Plus size={14} />
             </button>
@@ -1398,13 +1448,20 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                   const showPivot = !!motion && isSelected && !isPlaying
 
                   const stageSource = !!(stageLayout?.source && clip.id === recorderGuide.sourceClipId)
+                  // "Export as" preview in another shape: footage fills the frame,
+                  // its window on the face path at this moment (utils/reframe.js)
+                  const reframed = !stageSource && reframeView && isReframable(clip)
+                    ? reframeBox(clip.reframe || { path: [] }, playheadPosition - clip.timelineStart + (clip.startTime || 0), frameRatio,
+                      videoRefs.current[clip.id]?.videoWidth ? videoRefs.current[clip.id].videoWidth / videoRefs.current[clip.id].videoHeight : null)
+                    : null
                   const box = stageSource
                     ? stageLayout.source
-                    : hasLayout(clip) ? clip.layout : null
+                    : hasLayout(clip) ? clip.layout : reframed
                   // On the stage the original's tile pans and zooms but stays in place
+                  // (a reframed clip is moved with Export as, not by dragging)
                   const gestureClip = stageSource
                     ? { id: 'stage:source', layout: box, movable: false }
-                    : clip
+                    : reframed ? { id: clip.id, movable: false } : clip
                   const layerStyle = {
                     ...(box
                       ? { opacity: (clip.opacity ?? 100) < 100 ? clip.opacity / 100 : undefined }
@@ -1442,6 +1499,20 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                     layerStyle.opacity = baseOpacity * motionNowStyle.opacity
                     return { 'data-motion-id': clip.id, 'data-motion-base': base }
                   })() : {}
+                  // Keyframes (utils/keyframes.js): the layer moves from its reference
+                  // layout; during playback the loop above updates it every frame
+                  const kfNow = box ? null : layerKeyframeStyle(clip, playheadPosition)
+                  let kfProps = {}
+                  if (kfNow) {
+                    kfClipsRef.current[clip.id] = clip
+                    if (clip.type !== 'text') {
+                      kfProps = { 'data-kf-id': clip.id, 'data-kf-base': layerStyle.transform || '', 'data-kf-opacity': String(layerStyle.opacity ?? 1) }
+                      layerStyle.transform = `${kfNow.prefix} ${layerStyle.transform || ''}`.trim()
+                      layerStyle.opacity = (layerStyle.opacity ?? 1) * kfNow.opacity
+                    }
+                  }
+                  // Transitions and fades at the playhead, on top of the keyframes (the loop keeps them moving)
+                  const transProps = transitionLayerProps(clip, layerStyle, playheadPosition, frameH, CANVAS, transClipsRef.current)
 
                   if (box) {
                     const { panX, panY } = layoutPan(box)
@@ -1476,6 +1547,22 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                     />
                   ) : null
 
+                  // Titles: a motion scene in the engine's host page (SceneLayer.jsx)
+                  if (clip.type === 'scene') {
+                    return (
+                      <SceneLayer
+                        key={clip.id}
+                        clip={clip}
+                        time={playheadPosition}
+                        frame={outputSize(activeAspectRatio || '9:16')}
+                        style={layerStyle}
+                        registry={sceneClipsRef.current}
+                        onMouseDown={(e) => handleClipPointerDown(e, clip)}
+                        onTouchStart={(e) => handleClipPointerDown(e, clip)}
+                      />
+                    )
+                  }
+
                   if (clip.type === 'text') {
                     const hAlign = clip.textHAlign || 'center'
                     const textStyle = {
@@ -1491,6 +1578,8 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                       padding: '20px',
                       boxSizing: 'border-box',
                       textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
+                      // Outline (utils/textAnim.js; the render's drawtext border)
+                      ...textStrokeStyle(clip),
                       // The render (and the line measurement it gets) use 1.2;
                       // inherited "normal" is ~1.5 for some fonts
                       lineHeight: 1.2,
@@ -1526,18 +1615,21 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                             clip.textBoxPadding, clip.textBoxBorderWidth, clip.textHAlign].join('|')}
                           style={{
                             ...boxStyle,
+                            ...animatedBoxStyle(clip),
                             pointerEvents: 'auto',
                             // Text turns (and moves) its own box, around the box's centre
-                            ...((clip.rotation || motion) ? { transform: `${clip.rotation ? `rotate(${clip.rotation}deg)` : ''} ${motionNow}`.trim() } : {}),
-                            ...(motionNowStyle ? { opacity: motionNowStyle.opacity } : {}),
+                            ...((clip.rotation || motion || kfNow) ? { transform: `${kfNow?.prefix || ''} ${clip.rotation ? `rotate(${clip.rotation}deg)` : ''} ${motionNow}`.trim() } : {}),
+                            ...((motionNowStyle || kfNow) ? { opacity: (motionNowStyle ? motionNowStyle.opacity : 1) * (kfNow ? kfNow.opacity : 1) } : {}),
                             ...(showPivot ? { '--pivot-x': `${50 + motion.pivotX * 50}%`, '--pivot-y': `${50 + motion.pivotY * 50}%` } : {})
                           }}
                           className={showPivot ? 'motion-pivot-box' : undefined}
                           {...(motion ? { 'data-motion-id': clip.id, 'data-motion-base': clip.rotation ? `rotate(${clip.rotation}deg)` : '' } : {})}
+                          {...(kfNow ? { 'data-kf-id': clip.id, 'data-kf-base': clip.rotation ? `rotate(${clip.rotation}deg)` : '', 'data-kf-opacity': '1' } : {})}
                           onMouseDown={(e) => handleClipPointerDown(e, clip)}
                           onTouchStart={(e) => handleClipPointerDown(e, clip)}
                         >
-                          {clip.text || 'Text'}
+                          {/* word by word entrance: one span per word (TextFx.jsx) */}
+                          <AnimatedText clip={clip} time={playheadPosition} start={clip.timelineStart} registry={wordClipsRef.current} />
                         </FitTextBox>
                       </div>
                     )
@@ -1549,6 +1641,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                       <div
                         key={clip.id}
                         style={{ ...layerStyle, background: bg }}
+                        {...transProps}
                         onMouseDown={(e) => handleClipPointerDown(e, clip)}
                         onTouchStart={(e) => handleClipPointerDown(e, clip)}
                       />
@@ -1559,6 +1652,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                         key={clip.id}
                         className="preview-layout-box"
                         style={layerStyle}
+                        {...transProps}
                         onMouseDown={(e) => handleClipPointerDown(e, clip)}
                         onTouchStart={(e) => handleClipPointerDown(e, clip)}
                         onContextMenu={(e) => e.preventDefault()}
@@ -1593,6 +1687,8 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                         crossOrigin="anonymous"
                         style={layerStyle}
                         {...imageMotionProps}
+                        {...transProps}
+                        {...kfProps}
                         onLoad={(e) => {
                           const img = e.currentTarget
                           if (!imageSizeRef.current[clip.url]) {
@@ -1628,6 +1724,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                         key={clip.id}
                         className="preview-layout-box"
                         style={layerStyle}
+                        {...transProps}
                         onMouseDown={(e) => handleClipPointerDown(e, gestureClip)}
                         onTouchStart={(e) => handleClipPointerDown(e, gestureClip)}
                         onContextMenu={(e) => e.preventDefault()}
@@ -1652,6 +1749,8 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                           crossOrigin="anonymous"
                           playsInline
                           style={{ ...layerStyle, opacity: 0, outline: undefined }}
+                          {...kfProps}
+                          data-kf-opacity="0"
                           onMouseDown={(e) => handleClipPointerDown(e, clip)}
                           onTouchStart={(e) => handleClipPointerDown(e, clip)}
                           onContextMenu={(e) => e.preventDefault()}
@@ -1667,6 +1766,8 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                         ref={el => bindVideoEl(el, clip)}
                         crossOrigin="anonymous"
                         style={layerStyle}
+                        {...transProps}
+                        {...kfProps}
                         onMouseDown={(e) => handleClipPointerDown(e, clip)}
                         onTouchStart={(e) => handleClipPointerDown(e, clip)}
                         onContextMenu={(e) => e.preventDefault()}
@@ -1675,7 +1776,22 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                   }
                 })
               ) : (
-                <div className="no-clip-at-position">No clip at this position</div>
+                <div className="no-clip-at-position">{t('preview.noClipHere')}</div>
+              )}
+
+              {/* Auto captions, drawn as the render burns them in (utils/captions.js) */}
+              {captions && (
+                <div
+                  className="captions-canvas"
+                  style={{
+                    left: `calc((100cqw - ${CANVAS_W}) / 2)`,
+                    top: `calc((100cqh - ${CANVAS_H}) / 2)`,
+                    width: CANVAS_W,
+                    height: CANVAS_H
+                  }}
+                >
+                  <CaptionsOverlay captions={captions} time={playheadPosition} />
+                </div>
               )}
 
               {inlineRecording && recSize === 'stage' && (
@@ -1695,7 +1811,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                     movable: recorderGuide.mode === 'overlay',
                     mirror
                   }) : undefined}
-                  layoutChoices={onChangeRemixMode ? STAGE_LAYOUTS : null}
+                  layoutChoices={onChangeRemixMode ? stageLayouts : null}
                   onChangeLayout={onChangeRemixMode}
                 />
               )}
@@ -1703,7 +1819,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
           ) : (
             (emptyActions && !(tracks || []).some(t => t.clips.length))
               ? emptyActions
-              : <div className="no-video">No clips on timeline</div>
+              : <div className="no-video">{t('preview.noClips')}</div>
           )}
 
           {/* Audio track playback: <audio> (a video file's picture is never
@@ -1717,13 +1833,13 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
                 ref={el => {
                   // React clears the old ref (null) before it sets a new one for
                   // the same clip, so null always means this clip's element left
-                  if (el) { audioRefs.current[clip.id] = el; liveAudioElsRef.current.add(el) } else delete audioRefs.current[clip.id]
+                  if (el) { audioRefs.current[clip.id] = el; liveAudioElsRef.current.add(el); attachAudioSource(el, clip.url) } else delete audioRefs.current[clip.id]
                 }}
                 preload="auto"
                 crossOrigin={boosted ? 'anonymous' : undefined}
                 data-boost={boosted ? '1' : undefined}
                 data-clip-id={clip.id}
-                src={clip.url}
+                src={isHlsUrl(clip.url) ? undefined : clip.url}
               />
             )
           })}
@@ -1758,13 +1874,13 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       </div>
 
       {!ownPlayer && <div className="global-preview-controls">
-        <button onClick={handleReset} title="Reset">
+        <button onClick={handleReset} title={t('common.reset')}>
           <SkipBack size={14} />
         </button>
-        <button onClick={handlePlayPause} title={isPlaying ? 'Pause' : 'Play'}>
+        <button onClick={handlePlayPause} title={isPlaying ? t('common.pause') : t('common.play')}>
           {isPlaying ? <Pause size={14} /> : <Play size={14} />}
         </button>
-        <button className={loop ? 'loop-active' : ''} onClick={() => setLoop(v => !v)} title={loop ? 'Loop: On' : 'Loop: Off'}>
+        <button className={loop ? 'loop-active' : ''} onClick={() => setLoop(v => !v)} title={loop ? t('preview.loopOn') : t('preview.loopOff')}>
           <Repeat size={14} />
         </button>
         {onSetAspectRatio && (
@@ -1775,9 +1891,9 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
               const next = ASPECT_RATIOS[(idx + 1) % ASPECT_RATIOS.length]
               onSetAspectRatio(next)
             }}
-            title={`Aspect ratio: ${aspectRatioOverride === 'auto' ? `Auto (${activeAspectRatio})` : aspectRatioOverride}`}
+            title={aspectRatioOverride === 'auto' ? t('preview.aspect.titleAuto', { ratio: activeAspectRatio }) : t('preview.aspect.title', { ratio: aspectRatioOverride })}
           >
-            <span style={{ fontSize: '10px', fontWeight: 600, lineHeight: 1 }}>{RATIO_LABELS[aspectRatioOverride === 'auto' ? 'auto' : activeAspectRatio]}</span>
+            <span style={{ fontSize: '10px', fontWeight: 600, lineHeight: 1 }}>{aspectRatioOverride === 'auto' ? t('preview.aspect.auto') : RATIO_LABELS[activeAspectRatio]}</span>
           </button>
         )}
         <span className="time-display">
@@ -1788,11 +1904,11 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
             <button
               className={compactSize === 'half' ? 'active' : ''}
               onClick={() => setCompactSize(compactSize === 'half' ? 'full' : 'half')}
-              title={compactSize === 'half' ? 'Full size' : 'Half size'}
+              title={compactSize === 'half' ? t('preview.fullSize') : t('preview.halfSize')}
             >
               <Minimize2 size={14} />
             </button>
-            <button onClick={handleFullscreen} title="Fullscreen">
+            <button onClick={handleFullscreen} title={t('preview.fullscreen')}>
               <Maximize size={14} />
             </button>
           </div>
@@ -1806,7 +1922,7 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
           {topClip.name}
           {topClip.url && (
             <span className="source-indicator" style={{ marginLeft: 8, fontSize: '10px', opacity: 0.6 }}>
-              {isHlsUrl(topClip.url) ? '(HLS stream)' : topClip.serverUrl ? '(uploaded)' : topClip.url.startsWith('blob:') ? '(local)' : '(file)'}
+              {isHlsUrl(topClip.url) ? t('preview.source.hls') : topClip.serverUrl ? t('preview.source.uploaded') : topClip.url.startsWith('blob:') ? t('preview.source.local') : t('preview.source.file')}
             </span>
           )}
         </div>

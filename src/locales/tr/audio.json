@@ -1,0 +1,12 @@
+{
+  "cleaning": {
+    "voice_one": "{{count}} klipte ses temizleniyor…",
+    "voice_other": "{{count}} klipte ses temizleniyor…",
+    "voiceRecording_one": "{{count}} klipte ses temizleniyor · kayıt {{at}} / {{total}}",
+    "voiceRecording_other": "{{count}} klipte ses temizleniyor · kayıt {{at}} / {{total}}",
+    "back_one": "{{count}} klip eski hâline getiriliyor…",
+    "back_other": "{{count}} klip eski hâline getiriliyor…",
+    "backRecording_one": "{{count}} klip eski hâline getiriliyor · kayıt {{at}} / {{total}}",
+    "backRecording_other": "{{count}} klip eski hâline getiriliyor · kayıt {{at}} / {{total}}"
+  }
+}

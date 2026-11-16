@@ -1,0 +1,180 @@
+{
+  "aria": {
+    "timeline": "Dòng thời gian",
+    "ruler": "Thước thời gian: nhấp để di chuyển đầu phát",
+    "playhead": "Đầu phát",
+    "zoom": "Thu phóng"
+  },
+  "split": {
+    "title": "Tách clip tại đầu phát (Ctrl+R)",
+    "label": "Tách"
+  },
+  "toolbar": {
+    "add": {
+      "title": "Thêm rãnh hoặc clip",
+      "videoTrack": "Rãnh video",
+      "audioTrack": "Rãnh âm thanh",
+      "musicLibrary": "Thư viện nhạc",
+      "soundEffects": "Hiệu ứng âm thanh",
+      "stickers": "Nhãn dán",
+      "titles": "Tiêu đề",
+      "stock": "Kho phương tiện"
+    },
+    "zoomTitle": "Thu phóng: {{value}}px/giây",
+    "fit": {
+      "title": "Hiện toàn bộ dòng thời gian",
+      "label": "Vừa khung"
+    },
+    "select": {
+      "titleStart": "Chọn nhiều clip: chạm vào từng clip",
+      "titleDone": "Chọn xong",
+      "label": "Chọn"
+    },
+    "ripple": {
+      "titleTrack": "Khép khoảng trống tại đầu phát trên rãnh {{number}} (G). Các rãnh khác giữ nguyên.",
+      "titleNoGap": "Không có khoảng trống tại đầu phát trên rãnh của clip đã chọn",
+      "title": "Xóa khoảng trống tại đầu phát (G)",
+      "label": "Khép trống"
+    },
+    "captions": {
+      "title": "Phụ đề: biến lời nói thành phụ đề từng từ",
+      "label": "Phụ đề"
+    },
+    "transcript": {
+      "title": "Bản ghi lời: chỉnh sửa qua văn bản, xóa từ để cắt chúng",
+      "label": "Bản ghi lời"
+    },
+    "flag": {
+      "title": "Đặt cờ tại đầu phát (B): dấu mốc riêng của bạn, có số và màu, không bao giờ được xuất",
+      "label": "Cờ"
+    },
+    "autoCut": {
+      "title": "Tìm các chỗ ngừng và cắt ở đó",
+      "label": "Tự động cắt"
+    },
+    "beats": {
+      "title": "Tìm nhịp: bám vào nhịp, đặt clip theo nhịp",
+      "label": "Nhịp"
+    },
+    "delete": {
+      "title": "Xóa clip đã chọn (Del)",
+      "titleMany": "Xóa các clip đã chọn (Del)",
+      "labelMany": "Xóa {{number}}"
+    },
+    "options": "Tùy chọn",
+    "ungroup": {
+      "titleOne": "Bỏ nhóm: các clip của nó lại di chuyển và cắt gọt riêng",
+      "titleMany": "Bỏ nhóm: các clip này lại di chuyển và cắt gọt riêng",
+      "label": "Bỏ nhóm"
+    },
+    "group": {
+      "title": "Nhóm: các clip này di chuyển và cắt gọt cùng nhau",
+      "label": "Nhóm {{number}}"
+    },
+    "more": {
+      "title": "Thêm thao tác với clip",
+      "duplicate": "Nhân bản",
+      "groupVoicesTitle": "Nhóm với những gì phát cùng lúc trên các rãnh giọng nói khác: chúng được di chuyển, cắt gọt và cắt khoảng lặng cùng nhau",
+      "groupVoices": "Nhóm với các giọng khác",
+      "reverse": "Đảo ngược",
+      "unreverse": "Bỏ đảo ngược",
+      "snapOn": "Bám dính: bật",
+      "snapOff": "Bám dính: tắt"
+    }
+  },
+  "selectHint": {
+    "count_other": "Đã chọn {{count}} clip: chạm thêm, hoặc Xong",
+    "none": "Chạm vào từng clip bạn muốn chọn",
+    "clear": "Xóa"
+  },
+  "clip": {
+    "settings": "Cài đặt clip",
+    "textFallback": "Văn bản",
+    "layer": "Lớp {{number}}",
+    "kind": {
+      "video": "Clip video",
+      "audio": "Clip âm thanh",
+      "image": "Hình ảnh",
+      "text": "Văn bản",
+      "color": "Màu",
+      "other": "Clip"
+    },
+    "aria": {
+      "plain": "{{kind}}, {{from}} đến {{to}}",
+      "named": "{{kind}} {{name}}, {{from}} đến {{to}}",
+      "onTrack": "{{kind}} trên {{track}}, {{from}} đến {{to}}",
+      "namedOnTrack": "{{kind}} {{name}} trên {{track}}, {{from}} đến {{to}}"
+    }
+  },
+  "track": {
+    "show": "Hiện rãnh",
+    "hide": "Ẩn rãnh",
+    "mute": "Tắt tiếng rãnh",
+    "unmute": "Bật tiếng rãnh",
+    "remove": "Gỡ rãnh",
+    "addVisual": "Thêm video, hình ảnh hoặc văn bản",
+    "addAudio": "Thêm âm thanh",
+    "addFile": "Thêm tệp",
+    "addText": "Thêm văn bản",
+    "addColor": "Thêm màu",
+    "recordVideo": "Quay video",
+    "addAudioFile": "Thêm tệp âm thanh",
+    "recordAudio": "Ghi âm",
+    "resize": {
+      "aria": "Chiều cao của {{name}}",
+      "ariaUnnamed": "Chiều cao của rãnh này",
+      "title": "Kéo để làm rãnh cao hơn hoặc thấp hơn (nhấp đúp: về bình thường)"
+    },
+    "aria": {
+      "named": {
+        "video": "{{name}} (rãnh video)",
+        "audio": "{{name}} (rãnh âm thanh)",
+        "music": "{{name}} (rãnh nhạc)"
+      },
+      "numbered": {
+        "video": "Rãnh video {{number}}",
+        "audio": "Rãnh âm thanh {{number}}",
+        "music": "Rãnh nhạc {{number}}"
+      }
+    }
+  },
+  "trackName": {
+    "voice": "Giọng nói",
+    "voiceNumbered": "Giọng nói {{number}}",
+    "music": "Âm nhạc",
+    "musicNumbered": "Âm nhạc {{number}}",
+    "video": "Video",
+    "videoNumbered": "Video {{number}}",
+    "audioNumbered": "Âm thanh {{number}}",
+    "stickers": "Nhãn dán",
+    "stickersNumbered": "Nhãn dán {{number}}",
+    "sfx": "Hiệu ứng âm thanh",
+    "sfxNumbered": "Hiệu ứng âm thanh {{number}}"
+  },
+  "clipName": {
+    "text": "Lớp văn bản",
+    "color": "Màu",
+    "imported": "Phương tiện đã nhập",
+    "linkedAudio": "{{name}} (Âm thanh)"
+  },
+  "textClip": {
+    "defaultText": "Nhập văn bản tại đây"
+  },
+  "flag": {
+    "aria": "Cờ {{number}} tại {{time}}",
+    "title": "Cờ {{number}} · {{time}}: nhấp để nhảy đến đó, kéo để di chuyển, nhấp chuột phải để gỡ"
+  },
+  "range": {
+    "label": "{{from}} – {{to}} · {{seconds}} giây",
+    "startOnly": "{{time}} · nhấp vào chỗ kết thúc",
+    "dragStart": "Kéo để di chuyển điểm đầu",
+    "dragEnd": "Kéo để di chuyển điểm cuối"
+  },
+  "pastLimit": "Vượt quá giới hạn kết xuất",
+  "backgroundMusic": {
+    "title": "Nhạc nền",
+    "add": "Thêm nhạc nền",
+    "remove": "Gỡ nhạc"
+  },
+  "partName": "Phần {{n}} · {{name}}"
+}

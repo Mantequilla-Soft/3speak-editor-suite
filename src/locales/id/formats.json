@@ -1,0 +1,84 @@
+{
+  "aspect": {
+    "short": {
+      "label": "Short",
+      "hint": "Vertikal, hingga 2 menit, diposting sebagai Short"
+    },
+    "landscape": {
+      "label": "Lanskap",
+      "hint": "Video layar lebar, hingga 10 menit"
+    },
+    "classic": {
+      "label": "Klasik",
+      "hint": "Video 4:3, hingga 10 menit"
+    },
+    "square": {
+      "label": "Persegi",
+      "hint": "Video persegi, hingga 10 menit"
+    }
+  },
+  "chip": {
+    "title": "Bentuk proyek ini: {{shape}}. Klik untuk mengubahnya",
+    "aria": "Bentuk proyek: {{shape}}"
+  },
+  "picker": {
+    "title": "Apa yang kamu buat?",
+    "tooLong": "linimasamu {{length}}, pangkas menjadi {{limit}} untuk me-render",
+    "note": "Bentuk menentukan cara terbitnya di 3Speak: 9:16 sebagai Short, yang lain sebagai video biasa. Render sebagai juga me-render-nya dalam bentuk lain."
+  },
+  "preview": {
+    "heading": "Pratinjau dalam",
+    "yours": "{{aspect}} (milikmu)",
+    "projectIs": {
+      "short": "Proyekmu Short 9:16. Dalam bentuk lain, rekaman memenuhi bingkai, dipotong di sekitar wajah di dalamnya.",
+      "landscape": "Proyekmu Lanskap 16:9. Dalam bentuk lain, rekaman memenuhi bingkai, dipotong di sekitar wajah di dalamnya.",
+      "classic": "Proyekmu Klasik 4:3. Dalam bentuk lain, rekaman memenuhi bingkai, dipotong di sekitar wajah di dalamnya.",
+      "square": "Proyekmu Persegi 1:1. Dalam bentuk lain, rekaman memenuhi bingkai, dipotong di sekitar wajah di dalamnya."
+    }
+  },
+  "faces": {
+    "heading": "Ikuti wajah",
+    "noFootage": "Belum ada rekaman untuk dibingkai ulang. Klip yang dipindah atau di-zoom mempertahankan bingkainya sendiri.",
+    "hint": "Wajah dicari di browsermu, beberapa frame per detik. Tanpa wajah, bagian tengah tetap terlihat.",
+    "found": "Wajah ditemukan",
+    "noFace": "Tanpa wajah: tengah",
+    "middle": "Tengah",
+    "finding": "Mencari wajah",
+    "findOne": "Cari wajah",
+    "findMany_other": "Cari wajah di {{count}} klip",
+    "streamNamed": "{{name}} adalah stream: dipotong di sekitar bagian tengahnya.",
+    "streamUnnamed": "Sebuah klip adalah stream: dipotong di sekitar bagian tengahnya.",
+    "failed": "Pelacakan wajah tidak berfungsi di sini: {{error}}",
+    "moveWindow": "{{name}}: geser jendela",
+    "left": "Kiri",
+    "right": "Kanan",
+    "up": "Atas",
+    "down": "Bawah",
+    "moveX": "Geser jendela ke kiri atau kanan",
+    "moveY": "Geser jendela ke atas atau bawah",
+    "findAgain": "Cari wajah lagi",
+    "reset": "Tengah, tanpa geser"
+  },
+  "clipFallback": "Klip",
+  "stop": "Berhenti",
+  "render": {
+    "heading": "Render sebagai",
+    "shortsLimit": "Shorts maksimal {{limit}}: pangkas linimasa untuk me-render versi 9:16.",
+    "button_other": "Render {{count}} video",
+    "failed": "Render gagal: {{error}}",
+    "download": "Unduh",
+    "postShort": "Posting sebagai Short",
+    "postVideo": "Posting sebagai video"
+  },
+  "job": {
+    "waiting": "Menunggu...",
+    "preparing": "Menyiapkan file...",
+    "starting": "Memulai...",
+    "rendering": "Me-render...",
+    "done": "Selesai",
+    "stopped": "Dihentikan",
+    "busy": "Server render sedang sibuk. Mencoba lagi dalam {{seconds}} dtk...",
+    "offline": "Tidak ada koneksi ke server render. Mencoba lagi dalam {{seconds}} dtk...",
+    "failed": "Render gagal"
+  }
+}

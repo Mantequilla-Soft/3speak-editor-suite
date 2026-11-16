@@ -1,0 +1,22 @@
+{
+  "length": {
+    "title": "Linimasamu berdurasi {{length}}",
+    "body": "{{atMost}} Kamu tetap bisa mengedit semuanya, tetapi Render tetap nonaktif sampai linimasa berakhir di garis {{limitAt}} yang ditandai. Pangkas, bagi, atau hapus klip untuk mencapainya.",
+    "bodyAudio": "{{atMost}} Kamu tetap bisa mengedit semuanya, tetapi Ekspor tetap nonaktif sampai linimasa berakhir di garis {{limitAt}} yang ditandai. Pangkas, bagi, atau hapus klip untuk mencapainya."
+  },
+  "tooLarge": {
+    "title_other": "File ini terlalu besar",
+    "body": "Editor menerima file hingga {{size}}. Persingkat atau kompres video terlebih dahulu (ponsel atau aplikasi video apa pun bisa mengekspor salinan yang lebih kecil), lalu tambahkan lagi."
+  },
+  "encoding": {
+    "title": "Video ini perlu dikonversi dulu",
+    "videos_other": "{{count}} video",
+    "next": "Berikutnya",
+    "waiting_other": "Menunggu {{count}} video lain",
+    "starting": "Memulai…",
+    "upload": "Unggah",
+    "convert": "Konversi ke salinan yang bisa diputar",
+    "hint": "Browser ini tidak bisa memutar format video ini (HEVC atau HDR, umum dari ponsel), jadi tampil hitam sampai salinan yang bisa diputar siap. Pratinjau lalu beralih ke salinan itu dengan sendirinya. Sementara itu kamu tetap bisa mengedit.",
+    "hide": "Sembunyikan"
+  }
+}

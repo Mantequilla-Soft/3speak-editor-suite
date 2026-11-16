@@ -1,0 +1,55 @@
+{
+  "panel": {
+    "title": "스크립트",
+    "close": "스크립트 닫기"
+  },
+  "cutNotice": {
+    "plain": "잘라서 {{seconds}}초 짧아졌어요.",
+    "words_other": "{{count}}단어를 잘라서 {{seconds}}초 짧아졌어요.",
+    "found_other": "찾은 {{count}}개를 잘라서 {{seconds}}초 짧아졌어요.",
+    "fillers": "{{fillers}}, {{pauses}}를 잘라서 {{seconds}}초 짧아졌어요.",
+    "dismiss": "닫기"
+  },
+  "fillers": {
+    "title": "군말과 쉼 제거",
+    "emptyHint": "스크립트를 바탕으로 작동해요: 방송 언어의 음, 어, 그러니까 같은 말과 긴 쉼을 찾아요.",
+    "listening": "듣는 중...",
+    "transcribeFirst": "먼저 방송 받아쓰기",
+    "checking": "서버 확인 중...",
+    "unavailable": "지금은 이 편집기 서버에서 스크립트를 사용할 수 없어요.",
+    "intro": "{{language}} 군말. 하나씩 들어 보고, 남길 것은 체크를 해제하세요.",
+    "introNoList": "{{language}} 군말 (음, 어 같은 것만: 이 언어의 목록은 아직 없어요). 하나씩 들어 보고, 남길 것은 체크를 해제하세요.",
+    "stillTranscribing": "방송의 나머지는 아직 받아쓰는 중이에요.",
+    "fillerWords": "군말",
+    "longPauses": "긴 쉼",
+    "minPause": "<strong>{{seconds}}초</strong>보다 긴 쉼",
+    "keepPause": "쉼을 <strong>{{seconds}}초</strong>로 줄이기",
+    "keepPauseTitle": "자른 뒤 긴 쉼이 얼마나 남을지",
+    "fillerCount_other": "군말 {{count}}개",
+    "pauseCount_other": "쉼 {{count}}개",
+    "summary": "{{fillers}}, {{pauses}} 선택 · {{seconds}}초 자르기",
+    "nothingFound": "이 설정으로는 찾은 것이 없어요.",
+    "tickAllFillers": "군말 모두 선택",
+    "untickAllFillers": "군말 모두 선택 해제",
+    "tickAllPauses": "쉼 모두 선택",
+    "untickAllPauses": "쉼 모두 선택 해제",
+    "listLabel": "잘릴 항목",
+    "item": {
+      "keepPause": "이 쉼 남기기",
+      "cutPause": "이 쉼 자르기",
+      "keepFiller": "{{text}} 남기기",
+      "cutFiller": "{{text}} 자르기",
+      "stop": "중지",
+      "listenTitle": "듣기 (앞뒤 1초 포함)",
+      "listenAt": "{{time}}에서 듣기",
+      "pause": "쉼",
+      "pauseLength": "{{length}}초 → {{kept}}초",
+      "filler": "군말",
+      "fillerTitle": "머뭇거리는 소리",
+      "maybe": "아마도",
+      "maybeTitle": "여기 군말이 있어요 (쉼이나 쉼표로 구분됨): 먼저 들어 보세요"
+    },
+    "cut": "자르기",
+    "cutCount": "{{n}}개 자르기 ({{seconds}}초)"
+  }
+}

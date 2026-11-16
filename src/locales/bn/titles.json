@@ -1,0 +1,111 @@
+{
+  "textFx": {
+    "title": "লেখার ইফেক্ট",
+    "outline": "আউটলাইন",
+    "outlineColour": "আউটলাইনের রং",
+    "outlineWidth": "আউটলাইনের পুরুত্ব",
+    "wordsComeIn": "শব্দ যেভাবে আসে",
+    "allAtOnce": "সব একসাথে",
+    "atOnce": "একসাথে",
+    "anims": {
+      "pop": "পপ",
+      "fadeUp": "উপরে ফেড",
+      "typewriter": "টাইপরাইটার",
+      "slide": "স্লাইড"
+    },
+    "gap": "ফাঁক",
+    "gapSeconds": "শব্দের মাঝে সময় (সেকেন্ড)",
+    "defaultText": "লেখা"
+  },
+  "templates": {
+    "dialogTitle": "শিরোনাম",
+    "allTitles": "সব শিরোনাম",
+    "overVideo": "ভিডিওর উপরে",
+    "ownBackground": "নিজস্ব ব্যাকগ্রাউন্ড",
+    "starsHint": "কোনো শব্দ রঙিন করতে তার চারপাশে *তারা* দিন।",
+    "addTitle": "শিরোনাম যোগ করুন",
+    "groups": {
+      "lower": "লোয়ার থার্ড",
+      "title": "ভিডিওর উপরে শিরোনাম",
+      "card": "ইন্ট্রো ও আউট্রো কার্ড"
+    },
+    "fields": {
+      "name": "নাম",
+      "role": "ভূমিকা",
+      "lines": "লাইন",
+      "words": "শব্দ",
+      "lineUnder": "এগুলোর নিচের লাইন",
+      "lineInFront": "সামনের লাইন",
+      "rows": "সারি",
+      "headline": "শিরোনাম",
+      "lineUnderIt": "এর নিচের লাইন",
+      "tagline": "ট্যাগলাইন",
+      "cta": "কল টু অ্যাকশন",
+      "smallPrint": "ছোট হরফের লেখা"
+    },
+    "items": {
+      "lowerName": {
+        "label": "নাম ও ভূমিকা",
+        "sub": "3Speak-এর ক্রিয়েটর"
+      },
+      "lowerStatement": {
+        "label": "ছোট বক্তব্য",
+        "lines": "আজ আমি যে তিনটি\nজিনিস *শিখলাম*"
+      },
+      "titleWords": {
+        "label": "একবারে একটি শব্দ",
+        "words": "পরিকল্পনা।\nশুটিং।\n*পোস্ট।*",
+        "line": "3Speak-এ আমার সপ্তাহ"
+      },
+      "titleKinetic": {
+        "label": "শব্দ জোরে আসে",
+        "words": "দ্রুত\nসহজ\nআপনার",
+        "line": "*3Speak*-এ তৈরি"
+      },
+      "titlePoster": {
+        "label": "একটার উপর একটা বিশাল শব্দ",
+        "words": "প্রথম\nদিন।",
+        "sub": "শূন্য থেকে শুরু"
+      },
+      "titleMarquee": {
+        "label": "চলমান সারি",
+        "rows": "পরিকল্পনা\nশুটিং\nপোস্ট\nআবার",
+        "line": "প্রতি *সপ্তাহে*"
+      },
+      "cardHook": {
+        "label": "ইন্ট্রো: শুরুর লাইন",
+        "lines": "আমি কীভাবে\nআমার *শর্টস*\nএডিট করি",
+        "sub": "এক মিনিটেরও কমে"
+      },
+      "cardEnd": {
+        "label": "আউট্রো: আমাকে ফলো করুন",
+        "tagline": "*প্রতি সপ্তাহে* নতুন শর্টস",
+        "cta": "3Speak-এ ফলো করুন"
+      },
+      "cardPoster": {
+        "label": "আউট্রো: বিশাল শব্দ",
+        "words": "আবার\nদেখা\n*হবে।*",
+        "cta": "3Speak-এ ফলো করুন"
+      }
+    }
+  },
+  "scene": {
+    "title": "শিরোনাম",
+    "onePerLine": "প্রতি লাইনে একটি",
+    "colours": "রং",
+    "font": "ফন্ট",
+    "overVideo": "ভিডিওর উপরে",
+    "length": "দৈর্ঘ্য",
+    "lengthSeconds": "দৈর্ঘ্য (সেকেন্ড)",
+    "defaultName": "আমি",
+    "layerTitle": "শিরোনাম"
+  },
+  "colors": {
+    "ember": "অঙ্গার",
+    "amber": "অ্যাম্বার",
+    "ocean": "সমুদ্র",
+    "forest": "বন",
+    "berry": "বেরি",
+    "paper": "কাগজ"
+  }
+}

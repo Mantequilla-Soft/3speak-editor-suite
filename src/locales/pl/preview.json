@@ -1,0 +1,29 @@
+{
+  "header": "Podgląd osi czasu",
+  "smaller": "Mniejszy",
+  "larger": "Większy",
+  "loopOn": "Pętla: wł.",
+  "loopOff": "Pętla: wył.",
+  "aspect": {
+    "title": "Proporcje: {{ratio}}",
+    "titleAuto": "Proporcje: auto ({{ratio}})",
+    "auto": "Auto"
+  },
+  "fullSize": "Pełny rozmiar",
+  "halfSize": "Połowa rozmiaru",
+  "fullscreen": "Pełny ekran",
+  "noClipHere": "Brak klipu w tym miejscu",
+  "noClips": "Brak klipów na osi czasu",
+  "source": {
+    "hls": "(strumień HLS)",
+    "uploaded": "(przesłany)",
+    "local": "(lokalny)",
+    "file": "(plik)"
+  },
+  "stageLayout": {
+    "tileTop": "Kafelek nad",
+    "tileBottom": "Kafelek pod",
+    "overlay": "Nakładka"
+  },
+  "selectClip": "Wybierz klip do podglądu"
+}

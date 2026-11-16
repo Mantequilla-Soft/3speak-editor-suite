@@ -1,49 +1,58 @@
-import { memo } from 'react'
-import { colorParams, saturateMatrix } from '../utils/clipColor'
+import { memo, createElement } from 'react'
+import { gradeParams, fxParams, svgGradePrimitives, svgFxPrimitives } from '../utils/clipLook'
+import { hasLayout } from '../utils/remixLayout'
 
 export const clipColorFilterId = (clipId) => `clipfx-${clipId}`
 
-// CSS / canvas filter value for a clip's colour, or undefined when unchanged
+// The clip changes colour (sliders, a look's split tone) or has effects
+const hasLook = (clip) => !!(gradeParams(clip.color, clip.look) || fxParams(clip.look))
+
+// CSS / canvas filter value for a clip's colour and look, or undefined when unchanged
 export const clipColorFilter = (clip) =>
-  clip && (clip.type === 'video' || clip.type === 'image') && colorParams(clip.color)
+  clip && (clip.type === 'video' || clip.type === 'image') && hasLook(clip)
     ? `url(#${clipColorFilterId(clip.id)})`
     : undefined
+
+// SVG attribute names in React's spelling (kernelMatrix etc. are already camelCase)
+const REACT_ATTR = { in: 'in', in2: 'in2', 'stop-color': 'stopColor' }
+const toReact = ({ tag, attrs, children }, key) => createElement(
+  tag,
+  { key, ...Object.fromEntries(Object.entries(attrs).map(([k, v]) => [REACT_ATTR[k] || k, v])) },
+  ...(children || []).map((c, i) => toReact(c, i))
+)
+
+/** One <filter> for a colour grade and look (also used by the look thumbnails). */
+export function LookFilter({ id, color, look, aspect }) {
+  const prims = [...svgGradePrimitives(color, look), ...svgFxPrimitives(look, aspect)]
+  return (
+    <filter id={id} colorInterpolationFilters="sRGB" x="0" y="0" width="1" height="1" primitiveUnits="objectBoundingBox">
+      {prims.map((p, i) => toReact(p, i))}
+    </filter>
+  )
+}
 
 /**
  * One SVG <filter> per colour-adjusted clip, referenced by the preview
  * (CSS filter: url(#…)) and the browser export (ctx.filter = 'url(#…)').
- * Same maths as the backend render, see utils/clipColor.js.
+ * Same maths as the backend render, see utils/clipColor.js and utils/clipLook.js.
+ * frame: the output size; the effects are drawn relative to the element the
+ * filter is on (the canvas, or a remix layout box).
  */
-function ClipColorFilters({ tracks }) {
+function ClipColorFilters({ tracks, frame = { width: 1080, height: 1920 } }) {
   const clips = (tracks || []).flatMap(t => t.clips).filter(c => clipColorFilter(c))
+  const canvasAspect = frame.width / frame.height
   return (
     <svg width="0" height="0" style={{ position: 'absolute', width: 0, height: 0 }} aria-hidden="true" focusable="false">
       <defs>
-        {clips.map(clip => {
-          const p = colorParams(clip.color)
-          const func = (ch) => ({
-            type: 'gamma',
-            amplitude: p.channels[ch].A,
-            exponent: p.gamma,
-            offset: p.channels[ch].O
-          })
-          const m = saturateMatrix(p.saturation)
-          return (
-            <filter key={clip.id} id={clipColorFilterId(clip.id)} colorInterpolationFilters="sRGB" x="0" y="0" width="100%" height="100%">
-              <feComponentTransfer>
-                <feFuncR {...func('r')} />
-                <feFuncG {...func('g')} />
-                <feFuncB {...func('b')} />
-              </feComponentTransfer>
-              {p.saturation !== 1 && (
-                <feColorMatrix
-                  type="matrix"
-                  values={`${m[0]} ${m[1]} ${m[2]} 0 0  ${m[3]} ${m[4]} ${m[5]} 0 0  ${m[6]} ${m[7]} ${m[8]} 0 0  0 0 0 1 0`}
-                />
-              )}
-            </filter>
-          )
-        })}
+        {clips.map(clip => (
+          <LookFilter
+            key={clip.id}
+            id={clipColorFilterId(clip.id)}
+            color={clip.color}
+            look={clip.look}
+            aspect={hasLayout(clip) ? canvasAspect * (clip.layout.w / clip.layout.h) : canvasAspect}
+          />
+        ))}
       </defs>
     </svg>
   )

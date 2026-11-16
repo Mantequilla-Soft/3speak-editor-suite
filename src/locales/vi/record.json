@@ -1,0 +1,109 @@
+{
+  "media": {
+    "blocked": {
+      "camera": "Camera hoặc micrô đang bị chặn cho trang này. Hãy cho phép bằng biểu tượng trên thanh địa chỉ rồi thử lại. Nếu bạn chưa từng từ chối, có thể cài đặt quyền riêng tư của máy tính đang chặn trình duyệt.",
+      "microphone": "Micrô đang bị chặn cho trang này. Hãy cho phép bằng biểu tượng trên thanh địa chỉ rồi thử lại. Nếu bạn chưa từng từ chối, có thể cài đặt quyền riêng tư của máy tính đang chặn trình duyệt."
+    },
+    "notAllowed": {
+      "camera": "Trang này không được phép dùng camera hoặc micrô. Hãy tải lại 3Speak rồi thử lại.",
+      "microphone": "Trang này không được phép dùng micrô. Hãy tải lại 3Speak rồi thử lại."
+    },
+    "busy": {
+      "camera": "Camera hoặc micrô của bạn đang bận trong ứng dụng hoặc tab khác (cuộc gọi video, trình ghi khác). Hãy đóng nó ở đó rồi thử lại.",
+      "microphone": "Micrô của bạn đang bận trong ứng dụng hoặc tab khác (cuộc gọi video, trình ghi khác). Hãy đóng nó ở đó rồi thử lại."
+    },
+    "notFound": {
+      "camera": "Không tìm thấy camera hoặc micrô. Hãy kết nối thiết bị rồi thử lại.",
+      "microphone": "Không tìm thấy micrô. Hãy kết nối thiết bị rồi thử lại."
+    },
+    "noDevices": {
+      "camera": "Trình duyệt này không thể dùng camera hoặc micrô ở đây.",
+      "microphone": "Trình duyệt này không thể dùng micrô ở đây."
+    },
+    "failed": {
+      "camera": "Không khởi động được camera hoặc micrô. Hãy thử lại.",
+      "microphone": "Không khởi động được micrô. Hãy thử lại."
+    },
+    "failedNamed": {
+      "camera": "Không khởi động được camera hoặc micrô ({{name}}). Hãy thử lại.",
+      "microphone": "Không khởi động được micrô ({{name}}). Hãy thử lại."
+    }
+  },
+  "inline": {
+    "camera": "Camera",
+    "expand": "Mở rộng",
+    "shrink": "Thu nhỏ",
+    "uploading": "Đang tải lên...",
+    "uploadingPct": "Đang tải lên... {{pct}}%",
+    "converting": "Đang chuyển đổi...",
+    "rec": "ĐANG QUAY",
+    "starting": "Đang bắt đầu...",
+    "plateStepOut": "Hãy bước ra khỏi khung hình",
+    "plateShooting": "Đang chụp phông nền, đừng vào khung hình...",
+    "gestures": "Giữ và kéo một hình để đổi khung, chụm hai ngón để thu phóng.",
+    "gesturesOverlay": "Giữ và kéo một hình để đổi khung, chụm hai ngón để thu phóng, kéo khung camera của bạn để di chuyển nó.",
+    "greenScreen": {
+      "label": "Phông xanh",
+      "off": "Tắt",
+      "green": "Xanh lá",
+      "blue": "Xanh dương",
+      "person": "Người",
+      "static": "Tĩnh",
+      "staticTitle": "Phông nền tĩnh (thử nghiệm): xóa mọi thứ khớp với ảnh chụp phông nền trống",
+      "personTitle": "Không cần phông xanh: tìm bạn trong khung hình",
+      "threshold": "Ngưỡng",
+      "thresholdStaticTitle": "Dung sai: cao hơn thì bỏ qua nhiều thay đổi của phông nền hơn (nhiễu, ánh sáng, lấy nét) nhưng có thể bắt đầu xóa cả một phần của bạn",
+      "thresholdTitle": "Cao hơn thì xóa nhiều màu phông hơn",
+      "despill": "Khử loang màu",
+      "despillStaticTitle": "Xóa màu tường khỏi các cạnh",
+      "despillGreenTitle": "Xóa ánh xanh lá khỏi các cạnh",
+      "despillBlueTitle": "Xóa ánh xanh dương khỏi các cạnh",
+      "retakePlate": "Chụp lại phông nền trống",
+      "shootPlate": "Chụp phông nền trống",
+      "plateKeep": "Thử nghiệm. Giữ camera và ánh sáng y nguyên như hiện tại.",
+      "plateHowTo": "Thử nghiệm. Cố định camera, nhấn nút và bước ra khỏi khung hình.",
+      "keyFailed": "Không thể tách nền trực tiếp ở đây. Clip vẫn nhận cài đặt phông xanh.",
+      "personHowTo": "Không cần phông xanh: trình chỉnh sửa tìm bạn trong khung hình. Cảnh quay được ghi nguyên trạng và tách nền trên dòng thời gian, nơi bạn chọn thứ gì đặt phía sau mình."
+    },
+    "tpEdit": "Sửa nội dung máy nhắc chữ",
+    "tpAdd": "Thêm nội dung máy nhắc chữ",
+    "teleprompter": "Máy nhắc chữ",
+    "recordOnly": "Chỉ quay",
+    "recordAndPlay": "Quay + Phát video",
+    "plusPlay": "+ Phát",
+    "recordReactionTitle": "Quay trong lúc bản gốc phát",
+    "recordReaction": "Quay phản ứng",
+    "record": "Quay",
+    "stop": "Dừng",
+    "retake": "Quay lại",
+    "useClip": "Dùng clip"
+  },
+  "video": {
+    "title": "Quay video",
+    "startingCamera": "Đang bật camera...",
+    "start": "Bắt đầu quay",
+    "stop": "Dừng",
+    "retake": "Quay lại",
+    "useClip": "Dùng clip"
+  },
+  "audio": {
+    "title": "Ghi âm",
+    "cannotRecord": "Trình duyệt này không thể ghi âm ở đây.",
+    "addFailed": "Không thêm được bản ghi. Vui lòng thử lại.",
+    "yourRecording": "Bản ghi của bạn",
+    "micLevel": "Mức micrô",
+    "accessingMic": "Đang truy cập micrô...",
+    "ready": "Sẵn sàng ghi: hãy nói để kiểm tra mức âm",
+    "preparing": "Đang chuẩn bị bản ghi của bạn...",
+    "adding": "Đang thêm vào các rãnh của bạn...",
+    "tpEdit": "Sửa nội dung máy nhắc chữ",
+    "tpAdd": "Thêm nội dung máy nhắc chữ",
+    "teleprompter": "Máy nhắc chữ",
+    "start": "Bắt đầu ghi âm",
+    "stop": "Dừng",
+    "retake": "Ghi lại",
+    "addingShort": "Đang thêm...",
+    "useRecording": "Dùng bản ghi",
+    "useScript": "Dùng kịch bản này"
+  }
+}

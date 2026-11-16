@@ -1,0 +1,53 @@
+{
+  "title": "素材库",
+  "titleBackground": "选择背景",
+  "search": "搜索视频、照片和 GIF",
+  "searchProvider": "搜索 {{provider}}",
+  "searchProviderTitle": "搜索 {{provider}}（可免费使用，选中后会复制到我们的服务器）",
+  "kind": "类型",
+  "category": "类别",
+  "everything": "全部内容",
+  "types": {
+    "all": "全部",
+    "video": "视频",
+    "image": "照片",
+    "gif": "GIF"
+  },
+  "categories": {
+    "nature": "自然",
+    "city": "城市",
+    "people": "人物",
+    "animals": "动物",
+    "food": "美食",
+    "tech": "科技",
+    "sports": "体育",
+    "space": "太空",
+    "abstract": "抽象",
+    "backgrounds": "背景"
+  },
+  "loading": "正在加载素材库...",
+  "typeToSearch": "输入你要找的内容，在 {{provider}} 中搜索。",
+  "nothingFound": "未找到结果。",
+  "searching": "搜索中...",
+  "loadFailed": "无法加载素材库。",
+  "nothingMatches": "没有匹配项。",
+  "adding": "正在添加...",
+  "byAuthor": "{{title}}（{{author}}）",
+  "licenceOnline": "来自 {{provider}}：可免费使用，包括商业用途，无需署名。选中后文件会复制到 3Speak 的服务器。",
+  "licence": "可免费使用，包括商业用途，无需署名（来自 Wikimedia Commons 的 CC0 / 公共领域作品）。",
+  "placeBackground": "它会放在你身后的单独轨道上，时长与你的片段相同。",
+  "placeAdd": "它会添加在播放头处：时间线为空时作为你的视频，否则作为辅助画面叠加在上面。",
+  "errors": {
+    "notCopied": "无法复制该文件。",
+    "notAdded": "无法添加该文件。",
+    "tooMany": "搜索太频繁，请稍等片刻。",
+    "searchFailed": "搜索失败，请再试一次。",
+    "copyFailed": "无法将该文件复制到服务器。"
+  },
+  "trackName": {
+    "background": "背景",
+    "backgroundNumbered": "背景 {{number}}",
+    "broll": "辅助画面",
+    "brollNumbered": "辅助画面 {{number}}"
+  }
+}

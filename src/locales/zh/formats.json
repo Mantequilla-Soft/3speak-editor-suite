@@ -1,0 +1,84 @@
+{
+  "aspect": {
+    "short": {
+      "label": "短视频",
+      "hint": "竖屏，最长 2 分钟，作为短视频发布"
+    },
+    "landscape": {
+      "label": "横屏",
+      "hint": "宽屏视频，最长 10 分钟"
+    },
+    "classic": {
+      "label": "经典",
+      "hint": "4:3 视频，最长 10 分钟"
+    },
+    "square": {
+      "label": "方形",
+      "hint": "方形视频，最长 10 分钟"
+    }
+  },
+  "chip": {
+    "title": "此项目的画面比例：{{shape}}。点击即可更改",
+    "aria": "项目画面比例：{{shape}}"
+  },
+  "picker": {
+    "title": "你要制作什么？",
+    "tooLong": "你的时间线长度为 {{length}}，需修剪到 {{limit}} 才能渲染",
+    "note": "画面比例决定发布到 3Speak 的方式：9:16 作为短视频，其他比例作为普通视频。“导出为”还可以按其他比例渲染。"
+  },
+  "preview": {
+    "heading": "预览比例",
+    "yours": "{{aspect}}（你的）",
+    "projectIs": {
+      "short": "你的项目是短视频 9:16。换成其他比例时，画面会填满画框，并围绕人脸裁剪。",
+      "landscape": "你的项目是横屏 16:9。换成其他比例时，画面会填满画框，并围绕人脸裁剪。",
+      "classic": "你的项目是经典 4:3。换成其他比例时，画面会填满画框，并围绕人脸裁剪。",
+      "square": "你的项目是方形 1:1。换成其他比例时，画面会填满画框，并围绕人脸裁剪。"
+    }
+  },
+  "faces": {
+    "heading": "跟随人脸",
+    "noFootage": "还没有可重新构图的画面。移动或缩放过的片段会保留自己的构图。",
+    "hint": "人脸识别在你的浏览器中进行，每秒处理几帧。没有人脸时保持画面中间。",
+    "found": "已找到人脸",
+    "noFace": "无人脸：居中",
+    "middle": "居中",
+    "finding": "正在寻找人脸",
+    "findOne": "寻找人脸",
+    "findMany_other": "在 {{count}} 个片段中寻找人脸",
+    "streamNamed": "{{name}} 是直播流：将围绕其中间裁剪。",
+    "streamUnnamed": "有一个片段是直播流：将围绕其中间裁剪。",
+    "failed": "人脸跟踪在这里无法使用：{{error}}",
+    "moveWindow": "{{name}}：移动画框",
+    "left": "向左",
+    "right": "向右",
+    "up": "向上",
+    "down": "向下",
+    "moveX": "左右移动画框",
+    "moveY": "上下移动画框",
+    "findAgain": "重新寻找人脸",
+    "reset": "居中，不偏移"
+  },
+  "clipFallback": "片段",
+  "stop": "停止",
+  "render": {
+    "heading": "渲染为",
+    "shortsLimit": "短视频最长 {{limit}}：请修剪时间线以渲染 9:16 版本。",
+    "button_other": "渲染 {{count}} 个视频",
+    "failed": "渲染失败：{{error}}",
+    "download": "下载",
+    "postShort": "作为短视频发布",
+    "postVideo": "作为视频发布"
+  },
+  "job": {
+    "waiting": "等待中...",
+    "preparing": "正在准备文件...",
+    "starting": "正在开始...",
+    "rendering": "渲染中...",
+    "done": "完成",
+    "stopped": "已停止",
+    "busy": "渲染服务器繁忙。{{seconds}} 秒后重试...",
+    "offline": "未连接到渲染服务器。{{seconds}} 秒后重试...",
+    "failed": "渲染失败"
+  }
+}

@@ -1,0 +1,116 @@
+/* Titles dialog (TitleTemplates.jsx) and the title clip's colour chips */
+.remix-picker.title-templates {
+  max-width: 640px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+
+.title-group + .title-group {
+  margin-top: var(--sp-7);
+}
+
+.title-group h4 {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-10);
+  font-weight: var(--fw-black);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eyebrow);
+}
+
+.title-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--sp-3);
+}
+
+.title-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: var(--sp-5);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--r-lg);
+  color: var(--text);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.title-card:hover,
+.title-card:focus-visible {
+  border-color: var(--accent);
+  background: var(--accent-tint-strong);
+  outline: none;
+}
+
+.title-card-name {
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
+}
+
+.title-card-sub {
+  font-size: var(--fs-12);
+  color: var(--muted);
+}
+
+.title-editor {
+  display: flex;
+  gap: var(--sp-7);
+  align-items: flex-start;
+}
+
+/* the title at 9:16, over a plain surface when it goes over the video */
+.title-stage {
+  position: relative;
+  flex: 0 0 180px;
+  aspect-ratio: 9 / 16;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.title-fields {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.title-templates .silence-cut-actions {
+  margin-top: var(--sp-7);
+}
+
+.scene-colors {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.scene-colors-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  box-sizing: border-box;
+}
+
+@media (max-width: 767px) {
+  .remix-picker.title-templates {
+    max-height: 90vh;
+  }
+
+  .title-editor {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .title-stage {
+    flex: none;
+    width: 140px;
+    align-self: center;
+  }
+}

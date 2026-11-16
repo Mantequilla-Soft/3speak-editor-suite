@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "line": "{{clips}} · {{length}} · {{edited}}",
+    "audioLine": "Audio · {{clips}} · {{length}} · {{edited}}",
+    "clips_other": "{{count}} klip",
+    "edited": {
+      "justNow": "diedit baru saja",
+      "minutes_other": "diedit {{count}} mnt lalu",
+      "hours_other": "diedit {{count}} jam lalu",
+      "days_other": "diedit {{count}} hari lalu"
+    }
+  },
+  "prompt": {
+    "titleOne": "Lanjutkan drafmu?",
+    "titleMany": "Lanjutkan draf?",
+    "keptUntil": "Disimpan sampai {{date}}",
+    "open": "Buka",
+    "startNew": "Mulai proyek baru",
+    "singleNote": "Kamu bisa menyimpan satu draf. Memulai proyek baru akan menggantikan draf ini begitu kamu mengedit. 3Speak Pro menyimpan 3 draf selama 30 hari."
+  },
+  "limit": {
+    "titleOne": "Ganti draf yang tersimpan?",
+    "titleMany": "Kamu sudah punya {{n}} proyek tersimpan",
+    "skipTitle": "Jangan simpan proyek ini",
+    "noteOne": "Kamu bisa menyimpan satu draf. Menyimpan proyek ini akan menggantikan draf di bawah.",
+    "noteMany": "Kamu bisa menyimpan hingga {{n}}. Pilih satu yang akan digantikan proyek ini:",
+    "replace": "Ganti",
+    "skip": "Jangan simpan proyek ini"
+  },
+  "close": {
+    "saveTitle": "Simpan proyekmu?",
+    "closeTitle": "Tutup editor?",
+    "keepEditing": "Lanjut mengedit",
+    "signInFailed": "Tidak berhasil. Setujui permintaan masuk di dompetmu lalu coba lagi, atau keluar dari 3Speak lalu masuk lagi.",
+    "signInToKeep": "Masuk sekali untuk menyimpan proyek ini sebagai draf, agar bisa kamu lanjutkan nanti.",
+    "signedOutLost": "Editanmu akan hilang. Masuk ke 3Speak untuk menyimpan draf proyekmu.",
+    "lost": "Editanmu akan hilang.",
+    "signingIn": "Sedang masuk…",
+    "signInToSave": "Masuk untuk menyimpan",
+    "withoutSaving": "Tutup tanpa menyimpan",
+    "keepTitle": "Simpan proyek ini?",
+    "keepDays_other": "Kami menyimpannya selama {{count}} hari",
+    "keepHours_other": "Kami menyimpannya selama {{count}} jam",
+    "until": "sampai {{date}}",
+    "uploadingOne": "{{name}} masih diunggah ({{percent}}). Kamu bisa menyimpan setelah selesai.",
+    "uploadingFiles_other": "{{count}} file masih diunggah ({{percent}}). Kamu bisa menyimpan setelah selesai.",
+    "name": "Nama proyek",
+    "namePlaceholder": "Proyek tanpa judul",
+    "saveError": "Tidak dapat menyimpan. Periksa koneksimu lalu coba lagi.",
+    "saveAndClose": "Simpan dan tutup",
+    "afterUpload": "Tersedia setelah unggahan selesai",
+    "deleteAndClose": "Hapus dan tutup"
+  },
+  "pro": {
+    "title": "Lebih banyak dengan 3Speak Pro",
+    "text": "Simpan hingga 3 proyek masing-masing selama 30 hari, bukan 1 selama 7 hari.",
+    "get": "Dapatkan Pro"
+  },
+  "status": {
+    "signingIn": "Sedang masuk… periksa dompetmu",
+    "signInTitle": "Masuk sekali untuk menyimpan proyekmu sebagai draf",
+    "signInFailed": "Gagal masuk · coba lagi",
+    "saveDrafts": "Simpan draf",
+    "notSavedTitle": "Proyek ini belum disimpan",
+    "chooseSlot": "Belum disimpan: pilih slot",
+    "saving": "Menyimpan…",
+    "notSaved": "Draf tidak tersimpan",
+    "keptUntil": "Draf disimpan sampai {{date}}",
+    "savedUntil": "Draf tersimpan · sampai {{date}}"
+  },
+  "library": {
+    "title": "Pustaka proyek",
+    "addFiles": "Tambah file",
+    "groups": {
+      "videos": "Video",
+      "images": "Gambar",
+      "sounds": "Suara"
+    },
+    "empty": {
+      "videos": "Tidak ada video",
+      "images": "Tidak ada gambar",
+      "sounds": "Tidak ada suara"
+    },
+    "dropToAdd": "Lepaskan file untuk menambahkan",
+    "hint": "Lepaskan file di sini atau seret item ke linimasa",
+    "downloading": "Mengunduh... {{percent}}",
+    "downloaded": "Diunduh ke perangkat",
+    "local": "lokal",
+    "uploadingTitle": "Mengunggah di latar belakang. Render menunggu sampai selesai.",
+    "converting": "mengonversi",
+    "convertingTitle": "Browser ini tidak bisa menampilkan format video ini. Pratinjau beralih ke salinan 480p begitu siap.",
+    "noPreview": "tanpa pratinjau",
+    "noPreviewTitle": "Salinan yang bisa diputar tidak dapat dibuat. Pratinjau mungkin tetap hitam, render tetap berfungsi.",
+    "encodedTitle": "Di-encode ke 480p di server",
+    "encoding": "Meng-encode...",
+    "addToTimeline": "Tambahkan ke linimasa",
+    "remove": "Hapus dari pustaka"
+  }
+}

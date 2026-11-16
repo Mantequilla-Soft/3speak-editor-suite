@@ -3,14 +3,26 @@ import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch, currentToken } from '../utils/editorAuth'
 import { hasLayout } from '../utils/remixLayout'
 import { getClipChromaKey } from '../utils/chromaKey'
+import { uploadPersonMasks, personKeyPayload } from '../utils/personRender'
 import { normalizeColor } from '../utils/clipColor'
 import { normalizeMotion } from '../utils/stickerMotion'
+import { renderExtras } from '../utils/renderExtras'
+import { measureWordLayout } from '../utils/textMeasure'
+import { motionFields } from '../utils/motionEdits'
 import { duckPlans, localDuckPlan } from '../utils/duck'
+import { outputSize } from '../utils/outputSize'
+import { normalizeCaptions } from '../utils/captions'
+import { emojiUrlsOf } from '../utils/captionSources'
+import { loadCreditOf, isMusicLoad } from '../utils/loadCredit'
+import { reframeForRender, exportSizes } from '../utils/exportAs'
+import { submitRender, pollRender, statusPhase } from '../utils/renderQueue'
+import { t } from '../i18n'
 
 const isIframe = typeof window !== 'undefined' && window.parent !== window
 const GATEWAY_URL = (import.meta.env.VITE_GATEWAY_URL || '').replace(/\/+$/, '')
 
-export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay, audioMode = false, master = null, title = null, chapters = null }) {
+export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay, audioMode = false, master = null, title = null, chapters = null, captions = null }) {
+  const allTracks = tracks
   const parentOriginRef = useRef('*')
   const [renderStatus, setRenderStatus] = useState(null)
   const [theme, setTheme] = useState('dark')
@@ -18,7 +30,7 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     // Default: use own viewport when not in iframe, false in iframe until parent tells us
     return !isIframe && typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches
   })
-  const pollIntervalRef = useRef(null)
+  const pollAbortRef = useRef(null) // stops the submit retries / status polls of the render
   const uploadedPlatesRef = useRef(new Map()) // local clean-plate URL -> server URL
   const activeJobRef = useRef(null) // { jobId, backendEndpoint }
   const remixSourceRef = useRef(null) // { parentAuthor, parentPermlink } when remixing a short
@@ -27,6 +39,9 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
   const [remixPrompt, setRemixPrompt] = useState(null)
   const onTogglePlayRef = useRef(onTogglePlay)
   onTogglePlayRef.current = onTogglePlay
+  // The captions' "Show in the video" (on unless switched off), for the poll below
+  const captionsBurnRef = useRef(true)
+  captionsBurnRef.current = !!captions && captions.burn !== false
 
   // Compact mode: default to true in iframe, controllable via URL param or postMessage
   // ?compact=true forces it on even outside iframe; ?compact=false disables it in iframe
@@ -90,6 +105,12 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
           // with its own blob URL and the File kept for the render upload.
           const file = data.file instanceof Blob ? data.file : null
           const url = file ? URL.createObjectURL(file) : data.url
+          // "Use this sound" on 3Speak: the sound goes on the music track with
+          // its credit, which goes back with the post while the clip is used
+          if (addMusicClip && isMusicLoad(data, file)) {
+            await addMusicClip(url, String(name || 'Sound').slice(0, 200), loadCreditOf(data.credit))
+            break
+          }
           if (url && mediaType) {
             // Track remix source so rendered output posts as a comment under the original short
             if (parentAuthor && parentPermlink) {
@@ -105,7 +126,7 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
             if (clipEnd != null || urlRange.clipEnd != null) {
               range.clipEnd = clipEnd != null ? clipEnd : urlRange.clipEnd
             }
-            const added = await addToLibraryAndTimeline(url, name || file?.name || 'Imported Media', mediaType, file ? { ...range, file } : range)
+            const added = await addToLibraryAndTimeline(url, name || file?.name || t('app.importedMedia'), mediaType, file ? { ...range, file } : range)
             // The remix picker (stitch / reaction / free edit) is for someone else's
             // video. The creator's own file just goes on the timeline.
             if (added && !file && mediaType === 'video' && range.clipStart == null && range.clipEnd == null) {
@@ -189,9 +210,11 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
 
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
-  }, [addToLibraryAndTimeline, tracks, library, playheadPosition, sendToParent])
+  }, [addToLibraryAndTimeline, addMusicClip, tracks, library, playheadPosition, sendToParent])
 
-  // Notify parent that editor is ready
+  // Notify parent that editor is ready (once: a boolean, not the callback, so a
+  // new addMusicClip identity never sends it again)
+  const canLoadSound = !!addMusicClip
   useEffect(() => {
     if (!isIframe) return
     // `canLoadFile`: load-media takes a `file`. A parent with a local file checks
@@ -200,8 +223,13 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     // (request-close) before closing; an older editor gets the plain confirm.
     // `mode` / `canEditAudio`: this is the audio editor (opened with ?mode=audio);
     // it answers "Use this audio" with post-to-3speak { mediaType: 'audio' }.
-    sendToParent('editor-ready', { canLoadFile: true, canSaveDrafts: true, ...(audioMode ? { mode: 'audio', canEditAudio: true } : {}) })
-  }, [sendToParent, audioMode])
+    // `canLoadSound`: load-media { music: true, credit } puts a sound on the music
+    // track with its credit, and musicCredits only names the songs still used.
+    // `canFormat`: post-to-3speak carries `format: { aspect, short, durationSec }`
+    // (utils/projectFormat.js): a landscape, classic or square video is posted as
+    // a normal video, a 9:16 one as a Short; ?aspect= picks the first shape.
+    sendToParent('editor-ready', { canLoadFile: true, canSaveDrafts: true, canFormat: true, ...(canLoadSound ? { canLoadSound: true } : {}), ...(audioMode ? { mode: 'audio', canEditAudio: true, canVideoPodcast: true } : {}) })
+  }, [sendToParent, audioMode, canLoadSound])
 
   // Abort an active render job
   const abortActiveJob = useCallback(() => {
@@ -220,10 +248,8 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     fetch(abortUrl, { method: 'POST', keepalive: true, headers: tok ? { Authorization: `Bearer ${tok}` } : {} }).catch(() => {})
 
     activeJobRef.current = null
-    if (pollIntervalRef.current) {
-      clearInterval(pollIntervalRef.current)
-      pollIntervalRef.current = null
-    }
+    pollAbortRef.current?.abort()
+    pollAbortRef.current = null
   }, [])
 
   // Abort on page close / unmount
@@ -234,7 +260,7 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     return () => {
       window.removeEventListener('beforeunload', onBeforeUnload)
       abortActiveJob()
-      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
+      pollAbortRef.current?.abort()
     }
   }, [abortActiveJob])
 
@@ -251,7 +277,7 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     })
 
     if (!res.ok) {
-      throw new Error(`Upload failed: ${res.status}`)
+      throw new Error(t('errors.uploadFailed', { status: String(res.status) }))
     }
 
     const data = await res.json()
@@ -264,8 +290,14 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
 
   /**
    * Upload all blob: files and build the timeline payload with server URLs.
+   * `voiceTracks` (auto captions, utils/captionSources.js voiceTracksOf): only
+   * these tracks, as an audio timeline for speech to text. `aspect` ("Export
+   * as", utils/exportAs.js): render in this shape, footage reframed when it
+   * differs from the project's own.
    */
-  const buildAndUploadPayload = useCallback(async (onProgress) => {
+  const buildAndUploadPayload = useCallback(async (onProgress, { voiceTracks = null, aspect = null } = {}) => {
+    const reframing = !!aspect && aspect !== activeAspectRatio
+    const tracks = voiceTracks || allTracks
     const fileStore = fileStoreRef?.current
     // Collect clips that have blob: URLs but NO serverUrl (need upload)
     // Clips with a serverUrl already have a backend-accessible path
@@ -286,7 +318,9 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
 
     for (let i = 0; i < blobClips.length; i++) {
       const clip = blobClips[i]
-      onProgress(`Uploading ${clip.name || 'file'} (${i + 1}/${blobClips.length})...`)
+      onProgress(clip.name
+        ? t('render.phase.uploadingFile', { name: clip.name, index: i + 1, total: blobClips.length })
+        : t('render.phase.uploadingUnnamed', { index: i + 1, total: blobClips.length }))
       const serverUrl = await uploadFile(clip._file, clip.name)
       urlOverrides.set(clip.id, serverUrl)
     }
@@ -298,13 +332,16 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
       if (!localUrl || !/^(blob|data):/.test(localUrl)) return localUrl || null
       let url = uploadedPlatesRef.current.get(localUrl)
       if (!url) {
-        onProgress(`Uploading background frame for ${clip.name || 'clip'}...`)
+        onProgress(clip.name ? t('render.phase.uploadingPlate', { name: clip.name }) : t('render.phase.uploadingPlateUnnamed'))
         const blob = await (await fetch(localUrl)).blob()
         url = await uploadFile(blob, name)
         uploadedPlatesRef.current.set(localUrl, url)
       }
       return url
     }
+    // Background removal without a green screen: each clip's matte (made in
+    // this browser; waited for when it is still being made) goes up once
+    const maskUrls = await uploadPersonMasks(tracks, toServer, onProgress)
     for (const track of tracks) {
       for (const clip of track.clips) {
         const key = getClipChromaKey(clip)
@@ -358,19 +395,30 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
           if (+clip.fadeOut > 0) baseClip.fadeOut = +clip.fadeOut
         }
         if (hasLayout(clip)) baseClip.layout = clip.layout
+        // Another shape than the project's: the footage follows its face path (utils/reframe.js)
+        const reframe = reframeForRender(clip, track.type, reframing)
+        if (reframe) baseClip.reframe = reframe
 
         // Colour adjustments (utils/clipColor.js), same maths as the preview
         const color = (clip.type === 'video' || clip.type === 'image') ? normalizeColor(clip.color) : null
         if (color) baseClip.color = color
 
+        // Looks, transitions, video fades, text outline and word animation (utils/renderExtras.js)
+        Object.assign(baseClip, renderExtras(clip, { frame: outputSize(aspect || activeAspectRatio || '16:9') }))
+
         // Sticker motion (utils/stickerMotion.js), image and text clips
         const motion = (clip.type === 'image' || clip.type === 'text') ? normalizeMotion(clip.motion) : null
         if (motion) baseClip.motion = motion
 
+        // Speed, ramp or still (utils/clipSpeed.js) and keyframes (utils/keyframes.js)
+        Object.assign(baseClip, motionFields(clip))
+
         // Green screen: keyed out in the render, over the tracks below
         const key = getClipChromaKey(clip)
         if (key) {
-          baseClip.chromaKey = key.mode === 'static'
+          baseClip.chromaKey = key.mode === 'person'
+            ? personKeyPayload(key, maskUrls.get(clip.id))
+            : key.mode === 'static'
             ? { color: 'static', similarity: key.similarity, blend: key.blend, spill: key.spill, plateUrl: plateUrls.get(clip.id)?.plateUrl || null, noiseUrl: plateUrls.get(clip.id)?.noiseUrl || null }
             : { color: key.mode, similarity: key.similarity, blend: key.blend, spill: key.spill }
         }
@@ -448,6 +496,8 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
               // Store as ratio of preview width so backend can scale
               baseClip.measuredMaxLineWidth = maxLineWidth
               baseClip.measuredPreviewWidth = previewWidth
+              // Word by word entrance: where each word sits (utils/textMeasure.js)
+              if (baseClip.textAnim) baseClip.wordLayout = measureWordLayout(baseClip)
             }
             document.body.removeChild(measurer)
           }
@@ -456,6 +506,9 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
         return baseClip
       })
     }))
+
+    // Auto captions: the speech, as an audio timeline (backend routes/captions.js)
+    if (voiceTracks) return { timeline: { output: 'audio', tracks: trackData.filter(t => t.type === 'audio') } }
 
     // The audio editor renders an MP3 of the audio tracks (backend audioRender.js)
     if (audioMode) {
@@ -479,25 +532,24 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
       }
     }
 
-    // Output dimensions based on aspect ratio
-    let outputWidth = 1280
-    let outputHeight = 720
-    const ratio = activeAspectRatio || '16:9'
-    if (ratio === '9:16') {
-      outputWidth = 720
-      outputHeight = 1280
-    } else if (ratio === '4:3') {
-      outputWidth = 960
-      outputHeight = 720
-    } else if (ratio === '1:1') {
-      outputWidth = 720
-      outputHeight = 720
-    }
+    // Output dimensions based on aspect ratio (utils/outputSize.js: Shorts at 1080x1920)
+    const own = outputSize(activeAspectRatio || '16:9')
 
     // Measure the preview container so backend can scale pixel values
     const previewEl = document.querySelector('.preview-layer-container') || document.querySelector('.global-preview-video')
-    const previewWidth = previewEl ? previewEl.clientWidth : outputWidth
-    const previewHeight = previewEl ? previewEl.clientHeight : outputHeight
+    // ("Export as" another shape: sizes scaled so text keeps its size, utils/exportAs.js)
+    const { outputWidth, outputHeight, previewWidth, previewHeight } = exportSizes(
+      aspect || activeAspectRatio || '16:9',
+      previewEl ? previewEl.clientWidth : own.width,
+      previewEl ? previewEl.clientHeight : own.height
+    )
+
+    // Auto captions: burnt in (unless switched off) and written as subtitle
+    // files by the backend (services/captionBurn.js); emoji pictures by URL
+    const caps = normalizeCaptions(captions)
+    const captionsPayload = caps
+      ? { ...caps, burn: captions.burn !== false, ...(caps.style.emoji ? { emojiUrls: emojiUrlsOf(caps.words) } : {}) }
+      : null
 
     return {
       timeline: {
@@ -506,93 +558,106 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
         outputHeight,
         previewWidth,
         previewHeight,
-        fps: 30
+        fps: 30,
+        ...(captionsPayload ? { captions: captionsPayload } : {})
       },
       mediaUrls
     }
-  }, [tracks, uploadFile, activeAspectRatio, audioMode, master, title, chapters])
+  }, [allTracks, uploadFile, activeAspectRatio, audioMode, master, title, chapters, captions])
 
-  // Poll job status
-  const pollJobStatus = useCallback((jobId, backendEndpoint) => {
-    if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
-
-    pollIntervalRef.current = setInterval(async () => {
-      try {
-        let pollUrl
-        if (GATEWAY_URL && backendEndpoint) {
-          pollUrl = `${GATEWAY_URL}/api/render/${jobId}?backend=${encodeURIComponent(backendEndpoint)}`
-        } else {
-          pollUrl = api(`/api/render/${jobId}`)
-        }
-
-        const res = await fetch(pollUrl)
-        const data = await res.json()
-
-        if (data.status === 'completed') {
-          // Build full URL from the backend that rendered it (no gateway: the
-          // selected backend, not this page's own origin)
-          const base = backendEndpoint || getBackendUrl() || window.location.origin
-          const fullUrl = new URL(data.outputUrl, base).href
-          setRenderStatus({ ...data, outputUrl: fullUrl })
-          clearInterval(pollIntervalRef.current)
-          pollIntervalRef.current = null
-          activeJobRef.current = null
-          if (isIframe) {
-            sendToParent('render-complete', {
-              outputUrl: fullUrl,
-              ...(remixSourceRef.current && { remixSource: remixSourceRef.current })
-            })
+  // Follow the job until it is done (utils/renderQueue.js: its place in the
+  // line, then the progress; a hard error ends it, a short outage does not)
+  const pollJobStatus = useCallback(async (jobId, backendEndpoint, signal) => {
+    const pollUrl = GATEWAY_URL && backendEndpoint
+      ? `${GATEWAY_URL}/api/render/${jobId}?backend=${encodeURIComponent(backendEndpoint)}`
+      : api(`/api/render/${jobId}`)
+    let data
+    try {
+      data = await pollRender({
+        get: () => fetch(pollUrl, { cache: 'no-store', signal }),
+        signal,
+        onStatus: (d) => setRenderStatus(prev => (d.reconnecting
+          ? { ...prev, phase: t('render.phase.reconnecting') }
+          : { ...d, status: d.status || 'processing', phase: statusPhase(d) || prev?.phase }))
+      })
+    } catch (err) {
+      if (signal.aborted) return
+      data = { jobId, status: 'failed', error: err.message, progress: 0 }
+    }
+    if (!data || signal.aborted) return
+    activeJobRef.current = null
+    if (data.status === 'completed') {
+      // Build full URL from the backend that rendered it (no gateway: the
+      // selected backend, not this page's own origin)
+      const base = backendEndpoint || getBackendUrl() || window.location.origin
+      const fullUrl = new URL(data.outputUrl, base).href
+      // Auto captions' subtitle files sit next to the video. `burnedIn`: the
+      // words are in the picture too ("Show in the video"), so 3Speak keeps
+      // CC off for them by default; the backend says (it knows when it could
+      // not draw them), an older one does not, then the option decides.
+      const subtitles = data.subtitles
+        ? {
+            ...data.subtitles,
+            vttUrl: new URL(data.subtitles.vttUrl, base).href,
+            srtUrl: new URL(data.subtitles.srtUrl, base).href,
+            burnedIn: typeof data.subtitles.burnedIn === 'boolean' ? data.subtitles.burnedIn : captionsBurnRef.current
           }
-        } else if (data.status === 'failed' || data.status === 'aborted') {
-          setRenderStatus(data)
-          clearInterval(pollIntervalRef.current)
-          pollIntervalRef.current = null
-          activeJobRef.current = null
-          if (isIframe) {
-            sendToParent('render-failed', { error: data.error })
-          }
-        } else {
-          setRenderStatus(data)
-        }
-      } catch (err) {
-        console.error('[useIframeApi] Poll error:', err)
+        : undefined
+      setRenderStatus({ ...data, outputUrl: fullUrl, subtitles })
+      if (isIframe) {
+        sendToParent('render-complete', {
+          outputUrl: fullUrl,
+          ...(subtitles && { subtitles }),
+          ...(remixSourceRef.current && { remixSource: remixSourceRef.current })
+        })
       }
-    }, 1500)
+    } else {
+      setRenderStatus(data)
+      if (isIframe) sendToParent('render-failed', { error: data.error })
+    }
   }, [sendToParent])
 
-  // Submit render job to backend (or gateway if configured)
+  // Submit render job to backend (or gateway if configured). A busy server is
+  // waited for: the job goes in line, or the editor tries again by itself.
   const requestRender = useCallback(async () => {
+    pollAbortRef.current?.abort()
+    const ac = new AbortController()
+    pollAbortRef.current = ac
     try {
-      setRenderStatus({ status: 'submitting', progress: 0, phase: 'Preparing files...' })
+      setRenderStatus({ status: 'submitting', progress: 0, phase: t('render.phase.preparing') })
 
       const payload = await buildAndUploadPayload((phase) => {
         setRenderStatus(prev => ({ ...prev, phase }))
       })
 
-      setRenderStatus({ status: 'submitting', progress: 0, phase: 'Submitting render job...' })
+      setRenderStatus({ status: 'submitting', progress: 0, phase: t('render.phase.submitting') })
 
       const renderUrl = GATEWAY_URL ? `${GATEWAY_URL}/api/render` : api('/api/render')
-      const res = await authFetch(renderUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+      const body = JSON.stringify(payload)
+      const answer = await submitRender({
+        send: () => authFetch(renderUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }),
+        signal: ac.signal,
+        onWait: ({ seconds, busy }) => setRenderStatus({
+          status: 'submitting',
+          progress: 0,
+          phase: busy ? t('render.phase.busyRetry', { seconds }) : t('render.phase.offlineRetry', { seconds })
+        })
       })
+      if (!answer || ac.signal.aborted) return
 
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}))
-        throw new Error(errData.error || `Server responded with ${res.status}`)
-      }
-
-      const { jobId, backendEndpoint } = await res.json()
+      const { jobId, backendEndpoint } = answer
       activeJobRef.current = { jobId, backendEndpoint }
-      setRenderStatus({ jobId, status: 'processing', progress: 0, phase: 'Starting...' })
-      pollJobStatus(jobId, backendEndpoint)
+      setRenderStatus({ jobId, status: answer.status === 'queued' ? 'queued' : 'processing', progress: 0, phase: statusPhase(answer) || t('render.phase.starting'), ...(answer.position ? { position: answer.position } : {}) })
+      await pollJobStatus(jobId, backendEndpoint, ac.signal)
     } catch (err) {
+      if (ac.signal.aborted) return
       console.error('[useIframeApi] Render request failed:', err)
       setRenderStatus({ status: 'failed', error: err.message, progress: 0 })
       if (isIframe) {
         sendToParent('render-failed', { error: err.message })
       }
+    } finally {
+      if (pollAbortRef.current === ac) pollAbortRef.current = null
     }
   }, [buildAndUploadPayload, pollJobStatus, sendToParent])
 
@@ -667,6 +732,8 @@ export function useIframeApi({ addToLibraryAndTimeline, tracks, library, playhea
     draftContext,
     closeRequest,
     answerClose,
-    requestDraftSignIn
+    requestDraftSignIn,
+    // Uploads what still needs it and builds a render payload (auto captions use it for the speech)
+    buildAndUploadPayload
   }
 }

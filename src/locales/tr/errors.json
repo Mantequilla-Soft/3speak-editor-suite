@@ -1,0 +1,28 @@
+{
+  "render": {
+    "unreachable": "İşleme sunucusuna ulaşılamıyor. Bağlantını kontrol et ve yeniden işle.",
+    "stillBusy": "İşleme sunucuları hâlâ meşgul. Lütfen birkaç dakika sonra yeniden işle.",
+    "unknownJob": "İşleme sunucusu bu işlemeyi artık tanımıyor (yeniden başlamış olabilir). Lütfen yeniden işle.",
+    "lostContact": "İşleme sunucusuyla bağlantı kesildi. Lütfen yeniden işle.",
+    "serverStatus": "Sunucunun yanıtı: {{status}}"
+  },
+  "uploadFailed": "Yükleme başarısız: {{status}}",
+  "signIn": {
+    "loggedOut": "Düzenleyiciyi kullanmak için 3Speak'te oturum aç.",
+    "failed": "Yüklemek ve işlemek için 3Speak'te oturum aç (oturum açma iptal edildi ya da çalışmadı)."
+  },
+  "export": {
+    "failed": "Dışa aktarma başarısız",
+    "ffmpegNotLoaded": "FFmpeg yüklenmedi",
+    "noClips": "Dışa aktarılacak klip yok",
+    "noCodec": "MediaRecorder için desteklenen video codec'i bulunamadı",
+    "cancelled": "Dışa aktarma iptal edildi",
+    "noSource": "Klip için geçerli dosya kaynağı yok: {{name}}",
+    "ffmpegFailed": "FFmpeg komutu {{code}} çıkış koduyla başarısız oldu"
+  },
+  "reverse": {
+    "failed": "Ters çevirme başarısız",
+    "timedOut": "Ters çevirme zaman aşımına uğradı",
+    "statusCheck": "Durum kontrolü başarısız: {{status}}"
+  }
+}

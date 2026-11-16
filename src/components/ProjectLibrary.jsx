@@ -1,5 +1,8 @@
 import { useState, useRef } from 'react'
 import { Film, Music, Image, X, Plus, Upload, Download } from './icons'
+import { useT, formatNumber } from '../i18n'
+
+const percent = (p) => formatNumber(p || 0, { style: 'percent', maximumFractionDigits: 0 })
 
 function formatDuration(seconds) {
   const mins = Math.floor(seconds / 60)
@@ -8,6 +11,7 @@ function formatDuration(seconds) {
 }
 
 function LibraryItem({ item, isSelected, downloadStatus, onSelect, onRemove, onAddToTimeline }) {
+  const { t } = useT()
   // Items can go on the timeline while they upload: the preview plays the
   // local file and the upload finishes in the background
   const isEncoding = false
@@ -59,42 +63,42 @@ function LibraryItem({ item, isSelected, downloadStatus, onSelect, onRemove, onA
         <span className="library-item-duration">
           {formatDuration(item.duration)}
           {downloadStatus?.status === 'downloading' && (
-            <span className="hls-dl-badge" title={`Downloading... ${Math.round(downloadStatus.progress * 100)}%`}>
-              <Download size={9} /> {Math.round(downloadStatus.progress * 100)}%
+            <span className="hls-dl-badge" title={t('drafts.library.downloading', { percent: percent(downloadStatus.progress) })}>
+              <Download size={9} /> {percent(downloadStatus.progress)}
             </span>
           )}
           {downloadStatus?.status === 'done' && (
-            <span className="hls-dl-badge done" title="Downloaded locally">local</span>
+            <span className="hls-dl-badge done" title={t('drafts.library.downloaded')}>{t('drafts.library.local')}</span>
           )}
           {item.uploading && !item.serverUrl && (
-            <span className="hls-dl-badge" title="Uploading in the background. Render waits until it is done.">
-              <Upload size={9} /> {Math.round((item.uploadProgress || 0) * 100)}%
+            <span className="hls-dl-badge" title={t('drafts.library.uploadingTitle')}>
+              <Upload size={9} /> {percent(item.uploadProgress)}
             </span>
           )}
           {item.converting && (
-            <span className="hls-dl-badge" title="This browser cannot show this video's format. The preview switches to a 480p copy once it is ready.">
-              <Upload size={9} /> converting
+            <span className="hls-dl-badge" title={t('drafts.library.convertingTitle')}>
+              <Upload size={9} /> {t('drafts.library.converting')}
             </span>
           )}
           {item.convertFailed && (
-            <span className="hls-dl-badge" title="Could not make a playable copy. The preview may stay black, rendering still works.">no preview</span>
+            <span className="hls-dl-badge" title={t('drafts.library.noPreviewTitle')}>{t('drafts.library.noPreview')}</span>
           )}
           {item.serverUrl && !item.converting && !item.convertFailed && (
-            <span className="hls-dl-badge done" title="Encoded to 480p on server">480p</span>
+            <span className="hls-dl-badge done" title={t('drafts.library.encodedTitle')}>480p</span>
           )}
         </span>
       </div>
       <div className="library-item-actions">
         <button
           onClick={(e) => { e.stopPropagation(); if (!isEncoding) onAddToTimeline(item.id) }}
-          title={isEncoding ? "Encoding..." : "Add to timeline"}
+          title={isEncoding ? t('drafts.library.encoding') : t('drafts.library.addToTimeline')}
           disabled={isEncoding}
         >
           <Plus size={12} />
         </button>
         <button
           onClick={(e) => { e.stopPropagation(); onRemove(item.id) }}
-          title="Remove from library"
+          title={t('drafts.library.remove')}
         >
           <X size={12} />
         </button>
@@ -112,6 +116,7 @@ function ProjectLibrary({
   onAddToTimeline,
   onFilesAdded
 }) {
+  const { t } = useT()
   const [dragover, setDragover] = useState(false)
   const inputRef = useRef(null)
 
@@ -162,16 +167,17 @@ function ProjectLibrary({
     e.target.value = ''
   }
 
-  const renderGroup = (title, items, icon) => (
+  // group: 'videos' | 'images' | 'sounds'
+  const renderGroup = (group, items, icon) => (
     <div className="library-group">
       <div className="library-group-header">
         {icon}
-        <span>{title}</span>
+        <span>{t(`drafts.library.groups.${group}`)}</span>
         <span className="library-group-count">{items.length}</span>
       </div>
       <div className="library-group-items">
         {items.length === 0 ? (
-          <div className="library-empty">No {title.toLowerCase()}</div>
+          <div className="library-empty">{t(`drafts.library.empty.${group}`)}</div>
         ) : (
           items.map(item => (
             <LibraryItem
@@ -197,8 +203,8 @@ function ProjectLibrary({
       onDrop={handleDrop}
     >
       <div className="library-header">
-        <h3>Project Library</h3>
-        <button className="add-files-btn" onClick={handleClick} title="Add files">
+        <h3>{t('drafts.library.title')}</h3>
+        <button className="add-files-btn" onClick={handleClick} title={t('drafts.library.addFiles')}>
           <Upload size={14} />
         </button>
       </div>
@@ -211,12 +217,12 @@ function ProjectLibrary({
         style={{ display: 'none' }}
       />
       <div className="library-content">
-        {renderGroup('Videos', videos, <Film size={14} />)}
-        {renderGroup('Images', images, <Image size={14} />)}
-        {renderGroup('Sounds', sounds, <Music size={14} />)}
+        {renderGroup('videos', videos, <Film size={14} />)}
+        {renderGroup('images', images, <Image size={14} />)}
+        {renderGroup('sounds', sounds, <Music size={14} />)}
       </div>
       <div className="library-hint">
-        {dragover ? 'Drop files to add' : 'Drop files here or drag items to timeline'}
+        {dragover ? t('drafts.library.dropToAdd') : t('drafts.library.hint')}
       </div>
     </div>
   )

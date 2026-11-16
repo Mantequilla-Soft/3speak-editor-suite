@@ -1,0 +1,106 @@
+{
+  "speed": {
+    "title": "Snelheid",
+    "stillFrame": "Stilstaand beeld",
+    "holds": "Houdt het beeld vast op {{time}} van de video. Kort het in op de tijdlijn of kies een duur:",
+    "seconds": "{{value}} s",
+    "speed": "Snelheid",
+    "ramp": "Snelheidsverloop",
+    "ramps": {
+      "montage": "Montage",
+      "hero": "Held",
+      "speedUp": "Versnellen",
+      "slowDown": "Vertragen"
+    },
+    "rampHint": "Het voorbeeld volgt het verloop nauwkeurig, de render is exact. Het geluid houdt zijn toonhoogte.",
+    "freeze": "Beeld bevriezen",
+    "freezeLength": "Duur van het bevroren beeld",
+    "freezeTitle": "Het beeld onder de afspeelkop vasthouden",
+    "freezeMoveFirst": "Zet de afspeelkop eerst op deze clip",
+    "freezeAt": "Bevriezen op afspeelkop",
+    "stillName": "Stilstaand · {{name}}",
+    "stillNameFallback": "clip"
+  },
+  "badge": {
+    "still": "Stil",
+    "ramp": "Verloop",
+    "stillTitle": "Stilstaand beeld",
+    "speedTitle": "Snelheid {{speed}}",
+    "rampTitle": "Snelheidsverloop"
+  },
+  "keyframes": {
+    "title": "Keyframes",
+    "moveHere": "Zet de afspeelkop op deze clip om keyframes toe te voegen.",
+    "props": {
+      "x": "Positie X",
+      "y": "Positie Y",
+      "scale": "Schaal",
+      "rotation": "Draaiing",
+      "opacity": "Dekking",
+      "volume": "Volume"
+    },
+    "aria": {
+      "x": {
+        "prev": "Vorige keyframe voor positie X",
+        "next": "Volgende keyframe voor positie X",
+        "add": "Keyframe voor positie X toevoegen",
+        "remove": "Keyframe voor positie X verwijderen"
+      },
+      "y": {
+        "prev": "Vorige keyframe voor positie Y",
+        "next": "Volgende keyframe voor positie Y",
+        "add": "Keyframe voor positie Y toevoegen",
+        "remove": "Keyframe voor positie Y verwijderen"
+      },
+      "scale": {
+        "prev": "Vorige keyframe voor schaal",
+        "next": "Volgende keyframe voor schaal",
+        "add": "Keyframe voor schaal toevoegen",
+        "remove": "Keyframe voor schaal verwijderen"
+      },
+      "rotation": {
+        "prev": "Vorige keyframe voor draaiing",
+        "next": "Volgende keyframe voor draaiing",
+        "add": "Keyframe voor draaiing toevoegen",
+        "remove": "Keyframe voor draaiing verwijderen"
+      },
+      "opacity": {
+        "prev": "Vorige keyframe voor dekking",
+        "next": "Volgende keyframe voor dekking",
+        "add": "Keyframe voor dekking toevoegen",
+        "remove": "Keyframe voor dekking verwijderen"
+      },
+      "volume": {
+        "prev": "Vorige keyframe voor volume",
+        "next": "Volgende keyframe voor volume",
+        "add": "Keyframe voor volume toevoegen",
+        "remove": "Keyframe voor volume verwijderen"
+      }
+    },
+    "prev": "Vorige keyframe",
+    "next": "Volgende keyframe",
+    "add": "Keyframe toevoegen op de afspeelkop",
+    "remove": "Keyframe op de afspeelkop verwijderen",
+    "ease": "Vloeiend overgaan van hier tot de volgende keyframe",
+    "removeAll": "Alle keyframes verwijderen"
+  },
+  "kenBurns": {
+    "title": "Ken Burns",
+    "in": "Langzaam inzoomen",
+    "out": "Langzaam uitzoomen",
+    "pan": "Langzaam pannen"
+  },
+  "punch": {
+    "title": "Punch-in-zooms",
+    "hint": "Snelle zooms aan het begin van zinnen en op luide woorden, op basis van de ondertitels als die er zijn, anders op basis van het geluid.",
+    "listening": "Luisteren...",
+    "auto": "Automatische punch-in-zooms",
+    "remove": "Punch-in-zooms verwijderen",
+    "noMoments": "Geen zinsbegin of luide woorden gevonden in deze clip.",
+    "noSound": "Het geluid van deze clip kon niet worden gelezen. Voeg eerst automatische ondertitels toe en probeer het dan opnieuw.",
+    "addedCaptions_one": "{{count}} punch-in-zoom toegevoegd, op basis van de ondertitels. Het zijn gewone keyframes op Schaal.",
+    "addedCaptions_other": "{{count}} punch-in-zooms toegevoegd, op basis van de ondertitels. Het zijn gewone keyframes op Schaal.",
+    "addedSound_one": "{{count}} punch-in-zoom toegevoegd, op basis van het geluid. Het zijn gewone keyframes op Schaal.",
+    "addedSound_other": "{{count}} punch-in-zooms toegevoegd, op basis van het geluid. Het zijn gewone keyframes op Schaal."
+  }
+}

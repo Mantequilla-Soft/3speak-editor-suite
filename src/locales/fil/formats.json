@@ -1,0 +1,86 @@
+{
+  "aspect": {
+    "short": {
+      "label": "Short",
+      "hint": "Patayo, hanggang 2 minuto, ipo-post bilang Short"
+    },
+    "landscape": {
+      "label": "Landscape",
+      "hint": "Widescreen na video, hanggang 10 minuto"
+    },
+    "classic": {
+      "label": "Klasiko",
+      "hint": "4:3 na video, hanggang 10 minuto"
+    },
+    "square": {
+      "label": "Parisukat",
+      "hint": "Parisukat na video, hanggang 10 minuto"
+    }
+  },
+  "chip": {
+    "title": "Hugis ng proyektong ito: {{shape}}. I-click para palitan",
+    "aria": "Hugis ng proyekto: {{shape}}"
+  },
+  "picker": {
+    "title": "Ano ang ginagawa mo?",
+    "tooLong": "{{length}} ang timeline mo, i-trim ito sa {{limit}} para ma-render",
+    "note": "Ang hugis ang nagpapasya kung paano ito mapupunta sa 3Speak: 9:16 bilang Short, ang iba bilang karaniwang video. Nire-render din ito ng I-export bilang sa ibang hugis."
+  },
+  "preview": {
+    "heading": "I-preview sa",
+    "yours": "{{aspect}} (iyo)",
+    "projectIs": {
+      "short": "Short 9:16 ang proyekto mo. Sa ibang hugis, pupunuin ng footage ang frame, pinutol sa paligid ng mukha rito.",
+      "landscape": "Landscape 16:9 ang proyekto mo. Sa ibang hugis, pupunuin ng footage ang frame, pinutol sa paligid ng mukha rito.",
+      "classic": "Klasiko 4:3 ang proyekto mo. Sa ibang hugis, pupunuin ng footage ang frame, pinutol sa paligid ng mukha rito.",
+      "square": "Parisukat 1:1 ang proyekto mo. Sa ibang hugis, pupunuin ng footage ang frame, pinutol sa paligid ng mukha rito."
+    }
+  },
+  "faces": {
+    "heading": "Sundan ang mga mukha",
+    "noFootage": "Wala pang footage na ire-reframe. Pinapanatili ng mga inilipat o na-zoom na clip ang sarili nilang framing.",
+    "hint": "Hinahanap ang mukha sa browser mo, ilang frame bawat segundo. Kapag walang mukha, ang gitna ang nananatiling kita.",
+    "found": "May nakitang mukha",
+    "noFace": "Walang mukha: gitna",
+    "middle": "Gitna",
+    "finding": "Hinahanap ang mga mukha",
+    "findOne": "Hanapin ang mukha",
+    "findMany_one": "Hanapin ang mga mukha sa {{count}} clip",
+    "findMany_other": "Hanapin ang mga mukha sa {{count}} clip",
+    "streamNamed": "Stream ang {{name}}: pinutol ito sa paligid ng gitna nito.",
+    "streamUnnamed": "Stream ang isang clip: pinutol ito sa paligid ng gitna nito.",
+    "failed": "Hindi gumana rito ang face tracking: {{error}}",
+    "moveWindow": "{{name}}: ilipat ang window",
+    "left": "Kaliwa",
+    "right": "Kanan",
+    "up": "Itaas",
+    "down": "Ibaba",
+    "moveX": "Ilipat ang window pakaliwa o pakanan",
+    "moveY": "Ilipat ang window pataas o pababa",
+    "findAgain": "Hanapin ulit ang mukha",
+    "reset": "Gitna, walang usog"
+  },
+  "clipFallback": "Clip",
+  "stop": "Itigil",
+  "render": {
+    "heading": "I-render bilang",
+    "shortsLimit": "Hanggang {{limit}} lang ang Shorts: i-trim ang timeline para mag-render ng 9:16.",
+    "button_one": "I-render ang {{count}} video",
+    "button_other": "I-render ang {{count}} video",
+    "failed": "Pumalya ang render: {{error}}",
+    "download": "I-download",
+    "postShort": "I-post bilang Short",
+    "postVideo": "I-post bilang video"
+  },
+  "job": {
+    "waiting": "Naghihintay...",
+    "preparing": "Inihahanda ang mga file...",
+    "starting": "Nagsisimula...",
+    "rendering": "Nire-render...",
+    "done": "Tapos na",
+    "stopped": "Itinigil",
+    "busy": "Abala ang mga render server. Susubukan ulit sa loob ng {{seconds}} seg...",
+    "offline": "Walang koneksyon sa render server. Susubukan ulit sa loob ng {{seconds}} seg...",
+    "failed": "Pumalya ang render"
+  }
+}

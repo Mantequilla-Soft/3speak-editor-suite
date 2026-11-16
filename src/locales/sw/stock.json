@@ -1,0 +1,53 @@
+{
+  "title": "Midia za hifadhi",
+  "titleBackground": "Chagua mandharinyuma",
+  "search": "Tafuta video, picha na GIF",
+  "searchProvider": "Tafuta kwenye {{provider}}",
+  "searchProviderTitle": "Tafuta kwenye {{provider}} (bure kutumia, inanakiliwa kwenye seva yetu unapochagua)",
+  "kind": "Aina",
+  "category": "Kategoria",
+  "everything": "Kila kitu",
+  "types": {
+    "all": "Zote",
+    "video": "Video",
+    "image": "Picha",
+    "gif": "GIF"
+  },
+  "categories": {
+    "nature": "Mazingira",
+    "city": "Mji",
+    "people": "Watu",
+    "animals": "Wanyama",
+    "food": "Chakula",
+    "tech": "Teknolojia",
+    "sports": "Michezo",
+    "space": "Anga za juu",
+    "abstract": "Dhahania",
+    "backgrounds": "Mandharinyuma"
+  },
+  "loading": "Inapakia maktaba...",
+  "typeToSearch": "Andika unachotafuta ili kutafuta kwenye {{provider}}.",
+  "nothingFound": "Hakuna kilichopatikana.",
+  "searching": "Inatafuta...",
+  "loadFailed": "Maktaba ya hifadhi haikuweza kupakiwa.",
+  "nothingMatches": "Hakuna kinacholingana.",
+  "adding": "Inaongeza...",
+  "byAuthor": "{{title}} ({{author}})",
+  "licenceOnline": "Kutoka {{provider}}: bure kutumia, hata kibiashara, hakuna haja ya kutaja chanzo. Faili linanakiliwa kwenye seva ya 3Speak unapolichagua.",
+  "licence": "Bure kutumia, hata kibiashara, hakuna haja ya kutaja chanzo (CC0 / mali ya umma kutoka Wikimedia Commons).",
+  "placeBackground": "Inakaa nyuma yako, kwenye njia yake, kwa urefu wa klipu yako.",
+  "placeAdd": "Inawekwa kwenye kiashiria cha kucheza: kwenye mfuatano wa muda mtupu kama video yako, vinginevyo juu yake kama picha za ziada (B-roll).",
+  "errors": {
+    "notCopied": "Faili hilo halikuweza kunakiliwa.",
+    "notAdded": "Faili hilo halikuweza kuongezwa.",
+    "tooMany": "Utafutaji mwingi mno, subiri kidogo.",
+    "searchFailed": "Utafutaji haukufanya kazi, jaribu tena.",
+    "copyFailed": "Faili hilo halikuweza kunakiliwa kwenye seva."
+  },
+  "trackName": {
+    "background": "Mandharinyuma",
+    "backgroundNumbered": "Mandharinyuma {{number}}",
+    "broll": "Picha za ziada",
+    "brollNumbered": "Picha za ziada {{number}}"
+  }
+}

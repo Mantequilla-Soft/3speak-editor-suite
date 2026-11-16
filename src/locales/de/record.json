@@ -1,0 +1,109 @@
+{
+  "media": {
+    "blocked": {
+      "camera": "Kamera oder Mikrofon sind für diese Seite blockiert. Erlaube sie über das Symbol in der Adressleiste und versuch es erneut. Wenn du nie abgelehnt hast, blockieren vielleicht die Datenschutzeinstellungen deines Computers den Browser.",
+      "microphone": "Das Mikrofon ist für diese Seite blockiert. Erlaube es über das Symbol in der Adressleiste und versuch es erneut. Wenn du nie abgelehnt hast, blockieren vielleicht die Datenschutzeinstellungen deines Computers den Browser."
+    },
+    "notAllowed": {
+      "camera": "Diese Seite darf Kamera oder Mikrofon nicht nutzen. Lade 3Speak neu und versuch es erneut.",
+      "microphone": "Diese Seite darf das Mikrofon nicht nutzen. Lade 3Speak neu und versuch es erneut."
+    },
+    "busy": {
+      "camera": "Deine Kamera oder dein Mikrofon wird von einer anderen App oder einem anderen Tab benutzt (ein Videoanruf, ein anderer Recorder). Schließ es dort und versuch es erneut.",
+      "microphone": "Dein Mikrofon wird von einer anderen App oder einem anderen Tab benutzt (ein Videoanruf, ein anderer Recorder). Schließ es dort und versuch es erneut."
+    },
+    "notFound": {
+      "camera": "Keine Kamera und kein Mikrofon gefunden. Schließ eins an und versuch es erneut.",
+      "microphone": "Kein Mikrofon gefunden. Schließ eins an und versuch es erneut."
+    },
+    "noDevices": {
+      "camera": "Dieser Browser kann Kamera oder Mikrofon hier nicht nutzen.",
+      "microphone": "Dieser Browser kann das Mikrofon hier nicht nutzen."
+    },
+    "failed": {
+      "camera": "Kamera oder Mikrofon konnten nicht starten. Versuch es erneut.",
+      "microphone": "Das Mikrofon konnte nicht starten. Versuch es erneut."
+    },
+    "failedNamed": {
+      "camera": "Kamera oder Mikrofon konnten nicht starten ({{name}}). Versuch es erneut.",
+      "microphone": "Das Mikrofon konnte nicht starten ({{name}}). Versuch es erneut."
+    }
+  },
+  "inline": {
+    "camera": "Kamera",
+    "expand": "Vergrößern",
+    "shrink": "Verkleinern",
+    "uploading": "Wird hochgeladen...",
+    "uploadingPct": "Wird hochgeladen... {{pct}} %",
+    "converting": "Wird umgewandelt...",
+    "rec": "REC",
+    "starting": "Wird gestartet...",
+    "plateStepOut": "Geh aus dem Bild",
+    "plateShooting": "Hintergrund wird aufgenommen, bleib draußen...",
+    "gestures": "Halte und zieh ein Bild, um den Ausschnitt zu ändern, mit zwei Fingern zoomen.",
+    "gesturesOverlay": "Halte und zieh ein Bild, um den Ausschnitt zu ändern, mit zwei Fingern zoomen, zieh dein Kamerafenster, um es zu verschieben.",
+    "greenScreen": {
+      "label": "Greenscreen",
+      "off": "Aus",
+      "green": "Grün",
+      "blue": "Blau",
+      "person": "Person",
+      "static": "Statisch",
+      "staticTitle": "Statischer Hintergrund (experimentell): entfernt alles, was einer Aufnahme des leeren Hintergrunds entspricht",
+      "personTitle": "Kein Greenscreen nötig: findet dich im Bild",
+      "threshold": "Schwellenwert",
+      "thresholdStaticTitle": "Toleranz: höher ignoriert mehr Änderungen im Hintergrund (Rauschen, Licht, Fokus), kann aber anfangen, Teile von dir zu entfernen",
+      "thresholdTitle": "Höher entfernt mehr von der Hintergrundfarbe",
+      "despill": "Despill",
+      "despillStaticTitle": "Entfernt die Wandfarbe von den Kanten",
+      "despillGreenTitle": "Entfernt den Grünstich von den Kanten",
+      "despillBlueTitle": "Entfernt den Blaustich von den Kanten",
+      "retakePlate": "Leeren Hintergrund neu aufnehmen",
+      "shootPlate": "Leeren Hintergrund aufnehmen",
+      "plateKeep": "Experimentell. Lass Kamera und Licht genau so, wie sie sind.",
+      "plateHowTo": "Experimentell. Stell die Kamera fest auf, drück den Button und geh aus dem Bild.",
+      "keyFailed": "Live-Keying ist hier nicht verfügbar. Der Clip bekommt trotzdem die Greenscreen-Einstellung.",
+      "personHowTo": "Kein Greenscreen nötig: der Editor findet dich im Bild. Die Aufnahme wird so aufgenommen, wie sie ist, und in der Zeitleiste freigestellt, wo du wählst, was hinter dir erscheint."
+    },
+    "tpEdit": "Teleprompter-Text bearbeiten",
+    "tpAdd": "Teleprompter-Text hinzufügen",
+    "teleprompter": "Teleprompter",
+    "recordOnly": "Nur aufnehmen",
+    "recordAndPlay": "Aufnehmen + Video abspielen",
+    "plusPlay": "+ Abspielen",
+    "recordReactionTitle": "Aufnehmen, während das Original läuft",
+    "recordReaction": "Reaktion aufnehmen",
+    "record": "Aufnehmen",
+    "stop": "Stopp",
+    "retake": "Neu aufnehmen",
+    "useClip": "Clip verwenden"
+  },
+  "video": {
+    "title": "Video aufnehmen",
+    "startingCamera": "Kamera wird gestartet...",
+    "start": "Aufnahme starten",
+    "stop": "Stopp",
+    "retake": "Neu aufnehmen",
+    "useClip": "Clip verwenden"
+  },
+  "audio": {
+    "title": "Audio aufnehmen",
+    "cannotRecord": "Dieser Browser kann hier kein Audio aufnehmen.",
+    "addFailed": "Die Aufnahme konnte nicht hinzugefügt werden. Bitte versuch es erneut.",
+    "yourRecording": "Deine Aufnahme",
+    "micLevel": "Mikrofonpegel",
+    "accessingMic": "Zugriff auf das Mikrofon...",
+    "ready": "Bereit zur Aufnahme: sprich, um deinen Pegel zu prüfen",
+    "preparing": "Deine Aufnahme wird vorbereitet...",
+    "adding": "Wird zu deinen Spuren hinzugefügt...",
+    "tpEdit": "Teleprompter-Text bearbeiten",
+    "tpAdd": "Teleprompter-Text hinzufügen",
+    "teleprompter": "Teleprompter",
+    "start": "Aufnahme starten",
+    "stop": "Stopp",
+    "retake": "Neu aufnehmen",
+    "addingShort": "Wird hinzugefügt...",
+    "useRecording": "Aufnahme verwenden",
+    "useScript": "Dieses Skript verwenden"
+  }
+}

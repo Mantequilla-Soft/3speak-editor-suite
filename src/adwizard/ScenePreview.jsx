@@ -1,9 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react'
 import { HOST_URL } from './engine'
+import { useT } from '../i18n'
 
 // The scene engine's host page in a same-origin iframe, scaled to fit. The page is always the ad's real size
 // (1920x1080 or 1080x1920) so every layout is exactly what renders; the wizard calls seek(t) on it directly.
 const ScenePreview = forwardRef(function ScenePreview({ doc, onInfo, onError }, ref) {
+  const { t } = useT()
   const frameRef = useRef(null)
   const boxRef = useRef(null)
   const [scale, setScale] = useState(0.3)
@@ -56,7 +58,7 @@ const ScenePreview = forwardRef(function ScenePreview({ doc, onInfo, onError }, 
       <div className="aw-frame-wrap" style={{ width: W * scale, height: H * scale }}>
         <iframe
           ref={frameRef}
-          title="Ad preview"
+          title={t('adwizard.preview.frameTitle')}
           src={HOST_URL}
           className="aw-frame"
           style={{ width: W, height: H, transform: `scale(${scale})` }}

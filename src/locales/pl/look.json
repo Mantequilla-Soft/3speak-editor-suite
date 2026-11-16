@@ -1,0 +1,53 @@
+{
+  "title": "Wygląd",
+  "noEffects": "Bez efektów",
+  "presetsLabel": "Gotowe style",
+  "doubleClickReset": "Kliknij dwukrotnie, aby zresetować",
+  "presets": {
+    "original": "Oryginał",
+    "warm": "Ciepły",
+    "cool": "Chłodny",
+    "vivid": "Intensywny",
+    "matte": "Matowy",
+    "bw": "Cz-B",
+    "vintage": "Retro",
+    "tealorange": "Morski i pomarańcz",
+    "fade": "Wyblakły",
+    "noir": "Noir",
+    "sunset": "Zachód słońca"
+  },
+  "sliders": {
+    "blur": "Rozmycie",
+    "vignette": "Winieta",
+    "sharpen": "Wyostrzenie",
+    "split": "Morski i pomarańcz"
+  },
+  "transition": {
+    "title": "Przejście",
+    "none": "Brak",
+    "types": {
+      "crossfade": "Przenikanie",
+      "dissolve": "Przez czerń",
+      "slideleft": "Przesunięcie w lewo",
+      "slideright": "Przesunięcie w prawo",
+      "slideup": "Przesunięcie w górę",
+      "zoom": "Powiększenie",
+      "whip": "Smagnięcie"
+    },
+    "length": "Długość przejścia (sekundy)",
+    "fades": "Przejścia głośności",
+    "noFades": "Bez przejść",
+    "in": "Narastanie",
+    "out": "Wyciszanie",
+    "fadeInSeconds": "Narastanie (sekundy)",
+    "fadeOutSeconds": "Wyciszanie (sekundy)",
+    "intoNext": "W następny klip",
+    "needNext": "Umieść klip tuż po tym na tej samej ścieżce, aby dodać przejście.",
+    "fromTo": "{{from}} w {{to}}",
+    "fromUnnamed": "Klip w {{to}}",
+    "toUnnamed": "{{from}} w następny klip",
+    "bothUnnamed": "Klip w następny klip",
+    "add": "Dodaj przejście",
+    "cutLabel": "{{type}}, {{seconds}} s"
+  }
+}

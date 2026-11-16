@@ -1,0 +1,155 @@
+{
+  "dismiss": "Chiudi",
+  "branding": {
+    "audioEditor": "Editor audio",
+    "shortsEditor": "Editor Shorts",
+    "videoEditor": "Editor video",
+    "beta": "beta",
+    "backend": "Server: {{url}}",
+    "backendSelecting": "Server: selezione...",
+    "showTour": "Mostra di nuovo il tour",
+    "shortcuts": "Scorciatoie da tastiera (?)",
+    "shortcutsLabel": "Scorciatoie da tastiera",
+    "fullscreen": "Schermo intero (F)",
+    "fullscreenLabel": "Schermo intero",
+    "leaveFullscreen": "Esci dallo schermo intero (F)",
+    "leaveFullscreenLabel": "Esci dallo schermo intero",
+    "closeEditor": "Chiudi l'editor"
+  },
+  "backendDown": "Il server non è raggiungibile. Caricamento delle registrazioni, rendering ed elaborazione dei media non funzioneranno.",
+  "menu": {
+    "undo": "Annulla (Ctrl+Z)",
+    "redo": "Ripristina (Ctrl+Maiusc+Z)"
+  },
+  "audioTools": {
+    "cutSilences": "Taglia i silenzi",
+    "cutSilencesTitle": "Taglia i silenzi dalla clip selezionata (o dal suo gruppo): trova le pause, tagliale, chiudi i vuoti",
+    "template": "Modello",
+    "templateTitle": "Il tuo modello: intro, outro e base musicale per ogni registrazione",
+    "normalizeLabel": "Normalizza il volume",
+    "normalizeOn": "Normalizza: attivo",
+    "normalizeOff": "Normalizza: disattivo",
+    "normalizeOnTitle": "La normalizzazione è attiva: l'esportazione viene portata a un livello uniforme di -16 LUFS (lo standard dei podcast)",
+    "normalizeOffTitle": "La normalizzazione è disattiva: l'esportazione mantiene i tuoi livelli così come sono",
+    "chapters": "Capitoli",
+    "chaptersCount": "Capitoli ({{n}})",
+    "chaptersTitle": "Capitoli: segna dove inizia ogni parte (M ne aggiunge uno alla testina)",
+    "transcript": "Trascrizione",
+    "transcriptTitle": "Trascrizione: modifica la puntata dal testo, elimina parole per tagliarle",
+    "fillersLabel": "Rimuovi gli intercalari",
+    "fillers": "Intercalari",
+    "fillersTitle": "Rimuovi gli intercalari: trova ehm, uhm, cioè e le pause lunghe, controllali, tagliali"
+  },
+  "cutSilences": {
+    "progress": "Taglio dei silenzi: clip {{done}} di {{total}}",
+    "failed_one": "{{count}} clip non è stata letta. Le altre sono state tagliate.",
+    "failed_many": "{{count}} clip non sono state lette. Le altre sono state tagliate.",
+    "failed_other": "{{count}} clip non sono state lette. Le altre sono state tagliate.",
+    "failedUploading_one": "{{count}} clip non è ancora leggibile: riprova quando il caricamento è finito. Le altre sono state tagliate.",
+    "failedUploading_many": "{{count}} clip non sono ancora leggibili: riprova quando il caricamento è finito. Le altre sono state tagliate.",
+    "failedUploading_other": "{{count}} clip non sono ancora leggibili: riprova quando il caricamento è finito. Le altre sono state tagliate."
+  },
+  "group": {
+    "nothing": "Niente suona nello stesso momento su un'altra traccia voce. Metti prima l'altra voce su una traccia sua.",
+    "done_one": "{{count}} voce raggruppata: ora si spostano, si rifilano e perdono i silenzi insieme.",
+    "done_many": "{{count}} voci raggruppate: ora si spostano, si rifilano e perdono i silenzi insieme.",
+    "done_other": "{{count}} voci raggruppate: ora si spostano, si rifilano e perdono i silenzi insieme."
+  },
+  "template": {
+    "applied": "Modello applicato: {{parts}}.",
+    "intro": "intro",
+    "outro": "outro",
+    "bed": "base musicale",
+    "takeOff": "Toglilo"
+  },
+  "rangePick": {
+    "hint": "Fai clic dove inizia il pezzo dell'audiogramma, poi dove finisce (fino a 2 minuti). Trascina i bordi per regolarlo.",
+    "from": "Da {{start}}: ora fai clic dove finisce",
+    "span": "{{start}} – {{end}} · {{seconds}} s",
+    "listenTitle": "Ascolta solo questo pezzo (Spazio)",
+    "stop": "Stop",
+    "play": "Riproduci il pezzo",
+    "use": "Usa questo pezzo"
+  },
+  "empty": {
+    "addVideo": "Aggiungi video",
+    "addImage": "Aggiungi immagine",
+    "addAudio": "Aggiungi audio",
+    "addRecording": "Aggiungi registrazione",
+    "record": "Registra",
+    "music": "Musica"
+  },
+  "confirm": {
+    "removeClip": "Rimuovere questa clip dalla timeline?",
+    "removeClips_one": "Rimuovere questa clip ({{count}}) dalla timeline?",
+    "removeClips_many": "Rimuovere queste {{count}} clip dalla timeline?",
+    "removeClips_other": "Rimuovere queste {{count}} clip dalla timeline?",
+    "removeLibraryItem": "Rimuovere questo elemento dalla libreria del progetto?",
+    "removeTrack": "Rimuovere questa traccia e tutte le sue clip?"
+  },
+  "clipStreaming": "Questa clip è ancora in streaming da 3Speak. Riprova quando il download è finito.",
+  "reverse": {
+    "title": "Inversione della clip...",
+    "body": "Elaborazione sul server, attendi.",
+    "failed": "Impossibile invertire la clip: {{error}}"
+  },
+  "remix": {
+    "stitch": "Stitch",
+    "stitchHintBefore": "Registra fino a {{seconds}} s. Viene riprodotto subito prima dell'originale.",
+    "stitchHintAfter": "Registra fino a {{seconds}} s. Viene riprodotto subito dopo l'originale.",
+    "reaction": "Reazione",
+    "reactionHint": "L'originale parte dall'inizio mentre registri. Usa le cuffie, così non rimbomba nel microfono.",
+    "originalFillsLimit": "L'originale riempie già il limite di {{limit}}. Accorcialo sulla timeline, poi registra il tuo stitch con il pulsante della fotocamera."
+  },
+  "chapters": {
+    "intro": "Intro",
+    "numbered": "Capitolo {{n}}"
+  },
+  "duck": {
+    "allVoices": "Tutte le tracce voce"
+  },
+  "media": "Media",
+  "importedMedia": "Media importati",
+  "files_one": "{{count}} file",
+  "files_many": "{{count}} file",
+  "files_other": "{{count}} file",
+  "side": {
+    "clipsSelected_one": "{{count}} clip selezionata",
+    "clipsSelected_many": "{{count}} clip selezionate",
+    "clipsSelected_other": "{{count}} clip selezionate",
+    "clearSelection": "Annulla la selezione",
+    "closeProperties": "Chiudi le proprietà",
+    "captions": "Sottotitoli",
+    "closeCaptions": "Chiudi i sottotitoli",
+    "noClip": "Nessuna clip selezionata",
+    "noClipHint": "Seleziona una clip sulla timeline per vederne le impostazioni. Trascina un riquadro su più clip per modificarle insieme."
+  },
+  "cleaningHint": "Le registrazioni lunghe possono richiedere un minuto.",
+  "hlsDownload": {
+    "title": "Download dei media",
+    "hint": "Attendi mentre i media vengono preparati..."
+  },
+  "sendPreview": {
+    "titleAudio": "Ascolta prima di usarlo",
+    "titleVideo": "Anteprima del tuo video",
+    "back": "Torna all'editor",
+    "askTitle": "Creare audiogrammi per gli Shorts?",
+    "askBody": "Brevi video dei pezzi migliori di questo audio, pubblicati come Shorts di 3Speak insieme all'audio, ognuno con un link a esso.",
+    "askNo": "No, usa l'audio",
+    "askMake": "Crea audiogrammi"
+  },
+  "legacy": {
+    "projectLibrary": "Libreria del progetto",
+    "loadingFfmpeg": "Caricamento di FFmpeg... {{percent}}",
+    "properties": "Proprietà",
+    "propertiesOf": "Proprietà: {{name}}",
+    "addMedia": "Aggiungi media",
+    "addMediaTitle": "Aggiungi media alla libreria",
+    "record": "Registra",
+    "recordTitle": "Registra un video dalla fotocamera"
+  },
+  "drafts": {
+    "episode": "Episodio",
+    "project": "Progetto"
+  }
+}

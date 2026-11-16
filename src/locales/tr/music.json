@@ -1,0 +1,26 @@
+{
+  "music": {
+    "title": "Müzik",
+    "search": "Şarkı ara",
+    "loading": "Şarkılar yükleniyor...",
+    "failed": "Müzik kitaplığı yüklenemedi.",
+    "none": "Eşleşen şarkı yok.",
+    "note": "Şarkı bilgisi gönderine otomatik eklenir. Bir 3Speak içerik üreticisinin sesini seçmek ona gönderi ödüllerinin %5'ini verir.",
+    "addTitle": "Videoya ekle"
+  },
+  "sfx": {
+    "title": "Ses efektleri",
+    "search": "Ses ara",
+    "loading": "Sesler yükleniyor...",
+    "failed": "Ses efektleri yüklenemedi.",
+    "none": "Eşleşen ses yok.",
+    "note": "Sesler oynatma kafasına eklenir. Ücretsiz kullanılabilir (CC0, Kenney.nl), kaynak belirtmek gerekmez.",
+    "addTitle": "Oynatma kafasına ekle"
+  },
+  "all": "Tümü",
+  "timeline": "Zaman çizelgesi: {{title}}",
+  "seconds": "{{seconds}} sn",
+  "stop": "Durdur",
+  "listen": "Dinle",
+  "add": "Ekle"
+}

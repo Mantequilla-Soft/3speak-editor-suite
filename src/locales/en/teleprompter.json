@@ -1,0 +1,88 @@
+{
+  "title": "Teleprompter",
+  "showOnCamera": "Show on camera",
+  "speechNotice": {
+    "title": "Voice following only works in Chromium browsers for now.",
+    "body": "Use Chrome, Edge, Brave or Opera to have the script scroll as you speak. In this browser it scrolls at a steady speed you can set."
+  },
+  "speechErrors": {
+    "network": "Speech service unreachable. Recognition needs an internet connection (Chrome sends audio to Google to transcribe).",
+    "audioCapture": "No audio reached recognition. The mic may be busy, try a headset.",
+    "notAllowed": "Microphone permission is blocked for speech recognition.",
+    "unsupported": "This browser has no speech recognition.",
+    "generic": "Speech recognition error: {{err}}"
+  },
+  "noMic": "Recording without a microphone (mic unavailable).",
+  "autoDetect": "Auto-detect ({{lang}})",
+  "presets": {
+    "frontcam": "Front cam",
+    "frontcamTitle": "Small strip under the selfie lens, least obvious that you're reading",
+    "max": "Max size",
+    "maxTitle": "Big type from a distance",
+    "top": "Top lines",
+    "topTitle": "Several lines across the top"
+  },
+  "scroll": {
+    "label": "Scroll",
+    "modeAria": "Scroll mode",
+    "followVoice": "Follow voice",
+    "followVoiceTitle": "Scrolls as you read the script aloud",
+    "needsChromium": "Needs Chrome, Edge or another Chromium browser",
+    "timed": "Timed",
+    "timedTitle": "Scrolls at a steady speed",
+    "voiceForcedMissing": "Voice following is not available here, using timed scroll.",
+    "voiceUnavailable": "Voice following is not available in this browser."
+  },
+  "style": {
+    "title": "Text style",
+    "fontSize": "Font size",
+    "fontSizeValue": "{{size}}px",
+    "text": "Text",
+    "background": "Background",
+    "bgOpacity": "BG opacity",
+    "mirrorText": "Mirror text (for a teleprompter mirror)",
+    "voiceLanguage": "Voice language"
+  },
+  "status": {
+    "serverErrorSwitched": "Speech server error ({{reason}}). Switched to timed scroll.",
+    "voiceErrorSwitched": "{{error}} Switched to timed scroll.",
+    "voiceStoppedSwitched": "Voice following stopped. Switched to timed scroll.",
+    "serverError": "Speech server error ({{reason}}).",
+    "listeningServer": "Listening (server)… start reading",
+    "connectingServer": "Connecting to speech server…",
+    "listening": "Listening… start reading aloud",
+    "startingMic": "Starting mic…",
+    "scrollPaused": "Scroll paused",
+    "timedScroll": "Timed scroll, {{wpm}} wpm",
+    "scrollTest": "Scroll test, {{wpm}} wpm"
+  },
+  "sttReason": {
+    "unreachable": "unreachable",
+    "noMic": "no microphone",
+    "audioUnavailable": "audio unavailable",
+    "connectionFailed": "connection failed",
+    "unauthorized": "unauthorized",
+    "closed": "closed",
+    "serverError": "server error"
+  },
+  "scriptPlaceholder": "Write or paste your script here. While you record it scrolls as you read it aloud, or at a steady speed in timed mode.",
+  "scriptModeVoice": "Scroll: follows your voice",
+  "scriptModeTimed": "Scroll: timed, {{wpm}} wpm",
+  "hide": "Hide",
+  "dragToMove": "Drag to move",
+  "dragToResize": "Drag to resize",
+  "expandMenu": "Expand menu",
+  "collapseMenu": "Collapse menu",
+  "editScript": "Edit script",
+  "testVoice": "Test voice",
+  "stopVoiceTest": "Stop test",
+  "scrollSpeed": "Scroll speed",
+  "slower": "Slower",
+  "faster": "Faster",
+  "wordsPerMin": "words/min",
+  "testScroll": "Test scroll",
+  "stopScrollTest": "Stop scroll test",
+  "pauseScroll": "Pause scroll",
+  "resumeScroll": "Resume scroll",
+  "hideTeleprompter": "Hide teleprompter"
+}

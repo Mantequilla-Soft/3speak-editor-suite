@@ -1,0 +1,53 @@
+{
+  "sheet": {
+    "title": "키보드 단축키"
+  },
+  "groups": {
+    "playback": "재생",
+    "clips": "클립",
+    "project": "프로젝트"
+  },
+  "items": {
+    "playPause": "재생 / 일시정지",
+    "playForward": "앞으로 재생. 다시 누르면 2배, 4배, 8배",
+    "playBackward": "뒤로 재생. 다시 누르면 더 빠르게",
+    "stop": "중지",
+    "frameStep": "한 프레임 뒤로 / 앞으로 (Shift: 10프레임)",
+    "nudge": "재생 헤드를 0.1초 이동 (Shift: 1초)",
+    "fullscreen": "전체 화면 켜기 / 끄기",
+    "nextPrevClip": "다음 / 이전 클립 선택",
+    "clipLeftRight": "같은 트랙의 이전 / 다음 클립",
+    "clipUpDown": "위 / 아래 트랙의 클립",
+    "openClip": "선택한 클립의 설정 열기",
+    "selectNone": "선택 해제",
+    "selectAll": "모든 클립 선택",
+    "remove": "선택한 클립 제거",
+    "split": "선택한 클립을 재생 헤드 위치에서 분할",
+    "duplicate": "선택한 클립 복제",
+    "ungroup": "클립 그룹 해제",
+    "closeGap": "재생 헤드 위치의 빈틈 메우기",
+    "addText": "재생 헤드 위치에 텍스트 추가",
+    "undo": "실행 취소",
+    "redo": "다시 실행",
+    "addFlag": "재생 헤드 위치에 깃발 추가",
+    "addChapter": "재생 헤드 위치에 챕터 추가",
+    "zoom": "타임라인 확대 / 축소",
+    "showSheet": "이 단축키 보기"
+  },
+  "keys": {
+    "space": "스페이스바",
+    "tab": "Tab",
+    "shift": "Shift",
+    "alt": "Alt",
+    "ctrl": "Ctrl",
+    "enter": "Enter",
+    "esc": "Esc",
+    "delete": "Delete"
+  },
+  "announce": {
+    "selected": "{{clip}} 선택됨",
+    "stopped": "중지됨",
+    "forward": "앞으로 {{speed}}배",
+    "backward": "뒤로 {{speed}}배"
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "button": {
+    "rendering": "Renderizando...",
+    "exporting": "Exportando...",
+    "uploading": "Enviando {{percent}}",
+    "reRender": "Renderizar de novo",
+    "exportAgain": "Exportar de novo",
+    "trimToRender": "Corte a linha do tempo para {{limit}} ou menos para renderizar",
+    "trimToExport": "Corte a linha do tempo para {{limit}} ou menos para exportar"
+  },
+  "exportAs": {
+    "button": "Exportar como",
+    "title": "Exportar como: o mesmo projeto como Short, vídeo quadrado ou paisagem, recortado em volta dos rostos",
+    "close": "Fechar Exportar como",
+    "waitUpload": "Aguarde o envio terminar."
+  },
+  "done": {
+    "download": "Baixar",
+    "audiograms": "Audiogramas",
+    "audiogramsCount": "Audiogramas ({{n}})",
+    "audiogramsTitle": "Vídeos curtos com trechos do episódio, para compartilhar ou publicar como Shorts junto com ele",
+    "videoPodcast": "Videocast",
+    "videoPodcastTitle": "O episódio inteiro como vídeo 16:9 com a capa, uma forma de onda, legendas e quem está falando",
+    "useAudio": "Usar este áudio",
+    "sendVideo": "Enviar vídeo"
+  },
+  "failed": "Falha na renderização: {{error}}",
+  "phase": {
+    "preparing": "Preparando arquivos...",
+    "submitting": "Enviando a tarefa de renderização...",
+    "busyRetry": "Os servidores de renderização estão ocupados. Tentando de novo em {{seconds}} s...",
+    "offlineRetry": "Sem conexão com o servidor de renderização. Tentando de novo em {{seconds}} s...",
+    "starting": "Iniciando...",
+    "reconnecting": "Reconectando ao servidor de renderização...",
+    "uploadingFile": "Enviando {{name}} ({{index}}/{{total}})...",
+    "uploadingUnnamed": "Enviando arquivo ({{index}}/{{total}})...",
+    "uploadingPlate": "Enviando quadro de fundo para {{name}}...",
+    "uploadingPlateUnnamed": "Enviando quadro de fundo para o clipe..."
+  },
+  "queue": {
+    "next": "Você é o próximo",
+    "inLine": {
+      "one": "Você é o {{n}}º da fila",
+      "two": "Você é o {{n}}º da fila",
+      "few": "Você é o {{n}}º da fila",
+      "other": "Você é o {{n}}º da fila"
+    },
+    "waiting": "Aguardando uma vaga livre para renderizar..."
+  },
+  "legacy": {
+    "exportVideo": "Exportar vídeo",
+    "cancelTitle": "Cancelar exportação",
+    "settingsTitle": "Configurações de exportação",
+    "uploadingRender": "Enviando {{name}} ({{percent}}). Continue editando; Renderizar é liberado quando terminar.",
+    "uploadingExport": "Enviando {{name}} ({{percent}}). Continue editando; Exportar é liberado quando terminar.",
+    "lengthRender": "A linha do tempo tem {{length}}. Corte para {{limit}} ou menos para renderizar.",
+    "lengthExport": "A linha do tempo tem {{length}}. Corte para {{limit}} ou menos para exportar.",
+    "method": "Método de exportação",
+    "methodCanvas": "Canvas (o que você vê é o que sai)",
+    "methodFast": "Rápido (sem efeitos)",
+    "canvasHint": "Captura todos os efeitos visuais exatamente como aparecem na prévia",
+    "fastHint": "Exportação mais rápida, mas ignora zoom, posição, recorte e textos sobrepostos",
+    "quality": "Qualidade",
+    "qualityHigh": "Alta (arquivo maior)",
+    "qualityMedium": "Média (recomendada)",
+    "qualityLow": "Baixa (arquivo menor)",
+    "processing": "Processando... {{percent}}",
+    "renderingPercent": "Renderizando... {{percent}}",
+    "downloadRendered": "Baixar vídeo renderizado",
+    "ffmpegLoading": "Carregando FFmpeg...",
+    "ffmpegNotLoaded": "FFmpeg não carregado",
+    "addClips": "Adicione clipes à linha do tempo para exportar"
+  },
+  "canvas": {
+    "loadingMedia": "Carregando mídia...",
+    "renderingFrames": "Renderizando quadros...",
+    "encodingVideo": "Codificando vídeo...",
+    "processingAudio": "Processando áudio...",
+    "convertingMp4": "Convertendo para MP4...",
+    "preparingDownload": "Preparando o download...",
+    "complete": "Concluído!"
+  }
+}

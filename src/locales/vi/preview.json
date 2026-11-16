@@ -1,0 +1,29 @@
+{
+  "header": "Xem trước dòng thời gian",
+  "smaller": "Nhỏ hơn",
+  "larger": "Lớn hơn",
+  "loopOn": "Lặp: bật",
+  "loopOff": "Lặp: tắt",
+  "aspect": {
+    "title": "Tỉ lệ khung hình: {{ratio}}",
+    "titleAuto": "Tỉ lệ khung hình: Tự động ({{ratio}})",
+    "auto": "Tự động"
+  },
+  "fullSize": "Kích thước đầy đủ",
+  "halfSize": "Một nửa kích thước",
+  "fullscreen": "Toàn màn hình",
+  "noClipHere": "Không có clip ở vị trí này",
+  "noClips": "Không có clip trên dòng thời gian",
+  "source": {
+    "hls": "(luồng HLS)",
+    "uploaded": "(đã tải lên)",
+    "local": "(trên máy)",
+    "file": "(tệp)"
+  },
+  "stageLayout": {
+    "tileTop": "Xếp phía trên",
+    "tileBottom": "Xếp phía dưới",
+    "overlay": "Lớp phủ"
+  },
+  "selectClip": "Chọn một clip để xem trước"
+}

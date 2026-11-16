@@ -1,0 +1,304 @@
+{
+  "empty": "クリップを選ぶとプロパティが表示されます",
+  "types": {
+    "video": "動画",
+    "audio": "音声",
+    "image": "画像",
+    "text": "テキスト",
+    "color": "カラー",
+    "scene": "シーン"
+  },
+  "sections": {
+    "content": "コンテンツ",
+    "color": "色",
+    "audio": "音声",
+    "layout": "レイアウト",
+    "transform": "変形",
+    "timing": "タイミング",
+    "motion": "モーション",
+    "greenScreen": "グリーンバック"
+  },
+  "doubleClickReset": "ダブルクリックでリセット",
+  "text": {
+    "label": "テキスト",
+    "placeholder": "ここにテキストを入力...",
+    "font": "フォント",
+    "resetFont": "フォントをリセット",
+    "fontGroups": {
+      "sansSerif": "サンセリフ",
+      "serif": "セリフ",
+      "display": "ディスプレイ",
+      "handwriting": "手書き",
+      "monospace": "等幅"
+    },
+    "weight": {
+      "normal": "標準",
+      "bold": "太字"
+    },
+    "style": "スタイル",
+    "resetStyle": "スタイルをリセット",
+    "size": "サイズ",
+    "alignment": "配置",
+    "resetAlignment": "配置をリセット",
+    "align": {
+      "left": "左揃え",
+      "center": "中央揃え",
+      "right": "右揃え"
+    },
+    "box": "背景ボックス",
+    "fill": "塗りつぶし",
+    "opacity": "不透明度",
+    "padding": "余白",
+    "radius": "角の丸み",
+    "border": "枠線",
+    "width": "幅"
+  },
+  "colorClip": {
+    "background": "背景色",
+    "gradient": "グラデーション",
+    "enabled": "有効",
+    "disabled": "無効",
+    "endColor": "終了色",
+    "angle": "角度",
+    "resetAngle": "角度をリセット"
+  },
+  "volume": {
+    "label": "音量",
+    "reset": "音量をリセット",
+    "mute": "ミュート",
+    "unmute": "ミュート解除"
+  },
+  "fades": {
+    "label": "フェード",
+    "none": "フェードなし",
+    "in": "イン",
+    "out": "アウト",
+    "inSeconds": "イン（秒）",
+    "outSeconds": "アウト（秒）"
+  },
+  "noise": {
+    "reduce": "背景ノイズを軽減",
+    "cleanVoice": "音声をクリーンアップ",
+    "group": "ノイズ軽減",
+    "working": "処理中",
+    "workingDots": "処理中…",
+    "afterUpload": "このクリップのアップロードが完了すると使えます。",
+    "appliesGroup_other": "このクリップとそのグループ（{{count}} 個のクリップ）に適用されます。",
+    "appliesOne": "このクリップにのみ適用されます。",
+    "failed": "ノイズ軽減に失敗しました。もう一度お試しください。",
+    "levels": {
+      "light": "弱",
+      "medium": "中",
+      "strong": "強"
+    },
+    "studioTitle": "強：ノイズが少なく、低音のゴロゴロがなく、よりクリアで均一、S の音もやわらかく"
+  },
+  "duck": {
+    "label": "ダッキング",
+    "group": "このクリップをダッキング",
+    "depth": "{{db}} dB",
+    "source": "<lead></lead><pick/><tail>の再生中は音量を下げる</tail>",
+    "sourceLabel": "ダッキングのきっかけ",
+    "hint": "選んだトラックの再生中はこのクリップの音量が下がり、間ができると元に戻ります。"
+  },
+  "greenScreen": {
+    "removeBackground": "背景を削除",
+    "modes": {
+      "green": "グリーン",
+      "blue": "ブルー",
+      "person": "人物",
+      "static": "固定背景（実験的）"
+    },
+    "modeTitles": {
+      "green": "グリーンバック",
+      "blue": "ブルーバック",
+      "person": "グリーンバック不要：映像からあなたを見つけて、それ以外を削除します",
+      "static": "固定背景（実験的）：誰もいない背景のフレームと一致する部分を削除します"
+    },
+    "staticHint": "誰もいない背景の数フレームに似ている部分をすべて削除します。小さな変化（ノイズ、光、ピント）は無視され、壁と似ているあなたの部分も輪郭の内側なら残ります。カメラを動かさないでください。あなたの影は残ります。部屋の一部が見えたままなら、しきい値を上げてください。",
+    "hint": {
+      "green": "緑の背景を削除して、下のトラックのクリップが透けて見えるようにします。",
+      "blue": "青の背景を削除して、下のトラックのクリップが透けて見えるようにします。",
+      "person": "グリーンバック不要：エディターがすべてのフレームで人物を見つけ、それ以外を削除します。カメラの前に1人で、しっかり照明が当たっているときに最もよく機能します。"
+    },
+    "plate": "誰もいない背景のフレーム",
+    "plateAlt": "誰もいない背景",
+    "plateHint": "あなたが映っておらず、背景だけが映っている瞬間に再生ヘッドを移動してください。そこから0.5秒分が使われます。",
+    "grabbing": "フレームを取得中...",
+    "useFrame": "再生ヘッドのフレームを使う",
+    "useFrameInstead": "代わりに再生ヘッドのフレームを使う",
+    "grabFailed": "そのフレームを取得できませんでした。もう一度試すか、別の瞬間を選んでください。",
+    "threshold": "しきい値",
+    "thresholdStaticTitle": "許容度：高くすると背景の変化（ノイズ、光、ピント）をより無視しますが、あなたの一部まで削除され始めることがあります",
+    "thresholdTitle": "高くすると画面の色をより多く削除します",
+    "resetThreshold": "しきい値をリセット",
+    "softness": "エッジのぼかし",
+    "resetSoftness": "ぼかしをリセット",
+    "despill": "色かぶり除去",
+    "despillStaticTitle": "輪郭から壁の色を取り除きます",
+    "despillTitle": {
+      "green": "輪郭から緑の色かぶりを取り除きます",
+      "blue": "輪郭から青の色かぶりを取り除きます"
+    },
+    "resetDespill": "色かぶり除去をリセット",
+    "cameraLock": {
+      "allLocked": "カメラのピントと露出、ホワイトバランスも固定しました。",
+      "focusExposureLocked": "カメラのピントと露出を固定しました。",
+      "noFocus": "このカメラはピントを固定できません。カメラに近づいたり離れたりしないでください。",
+      "lockedList": "固定済み：{{list}}。",
+      "noExposure": "ピントを固定しました。このカメラは露出を固定できないため、明るさを一定に保ってください。",
+      "names": {
+        "focus": "ピント",
+        "exposure": "露出",
+        "whiteBalance": "ホワイトバランス"
+      }
+    }
+  },
+  "layout": {
+    "boxSize": "ボックスのサイズ",
+    "smaller": "小さく",
+    "larger": "大きく",
+    "zoom": "ズーム",
+    "resetZoom": "ズームをリセット",
+    "hint": "クリップをドラッグして移動します。長押ししてからドラッグすると、ボックス内の動画を動かせます。タッチ画面ではピンチでズームできます。",
+    "freeTransform": "自由変形に切り替え"
+  },
+  "transform": {
+    "scale": "拡大率",
+    "resetScale": "拡大率をリセット",
+    "rotation": "回転",
+    "resetRotation": "回転をリセット",
+    "position": "位置",
+    "resetPosition": "位置をリセット",
+    "dragToMove": "ドラッグして位置を変更",
+    "crop": "切り抜き",
+    "resetCrop": "切り抜きをリセット",
+    "cropWidth": "幅",
+    "cropHeight": "高さ",
+    "opacity": "不透明度",
+    "resetOpacity": "不透明度をリセット"
+  },
+  "timing": {
+    "duration": "長さ",
+    "seconds": "秒",
+    "in": "イン：",
+    "out": "アウト：",
+    "durationColon": "長さ：",
+    "position": "位置："
+  },
+  "color": {
+    "measuring": "測定中…",
+    "autoTitle": "このクリップのフレームからレベル、中間調、ホワイトバランスを補正",
+    "resetAll": "色の調整をすべてリセット",
+    "failed": "このクリップの映像を読み込めませんでした。",
+    "sliders": {
+      "brightness": "明るさ",
+      "contrast": "コントラスト",
+      "midtones": "中間調",
+      "saturation": "彩度",
+      "warmth": "色温度",
+      "tint": "色合い"
+    }
+  },
+  "effects": {
+    "hiddenName": "{{name}}（非表示）",
+    "show": "このエフェクトを再表示",
+    "hide": "このエフェクトを非表示（残りますが適用されません）",
+    "remove": "このエフェクトを削除",
+    "comesFrom": "入ってくる方向",
+    "goesTo": "出ていく方向",
+    "from": "入る方向",
+    "to": "出る方向",
+    "speed": "速度",
+    "amount": {
+      "amplitude": "振幅",
+      "bounce": "バウンド",
+      "distance": "距離"
+    },
+    "addFirst": "エフェクトを追加…",
+    "addAnother": "別のエフェクトを追加…",
+    "groups": {
+      "loop": "ループ",
+      "in": "登場",
+      "out": "退場"
+    },
+    "effect": {
+      "pulse": "パルス",
+      "wobble": "ぐらぐら",
+      "bob": "ふわふわ",
+      "sway": "ゆらゆら",
+      "spin": "回転",
+      "pop": "ポップイン",
+      "slideIn": "スライドイン",
+      "fadeIn": "フェードイン",
+      "popOut": "ポップアウト",
+      "slideOut": "スライドアウト",
+      "fadeOut": "フェードアウト"
+    },
+    "direction": {
+      "left": "左",
+      "right": "右",
+      "top": "上",
+      "bottom": "下"
+    },
+    "pivot": "支点",
+    "pivotPoint": "支点の位置",
+    "pivotName": {
+      "topLeft": "左上",
+      "top": "上",
+      "topRight": "右上",
+      "left": "左",
+      "centre": "中央",
+      "right": "右",
+      "bottomLeft": "左下",
+      "bottom": "下",
+      "bottomRight": "右下",
+      "custom": "カスタム"
+    }
+  },
+  "multi": {
+    "volume": "音量",
+    "volumeMixed": "音量（混在）",
+    "volumeAll": "選択したすべてのクリップの音量",
+    "muteAll": "すべてミュート",
+    "unmuteAll": "すべてミュート解除",
+    "cleanVoice": "音声をクリーンアップ",
+    "cleanGroup": "選択したすべてのクリップの音声クリーンアップ",
+    "afterUpload": "これらのクリップのアップロードが完了すると使えます。",
+    "failed": "音声のクリーンアップに失敗しました。もう一度お試しください。",
+    "applies_other": "選択した {{count}} 個のクリップに適用されます。",
+    "appliesWithGroups_other": "選択した {{selected}} 個のクリップと、そのグループ内の他の {{count}} 個のクリップに適用されます。",
+    "stillUploading": "アップロード中のクリップはそのままになります。",
+    "remove_other": "{{count}} 個のクリップを削除"
+  },
+  "trim": {
+    "title": "トリム：{{name}}",
+    "start": "開始点",
+    "end": "終了点",
+    "trimmed": "トリム後の長さ"
+  },
+  "reframe": {
+    "readFailed": "ここでは動画を読み込めませんでした",
+    "openFailed": "顔の追跡用に動画を開けませんでした"
+  },
+  "personKey": {
+    "ready": "準備完了：すべてのフレームであなたを切り抜きました。レンダリング結果はプレビューと同じになります。",
+    "failed": "このクリップで人物が見つかりませんでした（{{error}}）。",
+    "finding": "すべてのフレームであなたを探しています... その間もプレビューではライブで表示されます。",
+    "findingProgress": "すべてのフレームであなたを探しています：{{percent}} その間もプレビューではライブで表示されます。",
+    "behind": "あなたの背後",
+    "backgrounds": {
+      "none": "透過",
+      "noneTitle": "下のトラックのクリップがあなたの背後に表示されます",
+      "blur": "ぼかし",
+      "blurTitle": "あなた自身の背景をぼかします",
+      "color": "カラー",
+      "colorTitle": "背後を単色にします"
+    },
+    "pickStock": "背後にストック画像や動画を置く",
+    "colour": "色",
+    "blur": "ぼかし",
+    "resetBlur": "ぼかしをリセット",
+    "thresholdTitle": "高くするとあなたの周りを少なく残し、低くすると多く残します"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "cleaning": {
+    "voice_other": "Đang làm sạch giọng của {{count}} clip…",
+    "voiceRecording_other": "Đang làm sạch giọng của {{count}} clip · bản ghi {{at}}/{{total}}",
+    "back_other": "Đang chuyển {{count}} clip về lại…",
+    "backRecording_other": "Đang chuyển {{count}} clip về lại · bản ghi {{at}}/{{total}}"
+  }
+}

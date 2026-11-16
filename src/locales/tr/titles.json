@@ -1,0 +1,111 @@
+{
+  "textFx": {
+    "title": "Metin efektleri",
+    "outline": "Çerçeve",
+    "outlineColour": "Çerçeve rengi",
+    "outlineWidth": "Çerçeve kalınlığı",
+    "wordsComeIn": "Kelimelerin gelişi",
+    "allAtOnce": "Hepsi birden",
+    "atOnce": "Birden",
+    "anims": {
+      "pop": "Belirme",
+      "fadeUp": "Yukarı açılma",
+      "typewriter": "Daktilo",
+      "slide": "Kayma"
+    },
+    "gap": "Aralık",
+    "gapSeconds": "Kelimeler arası süre (saniye)",
+    "defaultText": "Metin"
+  },
+  "templates": {
+    "dialogTitle": "Başlıklar",
+    "allTitles": "Tüm başlıklar",
+    "overVideo": "Videonun üzerinde",
+    "ownBackground": "Kendi arka planı",
+    "starsHint": "Renklendirmek için bir kelimeyi *yıldız* içine al.",
+    "addTitle": "Başlık ekle",
+    "groups": {
+      "lower": "Alt bant yazıları",
+      "title": "Video üzerindeki başlıklar",
+      "card": "Giriş ve kapanış kartları"
+    },
+    "fields": {
+      "name": "Ad",
+      "role": "Rol",
+      "lines": "Satırlar",
+      "words": "Kelimeler",
+      "lineUnder": "Altlarındaki satır",
+      "lineInFront": "Öndeki satır",
+      "rows": "Sıralar",
+      "headline": "Başlık",
+      "lineUnderIt": "Altındaki satır",
+      "tagline": "Slogan",
+      "cta": "Harekete geçirici mesaj",
+      "smallPrint": "Küçük yazı"
+    },
+    "items": {
+      "lowerName": {
+        "label": "Ad ve rol",
+        "sub": "3Speak içerik üreticisi"
+      },
+      "lowerStatement": {
+        "label": "Kısa ifade",
+        "lines": "Bugün *öğrendiğim*\nüç şey"
+      },
+      "titleWords": {
+        "label": "Her seferinde bir kelime",
+        "words": "Planla.\nÇek.\n*Paylaş.*",
+        "line": "3Speak'te haftam"
+      },
+      "titleKinetic": {
+        "label": "Çarparak gelen kelimeler",
+        "words": "Hızlı\nBasit\nSenin",
+        "line": "*3Speak* ile yapıldı"
+      },
+      "titlePoster": {
+        "label": "Üst üste dev kelimeler",
+        "words": "Birinci\ngün.",
+        "sub": "Sıfırdan başlıyorum"
+      },
+      "titleMarquee": {
+        "label": "Kayan sıralar",
+        "rows": "Planla\nÇek\nPaylaş\nTekrarla",
+        "line": "Her *hafta*"
+      },
+      "cardHook": {
+        "label": "Giriş: açılış cümlesi",
+        "lines": "*Shorts*\nvideolarımı\nnasıl düzenliyorum",
+        "sub": "Bir dakikadan kısa sürede"
+      },
+      "cardEnd": {
+        "label": "Kapanış: beni takip et",
+        "tagline": "*Her hafta* yeni Shorts",
+        "cta": "3Speak'te takip et"
+      },
+      "cardPoster": {
+        "label": "Kapanış: dev kelimeler",
+        "words": "Yakında\n*görüşmek*\nüzere.",
+        "cta": "3Speak'te takip et"
+      }
+    }
+  },
+  "scene": {
+    "title": "Başlık",
+    "onePerLine": "Satır başına bir tane",
+    "colours": "Renkler",
+    "font": "Yazı tipi",
+    "overVideo": "Videonun üzerinde",
+    "length": "Uzunluk",
+    "lengthSeconds": "Uzunluk (saniye)",
+    "defaultName": "Ben",
+    "layerTitle": "Başlık"
+  },
+  "colors": {
+    "ember": "Kor",
+    "amber": "Kehribar",
+    "ocean": "Okyanus",
+    "forest": "Orman",
+    "berry": "Böğürtlen",
+    "paper": "Kâğıt"
+  }
+}

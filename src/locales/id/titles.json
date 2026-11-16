@@ -1,0 +1,111 @@
+{
+  "textFx": {
+    "title": "Efek teks",
+    "outline": "Garis luar",
+    "outlineColour": "Warna garis luar",
+    "outlineWidth": "Tebal garis luar",
+    "wordsComeIn": "Kata-kata masuk",
+    "allAtOnce": "Semua sekaligus",
+    "atOnce": "Sekaligus",
+    "anims": {
+      "pop": "Pop",
+      "fadeUp": "Muncul naik",
+      "typewriter": "Mesin ketik",
+      "slide": "Geser"
+    },
+    "gap": "Jeda",
+    "gapSeconds": "Waktu di antara kata (detik)",
+    "defaultText": "Teks"
+  },
+  "templates": {
+    "dialogTitle": "Judul",
+    "allTitles": "Semua judul",
+    "overVideo": "Di atas video",
+    "ownBackground": "Latar sendiri",
+    "starsHint": "Apit kata dengan *bintang* untuk mewarnainya.",
+    "addTitle": "Tambah judul",
+    "groups": {
+      "lower": "Lower third",
+      "title": "Judul di atas video",
+      "card": "Kartu intro dan outro"
+    },
+    "fields": {
+      "name": "Nama",
+      "role": "Peran",
+      "lines": "Baris",
+      "words": "Kata",
+      "lineUnder": "Kalimat di bawahnya",
+      "lineInFront": "Kalimat di depan",
+      "rows": "Baris",
+      "headline": "Judul utama",
+      "lineUnderIt": "Kalimat di bawahnya",
+      "tagline": "Tagline",
+      "cta": "Ajakan bertindak",
+      "smallPrint": "Cetakan kecil"
+    },
+    "items": {
+      "lowerName": {
+        "label": "Nama dan peran",
+        "sub": "Kreator di 3Speak"
+      },
+      "lowerStatement": {
+        "label": "Pernyataan singkat",
+        "lines": "Tiga hal yang\nku*pelajari* hari ini"
+      },
+      "titleWords": {
+        "label": "Satu kata setiap kali",
+        "words": "Rencanakan.\nRekam.\n*Posting.*",
+        "line": "Mingguku di 3Speak"
+      },
+      "titleKinetic": {
+        "label": "Kata-kata menghantam masuk",
+        "words": "Cepat\nMudah\nMilikmu",
+        "line": "Dibuat di *3Speak*"
+      },
+      "titlePoster": {
+        "label": "Kata-kata raksasa bertumpuk",
+        "words": "Hari\npertama.",
+        "sub": "Mulai dari nol"
+      },
+      "titleMarquee": {
+        "label": "Baris bergulir",
+        "rows": "Rencanakan\nRekam\nPosting\nUlangi",
+        "line": "Setiap *minggu*"
+      },
+      "cardHook": {
+        "label": "Intro: kalimat pembuka",
+        "lines": "Cara aku\nmengedit\n*Shorts*-ku",
+        "sub": "Dalam kurang dari semenit"
+      },
+      "cardEnd": {
+        "label": "Outro: ikuti aku",
+        "tagline": "Shorts baru *setiap minggu*",
+        "cta": "Ikuti di 3Speak"
+      },
+      "cardPoster": {
+        "label": "Outro: kata-kata raksasa",
+        "words": "Sampai\njumpa\n*lagi.*",
+        "cta": "Ikuti di 3Speak"
+      }
+    }
+  },
+  "scene": {
+    "title": "Judul",
+    "onePerLine": "Satu per baris",
+    "colours": "Warna",
+    "font": "Font",
+    "overVideo": "Di atas video",
+    "length": "Durasi",
+    "lengthSeconds": "Durasi (detik)",
+    "defaultName": "Aku",
+    "layerTitle": "Judul"
+  },
+  "colors": {
+    "ember": "Bara",
+    "amber": "Amber",
+    "ocean": "Samudra",
+    "forest": "Hutan",
+    "berry": "Beri",
+    "paper": "Kertas"
+  }
+}

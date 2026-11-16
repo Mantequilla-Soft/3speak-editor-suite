@@ -1,0 +1,308 @@
+{
+  "empty": "Özellikleri görmek için bir klip seç",
+  "types": {
+    "video": "video",
+    "audio": "ses",
+    "image": "görsel",
+    "text": "metin",
+    "color": "renk",
+    "scene": "sahne"
+  },
+  "sections": {
+    "content": "İçerik",
+    "color": "Renk",
+    "audio": "Ses",
+    "layout": "Yerleşim",
+    "transform": "Dönüştürme",
+    "timing": "Zamanlama",
+    "motion": "Hareket",
+    "greenScreen": "Yeşil ekran"
+  },
+  "doubleClickReset": "Sıfırlamak için çift tıkla",
+  "text": {
+    "label": "Metin",
+    "placeholder": "Metni buraya gir...",
+    "font": "Yazı tipi",
+    "resetFont": "Yazı tipini sıfırla",
+    "fontGroups": {
+      "sansSerif": "Sans Serif",
+      "serif": "Serif",
+      "display": "Başlık",
+      "handwriting": "El yazısı",
+      "monospace": "Eş aralıklı"
+    },
+    "weight": {
+      "normal": "Normal",
+      "bold": "Kalın"
+    },
+    "style": "Stil",
+    "resetStyle": "Stili sıfırla",
+    "size": "Boyut",
+    "alignment": "Hizalama",
+    "resetAlignment": "Hizalamayı sıfırla",
+    "align": {
+      "left": "Sola hizala",
+      "center": "Ortala",
+      "right": "Sağa hizala"
+    },
+    "box": "Arka Plan Kutusu",
+    "fill": "Dolgu",
+    "opacity": "Opaklık",
+    "padding": "İç boşluk",
+    "radius": "Köşe yarıçapı",
+    "border": "Kenarlık",
+    "width": "Genişlik"
+  },
+  "colorClip": {
+    "background": "Arka Plan Rengi",
+    "gradient": "Gradyan",
+    "enabled": "Açık",
+    "disabled": "Kapalı",
+    "endColor": "Bitiş Rengi",
+    "angle": "Açı",
+    "resetAngle": "Açıyı sıfırla"
+  },
+  "volume": {
+    "label": "Ses düzeyi",
+    "reset": "Ses düzeyini sıfırla",
+    "mute": "Sesi kapat",
+    "unmute": "Sesi aç"
+  },
+  "fades": {
+    "label": "Geçişler",
+    "none": "Geçiş yok",
+    "in": "Giriş",
+    "out": "Çıkış",
+    "inSeconds": "Giriş (saniye)",
+    "outSeconds": "Çıkış (saniye)"
+  },
+  "noise": {
+    "reduce": "Arka plan gürültüsünü azalt",
+    "cleanVoice": "Sesi temizle",
+    "group": "Gürültü azaltma",
+    "working": "Çalışılıyor",
+    "workingDots": "Çalışılıyor…",
+    "afterUpload": "Bu klibin yüklemesi bitince kullanılabilir.",
+    "appliesGroup_one": "Bu klibe ve grubuna uygulanır ({{count}} klip).",
+    "appliesGroup_other": "Bu klibe ve grubuna uygulanır ({{count}} klip).",
+    "appliesOne": "Yalnızca bu klibe uygulanır.",
+    "failed": "Gürültü azaltma başarısız oldu. Tekrar dene.",
+    "levels": {
+      "light": "Hafif",
+      "medium": "Orta",
+      "strong": "Güçlü"
+    },
+    "studioTitle": "Güçlü: daha az gürültü, uğultu yok, daha net ve dengeli, daha yumuşak S sesleri"
+  },
+  "duck": {
+    "label": "Kısma",
+    "group": "Bu klibi kıs",
+    "depth": "{{db}} dB",
+    "source": "<pick/><tail>çalarken</tail><lead>sesi kısılır</lead>",
+    "sourceLabel": "Kısma kaynağı",
+    "hint": "Seçilen kanal çalarken bu klibin sesi kısılır, duraklamalarda yeniden açılır."
+  },
+  "greenScreen": {
+    "removeBackground": "Arka planı kaldır",
+    "modes": {
+      "green": "Yeşil",
+      "blue": "Mavi",
+      "person": "Kişi",
+      "static": "Sabit (deneysel)"
+    },
+    "modeTitles": {
+      "green": "Yeşil ekran",
+      "blue": "Mavi ekran",
+      "person": "Yeşil ekran gerekmez: seni görüntüde bulur ve gerisini kaldırır",
+      "static": "Sabit arka plan (deneysel): boş arka plan karesine uyan her şeyi kaldırır"
+    },
+    "staticHint": "Boş arka planın birkaç karesine benzeyen her şeyi kaldırır. Küçük değişiklikler (gürültü, ışık, odak) yok sayılır ve senin duvara benzeyen kısımların dış hattının içinde kalır. Hareket etmeyen bir kamera gerekir; düşürdüğün gölgeler görünür kalır. Odanın bazı kısımları görünmeye devam ederse Eşiği artır.",
+    "hint": {
+      "green": "Yeşil fonu kaldırır, böylece alttaki kanallardaki klipler görünür.",
+      "blue": "Mavi fonu kaldırır, böylece alttaki kanallardaki klipler görünür.",
+      "person": "Yeşil ekran gerekmez: düzenleyici her karede kişiyi bulur ve gerisini kaldırır. En iyi, kameranın önünde tamamen aydınlatılmış tek bir kişiyle çalışır."
+    },
+    "plate": "Boş arka plan karesi",
+    "plateAlt": "Boş arka plan",
+    "plateHint": "Oynatma kafasını yalnızca arka planın göründüğü, senin olmadığın bir ana getir. Bunun yarım saniyesi kullanılır.",
+    "grabbing": "Kare alınıyor...",
+    "useFrame": "Oynatma kafasındaki kareyi kullan",
+    "useFrameInstead": "Bunun yerine oynatma kafasındaki kareyi kullan",
+    "grabFailed": "Bu kare alınamadı. Tekrar dene ya da başka bir an seç.",
+    "threshold": "Eşik",
+    "thresholdStaticTitle": "Tolerans: yüksek değer arka plandaki daha fazla değişikliği (gürültü, ışık, odak) yok sayar ama senin bazı kısımlarını da kaldırmaya başlayabilir",
+    "thresholdTitle": "Yüksek değer ekran renginden daha fazlasını kaldırır",
+    "resetThreshold": "Eşiği sıfırla",
+    "softness": "Kenar yumuşaklığı",
+    "resetSoftness": "Yumuşaklığı sıfırla",
+    "despill": "Renk taşmasını gider",
+    "despillStaticTitle": "Duvar rengini kenarlardan kaldırır",
+    "despillTitle": {
+      "green": "Yeşil tonu kenarlardan kaldırır",
+      "blue": "Mavi tonu kenarlardan kaldırır"
+    },
+    "resetDespill": "Renk taşmasını sıfırla",
+    "cameraLock": {
+      "allLocked": "Kamera odağı ve pozlaması kilitlendi, beyaz dengesi de.",
+      "focusExposureLocked": "Kamera odağı ve pozlaması kilitlendi.",
+      "noFocus": "Kameran odağın kilitlenmesine izin vermiyor; yaklaşmaktan ya da uzaklaşmaktan kaçın.",
+      "lockedList": "Kilitlenenler: {{list}}.",
+      "noExposure": "Odak kilitlendi. Bu kamerada pozlama kilitlenemiyor; ışığı sabit tut.",
+      "names": {
+        "focus": "odak",
+        "exposure": "pozlama",
+        "whiteBalance": "beyaz dengesi"
+      }
+    }
+  },
+  "layout": {
+    "boxSize": "Kutu boyutu",
+    "smaller": "Daha küçük",
+    "larger": "Daha büyük",
+    "zoom": "Yakınlaştır",
+    "resetZoom": "Yakınlaştırmayı sıfırla",
+    "hint": "Taşımak için klibi sürükle. Videoyu kutusunun içinde taşımak için basılı tut, sonra sürükle. Dokunmatik ekranlarda yakınlaştırmak için iki parmakla sıkıştır.",
+    "freeTransform": "Serbest dönüştürmeye geç"
+  },
+  "transform": {
+    "scale": "Ölçek",
+    "resetScale": "Ölçeği sıfırla",
+    "rotation": "Döndürme",
+    "resetRotation": "Döndürmeyi sıfırla",
+    "position": "Konum",
+    "resetPosition": "Konumu sıfırla",
+    "dragToMove": "Konumlandırmak için sürükle",
+    "crop": "Kırp",
+    "resetCrop": "Kırpmayı sıfırla",
+    "cropWidth": "G",
+    "cropHeight": "Y",
+    "opacity": "Opaklık",
+    "resetOpacity": "Opaklığı sıfırla"
+  },
+  "timing": {
+    "duration": "Süre",
+    "seconds": "sn",
+    "in": "Giriş:",
+    "out": "Çıkış:",
+    "durationColon": "Süre:",
+    "position": "Konum:"
+  },
+  "color": {
+    "measuring": "Ölçülüyor…",
+    "autoTitle": "Düzeyleri, orta tonları ve beyaz dengesini bu klibin karelerine göre düzelt",
+    "resetAll": "Tüm renk ayarlarını sıfırla",
+    "failed": "Bu klibin görüntüsü okunamadı.",
+    "sliders": {
+      "brightness": "Parlaklık",
+      "contrast": "Kontrast",
+      "midtones": "Orta tonlar",
+      "saturation": "Doygunluk",
+      "warmth": "Sıcaklık",
+      "tint": "Ton"
+    }
+  },
+  "effects": {
+    "hiddenName": "{{name}} (gizli)",
+    "show": "Bu efekti yeniden göster",
+    "hide": "Bu efekti gizle (korunur ama uygulanmaz)",
+    "remove": "Bu efekti kaldır",
+    "comesFrom": "Geldiği yön",
+    "goesTo": "Gittiği yön",
+    "from": "Başlangıç",
+    "to": "Bitiş",
+    "speed": "Hız",
+    "amount": {
+      "amplitude": "Genlik",
+      "bounce": "Zıplama",
+      "distance": "Mesafe"
+    },
+    "addFirst": "Efekt ekle…",
+    "addAnother": "Başka bir efekt ekle…",
+    "groups": {
+      "loop": "Döngüler",
+      "in": "Girişler",
+      "out": "Çıkışlar"
+    },
+    "effect": {
+      "pulse": "Nabız",
+      "wobble": "Sallanma",
+      "bob": "Hoplama",
+      "sway": "Salınma",
+      "spin": "Dönme",
+      "pop": "Belirme",
+      "slideIn": "Kayarak giriş",
+      "fadeIn": "Açılarak giriş",
+      "popOut": "Kaybolma",
+      "slideOut": "Kayarak çıkış",
+      "fadeOut": "Kararak çıkış"
+    },
+    "direction": {
+      "left": "sol",
+      "right": "sağ",
+      "top": "üst",
+      "bottom": "alt"
+    },
+    "pivot": "Eksen",
+    "pivotPoint": "Dönme noktası",
+    "pivotName": {
+      "topLeft": "sol üst",
+      "top": "üst",
+      "topRight": "sağ üst",
+      "left": "sol",
+      "centre": "orta",
+      "right": "sağ",
+      "bottomLeft": "sol alt",
+      "bottom": "alt",
+      "bottomRight": "sağ alt",
+      "custom": "özel"
+    }
+  },
+  "multi": {
+    "volume": "Ses düzeyi",
+    "volumeMixed": "Ses düzeyi (karışık)",
+    "volumeAll": "Seçili tüm kliplerin ses düzeyi",
+    "muteAll": "Tümünün sesini kapat",
+    "unmuteAll": "Tümünün sesini aç",
+    "cleanVoice": "Sesi temizle",
+    "cleanGroup": "Seçili tüm kliplerde ses temizleme",
+    "afterUpload": "Bu kliplerin yüklemesi bitince kullanılabilir.",
+    "failed": "Ses temizleme başarısız oldu. Tekrar dene.",
+    "applies_one": "Seçili {{count}} klibe uygulanır.",
+    "applies_other": "Seçili {{count}} klibe uygulanır.",
+    "appliesWithGroups_one": "Seçili {{selected}} klibe ve gruplarındaki diğer {{count}} klibe uygulanır.",
+    "appliesWithGroups_other": "Seçili {{selected}} klibe ve gruplarındaki diğer {{count}} klibe uygulanır.",
+    "stillUploading": "Hâlâ yüklenen klipler olduğu gibi bırakılır.",
+    "remove_one": "{{count}} klibi kaldır",
+    "remove_other": "{{count}} klibi kaldır"
+  },
+  "trim": {
+    "title": "Kırp: {{name}}",
+    "start": "Başlangıç Noktası",
+    "end": "Bitiş Noktası",
+    "trimmed": "Kırpılmış Süre"
+  },
+  "reframe": {
+    "readFailed": "Video burada okunamadı",
+    "openFailed": "Video yüz takibi için açılamadı"
+  },
+  "personKey": {
+    "ready": "Hazır: her karede arka plandan ayrıldın. İşlenmiş video önizleme gibi görünür.",
+    "failed": "Bu klipte bir kişi bulunamadı ({{error}}).",
+    "finding": "Her karede seni arıyor... Önizleme bu sırada zaten canlı gösteriyor.",
+    "findingProgress": "Her karede seni arıyor: {{percent}} Önizleme bu sırada zaten canlı gösteriyor.",
+    "behind": "Arkanda",
+    "backgrounds": {
+      "none": "Saydam",
+      "noneTitle": "Alttaki kanallardaki klipler arkanda görünür",
+      "blur": "Bulanık",
+      "blurTitle": "Kendi arka planın, bulanıklaştırılmış",
+      "color": "Renk",
+      "colorTitle": "Arkanda düz bir renk"
+    },
+    "pickStock": "Arkana hazır bir görsel ya da video koy",
+    "colour": "Renk",
+    "blur": "Bulanıklık",
+    "resetBlur": "Bulanıklığı sıfırla",
+    "thresholdTitle": "Yüksek değer çevrende daha azını, düşük değer daha fazlasını bırakır"
+  }
+}

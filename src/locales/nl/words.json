@@ -1,0 +1,59 @@
+{
+  "panel": {
+    "title": "Transcript",
+    "close": "Het transcript sluiten"
+  },
+  "cutNotice": {
+    "plain": "Geknipt: {{seconds}} s korter.",
+    "words_one": "{{count}} woord geknipt: {{seconds}} s korter.",
+    "words_other": "{{count}} woorden geknipt: {{seconds}} s korter.",
+    "found_one": "{{count}} treffer geknipt: {{seconds}} s korter.",
+    "found_other": "{{count}} treffers geknipt: {{seconds}} s korter.",
+    "fillers": "{{fillers}}, {{pauses}} geknipt: {{seconds}} s korter.",
+    "dismiss": "Sluiten"
+  },
+  "fillers": {
+    "title": "Stopwoorden en pauzes verwijderen",
+    "emptyHint": "Dit werkt via het transcript: het vindt eh, ehm, weet je en dergelijke in de taal van de show, en de lange pauzes.",
+    "listening": "Luisteren...",
+    "transcribeFirst": "Transcribeer eerst de show",
+    "checking": "Server controleren...",
+    "unavailable": "Transcripten zijn nu niet beschikbaar op deze editorserver.",
+    "intro": "Stopwoorden in het {{language}}. Luister naar elk, vink uit wat moet blijven.",
+    "introNoList": "Stopwoorden in het {{language}} (alleen eh, ehm en dergelijke: nog geen lijst voor deze taal). Luister naar elk, vink uit wat moet blijven.",
+    "stillTranscribing": "De rest van de show wordt nog getranscribeerd.",
+    "fillerWords": "Stopwoorden",
+    "longPauses": "Lange pauzes",
+    "minPause": "Pauze langer dan <strong>{{seconds}}s</strong>",
+    "keepPause": "Pauzes inkorten tot <strong>{{seconds}}s</strong>",
+    "keepPauseTitle": "Wat er na het knippen van een lange pauze overblijft",
+    "fillerCount_one": "{{count}} stopwoord",
+    "fillerCount_other": "{{count}} stopwoorden",
+    "pauseCount_one": "{{count}} pauze",
+    "pauseCount_other": "{{count}} pauzes",
+    "summary": "{{fillers}}, {{pauses}} aangevinkt · knipt {{seconds}}s",
+    "nothingFound": "Niets gevonden met deze instellingen.",
+    "tickAllFillers": "Alle stopwoorden aanvinken",
+    "untickAllFillers": "Alle stopwoorden uitvinken",
+    "tickAllPauses": "Alle pauzes aanvinken",
+    "untickAllPauses": "Alle pauzes uitvinken",
+    "listLabel": "Wat er geknipt zou worden",
+    "item": {
+      "keepPause": "Deze pauze behouden",
+      "cutPause": "Deze pauze knippen",
+      "keepFiller": "{{text}} behouden",
+      "cutFiller": "{{text}} knippen",
+      "stop": "Stoppen",
+      "listenTitle": "Beluisteren (met een seconde eromheen)",
+      "listenAt": "Beluisteren op {{time}}",
+      "pause": "Pauze",
+      "pauseLength": "{{length}}s → {{kept}}s",
+      "filler": "Stopwoord",
+      "fillerTitle": "Een aarzelingsgeluid",
+      "maybe": "Misschien",
+      "maybeTitle": "Hier een stopwoord (afgezet door pauzes of komma's): eerst beluisteren"
+    },
+    "cut": "Knippen",
+    "cutCount": "{{n}} knippen ({{seconds}}s)"
+  }
+}

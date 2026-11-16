@@ -1,0 +1,67 @@
+{
+  "language": {
+    "label": "Ngôn ngữ nói",
+    "auto": "Tự động phát hiện"
+  },
+  "intro": {
+    "title": "Phụ đề tự động",
+    "text": "Biến lời nói thành phụ đề chạy theo từng từ, gắn cứng vào Short của bạn và đồng thời gửi lên 3Speak dưới dạng phụ đề.",
+    "checking": "Đang kiểm tra máy chủ...",
+    "unavailable": "Phụ đề tự động hiện không khả dụng trên máy chủ chỉnh sửa này. Short của bạn vẫn kết xuất bình thường, chỉ là không có phụ đề.",
+    "go": "Phụ đề tự động"
+  },
+  "presets": {
+    "karaoke": "Karaoke",
+    "pop": "Bật lên",
+    "plain": "Phụ đề"
+  },
+  "presetHints": {
+    "karaoke": "Vài từ mỗi lần, từ đang được nói hiện bằng màu tô sáng",
+    "pop": "Một từ (hoặc vài từ) mỗi lần, bật lên",
+    "plain": "Dòng phụ đề cổ điển trên nền tối"
+  },
+  "style": {
+    "title": "Kiểu",
+    "presetsLabel": "Kiểu phụ đề",
+    "wordsAtATime": "Số từ mỗi lần",
+    "font": "Phông chữ",
+    "size": "Cỡ chữ",
+    "sizeLabel": "Cỡ phụ đề",
+    "position": "Vị trí",
+    "positionLabel": "Độ cao phụ đề trong khung hình",
+    "top": "Trên",
+    "middle": "Giữa",
+    "low": "Dưới",
+    "textColour": "Màu chữ",
+    "highlight": "Tô sáng",
+    "highlightLabel": "Màu tô sáng",
+    "uppercase": "Chữ in hoa",
+    "emoji": "Điểm nhấn emoji (phía trên những từ như \"lửa\" hoặc \"yêu\")",
+    "burn": "Hiện trong video (tắt: chỉ làm phụ đề trên 3Speak)"
+  },
+  "words": {
+    "title": "Từ ({{n}})",
+    "hint": "Sửa những chỗ nghe nhầm; xóa trống một từ để bỏ nó. Đã di chuyển hoặc cắt clip? Hãy chạy lại Phụ đề tự động.",
+    "goThere": "Đến đó",
+    "word": "Từ {{n}}",
+    "changeEmoji": "Đổi hoặc gỡ emoji của từ",
+    "addEmoji": "Thêm emoji",
+    "remove": "Gỡ từ này",
+    "removeNamed": "Gỡ {{word}}"
+  },
+  "actions": {
+    "again": "Làm lại",
+    "againTitle": "Nghe lại (thay thế các từ hiện có)",
+    "remove": "Gỡ phụ đề"
+  },
+  "videoSound": "Âm thanh video",
+  "job": {
+    "preparing": "Đang chuẩn bị âm thanh...",
+    "listening": "Đang nghe...",
+    "noTracks": "Không có lời nói nào để làm phụ đề: hãy thêm một clip có âm thanh trước.",
+    "serverAnswered": "Máy chủ phản hồi {{status}}",
+    "lost": "Tác vụ phụ đề bị mất (máy chủ đã khởi động lại?)",
+    "noSpeech": "Không tìm thấy lời nói. Giọng nói có nằm trên một rãnh âm thanh không bị tắt tiếng không (rãnh nhạc không được tính)?",
+    "failed": "Nhận dạng giọng nói thất bại"
+  }
+}

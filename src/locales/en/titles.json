@@ -1,0 +1,111 @@
+{
+  "textFx": {
+    "title": "Text effects",
+    "outline": "Outline",
+    "outlineColour": "Outline colour",
+    "outlineWidth": "Outline width",
+    "wordsComeIn": "Words come in",
+    "allAtOnce": "All at once",
+    "atOnce": "At once",
+    "anims": {
+      "pop": "Pop",
+      "fadeUp": "Fade up",
+      "typewriter": "Typewriter",
+      "slide": "Slide"
+    },
+    "gap": "Gap",
+    "gapSeconds": "Time between words (seconds)",
+    "defaultText": "Text"
+  },
+  "templates": {
+    "dialogTitle": "Titles",
+    "allTitles": "All titles",
+    "overVideo": "Over the video",
+    "ownBackground": "Own background",
+    "starsHint": "Put *stars* around a word to colour it.",
+    "addTitle": "Add title",
+    "groups": {
+      "lower": "Lower thirds",
+      "title": "Titles over the video",
+      "card": "Intro and outro cards"
+    },
+    "fields": {
+      "name": "Name",
+      "role": "Role",
+      "lines": "Lines",
+      "words": "Words",
+      "lineUnder": "Line under them",
+      "lineInFront": "Line in front",
+      "rows": "Rows",
+      "headline": "Headline",
+      "lineUnderIt": "Line under it",
+      "tagline": "Tagline",
+      "cta": "Call to action",
+      "smallPrint": "Small print"
+    },
+    "items": {
+      "lowerName": {
+        "label": "Name and role",
+        "sub": "Creator on 3Speak"
+      },
+      "lowerStatement": {
+        "label": "Short statement",
+        "lines": "Three things\nI *learned* today"
+      },
+      "titleWords": {
+        "label": "One word at a time",
+        "words": "Plan.\nFilm.\n*Post.*",
+        "line": "My week on 3Speak"
+      },
+      "titleKinetic": {
+        "label": "Words slam in",
+        "words": "Fast\nSimple\nYours",
+        "line": "Made on *3Speak*"
+      },
+      "titlePoster": {
+        "label": "Giant stacked words",
+        "words": "Day\none.",
+        "sub": "Starting from zero"
+      },
+      "titleMarquee": {
+        "label": "Scrolling rows",
+        "rows": "Plan\nFilm\nPost\nRepeat",
+        "line": "Every *week*"
+      },
+      "cardHook": {
+        "label": "Intro: opening line",
+        "lines": "How I\nedit my\n*Shorts*",
+        "sub": "In under a minute"
+      },
+      "cardEnd": {
+        "label": "Outro: follow me",
+        "tagline": "New Shorts *every week*",
+        "cta": "Follow on 3Speak"
+      },
+      "cardPoster": {
+        "label": "Outro: giant words",
+        "words": "See\nyou\n*soon.*",
+        "cta": "Follow on 3Speak"
+      }
+    }
+  },
+  "scene": {
+    "title": "Title",
+    "onePerLine": "One per line",
+    "colours": "Colours",
+    "font": "Font",
+    "overVideo": "Over the video",
+    "length": "Length",
+    "lengthSeconds": "Length (seconds)",
+    "defaultName": "Me",
+    "layerTitle": "Title"
+  },
+  "colors": {
+    "ember": "Ember",
+    "amber": "Amber",
+    "ocean": "Ocean",
+    "forest": "Forest",
+    "berry": "Berry",
+    "paper": "Paper"
+  }
+}

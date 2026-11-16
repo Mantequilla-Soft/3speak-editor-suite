@@ -1,0 +1,53 @@
+{
+  "title": "Mwonekano",
+  "noEffects": "Hakuna athari",
+  "presetsLabel": "Mipangilio ya mwonekano",
+  "doubleClickReset": "Bofya mara mbili ili kuweka upya",
+  "presets": {
+    "original": "Asili",
+    "warm": "Joto",
+    "cool": "Baridi",
+    "vivid": "Angavu",
+    "matte": "Isiyong'aa",
+    "bw": "Nyeusi na nyeupe",
+    "vintage": "Ya zamani",
+    "tealorange": "Samawati na machungwa",
+    "fade": "Iliyofifia",
+    "noir": "Giza",
+    "sunset": "Machweo"
+  },
+  "sliders": {
+    "blur": "Ukungu",
+    "vignette": "Giza la pembeni",
+    "sharpen": "Ukali",
+    "split": "Samawati na machungwa"
+  },
+  "transition": {
+    "title": "Mpito",
+    "none": "Hakuna",
+    "types": {
+      "crossfade": "Kufifia kupishana",
+      "dissolve": "Kufifia hadi weusi",
+      "slideleft": "Teleza kushoto",
+      "slideright": "Teleza kulia",
+      "slideup": "Teleza juu",
+      "zoom": "Kuza",
+      "whip": "Mchapo"
+    },
+    "length": "Urefu wa mpito (sekunde)",
+    "fades": "Kufifia",
+    "noFades": "Bila kufifia",
+    "in": "Kuingia",
+    "out": "Kutoka",
+    "fadeInSeconds": "Fifia kuingia (sekunde)",
+    "fadeOutSeconds": "Fifia kutoka (sekunde)",
+    "intoNext": "Kuingia klipu inayofuata",
+    "needNext": "Weka klipu mara baada ya hii kwenye njia ile ile ili kuongeza mpito.",
+    "fromTo": "{{from}} kuingia {{to}}",
+    "fromUnnamed": "Klipu kuingia {{to}}",
+    "toUnnamed": "{{from}} kuingia klipu inayofuata",
+    "bothUnnamed": "Klipu kuingia klipu inayofuata",
+    "add": "Ongeza mpito",
+    "cutLabel": "{{type}}, sek {{seconds}}"
+  }
+}

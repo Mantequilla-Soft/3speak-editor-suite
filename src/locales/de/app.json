@@ -1,0 +1,149 @@
+{
+  "dismiss": "Schließen",
+  "branding": {
+    "audioEditor": "Audio-Editor",
+    "shortsEditor": "Shorts-Editor",
+    "videoEditor": "Video-Editor",
+    "beta": "Beta",
+    "backend": "Backend: {{url}}",
+    "backendSelecting": "Backend: wird gewählt...",
+    "showTour": "Tour noch einmal zeigen",
+    "shortcuts": "Tastenkürzel (?)",
+    "shortcutsLabel": "Tastenkürzel",
+    "fullscreen": "Vollbild (F)",
+    "fullscreenLabel": "Vollbild",
+    "leaveFullscreen": "Vollbild beenden (F)",
+    "leaveFullscreenLabel": "Vollbild beenden",
+    "closeEditor": "Editor schließen"
+  },
+  "backendDown": "Der Backend-Server ist nicht erreichbar. Hochladen von Aufnahmen, Rendern und Medienverarbeitung funktionieren nicht.",
+  "menu": {
+    "undo": "Rückgängig (Strg+Z)",
+    "redo": "Wiederholen (Strg+Umschalt+Z)"
+  },
+  "audioTools": {
+    "cutSilences": "Stille schneiden",
+    "cutSilencesTitle": "Stille aus dem gewählten Clip (oder seiner Gruppe) schneiden: Pausen finden, herausschneiden, Lücken schließen",
+    "template": "Vorlage",
+    "templateTitle": "Deine Vorlage: Intro, Outro und Musikbett für jede Aufnahme",
+    "normalizeLabel": "Lautheit normalisieren",
+    "normalizeOn": "Normalisieren: an",
+    "normalizeOff": "Normalisieren: aus",
+    "normalizeOnTitle": "Normalisieren ist an: der Export wird auf gleichmäßige -16 LUFS gebracht (der Podcast-Standard)",
+    "normalizeOffTitle": "Normalisieren ist aus: der Export behält deine Pegel, wie sie sind",
+    "chapters": "Kapitel",
+    "chaptersCount": "Kapitel ({{n}})",
+    "chaptersTitle": "Kapitel: markiere, wo jeder Teil beginnt (M setzt eins am Abspielkopf)",
+    "transcript": "Transkript",
+    "transcriptTitle": "Transkript: bearbeite die Sendung über ihren Text, lösche Wörter, um sie herauszuschneiden",
+    "fillersLabel": "Füllwörter entfernen",
+    "fillers": "Füllwörter",
+    "fillersTitle": "Füllwörter entfernen: finde ähm, äh, sozusagen und lange Pausen, prüfe sie, schneide sie heraus"
+  },
+  "cutSilences": {
+    "progress": "Stille wird geschnitten: Clip {{done}} von {{total}}",
+    "failed_one": "{{count}} Clip konnte nicht gelesen werden. Die anderen wurden geschnitten.",
+    "failed_other": "{{count}} Clips konnten nicht gelesen werden. Die anderen wurden geschnitten.",
+    "failedUploading_one": "{{count}} Clip konnte noch nicht gelesen werden: versuch es nach dem Upload erneut. Die anderen wurden geschnitten.",
+    "failedUploading_other": "{{count}} Clips konnten noch nicht gelesen werden: versuch es nach dem Upload erneut. Die anderen wurden geschnitten."
+  },
+  "group": {
+    "nothing": "Auf keiner anderen Sprachspur läuft gleichzeitig etwas. Leg die andere Stimme zuerst auf eine eigene Spur.",
+    "done_one": "{{count}} Stimme gruppiert: sie werden jetzt zusammen verschoben, gekürzt und von Stille befreit.",
+    "done_other": "{{count}} Stimmen gruppiert: sie werden jetzt zusammen verschoben, gekürzt und von Stille befreit."
+  },
+  "template": {
+    "applied": "Vorlage angewendet: {{parts}}.",
+    "intro": "Intro",
+    "outro": "Outro",
+    "bed": "Musikbett",
+    "takeOff": "Wieder entfernen"
+  },
+  "rangePick": {
+    "hint": "Klick, wo das Stück für das Audiogramm beginnt, dann, wo es endet (bis zu 2 Minuten). Zieh an den Rändern, um es anzupassen.",
+    "from": "Ab {{start}}: klick jetzt, wo es endet",
+    "span": "{{start}} – {{end}} · {{seconds}} s",
+    "listenTitle": "Nur dieses Stück anhören (Leertaste)",
+    "stop": "Stopp",
+    "play": "Stück abspielen",
+    "use": "Dieses Stück verwenden"
+  },
+  "empty": {
+    "addVideo": "Video hinzufügen",
+    "addImage": "Bild hinzufügen",
+    "addAudio": "Audio hinzufügen",
+    "addRecording": "Aufnahme hinzufügen",
+    "record": "Aufnehmen",
+    "music": "Musik"
+  },
+  "confirm": {
+    "removeClip": "Diesen Clip aus der Zeitleiste entfernen?",
+    "removeClips_one": "Diesen {{count}} Clip aus der Zeitleiste entfernen?",
+    "removeClips_other": "Diese {{count}} Clips aus der Zeitleiste entfernen?",
+    "removeLibraryItem": "Dieses Element aus der Projektbibliothek entfernen?",
+    "removeTrack": "Diese Spur mit allen ihren Clips entfernen?"
+  },
+  "clipStreaming": "Dieser Clip wird noch von 3Speak gestreamt. Versuch es erneut, wenn sein Download fertig ist.",
+  "reverse": {
+    "title": "Clip wird umgekehrt...",
+    "body": "Wird auf dem Server verarbeitet, bitte warten.",
+    "failed": "Clip konnte nicht umgekehrt werden: {{error}}"
+  },
+  "remix": {
+    "stitch": "Stitch",
+    "stitchHintBefore": "Nimm bis zu {{seconds}} s auf. Es läuft direkt vor dem Original.",
+    "stitchHintAfter": "Nimm bis zu {{seconds}} s auf. Es läuft direkt nach dem Original.",
+    "reaction": "Reaktion",
+    "reactionHint": "Das Original läuft von Anfang an, während du aufnimmst. Nutze Kopfhörer, damit es nicht in dein Mikro hallt.",
+    "originalFillsLimit": "Das Original füllt das Limit von {{limit}} schon aus. Kürze es in der Zeitleiste und nimm dann deinen Stitch mit dem Kamera-Button auf."
+  },
+  "chapters": {
+    "intro": "Intro",
+    "numbered": "Kapitel {{n}}"
+  },
+  "duck": {
+    "allVoices": "Alle Sprachspuren"
+  },
+  "media": "Medien",
+  "importedMedia": "Importierte Medien",
+  "files_one": "{{count}} Datei",
+  "files_other": "{{count}} Dateien",
+  "side": {
+    "clipsSelected_one": "{{count}} Clip ausgewählt",
+    "clipsSelected_other": "{{count}} Clips ausgewählt",
+    "clearSelection": "Auswahl aufheben",
+    "closeProperties": "Eigenschaften schließen",
+    "captions": "Untertitel",
+    "closeCaptions": "Untertitel schließen",
+    "noClip": "Kein Clip ausgewählt",
+    "noClipHint": "Wähle einen Clip in der Zeitleiste, um seine Einstellungen zu sehen. Zieh einen Rahmen über mehrere Clips, um sie gemeinsam zu ändern."
+  },
+  "cleaningHint": "Lange Aufnahmen können eine Minute dauern.",
+  "hlsDownload": {
+    "title": "Medien werden heruntergeladen",
+    "hint": "Bitte warte, während die Medien vorbereitet werden..."
+  },
+  "sendPreview": {
+    "titleAudio": "Hör rein, bevor du es verwendest",
+    "titleVideo": "Vorschau deines Videos",
+    "back": "Zurück zum Editor",
+    "askTitle": "Audiogramme für Shorts erstellen?",
+    "askBody": "Kurze Videos mit den besten Stellen dieses Audios, zusammen damit als 3Speak-Shorts gepostet, jedes mit einem Link zurück.",
+    "askNo": "Nein, Audio verwenden",
+    "askMake": "Audiogramme erstellen"
+  },
+  "legacy": {
+    "projectLibrary": "Projektbibliothek",
+    "loadingFfmpeg": "FFmpeg wird geladen... {{percent}}",
+    "properties": "Eigenschaften",
+    "propertiesOf": "Eigenschaften: {{name}}",
+    "addMedia": "Medien hinzufügen",
+    "addMediaTitle": "Medien zur Bibliothek hinzufügen",
+    "record": "Aufnehmen",
+    "recordTitle": "Video mit der Kamera aufnehmen"
+  },
+  "drafts": {
+    "episode": "Folge",
+    "project": "Projekt"
+  }
+}

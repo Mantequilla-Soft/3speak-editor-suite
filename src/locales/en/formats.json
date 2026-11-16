@@ -1,0 +1,86 @@
+{
+  "aspect": {
+    "short": {
+      "label": "Short",
+      "hint": "Vertical, up to 2 minutes, posted as a Short"
+    },
+    "landscape": {
+      "label": "Landscape",
+      "hint": "Widescreen video, up to 10 minutes"
+    },
+    "classic": {
+      "label": "Classic",
+      "hint": "4:3 video, up to 10 minutes"
+    },
+    "square": {
+      "label": "Square",
+      "hint": "Square video, up to 10 minutes"
+    }
+  },
+  "chip": {
+    "title": "Shape of this project: {{shape}}. Click to change it",
+    "aria": "Project shape: {{shape}}"
+  },
+  "picker": {
+    "title": "What are you making?",
+    "tooLong": "your timeline is {{length}}, trim it to {{limit}} to render",
+    "note": "The shape decides how it goes to 3Speak: 9:16 as a Short, the others as a normal video. Export as renders it in other shapes too."
+  },
+  "preview": {
+    "heading": "Preview in",
+    "yours": "{{aspect}} (yours)",
+    "projectIs": {
+      "short": "Your project is Short 9:16. In another shape, footage fills the frame, cut around the face in it.",
+      "landscape": "Your project is Landscape 16:9. In another shape, footage fills the frame, cut around the face in it.",
+      "classic": "Your project is Classic 4:3. In another shape, footage fills the frame, cut around the face in it.",
+      "square": "Your project is Square 1:1. In another shape, footage fills the frame, cut around the face in it."
+    }
+  },
+  "faces": {
+    "heading": "Follow faces",
+    "noFootage": "No footage to reframe yet. Moved or zoomed clips keep their own framing.",
+    "hint": "The face is found in your browser, a few frames a second. Without a face the middle stays in view.",
+    "found": "Face found",
+    "noFace": "No face: middle",
+    "middle": "Middle",
+    "finding": "Finding faces",
+    "findOne": "Find the face",
+    "findMany_one": "Find faces in {{count}} clip",
+    "findMany_other": "Find faces in {{count}} clips",
+    "streamNamed": "{{name}} is a stream: it is cut around its middle.",
+    "streamUnnamed": "A clip is a stream: it is cut around its middle.",
+    "failed": "Face tracking did not work here: {{error}}",
+    "moveWindow": "{{name}}: move the window",
+    "left": "Left",
+    "right": "Right",
+    "up": "Up",
+    "down": "Down",
+    "moveX": "Move the window left or right",
+    "moveY": "Move the window up or down",
+    "findAgain": "Find the face again",
+    "reset": "Middle, no shift"
+  },
+  "clipFallback": "Clip",
+  "stop": "Stop",
+  "render": {
+    "heading": "Render as",
+    "shortsLimit": "Shorts are at most {{limit}}: trim the timeline to render a 9:16 one.",
+    "button_one": "Render {{count}} video",
+    "button_other": "Render {{count}} videos",
+    "failed": "Render failed: {{error}}",
+    "download": "Download",
+    "postShort": "Post as a Short",
+    "postVideo": "Post as a video"
+  },
+  "job": {
+    "waiting": "Waiting...",
+    "preparing": "Preparing files...",
+    "starting": "Starting...",
+    "rendering": "Rendering...",
+    "done": "Done",
+    "stopped": "Stopped",
+    "busy": "The render servers are busy. Trying again in {{seconds}} s...",
+    "offline": "No connection to the render server. Trying again in {{seconds}} s...",
+    "failed": "The render failed"
+  }
+}

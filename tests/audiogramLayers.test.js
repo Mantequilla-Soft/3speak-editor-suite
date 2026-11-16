@@ -153,4 +153,13 @@ describe('the piece and the Shorts', () => {
     expect(out[1].description).toHaveLength(5000)
     expect(audiogramsToPost(null)).toEqual([])
   })
+
+  it('says where in the episode each one starts, for the podcast feed\'s soundbites', () => {
+    const a = { url: 'https://b/1.mp4', format: 'vertical', duration: 42.5, title: 'T' }
+    expect(audiogramsToPost([{ ...a, start: 73.04 }])[0]).toMatchObject({ start: 73, duration: 42.5 })
+    expect(audiogramsToPost([{ ...a, start: 0 }])[0].start).toBe(0)
+    expect(audiogramsToPost([a])[0]).not.toHaveProperty('start')
+    expect(audiogramsToPost([{ ...a, start: -2 }])[0]).not.toHaveProperty('start')
+    expect(audiogramsToPost([{ ...a, start: 'soon' }])[0]).not.toHaveProperty('start')
+  })
 })
