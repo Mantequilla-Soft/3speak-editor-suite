@@ -14,6 +14,7 @@ import { outputSize } from '../utils/outputSize'
 import { normalizeCaptions } from '../utils/captions'
 import { emojiUrlsOf } from '../utils/captionSources'
 import { loadCreditOf, isMusicLoad } from '../utils/loadCredit'
+import { podcastEpisodeOf } from '../utils/podcastEpisode'
 import { reframeForRender, exportSizes } from '../utils/exportAs'
 import { submitRender, pollRender, statusPhase } from '../utils/renderQueue'
 import { t } from '../i18n'
@@ -76,6 +77,8 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
   const [remixing, setRemixing] = useState(false)
   // The person's playlist covers (from 3Speak, asked for by the audiograms): [{ title, url }]; null = not asked or no answer yet
   const [playlistCovers, setPlaylistCovers] = useState(null)
+  // A published episode for the video podcast (open-video-podcast), or null
+  const [podcastEpisode, setPodcastEpisode] = useState(null)
   // Texts written in 3Speak's own post editor (edit-text): requestId -> { resolve, timer }
   const textEditsRef = useRef(new Map())
 
@@ -166,6 +169,14 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
           break
         }
 
+        // The audio page's "Video podcast": a published episode, straight into the
+        // video podcast (no export first). Audio editor only.
+        case 'open-video-podcast': {
+          const episode = audioMode ? podcastEpisodeOf(data) : null
+          if (episode) setPodcastEpisode(episode)
+          break
+        }
+
         case 'playlist-covers': {
           const list = Array.isArray(data.covers) ? data.covers : []
           setPlaylistCovers(list
@@ -210,7 +221,7 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
 
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
-  }, [addToLibraryAndTimeline, addMusicClip, tracks, library, playheadPosition, sendToParent])
+  }, [addToLibraryAndTimeline, addMusicClip, tracks, library, playheadPosition, sendToParent, audioMode])
 
   // Notify parent that editor is ready (once: a boolean, not the callback, so a
   // new addMusicClip identity never sends it again)
@@ -228,7 +239,9 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
     // `canFormat`: post-to-3speak carries `format: { aspect, short, durationSec }`
     // (utils/projectFormat.js): a landscape, classic or square video is posted as
     // a normal video, a 9:16 one as a Short; ?aspect= picks the first shape.
-    sendToParent('editor-ready', { canLoadFile: true, canSaveDrafts: true, canFormat: true, ...(canLoadSound ? { canLoadSound: true } : {}), ...(audioMode ? { mode: 'audio', canEditAudio: true, canVideoPodcast: true } : {}) })
+    // `canPodcastFromEpisode`: open-video-podcast { url, title, cover, durationSec }
+    // opens the video podcast on a published episode (utils/podcastEpisode.js).
+    sendToParent('editor-ready', { canLoadFile: true, canSaveDrafts: true, canFormat: true, ...(canLoadSound ? { canLoadSound: true } : {}), ...(audioMode ? { mode: 'audio', canEditAudio: true, canVideoPodcast: true, canPodcastFromEpisode: true } : {}) })
   }, [sendToParent, audioMode, canLoadSound])
 
   // Abort an active render job
@@ -666,6 +679,7 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
   }, [])
 
   const clearRemixPrompt = useCallback(() => setRemixPrompt(null), [])
+  const clearPodcastEpisode = useCallback(() => setPodcastEpisode(null), [])
 
   const requestClose = useCallback(() => {
     sendToParent('editor-closed')
@@ -714,6 +728,8 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
     compactMode,
     playlistCovers,
     requestPlaylistCovers,
+    podcastEpisode,
+    clearPodcastEpisode,
     editTextInHost,
     isDesktop,
     theme,
