@@ -55,6 +55,26 @@ export function probeDuration(file) {
   })
 }
 
+/**
+ * The length of a file that does not state it: a browser recording (MediaRecorder
+ * WebM/Ogg, 3Speak's recorded episodes) has no duration in its header. The audio
+ * is read through once (no encoding) and the last timestamp counts.
+ */
+export function measureDuration(file, timeoutMs = 10 * 60 * 1000) {
+  return new Promise((resolve) => {
+    const proc = spawn('ffmpeg', ['-v', 'error', '-i', file, '-vn', '-f', 'null', '-progress', 'pipe:1', '-nostats', '-'], { stdio: ['ignore', 'pipe', 'ignore'] })
+    let last = 0
+    let tail = ''
+    proc.stdout.on('data', d => {
+      tail = (tail + d).slice(-4096)
+      for (const m of tail.matchAll(/out_time_us=(\d+)/g)) last = Math.max(last, +m[1] / 1e6)
+    })
+    const timer = setTimeout(() => proc.kill('SIGKILL'), timeoutMs)
+    proc.on('close', code => { clearTimeout(timer); resolve(code === 0 && last > 0 ? last : null) })
+    proc.on('error', () => { clearTimeout(timer); resolve(null) })
+  })
+}
+
 function run(job, args, onTime, timeoutMs) {
   return new Promise((resolve, reject) => {
     const proc = spawn('ffmpeg', [...args.slice(0, -1), '-progress', 'pipe:1', '-nostats', args.at(-1)], { stdio: ['ignore', 'pipe', 'pipe'] })
@@ -87,7 +107,7 @@ async function process_(job, url) {
     job.status = 'processing'
     job.phase = 'Getting the episode...'
     const input = (await localRendered(url)) || await downloadMedia(url, 'audio', jobDir)
-    const duration = await probeDuration(input)
+    const duration = (await probeDuration(input)) || (await measureDuration(input))
     if (!duration) throw new Error('The episode could not be read')
     if (duration > VIDEO_PODCAST_MAX_SECONDS + 1) throw new Error(`The episode is ${Math.ceil(duration / 60)} minutes long; a video podcast can be up to ${Math.round(VIDEO_PODCAST_MAX_SECONDS / 3600)} hours`)
     job.durationSec = Math.round(duration * 1000) / 1000
