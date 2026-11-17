@@ -53,6 +53,8 @@ import logo3speak from './assets/3speak.png'
 import ProjectFormat from './components/ProjectFormat'
 import FormatsPanel from './components/FormatsPanel'
 import VideoPodcastDialog from './components/VideoPodcastDialog'
+import { episodeCovers } from './utils/podcastEpisode'
+import { finiteDuration } from './utils/mediaDuration'
 import { useProjectFormat } from './hooks/useProjectFormat'
 import { postFormat } from './utils/projectFormat'
 import { useT } from './i18n'
@@ -297,6 +299,8 @@ function App() {
     clearRemixPrompt,
     playlistCovers,
     requestPlaylistCovers,
+    podcastEpisode,
+    clearPodcastEpisode,
     editTextInHost,
     buildAndUploadPayload
   } = useIframeApi({ addToLibraryAndTimeline, addMusicClip, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay, audioMode, master, title: audioTitle, chapters: chapterList, captions: audioMode ? null : captions })
@@ -1271,6 +1275,20 @@ function App() {
   // Audiograms (after an export): the ones made, the piece of the timeline
   // they are made from, and picking that piece on the timeline
   const [audiogramOpen, setAudiogramOpen] = useState(false)
+  // A published episode's length (open-video-podcast): given, or read from the audio
+  const [episodeLength, setEpisodeLength] = useState(null)
+  useEffect(() => {
+    if (!podcastEpisode) { setEpisodeLength(null); return undefined }
+    if (podcastEpisode.durationSec) { setEpisodeLength(podcastEpisode.durationSec); return undefined }
+    let live = true
+    const el = new Audio()
+    el.preload = 'metadata'
+    el.addEventListener('loadedmetadata', () => { finiteDuration(el).then(d => { if (live) setEpisodeLength(d || 0) }) }, { once: true })
+    el.addEventListener('error', () => { if (live) setEpisodeLength(0) }, { once: true })
+    el.src = podcastEpisode.url
+    return () => { live = false; el.removeAttribute('src') }
+  }, [podcastEpisode])
+
   // Video podcast: the whole episode as a 16:9 video (VideoPodcastDialog)
   const [videoPodcastOpen, setVideoPodcastOpen] = useState(false)
   const [audiograms, setAudiograms] = useState([])
@@ -2169,6 +2187,32 @@ function App() {
             onRequestCovers={requestPlaylistCovers}
             onEditText={isIframe ? editTextInHost : undefined}
             onClose={() => setAudiogramOpen(false)}
+          />
+        )}
+
+        {/* The audio page's "Video podcast": a published episode, no export first */}
+        {podcastEpisode && episodeLength != null && (
+          <VideoPodcastDialog
+            outputUrl={podcastEpisode.url}
+            length={episodeLength}
+            title={podcastEpisode.title}
+            tracks={[]}
+            playlistCovers={episodeCovers(podcastEpisode, playlistCovers)}
+            onRequestCovers={requestPlaylistCovers}
+            canSend={isIframe}
+            onSend={(r) => {
+              clearPodcastEpisode()
+              sendToParent('post-to-3speak', {
+                mediaType: 'video',
+                outputUrl: r.outputUrl,
+                fileName: audioFileName(podcastEpisode.title).replace(/\.mp3$/i, '.mp4'),
+                durationSec: r.durationSec,
+                format: postFormat('16:9', r.durationSec),
+                ...(podcastEpisode.title ? { title: podcastEpisode.title } : {}),
+                ...(r.subtitles && { subtitles: r.subtitles })
+              })
+            }}
+            onClose={() => { clearPodcastEpisode(); requestClose() }}
           />
         )}
 
