@@ -6,7 +6,7 @@ import { getPeaks } from '../utils/peakCache'
 import { voiceTracks, projectSpeakers } from '../utils/speakers'
 import { formatLength } from '../utils/limits'
 import { CAPTION_COLORS } from '../utils/captions'
-import { useT, t as i18nT } from '../i18n'
+import { useT, t as i18nT, tEnglish } from '../i18n'
 import './ProjectFormat.css'
 
 // The audiogram studio's shapes and logos (labels: audiogram.wave.*, audiogram.logo.*)
@@ -62,7 +62,8 @@ export default function VideoPodcastDialog({ outputUrl, length, title, tracks, p
   const haveWords = Array.isArray(words) && words.length > 0
   const [server, setServer] = useState(null) // { maxSeconds, captions, burnIn }
   const [text, setText] = useState(title || '')
-  const [line, setLine] = useState(() => t('podcast.video.defaultLine'))
+  // The line is burnt into the video: it starts in English, not in the editor's language
+  const [line, setLine] = useState(() => tEnglish('podcast.video.defaultLine'))
   const [wave, setWave] = useState({ type: 'bars', color: '#e32933' })
   const [logo, setLogo] = useState('full')
   const [image, setImage] = useState(null)

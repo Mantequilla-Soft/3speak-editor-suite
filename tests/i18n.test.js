@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from 'vitest'
 import path from 'node:path'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { createElement } from 'react'
-import { t, tRich, setLanguage, getLanguage, matchLanguage, initialLanguage, formatNumber, languageName, __setDictionary, LANGUAGE_CODES } from '../src/i18n'
+import { t, tRich, tEnglish, setLanguage, getLanguage, matchLanguage, initialLanguage, formatNumber, languageName, __setDictionary, LANGUAGE_CODES } from '../src/i18n'
 import { limitText } from '../src/utils/limits'
 import { checkLocales } from '../scripts/i18n/check.mjs'
 
@@ -128,5 +128,14 @@ describe('i18n: pieces of a cut clip', () => {
     __setDictionary('ja', { 'timeline.partName': '{{name}}(パート{{n}})' })
     await setLanguage('ja')
     expect(stripPart('talk.wav(パート4)')).toBe('talk.wav')
+  })
+})
+
+describe('words that go into a video stay English', () => {
+  it('tEnglish ignores the editor language', async () => {
+    __setDictionary('de', { 'podcast.video.defaultLine': 'Anschauen und anhören auf *3speak.tv*' })
+    await setLanguage('de')
+    expect(t('podcast.video.defaultLine')).toBe('Anschauen und anhören auf *3speak.tv*')
+    expect(tEnglish('podcast.video.defaultLine')).toBe('Watch and listen on *3speak.tv*')
   })
 })
