@@ -30,7 +30,7 @@ process.env.UPLOAD_DIR = path.join(dir, 'uploads')
 process.env.EDITOR_TOKEN_SECRET = 'test-secret'
 process.env.CAPTIONS_ENABLED = 'false' // no whisper in tests: words come with the request
 const express = (await import('express')).default
-const { videoPodcastRouter } = await import('../src/routes/videoPodcast.js')
+const { videoPodcastRouter, probeDuration, measureDuration } = await import('../src/routes/videoPodcast.js')
 const { cleanVideoPodcastOptions, cleanSpeakers, podcastAss, podcastSubtitles, podcastLayers, podcastPageState, videoPodcastArgs, PODCAST_LAYOUTS } = await import('../src/services/videoPodcast.js')
 const { waveFilter } = await import('../src/services/audiogram.js')
 const { waveBox } = await import('../src/services/audiogramPage.js')
@@ -104,6 +104,15 @@ test('the layout: a 16:9 page with the cover on the left, or one centred column'
   }
   assert.match(waveFilter('bars', 870, 150, '#e32933', 15), /rate=15/)
   assert.match(waveFilter('line', 870, 150, '#e32933'), /rate=30/)
+})
+
+test('a browser recording without a length in its header (3Speak recorded episodes) is measured', { skip: !hasFfmpeg }, async () => {
+  // WebM written to a pipe, like MediaRecorder: no duration in the header
+  const webm = path.join(dir, 'recorded.webm')
+  fs.writeFileSync(webm, execFileSync('ffmpeg', ['-v', 'error', '-f', 'lavfi', '-i', 'sine=frequency=440:duration=3', '-c:a', 'libopus', '-f', 'webm', 'pipe:1']))
+  assert.equal(await probeDuration(webm), null)
+  const d = await measureDuration(webm)
+  assert.ok(d > 2.9 && d < 3.1, `measured ${d}`)
 })
 
 test('ffmpeg: the graph renders a 16:9 MP4 at 15 fps with the speaker label burnt in', { skip: !hasFfmpeg || !hasAss }, () => {
