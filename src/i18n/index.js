@@ -135,6 +135,13 @@ export function t(key, vars) {
   return interpolate(lookup(key, vars), vars)
 }
 
+/** The text of `key` in English whatever the editor's language: for words that go
+ *  INTO a video (the video podcast's line), which speaks to everyone. */
+export function tEnglish(key, vars) {
+  const dict = dicts[DEFAULT_LANGUAGE]
+  return interpolate(dict[key] ?? key, vars)
+}
+
 /** Does the key exist (in English)? For code that picks a key by a value it got from elsewhere. */
 export const hasKey = key => key in dicts[DEFAULT_LANGUAGE] || `${key}_other` in dicts[DEFAULT_LANGUAGE]
 
