@@ -1203,6 +1203,10 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
       startMouseY: clientY,
       startPosX: valueAtTime(clip, 'x', playbackPosRef.current),
       startPosY: valueAtTime(clip, 'y', playbackPosRef.current),
+      // The layer is drawn scale(zoom) translate(position): a position step moves
+      // it zoom times as far on screen, so the drag divides by the zoom and the
+      // clip (a small sticker above all) stays under the pointer.
+      zoom: Math.max(0.01, (valueAtTime(clip, 'scale', playbackPosRef.current) || 100) / 100),
       // Layout clips move in canvas fractions, not preview pixels
       startLayout: layout,
       // Fixed boxes (tiles) only pan and zoom; a plain drag does nothing
@@ -1287,8 +1291,8 @@ function GlobalPreview({ tracks, playheadPosition, onSetPlayhead, isVerticalVide
         return
       }
       onUpdateClip(d.clipId, {
-        positionX: Math.round(d.startPosX + deltaX),
-        positionY: Math.round(d.startPosY + deltaY)
+        positionX: Math.round(d.startPosX + deltaX / d.zoom),
+        positionY: Math.round(d.startPosY + deltaY / d.zoom)
       })
     }
 
