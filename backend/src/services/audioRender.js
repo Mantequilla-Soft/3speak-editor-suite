@@ -4,7 +4,7 @@ import path from 'path'
 import fs from 'fs/promises'
 import { RENDER_CACHE_DIR } from './ffmpeg.js'
 import { ffmpegAudioTiming } from '../utils/clipSpeed.js'
-import { ffmpegVolumeFilter, hasVolumeKeyframes } from '../utils/keyframes.js'
+import { ffmpegVolumeFilter, hasVolumeKeyframes, keyframesOf } from '../utils/keyframes.js'
 
 /**
  * Audio mode render (podcasts, music, voice): the timeline's audio tracks
@@ -115,8 +115,18 @@ export function segmentFilter(clip) {
   // The clip's own auto-duck (its sidechain source's spans, in clip seconds)
   const duck = cleanClipDuck(clip.duckPlan)
   if (duck) parts.push(duckFilter(duck))
+  // Turned up above 100%: round off the peaks here, the 16-bit segment would
+  // chop them flat (heard as distortion) before the mix's limiter sees them
+  if (isBoosted(clip)) parts.push(BOOST_LIMITER)
   return parts.length ? parts.join(',') : null
 }
+
+/** Without delay (latency=1), so the clip stays on its samples. */
+export const BOOST_LIMITER = 'alimiter=limit=0.95:level=false:latency=1'
+
+const isBoosted = clip => hasVolumeKeyframes(clip)
+  ? keyframesOf(clip, 'volume').some(k => k.v > 100)
+  : clipVolume(clip) > 1.0001
 
 function segmentKey(clip, inputFile, samples, channels) {
   return crypto.createHash('sha256').update(JSON.stringify({
