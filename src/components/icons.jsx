@@ -79,6 +79,7 @@ export const MATERIAL = {
   Play: 'play_arrow',
   Plus: 'add',
   Redo2: 'redo',
+  RefreshCw: 'refresh',
   Repeat: 'repeat',
   RotateCcw: 'undo',
   RotateCw: 'rotate_right',
@@ -193,6 +194,7 @@ export const Pencil = make('Pencil')
 export const Play = make('Play')
 export const Plus = make('Plus')
 export const Redo2 = make('Redo2')
+export const RefreshCw = make('RefreshCw')
 export const Repeat = make('Repeat')
 export const RotateCcw = make('RotateCcw')
 export const RotateCw = make('RotateCw')

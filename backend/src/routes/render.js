@@ -7,6 +7,7 @@ import { buildAndRunFFmpeg, RENDER_CACHE_DIR } from '../services/ffmpeg.js'
 import { renderAudioTimeline, audioTimelineEnd } from '../services/audioRender.js'
 import crypto from 'crypto'
 import { requireSignIn } from '../auth.js'
+import { landscapeRenderRefusal } from '../proGate.js'
 import { renderUrlOf } from '../utils/uploadFiles.js'
 import { emojiDownloads, emojiKey, writeSubtitleFiles } from '../services/captionBurn.js'
 import { createRenderQueue, createJobStore, QueueFullError } from '../utils/renderQueue.js'
@@ -90,6 +91,7 @@ export async function cachedDownload(url, jobDir, state = {}) {
 /**
  * POST /api/render
  * Body: { timeline: { tracks, outputWidth, outputHeight, fps }, mediaUrls }
+ * 403 { code: 'pro_required', feature: 'landscape_editor', upgrade_url }: a landscape render of a free user
  */
 router.post('/', requireSignIn, async (req, res) => {
   try {
@@ -106,6 +108,10 @@ router.post('/', requireSignIn, async (req, res) => {
         return res.status(400).json({ error: `Audio is ${Math.ceil(length / 60)} minutes long; the limit is ${MAX_AUDIO_RENDER_SECONDS / 3600} hours` })
       }
     }
+
+    // Landscape (16:9, 4:3, 1:1) is 3Speak Pro; Shorts, audio and Ad Wizard mixes stay free (proGate.js)
+    const refusal = await landscapeRenderRefusal(req, timeline)
+    if (refusal) return res.status(403).json(refusal)
 
     let job
     try {

@@ -1,0 +1,15 @@
+{
+  "badge": "Pro",
+  "shapeTitle": "3Speak Pro'ya dahil",
+  "landscape": {
+    "title": "Yatay videolar 3Speak Pro'ya dahil",
+    "text": "Yatay 16:9, Klasik 4:3 ve Kare 1:1 videolar 3Speak Pro ile yapılır. Short'lar ve ses düzenleyici herkes için ücretsiz kalır.",
+    "get": "3Speak Pro'ya geç",
+    "makeShort": "Bunun yerine Short yap",
+    "checkAgain": "Artık Pro'yum",
+    "checking": "Hesabın kontrol ediliyor",
+    "stillFree": "Bu hesapta henüz 3Speak Pro yok. Abone olduktan sonra burada görünmesi bir dakika sürebilir."
+  },
+  "exportAs": "Short 9:16 dışındaki biçimler 3Speak Pro'ya dahil.",
+  "refused": "Yatay video düzenleyici 3Speak Pro'ya dahil. Short'lar ve ses düzenleyici ücretsiz kalır."
+}

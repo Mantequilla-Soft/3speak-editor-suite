@@ -9,6 +9,7 @@ import { verifyEditorToken } from './routes/projects.js'
  * REQUIRE_SIGN_IN=false switches the check off (local development only).
  */
 const REQUIRED = process.env.REQUIRE_SIGN_IN !== 'false'
+export const SIGN_IN_REQUIRED = REQUIRED
 
 export function requireSignIn(req, res, next) {
   if (!REQUIRED) return next()

@@ -1,0 +1,15 @@
+{
+  "badge": "Pro",
+  "shapeTitle": "Inclus dans 3Speak Pro",
+  "landscape": {
+    "title": "Les vidéos en paysage font partie de 3Speak Pro",
+    "text": "Les vidéos Paysage 16:9, Classique 4:3 et Carré 1:1 se font avec 3Speak Pro. Les Shorts et l'éditeur audio restent gratuits pour tout le monde.",
+    "get": "Passer à 3Speak Pro",
+    "makeShort": "Faire un Short à la place",
+    "checkAgain": "J'ai Pro maintenant",
+    "checking": "Vérification de ton compte",
+    "stillFree": "Ce compte n'a pas encore 3Speak Pro. Après l'abonnement, il peut falloir une minute pour qu'il apparaisse ici."
+  },
+  "exportAs": "Les formats autres que Short 9:16 font partie de 3Speak Pro.",
+  "refused": "L'éditeur de vidéos en paysage fait partie de 3Speak Pro. Les Shorts et l'éditeur audio restent gratuits."
+}

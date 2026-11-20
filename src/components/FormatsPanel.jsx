@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Crosshair, Download, Send, Loader2, Check, RotateCcw, Film } from './icons'
-import { AspectDiagram } from './ProjectFormat'
+import { Crosshair, Download, Send, Loader2, Check, RotateCcw, Film, ExternalLink } from './icons'
+import { AspectDiagram, ProBadge } from './ProjectFormat'
 import { ASPECT_INFO, aspectLabel, isShortAspect } from '../utils/projectFormat'
 import { EXPORT_ASPECTS, runRenderJob } from '../utils/exportAs'
 import { isReframable, normalizeReframe } from '../utils/reframe'
 import { trackClipFaces } from '../utils/faceTrack'
 import { maxSecondsFor, limitText } from '../utils/limits'
 import { isHlsUrl } from '../utils/hlsHelper'
+import { isProRefusal } from '../utils/landscapeAccess'
 import { useT } from '../i18n'
 
 // A clip's footage the face tracker can open here: its own file, else the
@@ -26,11 +27,13 @@ function trackableUrl(clip, fileStore) {
  * cut around the face the browser finds in it (Find faces), and each clip's
  * window can be shifted by hand. Then every ticked shape is rendered as its own
  * video, to download or to send to 3Speak (a 9:16 one as a Short, the others
- * as a normal video).
+ * as a normal video). lockedAspects: shapes this user may not render (the landscape editor is
+ * 3Speak Pro, utils/landscapeAccess.js), shown with the Pro mark and not ticked.
  */
 export default function FormatsPanel({
   projectAspect, viewAspect, onViewAspect, tracks, fileStore, onUpdateClip, selectedClipId, onSelectClip,
-  timelineEnd, buildPayload, canRender, renderBlocked, canSend, onSend
+  timelineEnd, buildPayload, canRender, renderBlocked, canSend, onSend,
+  lockedAspects = [], upgradeUrl = null, onProRequired = () => {}
 }) {
   const { t, formatNumber } = useT()
   const percent = (p) => formatNumber(p, { style: 'percent', maximumFractionDigits: 0 })
@@ -48,9 +51,11 @@ export default function FormatsPanel({
   const selected = clips.find(c => c.id === selectedClipId) || null
   const reframe = selected ? normalizeReframe(selected.reframe) : null
   const tooLongFor = (a) => timelineEnd > maxSecondsFor('video', a) + 0.01
+  const lockedFor = (a) => lockedAspects.includes(a)
+  const renderable = (a) => targets.includes(a) && !tooLongFor(a) && !lockedFor(a)
   const rendering = Object.values(jobs).some(j => j.status === 'running' || j.status === 'waiting')
   const busy = !!tracking || rendering
-  const renderCount = targets.filter(a => !tooLongFor(a)).length
+  const renderCount = EXPORT_ASPECTS.filter(renderable).length
 
   const findFaces = async (list) => {
     const ctrl = new AbortController()
@@ -94,7 +99,7 @@ export default function FormatsPanel({
   const render = async () => {
     const ctrl = new AbortController()
     stopRef.current = ctrl
-    const list = EXPORT_ASPECTS.filter(a => targets.includes(a) && !tooLongFor(a))
+    const list = EXPORT_ASPECTS.filter(renderable)
     setJobs(Object.fromEntries(list.map(a => [a, { status: 'waiting', progress: 0, phase: t('formats.job.waiting') }])))
     for (const a of list) {
       const set = (patch) => setJobs(j => ({ ...j, [a]: { ...j[a], ...patch } }))
@@ -105,6 +110,7 @@ export default function FormatsPanel({
         set({ status: 'completed', progress: 1, phase: t('formats.job.done'), outputUrl: r.outputUrl, subtitles: r.subtitles || null })
       } catch (err) {
         if (err?.name === 'AbortError') { set({ status: 'stopped', phase: t('formats.job.stopped') }); break }
+        if (isProRefusal(err)) { set({ status: 'failed', error: t('pro.refused') }); onProRequired(err.body); continue }
         set({ status: 'failed', error: err.message })
       }
     }
@@ -187,12 +193,18 @@ export default function FormatsPanel({
         <h4>{t('formats.render.heading')}</h4>
         <div className="formats-chips" role="group" aria-label={t('formats.render.heading')}>
           {EXPORT_ASPECTS.map(a => (
-            <button key={a} className="formats-chip" aria-pressed={targets.includes(a)} disabled={tooLongFor(a) || rendering} onClick={() => toggleTarget(a)}
-              title={tooLongFor(a) ? t(isShortAspect(a) ? 'common.limits.atMost.short' : 'common.limits.atMost.video', { limit: limitText(maxSecondsFor('video', a)) }) : undefined}>
-              {targets.includes(a) ? <Check size={14} /> : <AspectDiagram aspect={a} size={22} />}{aspectLabel(a)}
+            <button key={a} className="formats-chip" aria-pressed={targets.includes(a) && !lockedFor(a)} disabled={tooLongFor(a) || lockedFor(a) || rendering} onClick={() => toggleTarget(a)}
+              title={lockedFor(a) ? t('pro.shapeTitle') : tooLongFor(a) ? t(isShortAspect(a) ? 'common.limits.atMost.short' : 'common.limits.atMost.video', { limit: limitText(maxSecondsFor('video', a)) }) : undefined}>
+              {targets.includes(a) && !lockedFor(a) ? <Check size={14} /> : <AspectDiagram aspect={a} size={22} />}{aspectLabel(a)}{lockedFor(a) && <ProBadge />}
             </button>
           ))}
         </div>
+        {lockedAspects.length > 0 && (
+          <p>
+            {t('pro.exportAs')}{' '}
+            {upgradeUrl && <a className="formats-pro-link" href={upgradeUrl} target="_blank" rel="noopener noreferrer">{t('pro.landscape.get')} <ExternalLink size={12} /></a>}
+          </p>
+        )}
         {EXPORT_ASPECTS.some(tooLongFor) && <p>{t('formats.render.shortsLimit', { limit: limitText(maxSecondsFor('video', '9:16')) })}</p>}
         {renderBlocked && <p className="formats-error">{renderBlocked}</p>}
         <div className="formats-row">

@@ -1,0 +1,15 @@
+{
+  "badge": "Pro",
+  "shapeTitle": "Część 3Speak Pro",
+  "landscape": {
+    "title": "Filmy poziome są częścią 3Speak Pro",
+    "text": "Filmy Poziomo 16:9, Klasyczny 4:3 i Kwadrat 1:1 tworzysz z 3Speak Pro. Shorty i edytor audio pozostają darmowe dla wszystkich.",
+    "get": "Kup 3Speak Pro",
+    "makeShort": "Zrób zamiast tego Shorta",
+    "checkAgain": "Mam już Pro",
+    "checking": "Sprawdzanie konta",
+    "stillFree": "To konto nie ma jeszcze 3Speak Pro. Po wykupieniu subskrypcji może minąć minuta, zanim pojawi się tutaj."
+  },
+  "exportAs": "Formaty inne niż Short 9:16 są częścią 3Speak Pro.",
+  "refused": "Edytor filmów poziomych jest częścią 3Speak Pro. Shorty i edytor audio pozostają darmowe."
+}

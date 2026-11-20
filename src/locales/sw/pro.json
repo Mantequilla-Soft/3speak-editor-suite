@@ -1,0 +1,15 @@
+{
+  "badge": "Pro",
+  "shapeTitle": "Sehemu ya 3Speak Pro",
+  "landscape": {
+    "title": "Video za mlalo ni sehemu ya 3Speak Pro",
+    "text": "Video za Mlalo 16:9, Ya kawaida 4:3 na Mraba 1:1 hutengenezwa kwa 3Speak Pro. Short na kihariri cha sauti vinabaki bure kwa kila mtu.",
+    "get": "Pata 3Speak Pro",
+    "makeShort": "Tengeneza Short badala yake",
+    "checkAgain": "Sasa nina Pro",
+    "checking": "Tunakagua akaunti yako",
+    "stillFree": "Akaunti hii bado haina 3Speak Pro. Baada ya kujiunga, inaweza kuchukua dakika moja kuonekana hapa."
+  },
+  "exportAs": "Maumbo mengine zaidi ya Short 9:16 ni sehemu ya 3Speak Pro.",
+  "refused": "Kihariri cha video za mlalo ni sehemu ya 3Speak Pro. Short na kihariri cha sauti vinabaki bure."
+}

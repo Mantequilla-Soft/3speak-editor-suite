@@ -205,3 +205,74 @@
   border-radius: var(--r-md);
   background: var(--media-bg, var(--frame));
 }
+
+/* The landscape editor is 3Speak Pro (LandscapeProNotice.jsx): the Pro mark on a shape, and the
+   notice a free user gets in a landscape, classic or square project. Flat, red as an outline. */
+.pro-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 18px;
+  padding: 0 var(--sp-2);
+  border: 1px solid var(--accent);
+  border-radius: var(--r-sm);
+  color: var(--accent);
+  font: var(--fw-bold) var(--fs-10) / 1 var(--font-sans);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.remix-picker-copy strong .pro-badge { margin-left: var(--sp-2); }
+.formats-chip .pro-badge { margin-left: var(--sp-1); }
+.remix-picker.landscape-pro { max-width: 440px; }
+.landscape-pro-shape {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  font-size: var(--fs-14);
+}
+.landscape-pro-text {
+  margin: 0 0 var(--sp-3);
+  color: var(--text);
+  font-size: var(--fs-13);
+  line-height: 1.45;
+}
+.landscape-pro-note {
+  margin: 0 0 var(--sp-3);
+  color: var(--muted);
+  font-size: var(--fs-12);
+  line-height: 1.4;
+}
+.landscape-pro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-5);
+}
+.landscape-pro-get {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  height: var(--h-40);
+  padding: 0 var(--sp-5);
+  border: 1px solid var(--accent);
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--accent);
+  font: var(--fw-black) var(--fs-13) / 1 var(--font-sans);
+  text-decoration: none;
+  transition: background var(--t-fast) var(--ease);
+}
+.landscape-pro-get:hover { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+@media (max-width: 767px) {
+  .landscape-pro-actions > * { flex: 1 1 100%; justify-content: center; }
+}
+.formats-pro-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--accent);
+  font-weight: var(--fw-bold);
+  text-decoration: none;
+}
+.formats-pro-link:hover { text-decoration: underline; }

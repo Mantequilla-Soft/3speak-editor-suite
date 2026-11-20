@@ -1,0 +1,15 @@
+{
+  "badge": "Pro",
+  "shapeTitle": "Parte de 3Speak Pro",
+  "landscape": {
+    "title": "Los videos horizontales son parte de 3Speak Pro",
+    "text": "Los videos Horizontal 16:9, Clásico 4:3 y Cuadrado 1:1 se hacen con 3Speak Pro. Los Shorts y el editor de audio siguen gratis para todos.",
+    "get": "Obtener 3Speak Pro",
+    "makeShort": "Hacer un Short en su lugar",
+    "checkAgain": "Ya tengo Pro",
+    "checking": "Comprobando tu cuenta",
+    "stillFree": "Esta cuenta aún no tiene 3Speak Pro. Después de suscribirte puede tardar un minuto en aparecer aquí."
+  },
+  "exportAs": "Los formatos distintos de Short 9:16 son parte de 3Speak Pro.",
+  "refused": "El editor de video horizontal es parte de 3Speak Pro. Los Shorts y el editor de audio siguen gratis."
+}
