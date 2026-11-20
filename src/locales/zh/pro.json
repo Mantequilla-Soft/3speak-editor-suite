@@ -1,0 +1,15 @@
+{
+  "badge": "Pro",
+  "shapeTitle": "3Speak Pro 功能",
+  "landscape": {
+    "title": "横屏视频属于 3Speak Pro",
+    "text": "横屏 16:9、经典 4:3 和方形 1:1 视频需要 3Speak Pro。短视频和音频编辑器对所有人继续免费。",
+    "get": "获取 3Speak Pro",
+    "makeShort": "改做短视频",
+    "checkAgain": "我已开通 Pro",
+    "checking": "正在检查你的账号",
+    "stillFree": "此账号还没有 3Speak Pro。订阅后可能需要一分钟才会在这里生效。"
+  },
+  "exportAs": "短视频 9:16 以外的画面比例属于 3Speak Pro。",
+  "refused": "横屏视频编辑器属于 3Speak Pro。短视频和音频编辑器继续免费。"
+}

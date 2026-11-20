@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { X, Crop } from './icons'
+import { X, Crop, Crown } from './icons'
 import { PROJECT_ASPECTS, ASPECT_INFO, aspectValue, aspectLabel } from '../utils/projectFormat'
 import { limitText, maxSecondsFor, formatLength, getTimelineEnd } from '../utils/limits'
+import { isProAspect } from '../utils/landscapeAccess'
 import { useT } from '../i18n'
 import './ProjectFormat.css'
 
@@ -17,12 +18,19 @@ export function AspectDiagram({ aspect, size = 40 }) {
   )
 }
 
+/** The "Pro" mark next to a shape a free user can not make (the landscape editor is 3Speak Pro). */
+export function ProBadge() {
+  const { t } = useT()
+  return <span className="pro-badge" title={t('pro.shapeTitle')}><Crown size={11} />{t('pro.badge')}</span>
+}
+
 /**
  * The project's shape, at the top of the video editor: a chip that says what it
  * is, opening the picker. Changing it keeps every clip; footage is fitted into
- * the new frame (Export as reframes it around faces instead).
+ * the new frame (Export as reframes it around faces instead). proLocked: a free user, so the
+ * landscape, classic and square shapes carry the Pro mark (picking one shows the Pro notice).
  */
-export default function ProjectFormat({ aspect, onChange, tracks }) {
+export default function ProjectFormat({ aspect, onChange, tracks, proLocked = false }) {
   const { t } = useT()
   const [open, setOpen] = useState(false)
   const shape = aspectLabel(ASPECT_INFO[aspect] ? aspect : '9:16')
@@ -59,7 +67,7 @@ export default function ProjectFormat({ aspect, onChange, tracks }) {
                   >
                     <span className="remix-picker-diagram"><AspectDiagram aspect={a} /></span>
                     <span className="remix-picker-copy">
-                      <strong>{aspectLabel(a)}</strong>
+                      <strong>{aspectLabel(a)}{proLocked && isProAspect(a) && <ProBadge />}</strong>
                       <small>
                         {t(ASPECT_INFO[a].hintKey)}
                         {over ? ` · ${t('formats.picker.tooLong', { length: formatLength(length), limit: limitText(maxSecondsFor('video', a)) })}` : ''}

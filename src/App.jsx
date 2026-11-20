@@ -56,6 +56,9 @@ import VideoPodcastDialog from './components/VideoPodcastDialog'
 import { episodeCovers } from './utils/podcastEpisode'
 import { finiteDuration } from './utils/mediaDuration'
 import { useProjectFormat } from './hooks/useProjectFormat'
+import { useLandscapeAccess } from './hooks/useLandscapeAccess'
+import { landscapeLocked, lockedExportAspects, isProRefusal } from './utils/landscapeAccess'
+import LandscapeProNotice from './components/LandscapeProNotice'
 import { postFormat } from './utils/projectFormat'
 import { useT } from './i18n'
 import { stripPart } from './utils/partName'
@@ -304,6 +307,17 @@ function App() {
     editTextInHost,
     buildAndUploadPayload
   } = useIframeApi({ addToLibraryAndTimeline, addMusicClip, tracks, library, playheadPosition, fileStoreRef, activeAspectRatio, onTogglePlay: togglePreviewPlay, audioMode, master, title: audioTitle, chapters: chapterList, captions: audioMode ? null : captions })
+
+  // The landscape editor (16:9, 4:3, 1:1) is 3Speak Pro; Shorts and the audio editor are free
+  // (utils/landscapeAccess.js, enforced by the backend's render route). A free user in such a
+  // project gets the Pro notice; a refused render locks it too.
+  const landscape = useLandscapeAccess({ session: draftSession, audioMode })
+  const { markRefused: markLandscapeRefused } = landscape
+  useEffect(() => {
+    if (isProRefusal(renderStatus)) markLandscapeRefused(renderStatus.refusal)
+  }, [renderStatus, markLandscapeRefused])
+  const landscapeBlocked = landscapeLocked(landscape.access, activeAspectRatio, audioMode)
+  const proLocked = !audioMode && landscape.access?.allowed === false
 
   // Word tools (components/WordTools.jsx): the transcript to edit by text,
   // Remove fillers, chapter ideas. wordRefitRef: the audio template refitted
@@ -1615,6 +1629,9 @@ function App() {
         renderBlocked={activeUpload ? t('render.exportAs.waitUpload') : null}
         canSend={isIframe}
         onSend={sendFormatToHost}
+        lockedAspects={lockedExportAspects(landscape.access, audioMode)}
+        upgradeUrl={landscape.access?.upgradeUrl || null}
+        onProRequired={markLandscapeRefused}
       />
     </div>
   ) : null
@@ -1692,6 +1709,16 @@ function App() {
     <ConfirmDialog message={confirmAsk.message} onConfirm={acceptConfirm} onCancel={closeConfirm} />
   ) : null
 
+  const landscapeNotice = landscapeBlocked ? (
+    <LandscapeProNotice
+      aspect={activeAspectRatio}
+      access={landscape.access}
+      checking={landscape.checking}
+      onRecheck={landscape.recheck}
+      onMakeShort={() => { projectFormat.setAspect('9:16'); setViewAspect(null) }}
+    />
+  ) : null
+
   // The audio editor only exists in the compact layout
   if (compactMode || audioMode) {
     // What "Use this audio" / "Send Video" sends (after the audiograms question, if asked)
@@ -1733,7 +1760,7 @@ function App() {
           <div className="branding-left">
             <img src={logo3speak} alt="3Speak" className="branding-logo" />
             <span className="branding-text">{audioMode ? t('app.branding.audioEditor') : isVerticalVideo ? t('app.branding.shortsEditor') : t('app.branding.videoEditor')} <span className="branding-badge">{t('app.branding.beta')}</span></span>
-            {!audioMode && <ProjectFormat aspect={activeAspectRatio} onChange={(a) => { projectFormat.setAspect(a); setViewAspect(null) }} tracks={tracks} />}
+            {!audioMode && <ProjectFormat aspect={activeAspectRatio} onChange={(a) => { projectFormat.setAspect(a); setViewAspect(null) }} tracks={tracks} proLocked={proLocked} />}
             <span className="branding-info" onClick={() => setShowBackendInfo(prev => !prev)}>
               <Info size={14} />
               {showBackendInfo && (
@@ -2103,11 +2130,13 @@ function App() {
         </div>
 
         {confirmDialog}
+        {landscapeNotice}
         {shortcutLayer}
         {cleaningNotice}
 
         {/* Onboarding Tour (the shorts editor's, or the audio editor's) */}
-        {showTour && (
+        {/* the Pro notice first: the tour waits until the editor is one this user can use */}
+        {showTour && !landscapeBlocked && (
           <OnboardingTour steps={audioMode ? AUDIO_TOUR_STEPS : undefined} onComplete={finishTour} />
         )}
         {showPickTour && !showTour && <OnboardingTour steps={RANGE_PICK_TOUR_STEPS} onComplete={finishPickTour} />}
@@ -2770,6 +2799,7 @@ function App() {
       )}
 
       {confirmDialog}
+      {landscapeNotice}
       {shortcutLayer}
     </div>
   )

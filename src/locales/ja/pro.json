@@ -1,0 +1,15 @@
+{
+  "badge": "Pro",
+  "shapeTitle": "3Speak Pro の機能",
+  "landscape": {
+    "title": "横向き動画は 3Speak Pro の機能です",
+    "text": "横向き 16:9、クラシック 4:3、正方形 1:1 の動画は 3Speak Pro で作れます。ショートとオーディオエディターは誰でも無料のままです。",
+    "get": "3Speak Pro を入手",
+    "makeShort": "代わりにショートを作る",
+    "checkAgain": "Pro に登録しました",
+    "checking": "アカウントを確認中",
+    "stillFree": "このアカウントにはまだ 3Speak Pro がありません。登録後、ここに反映されるまで 1 分ほどかかることがあります。"
+  },
+  "exportAs": "ショート 9:16 以外の形は 3Speak Pro の機能です。",
+  "refused": "横向き動画エディターは 3Speak Pro の機能です。ショートとオーディオエディターは無料のままです。"
+}

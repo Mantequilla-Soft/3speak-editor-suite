@@ -1,0 +1,15 @@
+{
+  "badge": "Pro",
+  "shapeTitle": "Incluso in 3Speak Pro",
+  "landscape": {
+    "title": "I video orizzontali fanno parte di 3Speak Pro",
+    "text": "I video Orizzontale 16:9, Classico 4:3 e Quadrato 1:1 si fanno con 3Speak Pro. Gli Short e l'editor audio restano gratuiti per tutti.",
+    "get": "Passa a 3Speak Pro",
+    "makeShort": "Fai uno Short",
+    "checkAgain": "Ora ho Pro",
+    "checking": "Controllo del tuo account",
+    "stillFree": "Questo account non ha ancora 3Speak Pro. Dopo l'abbonamento può volerci un minuto prima che compaia qui."
+  },
+  "exportAs": "I formati diversi da Short 9:16 fanno parte di 3Speak Pro.",
+  "refused": "L'editor di video orizzontali fa parte di 3Speak Pro. Gli Short e l'editor audio restano gratuiti."
+}

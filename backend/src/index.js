@@ -14,6 +14,7 @@ import { captionsRouter } from './routes/captions.js'
 import { stockRouter } from './routes/stock.js'
 import { transcriptRouter } from './routes/transcript.js'
 import { videoPodcastRouter, getVideoPodcastStats } from './routes/videoPodcast.js'
+import { proRouter } from './routes/pro.js'
 import { pinnedUploads, uploadBase } from './utils/pinnedUploads.js'
 import { RENDER_CACHE_DIR } from './services/ffmpeg.js'
 
@@ -43,6 +44,9 @@ app.use('/api/render', renderRouter)
 
 // Clip preparation routes
 app.use('/api/clip', clipRouter)
+
+// Can this user make landscape videos (3Speak Pro)? The render route enforces it (proGate.js)
+app.use('/api/pro-status', proRouter)
 
 // Saved projects (drafts) of signed-in users
 app.use('/api/projects', projectsRouter)

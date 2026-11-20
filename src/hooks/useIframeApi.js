@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useRef, useState } from 'react'
 import { api, getBackendUrl } from '../utils/backendSelector'
 import { authFetch, currentToken } from '../utils/editorAuth'
+import { isProRefusal } from '../utils/landscapeAccess'
 import { hasLayout } from '../utils/remixLayout'
 import { getClipChromaKey } from '../utils/chromaKey'
 import { uploadPersonMasks, personKeyPayload } from '../utils/personRender'
@@ -664,6 +665,13 @@ export function useIframeApi({ addToLibraryAndTimeline, addMusicClip = null, tra
       await pollJobStatus(jobId, backendEndpoint, ac.signal)
     } catch (err) {
       if (ac.signal.aborted) return
+      // A landscape render of a free user (backend proGate.js): the editor shows the Pro notice
+      if (isProRefusal(err)) {
+        const error = t('pro.refused')
+        setRenderStatus({ status: 'failed', error, progress: 0, code: err.code, refusal: err.body })
+        if (isIframe) sendToParent('render-failed', { error, code: err.code, upgradeUrl: err.body?.upgrade_url })
+        return
+      }
       console.error('[useIframeApi] Render request failed:', err)
       setRenderStatus({ status: 'failed', error: err.message, progress: 0 })
       if (isIframe) {

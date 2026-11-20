@@ -76,7 +76,14 @@ export async function submitRender({ send, onWait = () => {}, signal = null, sle
     if (signal?.aborted) return null
     const r = await call(send)
     if (r.ok) return r.data
-    if (!isRetryable(r.status)) throw new Error(r.data?.error || t('errors.render.serverStatus', { status: String(r.status) }))
+    if (!isRetryable(r.status)) {
+      // .code / .body: what the server said, e.g. 403 pro_required (utils/landscapeAccess.js)
+      const err = new Error(r.data?.error || t('errors.render.serverStatus', { status: String(r.status) }))
+      err.status = r.status
+      if (r.data?.code) err.code = r.data.code
+      err.body = r.data
+      throw err
+    }
     const wait = retryDelay(attempt, r.data?.retryAfter)
     if (now() - started + wait > giveUpMs) {
       throw new Error(r.status === 0 ? t('errors.render.unreachable') : t('errors.render.stillBusy'))

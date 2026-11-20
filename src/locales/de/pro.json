@@ -1,0 +1,15 @@
+{
+  "badge": "Pro",
+  "shapeTitle": "Teil von 3Speak Pro",
+  "landscape": {
+    "title": "Querformat-Videos gehören zu 3Speak Pro",
+    "text": "Videos in Querformat 16:9, Klassisch 4:3 und Quadratisch 1:1 machst du mit 3Speak Pro. Shorts und der Audio-Editor bleiben für alle kostenlos.",
+    "get": "3Speak Pro holen",
+    "makeShort": "Stattdessen einen Short machen",
+    "checkAgain": "Ich habe jetzt Pro",
+    "checking": "Dein Konto wird geprüft",
+    "stillFree": "Dieses Konto hat noch kein 3Speak Pro. Nach dem Abschluss kann es eine Minute dauern, bis es hier ankommt."
+  },
+  "exportAs": "Andere Formate als Short 9:16 gehören zu 3Speak Pro.",
+  "refused": "Der Querformat-Videoeditor gehört zu 3Speak Pro. Shorts und der Audio-Editor bleiben kostenlos."
+}
