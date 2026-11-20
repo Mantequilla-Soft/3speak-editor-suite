@@ -2,7 +2,7 @@
 // (timing, drift over many cuts, overlaps, fades, loudness, MP3 output).
 import { test, before, after, describe } from 'node:test'
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -14,7 +14,7 @@ process.env.WORK_DIR = dir
 const {
   planLanes, laneEntries, segmentFilter, segmentArgs, mixArgs, parseLoudnorm, concatList,
   audioTimelineEnd, renderAudioTimeline, SEGMENT_RATE, OUTPUT_RATE, LOUDNESS_TARGET,
-  cleanDuck, cleanClipDuck, duckExpr, duckFilter, cleanChapters, chapterMetadata
+  cleanDuck, cleanClipDuck, duckExpr, duckFilter, cleanChapters, chapterMetadata, BOOST_LIMITER
 } = await import('../src/services/audioRender.js')
 after(() => fs.rmSync(dir, { recursive: true, force: true }))
 
@@ -82,6 +82,30 @@ describe('segmentFilter / segmentArgs', () => {
   test('fades are clamped to the clip and volume is applied', () => {
     assert.equal(segmentFilter(clip('a', { endTime: 2, fadeIn: 0.5, fadeOut: 5, volume: 50 })),
       'afade=t=in:st=0:d=0.500,afade=t=out:st=0.000:d=2.000,volume=0.500')
+  })
+
+  test('a clip turned up above 100% gets a limiter last, one at or below 100% none', () => {
+    assert.equal(segmentFilter(clip('a', { volume: 180 })), `volume=1.800,${BOOST_LIMITER}`)
+    assert.equal(segmentFilter(clip('a', { volume: 100 })), null)
+    assert.equal(segmentFilter(clip('a', { volume: 80 })), 'volume=0.800')
+    const kf = (v) => clip('a', { keyframes: { volume: [{ t: 0, v: 100 }, { t: 1, v }] } })
+    assert.ok(segmentFilter(kf(150)).endsWith(BOOST_LIMITER), 'animated volume going above 100%')
+    assert.ok(!segmentFilter(kf(60)).includes('alimiter'))
+  })
+
+  test('a boosted clip comes out rounded off, not chopped flat', { skip: !hasFfmpeg }, () => {
+    const src = path.join(dir, 'loud.wav')
+    execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-f', 'lavfi', '-i', 'aevalsrc=0.7*sin(2*PI*440*t)|0.7*sin(2*PI*440*t):s=44100:d=1', src])
+    const stats = (volume) => {
+      const out = path.join(dir, `boost-${volume}.flac`)
+      execFileSync('ffmpeg', segmentArgs(clip('a', { volume }), src, 48000, out))
+      const r = spawnSync('ffmpeg', ['-hide_banner', '-i', out, '-af', 'astats=measure_overall=Peak_level+Flat_factor:measure_perchannel=0', '-f', 'null', '-'], { encoding: 'utf8' })
+      const num = (k) => parseFloat(r.stderr.match(new RegExp(`${k}: (-?[\\d.]+)`))[1])
+      return { peak: num('Peak level dB'), flat: num('Flat factor') }
+    }
+    const boosted = stats(180)
+    assert.ok(boosted.peak < -0.3, `peaks stay under full scale (${boosted.peak} dB)`)
+    assert.ok(boosted.flat < 1, `no flat-topped samples (flat factor ${boosted.flat})`)
   })
 
   test('cuts at the clip start, pads and stops at the exact sample count', () => {
