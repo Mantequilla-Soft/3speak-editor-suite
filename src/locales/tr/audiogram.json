@@ -180,5 +180,15 @@
     "highlight": "Vurgula",
     "highlightSwatch": "Vurgu {{colour}}",
     "capitals": "Büyük harfler"
+  },
+  "chapters": {
+    "text_one": "Ya da {{count}} bölümün her biri için bir tane, her biri kendi bölümü kadar (en fazla 2 dakika), şu anki görünümle.",
+    "text_other": "Ya da {{count}} bölümün her biri için bir tane, her biri kendi bölümü kadar (en fazla 2 dakika), şu anki görünümle.",
+    "make_one": "Bölüm başına bir tane ({{count}})",
+    "make_other": "Bölüm başına bir tane ({{count}})",
+    "working": "Audiogram {{n}} / {{total}}…",
+    "noCaptions": "Altyazısız yapıldı.",
+    "done_one": "{{count}} audiogram yapıldı. Bölümle birlikte yayınlanır.",
+    "done_other": "{{count}} audiogram yapıldı. Bölümle birlikte yayınlanır."
   }
 }

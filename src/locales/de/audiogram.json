@@ -180,5 +180,15 @@
     "highlight": "Hervorheben",
     "highlightSwatch": "Hervorhebung {{colour}}",
     "capitals": "Großbuchstaben"
+  },
+  "chapters": {
+    "text_one": "Oder eins für jedes der {{count}} Kapitel, jeweils so lang wie das Kapitel (bis 2 Minuten), im aktuellen Look.",
+    "text_other": "Oder eins für jedes der {{count}} Kapitel, jeweils so lang wie das Kapitel (bis 2 Minuten), im aktuellen Look.",
+    "make_one": "Eins pro Kapitel ({{count}})",
+    "make_other": "Eins pro Kapitel ({{count}})",
+    "working": "Audiogramm {{n}} von {{total}}…",
+    "noCaptions": "Ohne Untertitel erstellt.",
+    "done_one": "{{count}} Audiogramm erstellt. Es geht mit der Episode raus.",
+    "done_other": "{{count}} Audiogramme erstellt. Sie gehen mit der Episode raus."
   }
 }

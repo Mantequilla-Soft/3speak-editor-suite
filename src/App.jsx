@@ -2206,6 +2206,7 @@ function App() {
             hidden={pickingRange}
             title={audioTitle}
             chapters={resolvedChapters}
+            chapterSpans={chapterList}
             range={audiogramRange}
             onPickRange={startPickingRange}
             audiograms={audiograms}

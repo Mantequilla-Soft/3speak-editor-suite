@@ -176,5 +176,12 @@
     "highlight": "Tô sáng",
     "highlightSwatch": "Tô sáng {{colour}}",
     "capitals": "Chữ in hoa"
+  },
+  "chapters": {
+    "text_other": "Hoặc mỗi chương trong {{count}} chương một cái, dài bằng chương đó (tối đa 2 phút), theo giao diện hiện tại.",
+    "make_other": "Mỗi chương một cái ({{count}})",
+    "working": "Audiogram {{n}} / {{total}}…",
+    "noCaptions": "Tạo không có phụ đề.",
+    "done_other": "Đã tạo {{count}} audiogram. Chúng sẽ được đăng cùng tập."
   }
 }

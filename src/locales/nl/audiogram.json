@@ -180,5 +180,15 @@
     "highlight": "Markeren",
     "highlightSwatch": "Markering {{colour}}",
     "capitals": "Hoofdletters"
+  },
+  "chapters": {
+    "text_one": "Of één voor elk van de {{count}} hoofdstukken, elk zo lang als het hoofdstuk (tot 2 minuten), in de huidige look.",
+    "text_other": "Of één voor elk van de {{count}} hoofdstukken, elk zo lang als het hoofdstuk (tot 2 minuten), in de huidige look.",
+    "make_one": "Eén per hoofdstuk ({{count}})",
+    "make_other": "Eén per hoofdstuk ({{count}})",
+    "working": "Audiogram {{n}} van {{total}}…",
+    "noCaptions": "Gemaakt zonder ondertitels.",
+    "done_one": "{{count}} audiogram gemaakt. Het gaat mee met de aflevering.",
+    "done_other": "{{count}} audiogrammen gemaakt. Ze gaan mee met de aflevering."
   }
 }

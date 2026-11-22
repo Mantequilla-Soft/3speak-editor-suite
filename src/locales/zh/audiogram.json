@@ -176,5 +176,12 @@
     "highlight": "高亮",
     "highlightSwatch": "高亮 {{colour}}",
     "capitals": "大写字母"
+  },
+  "chapters": {
+    "text_other": "或者为 {{count}} 个章节各做一个，每个与章节等长（最长 2 分钟），使用当前样式。",
+    "make_other": "每章一个 ({{count}})",
+    "working": "音频图 {{n}} / {{total}}…",
+    "noCaptions": "未加字幕。",
+    "done_other": "已制作 {{count}} 个音频图，会随节目一起发布。"
   }
 }

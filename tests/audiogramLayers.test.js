@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
+  chapterPieces,
   SIZES, clampBox, moveLayer, resizeLayer, rotateLayer, squareWave, setLogoStyle, dragAngle, LOGO_STYLES, restack, stackOrder, toggleLayer, withPicture, pieceOf, canBeShort, audiogramsToPost
 } from '../src/utils/audiogramLayers'
 
@@ -161,5 +162,23 @@ describe('the piece and the Shorts', () => {
     expect(audiogramsToPost([a])[0]).not.toHaveProperty('start')
     expect(audiogramsToPost([{ ...a, start: -2 }])[0]).not.toHaveProperty('start')
     expect(audiogramsToPost([{ ...a, start: 'soon' }])[0]).not.toHaveProperty('start')
+  })
+})
+
+describe('chapterPieces (One per chapter)', () => {
+  it('each chapter from its start, never past the next one, at most two minutes', () => {
+    const spans = [
+      { start: 0, end: 95, title: 'Intro' },
+      { start: 95, end: 700, title: 'The long one' },
+      { start: 700, end: 702, title: 'Too short' },
+      { start: 702, end: 760, title: '' },
+    ]
+    expect(chapterPieces(spans)).toEqual([
+      { start: 0, end: 95, title: 'Intro' },
+      { start: 95, end: 215, title: 'The long one' },
+      { start: 702, end: 760, title: '' },
+    ])
+    expect(chapterPieces(spans, 30)[1]).toEqual({ start: 95, end: 125, title: 'The long one' })
+    expect(chapterPieces(null)).toEqual([])
   })
 })

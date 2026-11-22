@@ -184,5 +184,18 @@
     "highlight": "Evidenziazione",
     "highlightSwatch": "Evidenziazione {{colour}}",
     "capitals": "Maiuscole"
+  },
+  "chapters": {
+    "text_one": "Oppure uno per ciascuno dei {{count}} capitoli, ognuno lungo quanto il suo capitolo (fino a 2 minuti), con lo stile attuale.",
+    "text_many": "Oppure uno per ciascuno dei {{count}} capitoli, ognuno lungo quanto il suo capitolo (fino a 2 minuti), con lo stile attuale.",
+    "text_other": "Oppure uno per ciascuno dei {{count}} capitoli, ognuno lungo quanto il suo capitolo (fino a 2 minuti), con lo stile attuale.",
+    "make_one": "Uno per capitolo ({{count}})",
+    "make_many": "Uno per capitolo ({{count}})",
+    "make_other": "Uno per capitolo ({{count}})",
+    "working": "Audiogramma {{n}} di {{total}}…",
+    "noCaptions": "Creati senza sottotitoli.",
+    "done_one": "{{count}} audiogramma creato. Esce insieme all'episodio.",
+    "done_many": "{{count}} audiogrammi creati. Escono insieme all'episodio.",
+    "done_other": "{{count}} audiogrammi creati. Escono insieme all'episodio."
   }
 }
