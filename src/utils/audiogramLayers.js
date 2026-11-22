@@ -211,3 +211,15 @@ export function audiogramsToPost(list) {
     }
   })
 }
+
+/**
+ * One audiogram piece per chapter ("One per chapter" in the audiogram studio):
+ * each chapter from its start, at most AUDIOGRAM_MAX_SECONDS and never past the
+ * next chapter; chapters under 3 s are left out. `spans` = chapterSpans().
+ * [{ start, end, title }]
+ */
+export function chapterPieces(spans, max = AUDIOGRAM_MAX_SECONDS) {
+  return (spans || [])
+    .map(c => ({ start: c.start, end: Math.min(c.end, c.start + max), title: c.title || '' }))
+    .filter(p => p.end - p.start >= 3)
+}

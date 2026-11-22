@@ -180,5 +180,15 @@
     "highlight": "Angazia",
     "highlightSwatch": "Angazia {{colour}}",
     "capitals": "Herufi kubwa"
+  },
+  "chapters": {
+    "text_one": "Au moja kwa kila moja ya sura {{count}}, kila moja ndefu kama sura yake (hadi dakika 2), kwa mwonekano wa sasa.",
+    "text_other": "Au moja kwa kila moja ya sura {{count}}, kila moja ndefu kama sura yake (hadi dakika 2), kwa mwonekano wa sasa.",
+    "make_one": "Moja kwa kila sura ({{count}})",
+    "make_other": "Moja kwa kila sura ({{count}})",
+    "working": "Audiogram {{n}} kati ya {{total}}…",
+    "noCaptions": "Zimetengenezwa bila manukuu.",
+    "done_one": "Audiogram {{count}} imetengenezwa. Itatoka pamoja na kipindi.",
+    "done_other": "Audiogram {{count}} zimetengenezwa. Zitatoka pamoja na kipindi."
   }
 }

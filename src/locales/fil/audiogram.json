@@ -180,5 +180,15 @@
     "highlight": "Highlight",
     "highlightSwatch": "Highlight {{colour}}",
     "capitals": "Malalaking titik"
+  },
+  "chapters": {
+    "text_one": "O isa para sa bawat isa sa {{count}} kabanata, bawat isa ay kasinghaba ng kabanata nito (hanggang 2 minuto), sa itsura ngayon.",
+    "text_other": "O isa para sa bawat isa sa {{count}} kabanata, bawat isa ay kasinghaba ng kabanata nito (hanggang 2 minuto), sa itsura ngayon.",
+    "make_one": "Isa bawat kabanata ({{count}})",
+    "make_other": "Isa bawat kabanata ({{count}})",
+    "working": "Audiogram {{n}} ng {{total}}…",
+    "noCaptions": "Ginawa nang walang caption.",
+    "done_one": "{{count}} audiogram ang nagawa. Lalabas ito kasama ng episode.",
+    "done_other": "{{count}} na audiogram ang nagawa. Lalabas ang mga ito kasama ng episode."
   }
 }

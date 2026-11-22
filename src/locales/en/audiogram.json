@@ -180,5 +180,15 @@
     "highlight": "Highlight",
     "highlightSwatch": "Highlight {{colour}}",
     "capitals": "Capital letters"
+  },
+  "chapters": {
+    "text_one": "Or one for each of the {{count}} chapters, each as long as its chapter (up to 2 minutes), in the look you have now.",
+    "text_other": "Or one for each of the {{count}} chapters, each as long as its chapter (up to 2 minutes), in the look you have now.",
+    "make_one": "One per chapter ({{count}})",
+    "make_other": "One per chapter ({{count}})",
+    "working": "Audiogram {{n}} of {{total}}…",
+    "noCaptions": "Made without captions.",
+    "done_one": "{{count}} audiogram made. It goes out with the episode.",
+    "done_other": "{{count}} audiograms made. They go out with the episode."
   }
 }

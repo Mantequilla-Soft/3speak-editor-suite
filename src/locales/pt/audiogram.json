@@ -184,5 +184,18 @@
     "highlight": "Destaque",
     "highlightSwatch": "Destaque {{colour}}",
     "capitals": "Letras maiúsculas"
+  },
+  "chapters": {
+    "text_one": "Ou um para cada um dos {{count}} capítulos, cada um do tamanho do capítulo (até 2 minutos), no visual atual.",
+    "text_many": "Ou um para cada um dos {{count}} capítulos, cada um do tamanho do capítulo (até 2 minutos), no visual atual.",
+    "text_other": "Ou um para cada um dos {{count}} capítulos, cada um do tamanho do capítulo (até 2 minutos), no visual atual.",
+    "make_one": "Um por capítulo ({{count}})",
+    "make_many": "Um por capítulo ({{count}})",
+    "make_other": "Um por capítulo ({{count}})",
+    "working": "Audiograma {{n}} de {{total}}…",
+    "noCaptions": "Feitos sem legendas.",
+    "done_one": "{{count}} audiograma feito. Ele sai junto com o episódio.",
+    "done_many": "{{count}} audiogramas feitos. Eles saem junto com o episódio.",
+    "done_other": "{{count}} audiogramas feitos. Eles saem junto com o episódio."
   }
 }

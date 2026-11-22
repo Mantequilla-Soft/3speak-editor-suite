@@ -176,5 +176,12 @@
     "highlight": "Sorotan",
     "highlightSwatch": "Sorotan {{colour}}",
     "capitals": "Huruf kapital"
+  },
+  "chapters": {
+    "text_other": "Atau satu untuk setiap {{count}} bab, masing-masing sepanjang babnya (hingga 2 menit), dengan tampilan saat ini.",
+    "make_other": "Satu per bab ({{count}})",
+    "working": "Audiogram {{n}} dari {{total}}…",
+    "noCaptions": "Dibuat tanpa teks.",
+    "done_other": "{{count}} audiogram dibuat. Ikut terbit bersama episodenya."
   }
 }

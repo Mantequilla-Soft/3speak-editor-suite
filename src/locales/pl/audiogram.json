@@ -188,5 +188,21 @@
     "highlight": "Wyróżnienie",
     "highlightSwatch": "Wyróżnienie {{colour}}",
     "capitals": "Wielkie litery"
+  },
+  "chapters": {
+    "text_one": "Albo po jednym na każdy z {{count}} rozdziałów, każdy tak długi jak rozdział (do 2 minut), w obecnym wyglądzie.",
+    "text_few": "Albo po jednym na każdy z {{count}} rozdziałów, każdy tak długi jak rozdział (do 2 minut), w obecnym wyglądzie.",
+    "text_many": "Albo po jednym na każdy z {{count}} rozdziałów, każdy tak długi jak rozdział (do 2 minut), w obecnym wyglądzie.",
+    "text_other": "Albo po jednym na każdy z {{count}} rozdziałów, każdy tak długi jak rozdział (do 2 minut), w obecnym wyglądzie.",
+    "make_one": "Po jednym na rozdział ({{count}})",
+    "make_few": "Po jednym na rozdział ({{count}})",
+    "make_many": "Po jednym na rozdział ({{count}})",
+    "make_other": "Po jednym na rozdział ({{count}})",
+    "working": "Audiogram {{n}} z {{total}}…",
+    "noCaptions": "Utworzone bez napisów.",
+    "done_one": "Utworzono {{count}} audiogram. Wyjdzie razem z odcinkiem.",
+    "done_few": "Utworzono {{count}} audiogramy. Wyjdą razem z odcinkiem.",
+    "done_many": "Utworzono {{count}} audiogramów. Wyjdą razem z odcinkiem.",
+    "done_other": "Utworzono {{count}} audiogramu. Wyjdą razem z odcinkiem."
   }
 }

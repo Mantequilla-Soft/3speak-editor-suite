@@ -176,5 +176,12 @@
     "highlight": "ハイライト",
     "highlightSwatch": "ハイライト {{colour}}",
     "capitals": "大文字"
+  },
+  "chapters": {
+    "text_other": "または {{count}} 個のチャプターそれぞれに 1 つずつ、チャプターの長さ（最長 2 分）で今の見た目のまま作れます。",
+    "make_other": "チャプターごとに 1 つ ({{count}})",
+    "working": "オーディオグラム {{n}} / {{total}}…",
+    "noCaptions": "字幕なしで作成しました。",
+    "done_other": "オーディオグラムを {{count}} 個作成しました。エピソードと一緒に公開されます。"
   }
 }

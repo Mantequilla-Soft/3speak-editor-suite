@@ -7315,6 +7315,20 @@ input[type="range"] {
   line-height: 1.45;
 }
 
+/* "One per chapter": under the timeline pick, a quieter second way in */
+.audiogram-per-chapter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
+  max-width: 420px;
+}
+.audiogram-per-chapter small { color: var(--text-muted); }
+.audiogram-per-chapter-btn { display: inline-flex; align-items: center; gap: 6px; }
+
 .audiogram-start .ms-icon:first-child {
   color: var(--accent-primary);
 }

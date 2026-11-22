@@ -5,7 +5,7 @@ import { authFetch } from '../utils/editorAuth'
 import { chapterTime } from '../utils/chapters'
 import {
   SIZES, LAYERS, moveLayer, resizeLayer, rotateLayer, squareWave, restack, stackOrder, toggleLayer, withPicture, pieceOf,
-  setLogoStyle, dragAngle, AUDIOGRAM_MAX_SECONDS, ROUND_WAVES
+  setLogoStyle, dragAngle, AUDIOGRAM_MAX_SECONDS, ROUND_WAVES, chapterPieces
 } from '../utils/audiogramLayers'
 import OnboardingTour, { AUDIOGRAM_TOUR_STEPS, useFirstTimeTour } from './OnboardingTour'
 import { AudiogramCaptionsLayer, AudiogramCaptionsField } from './AudiogramCaptions'
@@ -51,7 +51,7 @@ const lookKey = (style, text) => JSON.stringify([style, text])
  * an audiogram yet asks first.
  */
 export default function AudiogramDialog({
-  outputUrl, length, title, chapters, range, onPickRange, hidden = false,
+  outputUrl, length, title, chapters, chapterSpans = null, range, onPickRange, hidden = false,
   audiograms, onAddAudiogram, onUpdateAudiogram, onRemoveAudiogram,
   playlistCovers, onRequestCovers, onEditText, onClose
 }) {
@@ -326,6 +326,44 @@ export default function AudiogramDialog({
     }
   }
 
+  // "One per chapter": an audiogram of each chapter in the current look, one
+  // after another (the backend renders one at a time anyway), each titled with
+  // its chapter. Without captions: those need each piece listened to first.
+  const perChapter = useMemo(() => chapterPieces(chapterSpans), [chapterSpans])
+  const renderPiece = async (p, used, n, total) => {
+    setJob({ status: 'processing', progress: 0, phase: t('audiogram.chapters.working', { n, total }) })
+    const res = await authFetch(api('/api/audiogram'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: outputUrl, start: p.start, duration: Math.round((p.end - p.start) * 10) / 10, format, title: p.title, style: used })
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`)
+    for (;;) {
+      await new Promise(r => setTimeout(r, 1000))
+      const st = await (await fetch(api(`/api/audiogram/${data.jobId}`))).json().catch(() => ({}))
+      if (st.status === 'completed') return { id: data.jobId, url: absolute(st.outputUrl) }
+      if (st.status === 'failed' || st.error) throw new Error(st.error || t('audiogram.make.failedPlain'))
+      setJob({ ...st, status: 'processing', phase: t('audiogram.chapters.working', { n, total }) })
+    }
+  }
+  const makePerChapter = async () => {
+    clearInterval(pollRef.current)
+    const pieces = perChapter
+    try {
+      for (let i = 0; i < pieces.length; i++) {
+        const p = pieces[i]
+        const used = { ...style, duration: Math.round(p.end - p.start) }
+        const made = await renderPiece(p, used, i + 1, pieces.length)
+        onAddAudiogram({ id: made.id, url: made.url, format, start: p.start, duration: Math.round((p.end - p.start) * 10) / 10, title: p.title, description: '' })
+      }
+      setJob(null)
+      savedLookRef.current = lookKey(style, text)
+    } catch (err) {
+      setJob({ status: 'failed', error: err?.code === 'sign-in' ? t('audiogram.make.signIn') : err.message })
+    }
+  }
+
   // An audiogram's text for its Short: in 3Speak's own post editor, else typed here
   const editText = async (a) => {
     if (!onEditText) { setInlineText(a.id); return }
@@ -394,9 +432,21 @@ export default function AudiogramDialog({
             <Scissors size={22} aria-hidden="true" />
             <h4>{t('audiogram.start.title')}</h4>
             <p>{t('audiogram.start.text', { count: AUDIOGRAM_MAX_SECONDS / 60 })}</p>
-            <button className="silence-cut-apply audiogram-pick" onClick={onPickRange}>
+            <button className="silence-cut-apply audiogram-pick" onClick={onPickRange} disabled={busy}>
               <Scissors size={14} /> {t('audiogram.start.choose')}
             </button>
+            {perChapter.length >= 2 && (
+              <div className="audiogram-per-chapter" data-testid="audiogram-per-chapter">
+                <p>{t('audiogram.chapters.text', { count: perChapter.length })}</p>
+                <button className="compact-btn audiogram-per-chapter-btn" onClick={makePerChapter} disabled={busy}>
+                  {busy ? <Loader2 size={14} className="encoding-notice-spin" /> : <Film size={14} />} {t('audiogram.chapters.make', { count: perChapter.length })}
+                </button>
+                {capLook.on && <small>{t('audiogram.chapters.noCaptions')}</small>}
+                {busy && <p className="compact-render-progress-text" role="status">{job.phase}</p>}
+                {job?.status === 'failed' && <p className="audio-template-error" role="alert">{t('audiogram.make.failed', { error: job.error })}</p>}
+                {audiograms.length > 0 && !busy && <p role="status">{t('audiogram.chapters.done', { count: audiograms.length })}</p>}
+              </div>
+            )}
           </div>
         )}
 
